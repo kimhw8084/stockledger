@@ -177,6 +177,15 @@ export const useAppModel = () => {
           ),
         });
       },
+      async markAlertReviewed(alertId: string) {
+        if (!data) return;
+        await commit({
+          ...data,
+          alerts: data.alerts.map((alert) =>
+            alert.id === alertId ? { ...alert, reviewed: true } : alert,
+          ),
+        });
+      },
       async refreshMockData() {
         if (!data) return;
         const refreshed = data.stocks.map(buildMockSnapshot);

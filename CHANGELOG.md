@@ -10,3 +10,6 @@
 - Upgraded the project from Expo SDK 53 to SDK 54 to restore compatibility with the current Expo Go client.
 - Aligned React, React Native, Expo runtime dependencies, and TypeScript tooling with the SDK 54 version set.
 - Excluded generated `dist/` artifacts from TypeScript compilation so validation stays stable after export.
+- Reworked the app shell around a calmer mobile-first review flow instead of raw CRUD forms.
+- Replaced typed ID entry with tappable stock, recipe, eye, and alert selection chips.
+- Added in-place alert review actions, guided decision logging controls, and a stronger curated starter dataset.

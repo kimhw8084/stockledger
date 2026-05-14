@@ -62,3 +62,25 @@ No. Staying current with the supported Expo Go SDK is the default path unless th
 
 Roadmap impact:
 Low. This keeps the current local-first app launchable on target hardware without changing the product architecture.
+
+## 2026-05-13
+
+Decision:
+Re-center the MVP around guided review surfaces and explicit selection controls instead of freeform ID-driven forms.
+
+Reason:
+The docs prioritize mobile-first usefulness and calm review. Requiring internal IDs made the first version feel like an admin tool rather than a product.
+
+Alternatives considered:
+- Keep the original tab content and only polish styling
+- Add a navigation library first and postpone interaction cleanup
+- Wait for backend/provider work before improving the front-end workflow
+
+Tradeoff:
+The app now spends more code on presentation and interaction state before introducing richer backend behavior, but the core loop is materially easier to use and test on device.
+
+Temporary:
+Partly. The explicit chip-based selection and guided review pattern should remain, while the exact single-screen layout may evolve once dedicated detail screens are introduced.
+
+Roadmap impact:
+Medium. This raises the floor for product usability now and gives a better base for evaluating real-data integration next.
