@@ -106,3 +106,25 @@ Partly. The exact styling and single-screen composition may evolve, but the desi
 
 Roadmap impact:
 Medium. This makes the current prototype materially more usable for on-device review while preserving the existing local-first architecture.
+
+## 2026-05-14
+
+Decision:
+Replace the warm editorial visual language with a cleaner modern finance-app theme and a consistent sans-serif type system.
+
+Reason:
+The prior pass improved structure, but the serif headings and brown-beige palette pushed the app toward an ebook feel instead of the sharper readability users expect from products in the Robinhood, Webull, Empower, or Yahoo Finance category.
+
+Alternatives considered:
+- Keep the same layout and only swap the title font
+- Add a custom downloaded font before fixing the broader visual system
+- Wait for a future component library pass
+
+Tradeoff:
+System fonts are less distinctive than a branded custom family, but they are more consistent, lighter-weight, and safer for Expo Go while the app is still early. The palette change also makes the UI more conventional, which is acceptable because readability and product clarity are the priority right now.
+
+Temporary:
+Partly. The modern sans-serif direction should remain, while exact colors and elevation treatment may tighten further after dedicated detail screens and real data charts are added.
+
+Roadmap impact:
+Low to medium. This resets the visual baseline without changing product architecture or feature scope.
