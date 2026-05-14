@@ -3,5 +3,9 @@
   "compilerOptions": {
     "strict": true,
     "baseUrl": "."
-  }
+  },
+  "exclude": [
+    "dist",
+    "node_modules"
+  ]
 }
