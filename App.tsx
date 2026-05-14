@@ -27,13 +27,27 @@ import {
   VisualEvidenceGroup,
 } from "./src/types";
 import { evaluateEye } from "./src/lib/evaluateEye";
-import { buildEvidenceGroups, buildWhatChangedList } from "./src/lib/visualEvidence";
+import {
+  buildEvidenceGroups,
+  buildStockVisualAnalysisGroups,
+  buildWhatChangedList,
+} from "./src/lib/visualEvidence";
 
 type TabKey = "Dashboard" | "Watchlist" | "Studio" | "Journal";
 type WatchFilter = "All" | "Attention" | "Opportunity" | "Quiet";
 type StudioPanel = "Recipes" | "Eyes" | "Stocks";
 type DashboardFocus = "alerts" | "eyes" | "recipes" | "decisions";
+type StockWorkspaceTab = "Overview" | "Visual Analysis" | "Recipe Map";
 type ConditionKind = RecipeCondition["kind"];
+type AnalysisBenchmark = "SPY" | "QQQ" | "Sector ETF";
+type AnalysisLookback = "20D" | "3M" | "6M";
+type AnalysisStatusFilter =
+  | "All Statuses"
+  | "Passed"
+  | "Near Trigger"
+  | "Warning"
+  | "Blocked"
+  | "Needs Review";
 
 interface ConditionTemplate {
   id: string;
@@ -64,6 +78,17 @@ interface ConditionTemplate {
 const tabs: TabKey[] = ["Dashboard", "Watchlist", "Studio", "Journal"];
 const watchFilters: WatchFilter[] = ["All", "Attention", "Opportunity", "Quiet"];
 const studioPanels: StudioPanel[] = ["Recipes", "Eyes", "Stocks"];
+const stockWorkspaceTabs: StockWorkspaceTab[] = ["Overview", "Visual Analysis", "Recipe Map"];
+const analysisBenchmarks: AnalysisBenchmark[] = ["SPY", "QQQ", "Sector ETF"];
+const analysisLookbacks: AnalysisLookback[] = ["20D", "3M", "6M"];
+const analysisStatusFilters: AnalysisStatusFilter[] = [
+  "All Statuses",
+  "Passed",
+  "Near Trigger",
+  "Warning",
+  "Blocked",
+  "Needs Review",
+];
 const opportunityTypes = [
   "Temporary Mispricing",
   "Leader Pullback",
@@ -686,6 +711,8 @@ const statusTone = (status: VisualEvidenceCard["status"]) => {
   switch (status) {
     case "Passed":
       return [styles.statusBadge, styles.statusPassed];
+    case "Near Trigger":
+      return [styles.statusBadge, styles.statusNear];
     case "Warning":
       return [styles.statusBadge, styles.statusWarning];
     case "Blocked":
@@ -701,6 +728,17 @@ const statusTone = (status: VisualEvidenceCard["status"]) => {
     default:
       return [styles.statusBadge, styles.statusFailed];
   }
+};
+
+const matchesAnalysisStatus = (
+  status: VisualEvidenceCard["status"],
+  filter: AnalysisStatusFilter,
+) => {
+  if (filter === "All Statuses") return true;
+  if (filter === "Needs Review") {
+    return ["Warning", "Blocked", "Stale", "Partial", "Unavailable", "Mock"].includes(status);
+  }
+  return status === filter;
 };
 
 const freshnessTone = (freshness: FreshnessStatus) => {
@@ -737,6 +775,98 @@ const ThresholdBar = ({ card }: { card: VisualEvidenceCard }) => {
       <View style={styles.binaryVisual}>
         <View style={[styles.binaryDot, active ? styles.binaryDotActive : styles.binaryDotMuted]} />
         <Text style={styles.binaryVisualText}>{active ? "Active now" : "Inactive now"}</Text>
+      </View>
+    );
+  }
+
+  if (visual.kind === "checklist") {
+    return (
+      <View style={styles.checklistVisual}>
+        {(visual.items ?? []).map((item) => (
+          <View key={item.label} style={styles.checklistItem}>
+            <View
+              style={[
+                styles.checklistDot,
+                item.tone === "good"
+                  ? styles.checklistDotGood
+                  : item.tone === "warning"
+                    ? styles.checklistDotWarning
+                    : item.tone === "danger"
+                      ? styles.checklistDotDanger
+                      : styles.checklistDotNeutral,
+              ]}
+            />
+            <Text style={styles.checklistText}>{item.label}</Text>
+          </View>
+        ))}
+      </View>
+    );
+  }
+
+  if (visual.kind === "event_countdown") {
+    const days = visual.countdownDays ?? 0;
+    return (
+      <View style={styles.eventCountdown}>
+        <View style={[styles.eventCountdownBadge, days <= 7 ? styles.eventCountdownUrgent : styles.eventCountdownCalm]}>
+          <Text style={styles.eventCountdownValue}>{days}D</Text>
+        </View>
+        <View style={styles.flexOne}>
+          <Text style={styles.eventCountdownLabel}>{visual.countdownLabel ?? "Event timing"}</Text>
+          <Text style={styles.eventCountdownMeta}>
+            {days <= 7 ? "Event risk is close enough to demand a fresh review." : "No major event pressure inside the near window."}
+          </Text>
+        </View>
+      </View>
+    );
+  }
+
+  if (visual.kind === "risk_gauge") {
+    const min = visual.min ?? 0;
+    const max = visual.max ?? 100;
+    const current = visual.current ?? min;
+    const threshold = visual.threshold ?? max;
+    const currentPct = ((current - min) / Math.max(max - min, 1)) * 100;
+    const thresholdPct = ((threshold - min) / Math.max(max - min, 1)) * 100;
+
+    return (
+      <View style={styles.thresholdWrap}>
+        <View style={styles.riskGaugeTrack}>
+          <View style={styles.riskGaugeSafe} />
+          <View style={styles.riskGaugeWarn} />
+          <View style={styles.riskGaugeDanger} />
+          <View style={[styles.thresholdMarkerThreshold, { left: `${Math.max(0, Math.min(100, thresholdPct))}%` }]} />
+          <View style={[styles.thresholdMarkerCurrent, { left: `${Math.max(0, Math.min(100, currentPct))}%` }]} />
+        </View>
+        <View style={styles.thresholdLegend}>
+          <Text style={styles.thresholdLegendText}>Lower risk</Text>
+          <Text style={styles.thresholdLegendText}>{card.metric.currentLabel}</Text>
+          <Text style={styles.thresholdLegendText}>Higher risk</Text>
+        </View>
+      </View>
+    );
+  }
+
+  if (visual.kind === "mini_trend") {
+    return (
+      <View style={styles.miniTrendVisual}>
+        <View style={styles.miniTrendBars}>
+          {(visual.series ?? []).map((point, index) => (
+            <View
+              key={`${card.id}-mini-${index}`}
+              style={[
+                styles.miniTrendBar,
+                { height: 14 + point * 0.4 },
+                index === (visual.series ?? []).length - 1 ? styles.miniTrendBarActive : null,
+              ]}
+            />
+          ))}
+        </View>
+        <View style={styles.thresholdLegend}>
+          <Text style={styles.thresholdLegendText}>{visual.markerLabel ?? "Trend"}</Text>
+          <Text style={styles.thresholdLegendText}>
+            Need {card.metric.thresholdLabel ?? "context"}
+          </Text>
+        </View>
       </View>
     );
   }
@@ -779,6 +909,44 @@ const ThresholdBar = ({ card }: { card: VisualEvidenceCard }) => {
         <View style={[styles.thresholdMarkerThreshold, { left: `${Math.max(0, Math.min(100, thresholdPct))}%` }]} />
         <View style={[styles.thresholdMarkerCurrent, { left: `${Math.max(0, Math.min(100, currentPct))}%` }]} />
       </View>
+      {visual.series && visual.series.length > 0 ? (
+        <View style={styles.sparklineOverlay}>
+          {visual.series.map((point, index) => (
+            <View
+              key={`${card.id}-series-${index}`}
+              style={[
+                styles.sparklineBar,
+                { height: 10 + point * 0.26 },
+                index === visual.series!.length - 1 ? styles.sparklineBarActive : null,
+              ]}
+            />
+          ))}
+          {(visual.secondarySeries ?? []).map((point, index) => (
+            <View
+              key={`${card.id}-secondary-${index}`}
+              style={[
+                styles.sparklineLine,
+                {
+                  left: `${(index / Math.max((visual.secondarySeries ?? []).length - 1, 1)) * 100}%`,
+                  bottom: `${8 + point * 0.22}%`,
+                },
+              ]}
+            />
+          ))}
+          {(visual.tertiarySeries ?? []).map((point, index) => (
+            <View
+              key={`${card.id}-tertiary-${index}`}
+              style={[
+                styles.sparklineLineMuted,
+                {
+                  left: `${(index / Math.max((visual.tertiarySeries ?? []).length - 1, 1)) * 100}%`,
+                  bottom: `${8 + point * 0.22}%`,
+                },
+              ]}
+            />
+          ))}
+        </View>
+      ) : null}
       <View style={styles.thresholdLegend}>
         <Text style={styles.thresholdLegendText}>{min}</Text>
         <Text style={styles.thresholdLegendText}>Need {card.metric.thresholdLabel ?? "-"}</Text>
@@ -854,6 +1022,10 @@ const EvidenceCardView = ({ card }: { card: VisualEvidenceCard }) => {
         <DenseStat label="Threshold" value={card.metric.thresholdLabel ?? "Context only"} />
       </View>
 
+      {card.relatedConditionLabel ? (
+        <Text style={styles.evidenceRelated}>Recipe link: {card.relatedConditionLabel}</Text>
+      ) : null}
+
       <Text style={styles.evidenceEffect}>Effect: {card.effect}</Text>
       <Text style={styles.evidenceWhy}>Why it matters: {card.whyItMatters}</Text>
 
@@ -892,6 +1064,117 @@ const EvidenceGroupView = ({ group }: { group: VisualEvidenceGroup }) => (
   </View>
 );
 
+const RecipeConditionMapCard = ({
+  eye,
+  recipe,
+  stock,
+}: {
+  eye: Eye;
+  recipe: Recipe;
+  stock: Stock;
+}) => {
+  const evaluation = eye.lastEvaluation;
+  const [expanded, setExpanded] = useState(false);
+  if (!evaluation) return null;
+
+  const passed = (evaluation.conditionResults ?? []).filter((item) => item.passed);
+  const failed = (evaluation.conditionResults ?? []).filter((item) => !item.passed && !item.missingData);
+  const warnings = (evaluation.conditionResults ?? []).filter((item) => item.role === "Risk Warning" && item.passed);
+  const blockers = (evaluation.conditionResults ?? []).filter((item) => item.role === "Hard Disqualifier" && item.passed);
+  const nextTrigger =
+    failed.find((item) => item.role === "Timing Trigger") ??
+    failed.find((item) => item.role === "Eligibility Filter") ??
+    failed[0];
+
+  return (
+    <View style={styles.recipeMapCard}>
+      <View style={styles.inlineBetween}>
+        <View style={styles.flexOne}>
+          <Text style={styles.evidenceCardTitle}>{recipe.name}</Text>
+          <Text style={styles.evidenceRole}>
+            {stock.symbol} · v{recipe.version}
+          </Text>
+        </View>
+        <View style={styles.panelBadges}>
+          <Text style={stateTone(evaluation.currentState)}>{evaluation.currentState}</Text>
+        </View>
+      </View>
+
+      <Text style={styles.evidenceSummary}>{evaluation.whyNow}</Text>
+
+      <View style={styles.recipeMapStats}>
+        <DenseStat label="Passed" value={`${passed.length}`} tone="strong" />
+        <DenseStat label="Failed" value={`${failed.length}`} />
+        <DenseStat label="Warnings" value={`${warnings.length}`} tone={warnings.length > 0 ? "risk" : "neutral"} />
+        <DenseStat label="Blockers" value={`${blockers.length}`} tone={blockers.length > 0 ? "risk" : "neutral"} />
+      </View>
+
+      <View style={styles.dualColumn}>
+        <View style={styles.evidenceColumn}>
+          <Text style={styles.columnTitle}>Top support</Text>
+          {(evaluation.supportingEvidence ?? []).slice(0, 3).map((item) => (
+            <Text key={item} style={styles.listLine}>
+              + {item}
+            </Text>
+          ))}
+        </View>
+        <View style={styles.evidenceColumn}>
+          <Text style={styles.columnTitle}>Top risks</Text>
+          {[
+            ...(evaluation.contradictingEvidence ?? []),
+            ...(evaluation.riskWarnings ?? []),
+            ...(evaluation.hardDisqualifiers ?? []),
+          ]
+            .slice(0, 3)
+            .map((item) => (
+              <Text key={item} style={styles.listLine}>
+                - {item}
+              </Text>
+            ))}
+        </View>
+      </View>
+
+      <View style={styles.metaRow}>
+        <MetaPill label={`Last state change ${evaluation.stateChanged ? "now" : "unchanged"}`} />
+        <MetaPill label={`Urgency ${evaluation.actionUrgency}`} />
+        <MetaPill label={evaluation.setupStrength} />
+      </View>
+
+      {nextTrigger ? (
+        <Text style={styles.evidenceWhy}>Next likely trigger: {nextTrigger.explanation}</Text>
+      ) : null}
+
+      {(evaluation.missingData.length > 0 || evaluation.staleData.length > 0) ? (
+        <Text style={styles.evidenceEffect}>
+          Data issues: {[...evaluation.missingData, ...evaluation.staleData].slice(0, 2).join(" | ")}
+        </Text>
+      ) : null}
+
+      <Pressable onPress={() => setExpanded((current) => !current)} style={styles.formulaToggle}>
+        <Text style={styles.formulaToggleText}>{expanded ? "Hide condition matrix" : "Show condition matrix"}</Text>
+      </Pressable>
+
+      {expanded ? (
+        <View style={styles.recipeMatrix}>
+          {(evaluation.conditionResults ?? []).map((item) => (
+            <View key={item.conditionId} style={styles.recipeMatrixRow}>
+              <View style={statusTone(item.missingData ? "Partial" : item.passed ? "Passed" : item.role === "Hard Disqualifier" ? "Blocked" : item.role === "Risk Warning" ? "Warning" : "Failed")}>
+                <Text style={styles.statusBadgeText}>
+                  {item.missingData ? "Partial" : item.passed ? "Passed" : item.role === "Hard Disqualifier" ? "Blocked" : item.role === "Risk Warning" ? "Warning" : "Failed"}
+                </Text>
+              </View>
+              <View style={styles.flexOne}>
+                <Text style={styles.recipeMatrixTitle}>{item.metricKey ?? "Condition"}</Text>
+                <Text style={styles.recipeMatrixBody}>{item.explanation}</Text>
+              </View>
+            </View>
+          ))}
+        </View>
+      ) : null}
+    </View>
+  );
+};
+
 interface RecipeDraftForm {
   name: string;
   purpose: string;
@@ -919,6 +1202,10 @@ export default function App() {
   const [watchFilter, setWatchFilter] = useState<WatchFilter>("All");
   const [dashboardFocus, setDashboardFocus] = useState<DashboardFocus>("alerts");
   const [studioPanel, setStudioPanel] = useState<StudioPanel>("Recipes");
+  const [stockWorkspaceTab, setStockWorkspaceTab] = useState<StockWorkspaceTab>("Visual Analysis");
+  const [analysisBenchmark, setAnalysisBenchmark] = useState<AnalysisBenchmark>("SPY");
+  const [analysisLookback, setAnalysisLookback] = useState<AnalysisLookback>("3M");
+  const [analysisStatusFilter, setAnalysisStatusFilter] = useState<AnalysisStatusFilter>("All Statuses");
   const [fabOpen, setFabOpen] = useState(false);
 
   const [stockForm, setStockForm] = useState({ symbol: "", name: "", thesis: "" });
@@ -963,6 +1250,8 @@ export default function App() {
   const [selectedAlertId, setSelectedAlertId] = useState("");
   const [selectedStockId, setSelectedStockId] = useState("");
   const [previewStockId, setPreviewStockId] = useState("");
+  const [analysisRecipeFilter, setAnalysisRecipeFilter] = useState("All Recipes");
+  const [analysisNote, setAnalysisNote] = useState("");
 
   const eyesSorted = useMemo(
     () =>
@@ -1059,6 +1348,10 @@ export default function App() {
       setSelectedStockId(stockSummaries[0]?.stock.id ?? "");
     }
   }, [selectedStockId, stockSummaries]);
+
+  useEffect(() => {
+    setAnalysisRecipeFilter("All Recipes");
+  }, [selectedStockId]);
 
   useEffect(() => {
     if (!selectedAlertId && alertQueue[0]) {
@@ -1181,6 +1474,36 @@ export default function App() {
           evaluation: selectedAlertEvaluation,
         })
       : [];
+
+  const selectedStockEyes = selectedStockSummary?.eyes ?? [];
+  const selectedStockRecipeOptions = [
+    "All Recipes",
+    ...selectedStockEyes
+      .map((eye) => data.recipes.find((recipe) => recipe.id === eye.recipeId)?.name)
+      .filter((name): name is string => Boolean(name)),
+  ].filter((name, index, list) => list.indexOf(name) === index);
+  const selectedStockFilteredEyes =
+    analysisRecipeFilter === "All Recipes"
+      ? selectedStockEyes
+      : selectedStockEyes.filter(
+          (eye) => data.recipes.find((recipe) => recipe.id === eye.recipeId)?.name === analysisRecipeFilter,
+        );
+  const selectedStockAnalysisGroups =
+    selectedStockSummary?.snapshot
+      ? buildStockVisualAnalysisGroups({
+          stock: selectedStockSummary.stock,
+          snapshot: selectedStockSummary.snapshot,
+          eyes: selectedStockFilteredEyes,
+          recipes: data.recipes,
+          benchmark: analysisBenchmark,
+          lookbackLabel: analysisLookback,
+        }).map((group) => ({
+          ...group,
+          cards: group.cards.filter((card) => matchesAnalysisStatus(card.status, analysisStatusFilter)),
+        }))
+      : [];
+  const selectedStockRecipeMapEyes =
+    selectedStockFilteredEyes.length > 0 ? selectedStockFilteredEyes : selectedStockEyes;
 
   const previewRecipe =
     draftConditions.length === 0
@@ -1725,7 +2048,7 @@ export default function App() {
               <Reveal>
                 <SectionHeader
                   title="Watchlist"
-                  note="Chart-first stock monitoring with recipe-backed Eyes."
+                  note="Selected stocks open into a visual parameter workspace instead of a generic ticker card."
                 />
                 <HorizontalChoice options={watchFilters} value={watchFilter} onSelect={setWatchFilter} />
               </Reveal>
@@ -1773,11 +2096,238 @@ export default function App() {
                 </Reveal>
               ) : null}
 
+              {selectedStockSummary ? (
+                <Reveal delay={85}>
+                  <SectionHeader
+                    title="Selected Stock Workspace"
+                    note="Visual Analysis is the main tab. Use filters to inspect parameter evidence by recipe, benchmark, and status."
+                  />
+                  <HorizontalChoice
+                    options={stockWorkspaceTabs}
+                    value={stockWorkspaceTab}
+                    onSelect={setStockWorkspaceTab}
+                  />
+                </Reveal>
+              ) : null}
+
+              {selectedStockSummary && stockWorkspaceTab === "Overview" ? (
+                <Reveal delay={95}>
+                  <Card>
+                    <Text style={styles.cardEyebrow}>Overview</Text>
+                    <Text style={styles.cardTitle}>Quick scan for {selectedStockSummary.stock.symbol}</Text>
+                    <Text style={styles.cardBody}>
+                      {selectedStockSummary.snapshot?.isMock
+                        ? "All visuals below are mock-backed through the same adapter path planned for real market data."
+                        : "Provider-backed snapshot."}
+                    </Text>
+                    <View style={styles.dualDenseGrid}>
+                      <DenseStat
+                        label="Setup Strength"
+                        value={selectedStockSummary.dominantEye?.lastEvaluation?.setupStrength ?? "Low"}
+                        tone="strong"
+                      />
+                      <DenseStat
+                        label="Action Urgency"
+                        value={selectedStockSummary.dominantEye?.lastEvaluation?.actionUrgency ?? "Wait"}
+                      />
+                      <DenseStat
+                        label="Data Quality"
+                        value={selectedStockSummary.snapshot?.freshness ?? "Unavailable"}
+                        tone={selectedStockSummary.snapshot?.freshness === "Mock Data" ? "risk" : "neutral"}
+                      />
+                      <DenseStat
+                        label="Thesis Risk"
+                        value={
+                          selectedStockSummary.dominantEye?.lastEvaluation?.currentState === "Thesis Broken"
+                            ? "Broken"
+                            : selectedStockSummary.dominantEye?.lastEvaluation?.currentState === "Thesis Risk Rising"
+                              ? "Elevated"
+                              : "Low"
+                        }
+                        tone={
+                          ["Thesis Broken", "Thesis Risk Rising"].includes(
+                            selectedStockSummary.dominantEye?.lastEvaluation?.currentState ?? "",
+                          )
+                            ? "risk"
+                            : "neutral"
+                        }
+                      />
+                    </View>
+                    <View style={styles.analysisActionRow}>
+                      <Button
+                        label="Visual Analysis"
+                        onPress={() => setStockWorkspaceTab("Visual Analysis")}
+                      />
+                      <Button
+                        label="Recipe Map"
+                        tone="secondary"
+                        onPress={() => setStockWorkspaceTab("Recipe Map")}
+                      />
+                    </View>
+                  </Card>
+                </Reveal>
+              ) : null}
+
+              {selectedStockSummary && stockWorkspaceTab === "Visual Analysis" ? (
+                <Reveal delay={95}>
+                  <Card>
+                    <Text style={styles.cardEyebrow}>Visual Analysis</Text>
+                    <Text style={styles.cardTitle}>{selectedStockSummary.stock.symbol} parameter workspace</Text>
+                    <Text style={styles.cardBody}>
+                      Evidence families stay visible in human language first. Formula detail is available, but secondary.
+                    </Text>
+
+                    <Text style={styles.inputLabel}>Recipe filter</Text>
+                    <HorizontalChoice
+                      options={selectedStockRecipeOptions}
+                      value={analysisRecipeFilter}
+                      onSelect={setAnalysisRecipeFilter}
+                    />
+
+                    <View style={styles.dualColumn}>
+                      <View style={styles.evidenceColumn}>
+                        <Text style={styles.inputLabel}>Benchmark</Text>
+                        <HorizontalChoice
+                          options={analysisBenchmarks}
+                          value={analysisBenchmark}
+                          onSelect={setAnalysisBenchmark}
+                        />
+                      </View>
+                      <View style={styles.evidenceColumn}>
+                        <Text style={styles.inputLabel}>Lookback</Text>
+                        <HorizontalChoice
+                          options={analysisLookbacks}
+                          value={analysisLookback}
+                          onSelect={setAnalysisLookback}
+                        />
+                      </View>
+                    </View>
+
+                    <Text style={styles.inputLabel}>Status filter</Text>
+                    <HorizontalChoice
+                      options={analysisStatusFilters}
+                      value={analysisStatusFilter}
+                      onSelect={setAnalysisStatusFilter}
+                    />
+
+                    <WhatChangedPanel
+                      title="Fast review framing"
+                      items={[
+                        `Setup Strength: ${selectedStockSummary.dominantEye?.lastEvaluation?.setupStrength ?? "Low"}`,
+                        `Action Urgency: ${selectedStockSummary.dominantEye?.lastEvaluation?.actionUrgency ?? "Wait"}`,
+                        `Data Quality: ${selectedStockSummary.snapshot?.freshness ?? "Unavailable"}${selectedStockSummary.snapshot?.isMock ? " · Mock Data" : ""}`,
+                        `Recipe filter: ${analysisRecipeFilter}`,
+                      ]}
+                    />
+
+                    <View style={styles.analysisActionRow}>
+                      <Button
+                        label="Mark Thesis Reviewed"
+                        onPress={() =>
+                          void actions.markEyesReviewed({
+                            stockId: selectedStockSummary.stock.id,
+                            recipeId:
+                              analysisRecipeFilter === "All Recipes"
+                                ? undefined
+                                : selectedStockFilteredEyes[0]?.recipeId,
+                          })
+                        }
+                      />
+                      <Button
+                        label="Create / Apply Eye"
+                        tone="secondary"
+                        onPress={() => {
+                          setEyeForm((current) => ({
+                            ...current,
+                            stockId: selectedStockSummary.stock.id,
+                            thesisSnapshot: current.thesisSnapshot || selectedStockSummary.stock.thesis,
+                          }));
+                          setStudioPanel("Eyes");
+                          setTab("Studio");
+                        }}
+                      />
+                      <Button
+                        label="Recipe Preview"
+                        tone="ghost"
+                        onPress={() => {
+                          setPreviewStockId(selectedStockSummary.stock.id);
+                          setStudioPanel("Recipes");
+                          setTab("Studio");
+                        }}
+                      />
+                    </View>
+
+                    <Text style={styles.inputLabel}>Review note</Text>
+                    <Input
+                      value={analysisNote}
+                      onChangeText={setAnalysisNote}
+                      placeholder="What changed since the last thesis review?"
+                      multiline
+                    />
+
+                    <View style={styles.analysisActionRow}>
+                      <Button
+                        label="Open Decision Log"
+                        onPress={() => {
+                          setDecisionForm((current) => ({
+                            ...current,
+                            eyeId: selectedStockFilteredEyes[0]?.id ?? selectedStockEyes[0]?.id ?? current.eyeId,
+                            note:
+                              analysisNote.trim() ||
+                              `Review note for ${selectedStockSummary.stock.symbol}: parameter workspace reviewed.`,
+                          }));
+                          setTab("Journal");
+                        }}
+                      />
+                      <Button
+                        label="Recipe Map"
+                        tone="secondary"
+                        onPress={() => setStockWorkspaceTab("Recipe Map")}
+                      />
+                    </View>
+                  </Card>
+
+                  <View style={styles.stack}>
+                    {selectedStockAnalysisGroups.map((group) =>
+                      group.cards.length > 0 ? <EvidenceGroupView key={`stock-${group.key}`} group={group} /> : null,
+                    )}
+                  </View>
+                </Reveal>
+              ) : null}
+
+              {selectedStockSummary && stockWorkspaceTab === "Recipe Map" ? (
+                <Reveal delay={95}>
+                  <SectionHeader
+                    title="Recipe Condition Map"
+                    note="Bridge between the stock visuals and each active Eye’s actual recipe logic."
+                  />
+                  <View style={styles.stack}>
+                    {selectedStockRecipeMapEyes.map((eye) => {
+                      const recipe = data.recipes.find((item) => item.id === eye.recipeId);
+                      return recipe ? (
+                        <RecipeConditionMapCard
+                          key={eye.id}
+                          eye={eye}
+                          recipe={recipe}
+                          stock={selectedStockSummary.stock}
+                        />
+                      ) : null;
+                    })}
+                  </View>
+                </Reveal>
+              ) : null}
+
               <Reveal delay={100}>
                 <SectionHeader title="Monitored Stocks" note="Tap any stock to promote it into focus." />
                 <View style={styles.stack}>
                   {filteredStockSummaries.map((item) => (
-                    <Pressable key={item.stock.id} onPress={() => setSelectedStockId(item.stock.id)}>
+                    <Pressable
+                      key={item.stock.id}
+                      onPress={() => {
+                        setSelectedStockId(item.stock.id);
+                        setStockWorkspaceTab("Visual Analysis");
+                      }}
+                    >
                       <Card highlighted={selectedStockSummary?.stock.id === item.stock.id}>
                         <View style={styles.inlineBetween}>
                           <View style={styles.flexOne}>
@@ -3000,6 +3550,9 @@ const styles = StyleSheet.create({
   statusPassed: {
     backgroundColor: "#eaf6ee",
   },
+  statusNear: {
+    backgroundColor: "#eef6ff",
+  },
   statusFailed: {
     backgroundColor: "#f3f4f6",
   },
@@ -3067,6 +3620,12 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     gap: 8,
   },
+  evidenceRelated: {
+    color: "#64748b",
+    fontSize: 12,
+    lineHeight: 18,
+    fontFamily,
+  },
   thresholdWrap: {
     gap: 8,
   },
@@ -3112,6 +3671,38 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     fontFamily,
   },
+  sparklineOverlay: {
+    height: 42,
+    flexDirection: "row",
+    alignItems: "flex-end",
+    gap: 3,
+    position: "relative",
+    overflow: "hidden",
+  },
+  sparklineBar: {
+    flex: 1,
+    borderRadius: 2,
+    backgroundColor: "#d7e5f6",
+  },
+  sparklineBarActive: {
+    backgroundColor: "#0f172a",
+  },
+  sparklineLine: {
+    position: "absolute",
+    width: 6,
+    height: 2,
+    marginLeft: -3,
+    borderRadius: 999,
+    backgroundColor: "#4f83cc",
+  },
+  sparklineLineMuted: {
+    position: "absolute",
+    width: 5,
+    height: 2,
+    marginLeft: -2.5,
+    borderRadius: 999,
+    backgroundColor: "#93a9bf",
+  },
   binaryVisual: {
     flexDirection: "row",
     alignItems: "center",
@@ -3148,6 +3739,112 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     fontFamily,
   },
+  checklistVisual: {
+    gap: 8,
+  },
+  checklistItem: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 8,
+  },
+  checklistDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 999,
+    marginTop: 5,
+  },
+  checklistDotGood: {
+    backgroundColor: "#16a34a",
+  },
+  checklistDotNeutral: {
+    backgroundColor: "#94a3b8",
+  },
+  checklistDotWarning: {
+    backgroundColor: "#d97706",
+  },
+  checklistDotDanger: {
+    backgroundColor: "#dc2626",
+  },
+  checklistText: {
+    flex: 1,
+    color: "#334155",
+    fontSize: 13,
+    lineHeight: 18,
+    fontFamily,
+  },
+  eventCountdown: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    paddingVertical: 2,
+  },
+  eventCountdownBadge: {
+    minWidth: 52,
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    alignItems: "center",
+  },
+  eventCountdownUrgent: {
+    backgroundColor: "#fff1f2",
+  },
+  eventCountdownCalm: {
+    backgroundColor: "#eff6ff",
+  },
+  eventCountdownValue: {
+    color: "#0f172a",
+    fontSize: 18,
+    fontWeight: "800",
+    fontFamily,
+  },
+  eventCountdownLabel: {
+    color: "#0f172a",
+    fontSize: 13,
+    fontWeight: "800",
+    fontFamily,
+  },
+  eventCountdownMeta: {
+    color: "#64748b",
+    fontSize: 12,
+    lineHeight: 18,
+    fontFamily,
+  },
+  riskGaugeTrack: {
+    height: 10,
+    borderRadius: 999,
+    overflow: "hidden",
+    flexDirection: "row",
+    position: "relative",
+  },
+  riskGaugeSafe: {
+    flex: 1,
+    backgroundColor: "#dcfce7",
+  },
+  riskGaugeWarn: {
+    flex: 1,
+    backgroundColor: "#fef3c7",
+  },
+  riskGaugeDanger: {
+    flex: 1,
+    backgroundColor: "#fee2e2",
+  },
+  miniTrendVisual: {
+    gap: 8,
+  },
+  miniTrendBars: {
+    height: 48,
+    flexDirection: "row",
+    alignItems: "flex-end",
+    gap: 3,
+  },
+  miniTrendBar: {
+    flex: 1,
+    borderRadius: 2,
+    backgroundColor: "#d7e5f6",
+  },
+  miniTrendBarActive: {
+    backgroundColor: "#0f172a",
+  },
   evidenceEffect: {
     color: "#0f172a",
     fontSize: 13,
@@ -3159,6 +3856,39 @@ const styles = StyleSheet.create({
     color: "#475569",
     fontSize: 13,
     lineHeight: 20,
+    fontFamily,
+  },
+  recipeMapCard: {
+    padding: 16,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#e4eaf1",
+    backgroundColor: "#ffffff",
+    gap: 12,
+  },
+  recipeMapStats: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  recipeMatrix: {
+    gap: 10,
+  },
+  recipeMatrixRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 10,
+  },
+  recipeMatrixTitle: {
+    color: "#0f172a",
+    fontSize: 13,
+    fontWeight: "800",
+    fontFamily,
+  },
+  recipeMatrixBody: {
+    color: "#475569",
+    fontSize: 12,
+    lineHeight: 18,
     fontFamily,
   },
   formulaToggle: {
@@ -3231,6 +3961,12 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 20,
     fontFamily,
+  },
+  analysisActionRow: {
+    marginTop: 12,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
   },
   actionRow: {
     marginTop: 14,

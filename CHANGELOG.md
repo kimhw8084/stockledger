@@ -35,3 +35,7 @@
 - Built a first visual evidence adapter that converts evaluation results into grouped evidence cards with statuses, freshness, source labeling, threshold visuals, and expandable formula details.
 - Reworked Dashboard Eye review and Alert review around a shared evidence-board pattern instead of plain text evidence lists.
 - Added draft Recipe preview so a stock can be tested against unsaved Recipe logic using the same evaluation and evidence-card path as active Eyes.
+- Added a dedicated selected-stock `Visual Analysis` workspace inside Watchlist with grouped evidence families, benchmark and lookback controls, status filtering, and recipe filtering.
+- Built stock-level parameter cards for price damage, trend, relative strength, volume and volatility, valuation, financial quality, debt risk, earnings timing, thesis risk, sector context, macro context, and user thesis match.
+- Added a stock-scoped Recipe Condition Map that shows each active Eye’s recipe version, state, passed and failed logic, warnings, blockers, data issues, and next likely trigger.
+- Added thesis-review actions and stock-to-Studio / stock-to-Journal shortcuts so the new analysis workspace connects directly to Eye creation, recipe preview, and decision logging.

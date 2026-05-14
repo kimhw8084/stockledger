@@ -5,6 +5,7 @@
 - Replace the mock market adapter with a zero-cost provider adapter behind the same interface.
 - Add dedicated Eye detail and Alert detail drill-down screens once the current visual shell is validated on device.
 - Add dedicated stock detail with richer chart ranges, annotated state changes, and linked news/context once real data exists.
+- Add provider-backed news timelines, sector feeds, and event calendars so the new stock Visual Analysis workspace can replace mock placeholders with real evidence.
 - Introduce a small design token layer and reusable card primitives if the calmer visual system continues to hold up through feature growth.
 - Add recipe editing, duplication, and version history.
 - Add Eye state history and change-since-last-review diffs.
@@ -17,7 +18,7 @@
 - Add Piotroski-like quality scoring, fuller business quality models, and macro sensitivity tooling only after the simpler metric catalog proves useful.
 - Add advanced backtesting and broader market scanning only after watchlist-first monitoring works consistently.
 - Add broker integration, production push notifications, paid data providers, and monetization decisions only after the core product loop proves value.
-- Upgrade from generic threshold bars to richer context-aware visuals only after the current evidence-board flow is validated on device.
+- Upgrade the current stock Visual Analysis cards from first-slice mock visuals into richer context-aware charts after on-device validation and the first real data adapter.
 
 ## Rejected
 

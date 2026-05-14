@@ -257,6 +257,18 @@ export const useAppModel = () => {
           ),
         });
       },
+      async markEyesReviewed(input: { stockId: string; recipeId?: string }) {
+        if (!data) return;
+        const reviewedAt = new Date().toISOString();
+        await commit({
+          ...data,
+          eyes: data.eyes.map((eye) =>
+            eye.stockId === input.stockId && (!input.recipeId || eye.recipeId === input.recipeId)
+              ? { ...eye, lastReviewedAt: reviewedAt }
+              : eye,
+          ),
+        });
+      },
       async refreshMockData() {
         if (!data) return;
         const refreshed = data.stocks.map(buildMockSnapshot);

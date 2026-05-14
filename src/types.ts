@@ -28,6 +28,7 @@ export type ConditionVisualStatus =
   | "Failed"
   | "Warning"
   | "Blocked"
+  | "Near Trigger"
   | "Partial"
   | "Unavailable"
   | "Stale"
@@ -186,7 +187,16 @@ export interface VisualEvidenceMetric {
 }
 
 export interface VisualEvidenceVisual {
-  kind: "threshold_bar" | "comparison_bar" | "entry_zone" | "binary" | "freshness";
+  kind:
+    | "threshold_bar"
+    | "comparison_bar"
+    | "entry_zone"
+    | "binary"
+    | "freshness"
+    | "mini_trend"
+    | "checklist"
+    | "risk_gauge"
+    | "event_countdown";
   min?: number;
   max?: number;
   current?: number;
@@ -194,18 +204,35 @@ export interface VisualEvidenceVisual {
   low?: number;
   high?: number;
   markerLabel?: string;
+  series?: number[];
+  secondarySeries?: number[];
+  tertiarySeries?: number[];
+  items?: Array<{
+    label: string;
+    tone: "good" | "neutral" | "warning" | "danger";
+  }>;
+  countdownDays?: number;
+  countdownLabel?: string;
 }
 
 export interface VisualEvidenceCard {
   id: string;
   family:
     | "Price Damage"
-    | "Trend"
+    | "Trend & Stabilization"
     | "Relative Strength"
-    | "User Thesis"
-    | "Risk Controls"
+    | "Volume & Volatility"
+    | "Valuation"
+    | "Financial Quality"
+    | "Debt / Balance Sheet Risk"
+    | "Earnings & Events"
+    | "News & Thesis Risk"
+    | "Sector & Market Context"
+    | "Macro Context"
+    | "User Thesis Match"
+    | "Recipe Condition Map"
     | "Data Quality"
-    | "Quality";
+    | "Risk Controls";
   title: string;
   role: ConditionRole | "Data Quality";
   status: ConditionVisualStatus;
@@ -214,6 +241,7 @@ export interface VisualEvidenceCard {
   whyItMatters: string;
   freshness: FreshnessStatus;
   sourceType: "Mock Adapter" | "Provider Adapter" | "Manual Input";
+  relatedConditionLabel?: string;
   metric: VisualEvidenceMetric;
   formulaName?: string;
   formulaDescription?: string;
