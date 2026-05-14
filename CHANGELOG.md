@@ -54,3 +54,6 @@
 - Flattened `Stocks > Visual Analysis` into one continuous 2-up metric board instead of section-by-section collapsible evidence groups.
 - Added a first provider-aware snapshot adapter that attempts real daily price/history data, derives key market metrics, and falls back to mock snapshots when the provider path is unavailable.
 - Updated the app shell to surface provider-backed versus mock-fallback snapshot counts more explicitly so testing data trust is easier.
+- Split the Recipe Builder into clearer guided sections for purpose, logic, risk/alerts, and review/outcome framing instead of one undifferentiated authoring block.
+- Added first-pass alert lifecycle controls including snoozing, usefulness feedback, grouped active queue handling, and a dedicated snoozed-alert view.
+- Enriched Journal history with linked outcome context so decision review shows at least the current outcome status, lesson, and recipe-improvement note.

@@ -37,7 +37,7 @@ type TabKey = "Home" | "Stocks" | "Recipes" | "Eyes" | "Alerts" | "Journal";
 type StockFilter = "All" | "Needs Review" | "Opportunity" | "Quiet";
 type RecipeWorkspaceTab = "Builder" | "Preview" | "Library";
 type EyeWorkspaceTab = "Active Eyes" | "Create Eye";
-type AlertWorkspaceTab = "Queue" | "Detail";
+type AlertWorkspaceTab = "Queue" | "Detail" | "Snoozed";
 type JournalWorkspaceTab = "Log Decision" | "History";
 type StockWorkspaceTab = "Summary" | "Visual Analysis" | "Recipe Map" | "Notes";
 type ConditionKind = RecipeCondition["kind"];
@@ -53,6 +53,7 @@ type AnalysisStatusFilter =
 
 type AnalysisDensity = "Compact" | "Comfortable";
 type StockRouteTarget = "Stocks" | "Alerts" | "Eyes" | "Journal";
+type RecipeBuilderStep = "Purpose" | "Logic" | "Risk & Alerts" | "Review & Outcome";
 
 interface ConditionTemplate {
   id: string;
@@ -84,9 +85,10 @@ const tabs: TabKey[] = ["Home", "Stocks", "Recipes", "Eyes", "Alerts", "Journal"
 const stockFilters: StockFilter[] = ["All", "Needs Review", "Opportunity", "Quiet"];
 const recipeWorkspaceTabs: RecipeWorkspaceTab[] = ["Builder", "Preview", "Library"];
 const eyeWorkspaceTabs: EyeWorkspaceTab[] = ["Active Eyes", "Create Eye"];
-const alertWorkspaceTabs: AlertWorkspaceTab[] = ["Queue", "Detail"];
+const alertWorkspaceTabs: AlertWorkspaceTab[] = ["Queue", "Detail", "Snoozed"];
 const journalWorkspaceTabs: JournalWorkspaceTab[] = ["Log Decision", "History"];
 const stockWorkspaceTabs: StockWorkspaceTab[] = ["Summary", "Visual Analysis", "Recipe Map", "Notes"];
+const recipeBuilderSteps: RecipeBuilderStep[] = ["Purpose", "Logic", "Risk & Alerts", "Review & Outcome"];
 const analysisBenchmarks: AnalysisBenchmark[] = ["SPY", "QQQ", "Sector ETF"];
 const analysisLookbacks: AnalysisLookback[] = ["20D", "3M", "6M"];
 const analysisStatusFilters: AnalysisStatusFilter[] = [
@@ -1335,6 +1337,7 @@ export default function App() {
   const [tab, setTab] = useState<TabKey>("Home");
   const [stockFilter, setStockFilter] = useState<StockFilter>("All");
   const [recipeWorkspaceTab, setRecipeWorkspaceTab] = useState<RecipeWorkspaceTab>("Builder");
+  const [recipeBuilderStep, setRecipeBuilderStep] = useState<RecipeBuilderStep>("Purpose");
   const [eyeWorkspaceTab, setEyeWorkspaceTab] = useState<EyeWorkspaceTab>("Active Eyes");
   const [alertWorkspaceTab, setAlertWorkspaceTab] = useState<AlertWorkspaceTab>("Queue");
   const [journalWorkspaceTab, setJournalWorkspaceTab] = useState<JournalWorkspaceTab>("Log Decision");
@@ -1412,6 +1415,20 @@ export default function App() {
         (a, b) => Number(a.reviewed) - Number(b.reviewed) || b.createdAt.localeCompare(a.createdAt),
       ),
     [data?.alerts],
+  );
+  const activeAlertQueue = useMemo(
+    () =>
+      alertQueue.filter(
+        (alert) => !alert.snoozedUntil || new Date(alert.snoozedUntil).getTime() <= Date.now(),
+      ),
+    [alertQueue],
+  );
+  const snoozedAlerts = useMemo(
+    () =>
+      alertQueue.filter(
+        (alert) => Boolean(alert.snoozedUntil) && new Date(alert.snoozedUntil!).getTime() > Date.now(),
+      ),
+    [alertQueue],
   );
 
   const stockDirectory = useMemo(() => {
@@ -1703,6 +1720,12 @@ export default function App() {
     .filter((item): item is NonNullable<typeof item> => Boolean(item));
 
   const groupedAlertQueue = stockDirectory
+    .map((item) => ({
+      ...item,
+      openAlerts: item.openAlerts.filter(
+        (alert) => !alert.snoozedUntil || new Date(alert.snoozedUntil).getTime() <= Date.now(),
+      ),
+    }))
     .filter((item) => item.openAlerts.length > 0)
     .map((item) => {
       const groupedByRecipe = item.openAlerts.reduce<Record<string, Alert[]>>((accumulator, alert) => {
@@ -1740,6 +1763,14 @@ export default function App() {
       return Date.now() - reviewedAt > 1000 * 60 * 60 * 24 * 14;
     }),
   );
+  const snapshotDiagnostics = {
+    provider: data.snapshots.filter((snapshot) => !snapshot.isMock).length,
+    mock: data.snapshots.filter((snapshot) => snapshot.isMock).length,
+    partial: data.snapshots.filter((snapshot) => snapshot.freshness === "Partial").length,
+    delayed: data.snapshots.filter((snapshot) => snapshot.freshness === "Delayed").length,
+    stale: data.snapshots.filter((snapshot) => snapshot.freshness === "Stale").length,
+    unavailable: data.snapshots.filter((snapshot) => snapshot.freshness === "Unavailable").length,
+  };
 
   const previewRecipe =
     draftConditions.length === 0
@@ -2064,6 +2095,21 @@ export default function App() {
                     </View>
                   ))}
                 </View>
+              </Reveal>
+
+              <Reveal delay={60}>
+                <SectionHeader title="Data Trust" note="Provider coverage is still partial, so this panel shows what is real, delayed, or falling back to mock." />
+                <Card>
+                  <View style={styles.dualDenseGrid}>
+                    <DenseStat label="Provider" value={`${snapshotDiagnostics.provider}`} tone="strong" />
+                    <DenseStat label="Mock fallback" value={`${snapshotDiagnostics.mock}`} tone={snapshotDiagnostics.mock > 0 ? "risk" : "neutral"} />
+                    <DenseStat label="Delayed" value={`${snapshotDiagnostics.delayed}`} />
+                    <DenseStat label="Partial / unavailable" value={`${snapshotDiagnostics.partial + snapshotDiagnostics.unavailable + snapshotDiagnostics.stale}`} tone={snapshotDiagnostics.partial + snapshotDiagnostics.unavailable + snapshotDiagnostics.stale > 0 ? "risk" : "neutral"} />
+                  </View>
+                  <Text style={styles.metaLine}>
+                    Price/trend/relative-strength metrics are the current real-data slice. Earnings, news, valuation, and quality are still partial or deferred until the next provider expansions land.
+                  </Text>
+                </Card>
               </Reveal>
 
               <Reveal delay={80}>
@@ -2500,33 +2546,59 @@ export default function App() {
                     <Card highlighted>
                       <Text style={styles.formTitle}>Recipe Builder</Text>
                       <Text style={styles.formNote}>Build guided investment logic through typed controls and role-based conditions.</Text>
-                      <Text style={styles.inputLabel}>Recipe name</Text>
-                      <Input value={recipeForm.name} onChangeText={(name) => setRecipeForm((current) => ({ ...current, name }))} placeholder="Temporary Bargain Sale" />
-                      <Text style={styles.inputLabel}>Opportunity type</Text>
-                      <HorizontalChoice options={opportunityTypes} value={recipeForm.opportunityType} onSelect={(opportunityType) => setRecipeForm((current) => ({ ...current, opportunityType }))} />
-                      <Text style={styles.inputLabel}>Time horizon</Text>
-                      <HorizontalChoice options={timeHorizons} value={recipeForm.timeHorizon} onSelect={(timeHorizon) => setRecipeForm((current) => ({ ...current, timeHorizon }))} />
-                      <Text style={styles.inputLabel}>Primary use case</Text>
-                      <HorizontalChoice options={useCaseOptions} value={recipeForm.intendedUseCase} onSelect={(intendedUseCase) => setRecipeForm((current) => ({ ...current, intendedUseCase }))} />
-                      <View style={styles.dualDenseGrid}>
-                        <DenseStat label="Review cadence" value={`${recipeForm.reviewCadenceDays} days`} tone="strong" />
-                        <DenseStat label="Alert cooldown" value={`${recipeForm.alertCooldownHours} hours`} />
-                      </View>
-                      <Text style={styles.inputLabel}>Review cadence</Text>
-                      <HorizontalChoice options={reviewCadenceOptions.map(String)} value={String(recipeForm.reviewCadenceDays)} onSelect={(value) => setRecipeForm((current) => ({ ...current, reviewCadenceDays: Number(value) }))} />
-                      <Text style={styles.inputLabel}>Alert cooldown</Text>
-                      <HorizontalChoice options={alertCooldownOptions.map(String)} value={String(recipeForm.alertCooldownHours)} onSelect={(value) => setRecipeForm((current) => ({ ...current, alertCooldownHours: Number(value) }))} />
-                      <Text style={styles.inputLabel}>Purpose</Text>
-                      <Input value={recipeForm.purpose} onChangeText={(purpose) => setRecipeForm((current) => ({ ...current, purpose }))} placeholder="What opportunity should this logic surface?" multiline />
-                      <Text style={styles.inputLabel}>Notes</Text>
-                      <Input value={recipeForm.notes} onChangeText={(notes) => setRecipeForm((current) => ({ ...current, notes }))} placeholder="Guardrails, review triggers, downgrade logic" multiline />
+                      <Text style={styles.inputLabel}>Builder section</Text>
+                      <HorizontalChoice options={recipeBuilderSteps} value={recipeBuilderStep} onSelect={setRecipeBuilderStep} />
+                      {recipeBuilderStep === "Purpose" ? (
+                        <>
+                          <Text style={styles.inputLabel}>Recipe name</Text>
+                          <Input value={recipeForm.name} onChangeText={(name) => setRecipeForm((current) => ({ ...current, name }))} placeholder="Temporary Bargain Sale" />
+                          <Text style={styles.inputLabel}>Opportunity type</Text>
+                          <HorizontalChoice options={opportunityTypes} value={recipeForm.opportunityType} onSelect={(opportunityType) => setRecipeForm((current) => ({ ...current, opportunityType }))} />
+                          <Text style={styles.inputLabel}>Time horizon</Text>
+                          <HorizontalChoice options={timeHorizons} value={recipeForm.timeHorizon} onSelect={(timeHorizon) => setRecipeForm((current) => ({ ...current, timeHorizon }))} />
+                          <Text style={styles.inputLabel}>Primary use case</Text>
+                          <HorizontalChoice options={useCaseOptions} value={recipeForm.intendedUseCase} onSelect={(intendedUseCase) => setRecipeForm((current) => ({ ...current, intendedUseCase }))} />
+                          <Text style={styles.inputLabel}>Purpose</Text>
+                          <Input value={recipeForm.purpose} onChangeText={(purpose) => setRecipeForm((current) => ({ ...current, purpose }))} placeholder="What opportunity should this logic surface?" multiline />
+                        </>
+                      ) : null}
+                      {recipeBuilderStep === "Risk & Alerts" ? (
+                        <>
+                          <View style={styles.dualDenseGrid}>
+                            <DenseStat label="Alert cooldown" value={`${recipeForm.alertCooldownHours} hours`} tone="strong" />
+                            <DenseStat label="Risk posture" value={draftConditions.filter((condition) => condition.kind === "disqualifier" || condition.kind === "negative").length ? "Defined" : "Light"} />
+                          </View>
+                          <Text style={styles.inputLabel}>Alert cooldown</Text>
+                          <HorizontalChoice options={alertCooldownOptions.map(String)} value={String(recipeForm.alertCooldownHours)} onSelect={(value) => setRecipeForm((current) => ({ ...current, alertCooldownHours: Number(value) }))} />
+                          <Text style={styles.inputLabel}>Notes</Text>
+                          <Input value={recipeForm.notes} onChangeText={(notes) => setRecipeForm((current) => ({ ...current, notes }))} placeholder="Downgrade rules, blockers, and alert expectations" multiline />
+                        </>
+                      ) : null}
+                      {recipeBuilderStep === "Review & Outcome" ? (
+                        <>
+                          <View style={styles.dualDenseGrid}>
+                            <DenseStat label="Review cadence" value={`${recipeForm.reviewCadenceDays} days`} tone="strong" />
+                            <DenseStat label="Outcome tags" value={`${draftConditions.length} linked rules`} />
+                          </View>
+                          <Text style={styles.inputLabel}>Review cadence</Text>
+                          <HorizontalChoice options={reviewCadenceOptions.map(String)} value={String(recipeForm.reviewCadenceDays)} onSelect={(value) => setRecipeForm((current) => ({ ...current, reviewCadenceDays: Number(value) }))} />
+                          <Text style={styles.inputLabel}>Notes</Text>
+                          <Input value={recipeForm.notes} onChangeText={(notes) => setRecipeForm((current) => ({ ...current, notes }))} placeholder="Review prompts and what should be learned after decisions" multiline />
+                        </>
+                      ) : null}
+                      {recipeBuilderStep === "Logic" ? (
+                        <Text style={styles.metaLine}>
+                          Use the condition library below to define eligibility, support, timing, warnings, and hard disqualifiers for this recipe.
+                        </Text>
+                      ) : null}
                     </Card>
                   </Reveal>
 
-                  <Reveal delay={60}>
-                    <Card>
-                      <Text style={styles.formTitle}>Condition Library</Text>
-                      <Text style={styles.formNote}>Translate evidence into eligibility, support, risk, and disqualifier roles.</Text>
+                  {recipeBuilderStep === "Logic" ? (
+                    <Reveal delay={60}>
+                      <Card>
+                        <Text style={styles.formTitle}>Condition Library</Text>
+                        <Text style={styles.formNote}>Translate evidence into eligibility, support, risk, and disqualifier roles.</Text>
                       <Text style={styles.inputLabel}>Category</Text>
                       <HorizontalChoice
                         options={conditionCategories}
@@ -2589,12 +2661,13 @@ export default function App() {
                         </Text>
                         <Text style={styles.previewHint}>{selectedTemplate.description}</Text>
                       </View>
-                      <View style={styles.actionRow}>
-                        <Button label="Add Condition" onPress={addDraftCondition} />
-                        <Button label="Clear Draft" tone="ghost" onPress={() => setDraftConditions([])} />
-                      </View>
-                    </Card>
-                  </Reveal>
+                        <View style={styles.actionRow}>
+                          <Button label="Add Condition" onPress={addDraftCondition} />
+                          <Button label="Clear Draft" tone="ghost" onPress={() => setDraftConditions([])} />
+                        </View>
+                      </Card>
+                    </Reveal>
+                  ) : null}
 
                   <Reveal delay={80}>
                     <SectionHeader title="Draft Conditions" note="Review the current recipe logic before saving." />
@@ -2935,6 +3008,7 @@ export default function App() {
                                   <View style={styles.actionRow}>
                                     <Button label="Entered" onPress={() => void quickDecision(alert, "Entered")} />
                                     <Button label="Skipped" tone="secondary" onPress={() => void quickDecision(alert, "Skipped")} />
+                                    <Button label="Snooze 24H" tone="secondary" onPress={() => void actions.snoozeAlert(alert.id, 24)} />
                                     <Button label="Reviewed" tone="ghost" onPress={() => void actions.markAlertReviewed(alert.id)} />
                                   </View>
                                 </Pressable>
@@ -2986,11 +3060,52 @@ export default function App() {
                       </View>
                     </View>
                     <WhatChangedPanel title="Review in 5 seconds" items={[`Priority is ${selectedAlert.priority}.`, `State change: ${selectedAlert.stateChange}.`, selectedAlert.dataQuality]} />
+                    <View style={styles.analysisActionRow}>
+                      <Button label="Snooze 24H" onPress={() => void actions.snoozeAlert(selectedAlert.id, 24)} />
+                      <Button label="Useful" tone="secondary" onPress={() => void actions.setAlertFeedback(selectedAlert.id, "Useful")} />
+                      <Button label="Not Useful" tone="ghost" onPress={() => void actions.setAlertFeedback(selectedAlert.id, "Not Useful")} />
+                    </View>
                   </Card>
                   <View style={styles.stack}>
                     {selectedAlertEvidenceGroups.map((group) => (
                       <EvidenceGroupView key={`alert-${group.key}`} group={group} defaultExpanded={group.key === "supporting-evidence"} />
                     ))}
+                  </View>
+                </Reveal>
+              ) : null}
+
+              {alertWorkspaceTab === "Snoozed" ? (
+                <Reveal delay={40}>
+                  <SectionHeader title="Snoozed Alerts" note="Temporarily deferred alerts stay visible here with their wake-up time." />
+                  <View style={styles.stack}>
+                    {snoozedAlerts.length === 0 ? (
+                      <Card>
+                        <Text style={styles.cardBody}>No alerts are currently snoozed.</Text>
+                      </Card>
+                    ) : (
+                      snoozedAlerts.map((alert) => {
+                        const eye = data.eyes.find((item) => item.id === alert.eyeId);
+                        return (
+                          <Card key={`snoozed-${alert.id}`}>
+                            <Text style={styles.cardEyebrow}>{stockLabel(data.stocks, eye?.stockId ?? "")}</Text>
+                            <Text style={styles.alertTitle}>{alert.title}</Text>
+                            <Text style={styles.cardBody}>{alert.whyNow}</Text>
+                            <View style={styles.metaRow}>
+                              <MetaPill label={`Until ${alert.snoozedUntil ? formatDate(alert.snoozedUntil) : "unknown"}`} />
+                              {alert.usefulness ? <MetaPill label={alert.usefulness} /> : null}
+                            </View>
+                            <View style={styles.actionRow}>
+                              <Button label="Open Detail" onPress={() => {
+                                if (!eye) return;
+                                openStockContext({ stockId: eye.stockId, eyeId: eye.id, alertId: alert.id, target: "Alerts" });
+                                setAlertWorkspaceTab("Detail");
+                              }} />
+                              <Button label="Unsnooze" tone="secondary" onPress={() => void actions.snoozeAlert(alert.id, -1)} />
+                            </View>
+                          </Card>
+                        );
+                      })
+                    )}
                   </View>
                 </Reveal>
               ) : null}
@@ -3061,6 +3176,19 @@ export default function App() {
                         </View>
                         <Text style={styles.metaLine}>Concern: {decision.concern || "Not captured"}</Text>
                         <Text style={styles.metaLine}>Thesis {decision.thesisValid} · Timing {decision.timing} · {formatDate(decision.createdAt)}</Text>
+                        {data.outcomes.find((outcome) => outcome.decisionId === decision.id) ? (
+                          <View style={styles.formulaPanel}>
+                            <Text style={styles.formulaTitle}>
+                              Outcome · {data.outcomes.find((outcome) => outcome.decisionId === decision.id)?.status ?? "Pending"}
+                            </Text>
+                            <Text style={styles.formulaBody}>
+                              {data.outcomes.find((outcome) => outcome.decisionId === decision.id)?.lesson}
+                            </Text>
+                            <Text style={styles.formulaMeta}>
+                              {data.outcomes.find((outcome) => outcome.decisionId === decision.id)?.recipeSuggestion}
+                            </Text>
+                          </View>
+                        ) : null}
                       </Card>
                     ))}
                   </View>

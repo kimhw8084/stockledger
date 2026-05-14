@@ -240,6 +240,7 @@ export const useAppModel = () => {
           recipeId: decision.recipeId,
           recipeVersion: decision.recipeVersion,
           reviewWindow: "30 days",
+          status: "Pending",
           priceChangeNote: "Pending later real price review.",
           maxRunupNote: "Pending provider-backed outcome metrics.",
           maxDrawdownNote: "Pending provider-backed outcome metrics.",
@@ -262,6 +263,25 @@ export const useAppModel = () => {
           ...data,
           alerts: data.alerts.map((alert) =>
             alert.id === alertId ? { ...alert, reviewed: true } : alert,
+          ),
+        });
+      },
+      async snoozeAlert(alertId: string, hours: number) {
+        if (!data) return;
+        const snoozedUntil = new Date(Date.now() + hours * 60 * 60 * 1000).toISOString();
+        await commit({
+          ...data,
+          alerts: data.alerts.map((alert) =>
+            alert.id === alertId ? { ...alert, snoozedUntil } : alert,
+          ),
+        });
+      },
+      async setAlertFeedback(alertId: string, usefulness: "Useful" | "Not Useful") {
+        if (!data) return;
+        await commit({
+          ...data,
+          alerts: data.alerts.map((alert) =>
+            alert.id === alertId ? { ...alert, usefulness } : alert,
           ),
         });
       },

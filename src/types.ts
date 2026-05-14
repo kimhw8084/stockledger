@@ -316,6 +316,8 @@ export interface Alert {
   priority: "Low" | "Medium" | "High";
   createdAt: string;
   reviewed: boolean;
+  snoozedUntil?: string;
+  usefulness?: "Useful" | "Not Useful";
 }
 
 export interface Decision {
@@ -341,6 +343,7 @@ export interface Outcome {
   recipeId?: string;
   recipeVersion?: number;
   reviewWindow: string;
+  status?: "Pending" | "Reviewed";
   priceChangeNote: string;
   maxRunupNote: string;
   maxDrawdownNote: string;
