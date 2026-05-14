@@ -19,12 +19,16 @@ import {
 
 const createId = (prefix: string) => `${prefix}-${Math.random().toString(36).slice(2, 10)}`;
 
-const buildAlertFromEvaluation = (eye: Eye, evaluation: Evaluation): Alert => ({
+const buildAlertFromEvaluation = (
+  eye: Eye,
+  evaluation: Evaluation,
+  stockSymbol: string,
+): Alert => ({
   id: createId("alert"),
   eyeId: eye.id,
   recipeId: evaluation.recipeId,
   recipeVersion: evaluation.recipeVersion,
-  title: `${evaluation.currentState} for ${eye.id.replace("eye-", "").toUpperCase()}`,
+  title: `${evaluation.currentState} for ${stockSymbol}`,
   stateChange: `${evaluation.previousState} -> ${evaluation.currentState}`,
   whyNow: evaluation.whyNow,
   supportingEvidence: evaluation.supportingEvidence,
@@ -53,6 +57,7 @@ const evaluateAllEyes = (data: AppData): AppData => {
   const eyes = data.eyes.map((eye) => {
     const recipe = data.recipes.find((item) => item.id === eye.recipeId);
     const snapshot = data.snapshots.find((item) => item.stockId === eye.stockId);
+    const stock = data.stocks.find((item) => item.id === eye.stockId);
 
     if (!recipe || !snapshot) {
       return eye;
@@ -66,7 +71,7 @@ const evaluateAllEyes = (data: AppData): AppData => {
           alert.stateChange === `${evaluation.previousState} -> ${evaluation.currentState}`,
       );
       if (!hasDuplicate) {
-        alerts.unshift(buildAlertFromEvaluation(eye, evaluation));
+        alerts.unshift(buildAlertFromEvaluation(eye, evaluation, stock?.symbol ?? "Unknown"));
       }
     }
 

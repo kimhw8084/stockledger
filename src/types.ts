@@ -23,6 +23,16 @@ export type FreshnessStatus =
   | "Unavailable"
   | "Mock Data";
 
+export type ConditionVisualStatus =
+  | "Passed"
+  | "Failed"
+  | "Warning"
+  | "Blocked"
+  | "Partial"
+  | "Unavailable"
+  | "Stale"
+  | "Mock";
+
 export type MetricAvailability = "automated" | "manual" | "future";
 
 export type ConditionRole =
@@ -167,6 +177,55 @@ export interface ConditionEvaluationResult {
   actualValue?: string | number | boolean;
   explanation: string;
   missingData?: boolean;
+}
+
+export interface VisualEvidenceMetric {
+  currentLabel: string;
+  thresholdLabel?: string;
+  comparisonLabel?: string;
+}
+
+export interface VisualEvidenceVisual {
+  kind: "threshold_bar" | "comparison_bar" | "entry_zone" | "binary" | "freshness";
+  min?: number;
+  max?: number;
+  current?: number;
+  threshold?: number;
+  low?: number;
+  high?: number;
+  markerLabel?: string;
+}
+
+export interface VisualEvidenceCard {
+  id: string;
+  family:
+    | "Price Damage"
+    | "Trend"
+    | "Relative Strength"
+    | "User Thesis"
+    | "Risk Controls"
+    | "Data Quality"
+    | "Quality";
+  title: string;
+  role: ConditionRole | "Data Quality";
+  status: ConditionVisualStatus;
+  summary: string;
+  effect: string;
+  whyItMatters: string;
+  freshness: FreshnessStatus;
+  sourceType: "Mock Adapter" | "Provider Adapter" | "Manual Input";
+  metric: VisualEvidenceMetric;
+  formulaName?: string;
+  formulaDescription?: string;
+  formulaInputs?: string[];
+  visual: VisualEvidenceVisual;
+}
+
+export interface VisualEvidenceGroup {
+  key: string;
+  title: string;
+  note: string;
+  cards: VisualEvidenceCard[];
 }
 
 export interface Evaluation {

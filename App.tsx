@@ -19,10 +19,15 @@ import {
   DecisionAction,
   Eye,
   EyeState,
+  FreshnessStatus,
   Recipe,
   RecipeCondition,
   Stock,
+  VisualEvidenceCard,
+  VisualEvidenceGroup,
 } from "./src/types";
+import { evaluateEye } from "./src/lib/evaluateEye";
+import { buildEvidenceGroups, buildWhatChangedList } from "./src/lib/visualEvidence";
 
 type TabKey = "Dashboard" | "Watchlist" | "Studio" | "Journal";
 type WatchFilter = "All" | "Attention" | "Opportunity" | "Quiet";
@@ -677,6 +682,216 @@ const StockSparkline = ({
   );
 };
 
+const statusTone = (status: VisualEvidenceCard["status"]) => {
+  switch (status) {
+    case "Passed":
+      return [styles.statusBadge, styles.statusPassed];
+    case "Warning":
+      return [styles.statusBadge, styles.statusWarning];
+    case "Blocked":
+      return [styles.statusBadge, styles.statusBlocked];
+    case "Partial":
+      return [styles.statusBadge, styles.statusPartial];
+    case "Unavailable":
+      return [styles.statusBadge, styles.statusUnavailable];
+    case "Stale":
+      return [styles.statusBadge, styles.statusStale];
+    case "Mock":
+      return [styles.statusBadge, styles.statusMock];
+    default:
+      return [styles.statusBadge, styles.statusFailed];
+  }
+};
+
+const freshnessTone = (freshness: FreshnessStatus) => {
+  switch (freshness) {
+    case "Fresh":
+      return [styles.freshnessBadge, styles.freshnessFresh];
+    case "Delayed":
+      return [styles.freshnessBadge, styles.freshnessDelayed];
+    case "Partial":
+      return [styles.freshnessBadge, styles.freshnessPartial];
+    case "Unavailable":
+      return [styles.freshnessBadge, styles.freshnessUnavailable];
+    case "Stale":
+      return [styles.freshnessBadge, styles.freshnessStale];
+    default:
+      return [styles.freshnessBadge, styles.freshnessMock];
+  }
+};
+
+const ThresholdBar = ({ card }: { card: VisualEvidenceCard }) => {
+  const { visual } = card;
+  if (visual.kind === "freshness") {
+    return (
+      <View style={styles.freshnessVisual}>
+        <View style={styles.freshnessTrack} />
+        <Text style={styles.freshnessVisualText}>{card.freshness}</Text>
+      </View>
+    );
+  }
+
+  if (visual.kind === "binary") {
+    const active = (visual.current ?? 0) > 0;
+    return (
+      <View style={styles.binaryVisual}>
+        <View style={[styles.binaryDot, active ? styles.binaryDotActive : styles.binaryDotMuted]} />
+        <Text style={styles.binaryVisualText}>{active ? "Active now" : "Inactive now"}</Text>
+      </View>
+    );
+  }
+
+  if (visual.kind === "entry_zone") {
+    const low = visual.low ?? 0;
+    const high = visual.high ?? low;
+    const current = visual.current ?? low;
+    const min = Math.max(0, low * 0.92);
+    const max = high * 1.08 || 1;
+    const start = ((low - min) / Math.max(max - min, 1)) * 100;
+    const width = ((high - low) / Math.max(max - min, 1)) * 100;
+    const marker = ((current - min) / Math.max(max - min, 1)) * 100;
+
+    return (
+      <View style={styles.thresholdWrap}>
+        <View style={styles.thresholdTrack}>
+          <View style={[styles.entryZoneBand, { left: `${Math.max(0, start)}%`, width: `${Math.max(width, 4)}%` }]} />
+          <View style={[styles.thresholdMarkerCurrent, { left: `${Math.max(0, Math.min(100, marker))}%` }]} />
+        </View>
+        <View style={styles.thresholdLegend}>
+          <Text style={styles.thresholdLegendText}>Zone ${low.toFixed(2)}</Text>
+          <Text style={styles.thresholdLegendText}>Now ${current.toFixed(2)}</Text>
+          <Text style={styles.thresholdLegendText}>Zone ${high.toFixed(2)}</Text>
+        </View>
+      </View>
+    );
+  }
+
+  const min = visual.min ?? 0;
+  const max = visual.max ?? 100;
+  const current = visual.current ?? min;
+  const threshold = visual.threshold ?? min;
+  const currentPct = ((current - min) / Math.max(max - min, 1)) * 100;
+  const thresholdPct = ((threshold - min) / Math.max(max - min, 1)) * 100;
+
+  return (
+    <View style={styles.thresholdWrap}>
+      <View style={styles.thresholdTrack}>
+        <View style={[styles.thresholdMarkerThreshold, { left: `${Math.max(0, Math.min(100, thresholdPct))}%` }]} />
+        <View style={[styles.thresholdMarkerCurrent, { left: `${Math.max(0, Math.min(100, currentPct))}%` }]} />
+      </View>
+      <View style={styles.thresholdLegend}>
+        <Text style={styles.thresholdLegendText}>{min}</Text>
+        <Text style={styles.thresholdLegendText}>Need {card.metric.thresholdLabel ?? "-"}</Text>
+        <Text style={styles.thresholdLegendText}>{max}</Text>
+      </View>
+    </View>
+  );
+};
+
+const WhyNowPanel = ({
+  title,
+  body,
+  state,
+  recipeVersion,
+}: {
+  title: string;
+  body: string;
+  state: string;
+  recipeVersion: string;
+}) => (
+  <View style={styles.panel}>
+    <View style={styles.inlineBetween}>
+      <View style={styles.flexOne}>
+        <Text style={styles.panelLabel}>{title}</Text>
+        <Text style={styles.panelBody}>{body}</Text>
+      </View>
+      <View style={styles.panelBadges}>
+        <Text style={stateTone(state)}>{state}</Text>
+        <MetaPill label={recipeVersion} />
+      </View>
+    </View>
+  </View>
+);
+
+const WhatChangedPanel = ({ title, items }: { title: string; items: string[] }) => (
+  <View style={styles.panel}>
+    <Text style={styles.panelLabel}>{title}</Text>
+    <View style={styles.panelList}>
+      {items.map((item) => (
+        <Text key={item} style={styles.panelListItem}>
+          • {item}
+        </Text>
+      ))}
+    </View>
+  </View>
+);
+
+const EvidenceCardView = ({ card }: { card: VisualEvidenceCard }) => {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <View style={styles.evidenceCard}>
+      <View style={styles.inlineBetween}>
+        <View style={styles.flexOne}>
+          <Text style={styles.evidenceCardTitle}>{card.title}</Text>
+          <Text style={styles.evidenceRole}>{card.role}</Text>
+        </View>
+        <View style={styles.evidenceBadgeStack}>
+          <View style={statusTone(card.status)}>
+            <Text style={styles.statusBadgeText}>{card.status}</Text>
+          </View>
+          <View style={freshnessTone(card.freshness)}>
+            <Text style={styles.freshnessBadgeText}>{card.freshness}</Text>
+          </View>
+        </View>
+      </View>
+
+      <Text style={styles.evidenceSummary}>{card.summary}</Text>
+      <ThresholdBar card={card} />
+
+      <View style={styles.evidenceMetricsRow}>
+        <DenseStat label="Current" value={card.metric.currentLabel} tone="strong" />
+        <DenseStat label="Threshold" value={card.metric.thresholdLabel ?? "Context only"} />
+      </View>
+
+      <Text style={styles.evidenceEffect}>Effect: {card.effect}</Text>
+      <Text style={styles.evidenceWhy}>Why it matters: {card.whyItMatters}</Text>
+
+      <View style={styles.metaRow}>
+        <MetaPill label={card.sourceType} />
+        {card.metric.comparisonLabel ? <MetaPill label={card.metric.comparisonLabel} /> : null}
+      </View>
+
+      <Pressable onPress={() => setExpanded((current) => !current)} style={styles.formulaToggle}>
+        <Text style={styles.formulaToggleText}>
+          {expanded ? "Hide formula details" : "Show formula details"}
+        </Text>
+      </Pressable>
+
+      {expanded ? (
+        <View style={styles.formulaPanel}>
+          <Text style={styles.formulaTitle}>{card.formulaName ?? "Formula detail"}</Text>
+          <Text style={styles.formulaBody}>{card.formulaDescription ?? "No extra formula detail available."}</Text>
+          <Text style={styles.formulaMeta}>
+            Inputs: {card.formulaInputs?.join(", ") ?? "No explicit inputs recorded"}
+          </Text>
+        </View>
+      ) : null}
+    </View>
+  );
+};
+
+const EvidenceGroupView = ({ group }: { group: VisualEvidenceGroup }) => (
+  <View style={styles.evidenceGroup}>
+    <SectionHeader title={group.title} note={group.note} />
+    <View style={styles.stack}>
+      {group.cards.map((card) => (
+        <EvidenceCardView key={card.id} card={card} />
+      ))}
+    </View>
+  </View>
+);
+
 interface RecipeDraftForm {
   name: string;
   purpose: string;
@@ -745,7 +960,9 @@ export default function App() {
   });
   const [draftConditions, setDraftConditions] = useState<RecipeCondition[]>([]);
   const [selectedEyeId, setSelectedEyeId] = useState("");
+  const [selectedAlertId, setSelectedAlertId] = useState("");
   const [selectedStockId, setSelectedStockId] = useState("");
+  const [previewStockId, setPreviewStockId] = useState("");
 
   const eyesSorted = useMemo(
     () =>
@@ -844,6 +1061,26 @@ export default function App() {
   }, [selectedStockId, stockSummaries]);
 
   useEffect(() => {
+    if (!selectedAlertId && alertQueue[0]) {
+      setSelectedAlertId(alertQueue[0].id);
+      return;
+    }
+    if (selectedAlertId && !alertQueue.some((alert) => alert.id === selectedAlertId)) {
+      setSelectedAlertId(alertQueue[0]?.id ?? "");
+    }
+  }, [alertQueue, selectedAlertId]);
+
+  useEffect(() => {
+    if (!previewStockId && data?.stocks[0]) {
+      setPreviewStockId(data.stocks[0].id);
+      return;
+    }
+    if (previewStockId && !data?.stocks.some((stock) => stock.id === previewStockId)) {
+      setPreviewStockId(data?.stocks[0]?.id ?? "");
+    }
+  }, [data?.stocks, previewStockId]);
+
+  useEffect(() => {
     const template =
       conditionLibrary.find((item) => item.id === conditionBuilder.templateId) ?? conditionLibrary[0];
     setConditionBuilder((current) => ({
@@ -890,6 +1127,7 @@ export default function App() {
   const selectedTemplate =
     conditionLibrary.find((item) => item.id === conditionBuilder.templateId) ?? conditionLibrary[0];
   const selectedOperatorOptions = operatorOptionsForTemplate(selectedTemplate);
+  const selectedAlert = alertQueue.find((alert) => alert.id === selectedAlertId) ?? alertQueue[0];
   const openAlerts = data.alerts.filter((alert) => !alert.reviewed).length;
   const criticalEyes = data.eyes.filter((eye) =>
     ["Attention Needed", "Thesis Risk Rising", "Thesis Broken"].includes(
@@ -899,6 +1137,107 @@ export default function App() {
   const opportunityEyes = data.eyes.filter(
     (eye) => eye.lastEvaluation?.currentState === "Opportunity Zone Forming",
   ).length;
+
+  const selectedEyeRecipe = selectedEye
+    ? data.recipes.find((recipe) => recipe.id === selectedEye.recipeId)
+    : undefined;
+  const selectedEyeSnapshot = selectedEye
+    ? data.snapshots.find((snapshot) => snapshot.stockId === selectedEye.stockId)
+    : undefined;
+  const selectedEyeEvidenceGroups =
+    selectedEye && selectedEyeRecipe && selectedEyeSnapshot && selectedEye.lastEvaluation
+      ? buildEvidenceGroups({
+          eye: selectedEye,
+          recipe: selectedEyeRecipe,
+          snapshot: selectedEyeSnapshot,
+          evaluation: selectedEye.lastEvaluation,
+        })
+      : [];
+  const selectedEyeWhatChanged =
+    selectedEye && selectedEyeSnapshot && selectedEye.lastEvaluation
+      ? buildWhatChangedList({
+          eye: selectedEye,
+          snapshot: selectedEyeSnapshot,
+          evaluation: selectedEye.lastEvaluation,
+        })
+      : [];
+
+  const selectedAlertEye = selectedAlert
+    ? data.eyes.find((eye) => eye.id === selectedAlert.eyeId)
+    : undefined;
+  const selectedAlertRecipe = selectedAlertEye
+    ? data.recipes.find((recipe) => recipe.id === selectedAlertEye.recipeId)
+    : undefined;
+  const selectedAlertSnapshot = selectedAlertEye
+    ? data.snapshots.find((snapshot) => snapshot.stockId === selectedAlertEye.stockId)
+    : undefined;
+  const selectedAlertEvaluation = selectedAlertEye?.lastEvaluation;
+  const selectedAlertEvidenceGroups =
+    selectedAlertEye && selectedAlertRecipe && selectedAlertSnapshot && selectedAlertEvaluation
+      ? buildEvidenceGroups({
+          eye: selectedAlertEye,
+          recipe: selectedAlertRecipe,
+          snapshot: selectedAlertSnapshot,
+          evaluation: selectedAlertEvaluation,
+        })
+      : [];
+
+  const previewRecipe =
+    draftConditions.length === 0
+      ? undefined
+      : {
+          id: "preview-recipe",
+          version: 1,
+          name: recipeForm.name.trim() || "Draft Recipe",
+          purpose: recipeForm.purpose.trim() || "Preview how this draft logic behaves before saving it.",
+          opportunityType: recipeForm.opportunityType,
+          timeHorizon: recipeForm.timeHorizon,
+          intendedUseCase: recipeForm.intendedUseCase,
+          notes: recipeForm.notes,
+          createdAt: new Date().toISOString(),
+          conditions: draftConditions,
+          reviewConfig: {
+            cadenceDays: recipeForm.reviewCadenceDays,
+            reviewTriggers: ["manual_preview"],
+          },
+          alertConfig: {
+            cooldownHours: recipeForm.alertCooldownHours,
+            dedupeKey: "state_change" as const,
+            priorityOnAttention: "High" as const,
+            priorityOnRisk: "High" as const,
+          },
+        };
+
+  const previewStock = data.stocks.find((stock) => stock.id === previewStockId) ?? data.stocks[0];
+  const previewSnapshot = previewStock
+    ? data.snapshots.find((snapshot) => snapshot.stockId === previewStock.id)
+    : undefined;
+  const previewEye = previewStock
+    ? {
+        id: "preview-eye",
+        stockId: previewStock.id,
+        recipeId: previewRecipe?.id ?? "preview-recipe",
+        thesisSnapshot: eyeForm.thesisSnapshot.trim() || previewStock.thesis,
+        plannedEntryLow: Number(eyeForm.plannedEntryLow) || previewSnapshot?.plannedEntryLow,
+        plannedEntryHigh: Number(eyeForm.plannedEntryHigh) || previewSnapshot?.plannedEntryHigh,
+        invalidationRule: eyeForm.invalidationRule.trim() || "Preview only.",
+        lastReviewedAt: isoDateDaysAgo(eyeForm.lastReviewedDaysAgo),
+        createdAt: new Date().toISOString(),
+      }
+    : undefined;
+  const previewEvaluation =
+    previewRecipe && previewEye && previewSnapshot
+      ? evaluateEye(previewEye, previewRecipe, previewSnapshot)
+      : undefined;
+  const previewEvidenceGroups =
+    previewRecipe && previewEye && previewSnapshot && previewEvaluation
+      ? buildEvidenceGroups({
+          eye: previewEye,
+          recipe: previewRecipe,
+          snapshot: previewSnapshot,
+          evaluation: previewEvaluation,
+        })
+      : [];
 
   const jumpTo = (focus: DashboardFocus) => {
     setDashboardFocus(focus);
@@ -1144,20 +1483,11 @@ export default function App() {
 
               {selectedEye ? (
                 <Reveal delay={120}>
-                  <SectionHeader title="Focus Eye" note="Current context with price shape, evidence, and risks." />
+                  <SectionHeader title="Eye Detail" note="Main evidence board for the currently selected monitor." />
                   <Card>
-                    <View style={styles.inlineBetween}>
-                      <View style={styles.flexOne}>
-                        <Text style={styles.cardEyebrow}>Focused monitor</Text>
-                        <Text style={styles.cardTitle}>{eyeLine(selectedEye, data.stocks, data.recipes)}</Text>
-                        <Text style={styles.cardBody}>
-                          {selectedEye.lastEvaluation?.whyNow ?? "This Eye has not been evaluated yet."}
-                        </Text>
-                      </View>
-                      <Text style={stateTone(selectedEye.lastEvaluation?.currentState)}>
-                        {selectedEye.lastEvaluation?.currentState ?? "Not Evaluated"}
-                      </Text>
-                    </View>
+                    <Text style={styles.cardEyebrow}>Focused monitor</Text>
+                    <Text style={styles.cardTitle}>{eyeLine(selectedEye, data.stocks, data.recipes)}</Text>
+                    <Text style={styles.cardBody}>{selectedEye.thesisSnapshot}</Text>
 
                     {data.snapshots.find((snapshot) => snapshot.stockId === selectedEye.stockId) ? (
                       <StockSparkline
@@ -1175,27 +1505,112 @@ export default function App() {
                     <View style={styles.metaRow}>
                       <MetaPill label={selectedEye.lastEvaluation?.actionUrgency ?? "Wait"} />
                       <MetaPill label={`Setup ${selectedEye.lastEvaluation?.setupStrength ?? "Low"}`} />
-                      <MetaPill label={selectedEye.thesisSnapshot.slice(0, 42) + (selectedEye.thesisSnapshot.length > 42 ? "..." : "")} />
+                      <MetaPill label={selectedEyeSnapshot?.freshness ?? "No feed"} />
                     </View>
 
-                    <View style={styles.dualColumn}>
-                      <View style={styles.evidenceColumn}>
-                        <Text style={styles.columnTitle}>Supporting Evidence</Text>
-                        {(selectedEye.lastEvaluation?.supportingEvidence ?? []).slice(0, 4).map((item) => (
-                          <Text key={item} style={styles.listLine}>
-                            + {item}
-                          </Text>
+                    {selectedEye.lastEvaluation && selectedEyeRecipe ? (
+                      <>
+                        <WhyNowPanel
+                          title="Why now"
+                          body={selectedEye.lastEvaluation.whyNow}
+                          state={selectedEye.lastEvaluation.currentState}
+                          recipeVersion={`${selectedEyeRecipe.name} v${selectedEyeRecipe.version}`}
+                        />
+
+                        <View style={styles.dualColumn}>
+                          <View style={styles.evidenceColumn}>
+                            <Text style={styles.columnTitle}>Top support</Text>
+                            {(selectedEye.lastEvaluation.supportingEvidence ?? []).slice(0, 4).map((item) => (
+                              <Text key={item} style={styles.listLine}>
+                                + {item}
+                              </Text>
+                            ))}
+                          </View>
+                          <View style={styles.evidenceColumn}>
+                            <Text style={styles.columnTitle}>Top risks</Text>
+                            {[
+                              ...(selectedEye.lastEvaluation.contradictingEvidence ?? []),
+                              ...(selectedEye.lastEvaluation.riskWarnings ?? []),
+                              ...(selectedEye.lastEvaluation.hardDisqualifiers ?? []),
+                            ]
+                              .slice(0, 4)
+                              .map((item) => (
+                                <Text key={item} style={styles.listLine}>
+                                  - {item}
+                                </Text>
+                              ))}
+                          </View>
+                        </View>
+
+                        <WhatChangedPanel title="What changed" items={selectedEyeWhatChanged} />
+
+                        {selectedEyeEvidenceGroups.map((group) => (
+                          <EvidenceGroupView key={group.key} group={group} />
                         ))}
-                      </View>
-                      <View style={styles.evidenceColumn}>
-                        <Text style={styles.columnTitle}>Risks and Contradictions</Text>
-                        {(selectedEye.lastEvaluation?.contradictingEvidence ?? []).slice(0, 4).map((item) => (
-                          <Text key={item} style={styles.listLine}>
-                            - {item}
-                          </Text>
-                        ))}
-                      </View>
-                    </View>
+
+                        <View style={styles.actionRow}>
+                          <Button
+                            label="Entered"
+                            onPress={() => {
+                              const linkedAlert = data.alerts.find(
+                                (alert) => alert.eyeId === selectedEye.id && !alert.reviewed,
+                              );
+                              void actions.logDecision({
+                                eyeId: selectedEye.id,
+                                alertId: linkedAlert?.id,
+                                action: "Entered",
+                                note: `Entered after reviewing ${eyeLine(selectedEye, data.stocks, data.recipes)}.`,
+                                concern:
+                                  selectedEye.lastEvaluation?.contradictingEvidence[0] ??
+                                  "No primary concern captured.",
+                                thesisValid: "Yes",
+                                timing: "On Time",
+                              });
+                            }}
+                          />
+                          <Button
+                            label="Skipped"
+                            tone="secondary"
+                            onPress={() => {
+                              const linkedAlert = data.alerts.find(
+                                (alert) => alert.eyeId === selectedEye.id && !alert.reviewed,
+                              );
+                              void actions.logDecision({
+                                eyeId: selectedEye.id,
+                                alertId: linkedAlert?.id,
+                                action: "Skipped",
+                                note: `Skipped after reviewing ${eyeLine(selectedEye, data.stocks, data.recipes)}.`,
+                                concern:
+                                  selectedEye.lastEvaluation?.contradictingEvidence[0] ??
+                                  "No primary concern captured.",
+                                thesisValid: "Partly",
+                                timing: "On Time",
+                              });
+                            }}
+                          />
+                          <Button
+                            label="Rejected"
+                            tone="ghost"
+                            onPress={() => {
+                              const linkedAlert = data.alerts.find(
+                                (alert) => alert.eyeId === selectedEye.id && !alert.reviewed,
+                              );
+                              void actions.logDecision({
+                                eyeId: selectedEye.id,
+                                alertId: linkedAlert?.id,
+                                action: "Rejected",
+                                note: `Rejected after reviewing ${eyeLine(selectedEye, data.stocks, data.recipes)}.`,
+                                concern:
+                                  selectedEye.lastEvaluation?.contradictingEvidence[0] ??
+                                  "No primary concern captured.",
+                                thesisValid: "No",
+                                timing: "Late",
+                              });
+                            }}
+                          />
+                        </View>
+                      </>
+                    ) : null}
                   </Card>
                 </Reveal>
               ) : null}
@@ -1214,7 +1629,14 @@ export default function App() {
                     alertQueue.slice(0, 5).map((alert) => {
                       const eye = data.eyes.find((item) => item.id === alert.eyeId);
                       return (
-                        <Card key={alert.id}>
+                        <Pressable
+                          key={alert.id}
+                          onPress={() => {
+                            setSelectedAlertId(alert.id);
+                            if (eye) setSelectedEyeId(eye.id);
+                          }}
+                        >
+                        <Card highlighted={selectedAlert?.id === alert.id}>
                           <View style={styles.inlineBetween}>
                             <View style={styles.flexOne}>
                               <Text style={styles.cardEyebrow}>
@@ -1247,11 +1669,54 @@ export default function App() {
                             />
                           </View>
                         </Card>
+                        </Pressable>
                       );
                     })
                   )}
                 </View>
               </Reveal>
+
+              {selectedAlert && selectedAlertEye && selectedAlertRecipe && selectedAlertEvaluation ? (
+                <Reveal delay={200}>
+                  <SectionHeader
+                    title="Alert Detail"
+                    note="Fast explanation of what changed, why now, and what to review first."
+                  />
+                  <Card>
+                    <WhyNowPanel
+                      title="What happened"
+                      body={selectedAlert.whyNow}
+                      state={selectedAlertEvaluation.currentState}
+                      recipeVersion={`${selectedAlertRecipe.name} v${selectedAlertRecipe.version}`}
+                    />
+                    <View style={styles.dualColumn}>
+                      <View style={styles.evidenceColumn}>
+                        <Text style={styles.columnTitle}>Biggest support</Text>
+                        <Text style={styles.listLine}>
+                          + {selectedAlert.supportingEvidence[0] ?? "No strong support recorded."}
+                        </Text>
+                      </View>
+                      <View style={styles.evidenceColumn}>
+                        <Text style={styles.columnTitle}>Biggest risk</Text>
+                        <Text style={styles.listLine}>
+                          - {selectedAlert.risks[0] ?? "No major risk recorded."}
+                        </Text>
+                      </View>
+                    </View>
+                    <WhatChangedPanel
+                      title="Review in 5 seconds"
+                      items={[
+                        `Priority is ${selectedAlert.priority}.`,
+                        `State change: ${selectedAlert.stateChange}.`,
+                        selectedAlert.dataQuality,
+                      ]}
+                    />
+                    {selectedAlertEvidenceGroups.map((group) => (
+                      <EvidenceGroupView key={`alert-${group.key}`} group={group} />
+                    ))}
+                  </Card>
+                </Reveal>
+              ) : null}
             </>
           ) : null}
 
@@ -1620,6 +2085,81 @@ export default function App() {
                     <View style={styles.actionRow}>
                       <Button label="Save Recipe" onPress={() => void saveRecipe()} />
                     </View>
+                  </Reveal>
+
+                  <Reveal delay={120}>
+                    <SectionHeader
+                      title="Recipe Preview"
+                      note="Test the current draft on a selected stock before saving the recipe."
+                    />
+                    <Card>
+                      <Text style={styles.inputLabel}>Preview stock</Text>
+                      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.choiceRow}>
+                        {data.stocks.map((stock) => (
+                          <Pressable
+                            key={stock.id}
+                            onPress={() => setPreviewStockId(stock.id)}
+                            style={[styles.selectChip, previewStockId === stock.id ? styles.selectChipActive : null]}
+                          >
+                            <Text
+                              style={[
+                                styles.selectChipTitle,
+                                previewStockId === stock.id ? styles.selectChipTitleActive : null,
+                              ]}
+                            >
+                              {stock.symbol}
+                            </Text>
+                            <Text
+                              style={[
+                                styles.selectChipSubtitle,
+                                previewStockId === stock.id ? styles.selectChipSubtitleActive : null,
+                              ]}
+                            >
+                              {stock.name}
+                            </Text>
+                          </Pressable>
+                        ))}
+                      </ScrollView>
+
+                      {previewRecipe && previewEvaluation && previewStock ? (
+                        <>
+                          <WhyNowPanel
+                            title="Draft result"
+                            body={previewEvaluation.whyNow}
+                            state={previewEvaluation.currentState}
+                            recipeVersion={`${previewRecipe.name} v${previewRecipe.version}`}
+                          />
+                          <View style={styles.dualColumn}>
+                            <View style={styles.evidenceColumn}>
+                              <Text style={styles.columnTitle}>Preview support</Text>
+                              {(previewEvaluation.supportingEvidence ?? []).slice(0, 4).map((item) => (
+                                <Text key={item} style={styles.listLine}>
+                                  + {item}
+                                </Text>
+                              ))}
+                            </View>
+                            <View style={styles.evidenceColumn}>
+                              <Text style={styles.columnTitle}>Preview contradictions</Text>
+                              {(previewEvaluation.contradictingEvidence ?? []).slice(0, 4).map((item) => (
+                                <Text key={item} style={styles.listLine}>
+                                  - {item}
+                                </Text>
+                              ))}
+                            </View>
+                          </View>
+                          <Text style={styles.previewDisclosure}>
+                            Preview uses adapter-style sample data and must not be mistaken for live market data.
+                          </Text>
+                          {previewEvidenceGroups.map((group) => (
+                            <EvidenceGroupView key={`preview-${group.key}`} group={group} />
+                          ))}
+                        </>
+                      ) : (
+                        <Text style={styles.cardBody}>
+                          Add draft conditions first to see how this recipe would evaluate a stock.
+                        </Text>
+                      )}
+                    </Card>
                   </Reveal>
 
                   <Reveal delay={140}>
@@ -2356,6 +2896,44 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontFamily,
   },
+  panel: {
+    marginTop: 14,
+    padding: 14,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#e5ebf2",
+    backgroundColor: "#f8fafc",
+    gap: 8,
+  },
+  panelLabel: {
+    color: "#475569",
+    fontSize: 11,
+    fontWeight: "700",
+    letterSpacing: 0.8,
+    textTransform: "uppercase",
+    fontFamily,
+  },
+  panelBody: {
+    marginTop: 8,
+    color: "#0f172a",
+    fontSize: 15,
+    lineHeight: 22,
+    fontWeight: "600",
+    fontFamily,
+  },
+  panelBadges: {
+    alignItems: "flex-end",
+    gap: 8,
+  },
+  panelList: {
+    gap: 6,
+  },
+  panelListItem: {
+    color: "#334155",
+    fontSize: 14,
+    lineHeight: 20,
+    fontFamily,
+  },
   dualColumn: {
     marginTop: 16,
     gap: 12,
@@ -2383,6 +2961,240 @@ const styles = StyleSheet.create({
   },
   stack: {
     gap: 10,
+  },
+  evidenceGroup: {
+    marginTop: 16,
+    gap: 10,
+  },
+  evidenceCard: {
+    padding: 14,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#e4eaf1",
+    backgroundColor: "#ffffff",
+    gap: 10,
+  },
+  evidenceCardTitle: {
+    color: "#0f172a",
+    fontSize: 16,
+    lineHeight: 20,
+    fontWeight: "800",
+    fontFamily,
+  },
+  evidenceRole: {
+    marginTop: 4,
+    color: "#64748b",
+    fontSize: 12,
+    fontWeight: "700",
+    fontFamily,
+  },
+  evidenceBadgeStack: {
+    alignItems: "flex-end",
+    gap: 6,
+  },
+  statusBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    borderRadius: 5,
+  },
+  statusPassed: {
+    backgroundColor: "#eaf6ee",
+  },
+  statusFailed: {
+    backgroundColor: "#f3f4f6",
+  },
+  statusWarning: {
+    backgroundColor: "#fff4e5",
+  },
+  statusBlocked: {
+    backgroundColor: "#fee2e2",
+  },
+  statusPartial: {
+    backgroundColor: "#eef2ff",
+  },
+  statusUnavailable: {
+    backgroundColor: "#e5e7eb",
+  },
+  statusStale: {
+    backgroundColor: "#fef3c7",
+  },
+  statusMock: {
+    backgroundColor: "#e0f2fe",
+  },
+  statusBadgeText: {
+    color: "#0f172a",
+    fontSize: 11,
+    fontWeight: "800",
+    fontFamily,
+  },
+  freshnessBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    borderRadius: 5,
+  },
+  freshnessFresh: {
+    backgroundColor: "#eefbf3",
+  },
+  freshnessDelayed: {
+    backgroundColor: "#eef2ff",
+  },
+  freshnessPartial: {
+    backgroundColor: "#fff7ed",
+  },
+  freshnessUnavailable: {
+    backgroundColor: "#f3f4f6",
+  },
+  freshnessStale: {
+    backgroundColor: "#fef3c7",
+  },
+  freshnessMock: {
+    backgroundColor: "#e0f2fe",
+  },
+  freshnessBadgeText: {
+    color: "#334155",
+    fontSize: 11,
+    fontWeight: "700",
+    fontFamily,
+  },
+  evidenceSummary: {
+    color: "#334155",
+    fontSize: 14,
+    lineHeight: 21,
+    fontFamily,
+  },
+  evidenceMetricsRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  thresholdWrap: {
+    gap: 8,
+  },
+  thresholdTrack: {
+    height: 10,
+    borderRadius: 999,
+    backgroundColor: "#e8eef5",
+    overflow: "hidden",
+    position: "relative",
+  },
+  thresholdMarkerThreshold: {
+    position: "absolute",
+    top: -3,
+    bottom: -3,
+    width: 2,
+    backgroundColor: "#64748b",
+    marginLeft: -1,
+  },
+  thresholdMarkerCurrent: {
+    position: "absolute",
+    top: -5,
+    bottom: -5,
+    width: 4,
+    borderRadius: 4,
+    backgroundColor: "#0f172a",
+    marginLeft: -2,
+  },
+  entryZoneBand: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    borderRadius: 999,
+    backgroundColor: "#dbeafe",
+  },
+  thresholdLegend: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 8,
+  },
+  thresholdLegendText: {
+    color: "#64748b",
+    fontSize: 11,
+    fontWeight: "700",
+    fontFamily,
+  },
+  binaryVisual: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  binaryDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 999,
+  },
+  binaryDotActive: {
+    backgroundColor: "#0f172a",
+  },
+  binaryDotMuted: {
+    backgroundColor: "#cbd5e1",
+  },
+  binaryVisualText: {
+    color: "#475569",
+    fontSize: 13,
+    fontWeight: "700",
+    fontFamily,
+  },
+  freshnessVisual: {
+    gap: 8,
+  },
+  freshnessTrack: {
+    height: 8,
+    borderRadius: 999,
+    backgroundColor: "#dbeafe",
+  },
+  freshnessVisualText: {
+    color: "#475569",
+    fontSize: 12,
+    fontWeight: "700",
+    fontFamily,
+  },
+  evidenceEffect: {
+    color: "#0f172a",
+    fontSize: 13,
+    lineHeight: 19,
+    fontWeight: "700",
+    fontFamily,
+  },
+  evidenceWhy: {
+    color: "#475569",
+    fontSize: 13,
+    lineHeight: 20,
+    fontFamily,
+  },
+  formulaToggle: {
+    paddingTop: 2,
+  },
+  formulaToggleText: {
+    color: "#0f172a",
+    fontSize: 13,
+    fontWeight: "700",
+    fontFamily,
+  },
+  formulaPanel: {
+    padding: 12,
+    borderRadius: 7,
+    backgroundColor: "#f8fafc",
+    borderWidth: 1,
+    borderColor: "#e4eaf1",
+    gap: 6,
+  },
+  formulaTitle: {
+    color: "#0f172a",
+    fontSize: 13,
+    fontWeight: "800",
+    fontFamily,
+  },
+  formulaBody: {
+    color: "#475569",
+    fontSize: 13,
+    lineHeight: 19,
+    fontFamily,
+  },
+  formulaMeta: {
+    color: "#64748b",
+    fontSize: 12,
+    lineHeight: 18,
+    fontFamily,
   },
   priorityStack: {
     alignItems: "flex-end",
@@ -2587,6 +3399,14 @@ const styles = StyleSheet.create({
     color: "#475569",
     fontSize: 13,
     lineHeight: 20,
+    fontFamily,
+  },
+  previewDisclosure: {
+    marginTop: 14,
+    color: "#7c8ba1",
+    fontSize: 12,
+    lineHeight: 18,
+    fontWeight: "700",
     fontFamily,
   },
   kindPill: {

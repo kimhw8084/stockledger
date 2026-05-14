@@ -31,3 +31,7 @@
 - Reduced the overuse of rounded rectangle surfaces by shifting cards, chips, nav, and action controls to tighter finance-dashboard geometry with denser information layouts.
 - Replaced loose Recipe Builder threshold inputs with safer typed controls, including numeric steppers, enum selectors, explicit cadence/cooldown choices, and review-date presets.
 - Extended Eye creation so entry zones, invalidation notes, and last-review context are stored structurally instead of being buried only in freeform text.
+- Added `docs/10_VISUAL_EVIDENCE_LAYER_SPEC.md` to define the reusable explanation layer for Eye detail, Alert detail, and Recipe preview.
+- Built a first visual evidence adapter that converts evaluation results into grouped evidence cards with statuses, freshness, source labeling, threshold visuals, and expandable formula details.
+- Reworked Dashboard Eye review and Alert review around a shared evidence-board pattern instead of plain text evidence lists.
+- Added draft Recipe preview so a stock can be tested against unsaved Recipe logic using the same evaluation and evidence-card path as active Eyes.
