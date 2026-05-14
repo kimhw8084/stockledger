@@ -3,10 +3,11 @@
 ## Deferred
 
 - Replace the mock market adapter with a zero-cost provider adapter behind the same interface.
+- Add dedicated Eye detail and Alert detail drill-down screens once the current visual shell is validated on device.
+- Introduce a small design token layer and reusable card primitives if the calmer visual system continues to hold up through feature growth.
 - Add recipe editing, duplication, and version history.
 - Add Eye state history and change-since-last-review diffs.
 - Add provider health and freshness diagnostics in Settings.
-- Add a dedicated Eye detail screen and alert detail screen once the current single-screen review flow proves itself.
 - Replace the current custom tab shell with a proper navigation stack when screen count and drill-down depth justify it.
 - Add real outcome metrics instead of placeholder notes after provider-backed price history is available.
 - Add push notifications only after in-app alerts prove useful.

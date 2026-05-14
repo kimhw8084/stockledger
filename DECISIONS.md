@@ -84,3 +84,25 @@ Partly. The explicit chip-based selection and guided review pattern should remai
 
 Roadmap impact:
 Medium. This raises the floor for product usability now and gives a better base for evaluating real-data integration next.
+
+## 2026-05-13
+
+Decision:
+Push the MVP visual direction toward a calmer premium finance-product shell now, instead of deferring design quality until after backend work.
+
+Reason:
+The product brief is explicit that the app should feel serious, low-noise, analytical, and mobile-first. The earlier screen composition still read like a prototype even after the workflow cleanup.
+
+Alternatives considered:
+- Keep the same structure and only change colors
+- Wait until real data integration is finished before improving the interface
+- Add charts first to create a more "financial" feel
+
+Tradeoff:
+More front-end code now is dedicated to hierarchy, spacing, typography, and card composition. That does not solve the real-data gap, but it does create a higher-quality baseline that is worth iterating on once provider-backed signals arrive.
+
+Temporary:
+Partly. The exact styling and single-screen composition may evolve, but the design direction should remain calm, editorial, and state-led rather than loud or dashboard-noisy.
+
+Roadmap impact:
+Medium. This makes the current prototype materially more usable for on-device review while preserving the existing local-first architecture.

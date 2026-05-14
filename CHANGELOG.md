@@ -13,3 +13,6 @@
 - Reworked the app shell around a calmer mobile-first review flow instead of raw CRUD forms.
 - Replaced typed ID entry with tappable stock, recipe, eye, and alert selection chips.
 - Added in-place alert review actions, guided decision logging controls, and a stronger curated starter dataset.
+- Rebuilt the visual system toward a calmer premium finance-product feel with darker editorial framing, softer neutral surfaces, and clearer state hierarchy.
+- Reorganized Home, Eyes, Recipes, and Journal around decision-first cards instead of prototype-style stacked forms.
+- Tightened selection syncing and review flow behavior so Eye and Alert focus stays coherent as data changes.

@@ -1,6 +1,7 @@
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useMemo, useState } from "react";
 import {
+  Platform,
   Pressable,
   SafeAreaView,
   ScrollView,
@@ -11,7 +12,7 @@ import {
 } from "react-native";
 
 import { useAppModel } from "./src/hooks/useAppModel";
-import { Alert, DecisionAction, Eye, Recipe, Stock } from "./src/types";
+import { Alert, DecisionAction, Eye, EyeState, Recipe, Stock } from "./src/types";
 
 type TabKey = "Home" | "Eyes" | "Recipes" | "Journal";
 
@@ -26,6 +27,20 @@ const decisionActions: DecisionAction[] = [
 ];
 const thesisValidityOptions = ["Yes", "Partly", "No"] as const;
 const timingOptions = ["Early", "On Time", "Late"] as const;
+const statePriority: EyeState[] = [
+  "Attention Needed",
+  "Thesis Risk Rising",
+  "Opportunity Zone Forming",
+  "Watch Closely",
+  "Becoming Interesting",
+  "Not Relevant",
+  "Thesis Broken",
+];
+
+const headerFont = Platform.select({
+  ios: "Georgia",
+  default: undefined,
+});
 
 const formatDate = (value: string) =>
   new Date(value).toLocaleString(undefined, {
@@ -49,37 +64,53 @@ const urgencyWeight = (value?: string) => {
 const stateTone = (state?: string) => {
   switch (state) {
     case "Attention Needed":
-      return styles.stateCritical;
+      return [styles.statePill, styles.statePillAttention];
     case "Opportunity Zone Forming":
-      return styles.stateOpportunity;
+      return [styles.statePill, styles.statePillOpportunity];
     case "Thesis Risk Rising":
+      return [styles.statePill, styles.statePillRisk];
     case "Thesis Broken":
-      return styles.stateRisk;
+      return [styles.statePill, styles.statePillBroken];
     case "Watch Closely":
-      return styles.stateWatch;
+      return [styles.statePill, styles.statePillWatch];
+    case "Becoming Interesting":
+      return [styles.statePill, styles.statePillInteresting];
     default:
-      return styles.stateQuiet;
+      return [styles.statePill, styles.statePillQuiet];
   }
 };
 
 const priorityTone = (priority: Alert["priority"]) => {
   switch (priority) {
     case "High":
-      return styles.priorityHigh;
+      return [styles.priorityBadge, styles.priorityHigh];
     case "Medium":
-      return styles.priorityMedium;
+      return [styles.priorityBadge, styles.priorityMedium];
     default:
-      return styles.priorityLow;
+      return [styles.priorityBadge, styles.priorityLow];
   }
 };
 
 const Card = ({
   children,
   elevated,
+  tone = "default",
 }: {
   children: React.ReactNode;
   elevated?: boolean;
-}) => <View style={[styles.card, elevated ? styles.cardElevated : null]}>{children}</View>;
+  tone?: "default" | "dark" | "muted";
+}) => (
+  <View
+    style={[
+      styles.card,
+      tone === "dark" ? styles.cardDark : null,
+      tone === "muted" ? styles.cardMuted : null,
+      elevated ? styles.cardElevated : null,
+    ]}
+  >
+    {children}
+  </View>
+);
 
 const SectionTitle = ({
   title,
@@ -114,7 +145,7 @@ const Input = ({
     value={value}
     onChangeText={onChangeText}
     placeholder={placeholder}
-    placeholderTextColor="#73808c"
+    placeholderTextColor="#7f867f"
     multiline={multiline}
     style={[styles.input, multiline ? styles.textArea : null]}
   />
@@ -193,7 +224,7 @@ const SelectChips = ({
   onSelect: (value: string) => void;
 }) => (
   <View style={styles.selectBlock}>
-    <Text style={styles.selectLabel}>{label}</Text>
+    <Text style={styles.inputLabel}>{label}</Text>
     {options.length === 0 ? <Text style={styles.emptyInline}>{emptyLabel}</Text> : null}
     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.selectRow}>
       {options.map((option) => (
@@ -241,6 +272,12 @@ const decisionTitle = (eyeId: string, eyes: Eye[], stocks: Stock[], recipes: Rec
   return eye ? eyeLine(eye, stocks, recipes) : "Unknown Eye";
 };
 
+const topReason = (eye: Eye) =>
+  eye.lastEvaluation?.supportingEvidence[0] ??
+  eye.lastEvaluation?.contradictingEvidence[0] ??
+  eye.lastEvaluation?.whyNow ??
+  "No evaluation yet.";
+
 export default function App() {
   const { data, loading, actions } = useAppModel();
   const [tab, setTab] = useState<TabKey>("Home");
@@ -266,9 +303,14 @@ export default function App() {
 
   const eyesSorted = useMemo(
     () =>
-      [...(data?.eyes ?? [])].sort((a, b) =>
-        urgencyWeight(a.lastEvaluation?.actionUrgency) - urgencyWeight(b.lastEvaluation?.actionUrgency),
-      ),
+      [...(data?.eyes ?? [])].sort((a, b) => {
+        const stateDelta =
+          statePriority.indexOf(a.lastEvaluation?.currentState ?? "Not Relevant") -
+          statePriority.indexOf(b.lastEvaluation?.currentState ?? "Not Relevant");
+        return stateDelta !== 0
+          ? stateDelta
+          : urgencyWeight(a.lastEvaluation?.actionUrgency) - urgencyWeight(b.lastEvaluation?.actionUrgency);
+      }),
     [data?.eyes],
   );
 
@@ -286,6 +328,10 @@ export default function App() {
   useEffect(() => {
     if (!selectedEyeId && eyesSorted[0]) {
       setSelectedEyeId(eyesSorted[0].id);
+      return;
+    }
+    if (selectedEyeId && !eyesSorted.some((eye) => eye.id === selectedEyeId)) {
+      setSelectedEyeId(eyesSorted[0]?.id ?? "");
     }
   }, [eyesSorted, selectedEyeId]);
 
@@ -293,6 +339,10 @@ export default function App() {
     const openAlert = alertQueue.find((item) => !item.reviewed) ?? alertQueue[0];
     if (!selectedAlertId && openAlert) {
       setSelectedAlertId(openAlert.id);
+      return;
+    }
+    if (selectedAlertId && !alertQueue.some((alert) => alert.id === selectedAlertId)) {
+      setSelectedAlertId(openAlert?.id ?? "");
     }
   }, [alertQueue, selectedAlertId]);
 
@@ -304,12 +354,15 @@ export default function App() {
     if (eyeForm.recipeId && !data.recipes.some((recipe) => recipe.id === eyeForm.recipeId)) {
       setEyeForm((current) => ({ ...current, recipeId: "" }));
     }
-  }, [data, eyeForm.recipeId, eyeForm.stockId]);
+    if (decisionForm.eyeId && !data.eyes.some((eye) => eye.id === decisionForm.eyeId)) {
+      setDecisionForm((current) => ({ ...current, eyeId: "", alertId: "" }));
+    }
+  }, [data, decisionForm.eyeId, eyeForm.recipeId, eyeForm.stockId]);
 
   if (loading || !data) {
     return (
       <SafeAreaView style={styles.loadingScreen}>
-        <StatusBar style="dark" />
+        <StatusBar style="light" />
         <Text style={styles.loadingText}>Loading StockLedger...</Text>
       </SafeAreaView>
     );
@@ -336,6 +389,26 @@ export default function App() {
     (eye) => eye.lastEvaluation?.currentState === "Opportunity Zone Forming",
   ).length;
   const openAlerts = data.alerts.filter((alert) => !alert.reviewed).length;
+  const quietEyes = data.eyes.filter(
+    (eye) =>
+      !["Attention Needed", "Thesis Risk Rising", "Thesis Broken", "Opportunity Zone Forming"].includes(
+        eye.lastEvaluation?.currentState ?? "",
+      ),
+  ).length;
+  const mockCount = data.snapshots.filter((snapshot) => snapshot.isMock).length;
+  const freshestUpdate = data.snapshots
+    .map((snapshot) => snapshot.updatedAt)
+    .sort((a, b) => b.localeCompare(a))[0];
+
+  const stateSummary = statePriority
+    .filter((state) => state !== "Not Relevant")
+    .map((state) => ({
+      state,
+      count: data.eyes.filter((eye) => eye.lastEvaluation?.currentState === state).length,
+    }))
+    .filter((item) => item.count > 0);
+
+  const recentDecisions = data.decisions.slice(0, 3);
 
   const quickDecision = async (action: DecisionAction) => {
     if (!selectedAlert) return;
@@ -358,31 +431,43 @@ export default function App() {
 
   return (
     <SafeAreaView style={styles.screen}>
-      <StatusBar style="dark" />
-      <ScrollView contentContainerStyle={styles.page}>
-        <View style={styles.hero}>
-          <Text style={styles.kicker}>Personal investment recipe engine</Text>
-          <Text style={styles.title}>StockLedger</Text>
-          <Text style={styles.subtitle}>
-            Evidence-first stock memory for opportunities you do not want to lose. This build is
-            local-first and honest about mock data.
+      <StatusBar style="light" />
+      <ScrollView contentContainerStyle={styles.page} showsVerticalScrollIndicator={false}>
+        <Card tone="dark" elevated>
+          <View style={styles.heroTopline}>
+            <Text style={styles.heroEyebrow}>Evidence-driven investing workspace</Text>
+            <Text style={styles.heroTimestamp}>
+              {freshestUpdate ? `Updated ${formatDate(freshestUpdate)}` : "No market snapshots yet"}
+            </Text>
+          </View>
+          <Text style={styles.heroTitle}>StockLedger</Text>
+          <Text style={styles.heroSubtitle}>
+            Calm monitoring for investment ideas that deserve memory, context, and disciplined review.
           </Text>
 
           <View style={styles.metricStrip}>
-            <Card elevated>
+            <View style={styles.metricCard}>
               <Text style={styles.metricValue}>{openAlerts}</Text>
               <Text style={styles.metricLabel}>Open alerts</Text>
-            </Card>
-            <Card elevated>
+            </View>
+            <View style={styles.metricCard}>
               <Text style={styles.metricValue}>{criticalEyes}</Text>
               <Text style={styles.metricLabel}>Risk or attention</Text>
-            </Card>
-            <Card elevated>
+            </View>
+            <View style={styles.metricCard}>
               <Text style={styles.metricValue}>{opportunityEyes}</Text>
               <Text style={styles.metricLabel}>Opportunity forming</Text>
-            </Card>
+            </View>
           </View>
-        </View>
+
+          <View style={styles.heroFootRow}>
+            <MetaPill label={`${quietEyes} quieter eyes`} tone={styles.metaPillSoftDark} />
+            <MetaPill
+              label={mockCount > 0 ? `${mockCount} mock feeds active` : "Provider-backed data"}
+              tone={styles.metaPillSoftDark}
+            />
+          </View>
+        </Card>
 
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabRow}>
           {tabs.map((item) => (
@@ -399,29 +484,50 @@ export default function App() {
         {tab === "Home" ? (
           <>
             <SectionTitle
-              title="Attention Today"
-              note="A mobile-first review surface. Prioritized by meaningful state, not price noise."
+              title="Today"
+              note="What needs your attention, what can wait, and why."
               action={<Button label="Refresh Mock Data" onPress={() => actions.refreshMockData()} tone="ghost" />}
             />
 
+            {stateSummary.length > 0 ? (
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.stateBoardRow}
+              >
+                {stateSummary.map((item) => (
+                  <Card key={item.state} tone="muted">
+                    <Text style={styles.stateBoardCount}>{item.count}</Text>
+                    <Text style={styles.stateBoardLabel}>{item.state}</Text>
+                  </Card>
+                ))}
+              </ScrollView>
+            ) : null}
+
             {selectedEye ? (
               <Card elevated>
-                <View style={styles.inlineBetween}>
+                <View style={styles.inlineBetweenStart}>
                   <View style={styles.flexOne}>
                     <Text style={styles.cardEyebrow}>Focus eye</Text>
-                    <Text style={styles.cardTitle}>{eyeLine(selectedEye, data.stocks, data.recipes)}</Text>
-                    <Text style={styles.cardBody}>{selectedEye.lastEvaluation?.whyNow}</Text>
+                    <Text style={styles.cardTitle}>{selectedEye ? eyeLine(selectedEye, data.stocks, data.recipes) : "No Eye"}</Text>
+                    <Text style={styles.cardBody}>
+                      {selectedEye.lastEvaluation?.whyNow ?? "This Eye has not been evaluated yet."}
+                    </Text>
                   </View>
-                  <Text style={[styles.statePill, stateTone(selectedEye.lastEvaluation?.currentState)]}>
+                  <Text style={stateTone(selectedEye.lastEvaluation?.currentState)}>
                     {selectedEye.lastEvaluation?.currentState ?? "Not Evaluated"}
                   </Text>
                 </View>
 
                 <View style={styles.metaPillRow}>
                   <MetaPill label={selectedEye.lastEvaluation?.actionUrgency ?? "Wait"} />
-                  <MetaPill label={selectedEye.lastEvaluation?.setupStrength ?? "Low"} />
+                  <MetaPill label={`Setup ${selectedEye.lastEvaluation?.setupStrength ?? "Low"}`} />
+                  {selectedRecipe ? <MetaPill label={selectedRecipe.timeHorizon || "No horizon"} /> : null}
                   {selectedSnapshot ? (
-                    <MetaPill label={selectedSnapshot.freshness} tone={styles.metaPillMock} />
+                    <MetaPill
+                      label={`${selectedSnapshot.sourceName} · ${selectedSnapshot.freshness}`}
+                      tone={selectedSnapshot.isMock ? styles.metaPillMock : undefined}
+                    />
                   ) : null}
                 </View>
 
@@ -462,7 +568,7 @@ export default function App() {
                     ))}
                   </View>
                   <View style={styles.evidenceColumn}>
-                    <Text style={styles.columnTitle}>Contradictions and risks</Text>
+                    <Text style={styles.columnTitle}>Risks and contradictions</Text>
                     {(selectedEye.lastEvaluation?.contradictingEvidence ?? []).slice(0, 4).map((item) => (
                       <Text key={item} style={styles.listLine}>
                         - {item}
@@ -471,101 +577,164 @@ export default function App() {
                   </View>
                 </View>
 
+                <View style={styles.annotationBlock}>
+                  <Text style={styles.annotationLabel}>Original thesis snapshot</Text>
+                  <Text style={styles.annotationText}>{selectedEye.thesisSnapshot}</Text>
+                </View>
+
                 <Text style={styles.footnote}>{selectedEye.lastEvaluation?.dataQuality}</Text>
               </Card>
             ) : (
               <Card>
-                <Text style={styles.cardBody}>No Eyes yet. Add a stock, pick a recipe, and create an Eye.</Text>
+                <Text style={styles.cardBody}>No Eyes yet. Add a stock, choose a recipe, and start monitoring.</Text>
               </Card>
             )}
 
-            <SectionTitle title="Alert Queue" note="Tap an alert to review it in place." />
-            {selectedAlert ? (
-              <Card elevated>
-                <View style={styles.inlineBetween}>
-                  <View style={styles.flexOne}>
-                    <Text style={styles.cardEyebrow}>Selected alert</Text>
-                    <Text style={styles.cardTitle}>{selectedAlert.title}</Text>
-                    <Text style={styles.cardBody}>{selectedAlert.whyNow}</Text>
-                  </View>
-                  <View style={[styles.priorityBadge, priorityTone(selectedAlert.priority)]}>
-                    <Text style={styles.priorityBadgeText}>{selectedAlert.priority}</Text>
-                  </View>
-                </View>
-                <Text style={styles.metaLine}>
-                  {selectedAlert.stateChange} · {selectedAlert.reviewed ? "Reviewed" : "Open"} ·{" "}
-                  {formatDate(selectedAlert.createdAt)}
-                </Text>
-                <Text style={styles.metaLine}>Support: {selectedAlert.supportingEvidence.join(" | ") || "None"}</Text>
-                <Text style={styles.metaLine}>Risks: {selectedAlert.risks.join(" | ") || "None"}</Text>
-                <Text style={styles.footnote}>{selectedAlert.dataQuality}</Text>
-                <View style={styles.actionRow}>
-                  <Button label="Entered" onPress={() => void quickDecision("Entered")} />
-                  <Button label="Skipped" onPress={() => void quickDecision("Skipped")} tone="secondary" />
-                  <Button label="Snoozed" onPress={() => void quickDecision("Snoozed")} tone="secondary" />
-                </View>
-                <View style={styles.actionRow}>
-                  <Button
-                    label="Mark Reviewed"
-                    onPress={() => void actions.markAlertReviewed(selectedAlert.id)}
-                    tone="ghost"
-                  />
-                  <Button
-                    label="Journal It"
-                    onPress={() => {
-                      setDecisionForm((current) => ({
-                        ...current,
-                        eyeId: selectedAlert.eyeId,
-                        alertId: selectedAlert.id,
-                        note: selectedAlert.whyNow,
-                      }));
-                      setTab("Journal");
-                    }}
-                    tone="ghost"
-                  />
-                </View>
-              </Card>
+            <SectionTitle title="Review Queue" note="A five-second scan should be enough to know what changed." />
+            {alertQueue.length > 0 ? (
+              <View style={styles.stack}>
+                {alertQueue.slice(0, 5).map((alert) => {
+                  const alertEye = data.eyes.find((eye) => eye.id === alert.eyeId);
+                  return (
+                    <Pressable
+                      key={alert.id}
+                      onPress={() => {
+                        setSelectedAlertId(alert.id);
+                        if (alertEye) {
+                          setSelectedEyeId(alertEye.id);
+                        }
+                      }}
+                    >
+                      <Card elevated={selectedAlert?.id === alert.id} tone={selectedAlert?.id === alert.id ? "default" : "muted"}>
+                        <View style={styles.inlineBetweenStart}>
+                          <View style={styles.flexOne}>
+                            <Text style={styles.alertSymbol}>
+                              {stockLabel(data.stocks, alertEye?.stockId ?? "")}
+                            </Text>
+                            <Text style={styles.alertTitle}>{alert.title}</Text>
+                            <Text style={styles.cardBody}>{alert.whyNow}</Text>
+                          </View>
+                          <View style={styles.alertMetaCol}>
+                            <View style={priorityTone(alert.priority)}>
+                              <Text style={styles.priorityBadgeText}>{alert.priority}</Text>
+                            </View>
+                            <Text style={styles.alertTimestamp}>{formatDate(alert.createdAt)}</Text>
+                          </View>
+                        </View>
+                        <Text style={styles.metaLine}>{alert.stateChange}</Text>
+                        <Text style={styles.metaLine}>Support: {alert.supportingEvidence.join(" | ") || "None"}</Text>
+                        <Text style={styles.metaLine}>Risks: {alert.risks.join(" | ") || "None"}</Text>
+                        <View style={styles.actionRow}>
+                          <Button label="Entered" onPress={() => void quickDecision("Entered")} />
+                          <Button label="Skipped" onPress={() => void quickDecision("Skipped")} tone="secondary" />
+                          <Button label="Snoozed" onPress={() => void quickDecision("Snoozed")} tone="ghost" />
+                        </View>
+                      </Card>
+                    </Pressable>
+                  );
+                })}
+              </View>
             ) : (
               <Card>
-                <Text style={styles.cardBody}>No alerts to review right now.</Text>
+                <Text style={styles.cardBody}>No alerts are open right now.</Text>
               </Card>
             )}
 
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.selectRow}>
-              {alertQueue.map((alert) => (
-                <Pressable
-                  key={alert.id}
-                  onPress={() => setSelectedAlertId(alert.id)}
-                  style={[styles.alertChip, selectedAlert?.id === alert.id ? styles.alertChipActive : null]}
-                >
-                  <Text style={styles.alertChipTitle}>{stockLabel(data.stocks, data.eyes.find((eye) => eye.id === alert.eyeId)?.stockId ?? "")}</Text>
-                  <Text style={styles.alertChipSubtitle}>{alert.stateChange}</Text>
-                </Pressable>
-              ))}
-            </ScrollView>
+            <SectionTitle title="Recent Decisions" note="Keep the feedback loop close to the monitoring surface." />
+            {recentDecisions.length > 0 ? (
+              <View style={styles.stack}>
+                {recentDecisions.map((decision) => (
+                  <Card key={decision.id} tone="muted">
+                    <Text style={styles.decisionHeading}>
+                      {decision.action} · {decisionTitle(decision.eyeId, data.eyes, data.stocks, data.recipes)}
+                    </Text>
+                    <Text style={styles.cardBody}>{decision.note}</Text>
+                    <Text style={styles.metaLine}>
+                      Thesis {decision.thesisValid} · Timing {decision.timing} · {formatDate(decision.createdAt)}
+                    </Text>
+                  </Card>
+                ))}
+              </View>
+            ) : (
+              <Card tone="muted">
+                <Text style={styles.cardBody}>No decisions logged yet.</Text>
+              </Card>
+            )}
           </>
         ) : null}
 
         {tab === "Eyes" ? (
           <>
             <SectionTitle
-              title="Create Eye"
-              note="A stock is watched through a reason. Pick both explicitly."
+              title="Active Eyes"
+              note="Each Eye should explain current state, top reason, freshness, and the next useful action."
               action={<Button label="Load Curated Starter" onPress={() => actions.resetToSeed()} tone="ghost" />}
             />
+            <View style={styles.stack}>
+              {eyesSorted.map((eye) => {
+                const stock = data.stocks.find((item) => item.id === eye.stockId);
+                const recipe = data.recipes.find((item) => item.id === eye.recipeId);
+                const snapshot = data.snapshots.find((item) => item.stockId === eye.stockId);
+                const relatedAlert = alertQueue.find((alert) => alert.eyeId === eye.id && !alert.reviewed);
+                return (
+                  <Pressable
+                    key={eye.id}
+                    onPress={() => {
+                      setSelectedEyeId(eye.id);
+                      if (relatedAlert) {
+                        setSelectedAlertId(relatedAlert.id);
+                      }
+                      setTab("Home");
+                    }}
+                  >
+                    <Card elevated={selectedEye?.id === eye.id}>
+                      <View style={styles.inlineBetweenStart}>
+                        <View style={styles.flexOne}>
+                          <Text style={styles.cardEyebrow}>{stock?.name ?? "Unknown company"}</Text>
+                          <Text style={styles.cardTitle}>
+                            {stock?.symbol ?? "Unknown"} · {recipe?.name ?? "Unknown recipe"}
+                          </Text>
+                          <Text style={styles.cardBody}>{topReason(eye)}</Text>
+                        </View>
+                        <Text style={stateTone(eye.lastEvaluation?.currentState)}>
+                          {eye.lastEvaluation?.currentState ?? "Not Evaluated"}
+                        </Text>
+                      </View>
+                      <View style={styles.metaPillRow}>
+                        <MetaPill label={eye.lastEvaluation?.actionUrgency ?? "Wait"} />
+                        {snapshot ? (
+                          <MetaPill
+                            label={`${snapshot.freshness} · ${formatDate(snapshot.updatedAt)}`}
+                            tone={snapshot.isMock ? styles.metaPillMock : undefined}
+                          />
+                        ) : null}
+                        {relatedAlert ? <MetaPill label={`Alert ${relatedAlert.priority}`} /> : null}
+                      </View>
+                      <Text style={styles.metaLine}>{eye.thesisSnapshot}</Text>
+                    </Card>
+                  </Pressable>
+                );
+              })}
+            </View>
+
+            <SectionTitle title="Create Eye" note="A stock is watched through an explicit recipe, not a vague alert." />
             <Card elevated>
               <View style={styles.formBlock}>
                 <Text style={styles.formTitle}>1. Add stock to memory</Text>
+                <Text style={styles.formNote}>Keep it deliberate. Save only names worth repeated review.</Text>
+                <Text style={styles.inputLabel}>Ticker</Text>
                 <Input
                   value={stockForm.symbol}
                   onChangeText={(symbol) => setStockForm((current) => ({ ...current, symbol }))}
                   placeholder="Ticker symbol"
                 />
+                <Text style={styles.inputLabel}>Company</Text>
                 <Input
                   value={stockForm.name}
                   onChangeText={(name) => setStockForm((current) => ({ ...current, name }))}
                   placeholder="Company name"
                 />
+                <Text style={styles.inputLabel}>Why this stock belongs here</Text>
                 <Input
                   value={stockForm.thesis}
                   onChangeText={(thesis) => setStockForm((current) => ({ ...current, thesis }))}
@@ -585,7 +754,8 @@ export default function App() {
               <View style={styles.divider} />
 
               <View style={styles.formBlock}>
-                <Text style={styles.formTitle}>2. Apply a recipe</Text>
+                <Text style={styles.formTitle}>2. Apply recipe to stock</Text>
+                <Text style={styles.formNote}>This creates a living monitor, not a one-off trigger.</Text>
                 <SelectChips
                   label="Stock"
                   emptyLabel="Add a stock first."
@@ -608,6 +778,7 @@ export default function App() {
                   selectedId={eyeForm.recipeId}
                   onSelect={(recipeId) => setEyeForm((current) => ({ ...current, recipeId }))}
                 />
+                <Text style={styles.inputLabel}>Why this pairing matters</Text>
                 <Input
                   value={eyeForm.thesisSnapshot}
                   onChangeText={(thesisSnapshot) =>
@@ -626,81 +797,82 @@ export default function App() {
                 />
               </View>
             </Card>
-
-            <SectionTitle title="Active Eyes" note="Tap a card to make it the focus eye on Home." />
-            {eyesSorted.map((eye) => {
-              const stock = data.stocks.find((item) => item.id === eye.stockId);
-              const snapshot = data.snapshots.find((item) => item.stockId === eye.stockId);
-              return (
-                <Pressable
-                  key={eye.id}
-                  onPress={() => {
-                    setSelectedEyeId(eye.id);
-                    setTab("Home");
-                  }}
-                >
-                  <Card elevated={selectedEyeId === eye.id}>
-                    <View style={styles.inlineBetween}>
-                      <View style={styles.flexOne}>
-                        <Text style={styles.cardTitle}>{eyeLine(eye, data.stocks, data.recipes)}</Text>
-                        <Text style={styles.cardBody}>{eye.thesisSnapshot}</Text>
-                      </View>
-                      <Text style={[styles.statePill, stateTone(eye.lastEvaluation?.currentState)]}>
-                        {eye.lastEvaluation?.currentState ?? "Not Evaluated"}
-                      </Text>
-                    </View>
-                    <View style={styles.metaPillRow}>
-                      <MetaPill label={eye.lastEvaluation?.actionUrgency ?? "Wait"} />
-                      {snapshot ? <MetaPill label={snapshot.freshness} tone={styles.metaPillMock} /> : null}
-                    </View>
-                    <Text style={styles.metaLine}>{eye.lastEvaluation?.whyNow}</Text>
-                    {stock ? <Text style={styles.footnote}>Original stock thesis: {stock.thesis}</Text> : null}
-                  </Card>
-                </Pressable>
-              );
-            })}
           </>
         ) : null}
 
         {tab === "Recipes" ? (
           <>
-            <SectionTitle
-              title="Recipe Builder"
-              note="Keep rules human-readable. This is not a programming tool."
-            />
+            <SectionTitle title="Recipe Library" note="Human-readable investing logic first. Technical expansion can come later." />
+            <View style={styles.stack}>
+              {data.recipes.map((recipe) => (
+                <Card key={recipe.id} elevated>
+                  <View style={styles.inlineBetweenStart}>
+                    <View style={styles.flexOne}>
+                      <Text style={styles.cardEyebrow}>Version {recipe.version}</Text>
+                      <Text style={styles.cardTitle}>{recipe.name}</Text>
+                      <Text style={styles.cardBody}>{recipe.purpose}</Text>
+                    </View>
+                    <MetaPill label={recipe.timeHorizon || "No horizon"} />
+                  </View>
+                  <Text style={styles.metaLine}>Use case: {recipe.intendedUseCase || "Not specified yet"}</Text>
+                  {recipe.conditions.map((condition) => (
+                    <Text key={condition.id} style={styles.listLine}>
+                      {condition.kind === "required"
+                        ? "+ "
+                        : condition.kind === "supporting"
+                          ? "+ "
+                          : condition.kind === "negative"
+                            ? "- "
+                            : "! "}
+                      {condition.label}
+                    </Text>
+                  ))}
+                  {recipe.notes ? <Text style={styles.footnote}>{recipe.notes}</Text> : null}
+                </Card>
+              ))}
+            </View>
+
+            <SectionTitle title="Draft New Recipe" note="The builder stays plain-language for now." />
             <Card elevated>
+              <Text style={styles.inputLabel}>Recipe name</Text>
               <Input
                 value={recipeForm.name}
                 onChangeText={(name) => setRecipeForm((current) => ({ ...current, name }))}
-                placeholder="Recipe name"
+                placeholder="Temporary Bargain Sale"
               />
+              <Text style={styles.inputLabel}>Purpose</Text>
               <Input
                 value={recipeForm.purpose}
                 onChangeText={(purpose) => setRecipeForm((current) => ({ ...current, purpose }))}
-                placeholder="Purpose"
+                placeholder="What investment idea does this represent?"
                 multiline
               />
+              <Text style={styles.inputLabel}>Time horizon</Text>
               <Input
                 value={recipeForm.timeHorizon}
-                onChangeText={(timeHorizon) => setRecipeForm((current) => ({ ...current, timeHorizon }))}
-                placeholder="Time horizon"
+                onChangeText={(timeHorizon) =>
+                  setRecipeForm((current) => ({ ...current, timeHorizon }))
+                }
+                placeholder="Weeks, months, or years?"
               />
+              <Text style={styles.inputLabel}>Intended use case</Text>
               <Input
                 value={recipeForm.intendedUseCase}
                 onChangeText={(intendedUseCase) =>
                   setRecipeForm((current) => ({ ...current, intendedUseCase }))
                 }
-                placeholder="Intended use case"
+                placeholder="When should this recipe be applied?"
                 multiline
               />
+              <Text style={styles.inputLabel}>Notes</Text>
               <Input
                 value={recipeForm.notes}
                 onChangeText={(notes) => setRecipeForm((current) => ({ ...current, notes }))}
-                placeholder="Notes and hard disqualifiers"
+                placeholder="Risks, disqualifiers, or review ideas"
                 multiline
               />
               <Button
-                label="Save Recipe"
+                label="Save Recipe Draft"
                 onPress={() => {
                   if (!recipeForm.name.trim()) return;
                   void actions.addRecipe(recipeForm);
@@ -714,80 +886,73 @@ export default function App() {
                 }}
               />
             </Card>
-
-            <SectionTitle title="Recipe Library" note="Readable first. Conditions stay visible." />
-            {data.recipes.map((recipe) => (
-              <Card key={recipe.id}>
-                <Text style={styles.cardTitle}>
-                  {recipe.name} v{recipe.version}
-                </Text>
-                <Text style={styles.cardBody}>{recipe.purpose}</Text>
-                <Text style={styles.metaLine}>
-                  {recipe.timeHorizon} · {recipe.intendedUseCase}
-                </Text>
-                {recipe.conditions.map((condition) => (
-                  <Text key={condition.id} style={styles.listLine}>
-                    {condition.kind === "disqualifier" ? "!" : condition.kind === "negative" ? "-" : "+"}{" "}
-                    {condition.label}
-                  </Text>
-                ))}
-                <Text style={styles.footnote}>{recipe.notes}</Text>
-              </Card>
-            ))}
           </>
         ) : null}
 
         {tab === "Journal" ? (
           <>
-            <SectionTitle title="Decision Journal" note="Guided logging, not blank note-taking." />
+            <SectionTitle title="Decision Journal" note="Fast prompts, minimal friction, enough context to learn later." />
             <Card elevated>
               <SelectChips
                 label="Eye"
                 emptyLabel="Create an Eye first."
                 options={data.eyes.map((eye) => ({
                   id: eye.id,
-                  title: eyeLine(eye, data.stocks, data.recipes),
-                  subtitle: eye.lastEvaluation?.currentState ?? "Not Evaluated",
+                  title: stockLabel(data.stocks, eye.stockId),
+                  subtitle: recipeLabel(data.recipes, eye.recipeId),
                 }))}
                 selectedId={decisionForm.eyeId}
                 onSelect={(eyeId) => setDecisionForm((current) => ({ ...current, eyeId }))}
               />
               <SelectChips
-                label="Linked alert"
-                emptyLabel="Optional. Choose an alert if this decision came from one."
-                options={data.alerts.map((alert) => ({
+                label="Related alert"
+                emptyLabel="No alerts yet."
+                options={alertQueue.map((alert) => ({
                   id: alert.id,
-                  title: alert.title,
+                  title: stockLabel(
+                    data.stocks,
+                    data.eyes.find((eye) => eye.id === alert.eyeId)?.stockId ?? "",
+                  ),
                   subtitle: alert.stateChange,
                 }))}
                 selectedId={decisionForm.alertId}
-                onSelect={(alertId) => setDecisionForm((current) => ({ ...current, alertId }))}
+                onSelect={(alertId) => {
+                  const linkedAlert = data.alerts.find((alert) => alert.id === alertId);
+                  setDecisionForm((current) => ({
+                    ...current,
+                    alertId,
+                    eyeId: linkedAlert?.eyeId ?? current.eyeId,
+                    note: linkedAlert?.whyNow ?? current.note,
+                  }));
+                }}
               />
-              <Text style={styles.selectLabel}>Action</Text>
+              <Text style={styles.inputLabel}>Action</Text>
               <ChoiceGroup
                 options={decisionActions}
                 selected={decisionForm.action}
                 onSelect={(action) => setDecisionForm((current) => ({ ...current, action }))}
               />
+              <Text style={styles.inputLabel}>Why did you act this way?</Text>
               <Input
                 value={decisionForm.note}
                 onChangeText={(note) => setDecisionForm((current) => ({ ...current, note }))}
-                placeholder="Why did you make this decision?"
+                placeholder="Why did you enter, skip, or delay?"
                 multiline
               />
+              <Text style={styles.inputLabel}>Main concern</Text>
               <Input
                 value={decisionForm.concern}
                 onChangeText={(concern) => setDecisionForm((current) => ({ ...current, concern }))}
-                placeholder="What risk concerned you most?"
+                placeholder="What risk mattered most?"
                 multiline
               />
-              <Text style={styles.selectLabel}>Was the original thesis still valid?</Text>
+              <Text style={styles.inputLabel}>Was the thesis still valid?</Text>
               <ChoiceGroup
                 options={thesisValidityOptions}
                 selected={decisionForm.thesisValid}
                 onSelect={(thesisValid) => setDecisionForm((current) => ({ ...current, thesisValid }))}
               />
-              <Text style={styles.selectLabel}>Alert timing</Text>
+              <Text style={styles.inputLabel}>Was the alert early, on time, or late?</Text>
               <ChoiceGroup
                 options={timingOptions}
                 selected={decisionForm.timing}
@@ -796,11 +961,8 @@ export default function App() {
               <Button
                 label="Save Decision"
                 onPress={() => {
-                  if (!decisionForm.eyeId.trim() || !decisionForm.note.trim()) return;
-                  void actions.logDecision({
-                    ...decisionForm,
-                    alertId: decisionForm.alertId || undefined,
-                  });
+                  if (!decisionForm.eyeId || !decisionForm.note.trim()) return;
+                  void actions.logDecision(decisionForm);
                   setDecisionForm({
                     eyeId: "",
                     alertId: "",
@@ -814,25 +976,21 @@ export default function App() {
               />
             </Card>
 
-            <SectionTitle title="Recent Decisions" note="The product should teach the recipe loop over time." />
-            {data.decisions.map((decision) => (
-              <Card key={decision.id}>
-                <View style={styles.inlineBetween}>
-                  <View style={styles.flexOne}>
-                    <Text style={styles.cardTitle}>{decision.action}</Text>
-                    <Text style={styles.metaLine}>
-                      {decisionTitle(decision.eyeId, data.eyes, data.stocks, data.recipes)}
-                    </Text>
-                  </View>
-                  <Text style={styles.cardEyebrow}>{formatDate(decision.createdAt)}</Text>
-                </View>
-                <Text style={styles.cardBody}>{decision.note}</Text>
-                <Text style={styles.metaLine}>
-                  Thesis: {decision.thesisValid} · Timing: {decision.timing}
-                </Text>
-                <Text style={styles.footnote}>Top concern: {decision.concern || "None captured."}</Text>
-              </Card>
-            ))}
+            <SectionTitle title="History" note="Review quality of decisions before trying to optimize recipes." />
+            <View style={styles.stack}>
+              {data.decisions.map((decision) => (
+                <Card key={decision.id} tone="muted">
+                  <Text style={styles.decisionHeading}>
+                    {decision.action} · {decisionTitle(decision.eyeId, data.eyes, data.stocks, data.recipes)}
+                  </Text>
+                  <Text style={styles.cardBody}>{decision.note}</Text>
+                  <Text style={styles.metaLine}>Concern: {decision.concern || "Not captured"}</Text>
+                  <Text style={styles.metaLine}>
+                    Thesis {decision.thesisValid} · Timing {decision.timing} · {formatDate(decision.createdAt)}
+                  </Text>
+                </Card>
+              ))}
+            </View>
           </>
         ) : null}
       </ScrollView>
@@ -843,91 +1001,132 @@ export default function App() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: "#f2efe8",
-  },
-  page: {
-    paddingBottom: 40,
+    backgroundColor: "#ebe6db",
   },
   loadingScreen: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#f2efe8",
+    backgroundColor: "#17212b",
   },
   loadingText: {
-    fontSize: 20,
-    color: "#203246",
+    color: "#f7f1e5",
+    fontSize: 18,
+    fontWeight: "600",
   },
-  hero: {
-    paddingHorizontal: 20,
+  page: {
+    paddingHorizontal: 18,
     paddingTop: 18,
-    paddingBottom: 12,
-    backgroundColor: "#e8e1d4",
-    borderBottomWidth: 1,
-    borderBottomColor: "#d8cfbe",
+    paddingBottom: 42,
+    gap: 18,
   },
-  kicker: {
-    fontSize: 11,
+  card: {
+    borderRadius: 24,
+    padding: 18,
+    backgroundColor: "#f9f6ef",
+    borderWidth: 1,
+    borderColor: "#ddd5c4",
+  },
+  cardDark: {
+    backgroundColor: "#17212b",
+    borderColor: "#273240",
+  },
+  cardMuted: {
+    backgroundColor: "#f2eee4",
+  },
+  cardElevated: {
+    shadowColor: "#0b1220",
+    shadowOffset: { width: 0, height: 16 },
+    shadowOpacity: 0.08,
+    shadowRadius: 24,
+    elevation: 2,
+  },
+  heroTopline: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: 12,
+  },
+  heroEyebrow: {
+    color: "#9db39d",
+    fontSize: 12,
+    fontWeight: "700",
+    letterSpacing: 1.1,
     textTransform: "uppercase",
-    letterSpacing: 1.4,
-    color: "#8d5d2c",
-    marginBottom: 8,
-    fontWeight: "700",
   },
-  title: {
-    fontSize: 34,
-    lineHeight: 38,
-    fontWeight: "700",
-    color: "#152638",
+  heroTimestamp: {
+    color: "#8d98a7",
+    fontSize: 12,
   },
-  subtitle: {
-    marginTop: 8,
+  heroTitle: {
+    marginTop: 18,
+    color: "#f7f1e5",
+    fontSize: 38,
+    lineHeight: 40,
+    fontFamily: headerFont,
+  },
+  heroSubtitle: {
+    marginTop: 10,
+    color: "#bbc5d0",
     fontSize: 15,
     lineHeight: 22,
-    color: "#42515f",
+    maxWidth: 560,
   },
   metricStrip: {
     flexDirection: "row",
-    gap: 10,
-    marginTop: 18,
+    flexWrap: "wrap",
+    gap: 12,
+    marginTop: 22,
+  },
+  metricCard: {
+    flexGrow: 1,
+    minWidth: 96,
+    padding: 14,
+    borderRadius: 18,
+    backgroundColor: "#202d39",
+    borderWidth: 1,
+    borderColor: "#2c3948",
   },
   metricValue: {
-    fontSize: 24,
+    color: "#f7f1e5",
+    fontSize: 28,
     fontWeight: "700",
-    color: "#152638",
   },
   metricLabel: {
-    marginTop: 4,
+    marginTop: 6,
+    color: "#a7b2bf",
     fontSize: 12,
-    color: "#5e6a75",
+  },
+  heroFootRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    marginTop: 16,
   },
   tabRow: {
-    paddingHorizontal: 16,
-    paddingTop: 14,
-    paddingBottom: 6,
     gap: 10,
   },
   tab: {
     paddingHorizontal: 16,
-    paddingVertical: 10,
+    paddingVertical: 12,
     borderRadius: 999,
-    backgroundColor: "#e4ddd0",
+    backgroundColor: "#f5f1e8",
+    borderWidth: 1,
+    borderColor: "#d4ccb8",
   },
   tabActive: {
-    backgroundColor: "#1f3448",
+    backgroundColor: "#17212b",
+    borderColor: "#17212b",
   },
   tabText: {
-    color: "#4c5b68",
-    fontSize: 14,
-    fontWeight: "600",
+    color: "#56606d",
+    fontSize: 13,
+    fontWeight: "700",
   },
   tabTextActive: {
-    color: "#f7f3ea",
+    color: "#f7f1e5",
   },
   sectionHeader: {
-    paddingHorizontal: 20,
-    marginTop: 18,
-    marginBottom: 10,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-end",
@@ -938,106 +1137,95 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   sectionTitle: {
-    fontSize: 22,
-    fontWeight: "700",
-    color: "#152638",
+    color: "#17212b",
+    fontSize: 26,
+    lineHeight: 28,
+    fontFamily: headerFont,
   },
   sectionNote: {
+    color: "#65707b",
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  stateBoardRow: {
+    gap: 12,
+  },
+  stateBoardCount: {
+    color: "#17212b",
+    fontSize: 28,
+    fontWeight: "700",
+  },
+  stateBoardLabel: {
+    marginTop: 6,
+    color: "#56606d",
     fontSize: 13,
+    maxWidth: 120,
     lineHeight: 18,
-    color: "#697481",
   },
-  card: {
-    backgroundColor: "#fbf8f2",
-    borderWidth: 1,
-    borderColor: "#dfd5c6",
-    borderRadius: 24,
-    marginHorizontal: 20,
-    marginBottom: 14,
-    padding: 18,
+  inlineBetweenStart: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    gap: 14,
   },
-  cardElevated: {
-    shadowColor: "#17293b",
-    shadowOpacity: 0.08,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 10 },
-    elevation: 2,
+  flexOne: {
+    flex: 1,
   },
   cardEyebrow: {
+    color: "#7d6b50",
     fontSize: 11,
-    textTransform: "uppercase",
-    letterSpacing: 1.2,
-    color: "#8d5d2c",
     fontWeight: "700",
+    letterSpacing: 1,
+    textTransform: "uppercase",
   },
   cardTitle: {
-    marginTop: 6,
-    fontSize: 20,
-    lineHeight: 24,
-    color: "#152638",
-    fontWeight: "700",
+    marginTop: 8,
+    color: "#17212b",
+    fontSize: 28,
+    lineHeight: 30,
+    fontFamily: headerFont,
   },
   cardBody: {
-    marginTop: 8,
+    marginTop: 10,
+    color: "#45515e",
     fontSize: 15,
     lineHeight: 22,
-    color: "#44525f",
-  },
-  metaLine: {
-    marginTop: 8,
-    fontSize: 13,
-    lineHeight: 18,
-    color: "#67737f",
-  },
-  footnote: {
-    marginTop: 12,
-    fontSize: 12,
-    lineHeight: 18,
-    color: "#75818c",
   },
   statePill: {
-    alignSelf: "flex-start",
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 999,
-    fontSize: 12,
-    fontWeight: "700",
     overflow: "hidden",
-    color: "#152638",
-  },
-  stateCritical: {
-    backgroundColor: "#f5c9b4",
-  },
-  stateOpportunity: {
-    backgroundColor: "#f0dc9b",
-  },
-  stateRisk: {
-    backgroundColor: "#edc2c1",
-  },
-  stateWatch: {
-    backgroundColor: "#d6e0d1",
-  },
-  stateQuiet: {
-    backgroundColor: "#dce4ea",
-  },
-  priorityBadge: {
-    borderRadius: 999,
     paddingHorizontal: 12,
     paddingVertical: 8,
-  },
-  priorityHigh: {
-    backgroundColor: "#f1b4b2",
-  },
-  priorityMedium: {
-    backgroundColor: "#f2dd9c",
-  },
-  priorityLow: {
-    backgroundColor: "#dde4ea",
-  },
-  priorityBadgeText: {
+    borderRadius: 999,
     fontSize: 12,
     fontWeight: "700",
-    color: "#152638",
+  },
+  statePillAttention: {
+    color: "#ffffff",
+    backgroundColor: "#8a4a2f",
+  },
+  statePillOpportunity: {
+    color: "#174334",
+    backgroundColor: "#cae2d1",
+  },
+  statePillRisk: {
+    color: "#733c35",
+    backgroundColor: "#ecd1cb",
+  },
+  statePillBroken: {
+    color: "#ffffff",
+    backgroundColor: "#5a2d2d",
+  },
+  statePillWatch: {
+    color: "#5f4a1e",
+    backgroundColor: "#ece0bb",
+  },
+  statePillInteresting: {
+    color: "#24435f",
+    backgroundColor: "#d7e6f2",
+  },
+  statePillQuiet: {
+    color: "#596574",
+    backgroundColor: "#dfe5eb",
   },
   metaPillRow: {
     flexDirection: "row",
@@ -1046,231 +1234,291 @@ const styles = StyleSheet.create({
     marginTop: 14,
   },
   metaPill: {
-    paddingHorizontal: 12,
+    paddingHorizontal: 10,
     paddingVertical: 8,
     borderRadius: 999,
-    backgroundColor: "#e4ddd0",
-  },
-  metaPillMock: {
-    backgroundColor: "#d7e1ec",
+    backgroundColor: "#ece8de",
   },
   metaPillText: {
+    color: "#55606d",
     fontSize: 12,
-    color: "#475462",
     fontWeight: "600",
+  },
+  metaPillMock: {
+    backgroundColor: "#e9ddd0",
+  },
+  metaPillSoftDark: {
+    backgroundColor: "#22303b",
   },
   snapshotGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 10,
-    marginTop: 14,
+    marginTop: 18,
   },
   snapshotMetric: {
-    width: "47%",
-    backgroundColor: "#f1ece2",
+    minWidth: "47%",
+    flexGrow: 1,
+    padding: 14,
     borderRadius: 18,
-    padding: 12,
+    backgroundColor: "#f2eee4",
+    borderWidth: 1,
+    borderColor: "#ddd5c4",
   },
   snapshotLabel: {
-    fontSize: 11,
-    textTransform: "uppercase",
-    letterSpacing: 1.1,
-    color: "#7d6952",
-    fontWeight: "700",
+    color: "#7e8a95",
+    fontSize: 12,
   },
   snapshotValue: {
     marginTop: 6,
-    fontSize: 15,
-    lineHeight: 20,
-    color: "#203246",
-    fontWeight: "600",
+    color: "#17212b",
+    fontSize: 18,
+    fontWeight: "700",
   },
   dualColumn: {
     gap: 12,
-    marginTop: 16,
+    marginTop: 18,
   },
   evidenceColumn: {
-    backgroundColor: "#f4efe5",
-    borderRadius: 18,
     padding: 14,
+    borderRadius: 18,
+    backgroundColor: "#f2eee4",
   },
   columnTitle: {
-    fontSize: 14,
+    color: "#17212b",
+    fontSize: 13,
     fontWeight: "700",
-    color: "#203246",
     marginBottom: 8,
   },
   listLine: {
+    color: "#43515c",
     fontSize: 14,
-    lineHeight: 20,
-    color: "#44525f",
-    marginTop: 6,
+    lineHeight: 21,
+    marginTop: 3,
   },
-  inlineBetween: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
+  annotationBlock: {
+    marginTop: 18,
+    padding: 14,
+    borderRadius: 18,
+    backgroundColor: "#15202b",
+  },
+  annotationLabel: {
+    color: "#9db39d",
+    fontSize: 11,
+    fontWeight: "700",
+    letterSpacing: 1,
+    textTransform: "uppercase",
+  },
+  annotationText: {
+    marginTop: 8,
+    color: "#d8e0e7",
+    fontSize: 14,
+    lineHeight: 21,
+  },
+  footnote: {
+    marginTop: 14,
+    color: "#6a7682",
+    fontSize: 12,
+    lineHeight: 18,
+  },
+  stack: {
     gap: 12,
   },
-  flexOne: {
-    flex: 1,
+  alertSymbol: {
+    color: "#7d6b50",
+    fontSize: 12,
+    fontWeight: "700",
+    letterSpacing: 1,
+    textTransform: "uppercase",
+  },
+  alertTitle: {
+    marginTop: 6,
+    color: "#17212b",
+    fontSize: 22,
+    lineHeight: 24,
+    fontFamily: headerFont,
+  },
+  alertMetaCol: {
+    alignItems: "flex-end",
+    gap: 8,
+  },
+  priorityBadge: {
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+  },
+  priorityHigh: {
+    backgroundColor: "#8a4a2f",
+  },
+  priorityMedium: {
+    backgroundColor: "#d7c89a",
+  },
+  priorityLow: {
+    backgroundColor: "#dfe5eb",
+  },
+  priorityBadgeText: {
+    color: "#ffffff",
+    fontSize: 11,
+    fontWeight: "700",
+  },
+  alertTimestamp: {
+    color: "#6f7b87",
+    fontSize: 12,
+  },
+  metaLine: {
+    marginTop: 10,
+    color: "#586572",
+    fontSize: 13,
+    lineHeight: 20,
   },
   actionRow: {
     flexDirection: "row",
+    flexWrap: "wrap",
     gap: 10,
     marginTop: 14,
-    flexWrap: "wrap",
   },
   button: {
-    borderRadius: 999,
+    minHeight: 46,
     paddingHorizontal: 16,
     paddingVertical: 12,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
   },
   buttonPrimary: {
-    backgroundColor: "#203246",
+    backgroundColor: "#17212b",
   },
   buttonSecondary: {
-    backgroundColor: "#e4ddd0",
+    backgroundColor: "#ebe2d0",
   },
   buttonGhost: {
-    backgroundColor: "#f5f1e8",
+    backgroundColor: "#f4efe4",
     borderWidth: 1,
-    borderColor: "#d6cdc0",
+    borderColor: "#d7cfbd",
   },
   buttonText: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: "700",
   },
   buttonPrimaryText: {
-    color: "#f7f3ea",
+    color: "#f7f1e5",
   },
   buttonSecondaryText: {
-    color: "#304354",
+    color: "#4c3d23",
   },
   buttonGhostText: {
-    color: "#5c6874",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#d6cdc0",
-    backgroundColor: "#fffdf9",
-    borderRadius: 18,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 15,
-    color: "#203246",
-    marginBottom: 12,
-  },
-  textArea: {
-    minHeight: 92,
-    textAlignVertical: "top",
+    color: "#4d5864",
   },
   formBlock: {
-    gap: 2,
+    gap: 10,
   },
   formTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#203246",
-    marginBottom: 8,
+    color: "#17212b",
+    fontSize: 22,
+    lineHeight: 24,
+    fontFamily: headerFont,
+  },
+  formNote: {
+    color: "#65707b",
+    fontSize: 14,
+    lineHeight: 20,
   },
   divider: {
-    height: 1,
-    backgroundColor: "#e2d9ca",
     marginVertical: 18,
+    height: 1,
+    backgroundColor: "#ddd5c4",
+  },
+  inputLabel: {
+    color: "#5b6874",
+    fontSize: 12,
+    fontWeight: "700",
+    letterSpacing: 0.4,
+    textTransform: "uppercase",
+    marginTop: 4,
+  },
+  input: {
+    minHeight: 48,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "#d4ccb8",
+    backgroundColor: "#f4f0e7",
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    color: "#17212b",
+    fontSize: 15,
+  },
+  textArea: {
+    minHeight: 96,
+    textAlignVertical: "top",
   },
   selectBlock: {
-    marginBottom: 12,
+    gap: 8,
   },
-  selectLabel: {
+  emptyInline: {
+    color: "#6f7b87",
     fontSize: 13,
-    fontWeight: "700",
-    color: "#5d6976",
-    marginBottom: 8,
   },
   selectRow: {
     gap: 10,
-    paddingRight: 20,
   },
   selectChip: {
-    width: 178,
-    backgroundColor: "#f1ece2",
+    minWidth: 132,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderRadius: 16,
+    backgroundColor: "#f4efe4",
     borderWidth: 1,
-    borderColor: "#dbd2c5",
-    borderRadius: 20,
-    padding: 14,
+    borderColor: "#d7cfbd",
+    gap: 4,
   },
   selectChipActive: {
-    backgroundColor: "#203246",
-    borderColor: "#203246",
+    backgroundColor: "#17212b",
+    borderColor: "#17212b",
   },
   selectChipTitle: {
+    color: "#17212b",
     fontSize: 14,
     fontWeight: "700",
-    color: "#203246",
   },
   selectChipTitleActive: {
-    color: "#f7f3ea",
+    color: "#f7f1e5",
   },
   selectChipSubtitle: {
-    marginTop: 4,
+    color: "#6c7883",
     fontSize: 12,
-    lineHeight: 16,
-    color: "#62707d",
   },
   selectChipSubtitleActive: {
-    color: "#d5dde4",
-  },
-  emptyInline: {
-    fontSize: 13,
-    color: "#7b8893",
-    marginBottom: 8,
+    color: "#b8c3ce",
   },
   choiceGroup: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 8,
-    marginBottom: 12,
+    gap: 10,
   },
   choiceChip: {
     paddingHorizontal: 12,
     paddingVertical: 10,
     borderRadius: 999,
-    backgroundColor: "#e8e1d4",
+    borderWidth: 1,
+    borderColor: "#d4ccb8",
+    backgroundColor: "#f4efe4",
   },
   choiceChipActive: {
-    backgroundColor: "#203246",
+    backgroundColor: "#17212b",
+    borderColor: "#17212b",
   },
   choiceChipText: {
+    color: "#495560",
     fontSize: 13,
-    color: "#50606d",
     fontWeight: "600",
   },
   choiceChipTextActive: {
-    color: "#f7f3ea",
+    color: "#f7f1e5",
   },
-  alertChip: {
-    width: 180,
-    backgroundColor: "#f1ece2",
-    borderRadius: 18,
-    padding: 14,
-    borderWidth: 1,
-    borderColor: "#dfd5c6",
-    marginLeft: 20,
-  },
-  alertChipActive: {
-    backgroundColor: "#203246",
-    borderColor: "#203246",
-  },
-  alertChipTitle: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: "#203246",
-  },
-  alertChipSubtitle: {
-    marginTop: 4,
-    fontSize: 12,
-    lineHeight: 16,
-    color: "#65727e",
+  decisionHeading: {
+    color: "#17212b",
+    fontSize: 18,
+    lineHeight: 22,
+    fontFamily: headerFont,
   },
 });
