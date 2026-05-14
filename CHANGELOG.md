@@ -47,3 +47,7 @@
 - Reworked Home from mixed Eye-level cards into stock-grouped review sections so one stock is no longer scattered across multiple independent monitor cards.
 - Compressed `Stocks > Visual Analysis` into a more visual 2-up metric-board pattern with compact square tiles, minimal default copy, and tap-to-expand detail.
 - Moved most explanation text out of the default stock tiles and into the expanded detail state so the stock workspace is faster to scan at a glance.
+- Added selected-stock continuity helpers so moving between Stocks, Eyes, Alerts, and Journal preserves the current stock context more reliably.
+- Added a recent-stocks strip and tighter stock switching flow inside Stocks so returning to active names takes fewer taps.
+- Reworked Alerts queue from a flatter list into stock-grouped alert clusters with recipe counts, shared stock context, and direct drill-down into stock or alert detail.
+- Added stronger stock-level “what changed” summaries so Summary and Recipe Map show clearer cross-recipe changes instead of only isolated Eye snippets.

@@ -52,6 +52,7 @@ type AnalysisStatusFilter =
   | "Needs Review";
 
 type AnalysisDensity = "Compact" | "Comfortable";
+type StockRouteTarget = "Stocks" | "Alerts" | "Eyes" | "Journal";
 
 interface ConditionTemplate {
   id: string;
@@ -1389,6 +1390,7 @@ export default function App() {
   const [analysisRecipeFilter, setAnalysisRecipeFilter] = useState("All Recipes");
   const [analysisNote, setAnalysisNote] = useState("");
   const [stockSearch, setStockSearch] = useState("");
+  const [recentStockIds, setRecentStockIds] = useState<string[]>([]);
   const deferredStockSearch = useDeferredValue(stockSearch);
 
   const eyesSorted = useMemo(
@@ -1656,6 +1658,73 @@ export default function App() {
   const selectedStockRecipeMapEyes =
     selectedStockFilteredEyes.length > 0 ? selectedStockFilteredEyes : selectedStockEyes;
 
+  const selectedStockWhatChanged = useMemo(() => {
+    if (!selectedStockSummary) return [];
+    const dominantEvaluation = selectedStockSummary.dominantEye?.lastEvaluation;
+    const items: string[] = [];
+    if (selectedStockSummary.snapshot) {
+      items.push(
+        `${selectedStockSummary.stock.symbol} is at $${selectedStockSummary.snapshot.price.toFixed(2)} with ${selectedStockSummary.snapshot.drawdownPct}% drawdown.`,
+      );
+      items.push(
+        `Data quality is ${selectedStockSummary.snapshot.freshness}${selectedStockSummary.snapshot.isMock ? " and mock-backed" : ""}.`,
+      );
+    }
+    if (dominantEvaluation?.supportingEvidence?.[0]) {
+      items.push(`Top support: ${dominantEvaluation.supportingEvidence[0]}`);
+    }
+    if (
+      dominantEvaluation?.hardDisqualifiers?.[0] ||
+      dominantEvaluation?.riskWarnings?.[0] ||
+      dominantEvaluation?.contradictingEvidence?.[0]
+    ) {
+      items.push(
+        `Top risk: ${
+          dominantEvaluation.hardDisqualifiers?.[0] ??
+          dominantEvaluation.riskWarnings?.[0] ??
+          dominantEvaluation.contradictingEvidence?.[0]
+        }`,
+      );
+    }
+    if (selectedStockSummary.openAlerts.length > 0) {
+      items.push(`${selectedStockSummary.openAlerts.length} active alerts are open on this stock.`);
+    }
+    return items.slice(0, 4);
+  }, [selectedStockSummary]);
+
+  const recentStocks = useMemo(
+    () =>
+      recentStockIds
+        .map((id) => stockDirectory.find((item) => item.stock.id === id))
+        .filter((item): item is NonNullable<typeof item> => Boolean(item)),
+    [recentStockIds, stockDirectory],
+  );
+
+  const groupedAlertQueue = useMemo(() => {
+    return stockDirectory
+      .filter((item) => item.openAlerts.length > 0)
+      .map((item) => {
+        const groupedByRecipe = item.openAlerts.reduce<Record<string, Alert[]>>((accumulator, alert) => {
+          const eye = item.eyes.find((candidate) => candidate.id === alert.eyeId);
+          const recipeName = eye ? recipeLabel(data.recipes, eye.recipeId) : "Unknown Recipe";
+          accumulator[recipeName] = [...(accumulator[recipeName] ?? []), alert];
+          return accumulator;
+        }, {});
+        return {
+          ...item,
+          groupedAlerts: groupedByRecipe,
+          highestPriority: (item.openAlerts.some((alert) => alert.priority === "High") ? "High" : "Medium") as
+            | "High"
+            | "Medium",
+        };
+      })
+      .sort(
+        (left, right) =>
+          Number(right.highestPriority === "High") - Number(left.highestPriority === "High") ||
+          right.openAlerts.length - left.openAlerts.length,
+      );
+  }, [data.recipes, stockDirectory]);
+
   const homeUrgentStocks = useMemo(
     () =>
       stockDirectory.filter((item) =>
@@ -1746,6 +1815,43 @@ export default function App() {
     setTab(target);
   };
 
+  const openStockContext = ({
+    stockId,
+    eyeId,
+    alertId,
+    target = "Stocks",
+    stockTab = "Visual Analysis",
+  }: {
+    stockId: string;
+    eyeId?: string;
+    alertId?: string;
+    target?: StockRouteTarget;
+    stockTab?: StockWorkspaceTab;
+  }) => {
+    setSelectedStockId(stockId);
+    if (eyeId) setSelectedEyeId(eyeId);
+    if (alertId) setSelectedAlertId(alertId);
+    setRecentStockIds((current) => [stockId, ...current.filter((id) => id !== stockId)].slice(0, 6));
+
+    if (target === "Stocks") {
+      setStockWorkspaceTab(stockTab);
+      setTab("Stocks");
+      return;
+    }
+    if (target === "Alerts") {
+      setAlertWorkspaceTab(alertId ? "Detail" : "Queue");
+      setTab("Alerts");
+      return;
+    }
+    if (target === "Eyes") {
+      setEyeWorkspaceTab("Active Eyes");
+      setTab("Eyes");
+      return;
+    }
+    setJournalWorkspaceTab("Log Decision");
+    setTab("Journal");
+  };
+
   const quickDecision = async (alert: Alert, action: DecisionAction) => {
     const eye = data.eyes.find((item) => item.id === alert.eyeId);
     if (!eye) return;
@@ -1760,7 +1866,12 @@ export default function App() {
       thesisValid: action === "Marked Thesis Broken" ? "No" : action === "Rejected" ? "Partly" : "Yes",
       timing: "On Time",
     });
-    setTab("Journal");
+    openStockContext({
+      stockId: eye.stockId,
+      eyeId: eye.id,
+      alertId: alert.id,
+      target: "Journal",
+    });
   };
 
   const addDraftCondition = () => {
@@ -1978,11 +2089,7 @@ export default function App() {
                         key={item.stock.id}
                         item={item}
                         recipes={data.recipes}
-                        onOpenStock={() => {
-                          setSelectedStockId(item.stock.id);
-                          setStockWorkspaceTab("Visual Analysis");
-                          setTab("Stocks");
-                        }}
+                        onOpenStock={() => openStockContext({ stockId: item.stock.id })}
                       />
                     ))
                   )}
@@ -1997,11 +2104,7 @@ export default function App() {
                       key={item.stock.id}
                       item={item}
                       recipes={data.recipes}
-                      onOpenStock={() => {
-                        setSelectedStockId(item.stock.id);
-                        setStockWorkspaceTab("Visual Analysis");
-                        setTab("Stocks");
-                      }}
+                      onOpenStock={() => openStockContext({ stockId: item.stock.id })}
                     />
                   ))}
                   {homeOpportunityStocks.length === 0 ? (
@@ -2020,11 +2123,7 @@ export default function App() {
                       key={item.stock.id}
                       item={item}
                       recipes={data.recipes}
-                      onOpenStock={() => {
-                        setSelectedStockId(item.stock.id);
-                        setStockWorkspaceTab("Notes");
-                        setTab("Stocks");
-                      }}
+                      onOpenStock={() => openStockContext({ stockId: item.stock.id, stockTab: "Notes" })}
                     />
                   ))}
                   {homeStaleReviewStocks.length === 0 ? (
@@ -2063,14 +2162,32 @@ export default function App() {
 
               <Reveal delay={40}>
                 <SectionHeader title="Stock Directory" note="Select a stock to open its dedicated workspace." />
+                {recentStocks.length > 0 ? (
+                  <View style={styles.recentStockStrip}>
+                    <Text style={styles.inputLabel}>Recent</Text>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.choiceRow}>
+                      {recentStocks.map((item) => (
+                        <Pressable
+                          key={`recent-${item.stock.id}`}
+                          onPress={() => openStockContext({ stockId: item.stock.id })}
+                          style={[styles.selectChip, selectedStockSummary?.stock.id === item.stock.id ? styles.selectChipActive : null]}
+                        >
+                          <Text style={[styles.selectChipTitle, selectedStockSummary?.stock.id === item.stock.id ? styles.selectChipTitleActive : null]}>
+                            {item.stock.symbol}
+                          </Text>
+                          <Text style={[styles.selectChipSubtitle, selectedStockSummary?.stock.id === item.stock.id ? styles.selectChipSubtitleActive : null]}>
+                            {item.dominantEye?.lastEvaluation?.currentState ?? "Recent"}
+                          </Text>
+                        </Pressable>
+                      ))}
+                    </ScrollView>
+                  </View>
+                ) : null}
                 <View style={styles.stockGrid}>
                   {filteredStockDirectory.slice(0, 8).map((item) => (
                     <Pressable
                       key={item.stock.id}
-                      onPress={() => {
-                        setSelectedStockId(item.stock.id);
-                        setStockWorkspaceTab("Visual Analysis");
-                      }}
+                      onPress={() => openStockContext({ stockId: item.stock.id })}
                       style={styles.stockGridItem}
                     >
                       <Card highlighted={selectedStockSummary?.stock.id === item.stock.id}>
@@ -2187,11 +2304,15 @@ export default function App() {
                                 stockId: selectedStockSummary.stock.id,
                                 thesisSnapshot: current.thesisSnapshot || selectedStockSummary.stock.thesis,
                               }));
+                              setRecentStockIds((current) => [selectedStockSummary.stock.id, ...current.filter((id) => id !== selectedStockSummary.stock.id)].slice(0, 6));
                               setEyeWorkspaceTab("Create Eye");
                               setTab("Eyes");
                             }}
                           />
                         </View>
+                        {selectedStockWhatChanged.length > 0 ? (
+                          <WhatChangedPanel title="What changed on this stock" items={selectedStockWhatChanged} />
+                        ) : null}
                       </Card>
                     </Reveal>
                   ) : null}
@@ -2260,6 +2381,7 @@ export default function App() {
                             tone="secondary"
                             onPress={() => {
                               setPreviewStockId(selectedStockSummary.stock.id);
+                              setRecentStockIds((current) => [selectedStockSummary.stock.id, ...current.filter((id) => id !== selectedStockSummary.stock.id)].slice(0, 6));
                               setRecipeWorkspaceTab("Preview");
                               setTab("Recipes");
                             }}
@@ -2275,6 +2397,7 @@ export default function App() {
                                   analysisNote.trim() ||
                                   `Review note for ${selectedStockSummary.stock.symbol}: visual analysis reviewed.`,
                               }));
+                              setRecentStockIds((current) => [selectedStockSummary.stock.id, ...current.filter((id) => id !== selectedStockSummary.stock.id)].slice(0, 6));
                               setJournalWorkspaceTab("Log Decision");
                               setTab("Journal");
                             }}
@@ -2314,6 +2437,9 @@ export default function App() {
                           })
                         )}
                       </View>
+                      {selectedStockWhatChanged.length > 0 ? (
+                        <WhatChangedPanel title="Stock-level change summary" items={selectedStockWhatChanged} />
+                      ) : null}
                     </Reveal>
                   ) : null}
 
@@ -2605,11 +2731,12 @@ export default function App() {
                             <View style={styles.actionRow}>
                               <Button
                                 label="Open Stock"
-                                onPress={() => {
-                                  setSelectedStockId(selectedEye.stockId);
-                                  setStockWorkspaceTab("Visual Analysis");
-                                  setTab("Stocks");
-                                }}
+                                onPress={() =>
+                                  openStockContext({
+                                    stockId: selectedEye.stockId,
+                                    eyeId: selectedEye.id,
+                                  })
+                                }
                               />
                               <Button
                                 label="Decision Log"
@@ -2631,7 +2758,16 @@ export default function App() {
                     <SectionHeader title="Active Monitor List" note="Pick a monitor, then branch to stock analysis or decision logging." />
                     <View style={styles.stack}>
                       {eyesSorted.map((eye) => (
-                        <Pressable key={eye.id} onPress={() => setSelectedEyeId(eye.id)}>
+                        <Pressable
+                          key={eye.id}
+                          onPress={() =>
+                            openStockContext({
+                              stockId: eye.stockId,
+                              eyeId: eye.id,
+                              target: "Eyes",
+                            })
+                          }
+                        >
                           <Card highlighted={selectedEye?.id === eye.id}>
                             <View style={styles.inlineBetween}>
                               <View style={styles.flexOne}>
@@ -2742,48 +2878,97 @@ export default function App() {
 
               {alertWorkspaceTab === "Queue" ? (
                 <Reveal delay={40}>
-                  <SectionHeader title="Queue" note="Open alerts with direct review actions." />
+                  <SectionHeader title="Queue" note="Alerts are grouped by stock first so related signals stay together." />
                   <View style={styles.stack}>
-                    {alertQueue.length === 0 ? (
+                    {groupedAlertQueue.length === 0 ? (
                       <Card>
                         <Text style={styles.cardBody}>No alerts are open right now.</Text>
                       </Card>
                     ) : (
-                      alertQueue.map((alert) => {
-                        const eye = data.eyes.find((item) => item.id === alert.eyeId);
-                        return (
-                          <Pressable
-                            key={alert.id}
-                            onPress={() => {
-                              setSelectedAlertId(alert.id);
-                              if (eye) setSelectedEyeId(eye.id);
-                              setAlertWorkspaceTab("Detail");
-                            }}
-                          >
-                            <Card highlighted={selectedAlert?.id === alert.id}>
-                              <View style={styles.inlineBetween}>
-                                <View style={styles.flexOne}>
-                                  <Text style={styles.cardEyebrow}>{stockLabel(data.stocks, eye?.stockId ?? "")}</Text>
-                                  <Text style={styles.alertTitle}>{alert.title}</Text>
-                                  <Text style={styles.cardBody}>{alert.whyNow}</Text>
-                                </View>
-                                <View style={styles.priorityStack}>
-                                  <View style={priorityTone(alert.priority)}>
-                                    <Text style={styles.priorityBadgeText}>{alert.priority}</Text>
+                      groupedAlertQueue.map((group) => (
+                        <Card key={`alert-group-${group.stock.id}`} highlighted={selectedStockId === group.stock.id}>
+                          <View style={styles.inlineBetween}>
+                            <View style={styles.flexOne}>
+                              <Text style={styles.cardEyebrow}>{group.stock.name}</Text>
+                              <Text style={styles.cardTitle}>{group.stock.symbol}</Text>
+                              <Text style={styles.stockGroupSummary}>
+                                {group.dominantEye?.lastEvaluation?.whyNow ?? "Review grouped signals on this stock."}
+                              </Text>
+                            </View>
+                            <View style={styles.priorityStack}>
+                              <View style={priorityTone(group.highestPriority)}>
+                                <Text style={styles.priorityBadgeText}>{group.highestPriority}</Text>
+                              </View>
+                              <Text style={styles.timestampText}>{group.openAlerts.length} alerts</Text>
+                            </View>
+                          </View>
+
+                          <View style={styles.metaRow}>
+                            {Object.entries(group.groupedAlerts).map(([recipeName, alerts]) => (
+                              <MetaPill key={`${group.stock.id}-${recipeName}`} label={`${recipeName} · ${alerts.length}`} />
+                            ))}
+                          </View>
+
+                          <View style={styles.stack}>
+                            {group.openAlerts.slice(0, 3).map((alert) => {
+                              const eye = group.eyes.find((item) => item.id === alert.eyeId);
+                              return (
+                                <Pressable
+                                  key={alert.id}
+                                  onPress={() =>
+                                    openStockContext({
+                                      stockId: group.stock.id,
+                                      eyeId: eye?.id,
+                                      alertId: alert.id,
+                                      target: "Alerts",
+                                    })
+                                  }
+                                >
+                                  <View style={styles.alertMiniRow}>
+                                    <View style={styles.flexOne}>
+                                      <Text style={styles.alertMiniTitle}>{alert.title}</Text>
+                                      <Text style={styles.alertMiniBody}>{alert.whyNow}</Text>
+                                    </View>
+                                    <View style={styles.priorityStack}>
+                                      <View style={priorityTone(alert.priority)}>
+                                        <Text style={styles.priorityBadgeText}>{alert.priority}</Text>
+                                      </View>
+                                      <Text style={styles.timestampText}>{formatDate(alert.createdAt)}</Text>
+                                    </View>
                                   </View>
-                                  <Text style={styles.timestampText}>{formatDate(alert.createdAt)}</Text>
-                                </View>
-                              </View>
-                              <Text style={styles.metaLine}>{alert.stateChange}</Text>
-                              <View style={styles.actionRow}>
-                                <Button label="Entered" onPress={() => void quickDecision(alert, "Entered")} />
-                                <Button label="Skipped" tone="secondary" onPress={() => void quickDecision(alert, "Skipped")} />
-                                <Button label="Reviewed" tone="ghost" onPress={() => void actions.markAlertReviewed(alert.id)} />
-                              </View>
-                            </Card>
-                          </Pressable>
-                        );
-                      })
+                                  <View style={styles.actionRow}>
+                                    <Button label="Entered" onPress={() => void quickDecision(alert, "Entered")} />
+                                    <Button label="Skipped" tone="secondary" onPress={() => void quickDecision(alert, "Skipped")} />
+                                    <Button label="Reviewed" tone="ghost" onPress={() => void actions.markAlertReviewed(alert.id)} />
+                                  </View>
+                                </Pressable>
+                              );
+                            })}
+                          </View>
+
+                          <View style={styles.analysisActionRow}>
+                            <Button
+                              label="Open Stock"
+                              onPress={() => openStockContext({ stockId: group.stock.id })}
+                            />
+                            <Button
+                              label="Open Detail"
+                              tone="secondary"
+                              onPress={() => {
+                                const firstAlert = group.openAlerts[0];
+                                const firstEye = group.eyes.find((eye) => eye.id === firstAlert?.eyeId);
+                                if (!firstAlert) return;
+                                openStockContext({
+                                  stockId: group.stock.id,
+                                  eyeId: firstEye?.id,
+                                  alertId: firstAlert.id,
+                                  target: "Alerts",
+                                });
+                              }}
+                            />
+                          </View>
+                        </Card>
+                      ))
                     )}
                   </View>
                 </Reveal>
@@ -3790,6 +3975,28 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     gap: 10,
   },
+  alertMiniRow: {
+    paddingVertical: 10,
+    gap: 10,
+    flexDirection: "row",
+    alignItems: "flex-start",
+    borderBottomWidth: 1,
+    borderBottomColor: "#edf2f7",
+  },
+  alertMiniTitle: {
+    color: "#0f172a",
+    fontSize: 13,
+    lineHeight: 18,
+    fontWeight: "800",
+    fontFamily,
+  },
+  alertMiniBody: {
+    marginTop: 4,
+    color: "#475569",
+    fontSize: 12,
+    lineHeight: 17,
+    fontFamily,
+  },
   stockGroupEvidenceRow: {
     marginTop: 12,
     gap: 10,
@@ -4110,6 +4317,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 10,
+  },
+  recentStockStrip: {
+    marginBottom: 12,
+    gap: 8,
   },
   stockGridItem: {
     width: "48.5%",
