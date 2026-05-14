@@ -4,7 +4,18 @@ import { evaluateEye } from "../lib/evaluateEye";
 import { buildMockSnapshot } from "../lib/mockSnapshot";
 import { seedData } from "../lib/seed";
 import { loadAppData, saveAppData } from "../lib/storage";
-import { Alert, AppData, Decision, DecisionAction, Eye, Evaluation, Outcome, Recipe, Stock } from "../types";
+import {
+  Alert,
+  AppData,
+  Decision,
+  DecisionAction,
+  Eye,
+  Evaluation,
+  Outcome,
+  Recipe,
+  RecipeCondition,
+  Stock,
+} from "../types";
 
 const createId = (prefix: string) => `${prefix}-${Math.random().toString(36).slice(2, 10)}`;
 
@@ -104,6 +115,7 @@ export const useAppModel = () => {
         timeHorizon: string;
         intendedUseCase: string;
         notes: string;
+        conditions?: RecipeCondition[];
       }) {
         if (!data) return;
         const recipe: Recipe = {
@@ -115,13 +127,19 @@ export const useAppModel = () => {
           intendedUseCase: input.intendedUseCase.trim(),
           notes: input.notes.trim(),
           createdAt: new Date().toISOString(),
-          conditions: [
-            {
-              id: createId("condition"),
-              label: "User-defined rule set. Expand this recipe in future iterations.",
-              kind: "required",
-            },
-          ],
+          conditions:
+            input.conditions && input.conditions.length > 0
+              ? input.conditions.map((condition) => ({
+                  ...condition,
+                  id: condition.id || createId("condition"),
+                }))
+              : [
+                  {
+                    id: createId("condition"),
+                    label: "User-defined rule set. Expand this recipe in future iterations.",
+                    kind: "required",
+                  },
+                ],
         };
         await commit({
           ...data,

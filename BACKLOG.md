@@ -4,6 +4,7 @@
 
 - Replace the mock market adapter with a zero-cost provider adapter behind the same interface.
 - Add dedicated Eye detail and Alert detail drill-down screens once the current visual shell is validated on device.
+- Add dedicated stock detail with richer chart ranges, annotated state changes, and linked news/context once real data exists.
 - Introduce a small design token layer and reusable card primitives if the calmer visual system continues to hold up through feature growth.
 - Add recipe editing, duplication, and version history.
 - Add Eye state history and change-since-last-review diffs.

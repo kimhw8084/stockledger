@@ -22,3 +22,6 @@
 - Replaced the serif-heavy editorial theme with a cleaner modern sans-serif system font treatment across headers, labels, body copy, and controls.
 - Overhauled the app palette from warm beige tones to cooler finance-style neutrals with darker market surfaces and brighter green-blue accents.
 - Increased contrast and consistency across tabs, buttons, pills, forms, and cards to improve readability and make the product feel closer to a contemporary investing app.
+- Replaced pill-based top navigation with a persistent bottom navigation bar and a floating action menu for add/utility actions from any scroll position.
+- Reworked the screen architecture into Dashboard, Watchlist, Studio, and Journal to better separate monitoring, drilldown, building, and review.
+- Added lightweight stock chart visualizations and a more serious recipe generator flow with condition templates, parameters, roles, and draft-condition assembly.

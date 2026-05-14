@@ -128,3 +128,25 @@ Partly. The modern sans-serif direction should remain, while exact colors and el
 
 Roadmap impact:
 Low to medium. This resets the visual baseline without changing product architecture or feature scope.
+
+## 2026-05-14
+
+Decision:
+Restructure the MVP around bottom navigation and a merged builder-oriented Studio tab, instead of keeping Eyes and Recipes as separate top-level pill tabs.
+
+Reason:
+The app needs to behave more like a serious investment product on mobile. Persistent bottom navigation is easier to scan and reach one-handed, while a combined Studio better reflects how recipes, stocks, and Eyes are actually created together.
+
+Alternatives considered:
+- Keep the previous top pill navigation and only add more screens
+- Split everything further into many narrow tabs
+- Delay navigation restructuring until after real data integration
+
+Tradeoff:
+The app now uses a broader single-file shell with more UI state while still lacking a formal navigation library. That is acceptable for this stage because the interaction model is materially closer to production expectations and still easy to validate in Expo Go.
+
+Temporary:
+Yes. The information architecture direction should remain, but the implementation may later move to a proper stack/tab navigator once dedicated stock, Eye, and alert detail screens are added.
+
+Roadmap impact:
+Medium. This improves mobile usability immediately and creates a clearer place for future charting, news, and drill-down surfaces.
