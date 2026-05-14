@@ -39,3 +39,8 @@
 - Built stock-level parameter cards for price damage, trend, relative strength, volume and volatility, valuation, financial quality, debt risk, earnings timing, thesis risk, sector context, macro context, and user thesis match.
 - Added a stock-scoped Recipe Condition Map that shows each active Eye’s recipe version, state, passed and failed logic, warnings, blockers, data issues, and next likely trigger.
 - Added thesis-review actions and stock-to-Studio / stock-to-Journal shortcuts so the new analysis workspace connects directly to Eye creation, recipe preview, and decision logging.
+- Reorganized the entire app shell around six clearer workspaces: Home, Stocks, Recipes, Eyes, Alerts, and Journal.
+- Promoted Stocks into the first-class stock search and inspection surface instead of burying stock detail inside a mixed watchlist tab.
+- Rebuilt the selected-stock experience into a dedicated workspace with Summary, Visual Analysis, Recipe Map, and Notes subviews.
+- Added stock search, state-aware stock filtering, compact stock tiles, and a denser grid-style evidence layout so stock review feels more like a purposeful finance workspace than a long stacked page.
+- Split recipe authoring, eye creation, alert review, and decision logging into separate workspaces so each destination has a narrower and clearer job.

@@ -7,6 +7,7 @@
 - Add dedicated stock detail with richer chart ranges, annotated state changes, and linked news/context once real data exists.
 - Add provider-backed news timelines, sector feeds, and event calendars so the new stock Visual Analysis workspace can replace mock placeholders with real evidence.
 - Introduce a small design token layer and reusable card primitives if the calmer visual system continues to hold up through feature growth.
+- Add true drill-down navigation stacks for stock cards, recipe cards, alerts, and decisions if the new six-workspace shell proves stable and the app needs deeper hierarchy.
 - Add recipe editing, duplication, and version history.
 - Add Eye state history and change-since-last-review diffs.
 - Expand the visual evidence layer with valuation bands, richer financial trend cards, event timelines, and news clustering once real data adapters exist.

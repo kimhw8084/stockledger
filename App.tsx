@@ -1,5 +1,5 @@
 import { StatusBar } from "expo-status-bar";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import {
   Animated,
   Platform,
@@ -33,11 +33,13 @@ import {
   buildWhatChangedList,
 } from "./src/lib/visualEvidence";
 
-type TabKey = "Dashboard" | "Watchlist" | "Studio" | "Journal";
-type WatchFilter = "All" | "Attention" | "Opportunity" | "Quiet";
-type StudioPanel = "Recipes" | "Eyes" | "Stocks";
-type DashboardFocus = "alerts" | "eyes" | "recipes" | "decisions";
-type StockWorkspaceTab = "Overview" | "Visual Analysis" | "Recipe Map";
+type TabKey = "Home" | "Stocks" | "Recipes" | "Eyes" | "Alerts" | "Journal";
+type StockFilter = "All" | "Needs Review" | "Opportunity" | "Quiet";
+type RecipeWorkspaceTab = "Builder" | "Preview" | "Library";
+type EyeWorkspaceTab = "Active Eyes" | "Create Eye";
+type AlertWorkspaceTab = "Queue" | "Detail";
+type JournalWorkspaceTab = "Log Decision" | "History";
+type StockWorkspaceTab = "Summary" | "Visual Analysis" | "Recipe Map" | "Notes";
 type ConditionKind = RecipeCondition["kind"];
 type AnalysisBenchmark = "SPY" | "QQQ" | "Sector ETF";
 type AnalysisLookback = "20D" | "3M" | "6M";
@@ -48,6 +50,8 @@ type AnalysisStatusFilter =
   | "Warning"
   | "Blocked"
   | "Needs Review";
+
+type AnalysisDensity = "Compact" | "Comfortable";
 
 interface ConditionTemplate {
   id: string;
@@ -75,10 +79,13 @@ interface ConditionTemplate {
       };
 }
 
-const tabs: TabKey[] = ["Dashboard", "Watchlist", "Studio", "Journal"];
-const watchFilters: WatchFilter[] = ["All", "Attention", "Opportunity", "Quiet"];
-const studioPanels: StudioPanel[] = ["Recipes", "Eyes", "Stocks"];
-const stockWorkspaceTabs: StockWorkspaceTab[] = ["Overview", "Visual Analysis", "Recipe Map"];
+const tabs: TabKey[] = ["Home", "Stocks", "Recipes", "Eyes", "Alerts", "Journal"];
+const stockFilters: StockFilter[] = ["All", "Needs Review", "Opportunity", "Quiet"];
+const recipeWorkspaceTabs: RecipeWorkspaceTab[] = ["Builder", "Preview", "Library"];
+const eyeWorkspaceTabs: EyeWorkspaceTab[] = ["Active Eyes", "Create Eye"];
+const alertWorkspaceTabs: AlertWorkspaceTab[] = ["Queue", "Detail"];
+const journalWorkspaceTabs: JournalWorkspaceTab[] = ["Log Decision", "History"];
+const stockWorkspaceTabs: StockWorkspaceTab[] = ["Summary", "Visual Analysis", "Recipe Map", "Notes"];
 const analysisBenchmarks: AnalysisBenchmark[] = ["SPY", "QQQ", "Sector ETF"];
 const analysisLookbacks: AnalysisLookback[] = ["20D", "3M", "6M"];
 const analysisStatusFilters: AnalysisStatusFilter[] = [
@@ -89,6 +96,7 @@ const analysisStatusFilters: AnalysisStatusFilter[] = [
   "Blocked",
   "Needs Review",
 ];
+const analysisDensityOptions: AnalysisDensity[] = ["Compact", "Comfortable"];
 const opportunityTypes = [
   "Temporary Mispricing",
   "Leader Pullback",
@@ -1053,16 +1061,38 @@ const EvidenceCardView = ({ card }: { card: VisualEvidenceCard }) => {
   );
 };
 
-const EvidenceGroupView = ({ group }: { group: VisualEvidenceGroup }) => (
-  <View style={styles.evidenceGroup}>
-    <SectionHeader title={group.title} note={group.note} />
-    <View style={styles.stack}>
-      {group.cards.map((card) => (
-        <EvidenceCardView key={card.id} card={card} />
-      ))}
+const EvidenceGroupView = ({
+  group,
+  layout = "stack",
+  defaultExpanded = true,
+}: {
+  group: VisualEvidenceGroup;
+  layout?: "stack" | "grid";
+  defaultExpanded?: boolean;
+}) => {
+  const [expanded, setExpanded] = useState(defaultExpanded);
+
+  return (
+    <View style={styles.evidenceGroup}>
+      <Pressable onPress={() => setExpanded((current) => !current)} style={styles.groupHeaderButton}>
+        <View style={styles.flexOne}>
+          <Text style={styles.sectionTitle}>{group.title}</Text>
+          <Text style={styles.sectionNote}>{group.note}</Text>
+        </View>
+        <Text style={styles.groupHeaderToggle}>{expanded ? "Hide" : "Show"}</Text>
+      </Pressable>
+      {expanded ? (
+        <View style={layout === "grid" ? styles.evidenceGrid : styles.stack}>
+          {group.cards.map((card) => (
+            <View key={card.id} style={layout === "grid" ? styles.evidenceGridItem : undefined}>
+              <EvidenceCardView card={card} />
+            </View>
+          ))}
+        </View>
+      ) : null}
     </View>
-  </View>
-);
+  );
+};
 
 const RecipeConditionMapCard = ({
   eye,
@@ -1198,14 +1228,17 @@ interface EyeDraftForm {
 
 export default function App() {
   const { data, loading, actions } = useAppModel();
-  const [tab, setTab] = useState<TabKey>("Dashboard");
-  const [watchFilter, setWatchFilter] = useState<WatchFilter>("All");
-  const [dashboardFocus, setDashboardFocus] = useState<DashboardFocus>("alerts");
-  const [studioPanel, setStudioPanel] = useState<StudioPanel>("Recipes");
+  const [tab, setTab] = useState<TabKey>("Home");
+  const [stockFilter, setStockFilter] = useState<StockFilter>("All");
+  const [recipeWorkspaceTab, setRecipeWorkspaceTab] = useState<RecipeWorkspaceTab>("Builder");
+  const [eyeWorkspaceTab, setEyeWorkspaceTab] = useState<EyeWorkspaceTab>("Active Eyes");
+  const [alertWorkspaceTab, setAlertWorkspaceTab] = useState<AlertWorkspaceTab>("Queue");
+  const [journalWorkspaceTab, setJournalWorkspaceTab] = useState<JournalWorkspaceTab>("Log Decision");
   const [stockWorkspaceTab, setStockWorkspaceTab] = useState<StockWorkspaceTab>("Visual Analysis");
   const [analysisBenchmark, setAnalysisBenchmark] = useState<AnalysisBenchmark>("SPY");
   const [analysisLookback, setAnalysisLookback] = useState<AnalysisLookback>("3M");
   const [analysisStatusFilter, setAnalysisStatusFilter] = useState<AnalysisStatusFilter>("All Statuses");
+  const [analysisDensity, setAnalysisDensity] = useState<AnalysisDensity>("Compact");
   const [fabOpen, setFabOpen] = useState(false);
 
   const [stockForm, setStockForm] = useState({ symbol: "", name: "", thesis: "" });
@@ -1252,6 +1285,8 @@ export default function App() {
   const [previewStockId, setPreviewStockId] = useState("");
   const [analysisRecipeFilter, setAnalysisRecipeFilter] = useState("All Recipes");
   const [analysisNote, setAnalysisNote] = useState("");
+  const [stockSearch, setStockSearch] = useState("");
+  const deferredStockSearch = useDeferredValue(stockSearch);
 
   const eyesSorted = useMemo(
     () =>
@@ -1274,7 +1309,7 @@ export default function App() {
     [data?.alerts],
   );
 
-  const stockSummaries = useMemo(() => {
+  const stockDirectory = useMemo(() => {
     if (!data) return [];
     return data.stocks
       .map((stock) => {
@@ -1298,36 +1333,49 @@ export default function App() {
           snapshot,
           openAlerts,
           dominantEye,
+          decisions: data.decisions.filter((decision) =>
+            eyes.some((eye) => eye.id === decision.eyeId),
+          ),
         };
       })
-      .filter((item) => item.eyes.length > 0)
       .sort((a, b) => {
         const left = a.dominantEye?.lastEvaluation?.currentState ?? "Not Relevant";
         const right = b.dominantEye?.lastEvaluation?.currentState ?? "Not Relevant";
-        return statePriority.indexOf(left) - statePriority.indexOf(right);
+        const stateDelta = statePriority.indexOf(left) - statePriority.indexOf(right);
+        return stateDelta !== 0 ? stateDelta : a.stock.symbol.localeCompare(b.stock.symbol);
       });
   }, [data]);
 
-  const filteredStockSummaries = useMemo(() => {
-    if (watchFilter === "All") return stockSummaries;
-    if (watchFilter === "Attention") {
-      return stockSummaries.filter((item) =>
+  const filteredStockDirectory = useMemo(() => {
+    const normalizedQuery = deferredStockSearch.trim().toLowerCase();
+    const baseList = stockDirectory.filter((item) => {
+      if (!normalizedQuery) return true;
+      return (
+        item.stock.symbol.toLowerCase().includes(normalizedQuery) ||
+        item.stock.name.toLowerCase().includes(normalizedQuery) ||
+        item.stock.thesis.toLowerCase().includes(normalizedQuery)
+      );
+    });
+
+    if (stockFilter === "All") return baseList;
+    if (stockFilter === "Needs Review") {
+      return baseList.filter((item) =>
         ["Attention Needed", "Thesis Risk Rising", "Thesis Broken"].includes(
           item.dominantEye?.lastEvaluation?.currentState ?? "",
         ),
       );
     }
-    if (watchFilter === "Opportunity") {
-      return stockSummaries.filter(
+    if (stockFilter === "Opportunity") {
+      return baseList.filter(
         (item) => item.dominantEye?.lastEvaluation?.currentState === "Opportunity Zone Forming",
       );
     }
-    return stockSummaries.filter((item) =>
+    return baseList.filter((item) =>
       ["Watch Closely", "Becoming Interesting", "Not Relevant"].includes(
         item.dominantEye?.lastEvaluation?.currentState ?? "",
       ),
     );
-  }, [stockSummaries, watchFilter]);
+  }, [deferredStockSearch, stockDirectory, stockFilter]);
 
   useEffect(() => {
     if (!selectedEyeId && eyesSorted[0]) {
@@ -1340,14 +1388,14 @@ export default function App() {
   }, [eyesSorted, selectedEyeId]);
 
   useEffect(() => {
-    if (!selectedStockId && stockSummaries[0]) {
-      setSelectedStockId(stockSummaries[0].stock.id);
+    if (!selectedStockId && stockDirectory[0]) {
+      setSelectedStockId(stockDirectory[0].stock.id);
       return;
     }
-    if (selectedStockId && !stockSummaries.some((item) => item.stock.id === selectedStockId)) {
-      setSelectedStockId(stockSummaries[0]?.stock.id ?? "");
+    if (selectedStockId && !stockDirectory.some((item) => item.stock.id === selectedStockId)) {
+      setSelectedStockId(stockDirectory[0]?.stock.id ?? "");
     }
-  }, [selectedStockId, stockSummaries]);
+  }, [selectedStockId, stockDirectory]);
 
   useEffect(() => {
     setAnalysisRecipeFilter("All Recipes");
@@ -1413,10 +1461,10 @@ export default function App() {
 
   const selectedEye = eyesSorted.find((eye) => eye.id === selectedEyeId) ?? eyesSorted[0];
   const selectedStockSummary =
-    filteredStockSummaries.find((item) => item.stock.id === selectedStockId) ??
-    stockSummaries.find((item) => item.stock.id === selectedStockId) ??
-    filteredStockSummaries[0] ??
-    stockSummaries[0];
+    filteredStockDirectory.find((item) => item.stock.id === selectedStockId) ??
+    stockDirectory.find((item) => item.stock.id === selectedStockId) ??
+    filteredStockDirectory[0] ??
+    stockDirectory[0];
   const selectedTemplate =
     conditionLibrary.find((item) => item.id === conditionBuilder.templateId) ?? conditionLibrary[0];
   const selectedOperatorOptions = operatorOptionsForTemplate(selectedTemplate);
@@ -1562,22 +1610,9 @@ export default function App() {
         })
       : [];
 
-  const jumpTo = (focus: DashboardFocus) => {
-    setDashboardFocus(focus);
-    if (focus === "eyes") {
-      setTab("Watchlist");
-      return;
-    }
-    if (focus === "recipes") {
-      setStudioPanel("Recipes");
-      setTab("Studio");
-      return;
-    }
-    if (focus === "decisions") {
-      setTab("Journal");
-      return;
-    }
-    setTab("Dashboard");
+  const jumpTo = (target: TabKey) => {
+    setFabOpen(false);
+    setTab(target);
   };
 
   const quickDecision = async (alert: Alert, action: DecisionAction) => {
@@ -1645,7 +1680,7 @@ export default function App() {
   };
 
   const fabActions =
-    tab === "Dashboard"
+    tab === "Home"
       ? [
           {
             label: "Refresh",
@@ -1658,58 +1693,89 @@ export default function App() {
             label: "Log Decision",
             onPress: () => {
               setFabOpen(false);
+              setJournalWorkspaceTab("Log Decision");
               setTab("Journal");
             },
           },
         ]
-      : tab === "Watchlist"
+      : tab === "Stocks"
         ? [
             {
               label: "New Eye",
               onPress: () => {
                 setFabOpen(false);
-                setStudioPanel("Eyes");
-                setTab("Studio");
+                setEyeWorkspaceTab("Create Eye");
+                setTab("Eyes");
               },
             },
             {
               label: "Alerts",
               onPress: () => {
                 setFabOpen(false);
-                setTab("Dashboard");
-                setDashboardFocus("alerts");
+                setAlertWorkspaceTab("Queue");
+                setTab("Alerts");
               },
             },
           ]
-        : tab === "Studio"
+        : tab === "Recipes"
           ? [
               {
                 label: "New Recipe",
                 onPress: () => {
                   setFabOpen(false);
-                  setStudioPanel("Recipes");
-                },
-              },
-              {
-                label: "Add Stock",
-                onPress: () => {
-                  setFabOpen(false);
-                  setStudioPanel("Stocks");
+                  setRecipeWorkspaceTab("Builder");
                 },
               },
               {
                 label: "New Eye",
                 onPress: () => {
                   setFabOpen(false);
-                  setStudioPanel("Eyes");
+                  setEyeWorkspaceTab("Create Eye");
+                  setTab("Eyes");
                 },
               },
             ]
+          : tab === "Eyes"
+            ? [
+                {
+                  label: "Create Eye",
+                  onPress: () => {
+                    setFabOpen(false);
+                    setEyeWorkspaceTab("Create Eye");
+                  },
+                },
+                {
+                  label: "Stocks",
+                  onPress: () => {
+                    setFabOpen(false);
+                    setTab("Stocks");
+                  },
+                },
+              ]
+          : tab === "Alerts"
+            ? [
+                {
+                  label: "Review Queue",
+                  onPress: () => {
+                    setFabOpen(false);
+                    setAlertWorkspaceTab("Queue");
+                  },
+                },
+                {
+                  label: "Journal",
+                  onPress: () => {
+                    setFabOpen(false);
+                    setJournalWorkspaceTab("Log Decision");
+                    setTab("Journal");
+                  },
+                },
+              ]
           : [
               {
                 label: "New Decision",
                 onPress: () => {
                   setFabOpen(false);
+                  setJournalWorkspaceTab("Log Decision");
                 },
               },
               {
@@ -1726,75 +1792,39 @@ export default function App() {
       <StatusBar style="dark" />
       <View style={styles.frame}>
         <ScrollView contentContainerStyle={styles.page} showsVerticalScrollIndicator={false}>
-          <Reveal>
-            <Card highlighted>
-              <Text style={styles.heroEyebrow}>Evidence-driven investing workspace</Text>
-              <Text style={styles.heroTitle}>StockLedger</Text>
-              <Text style={styles.heroSubtitle}>
-                Light, fast review surfaces for recipes, monitored stocks, and decisions you cannot afford
-                to skim poorly.
-              </Text>
-
-              <View style={styles.metricGrid}>
-                <MetricButton
-                  value={openAlerts}
-                  label="Open Alerts"
-                  note="Jump to review queue"
-                  onPress={() => jumpTo("alerts")}
-                />
-                <MetricButton
-                  value={data.eyes.length}
-                  label="Active Eyes"
-                  note="Open monitored list"
-                  onPress={() => jumpTo("eyes")}
-                />
-                <MetricButton
-                  value={data.recipes.length}
-                  label="Recipes"
-                  note="Open studio library"
-                  onPress={() => jumpTo("recipes")}
-                />
-                <MetricButton
-                  value={data.decisions.length}
-                  label="Decisions"
-                  note="Open journal history"
-                  onPress={() => jumpTo("decisions")}
-                />
-              </View>
-
-              <View style={styles.summaryRow}>
-                <MetaPill label={`${criticalEyes} critical eyes`} />
-                <MetaPill label={`${opportunityEyes} opportunity setups`} />
-                <MetaPill
-                  label={`${data.snapshots.filter((snapshot) => snapshot.isMock).length} mock feeds active`}
-                />
-              </View>
-            </Card>
-          </Reveal>
-
-          {tab === "Dashboard" ? (
+          {tab === "Home" ? (
             <>
-              <Reveal delay={40}>
-                <SectionHeader
-                  title="Dashboard"
-                  note="The fastest way to catch what changed, why it matters, and what deserves action."
-                />
+              <Reveal>
+                <Card highlighted>
+                  <Text style={styles.heroEyebrow}>Clear investment operating system</Text>
+                  <Text style={styles.heroTitle}>StockLedger</Text>
+                  <Text style={styles.heroSubtitle}>
+                    The shell now separates triage, stock inspection, recipe logic, alerts, and judgment history
+                    into distinct workspaces so each screen answers one question quickly.
+                  </Text>
+
+                  <View style={styles.metricGrid}>
+                    <MetricButton value={openAlerts} label="Alerts" note="Open review queue" onPress={() => jumpTo("Alerts")} />
+                    <MetricButton value={data.stocks.length} label="Stocks" note="Open search workspace" onPress={() => jumpTo("Stocks")} />
+                    <MetricButton value={data.recipes.length} label="Recipes" note="Open logic library" onPress={() => jumpTo("Recipes")} />
+                    <MetricButton value={data.decisions.length} label="Journal" note="Open decision memory" onPress={() => jumpTo("Journal")} />
+                  </View>
+
+                  <View style={styles.summaryRow}>
+                    <MetaPill label={`${criticalEyes} critical eyes`} />
+                    <MetaPill label={`${opportunityEyes} opportunity setups`} />
+                    <MetaPill label={`${data.snapshots.filter((snapshot) => snapshot.isMock).length} mock feeds active`} />
+                  </View>
+                </Card>
               </Reveal>
 
-              <Reveal delay={80}>
-                <SectionHeader
-                  title="Priority Radar"
-                  note="State-led summaries for quick scanning."
-                />
+              <Reveal delay={40}>
+                <SectionHeader title="Priority Radar" note="Home is now triage only: what changed, what is urgent, and what to reopen." />
                 <View style={styles.radarGrid}>
                   {[
-                    { label: "Attention Needed", value: criticalEyes, tone: styles.radarCritical },
-                    { label: "Opportunity Forming", value: opportunityEyes, tone: styles.radarOpportunity },
-                    {
-                      label: "Quiet / watchful",
-                      value: data.eyes.length - criticalEyes - opportunityEyes,
-                      tone: styles.radarQuiet,
-                    },
+                    { label: "Review Now", value: criticalEyes, tone: styles.radarCritical },
+                    { label: "Forming", value: opportunityEyes, tone: styles.radarOpportunity },
+                    { label: "Tracked Stocks", value: data.stocks.length, tone: styles.radarQuiet },
                   ].map((item) => (
                     <View key={item.label} style={[styles.radarCard, item.tone]}>
                       <Text style={styles.radarValue}>{item.value}</Text>
@@ -1804,152 +1834,15 @@ export default function App() {
                 </View>
               </Reveal>
 
-              {selectedEye ? (
-                <Reveal delay={120}>
-                  <SectionHeader title="Eye Detail" note="Main evidence board for the currently selected monitor." />
-                  <Card>
-                    <Text style={styles.cardEyebrow}>Focused monitor</Text>
-                    <Text style={styles.cardTitle}>{eyeLine(selectedEye, data.stocks, data.recipes)}</Text>
-                    <Text style={styles.cardBody}>{selectedEye.thesisSnapshot}</Text>
-
-                    {data.snapshots.find((snapshot) => snapshot.stockId === selectedEye.stockId) ? (
-                      <StockSparkline
-                        price={data.snapshots.find((snapshot) => snapshot.stockId === selectedEye.stockId)!.price}
-                        drawdownPct={
-                          data.snapshots.find((snapshot) => snapshot.stockId === selectedEye.stockId)!.drawdownPct
-                        }
-                        stabilizationScore={
-                          data.snapshots.find((snapshot) => snapshot.stockId === selectedEye.stockId)!
-                            .stabilizationScore
-                        }
-                      />
-                    ) : null}
-
-                    <View style={styles.metaRow}>
-                      <MetaPill label={selectedEye.lastEvaluation?.actionUrgency ?? "Wait"} />
-                      <MetaPill label={`Setup ${selectedEye.lastEvaluation?.setupStrength ?? "Low"}`} />
-                      <MetaPill label={selectedEyeSnapshot?.freshness ?? "No feed"} />
-                    </View>
-
-                    {selectedEye.lastEvaluation && selectedEyeRecipe ? (
-                      <>
-                        <WhyNowPanel
-                          title="Why now"
-                          body={selectedEye.lastEvaluation.whyNow}
-                          state={selectedEye.lastEvaluation.currentState}
-                          recipeVersion={`${selectedEyeRecipe.name} v${selectedEyeRecipe.version}`}
-                        />
-
-                        <View style={styles.dualColumn}>
-                          <View style={styles.evidenceColumn}>
-                            <Text style={styles.columnTitle}>Top support</Text>
-                            {(selectedEye.lastEvaluation.supportingEvidence ?? []).slice(0, 4).map((item) => (
-                              <Text key={item} style={styles.listLine}>
-                                + {item}
-                              </Text>
-                            ))}
-                          </View>
-                          <View style={styles.evidenceColumn}>
-                            <Text style={styles.columnTitle}>Top risks</Text>
-                            {[
-                              ...(selectedEye.lastEvaluation.contradictingEvidence ?? []),
-                              ...(selectedEye.lastEvaluation.riskWarnings ?? []),
-                              ...(selectedEye.lastEvaluation.hardDisqualifiers ?? []),
-                            ]
-                              .slice(0, 4)
-                              .map((item) => (
-                                <Text key={item} style={styles.listLine}>
-                                  - {item}
-                                </Text>
-                              ))}
-                          </View>
-                        </View>
-
-                        <WhatChangedPanel title="What changed" items={selectedEyeWhatChanged} />
-
-                        {selectedEyeEvidenceGroups.map((group) => (
-                          <EvidenceGroupView key={group.key} group={group} />
-                        ))}
-
-                        <View style={styles.actionRow}>
-                          <Button
-                            label="Entered"
-                            onPress={() => {
-                              const linkedAlert = data.alerts.find(
-                                (alert) => alert.eyeId === selectedEye.id && !alert.reviewed,
-                              );
-                              void actions.logDecision({
-                                eyeId: selectedEye.id,
-                                alertId: linkedAlert?.id,
-                                action: "Entered",
-                                note: `Entered after reviewing ${eyeLine(selectedEye, data.stocks, data.recipes)}.`,
-                                concern:
-                                  selectedEye.lastEvaluation?.contradictingEvidence[0] ??
-                                  "No primary concern captured.",
-                                thesisValid: "Yes",
-                                timing: "On Time",
-                              });
-                            }}
-                          />
-                          <Button
-                            label="Skipped"
-                            tone="secondary"
-                            onPress={() => {
-                              const linkedAlert = data.alerts.find(
-                                (alert) => alert.eyeId === selectedEye.id && !alert.reviewed,
-                              );
-                              void actions.logDecision({
-                                eyeId: selectedEye.id,
-                                alertId: linkedAlert?.id,
-                                action: "Skipped",
-                                note: `Skipped after reviewing ${eyeLine(selectedEye, data.stocks, data.recipes)}.`,
-                                concern:
-                                  selectedEye.lastEvaluation?.contradictingEvidence[0] ??
-                                  "No primary concern captured.",
-                                thesisValid: "Partly",
-                                timing: "On Time",
-                              });
-                            }}
-                          />
-                          <Button
-                            label="Rejected"
-                            tone="ghost"
-                            onPress={() => {
-                              const linkedAlert = data.alerts.find(
-                                (alert) => alert.eyeId === selectedEye.id && !alert.reviewed,
-                              );
-                              void actions.logDecision({
-                                eyeId: selectedEye.id,
-                                alertId: linkedAlert?.id,
-                                action: "Rejected",
-                                note: `Rejected after reviewing ${eyeLine(selectedEye, data.stocks, data.recipes)}.`,
-                                concern:
-                                  selectedEye.lastEvaluation?.contradictingEvidence[0] ??
-                                  "No primary concern captured.",
-                                thesisValid: "No",
-                                timing: "Late",
-                              });
-                            }}
-                          />
-                        </View>
-                      </>
-                    ) : null}
-                  </Card>
-                </Reveal>
-              ) : null}
-
-              <Reveal delay={160}>
-                <SectionHeader
-                  title="Review Queue"
-                  note="Fast scan cards with direct actions."
-                />
+              <Reveal delay={80}>
+                <SectionHeader title="Open Alerts" note="Fastest queue for immediate review." />
                 <View style={styles.stack}>
                   {alertQueue.length === 0 ? (
                     <Card>
-                      <Text style={styles.cardBody}>No alerts are open right now.</Text>
+                      <Text style={styles.cardBody}>No open alerts are waiting right now.</Text>
                     </Card>
                   ) : (
-                    alertQueue.slice(0, 5).map((alert) => {
+                    alertQueue.slice(0, 4).map((alert) => {
                       const eye = data.eyes.find((item) => item.id === alert.eyeId);
                       return (
                         <Pressable
@@ -1957,41 +1850,29 @@ export default function App() {
                           onPress={() => {
                             setSelectedAlertId(alert.id);
                             if (eye) setSelectedEyeId(eye.id);
+                            setAlertWorkspaceTab("Detail");
+                            setTab("Alerts");
                           }}
                         >
-                        <Card highlighted={selectedAlert?.id === alert.id}>
-                          <View style={styles.inlineBetween}>
-                            <View style={styles.flexOne}>
-                              <Text style={styles.cardEyebrow}>
-                                {stockLabel(data.stocks, eye?.stockId ?? "")}
-                              </Text>
-                              <Text style={styles.alertTitle}>{alert.title}</Text>
-                              <Text style={styles.cardBody}>{alert.whyNow}</Text>
-                            </View>
-                            <View style={styles.priorityStack}>
-                              <View style={priorityTone(alert.priority)}>
-                                <Text style={styles.priorityBadgeText}>{alert.priority}</Text>
+                          <Card highlighted={selectedAlert?.id === alert.id}>
+                            <View style={styles.inlineBetween}>
+                              <View style={styles.flexOne}>
+                                <Text style={styles.cardEyebrow}>{stockLabel(data.stocks, eye?.stockId ?? "")}</Text>
+                                <Text style={styles.alertTitle}>{alert.title}</Text>
+                                <Text style={styles.cardBody}>{alert.whyNow}</Text>
                               </View>
-                              <Text style={styles.timestampText}>{formatDate(alert.createdAt)}</Text>
+                              <View style={styles.priorityStack}>
+                                <View style={priorityTone(alert.priority)}>
+                                  <Text style={styles.priorityBadgeText}>{alert.priority}</Text>
+                                </View>
+                                <Text style={styles.timestampText}>{formatDate(alert.createdAt)}</Text>
+                              </View>
                             </View>
-                          </View>
-                          <Text style={styles.metaLine}>{alert.stateChange}</Text>
-                          <Text style={styles.metaLine}>Support: {alert.supportingEvidence.join(" | ") || "None"}</Text>
-                          <Text style={styles.metaLine}>Risks: {alert.risks.join(" | ") || "None"}</Text>
-                          <View style={styles.actionRow}>
-                            <Button label="Entered" onPress={() => void quickDecision(alert, "Entered")} />
-                            <Button
-                              label="Skipped"
-                              tone="secondary"
-                              onPress={() => void quickDecision(alert, "Skipped")}
-                            />
-                            <Button
-                              label="Reviewed"
-                              tone="ghost"
-                              onPress={() => void actions.markAlertReviewed(alert.id)}
-                            />
-                          </View>
-                        </Card>
+                            <View style={styles.metaRow}>
+                              <MetaPill label={alert.stateChange} />
+                              <MetaPill label={alert.dataQuality} />
+                            </View>
+                          </Card>
                         </Pressable>
                       );
                     })
@@ -1999,366 +1880,32 @@ export default function App() {
                 </View>
               </Reveal>
 
-              {selectedAlert && selectedAlertEye && selectedAlertRecipe && selectedAlertEvaluation ? (
-                <Reveal delay={200}>
-                  <SectionHeader
-                    title="Alert Detail"
-                    note="Fast explanation of what changed, why now, and what to review first."
-                  />
-                  <Card>
-                    <WhyNowPanel
-                      title="What happened"
-                      body={selectedAlert.whyNow}
-                      state={selectedAlertEvaluation.currentState}
-                      recipeVersion={`${selectedAlertRecipe.name} v${selectedAlertRecipe.version}`}
-                    />
-                    <View style={styles.dualColumn}>
-                      <View style={styles.evidenceColumn}>
-                        <Text style={styles.columnTitle}>Biggest support</Text>
-                        <Text style={styles.listLine}>
-                          + {selectedAlert.supportingEvidence[0] ?? "No strong support recorded."}
-                        </Text>
-                      </View>
-                      <View style={styles.evidenceColumn}>
-                        <Text style={styles.columnTitle}>Biggest risk</Text>
-                        <Text style={styles.listLine}>
-                          - {selectedAlert.risks[0] ?? "No major risk recorded."}
-                        </Text>
-                      </View>
-                    </View>
-                    <WhatChangedPanel
-                      title="Review in 5 seconds"
-                      items={[
-                        `Priority is ${selectedAlert.priority}.`,
-                        `State change: ${selectedAlert.stateChange}.`,
-                        selectedAlert.dataQuality,
-                      ]}
-                    />
-                    {selectedAlertEvidenceGroups.map((group) => (
-                      <EvidenceGroupView key={`alert-${group.key}`} group={group} />
-                    ))}
-                  </Card>
-                </Reveal>
-              ) : null}
-            </>
-          ) : null}
-
-          {tab === "Watchlist" ? (
-            <>
-              <Reveal>
-                <SectionHeader
-                  title="Watchlist"
-                  note="Selected stocks open into a visual parameter workspace instead of a generic ticker card."
-                />
-                <HorizontalChoice options={watchFilters} value={watchFilter} onSelect={setWatchFilter} />
-              </Reveal>
-
-              {selectedStockSummary ? (
-                <Reveal delay={60}>
-                  <Card highlighted>
-                    <View style={styles.inlineBetween}>
-                      <View style={styles.flexOne}>
-                        <Text style={styles.cardEyebrow}>{selectedStockSummary.stock.name}</Text>
-                        <Text style={styles.cardTitle}>{selectedStockSummary.stock.symbol}</Text>
-                        <Text style={styles.cardBody}>{selectedStockSummary.stock.thesis}</Text>
-                      </View>
-                      <Text style={stateTone(selectedStockSummary.dominantEye?.lastEvaluation?.currentState)}>
-                        {selectedStockSummary.dominantEye?.lastEvaluation?.currentState ?? "No state"}
-                      </Text>
-                    </View>
-                    {selectedStockSummary.snapshot ? (
-                      <StockSparkline
-                        price={selectedStockSummary.snapshot.price}
-                        drawdownPct={selectedStockSummary.snapshot.drawdownPct}
-                        stabilizationScore={selectedStockSummary.snapshot.stabilizationScore}
-                      />
-                    ) : null}
-                    {selectedStockSummary.snapshot ? (
-                      <View style={styles.dualDenseGrid}>
-                        <DenseStat label="Price" value={`$${selectedStockSummary.snapshot.price.toFixed(2)}`} tone="strong" />
-                        <DenseStat label="Drawdown" value={`${selectedStockSummary.snapshot.drawdownPct}%`} />
-                        <DenseStat
-                          label="RS vs SPY"
-                          value={`${selectedStockSummary.snapshot.relativeStrengthVsSpyPct ?? 0}%`}
-                          tone={(selectedStockSummary.snapshot.relativeStrengthVsSpyPct ?? 0) < 0 ? "risk" : "neutral"}
-                        />
-                        <DenseStat label="Freshness" value={selectedStockSummary.snapshot.freshness} />
-                      </View>
-                    ) : null}
-                    <View style={styles.metaRow}>
-                      <MetaPill label={`${selectedStockSummary.eyes.length} eyes`} />
-                      <MetaPill label={`${selectedStockSummary.openAlerts.length} open alerts`} />
-                      {selectedStockSummary.snapshot ? (
-                        <MetaPill label={selectedStockSummary.snapshot.freshness} />
-                      ) : null}
-                    </View>
-                  </Card>
-                </Reveal>
-              ) : null}
-
-              {selectedStockSummary ? (
-                <Reveal delay={85}>
-                  <SectionHeader
-                    title="Selected Stock Workspace"
-                    note="Visual Analysis is the main tab. Use filters to inspect parameter evidence by recipe, benchmark, and status."
-                  />
-                  <HorizontalChoice
-                    options={stockWorkspaceTabs}
-                    value={stockWorkspaceTab}
-                    onSelect={setStockWorkspaceTab}
-                  />
-                </Reveal>
-              ) : null}
-
-              {selectedStockSummary && stockWorkspaceTab === "Overview" ? (
-                <Reveal delay={95}>
-                  <Card>
-                    <Text style={styles.cardEyebrow}>Overview</Text>
-                    <Text style={styles.cardTitle}>Quick scan for {selectedStockSummary.stock.symbol}</Text>
-                    <Text style={styles.cardBody}>
-                      {selectedStockSummary.snapshot?.isMock
-                        ? "All visuals below are mock-backed through the same adapter path planned for real market data."
-                        : "Provider-backed snapshot."}
-                    </Text>
-                    <View style={styles.dualDenseGrid}>
-                      <DenseStat
-                        label="Setup Strength"
-                        value={selectedStockSummary.dominantEye?.lastEvaluation?.setupStrength ?? "Low"}
-                        tone="strong"
-                      />
-                      <DenseStat
-                        label="Action Urgency"
-                        value={selectedStockSummary.dominantEye?.lastEvaluation?.actionUrgency ?? "Wait"}
-                      />
-                      <DenseStat
-                        label="Data Quality"
-                        value={selectedStockSummary.snapshot?.freshness ?? "Unavailable"}
-                        tone={selectedStockSummary.snapshot?.freshness === "Mock Data" ? "risk" : "neutral"}
-                      />
-                      <DenseStat
-                        label="Thesis Risk"
-                        value={
-                          selectedStockSummary.dominantEye?.lastEvaluation?.currentState === "Thesis Broken"
-                            ? "Broken"
-                            : selectedStockSummary.dominantEye?.lastEvaluation?.currentState === "Thesis Risk Rising"
-                              ? "Elevated"
-                              : "Low"
-                        }
-                        tone={
-                          ["Thesis Broken", "Thesis Risk Rising"].includes(
-                            selectedStockSummary.dominantEye?.lastEvaluation?.currentState ?? "",
-                          )
-                            ? "risk"
-                            : "neutral"
-                        }
-                      />
-                    </View>
-                    <View style={styles.analysisActionRow}>
-                      <Button
-                        label="Visual Analysis"
-                        onPress={() => setStockWorkspaceTab("Visual Analysis")}
-                      />
-                      <Button
-                        label="Recipe Map"
-                        tone="secondary"
-                        onPress={() => setStockWorkspaceTab("Recipe Map")}
-                      />
-                    </View>
-                  </Card>
-                </Reveal>
-              ) : null}
-
-              {selectedStockSummary && stockWorkspaceTab === "Visual Analysis" ? (
-                <Reveal delay={95}>
-                  <Card>
-                    <Text style={styles.cardEyebrow}>Visual Analysis</Text>
-                    <Text style={styles.cardTitle}>{selectedStockSummary.stock.symbol} parameter workspace</Text>
-                    <Text style={styles.cardBody}>
-                      Evidence families stay visible in human language first. Formula detail is available, but secondary.
-                    </Text>
-
-                    <Text style={styles.inputLabel}>Recipe filter</Text>
-                    <HorizontalChoice
-                      options={selectedStockRecipeOptions}
-                      value={analysisRecipeFilter}
-                      onSelect={setAnalysisRecipeFilter}
-                    />
-
-                    <View style={styles.dualColumn}>
-                      <View style={styles.evidenceColumn}>
-                        <Text style={styles.inputLabel}>Benchmark</Text>
-                        <HorizontalChoice
-                          options={analysisBenchmarks}
-                          value={analysisBenchmark}
-                          onSelect={setAnalysisBenchmark}
-                        />
-                      </View>
-                      <View style={styles.evidenceColumn}>
-                        <Text style={styles.inputLabel}>Lookback</Text>
-                        <HorizontalChoice
-                          options={analysisLookbacks}
-                          value={analysisLookback}
-                          onSelect={setAnalysisLookback}
-                        />
-                      </View>
-                    </View>
-
-                    <Text style={styles.inputLabel}>Status filter</Text>
-                    <HorizontalChoice
-                      options={analysisStatusFilters}
-                      value={analysisStatusFilter}
-                      onSelect={setAnalysisStatusFilter}
-                    />
-
-                    <WhatChangedPanel
-                      title="Fast review framing"
-                      items={[
-                        `Setup Strength: ${selectedStockSummary.dominantEye?.lastEvaluation?.setupStrength ?? "Low"}`,
-                        `Action Urgency: ${selectedStockSummary.dominantEye?.lastEvaluation?.actionUrgency ?? "Wait"}`,
-                        `Data Quality: ${selectedStockSummary.snapshot?.freshness ?? "Unavailable"}${selectedStockSummary.snapshot?.isMock ? " · Mock Data" : ""}`,
-                        `Recipe filter: ${analysisRecipeFilter}`,
-                      ]}
-                    />
-
-                    <View style={styles.analysisActionRow}>
-                      <Button
-                        label="Mark Thesis Reviewed"
-                        onPress={() =>
-                          void actions.markEyesReviewed({
-                            stockId: selectedStockSummary.stock.id,
-                            recipeId:
-                              analysisRecipeFilter === "All Recipes"
-                                ? undefined
-                                : selectedStockFilteredEyes[0]?.recipeId,
-                          })
-                        }
-                      />
-                      <Button
-                        label="Create / Apply Eye"
-                        tone="secondary"
-                        onPress={() => {
-                          setEyeForm((current) => ({
-                            ...current,
-                            stockId: selectedStockSummary.stock.id,
-                            thesisSnapshot: current.thesisSnapshot || selectedStockSummary.stock.thesis,
-                          }));
-                          setStudioPanel("Eyes");
-                          setTab("Studio");
-                        }}
-                      />
-                      <Button
-                        label="Recipe Preview"
-                        tone="ghost"
-                        onPress={() => {
-                          setPreviewStockId(selectedStockSummary.stock.id);
-                          setStudioPanel("Recipes");
-                          setTab("Studio");
-                        }}
-                      />
-                    </View>
-
-                    <Text style={styles.inputLabel}>Review note</Text>
-                    <Input
-                      value={analysisNote}
-                      onChangeText={setAnalysisNote}
-                      placeholder="What changed since the last thesis review?"
-                      multiline
-                    />
-
-                    <View style={styles.analysisActionRow}>
-                      <Button
-                        label="Open Decision Log"
-                        onPress={() => {
-                          setDecisionForm((current) => ({
-                            ...current,
-                            eyeId: selectedStockFilteredEyes[0]?.id ?? selectedStockEyes[0]?.id ?? current.eyeId,
-                            note:
-                              analysisNote.trim() ||
-                              `Review note for ${selectedStockSummary.stock.symbol}: parameter workspace reviewed.`,
-                          }));
-                          setTab("Journal");
-                        }}
-                      />
-                      <Button
-                        label="Recipe Map"
-                        tone="secondary"
-                        onPress={() => setStockWorkspaceTab("Recipe Map")}
-                      />
-                    </View>
-                  </Card>
-
-                  <View style={styles.stack}>
-                    {selectedStockAnalysisGroups.map((group) =>
-                      group.cards.length > 0 ? <EvidenceGroupView key={`stock-${group.key}`} group={group} /> : null,
-                    )}
-                  </View>
-                </Reveal>
-              ) : null}
-
-              {selectedStockSummary && stockWorkspaceTab === "Recipe Map" ? (
-                <Reveal delay={95}>
-                  <SectionHeader
-                    title="Recipe Condition Map"
-                    note="Bridge between the stock visuals and each active Eye’s actual recipe logic."
-                  />
-                  <View style={styles.stack}>
-                    {selectedStockRecipeMapEyes.map((eye) => {
-                      const recipe = data.recipes.find((item) => item.id === eye.recipeId);
-                      return recipe ? (
-                        <RecipeConditionMapCard
-                          key={eye.id}
-                          eye={eye}
-                          recipe={recipe}
-                          stock={selectedStockSummary.stock}
-                        />
-                      ) : null;
-                    })}
-                  </View>
-                </Reveal>
-              ) : null}
-
-              <Reveal delay={100}>
-                <SectionHeader title="Monitored Stocks" note="Tap any stock to promote it into focus." />
+              <Reveal delay={120}>
+                <SectionHeader title="Eyes Changing State" note="Monitor-level review without opening the builder." />
                 <View style={styles.stack}>
-                  {filteredStockSummaries.map((item) => (
+                  {eyesSorted.slice(0, 4).map((eye) => (
                     <Pressable
-                      key={item.stock.id}
+                      key={eye.id}
                       onPress={() => {
-                        setSelectedStockId(item.stock.id);
-                        setStockWorkspaceTab("Visual Analysis");
+                        setSelectedEyeId(eye.id);
+                        setEyeWorkspaceTab("Active Eyes");
+                        setTab("Eyes");
                       }}
                     >
-                      <Card highlighted={selectedStockSummary?.stock.id === item.stock.id}>
+                      <Card highlighted={selectedEye?.id === eye.id}>
                         <View style={styles.inlineBetween}>
                           <View style={styles.flexOne}>
-                            <Text style={styles.cardEyebrow}>{item.stock.name}</Text>
-                            <Text style={styles.alertTitle}>{item.stock.symbol}</Text>
-                            <Text style={styles.cardBody}>{topReason(item.dominantEye ?? item.eyes[0])}</Text>
+                            <Text style={styles.cardEyebrow}>{stockLabel(data.stocks, eye.stockId)}</Text>
+                            <Text style={styles.alertTitle}>{recipeLabel(data.recipes, eye.recipeId)}</Text>
+                            <Text style={styles.cardBody}>{topReason(eye)}</Text>
                           </View>
-                          <Text style={stateTone(item.dominantEye?.lastEvaluation?.currentState)}>
-                            {item.dominantEye?.lastEvaluation?.currentState ?? "No state"}
+                          <Text style={stateTone(eye.lastEvaluation?.currentState)}>
+                            {eye.lastEvaluation?.currentState ?? "Not Evaluated"}
                           </Text>
                         </View>
-                        {item.snapshot ? (
-                          <StockSparkline
-                            price={item.snapshot.price}
-                            drawdownPct={item.snapshot.drawdownPct}
-                            stabilizationScore={item.snapshot.stabilizationScore}
-                          />
-                        ) : null}
-                        {item.snapshot ? (
-                          <View style={styles.compactMetricRow}>
-                            <Text style={styles.compactMetricText}>${item.snapshot.price.toFixed(2)}</Text>
-                            <Text style={styles.compactMetricText}>{item.snapshot.drawdownPct}% drawdown</Text>
-                            <Text style={styles.compactMetricText}>
-                              RS {item.snapshot.relativeStrengthVsSpyPct ?? 0}%
-                            </Text>
-                          </View>
-                        ) : null}
                         <View style={styles.metaRow}>
-                          <MetaPill label={`${item.eyes.length} recipes watching`} />
-                          <MetaPill label={`${item.openAlerts.length} alerts`} />
-                          {item.snapshot ? <MetaPill label={`Updated ${formatDate(item.snapshot.updatedAt)}`} /> : null}
+                          <MetaPill label={eye.lastEvaluation?.actionUrgency ?? "Wait"} />
+                          <MetaPill label={`Setup ${eye.lastEvaluation?.setupStrength ?? "Low"}`} />
                         </View>
                       </Card>
                     </Pressable>
@@ -2368,111 +1915,380 @@ export default function App() {
             </>
           ) : null}
 
-          {tab === "Studio" ? (
+          {tab === "Stocks" ? (
             <>
               <Reveal>
                 <SectionHeader
-                  title="Studio"
-                  note="Build reusable investing logic and bind it to stocks through explicit Eyes."
+                  title="Stocks"
+                  note="Search first, select a stock, then inspect the same visual parameter grid every time."
                 />
-                <HorizontalChoice options={studioPanels} value={studioPanel} onSelect={setStudioPanel} />
+                <Card highlighted>
+                  <Text style={styles.inputLabel}>Search stocks</Text>
+                  <Input
+                    value={stockSearch}
+                    onChangeText={setStockSearch}
+                    placeholder="Search ticker, company, or thesis"
+                    autoCapitalize="none"
+                  />
+                  <Text style={styles.inputLabel}>Filter</Text>
+                  <HorizontalChoice options={stockFilters} value={stockFilter} onSelect={setStockFilter} />
+                  <View style={styles.metaRow}>
+                    <MetaPill label={`${filteredStockDirectory.length} results`} />
+                    <MetaPill label={`${data.stocks.length} tracked stocks`} />
+                  </View>
+                </Card>
               </Reveal>
 
-              {studioPanel === "Recipes" ? (
+              <Reveal delay={40}>
+                <SectionHeader title="Stock Directory" note="Select a stock to open its dedicated workspace." />
+                <View style={styles.stockGrid}>
+                  {filteredStockDirectory.slice(0, 8).map((item) => (
+                    <Pressable
+                      key={item.stock.id}
+                      onPress={() => {
+                        setSelectedStockId(item.stock.id);
+                        setStockWorkspaceTab("Visual Analysis");
+                      }}
+                      style={styles.stockGridItem}
+                    >
+                      <Card highlighted={selectedStockSummary?.stock.id === item.stock.id}>
+                        <View style={styles.inlineBetween}>
+                          <View style={styles.flexOne}>
+                            <Text style={styles.cardEyebrow}>{item.stock.name}</Text>
+                            <Text style={styles.alertTitle}>{item.stock.symbol}</Text>
+                          </View>
+                          <Text style={stateTone(item.dominantEye?.lastEvaluation?.currentState)}>
+                            {item.dominantEye?.lastEvaluation?.currentState ?? "Unwatched"}
+                          </Text>
+                        </View>
+                        <Text style={styles.cardBody}>{item.stock.thesis}</Text>
+                        {item.snapshot ? (
+                          <View style={styles.compactMetricRow}>
+                            <Text style={styles.compactMetricText}>${item.snapshot.price.toFixed(2)}</Text>
+                            <Text style={styles.compactMetricText}>{item.snapshot.drawdownPct}%</Text>
+                            <Text style={styles.compactMetricText}>{item.snapshot.freshness}</Text>
+                          </View>
+                        ) : (
+                          <Text style={styles.metaLine}>No snapshot loaded yet.</Text>
+                        )}
+                      </Card>
+                    </Pressable>
+                  ))}
+                </View>
+              </Reveal>
+
+              <Reveal delay={60}>
+                <SectionHeader title="Add Stock" note="Keep the stock universe intentional and searchable." />
+                <Card>
+                  <View style={styles.dualColumn}>
+                    <View style={styles.evidenceColumn}>
+                      <Text style={styles.inputLabel}>Ticker</Text>
+                      <Input
+                        value={stockForm.symbol}
+                        onChangeText={(symbol) => setStockForm((current) => ({ ...current, symbol }))}
+                        placeholder="Ticker symbol"
+                        autoCapitalize="characters"
+                      />
+                    </View>
+                    <View style={styles.evidenceColumn}>
+                      <Text style={styles.inputLabel}>Company</Text>
+                      <Input
+                        value={stockForm.name}
+                        onChangeText={(name) => setStockForm((current) => ({ ...current, name }))}
+                        placeholder="Company name"
+                      />
+                    </View>
+                  </View>
+                  <Text style={styles.inputLabel}>Why track it</Text>
+                  <Input
+                    value={stockForm.thesis}
+                    onChangeText={(thesis) => setStockForm((current) => ({ ...current, thesis }))}
+                    placeholder="What makes this worth monitoring?"
+                    multiline
+                  />
+                  <Button
+                    label="Add Stock"
+                    onPress={() => {
+                      if (!stockForm.symbol.trim()) return;
+                      void actions.addStock(stockForm);
+                      setStockForm({ symbol: "", name: "", thesis: "" });
+                    }}
+                  />
+                </Card>
+              </Reveal>
+
+              {selectedStockSummary ? (
                 <>
-                  <Reveal delay={60}>
+                  <Reveal delay={80}>
                     <SectionHeader
-                      title="Recipe Generator"
-                      note="Guided, typed controls for logic, cadence, and alerts instead of loose parameter text."
+                      title={`${selectedStockSummary.stock.symbol} Workspace`}
+                      note="Summary, parameter grid, recipe logic, and notes stay separate so the view does not collapse into one endless surface."
                     />
-                    <Card highlighted>
-                      <View style={styles.compactSection}>
-                        <Text style={styles.inputLabel}>Recipe name</Text>
-                        <Input
-                          value={recipeForm.name}
-                          onChangeText={(name) => setRecipeForm((current) => ({ ...current, name }))}
-                          placeholder="Temporary Bargain Sale"
-                        />
+                    <HorizontalChoice options={stockWorkspaceTabs} value={stockWorkspaceTab} onSelect={setStockWorkspaceTab} />
+                  </Reveal>
 
-                        <Text style={styles.inputLabel}>Opportunity type</Text>
-                        <HorizontalChoice
-                          options={opportunityTypes}
-                          value={recipeForm.opportunityType}
-                          onSelect={(opportunityType) =>
-                            setRecipeForm((current) => ({ ...current, opportunityType }))
-                          }
-                        />
-
-                        <Text style={styles.inputLabel}>Time horizon</Text>
-                        <HorizontalChoice
-                          options={timeHorizons}
-                          value={recipeForm.timeHorizon}
-                          onSelect={(timeHorizon) => setRecipeForm((current) => ({ ...current, timeHorizon }))}
-                        />
-
-                        <Text style={styles.inputLabel}>Primary use case</Text>
-                        <HorizontalChoice
-                          options={useCaseOptions}
-                          value={recipeForm.intendedUseCase}
-                          onSelect={(intendedUseCase) =>
-                            setRecipeForm((current) => ({ ...current, intendedUseCase }))
-                          }
-                        />
-
+                  {stockWorkspaceTab === "Summary" ? (
+                    <Reveal delay={100}>
+                      <Card highlighted>
+                        <View style={styles.inlineBetween}>
+                          <View style={styles.flexOne}>
+                            <Text style={styles.cardEyebrow}>{selectedStockSummary.stock.name}</Text>
+                            <Text style={styles.cardTitle}>{selectedStockSummary.stock.symbol}</Text>
+                            <Text style={styles.cardBody}>{selectedStockSummary.stock.thesis}</Text>
+                          </View>
+                          <Text style={stateTone(selectedStockSummary.dominantEye?.lastEvaluation?.currentState)}>
+                            {selectedStockSummary.dominantEye?.lastEvaluation?.currentState ?? "No eye state"}
+                          </Text>
+                        </View>
+                        {selectedStockSummary.snapshot ? (
+                          <StockSparkline
+                            price={selectedStockSummary.snapshot.price}
+                            drawdownPct={selectedStockSummary.snapshot.drawdownPct}
+                            stabilizationScore={selectedStockSummary.snapshot.stabilizationScore}
+                          />
+                        ) : null}
                         <View style={styles.dualDenseGrid}>
-                          <DenseStat label="Review cadence" value={`${recipeForm.reviewCadenceDays} days`} tone="strong" />
-                          <DenseStat label="Alert cooldown" value={`${recipeForm.alertCooldownHours} hours`} />
+                          <DenseStat label="Price" value={selectedStockSummary.snapshot ? `$${selectedStockSummary.snapshot.price.toFixed(2)}` : "No feed"} tone="strong" />
+                          <DenseStat label="Setup Strength" value={selectedStockSummary.dominantEye?.lastEvaluation?.setupStrength ?? "Low"} />
+                          <DenseStat label="Action Urgency" value={selectedStockSummary.dominantEye?.lastEvaluation?.actionUrgency ?? "Wait"} />
+                          <DenseStat label="Data Quality" value={selectedStockSummary.snapshot?.freshness ?? "Unavailable"} tone={selectedStockSummary.snapshot?.isMock ? "risk" : "neutral"} />
+                        </View>
+                        <View style={styles.analysisActionRow}>
+                          <Button label="Open Visual Analysis" onPress={() => setStockWorkspaceTab("Visual Analysis")} />
+                          <Button label="Open Recipe Map" tone="secondary" onPress={() => setStockWorkspaceTab("Recipe Map")} />
+                          <Button
+                            label="Create / Apply Eye"
+                            tone="ghost"
+                            onPress={() => {
+                              setEyeForm((current) => ({
+                                ...current,
+                                stockId: selectedStockSummary.stock.id,
+                                thesisSnapshot: current.thesisSnapshot || selectedStockSummary.stock.thesis,
+                              }));
+                              setEyeWorkspaceTab("Create Eye");
+                              setTab("Eyes");
+                            }}
+                          />
+                        </View>
+                      </Card>
+                    </Reveal>
+                  ) : null}
+
+                  {stockWorkspaceTab === "Visual Analysis" ? (
+                    <Reveal delay={100}>
+                      <Card highlighted>
+                        <Text style={styles.cardEyebrow}>Visual Analysis</Text>
+                        <Text style={styles.cardTitle}>Consistent parameter grid for {selectedStockSummary.stock.symbol}</Text>
+                        <Text style={styles.cardBody}>
+                          Same evidence families for every stock. Tap a card to expand details. Mock-backed feeds stay labeled.
+                        </Text>
+
+                        <Text style={styles.inputLabel}>Recipe filter</Text>
+                        <HorizontalChoice options={selectedStockRecipeOptions} value={analysisRecipeFilter} onSelect={setAnalysisRecipeFilter} />
+
+                        <View style={styles.dualColumn}>
+                          <View style={styles.evidenceColumn}>
+                            <Text style={styles.inputLabel}>Benchmark</Text>
+                            <HorizontalChoice options={analysisBenchmarks} value={analysisBenchmark} onSelect={setAnalysisBenchmark} />
+                          </View>
+                          <View style={styles.evidenceColumn}>
+                            <Text style={styles.inputLabel}>Lookback</Text>
+                            <HorizontalChoice options={analysisLookbacks} value={analysisLookback} onSelect={setAnalysisLookback} />
+                          </View>
                         </View>
 
-                        <Text style={styles.inputLabel}>Review cadence</Text>
-                        <HorizontalChoice
-                          options={reviewCadenceOptions.map(String)}
-                          value={String(recipeForm.reviewCadenceDays)}
-                          onSelect={(value) =>
-                            setRecipeForm((current) => ({ ...current, reviewCadenceDays: Number(value) }))
-                          }
-                        />
+                        <View style={styles.dualColumn}>
+                          <View style={styles.evidenceColumn}>
+                            <Text style={styles.inputLabel}>Status</Text>
+                            <HorizontalChoice options={analysisStatusFilters} value={analysisStatusFilter} onSelect={setAnalysisStatusFilter} />
+                          </View>
+                          <View style={styles.evidenceColumn}>
+                            <Text style={styles.inputLabel}>Density</Text>
+                            <HorizontalChoice options={analysisDensityOptions} value={analysisDensity} onSelect={setAnalysisDensity} />
+                          </View>
+                        </View>
 
-                        <Text style={styles.inputLabel}>Alert cooldown</Text>
-                        <HorizontalChoice
-                          options={alertCooldownOptions.map(String)}
-                          value={String(recipeForm.alertCooldownHours)}
-                          onSelect={(value) =>
-                            setRecipeForm((current) => ({ ...current, alertCooldownHours: Number(value) }))
-                          }
-                        />
+                        <View style={styles.metaRow}>
+                          <MetaPill label={`Data ${selectedStockSummary.snapshot?.freshness ?? "Unavailable"}`} />
+                          <MetaPill label={`Filter ${analysisRecipeFilter}`} />
+                          <MetaPill label={`Benchmark ${analysisBenchmark}`} />
+                        </View>
 
-                        <Text style={styles.inputLabel}>Purpose</Text>
+                        <Text style={styles.inputLabel}>Review note</Text>
                         <Input
-                          value={recipeForm.purpose}
-                          onChangeText={(purpose) => setRecipeForm((current) => ({ ...current, purpose }))}
-                          placeholder="What opportunity should this logic surface?"
+                          value={analysisNote}
+                          onChangeText={setAnalysisNote}
+                          placeholder="What changed since the last review?"
                           multiline
                         />
 
-                        <Text style={styles.inputLabel}>Notes</Text>
-                        <Input
-                          value={recipeForm.notes}
-                          onChangeText={(notes) => setRecipeForm((current) => ({ ...current, notes }))}
-                          placeholder="Review triggers, downgrade rules, or thesis guardrails"
-                          multiline
-                        />
+                        <View style={styles.analysisActionRow}>
+                          <Button
+                            label="Mark Thesis Reviewed"
+                            onPress={() =>
+                              void actions.markEyesReviewed({
+                                stockId: selectedStockSummary.stock.id,
+                                recipeId:
+                                  analysisRecipeFilter === "All Recipes" ? undefined : selectedStockFilteredEyes[0]?.recipeId,
+                              })
+                            }
+                          />
+                          <Button
+                            label="Recipe Preview"
+                            tone="secondary"
+                            onPress={() => {
+                              setPreviewStockId(selectedStockSummary.stock.id);
+                              setRecipeWorkspaceTab("Preview");
+                              setTab("Recipes");
+                            }}
+                          />
+                          <Button
+                            label="Decision Log"
+                            tone="ghost"
+                            onPress={() => {
+                              setDecisionForm((current) => ({
+                                ...current,
+                                eyeId: selectedStockFilteredEyes[0]?.id ?? selectedStockEyes[0]?.id ?? current.eyeId,
+                                note:
+                                  analysisNote.trim() ||
+                                  `Review note for ${selectedStockSummary.stock.symbol}: visual analysis reviewed.`,
+                              }));
+                              setJournalWorkspaceTab("Log Decision");
+                              setTab("Journal");
+                            }}
+                          />
+                        </View>
+                      </Card>
+
+                      <View style={styles.stack}>
+                        {selectedStockAnalysisGroups.map((group) =>
+                          group.cards.length > 0 ? (
+                            <EvidenceGroupView
+                              key={`stock-${group.key}`}
+                              group={group}
+                              layout={analysisDensity === "Compact" ? "grid" : "stack"}
+                              defaultExpanded={group.key === "price-damage" || group.key === "trend-stabilization"}
+                            />
+                          ) : null,
+                        )}
                       </View>
+                    </Reveal>
+                  ) : null}
 
-                      <View style={styles.divider} />
+                  {stockWorkspaceTab === "Recipe Map" ? (
+                    <Reveal delay={100}>
+                      <SectionHeader title="Recipe Condition Map" note="See how each active Eye currently interprets this stock." />
+                      <View style={styles.stack}>
+                        {selectedStockRecipeMapEyes.length === 0 ? (
+                          <Card>
+                            <Text style={styles.cardBody}>No active Eyes are attached to this stock yet.</Text>
+                          </Card>
+                        ) : (
+                          selectedStockRecipeMapEyes.map((eye) => {
+                            const recipe = data.recipes.find((item) => item.id === eye.recipeId);
+                            return recipe ? (
+                              <RecipeConditionMapCard key={eye.id} eye={eye} recipe={recipe} stock={selectedStockSummary.stock} />
+                            ) : null;
+                          })
+                        )}
+                      </View>
+                    </Reveal>
+                  ) : null}
 
+                  {stockWorkspaceTab === "Notes" ? (
+                    <Reveal delay={100}>
+                      <Card>
+                        <Text style={styles.cardEyebrow}>Notes & Decisions</Text>
+                        <Text style={styles.cardTitle}>{selectedStockSummary.stock.symbol} thesis memory</Text>
+                        <Text style={styles.cardBody}>{selectedStockSummary.stock.thesis}</Text>
+                        <View style={styles.metaRow}>
+                          <MetaPill label={`${selectedStockSummary.eyes.length} eyes`} />
+                          <MetaPill label={`${selectedStockSummary.decisions.length} decisions`} />
+                          <MetaPill label={`${selectedStockSummary.openAlerts.length} open alerts`} />
+                        </View>
+                        <Text style={styles.inputLabel}>Current review note</Text>
+                        <Input value={analysisNote} onChangeText={setAnalysisNote} placeholder="Capture what changed in the thesis." multiline />
+                        <View style={styles.analysisActionRow}>
+                          <Button
+                            label="Log This Note"
+                            onPress={() => {
+                              setDecisionForm((current) => ({
+                                ...current,
+                                eyeId: selectedStockFilteredEyes[0]?.id ?? selectedStockEyes[0]?.id ?? current.eyeId,
+                                note: analysisNote.trim() || current.note,
+                              }));
+                              setJournalWorkspaceTab("Log Decision");
+                              setTab("Journal");
+                            }}
+                          />
+                          <Button label="Visual Analysis" tone="secondary" onPress={() => setStockWorkspaceTab("Visual Analysis")} />
+                        </View>
+                      </Card>
+
+                      <View style={styles.stack}>
+                        {selectedStockSummary.decisions.slice(0, 6).map((decision) => (
+                          <Card key={decision.id}>
+                            <Text style={styles.alertTitle}>{decision.action}</Text>
+                            <Text style={styles.cardBody}>{decision.note}</Text>
+                            <Text style={styles.metaLine}>
+                              {decision.stateAtDecision ?? "No state snapshot"} · {decision.dataQuality ?? "No data note"} · {formatDate(decision.createdAt)}
+                            </Text>
+                          </Card>
+                        ))}
+                      </View>
+                    </Reveal>
+                  ) : null}
+                </>
+              ) : null}
+            </>
+          ) : null}
+
+          {tab === "Recipes" ? (
+            <>
+              <Reveal>
+                <SectionHeader title="Recipes" note="Recipe authoring, preview, and library stay here instead of leaking into stock review screens." />
+                <HorizontalChoice options={recipeWorkspaceTabs} value={recipeWorkspaceTab} onSelect={setRecipeWorkspaceTab} />
+              </Reveal>
+
+              {recipeWorkspaceTab === "Builder" ? (
+                <>
+                  <Reveal delay={40}>
+                    <Card highlighted>
+                      <Text style={styles.formTitle}>Recipe Builder</Text>
+                      <Text style={styles.formNote}>Build guided investment logic through typed controls and role-based conditions.</Text>
+                      <Text style={styles.inputLabel}>Recipe name</Text>
+                      <Input value={recipeForm.name} onChangeText={(name) => setRecipeForm((current) => ({ ...current, name }))} placeholder="Temporary Bargain Sale" />
+                      <Text style={styles.inputLabel}>Opportunity type</Text>
+                      <HorizontalChoice options={opportunityTypes} value={recipeForm.opportunityType} onSelect={(opportunityType) => setRecipeForm((current) => ({ ...current, opportunityType }))} />
+                      <Text style={styles.inputLabel}>Time horizon</Text>
+                      <HorizontalChoice options={timeHorizons} value={recipeForm.timeHorizon} onSelect={(timeHorizon) => setRecipeForm((current) => ({ ...current, timeHorizon }))} />
+                      <Text style={styles.inputLabel}>Primary use case</Text>
+                      <HorizontalChoice options={useCaseOptions} value={recipeForm.intendedUseCase} onSelect={(intendedUseCase) => setRecipeForm((current) => ({ ...current, intendedUseCase }))} />
+                      <View style={styles.dualDenseGrid}>
+                        <DenseStat label="Review cadence" value={`${recipeForm.reviewCadenceDays} days`} tone="strong" />
+                        <DenseStat label="Alert cooldown" value={`${recipeForm.alertCooldownHours} hours`} />
+                      </View>
+                      <Text style={styles.inputLabel}>Review cadence</Text>
+                      <HorizontalChoice options={reviewCadenceOptions.map(String)} value={String(recipeForm.reviewCadenceDays)} onSelect={(value) => setRecipeForm((current) => ({ ...current, reviewCadenceDays: Number(value) }))} />
+                      <Text style={styles.inputLabel}>Alert cooldown</Text>
+                      <HorizontalChoice options={alertCooldownOptions.map(String)} value={String(recipeForm.alertCooldownHours)} onSelect={(value) => setRecipeForm((current) => ({ ...current, alertCooldownHours: Number(value) }))} />
+                      <Text style={styles.inputLabel}>Purpose</Text>
+                      <Input value={recipeForm.purpose} onChangeText={(purpose) => setRecipeForm((current) => ({ ...current, purpose }))} placeholder="What opportunity should this logic surface?" multiline />
+                      <Text style={styles.inputLabel}>Notes</Text>
+                      <Input value={recipeForm.notes} onChangeText={(notes) => setRecipeForm((current) => ({ ...current, notes }))} placeholder="Guardrails, review triggers, downgrade logic" multiline />
+                    </Card>
+                  </Reveal>
+
+                  <Reveal delay={60}>
+                    <Card>
                       <Text style={styles.formTitle}>Condition Library</Text>
-                      <Text style={styles.formNote}>
-                        Choose the kind of critical thinking you want the recipe to express.
-                      </Text>
-
+                      <Text style={styles.formNote}>Translate evidence into eligibility, support, risk, and disqualifier roles.</Text>
                       <Text style={styles.inputLabel}>Category</Text>
                       <HorizontalChoice
                         options={conditionCategories}
                         value={conditionBuilder.category as (typeof conditionCategories)[number]}
                         onSelect={(category) => {
-                          const firstTemplate =
-                            conditionLibrary.find((item) => item.category === category) ?? conditionLibrary[0];
+                          const firstTemplate = conditionLibrary.find((item) => item.category === category) ?? conditionLibrary[0];
                           setConditionBuilder({
                             category,
                             templateId: firstTemplate.id,
@@ -2483,150 +2299,75 @@ export default function App() {
                           });
                         }}
                       />
-
                       <Text style={styles.inputLabel}>Template</Text>
-                      <ScrollView
-                        horizontal
-                        showsHorizontalScrollIndicator={false}
-                        contentContainerStyle={styles.choiceRow}
-                      >
+                      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.choiceRow}>
                         {conditionLibrary
                           .filter((item) => item.category === conditionBuilder.category)
                           .map((template) => (
                             <Pressable
                               key={template.id}
-                              onPress={() =>
-                                setConditionBuilder((current) => ({
-                                  ...current,
-                                  templateId: template.id,
-                                }))
-                              }
-                              style={[
-                                styles.templateCard,
-                                conditionBuilder.templateId === template.id ? styles.templateCardActive : null,
-                              ]}
+                              onPress={() => setConditionBuilder((current) => ({ ...current, templateId: template.id }))}
+                              style={[styles.templateCard, conditionBuilder.templateId === template.id ? styles.templateCardActive : null]}
                             >
-                              <Text
-                                style={[
-                                  styles.templateTitle,
-                                  conditionBuilder.templateId === template.id
-                                    ? styles.templateTitleActive
-                                    : null,
-                                ]}
-                              >
+                              <Text style={[styles.templateTitle, conditionBuilder.templateId === template.id ? styles.templateTitleActive : null]}>
                                 {template.title}
                               </Text>
-                              <Text
-                                style={[
-                                  styles.templateSubtitle,
-                                  conditionBuilder.templateId === template.id
-                                    ? styles.templateSubtitleActive
-                                    : null,
-                                ]}
-                              >
+                              <Text style={[styles.templateSubtitle, conditionBuilder.templateId === template.id ? styles.templateSubtitleActive : null]}>
                                 {template.complexity} · {template.description}
                               </Text>
                             </Pressable>
                           ))}
                       </ScrollView>
-
                       <Text style={styles.inputLabel}>Condition role</Text>
-                      <HorizontalChoice
-                        options={conditionKinds}
-                        value={conditionBuilder.kind}
-                        onSelect={(kind) => setConditionBuilder((current) => ({ ...current, kind }))}
-                      />
-
+                      <HorizontalChoice options={conditionKinds} value={conditionBuilder.kind} onSelect={(kind) => setConditionBuilder((current) => ({ ...current, kind }))} />
                       <Text style={styles.inputLabel}>Operator</Text>
-                      <HorizontalChoice
-                        options={selectedOperatorOptions}
-                        value={conditionBuilder.operator}
-                        onSelect={(operator) => setConditionBuilder((current) => ({ ...current, operator }))}
-                      />
-
+                      <HorizontalChoice options={selectedOperatorOptions} value={conditionBuilder.operator} onSelect={(operator) => setConditionBuilder((current) => ({ ...current, operator }))} />
                       <Text style={styles.inputLabel}>Threshold / parameter</Text>
                       {selectedTemplate.control.type === "number" ? (
                         <NumberStepper
                           label={selectedTemplate.metricLabel}
                           value={Number(conditionBuilder.threshold)}
-                          onChange={(next) =>
-                            setConditionBuilder((current) => ({ ...current, threshold: String(next) }))
-                          }
+                          onChange={(next) => setConditionBuilder((current) => ({ ...current, threshold: String(next) }))}
                           step={selectedTemplate.control.step}
                           min={selectedTemplate.control.min}
                           max={selectedTemplate.control.max}
                           unit={selectedTemplate.control.unit}
                         />
                       ) : (
-                        <HorizontalChoice
-                          options={selectedTemplate.control.options}
-                          value={conditionBuilder.threshold}
-                          onSelect={(threshold) => setConditionBuilder((current) => ({ ...current, threshold }))}
-                        />
+                        <HorizontalChoice options={selectedTemplate.control.options} value={conditionBuilder.threshold} onSelect={(threshold) => setConditionBuilder((current) => ({ ...current, threshold }))} />
                       )}
-
                       <Text style={styles.inputLabel}>Why this matters</Text>
-                      <Input
-                        value={conditionBuilder.note}
-                        onChangeText={(note) => setConditionBuilder((current) => ({ ...current, note }))}
-                        placeholder="Optional context for future you"
-                        multiline
-                      />
-
+                      <Input value={conditionBuilder.note} onChangeText={(note) => setConditionBuilder((current) => ({ ...current, note }))} placeholder="Optional context for future you" multiline />
                       <View style={styles.previewCard}>
                         <Text style={styles.previewLabel}>Preview</Text>
                         <Text style={styles.previewText}>
-                          {selectedTemplate.title}: {selectedTemplate.metricLabel} {conditionBuilder.operator}{" "}
-                          {formatMetricThreshold(
-                            selectedTemplate,
-                            conditionBuilder.threshold || selectedTemplate.defaultValue,
-                          )}
+                          {selectedTemplate.title}: {selectedTemplate.metricLabel} {conditionBuilder.operator} {formatMetricThreshold(selectedTemplate, conditionBuilder.threshold || selectedTemplate.defaultValue)}
                         </Text>
                         <Text style={styles.previewHint}>{selectedTemplate.description}</Text>
                       </View>
-
                       <View style={styles.actionRow}>
                         <Button label="Add Condition" onPress={addDraftCondition} />
-                        <Button
-                          label="Clear Draft"
-                          tone="ghost"
-                          onPress={() => setDraftConditions([])}
-                        />
+                        <Button label="Clear Draft" tone="ghost" onPress={() => setDraftConditions([])} />
                       </View>
                     </Card>
                   </Reveal>
 
-                  <Reveal delay={100}>
-                    <SectionHeader
-                      title="Draft Conditions"
-                      note="Mix simple filters, layered confirmations, and hard disqualifiers."
-                    />
+                  <Reveal delay={80}>
+                    <SectionHeader title="Draft Conditions" note="Review the current recipe logic before saving." />
                     <View style={styles.stack}>
                       {draftConditions.length === 0 ? (
                         <Card>
-                          <Text style={styles.cardBody}>
-                            No conditions added yet. Use the library above to translate your investment logic.
-                          </Text>
+                          <Text style={styles.cardBody}>No conditions added yet.</Text>
                         </Card>
                       ) : (
                         draftConditions.map((condition) => (
                           <Card key={condition.id}>
                             <View style={styles.inlineBetween}>
                               <View style={styles.flexOne}>
-                                <Text style={[styles.kindPill, conditionKindTone(condition.kind)]}>
-                                  {condition.kind}
-                                </Text>
+                                <Text style={[styles.kindPill, conditionKindTone(condition.kind)]}>{condition.kind}</Text>
                                 <Text style={styles.cardBody}>{condition.label}</Text>
                               </View>
-                              <Button
-                                label="Remove"
-                                tone="ghost"
-                                onPress={() =>
-                                  setDraftConditions((current) =>
-                                    current.filter((item) => item.id !== condition.id),
-                                  )
-                                }
-                              />
+                              <Button label="Remove" tone="ghost" onPress={() => setDraftConditions((current) => current.filter((item) => item.id !== condition.id))} />
                             </View>
                           </Card>
                         ))
@@ -2634,356 +2375,321 @@ export default function App() {
                     </View>
                     <View style={styles.actionRow}>
                       <Button label="Save Recipe" onPress={() => void saveRecipe()} />
-                    </View>
-                  </Reveal>
-
-                  <Reveal delay={120}>
-                    <SectionHeader
-                      title="Recipe Preview"
-                      note="Test the current draft on a selected stock before saving the recipe."
-                    />
-                    <Card>
-                      <Text style={styles.inputLabel}>Preview stock</Text>
-                      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.choiceRow}>
-                        {data.stocks.map((stock) => (
-                          <Pressable
-                            key={stock.id}
-                            onPress={() => setPreviewStockId(stock.id)}
-                            style={[styles.selectChip, previewStockId === stock.id ? styles.selectChipActive : null]}
-                          >
-                            <Text
-                              style={[
-                                styles.selectChipTitle,
-                                previewStockId === stock.id ? styles.selectChipTitleActive : null,
-                              ]}
-                            >
-                              {stock.symbol}
-                            </Text>
-                            <Text
-                              style={[
-                                styles.selectChipSubtitle,
-                                previewStockId === stock.id ? styles.selectChipSubtitleActive : null,
-                              ]}
-                            >
-                              {stock.name}
-                            </Text>
-                          </Pressable>
-                        ))}
-                      </ScrollView>
-
-                      {previewRecipe && previewEvaluation && previewStock ? (
-                        <>
-                          <WhyNowPanel
-                            title="Draft result"
-                            body={previewEvaluation.whyNow}
-                            state={previewEvaluation.currentState}
-                            recipeVersion={`${previewRecipe.name} v${previewRecipe.version}`}
-                          />
-                          <View style={styles.dualColumn}>
-                            <View style={styles.evidenceColumn}>
-                              <Text style={styles.columnTitle}>Preview support</Text>
-                              {(previewEvaluation.supportingEvidence ?? []).slice(0, 4).map((item) => (
-                                <Text key={item} style={styles.listLine}>
-                                  + {item}
-                                </Text>
-                              ))}
-                            </View>
-                            <View style={styles.evidenceColumn}>
-                              <Text style={styles.columnTitle}>Preview contradictions</Text>
-                              {(previewEvaluation.contradictingEvidence ?? []).slice(0, 4).map((item) => (
-                                <Text key={item} style={styles.listLine}>
-                                  - {item}
-                                </Text>
-                              ))}
-                            </View>
-                          </View>
-                          <Text style={styles.previewDisclosure}>
-                            Preview uses adapter-style sample data and must not be mistaken for live market data.
-                          </Text>
-                          {previewEvidenceGroups.map((group) => (
-                            <EvidenceGroupView key={`preview-${group.key}`} group={group} />
-                          ))}
-                        </>
-                      ) : (
-                        <Text style={styles.cardBody}>
-                          Add draft conditions first to see how this recipe would evaluate a stock.
-                        </Text>
-                      )}
-                    </Card>
-                  </Reveal>
-
-                  <Reveal delay={140}>
-                    <SectionHeader title="Recipe Library" note="Existing playbooks ready to reuse." />
-                    <View style={styles.stack}>
-                      {data.recipes.map((recipe) => (
-                        <Card key={recipe.id}>
-                          <Text style={styles.cardEyebrow}>Version {recipe.version}</Text>
-                          <Text style={styles.cardTitle}>{recipe.name}</Text>
-                          <Text style={styles.cardBody}>{recipe.purpose}</Text>
-                          <View style={styles.dualDenseGrid}>
-                            <DenseStat label="Type" value={recipe.opportunityType ?? "General"} tone="strong" />
-                            <DenseStat label="Horizon" value={recipe.timeHorizon || "Unset"} />
-                            <DenseStat
-                              label="Cadence"
-                              value={`${recipe.reviewConfig?.cadenceDays ?? 14}d`}
-                            />
-                            <DenseStat label="Conditions" value={String(recipe.conditions.length)} />
-                          </View>
-                          <View style={styles.metaRow}>
-                            <MetaPill label={recipe.intendedUseCase || "No use case"} />
-                            <MetaPill label={`${recipe.alertConfig?.cooldownHours ?? 24}h cooldown`} />
-                          </View>
-                        </Card>
-                      ))}
+                      <Button label="Open Preview" tone="secondary" onPress={() => setRecipeWorkspaceTab("Preview")} />
                     </View>
                   </Reveal>
                 </>
               ) : null}
 
-              {studioPanel === "Eyes" ? (
+              {recipeWorkspaceTab === "Preview" ? (
+                <Reveal delay={40}>
+                  <SectionHeader title="Recipe Preview" note="Apply the current draft to a selected stock before saving it." />
+                  <Card highlighted>
+                    <Text style={styles.inputLabel}>Preview stock</Text>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.choiceRow}>
+                      {data.stocks.map((stock) => (
+                        <Pressable key={stock.id} onPress={() => setPreviewStockId(stock.id)} style={[styles.selectChip, previewStockId === stock.id ? styles.selectChipActive : null]}>
+                          <Text style={[styles.selectChipTitle, previewStockId === stock.id ? styles.selectChipTitleActive : null]}>{stock.symbol}</Text>
+                          <Text style={[styles.selectChipSubtitle, previewStockId === stock.id ? styles.selectChipSubtitleActive : null]}>{stock.name}</Text>
+                        </Pressable>
+                      ))}
+                    </ScrollView>
+
+                    {previewRecipe && previewEvaluation && previewStock ? (
+                      <>
+                        <WhyNowPanel title="Draft result" body={previewEvaluation.whyNow} state={previewEvaluation.currentState} recipeVersion={`${previewRecipe.name} v${previewRecipe.version}`} />
+                        <View style={styles.dualColumn}>
+                          <View style={styles.evidenceColumn}>
+                            <Text style={styles.columnTitle}>Preview support</Text>
+                            {(previewEvaluation.supportingEvidence ?? []).slice(0, 4).map((item) => (
+                              <Text key={item} style={styles.listLine}>+ {item}</Text>
+                            ))}
+                          </View>
+                          <View style={styles.evidenceColumn}>
+                            <Text style={styles.columnTitle}>Preview contradictions</Text>
+                            {(previewEvaluation.contradictingEvidence ?? []).slice(0, 4).map((item) => (
+                              <Text key={item} style={styles.listLine}>- {item}</Text>
+                            ))}
+                          </View>
+                        </View>
+                        <Text style={styles.previewDisclosure}>Preview uses adapter-style sample data and must not be mistaken for live market data.</Text>
+                        {previewEvidenceGroups.map((group) => (
+                          <EvidenceGroupView key={`preview-${group.key}`} group={group} defaultExpanded={group.key === "supporting-evidence"} />
+                        ))}
+                      </>
+                    ) : (
+                      <Text style={styles.cardBody}>Add draft conditions first to see a preview.</Text>
+                    )}
+                  </Card>
+                </Reveal>
+              ) : null}
+
+              {recipeWorkspaceTab === "Library" ? (
+                <Reveal delay={40}>
+                  <SectionHeader title="Recipe Library" note="Saved logic stays readable and reusable." />
+                  <View style={styles.stack}>
+                    {data.recipes.map((recipe) => (
+                      <Card key={recipe.id}>
+                        <Text style={styles.cardEyebrow}>Version {recipe.version}</Text>
+                        <Text style={styles.cardTitle}>{recipe.name}</Text>
+                        <Text style={styles.cardBody}>{recipe.purpose}</Text>
+                        <View style={styles.dualDenseGrid}>
+                          <DenseStat label="Type" value={recipe.opportunityType ?? "General"} tone="strong" />
+                          <DenseStat label="Horizon" value={recipe.timeHorizon || "Unset"} />
+                          <DenseStat label="Cadence" value={`${recipe.reviewConfig?.cadenceDays ?? 14}d`} />
+                          <DenseStat label="Conditions" value={String(recipe.conditions.length)} />
+                        </View>
+                        <View style={styles.metaRow}>
+                          <MetaPill label={recipe.intendedUseCase || "No use case"} />
+                          <MetaPill label={`${recipe.alertConfig?.cooldownHours ?? 24}h cooldown`} />
+                        </View>
+                      </Card>
+                    ))}
+                  </View>
+                </Reveal>
+              ) : null}
+            </>
+          ) : null}
+
+          {tab === "Eyes" ? (
+            <>
+              <Reveal>
+                <SectionHeader title="Eyes" note="Eyes are the recipe-applied monitors. Keep monitor review separate from raw stock inspection." />
+                <HorizontalChoice options={eyeWorkspaceTabs} value={eyeWorkspaceTab} onSelect={setEyeWorkspaceTab} />
+              </Reveal>
+
+              {eyeWorkspaceTab === "Active Eyes" ? (
                 <>
+                  {selectedEye ? (
+                    <Reveal delay={40}>
+                      <Card highlighted>
+                        <Text style={styles.cardEyebrow}>Focused Eye</Text>
+                        <Text style={styles.cardTitle}>{eyeLine(selectedEye, data.stocks, data.recipes)}</Text>
+                        <Text style={styles.cardBody}>{selectedEye.thesisSnapshot}</Text>
+                        <View style={styles.metaRow}>
+                          <MetaPill label={selectedEye.lastEvaluation?.actionUrgency ?? "Wait"} />
+                          <MetaPill label={`Setup ${selectedEye.lastEvaluation?.setupStrength ?? "Low"}`} />
+                          <MetaPill label={selectedEyeSnapshot?.freshness ?? "No feed"} />
+                        </View>
+                        {selectedEye.lastEvaluation && selectedEyeRecipe ? (
+                          <>
+                            <WhyNowPanel
+                              title="Why now"
+                              body={selectedEye.lastEvaluation.whyNow}
+                              state={selectedEye.lastEvaluation.currentState}
+                              recipeVersion={`${selectedEyeRecipe.name} v${selectedEyeRecipe.version}`}
+                            />
+                            <WhatChangedPanel title="What changed" items={selectedEyeWhatChanged} />
+                            <View style={styles.actionRow}>
+                              <Button
+                                label="Open Stock"
+                                onPress={() => {
+                                  setSelectedStockId(selectedEye.stockId);
+                                  setStockWorkspaceTab("Visual Analysis");
+                                  setTab("Stocks");
+                                }}
+                              />
+                              <Button
+                                label="Decision Log"
+                                tone="secondary"
+                                onPress={() => {
+                                  setDecisionForm((current) => ({ ...current, eyeId: selectedEye.id }));
+                                  setJournalWorkspaceTab("Log Decision");
+                                  setTab("Journal");
+                                }}
+                              />
+                            </View>
+                          </>
+                        ) : null}
+                      </Card>
+                    </Reveal>
+                  ) : null}
+
                   <Reveal delay={60}>
-                    <SectionHeader
-                      title="Create Eye"
-                      note="Bind a stock to a recipe with entry zone, review date, and invalidation context."
-                    />
-                    <Card highlighted>
-                      <Text style={styles.inputLabel}>Stock</Text>
-                      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.choiceRow}>
-                        {data.stocks.map((stock) => (
-                          <Pressable
-                            key={stock.id}
-                            onPress={() => setEyeForm((current) => ({ ...current, stockId: stock.id }))}
-                            style={[styles.selectChip, eyeForm.stockId === stock.id ? styles.selectChipActive : null]}
-                          >
-                            <Text
-                              style={[
-                                styles.selectChipTitle,
-                                eyeForm.stockId === stock.id ? styles.selectChipTitleActive : null,
-                              ]}
-                            >
-                              {stock.symbol}
-                            </Text>
-                            <Text
-                              style={[
-                                styles.selectChipSubtitle,
-                                eyeForm.stockId === stock.id ? styles.selectChipSubtitleActive : null,
-                              ]}
-                            >
-                              {stock.name}
-                            </Text>
-                          </Pressable>
-                        ))}
-                      </ScrollView>
-
-                      <Text style={styles.inputLabel}>Recipe</Text>
-                      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.choiceRow}>
-                        {data.recipes.map((recipe) => (
-                          <Pressable
-                            key={recipe.id}
-                            onPress={() => setEyeForm((current) => ({ ...current, recipeId: recipe.id }))}
-                            style={[styles.selectChip, eyeForm.recipeId === recipe.id ? styles.selectChipActive : null]}
-                          >
-                            <Text
-                              style={[
-                                styles.selectChipTitle,
-                                eyeForm.recipeId === recipe.id ? styles.selectChipTitleActive : null,
-                              ]}
-                            >
-                              {recipe.name}
-                            </Text>
-                            <Text
-                              style={[
-                                styles.selectChipSubtitle,
-                                eyeForm.recipeId === recipe.id ? styles.selectChipSubtitleActive : null,
-                              ]}
-                            >
-                              {recipe.timeHorizon}
-                            </Text>
-                          </Pressable>
-                        ))}
-                      </ScrollView>
-
-                      <Text style={styles.inputLabel}>Specific thesis snapshot</Text>
-                      <Input
-                        value={eyeForm.thesisSnapshot}
-                        onChangeText={(thesisSnapshot) =>
-                          setEyeForm((current) => ({ ...current, thesisSnapshot }))
-                        }
-                        placeholder="Why does this stock under this recipe deserve repeated attention?"
-                        multiline
-                      />
-
-                      <View style={styles.dualDenseGrid}>
-                        <NumberStepper
-                          label="Planned entry low"
-                          value={Number(eyeForm.plannedEntryLow || 0)}
-                          onChange={(next) =>
-                            setEyeForm((current) => ({ ...current, plannedEntryLow: next.toFixed(2) }))
-                          }
-                          step={0.5}
-                          min={0}
-                          max={10000}
-                        />
-                        <NumberStepper
-                          label="Planned entry high"
-                          value={Number(eyeForm.plannedEntryHigh || 0)}
-                          onChange={(next) =>
-                            setEyeForm((current) => ({ ...current, plannedEntryHigh: next.toFixed(2) }))
-                          }
-                          step={0.5}
-                          min={0}
-                          max={10000}
-                        />
-                      </View>
-
-                      <Text style={styles.inputLabel}>Last thesis review</Text>
-                      <HorizontalChoice
-                        options={reviewDateOptions.map((item) => item.label)}
-                        value={
-                          reviewDateOptions.find((item) => item.daysAgo === eyeForm.lastReviewedDaysAgo)?.label ??
-                          reviewDateOptions[2].label
-                        }
-                        onSelect={(label) =>
-                          setEyeForm((current) => ({
-                            ...current,
-                            lastReviewedDaysAgo:
-                              reviewDateOptions.find((item) => item.label === label)?.daysAgo ??
-                              reviewDateOptions[2].daysAgo,
-                          }))
-                        }
-                      />
-
-                      <Text style={styles.inputLabel}>Invalidation rule</Text>
-                      <Input
-                        value={eyeForm.invalidationRule}
-                        onChangeText={(invalidationRule) =>
-                          setEyeForm((current) => ({ ...current, invalidationRule }))
-                        }
-                        placeholder="What would break the thesis fast?"
-                        multiline
-                      />
-
-                      <View style={styles.dualDenseGrid}>
-                        <DenseStat
-                          label="Review stamp"
-                          value={formatShortDate(isoDateDaysAgo(eyeForm.lastReviewedDaysAgo))}
-                        />
-                        <DenseStat
-                          label="Entry band"
-                          value={
-                            eyeForm.plannedEntryLow && eyeForm.plannedEntryHigh
-                              ? `$${eyeForm.plannedEntryLow} to $${eyeForm.plannedEntryHigh}`
-                              : "Not set"
-                          }
-                          tone="strong"
-                        />
-                      </View>
-
-                      <Button
-                        label="Create Eye"
-                        onPress={() => {
-                          if (!eyeForm.stockId || !eyeForm.recipeId || !eyeForm.thesisSnapshot.trim()) return;
-                          void actions.addEye({
-                            stockId: eyeForm.stockId,
-                            recipeId: eyeForm.recipeId,
-                            thesisSnapshot: eyeForm.thesisSnapshot,
-                            plannedEntryLow: Number(eyeForm.plannedEntryLow),
-                            plannedEntryHigh: Number(eyeForm.plannedEntryHigh),
-                            invalidationRule: eyeForm.invalidationRule,
-                            lastReviewedAt: isoDateDaysAgo(eyeForm.lastReviewedDaysAgo),
-                          });
-                          setEyeForm({
-                            stockId: "",
-                            recipeId: "",
-                            thesisSnapshot: "",
-                            plannedEntryLow: "",
-                            plannedEntryHigh: "",
-                            invalidationRule: "",
-                            lastReviewedDaysAgo: reviewDateOptions[2].daysAgo,
-                          });
-                        }}
-                      />
-                    </Card>
-                  </Reveal>
-
-                  <Reveal delay={100}>
-                    <SectionHeader title="Active Eyes" note="Every monitored pairing currently in the system." />
+                    <SectionHeader title="Active Monitor List" note="Pick a monitor, then branch to stock analysis or decision logging." />
                     <View style={styles.stack}>
                       {eyesSorted.map((eye) => (
-                        <Card key={eye.id}>
-                          <View style={styles.inlineBetween}>
-                            <View style={styles.flexOne}>
-                              <Text style={styles.cardEyebrow}>
-                                {stockLabel(data.stocks, eye.stockId)}
+                        <Pressable key={eye.id} onPress={() => setSelectedEyeId(eye.id)}>
+                          <Card highlighted={selectedEye?.id === eye.id}>
+                            <View style={styles.inlineBetween}>
+                              <View style={styles.flexOne}>
+                                <Text style={styles.cardEyebrow}>{stockLabel(data.stocks, eye.stockId)}</Text>
+                                <Text style={styles.alertTitle}>{recipeLabel(data.recipes, eye.recipeId)}</Text>
+                                <Text style={styles.cardBody}>{eye.thesisSnapshot}</Text>
+                              </View>
+                              <Text style={stateTone(eye.lastEvaluation?.currentState)}>
+                                {eye.lastEvaluation?.currentState ?? "Not Evaluated"}
                               </Text>
-                              <Text style={styles.alertTitle}>{recipeLabel(data.recipes, eye.recipeId)}</Text>
-                              <Text style={styles.cardBody}>{eye.thesisSnapshot}</Text>
                             </View>
-                            <Text style={stateTone(eye.lastEvaluation?.currentState)}>
-                              {eye.lastEvaluation?.currentState ?? "Not Evaluated"}
-                            </Text>
-                          </View>
-                          <View style={styles.dualDenseGrid}>
-                            <DenseStat
-                              label="Entry zone"
-                              value={
-                                eye.plannedEntryLow !== undefined && eye.plannedEntryHigh !== undefined
-                                  ? `$${eye.plannedEntryLow} to $${eye.plannedEntryHigh}`
-                                  : "Unset"
-                              }
-                            />
-                            <DenseStat
-                              label="Last review"
-                              value={eye.lastReviewedAt ? formatShortDate(eye.lastReviewedAt) : "Unset"}
-                            />
-                          </View>
-                        </Card>
+                            <View style={styles.dualDenseGrid}>
+                              <DenseStat label="Entry zone" value={eye.plannedEntryLow !== undefined && eye.plannedEntryHigh !== undefined ? `$${eye.plannedEntryLow} to $${eye.plannedEntryHigh}` : "Unset"} />
+                              <DenseStat label="Last review" value={eye.lastReviewedAt ? formatShortDate(eye.lastReviewedAt) : "Unset"} />
+                            </View>
+                          </Card>
+                        </Pressable>
                       ))}
                     </View>
                   </Reveal>
                 </>
               ) : null}
 
-              {studioPanel === "Stocks" ? (
-                <>
-                  <Reveal delay={60}>
-                    <SectionHeader
-                      title="Add Stock"
-                      note="Keep the tracked universe intentional and thesis-led."
+              {eyeWorkspaceTab === "Create Eye" ? (
+                <Reveal delay={40}>
+                  <SectionHeader title="Create Eye" note="Bind a stock to a recipe with entry zone, review date, and invalidation context." />
+                  <Card highlighted>
+                    <Text style={styles.inputLabel}>Stock</Text>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.choiceRow}>
+                      {data.stocks.map((stock) => (
+                        <Pressable key={stock.id} onPress={() => setEyeForm((current) => ({ ...current, stockId: stock.id }))} style={[styles.selectChip, eyeForm.stockId === stock.id ? styles.selectChipActive : null]}>
+                          <Text style={[styles.selectChipTitle, eyeForm.stockId === stock.id ? styles.selectChipTitleActive : null]}>{stock.symbol}</Text>
+                          <Text style={[styles.selectChipSubtitle, eyeForm.stockId === stock.id ? styles.selectChipSubtitleActive : null]}>{stock.name}</Text>
+                        </Pressable>
+                      ))}
+                    </ScrollView>
+
+                    <Text style={styles.inputLabel}>Recipe</Text>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.choiceRow}>
+                      {data.recipes.map((recipe) => (
+                        <Pressable key={recipe.id} onPress={() => setEyeForm((current) => ({ ...current, recipeId: recipe.id }))} style={[styles.selectChip, eyeForm.recipeId === recipe.id ? styles.selectChipActive : null]}>
+                          <Text style={[styles.selectChipTitle, eyeForm.recipeId === recipe.id ? styles.selectChipTitleActive : null]}>{recipe.name}</Text>
+                          <Text style={[styles.selectChipSubtitle, eyeForm.recipeId === recipe.id ? styles.selectChipSubtitleActive : null]}>{recipe.timeHorizon}</Text>
+                        </Pressable>
+                      ))}
+                    </ScrollView>
+
+                    <Text style={styles.inputLabel}>Specific thesis snapshot</Text>
+                    <Input value={eyeForm.thesisSnapshot} onChangeText={(thesisSnapshot) => setEyeForm((current) => ({ ...current, thesisSnapshot }))} placeholder="Why does this stock under this recipe deserve repeated attention?" multiline />
+                    <View style={styles.dualDenseGrid}>
+                      <NumberStepper label="Planned entry low" value={Number(eyeForm.plannedEntryLow || 0)} onChange={(next) => setEyeForm((current) => ({ ...current, plannedEntryLow: next.toFixed(2) }))} step={0.5} min={0} max={10000} />
+                      <NumberStepper label="Planned entry high" value={Number(eyeForm.plannedEntryHigh || 0)} onChange={(next) => setEyeForm((current) => ({ ...current, plannedEntryHigh: next.toFixed(2) }))} step={0.5} min={0} max={10000} />
+                    </View>
+                    <Text style={styles.inputLabel}>Last thesis review</Text>
+                    <HorizontalChoice
+                      options={reviewDateOptions.map((item) => item.label)}
+                      value={reviewDateOptions.find((item) => item.daysAgo === eyeForm.lastReviewedDaysAgo)?.label ?? reviewDateOptions[2].label}
+                      onSelect={(label) =>
+                        setEyeForm((current) => ({
+                          ...current,
+                          lastReviewedDaysAgo: reviewDateOptions.find((item) => item.label === label)?.daysAgo ?? reviewDateOptions[2].daysAgo,
+                        }))
+                      }
                     />
-                    <Card highlighted>
-                      <Text style={styles.inputLabel}>Ticker</Text>
-                      <Input
-                        value={stockForm.symbol}
-                        onChangeText={(symbol) => setStockForm((current) => ({ ...current, symbol }))}
-                        placeholder="Ticker symbol"
-                        autoCapitalize="characters"
-                      />
-                      <Text style={styles.inputLabel}>Company name</Text>
-                      <Input
-                        value={stockForm.name}
-                        onChangeText={(name) => setStockForm((current) => ({ ...current, name }))}
-                        placeholder="Company name"
-                      />
-                      <Text style={styles.inputLabel}>Why track it</Text>
-                      <Input
-                        value={stockForm.thesis}
-                        onChangeText={(thesis) => setStockForm((current) => ({ ...current, thesis }))}
-                        placeholder="What makes this worth saving into your monitoring memory?"
-                        multiline
-                      />
-                      <Button
-                        label="Add Stock"
-                        onPress={() => {
-                          if (!stockForm.symbol.trim()) return;
-                          void actions.addStock(stockForm);
-                          setStockForm({ symbol: "", name: "", thesis: "" });
-                        }}
-                      />
-                    </Card>
-                  </Reveal>
-                </>
+                    <Text style={styles.inputLabel}>Invalidation rule</Text>
+                    <Input value={eyeForm.invalidationRule} onChangeText={(invalidationRule) => setEyeForm((current) => ({ ...current, invalidationRule }))} placeholder="What would break the thesis fast?" multiline />
+                    <View style={styles.dualDenseGrid}>
+                      <DenseStat label="Review stamp" value={formatShortDate(isoDateDaysAgo(eyeForm.lastReviewedDaysAgo))} />
+                      <DenseStat label="Entry band" value={eyeForm.plannedEntryLow && eyeForm.plannedEntryHigh ? `$${eyeForm.plannedEntryLow} to $${eyeForm.plannedEntryHigh}` : "Not set"} tone="strong" />
+                    </View>
+                    <Button
+                      label="Create Eye"
+                      onPress={() => {
+                        if (!eyeForm.stockId || !eyeForm.recipeId || !eyeForm.thesisSnapshot.trim()) return;
+                        void actions.addEye({
+                          stockId: eyeForm.stockId,
+                          recipeId: eyeForm.recipeId,
+                          thesisSnapshot: eyeForm.thesisSnapshot,
+                          plannedEntryLow: Number(eyeForm.plannedEntryLow),
+                          plannedEntryHigh: Number(eyeForm.plannedEntryHigh),
+                          invalidationRule: eyeForm.invalidationRule,
+                          lastReviewedAt: isoDateDaysAgo(eyeForm.lastReviewedDaysAgo),
+                        });
+                        setEyeForm({
+                          stockId: "",
+                          recipeId: "",
+                          thesisSnapshot: "",
+                          plannedEntryLow: "",
+                          plannedEntryHigh: "",
+                          invalidationRule: "",
+                          lastReviewedDaysAgo: reviewDateOptions[2].daysAgo,
+                        });
+                        setEyeWorkspaceTab("Active Eyes");
+                      }}
+                    />
+                  </Card>
+                </Reveal>
+              ) : null}
+            </>
+          ) : null}
+
+          {tab === "Alerts" ? (
+            <>
+              <Reveal>
+                <SectionHeader title="Alerts" note="Alerts answer what happened, why now, and what deserves review first." />
+                <HorizontalChoice options={alertWorkspaceTabs} value={alertWorkspaceTab} onSelect={setAlertWorkspaceTab} />
+              </Reveal>
+
+              {alertWorkspaceTab === "Queue" ? (
+                <Reveal delay={40}>
+                  <SectionHeader title="Queue" note="Open alerts with direct review actions." />
+                  <View style={styles.stack}>
+                    {alertQueue.length === 0 ? (
+                      <Card>
+                        <Text style={styles.cardBody}>No alerts are open right now.</Text>
+                      </Card>
+                    ) : (
+                      alertQueue.map((alert) => {
+                        const eye = data.eyes.find((item) => item.id === alert.eyeId);
+                        return (
+                          <Pressable
+                            key={alert.id}
+                            onPress={() => {
+                              setSelectedAlertId(alert.id);
+                              if (eye) setSelectedEyeId(eye.id);
+                              setAlertWorkspaceTab("Detail");
+                            }}
+                          >
+                            <Card highlighted={selectedAlert?.id === alert.id}>
+                              <View style={styles.inlineBetween}>
+                                <View style={styles.flexOne}>
+                                  <Text style={styles.cardEyebrow}>{stockLabel(data.stocks, eye?.stockId ?? "")}</Text>
+                                  <Text style={styles.alertTitle}>{alert.title}</Text>
+                                  <Text style={styles.cardBody}>{alert.whyNow}</Text>
+                                </View>
+                                <View style={styles.priorityStack}>
+                                  <View style={priorityTone(alert.priority)}>
+                                    <Text style={styles.priorityBadgeText}>{alert.priority}</Text>
+                                  </View>
+                                  <Text style={styles.timestampText}>{formatDate(alert.createdAt)}</Text>
+                                </View>
+                              </View>
+                              <Text style={styles.metaLine}>{alert.stateChange}</Text>
+                              <View style={styles.actionRow}>
+                                <Button label="Entered" onPress={() => void quickDecision(alert, "Entered")} />
+                                <Button label="Skipped" tone="secondary" onPress={() => void quickDecision(alert, "Skipped")} />
+                                <Button label="Reviewed" tone="ghost" onPress={() => void actions.markAlertReviewed(alert.id)} />
+                              </View>
+                            </Card>
+                          </Pressable>
+                        );
+                      })
+                    )}
+                  </View>
+                </Reveal>
+              ) : null}
+
+              {alertWorkspaceTab === "Detail" && selectedAlert && selectedAlertEye && selectedAlertRecipe && selectedAlertEvaluation ? (
+                <Reveal delay={40}>
+                  <SectionHeader title="Alert Detail" note="Visual explanation of the current alert, not just text." />
+                  <Card highlighted>
+                    <WhyNowPanel title="What happened" body={selectedAlert.whyNow} state={selectedAlertEvaluation.currentState} recipeVersion={`${selectedAlertRecipe.name} v${selectedAlertRecipe.version}`} />
+                    <View style={styles.dualColumn}>
+                      <View style={styles.evidenceColumn}>
+                        <Text style={styles.columnTitle}>Biggest support</Text>
+                        <Text style={styles.listLine}>+ {selectedAlert.supportingEvidence[0] ?? "No strong support recorded."}</Text>
+                      </View>
+                      <View style={styles.evidenceColumn}>
+                        <Text style={styles.columnTitle}>Biggest risk</Text>
+                        <Text style={styles.listLine}>- {selectedAlert.risks[0] ?? "No major risk recorded."}</Text>
+                      </View>
+                    </View>
+                    <WhatChangedPanel title="Review in 5 seconds" items={[`Priority is ${selectedAlert.priority}.`, `State change: ${selectedAlert.stateChange}.`, selectedAlert.dataQuality]} />
+                  </Card>
+                  <View style={styles.stack}>
+                    {selectedAlertEvidenceGroups.map((group) => (
+                      <EvidenceGroupView key={`alert-${group.key}`} group={group} defaultExpanded={group.key === "supporting-evidence"} />
+                    ))}
+                  </View>
+                </Reveal>
               ) : null}
             </>
           ) : null}
@@ -2991,119 +2697,72 @@ export default function App() {
           {tab === "Journal" ? (
             <>
               <Reveal>
-                <SectionHeader
-                  title="Decision Journal"
-                  note="Capture action, concern, timing, and thesis quality while the context is fresh."
-                />
+                <SectionHeader title="Journal" note="Capture decisions while the context is fresh, then review the record later without mixing it into alert triage." />
+                <HorizontalChoice options={journalWorkspaceTabs} value={journalWorkspaceTab} onSelect={setJournalWorkspaceTab} />
               </Reveal>
 
-              <Reveal delay={60}>
-                <Card highlighted>
-                  <Text style={styles.inputLabel}>Eye</Text>
-                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.choiceRow}>
-                    {data.eyes.map((eye) => (
-                      <Pressable
-                        key={eye.id}
-                        onPress={() => setDecisionForm((current) => ({ ...current, eyeId: eye.id }))}
-                        style={[styles.selectChip, decisionForm.eyeId === eye.id ? styles.selectChipActive : null]}
-                      >
-                        <Text
-                          style={[
-                            styles.selectChipTitle,
-                            decisionForm.eyeId === eye.id ? styles.selectChipTitleActive : null,
-                          ]}
-                        >
-                          {stockLabel(data.stocks, eye.stockId)}
-                        </Text>
-                        <Text
-                          style={[
-                            styles.selectChipSubtitle,
-                            decisionForm.eyeId === eye.id ? styles.selectChipSubtitleActive : null,
-                          ]}
-                        >
-                          {recipeLabel(data.recipes, eye.recipeId)}
-                        </Text>
-                      </Pressable>
+              {journalWorkspaceTab === "Log Decision" ? (
+                <Reveal delay={40}>
+                  <Card highlighted>
+                    <Text style={styles.inputLabel}>Eye</Text>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.choiceRow}>
+                      {data.eyes.map((eye) => (
+                        <Pressable key={eye.id} onPress={() => setDecisionForm((current) => ({ ...current, eyeId: eye.id }))} style={[styles.selectChip, decisionForm.eyeId === eye.id ? styles.selectChipActive : null]}>
+                          <Text style={[styles.selectChipTitle, decisionForm.eyeId === eye.id ? styles.selectChipTitleActive : null]}>{stockLabel(data.stocks, eye.stockId)}</Text>
+                          <Text style={[styles.selectChipSubtitle, decisionForm.eyeId === eye.id ? styles.selectChipSubtitleActive : null]}>{recipeLabel(data.recipes, eye.recipeId)}</Text>
+                        </Pressable>
+                      ))}
+                    </ScrollView>
+                    <Text style={styles.inputLabel}>Action</Text>
+                    <HorizontalChoice options={decisionActions} value={decisionForm.action} onSelect={(action) => setDecisionForm((current) => ({ ...current, action }))} />
+                    <Text style={styles.inputLabel}>Why did you act this way?</Text>
+                    <Input value={decisionForm.note} onChangeText={(note) => setDecisionForm((current) => ({ ...current, note }))} placeholder="Why did you enter, skip, or revise?" multiline />
+                    <Text style={styles.inputLabel}>Main concern</Text>
+                    <Input value={decisionForm.concern} onChangeText={(concern) => setDecisionForm((current) => ({ ...current, concern }))} placeholder="What risk mattered most?" multiline />
+                    <Text style={styles.inputLabel}>Thesis validity</Text>
+                    <HorizontalChoice options={thesisValidityOptions} value={decisionForm.thesisValid} onSelect={(thesisValid) => setDecisionForm((current) => ({ ...current, thesisValid }))} />
+                    <Text style={styles.inputLabel}>Timing</Text>
+                    <HorizontalChoice options={timingOptions} value={decisionForm.timing} onSelect={(timing) => setDecisionForm((current) => ({ ...current, timing }))} />
+                    <Button
+                      label="Save Decision"
+                      onPress={() => {
+                        if (!decisionForm.eyeId || !decisionForm.note.trim()) return;
+                        void actions.logDecision(decisionForm);
+                        setDecisionForm({
+                          eyeId: "",
+                          alertId: "",
+                          action: "Entered",
+                          note: "",
+                          concern: "",
+                          thesisValid: "Yes",
+                          timing: "On Time",
+                        });
+                        setJournalWorkspaceTab("History");
+                      }}
+                    />
+                  </Card>
+                </Reveal>
+              ) : null}
+
+              {journalWorkspaceTab === "History" ? (
+                <Reveal delay={40}>
+                  <SectionHeader title="History" note="Review decisions, state context, and data quality later." />
+                  <View style={styles.stack}>
+                    {data.decisions.map((decision) => (
+                      <Card key={decision.id}>
+                        <Text style={styles.alertTitle}>{decision.action} · {decisionTitle(decision.eyeId, data.eyes, data.stocks, data.recipes)}</Text>
+                        <Text style={styles.cardBody}>{decision.note}</Text>
+                        <View style={styles.compactMetricRow}>
+                          <Text style={styles.compactMetricText}>{decision.stateAtDecision ?? "No state snapshot"}</Text>
+                          <Text style={styles.compactMetricText}>{decision.dataQuality ?? "No data note"}</Text>
+                        </View>
+                        <Text style={styles.metaLine}>Concern: {decision.concern || "Not captured"}</Text>
+                        <Text style={styles.metaLine}>Thesis {decision.thesisValid} · Timing {decision.timing} · {formatDate(decision.createdAt)}</Text>
+                      </Card>
                     ))}
-                  </ScrollView>
-
-                  <Text style={styles.inputLabel}>Action</Text>
-                  <HorizontalChoice
-                    options={decisionActions}
-                    value={decisionForm.action}
-                    onSelect={(action) => setDecisionForm((current) => ({ ...current, action }))}
-                  />
-
-                  <Text style={styles.inputLabel}>Why did you act this way?</Text>
-                  <Input
-                    value={decisionForm.note}
-                    onChangeText={(note) => setDecisionForm((current) => ({ ...current, note }))}
-                    placeholder="Why did you enter, skip, or revise?"
-                    multiline
-                  />
-
-                  <Text style={styles.inputLabel}>Main concern</Text>
-                  <Input
-                    value={decisionForm.concern}
-                    onChangeText={(concern) => setDecisionForm((current) => ({ ...current, concern }))}
-                    placeholder="What risk mattered most?"
-                    multiline
-                  />
-
-                  <Text style={styles.inputLabel}>Thesis validity</Text>
-                  <HorizontalChoice
-                    options={thesisValidityOptions}
-                    value={decisionForm.thesisValid}
-                    onSelect={(thesisValid) => setDecisionForm((current) => ({ ...current, thesisValid }))}
-                  />
-
-                  <Text style={styles.inputLabel}>Timing</Text>
-                  <HorizontalChoice
-                    options={timingOptions}
-                    value={decisionForm.timing}
-                    onSelect={(timing) => setDecisionForm((current) => ({ ...current, timing }))}
-                  />
-
-                  <Button
-                    label="Save Decision"
-                    onPress={() => {
-                      if (!decisionForm.eyeId || !decisionForm.note.trim()) return;
-                      void actions.logDecision(decisionForm);
-                      setDecisionForm({
-                        eyeId: "",
-                        alertId: "",
-                        action: "Entered",
-                        note: "",
-                        concern: "",
-                        thesisValid: "Yes",
-                        timing: "On Time",
-                      });
-                    }}
-                  />
-                </Card>
-              </Reveal>
-
-              <Reveal delay={100}>
-                <SectionHeader title="History" note="Review outcomes and judgment quality over time." />
-                <View style={styles.stack}>
-                  {data.decisions.map((decision) => (
-                    <Card key={decision.id}>
-                      <Text style={styles.alertTitle}>
-                        {decision.action} · {decisionTitle(decision.eyeId, data.eyes, data.stocks, data.recipes)}
-                      </Text>
-                      <Text style={styles.cardBody}>{decision.note}</Text>
-                      <View style={styles.compactMetricRow}>
-                        <Text style={styles.compactMetricText}>{decision.stateAtDecision ?? "No state snapshot"}</Text>
-                        <Text style={styles.compactMetricText}>{decision.dataQuality ?? "No data note"}</Text>
-                      </View>
-                      <Text style={styles.metaLine}>Concern: {decision.concern || "Not captured"}</Text>
-                      <Text style={styles.metaLine}>
-                        Thesis {decision.thesisValid} · Timing {decision.timing} · {formatDate(decision.createdAt)}
-                      </Text>
-                    </Card>
-                  ))}
-                </View>
-              </Reveal>
+                  </View>
+                </Reveal>
+              ) : null}
             </>
           ) : null}
         </ScrollView>
@@ -4257,6 +3916,35 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     gap: 8,
   },
+  stockGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+  },
+  stockGridItem: {
+    width: "48.5%",
+  },
+  groupHeaderButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  groupHeaderToggle: {
+    color: "#0f172a",
+    fontSize: 12,
+    fontWeight: "700",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+    fontFamily,
+  },
+  evidenceGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+  },
+  evidenceGridItem: {
+    width: "48.5%",
+  },
   denseStat: {
     minWidth: 120,
     flexGrow: 1,
@@ -4351,7 +4039,7 @@ const styles = StyleSheet.create({
     bottom: 16,
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingHorizontal: 8,
+    paddingHorizontal: 6,
     paddingVertical: 10,
     borderRadius: 12,
     backgroundColor: "rgba(255,255,255,0.96)",
@@ -4374,7 +4062,7 @@ const styles = StyleSheet.create({
   },
   navLabel: {
     color: "#64748b",
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: "700",
     fontFamily,
   },
