@@ -1658,7 +1658,7 @@ export default function App() {
   const selectedStockRecipeMapEyes =
     selectedStockFilteredEyes.length > 0 ? selectedStockFilteredEyes : selectedStockEyes;
 
-  const selectedStockWhatChanged = useMemo(() => {
+  const selectedStockWhatChanged = (() => {
     if (!selectedStockSummary) return [];
     const dominantEvaluation = selectedStockSummary.dominantEye?.lastEvaluation;
     const items: string[] = [];
@@ -1690,67 +1690,49 @@ export default function App() {
       items.push(`${selectedStockSummary.openAlerts.length} active alerts are open on this stock.`);
     }
     return items.slice(0, 4);
-  }, [selectedStockSummary]);
+  })();
 
-  const recentStocks = useMemo(
-    () =>
-      recentStockIds
-        .map((id) => stockDirectory.find((item) => item.stock.id === id))
-        .filter((item): item is NonNullable<typeof item> => Boolean(item)),
-    [recentStockIds, stockDirectory],
-  );
+  const recentStocks = recentStockIds
+    .map((id) => stockDirectory.find((item) => item.stock.id === id))
+    .filter((item): item is NonNullable<typeof item> => Boolean(item));
 
-  const groupedAlertQueue = useMemo(() => {
-    return stockDirectory
-      .filter((item) => item.openAlerts.length > 0)
-      .map((item) => {
-        const groupedByRecipe = item.openAlerts.reduce<Record<string, Alert[]>>((accumulator, alert) => {
-          const eye = item.eyes.find((candidate) => candidate.id === alert.eyeId);
-          const recipeName = eye ? recipeLabel(data.recipes, eye.recipeId) : "Unknown Recipe";
-          accumulator[recipeName] = [...(accumulator[recipeName] ?? []), alert];
-          return accumulator;
-        }, {});
-        return {
-          ...item,
-          groupedAlerts: groupedByRecipe,
-          highestPriority: (item.openAlerts.some((alert) => alert.priority === "High") ? "High" : "Medium") as
-            | "High"
-            | "Medium",
-        };
-      })
-      .sort(
-        (left, right) =>
-          Number(right.highestPriority === "High") - Number(left.highestPriority === "High") ||
-          right.openAlerts.length - left.openAlerts.length,
-      );
-  }, [data.recipes, stockDirectory]);
+  const groupedAlertQueue = stockDirectory
+    .filter((item) => item.openAlerts.length > 0)
+    .map((item) => {
+      const groupedByRecipe = item.openAlerts.reduce<Record<string, Alert[]>>((accumulator, alert) => {
+        const eye = item.eyes.find((candidate) => candidate.id === alert.eyeId);
+        const recipeName = eye ? recipeLabel(data.recipes, eye.recipeId) : "Unknown Recipe";
+        accumulator[recipeName] = [...(accumulator[recipeName] ?? []), alert];
+        return accumulator;
+      }, {});
+      return {
+        ...item,
+        groupedAlerts: groupedByRecipe,
+        highestPriority: (item.openAlerts.some((alert) => alert.priority === "High") ? "High" : "Medium") as
+          | "High"
+          | "Medium",
+      };
+    })
+    .sort(
+      (left, right) =>
+        Number(right.highestPriority === "High") - Number(left.highestPriority === "High") ||
+        right.openAlerts.length - left.openAlerts.length,
+    );
 
-  const homeUrgentStocks = useMemo(
-    () =>
-      stockDirectory.filter((item) =>
-        ["Attention Needed", "Thesis Risk Rising", "Thesis Broken"].includes(
-          item.dominantEye?.lastEvaluation?.currentState ?? "",
-        ),
-      ),
-    [stockDirectory],
+  const homeUrgentStocks = stockDirectory.filter((item) =>
+    ["Attention Needed", "Thesis Risk Rising", "Thesis Broken"].includes(
+      item.dominantEye?.lastEvaluation?.currentState ?? "",
+    ),
   );
-  const homeOpportunityStocks = useMemo(
-    () =>
-      stockDirectory.filter(
-        (item) => item.dominantEye?.lastEvaluation?.currentState === "Opportunity Zone Forming",
-      ),
-    [stockDirectory],
+  const homeOpportunityStocks = stockDirectory.filter(
+    (item) => item.dominantEye?.lastEvaluation?.currentState === "Opportunity Zone Forming",
   );
-  const homeStaleReviewStocks = useMemo(
-    () =>
-      stockDirectory.filter((item) =>
-        item.eyes.some((eye) => {
-          if (!eye.lastReviewedAt) return true;
-          const reviewedAt = new Date(eye.lastReviewedAt).getTime();
-          return Date.now() - reviewedAt > 1000 * 60 * 60 * 24 * 14;
-        }),
-      ),
-    [stockDirectory],
+  const homeStaleReviewStocks = stockDirectory.filter((item) =>
+    item.eyes.some((eye) => {
+      if (!eye.lastReviewedAt) return true;
+      const reviewedAt = new Date(eye.lastReviewedAt).getTime();
+      return Date.now() - reviewedAt > 1000 * 60 * 60 * 24 * 14;
+    }),
   );
 
   const previewRecipe =
