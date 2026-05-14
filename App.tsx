@@ -1655,6 +1655,12 @@ export default function App() {
           cards: group.cards.filter((card) => matchesAnalysisStatus(card.status, analysisStatusFilter)),
         }))
       : [];
+  const selectedStockAnalysisCards = selectedStockAnalysisGroups.flatMap((group) =>
+    group.cards.map((card) => ({
+      ...card,
+      title: card.title,
+    })),
+  );
   const selectedStockRecipeMapEyes =
     selectedStockFilteredEyes.length > 0 ? selectedStockFilteredEyes : selectedStockEyes;
 
@@ -1907,7 +1913,7 @@ export default function App() {
     tab === "Home"
       ? [
           {
-            label: "Refresh",
+            label: "Sync Data",
             onPress: () => {
               setFabOpen(false);
               void actions.refreshMockData();
@@ -2037,7 +2043,9 @@ export default function App() {
                   <View style={styles.summaryRow}>
                     <MetaPill label={`${criticalEyes} critical eyes`} />
                     <MetaPill label={`${opportunityEyes} opportunity setups`} />
-                    <MetaPill label={`${data.snapshots.filter((snapshot) => snapshot.isMock).length} mock feeds active`} />
+                    <MetaPill
+                      label={`${data.snapshots.filter((snapshot) => !snapshot.isMock).length} provider-backed · ${data.snapshots.filter((snapshot) => snapshot.isMock).length} mock fallback`}
+                    />
                   </View>
                 </Card>
               </Reveal>
@@ -2305,7 +2313,7 @@ export default function App() {
                         <Text style={styles.cardEyebrow}>Visual Analysis</Text>
                         <Text style={styles.cardTitle}>Consistent parameter grid for {selectedStockSummary.stock.symbol}</Text>
                         <Text style={styles.cardBody}>
-                          Same evidence families for every stock. Tap a card to expand details. Mock-backed feeds stay labeled.
+                          One continuous metric board for this stock. Tap any tile for details. Provider-backed and mock fallback data stay labeled.
                         </Text>
 
                         <Text style={styles.inputLabel}>Recipe filter</Text>
@@ -2388,15 +2396,21 @@ export default function App() {
                       </Card>
 
                       <View style={styles.stack}>
-                        {selectedStockAnalysisGroups.map((group) =>
-                          group.cards.length > 0 ? (
-                            <EvidenceGroupView
-                              key={`stock-${group.key}`}
-                              group={group}
-                              layout={analysisDensity === "Compact" ? "grid" : "stack"}
-                              defaultExpanded={group.key === "price-damage" || group.key === "trend-stabilization"}
-                            />
-                          ) : null,
+                        {selectedStockAnalysisCards.length > 0 ? (
+                          <View style={analysisDensity === "Compact" ? styles.stockAnalysisBoard : styles.stack}>
+                            {selectedStockAnalysisCards.map((card) => (
+                              <View
+                                key={`stock-card-${card.id}`}
+                                style={analysisDensity === "Compact" ? styles.stockAnalysisBoardItem : undefined}
+                              >
+                                <EvidenceCardView card={card} compact={analysisDensity === "Compact"} />
+                              </View>
+                            ))}
+                          </View>
+                        ) : (
+                          <Card>
+                            <Text style={styles.cardBody}>No parameters match the current filters.</Text>
+                          </Card>
                         )}
                       </View>
                     </Reveal>
@@ -4305,6 +4319,14 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   stockGridItem: {
+    width: "48.5%",
+  },
+  stockAnalysisBoard: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+  },
+  stockAnalysisBoardItem: {
     width: "48.5%",
   },
   groupHeaderButton: {

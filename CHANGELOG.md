@@ -51,3 +51,6 @@
 - Added a recent-stocks strip and tighter stock switching flow inside Stocks so returning to active names takes fewer taps.
 - Reworked Alerts queue from a flatter list into stock-grouped alert clusters with recipe counts, shared stock context, and direct drill-down into stock or alert detail.
 - Added stronger stock-level “what changed” summaries so Summary and Recipe Map show clearer cross-recipe changes instead of only isolated Eye snippets.
+- Flattened `Stocks > Visual Analysis` into one continuous 2-up metric board instead of section-by-section collapsible evidence groups.
+- Added a first provider-aware snapshot adapter that attempts real daily price/history data, derives key market metrics, and falls back to mock snapshots when the provider path is unavailable.
+- Updated the app shell to surface provider-backed versus mock-fallback snapshot counts more explicitly so testing data trust is easier.

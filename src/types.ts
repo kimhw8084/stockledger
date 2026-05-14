@@ -146,11 +146,11 @@ export interface MockSnapshot {
   stockId: string;
   price: number;
   drawdownPct: number;
-  nearSupport: boolean;
+  nearSupport?: boolean;
   stabilizationScore: number;
-  valuationDiscount: boolean;
-  analystRevisionTrend: "improving" | "flat" | "weak";
-  earningsSoon: boolean;
+  valuationDiscount?: boolean;
+  analystRevisionTrend?: "improving" | "flat" | "weak";
+  earningsSoon?: boolean;
   riskFlags: string[];
   movingAverage50DistancePct?: number;
   relativeStrengthVsSpyPct?: number;

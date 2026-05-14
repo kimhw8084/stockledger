@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { evaluateEye } from "../lib/evaluateEye";
-import { buildMockSnapshot } from "../lib/mockSnapshot";
+import { buildProviderSnapshot, buildSnapshotsFromAdapters } from "../lib/providerSnapshot";
 import { seedData } from "../lib/seed";
 import { loadAppData, saveAppData } from "../lib/storage";
 import {
@@ -97,6 +97,14 @@ export const useAppModel = () => {
       .then((loaded) => {
         const evaluated = evaluateAllEyes(loaded);
         setData(evaluated);
+        void buildSnapshotsFromAdapters(loaded.stocks).then((snapshots) => {
+          const providerEvaluated = evaluateAllEyes({
+            ...loaded,
+            snapshots,
+          });
+          setData(providerEvaluated);
+          void saveAppData(providerEvaluated);
+        });
         return saveAppData(evaluated);
       })
       .finally(() => setLoading(false));
@@ -119,7 +127,7 @@ export const useAppModel = () => {
           thesis: input.thesis.trim(),
           createdAt: new Date().toISOString(),
         };
-        const snapshot = buildMockSnapshot(stock);
+        const snapshot = await buildProviderSnapshot(stock);
         await commit({
           ...data,
           stocks: [stock, ...data.stocks],
@@ -271,7 +279,7 @@ export const useAppModel = () => {
       },
       async refreshMockData() {
         if (!data) return;
-        const refreshed = data.stocks.map(buildMockSnapshot);
+        const refreshed = await buildSnapshotsFromAdapters(data.stocks);
         await commit({
           ...data,
           snapshots: refreshed,

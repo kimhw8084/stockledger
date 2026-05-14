@@ -11,6 +11,7 @@
 - Add recipe editing, duplication, and version history.
 - Add Eye state history and change-since-last-review diffs.
 - Expand the visual evidence layer with valuation bands, richer financial trend cards, event timelines, and news clustering once real data adapters exist.
+- Expand the first provider adapter beyond price/trend/volume so earnings, news, valuation, and quality visuals stop relying on partial or mock-backed fallbacks.
 - Add provider health and freshness diagnostics in Settings.
 - Replace the current custom tab shell with a proper navigation stack when screen count and drill-down depth justify it.
 - Add real outcome metrics instead of placeholder notes after provider-backed price history is available.
