@@ -13,6 +13,7 @@ Recipe -> Eye -> Evaluation -> Alert -> Decision -> Outcome
 ## Next Phases
 
 1. Replace mock snapshots with the first zero-cost provider adapter and visible freshness metadata.
-2. Expand recipe editing, duplication, and version preservation.
-3. Improve mobile alert review and decision speed.
-4. Add outcome metrics backed by cached provider data.
+2. Expand the Recipe Builder from V1 condition assembly into full guided sections for universe, quality, timing, risk, review cadence, and outcome tracking.
+3. Add explicit recipe editing, duplication, and version-preserving upgrade workflows.
+4. Improve mobile alert review and decision speed on top of the richer evaluation context.
+5. Add outcome metrics backed by cached provider data.

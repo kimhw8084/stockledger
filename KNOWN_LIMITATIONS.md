@@ -5,4 +5,5 @@
 - The app uses text inputs for Eye and Decision linking instead of a proper picker flow.
 - There is no backend yet, so evaluation, alert generation, and persistence all run locally on-device.
 - There are no scheduled refresh jobs or push notifications yet.
-- Recipe versioning is represented structurally in the model but not yet exposed as an editable workflow.
+- Recipe versioning and evaluation context are now preserved structurally, but recipe editing and version-upgrade workflows are not exposed yet.
+- The V1 metric catalog and formula registry are still partial; several metrics remain manual or future/deferred placeholders until real data providers are integrated.

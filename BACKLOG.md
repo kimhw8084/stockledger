@@ -11,7 +11,11 @@
 - Add provider health and freshness diagnostics in Settings.
 - Replace the current custom tab shell with a proper navigation stack when screen count and drill-down depth justify it.
 - Add real outcome metrics instead of placeholder notes after provider-backed price history is available.
-- Add push notifications only after in-app alerts prove useful.
+- Add full peer comparison and richer relative valuation frameworks once suitable data sources exist.
+- Add analyst revisions, advanced news clustering, and richer event/calendar support after the first real provider layer is live.
+- Add Piotroski-like quality scoring, fuller business quality models, and macro sensitivity tooling only after the simpler metric catalog proves useful.
+- Add advanced backtesting and broader market scanning only after watchlist-first monitoring works consistently.
+- Add broker integration, production push notifications, paid data providers, and monetization decisions only after the core product loop proves value.
 - Add charts only after state, why-now, and evidence review feel solid.
 
 ## Rejected

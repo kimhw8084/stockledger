@@ -23,6 +23,29 @@ export type FreshnessStatus =
   | "Unavailable"
   | "Mock Data";
 
+export type MetricAvailability = "automated" | "manual" | "future";
+
+export type ConditionRole =
+  | "Eligibility Filter"
+  | "Supporting Evidence"
+  | "Timing Trigger"
+  | "Risk Warning"
+  | "Hard Disqualifier"
+  | "Review Trigger"
+  | "Outcome Learning Tag";
+
+export type ConditionOperator =
+  | "<="
+  | ">="
+  | "<"
+  | ">"
+  | "="
+  | "is"
+  | "contains"
+  | "between"
+  | "crosses"
+  | "within";
+
 export interface Stock {
   id: string;
   symbol: string;
@@ -35,6 +58,60 @@ export interface RecipeCondition {
   id: string;
   label: string;
   kind: "required" | "supporting" | "negative" | "disqualifier";
+  role?: ConditionRole;
+  metricKey?: string;
+  formulaKey?: string;
+  operator?: ConditionOperator;
+  value?: string | number | boolean | [number, number];
+  unit?: string;
+  humanDescription?: string;
+  notes?: string;
+  availability?: MetricAvailability;
+}
+
+export interface MetricDefinition {
+  key: string;
+  name: string;
+  humanMeaning: string;
+  formulaKey: string;
+  requiredData: string[];
+  freshnessExpectation: FreshnessStatus | "Near Real Time" | "Daily" | "Review Cadence";
+  availability: MetricAvailability;
+  exampleConditions: string[];
+  exampleDisplayText: string;
+  missingDataBehavior: string;
+}
+
+export interface FormulaDefinition {
+  key: string;
+  name: string;
+  description: string;
+  requiredData: string[];
+  outputType: "number" | "boolean" | "string";
+}
+
+export interface RecipeStateConfig {
+  attentionNeededMinScore: number;
+  opportunityMinScore: number;
+  watchMinScore: number;
+  becomingInterestingMinScore: number;
+  riskWarningThreshold: number;
+}
+
+export interface RecipeAlertConfig {
+  cooldownHours: number;
+  dedupeKey: "state_change" | "current_state";
+  priorityOnAttention: "High" | "Medium" | "Low";
+  priorityOnRisk: "High" | "Medium" | "Low";
+}
+
+export interface RecipeReviewConfig {
+  cadenceDays: number;
+  reviewTriggers: string[];
+}
+
+export interface RecipeOutcomeConfig {
+  trackedTags: string[];
 }
 
 export interface Recipe {
@@ -42,11 +119,16 @@ export interface Recipe {
   version: number;
   name: string;
   purpose: string;
+  opportunityType?: string;
   timeHorizon: string;
   intendedUseCase: string;
   notes: string;
   conditions: RecipeCondition[];
   createdAt: string;
+  stateConfig?: RecipeStateConfig;
+  alertConfig?: RecipeAlertConfig;
+  reviewConfig?: RecipeReviewConfig;
+  outcomeConfig?: RecipeOutcomeConfig;
 }
 
 export interface MockSnapshot {
@@ -59,27 +141,56 @@ export interface MockSnapshot {
   analystRevisionTrend: "improving" | "flat" | "weak";
   earningsSoon: boolean;
   riskFlags: string[];
+  movingAverage50DistancePct?: number;
+  relativeStrengthVsSpyPct?: number;
+  volumeSpike?: boolean;
+  revenueGrowthYoY?: number;
+  marginChangePct?: number;
+  debtRiskLevel?: "low" | "medium" | "high";
+  plannedEntryLow?: number;
+  plannedEntryHigh?: number;
+  lastThesisReviewAt?: string;
   updatedAt: string;
   sourceName: string;
   freshness: FreshnessStatus;
   isMock: boolean;
 }
 
+export interface ConditionEvaluationResult {
+  conditionId: string;
+  role: ConditionRole;
+  passed: boolean;
+  metricKey?: string;
+  formulaKey?: string;
+  operator?: ConditionOperator;
+  expectedValue?: string | number | boolean | [number, number];
+  actualValue?: string | number | boolean;
+  explanation: string;
+  missingData?: boolean;
+}
+
 export interface Evaluation {
   eyeId: string;
+  recipeId?: string;
+  recipeVersion?: number;
   previousState: EyeState;
   currentState: EyeState;
   stateChanged: boolean;
   whyNow: string;
   supportingEvidence: string[];
   contradictingEvidence: string[];
+  riskWarnings?: string[];
+  hardDisqualifiers?: string[];
   missingData: string[];
   staleData: string[];
   dataQuality: string;
   setupStrength: "Low" | "Medium" | "High";
   actionUrgency: "Wait" | "Review Soon" | "Actively Review";
+  recommendedAction?: string;
+  conditionResults?: ConditionEvaluationResult[];
   alertSuggested: boolean;
   alertReason?: string;
+  alertSuppressedReason?: string;
   evaluatedAt: string;
 }
 
@@ -89,18 +200,32 @@ export interface Eye {
   recipeId: string;
   createdAt: string;
   thesisSnapshot: string;
+  recipeVersionAtCreation?: number;
+  plannedEntryLow?: number;
+  plannedEntryHigh?: number;
+  invalidationRule?: string;
+  manualFlags?: string[];
+  lastReviewedAt?: string;
   lastEvaluation?: Evaluation;
 }
 
 export interface Alert {
   id: string;
   eyeId: string;
+  recipeId?: string;
+  recipeVersion?: number;
   title: string;
   stateChange: string;
   whyNow: string;
   supportingEvidence: string[];
   risks: string[];
   dataQuality: string;
+  evaluationContext?: {
+    currentState: EyeState;
+    conditionResults?: ConditionEvaluationResult[];
+    staleData?: string[];
+    missingData?: string[];
+  };
   priority: "Low" | "Medium" | "High";
   createdAt: string;
   reviewed: boolean;
@@ -110,6 +235,11 @@ export interface Decision {
   id: string;
   eyeId: string;
   alertId?: string;
+  recipeId?: string;
+  recipeVersion?: number;
+  stateAtDecision?: EyeState;
+  conditionResults?: ConditionEvaluationResult[];
+  dataQuality?: string;
   action: DecisionAction;
   note: string;
   concern: string;
@@ -121,6 +251,8 @@ export interface Decision {
 export interface Outcome {
   id: string;
   decisionId: string;
+  recipeId?: string;
+  recipeVersion?: number;
   reviewWindow: string;
   priceChangeNote: string;
   maxRunupNote: string;

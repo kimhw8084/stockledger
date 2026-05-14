@@ -13,7 +13,16 @@ import {
 } from "react-native";
 
 import { useAppModel } from "./src/hooks/useAppModel";
-import { Alert, DecisionAction, Eye, EyeState, Recipe, RecipeCondition, Stock } from "./src/types";
+import {
+  Alert,
+  ConditionOperator,
+  DecisionAction,
+  Eye,
+  EyeState,
+  Recipe,
+  RecipeCondition,
+  Stock,
+} from "./src/types";
 
 type TabKey = "Dashboard" | "Watchlist" | "Studio" | "Journal";
 type WatchFilter = "All" | "Attention" | "Opportunity" | "Quiet";
@@ -26,10 +35,12 @@ interface ConditionTemplate {
   category: string;
   title: string;
   description: string;
+  metricKey: string;
+  formulaKey: string;
   defaultKind: ConditionKind;
   complexity: "Simple" | "Layered" | "Advanced";
   metricLabel: string;
-  defaultOperator: string;
+  defaultOperator: ConditionOperator;
   defaultValue: string;
 }
 
@@ -47,7 +58,7 @@ const decisionActions: DecisionAction[] = [
 const thesisValidityOptions = ["Yes", "Partly", "No"] as const;
 const timingOptions = ["Early", "On Time", "Late"] as const;
 const conditionKinds: ConditionKind[] = ["required", "supporting", "negative", "disqualifier"];
-const conditionOperators = [">=", "<=", "crosses", "within", "is", "contains"];
+const conditionOperators: readonly ConditionOperator[] = [">=", "<=", "is", "contains", "between"];
 const conditionCategories = [
   "Technical",
   "Valuation",
@@ -80,6 +91,8 @@ const conditionLibrary: ConditionTemplate[] = [
     category: "Technical",
     title: "Price drawdown from high",
     description: "Require a meaningful discount from the recent high before attention rises.",
+    metricKey: "drawdown_from_recent_high",
+    formulaKey: "drawdown_pct",
     defaultKind: "required",
     complexity: "Simple",
     metricLabel: "drawdown %",
@@ -91,6 +104,8 @@ const conditionLibrary: ConditionTemplate[] = [
     category: "Technical",
     title: "Prior support is holding",
     description: "Look for price behavior that is stabilizing around a prior support zone.",
+    metricKey: "near_support",
+    formulaKey: "near_support_bool",
     defaultKind: "supporting",
     complexity: "Layered",
     metricLabel: "support zone",
@@ -102,6 +117,8 @@ const conditionLibrary: ConditionTemplate[] = [
     category: "Technical",
     title: "Moving average recovery",
     description: "Capture a reclaim or hold above an important moving average.",
+    metricKey: "distance_from_ma_50",
+    formulaKey: "distance_from_ma_50_pct",
     defaultKind: "supporting",
     complexity: "Layered",
     metricLabel: "moving average",
@@ -113,6 +130,8 @@ const conditionLibrary: ConditionTemplate[] = [
     category: "Valuation",
     title: "Valuation discount vs history",
     description: "Express when the stock looks attractively priced versus its own recent baseline.",
+    metricKey: "valuation_discount",
+    formulaKey: "valuation_discount_bool",
     defaultKind: "supporting",
     complexity: "Layered",
     metricLabel: "valuation gap",
@@ -124,6 +143,8 @@ const conditionLibrary: ConditionTemplate[] = [
     category: "Business Quality",
     title: "Revenue stability",
     description: "Avoid bargain setups where the business is already deteriorating.",
+    metricKey: "revenue_growth_yoy",
+    formulaKey: "revenue_growth_yoy",
     defaultKind: "required",
     complexity: "Layered",
     metricLabel: "revenue trend",
@@ -135,6 +156,8 @@ const conditionLibrary: ConditionTemplate[] = [
     category: "Business Quality",
     title: "Margin deterioration",
     description: "Track when profitability weakens enough to matter to the thesis.",
+    metricKey: "margin_change_pct",
+    formulaKey: "margin_change_pct",
     defaultKind: "negative",
     complexity: "Advanced",
     metricLabel: "margin trend",
@@ -146,6 +169,8 @@ const conditionLibrary: ConditionTemplate[] = [
     category: "News",
     title: "Negative news cluster",
     description: "Group repeated headlines around legal, product, or demand issues.",
+    metricKey: "manual_flag_present",
+    formulaKey: "manual_flag_present",
     defaultKind: "negative",
     complexity: "Advanced",
     metricLabel: "headline cluster",
@@ -157,6 +182,8 @@ const conditionLibrary: ConditionTemplate[] = [
     category: "News",
     title: "Earnings proximity",
     description: "Account for the added uncertainty of an upcoming earnings event.",
+    metricKey: "earnings_soon",
+    formulaKey: "earnings_soon_bool",
     defaultKind: "negative",
     complexity: "Simple",
     metricLabel: "days to earnings",
@@ -168,6 +195,8 @@ const conditionLibrary: ConditionTemplate[] = [
     category: "Macro",
     title: "Broad market stress",
     description: "Adapt recipe behavior when the wider market is under pressure.",
+    metricKey: "relative_strength_vs_spy",
+    formulaKey: "relative_strength_vs_spy_pct",
     defaultKind: "negative",
     complexity: "Layered",
     metricLabel: "market regime",
@@ -179,6 +208,8 @@ const conditionLibrary: ConditionTemplate[] = [
     category: "Risk",
     title: "Debt stress",
     description: "Hard-stop the setup if leverage or refinancing risk becomes too severe.",
+    metricKey: "debt_risk_level",
+    formulaKey: "debt_risk_level",
     defaultKind: "disqualifier",
     complexity: "Advanced",
     metricLabel: "debt coverage",
@@ -190,6 +221,8 @@ const conditionLibrary: ConditionTemplate[] = [
     category: "Risk",
     title: "Management credibility damage",
     description: "Represent when trust in management falls enough to break the thesis.",
+    metricKey: "manual_flag_present",
+    formulaKey: "manual_flag_present",
     defaultKind: "disqualifier",
     complexity: "Advanced",
     metricLabel: "credibility event",
@@ -201,6 +234,8 @@ const conditionLibrary: ConditionTemplate[] = [
     category: "Sentiment",
     title: "Analyst revision trend",
     description: "Track whether revisions are improving, flat, or weakening.",
+    metricKey: "analyst_revision_trend",
+    formulaKey: "analyst_revision_trend",
     defaultKind: "negative",
     complexity: "Simple",
     metricLabel: "revision trend",
@@ -210,6 +245,19 @@ const conditionLibrary: ConditionTemplate[] = [
 ];
 
 const createLocalId = (prefix: string) => `${prefix}-${Math.random().toString(36).slice(2, 10)}`;
+
+const roleFromBuilderKind = (kind: ConditionKind): RecipeCondition["role"] => {
+  switch (kind) {
+    case "required":
+      return "Eligibility Filter";
+    case "supporting":
+      return "Supporting Evidence";
+    case "negative":
+      return "Risk Warning";
+    default:
+      return "Hard Disqualifier";
+  }
+};
 
 const formatDate = (value: string) =>
   new Date(value).toLocaleString(undefined, {
@@ -524,7 +572,7 @@ export default function App() {
     category: "Technical",
     templateId: conditionLibrary[0].id,
     kind: conditionLibrary[0].defaultKind,
-    operator: conditionLibrary[0].defaultOperator,
+    operator: conditionLibrary[0].defaultOperator as ConditionOperator,
     threshold: conditionLibrary[0].defaultValue,
     note: "",
   });
@@ -708,6 +756,21 @@ export default function App() {
       {
         id: createLocalId("condition"),
         kind: conditionBuilder.kind,
+        role: roleFromBuilderKind(conditionBuilder.kind),
+        metricKey: selectedTemplate.metricKey,
+        formulaKey: selectedTemplate.formulaKey,
+        operator: conditionBuilder.operator,
+        value:
+          conditionBuilder.threshold === "true"
+            ? true
+            : conditionBuilder.threshold === "false"
+              ? false
+              : Number.isNaN(Number(conditionBuilder.threshold))
+                ? conditionBuilder.threshold
+                : Number(conditionBuilder.threshold),
+        humanDescription: label,
+        notes: conditionBuilder.note.trim(),
+        availability: selectedTemplate.metricKey === "manual_flag_present" ? "manual" : "automated",
         label,
       },
       ...current,

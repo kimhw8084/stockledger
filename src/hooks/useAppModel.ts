@@ -22,12 +22,24 @@ const createId = (prefix: string) => `${prefix}-${Math.random().toString(36).sli
 const buildAlertFromEvaluation = (eye: Eye, evaluation: Evaluation): Alert => ({
   id: createId("alert"),
   eyeId: eye.id,
+  recipeId: evaluation.recipeId,
+  recipeVersion: evaluation.recipeVersion,
   title: `${evaluation.currentState} for ${eye.id.replace("eye-", "").toUpperCase()}`,
   stateChange: `${evaluation.previousState} -> ${evaluation.currentState}`,
   whyNow: evaluation.whyNow,
   supportingEvidence: evaluation.supportingEvidence,
-  risks: evaluation.contradictingEvidence,
+  risks: [
+    ...evaluation.contradictingEvidence,
+    ...(evaluation.riskWarnings ?? []),
+    ...(evaluation.hardDisqualifiers ?? []),
+  ],
   dataQuality: evaluation.dataQuality,
+  evaluationContext: {
+    currentState: evaluation.currentState,
+    conditionResults: evaluation.conditionResults,
+    staleData: evaluation.staleData,
+    missingData: evaluation.missingData,
+  },
   priority:
     evaluation.currentState === "Attention Needed" || evaluation.currentState === "Thesis Broken"
       ? "High"
@@ -148,11 +160,13 @@ export const useAppModel = () => {
       },
       async addEye(input: { stockId: string; recipeId: string; thesisSnapshot: string }) {
         if (!data) return;
+        const recipe = data.recipes.find((item) => item.id === input.recipeId);
         const eye: Eye = {
           id: createId("eye"),
           stockId: input.stockId,
           recipeId: input.recipeId,
           thesisSnapshot: input.thesisSnapshot.trim(),
+          recipeVersionAtCreation: recipe?.version,
           createdAt: new Date().toISOString(),
         };
         await commit({
@@ -170,14 +184,22 @@ export const useAppModel = () => {
         timing: "Early" | "On Time" | "Late";
       }) {
         if (!data) return;
+        const eye = data.eyes.find((item) => item.id === input.eyeId);
         const decision: Decision = {
           id: createId("decision"),
           ...input,
+          recipeId: eye?.recipeId,
+          recipeVersion: eye?.lastEvaluation?.recipeVersion ?? eye?.recipeVersionAtCreation,
+          stateAtDecision: eye?.lastEvaluation?.currentState,
+          conditionResults: eye?.lastEvaluation?.conditionResults,
+          dataQuality: eye?.lastEvaluation?.dataQuality,
           createdAt: new Date().toISOString(),
         };
         const outcome: Outcome = {
           id: createId("outcome"),
           decisionId: decision.id,
+          recipeId: decision.recipeId,
+          recipeVersion: decision.recipeVersion,
           reviewWindow: "30 days",
           priceChangeNote: "Pending later real price review.",
           maxRunupNote: "Pending provider-backed outcome metrics.",

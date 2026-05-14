@@ -25,3 +25,6 @@
 - Replaced pill-based top navigation with a persistent bottom navigation bar and a floating action menu for add/utility actions from any scroll position.
 - Reworked the screen architecture into Dashboard, Watchlist, Studio, and Journal to better separate monitoring, drilldown, building, and review.
 - Added lightweight stock chart visualizations and a more serious recipe generator flow with condition templates, parameters, roles, and draft-condition assembly.
+- Added `docs/09_RECIPE_BUILDER_SPEC.md` to define the Recipe Builder foundation around metrics, formulas, conditions, roles, state rules, alert rules, and version-aware evaluation.
+- Replaced the old bargain-only evaluator with a role-aware Recipe evaluation path that reads condition definitions, computes metric results, and maps them deterministically into Eye states.
+- Expanded seed recipes, mock snapshots, alerts, and decisions so Recipe version and evaluation context are preserved through the core loop.

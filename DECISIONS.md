@@ -150,3 +150,25 @@ Yes. The information architecture direction should remain, but the implementatio
 
 Roadmap impact:
 Medium. This improves mobile usability immediately and creates a clearer place for future charting, news, and drill-down surfaces.
+
+## 2026-05-14
+
+Decision:
+Move the Recipe foundation from a hardcoded snapshot-scoring model to a metric -> condition -> role -> state evaluation model.
+
+Reason:
+The product goal is to support many future investment logics without rewriting the app for every new Recipe. The earlier evaluator was effectively a single baked-in bargain heuristic, even if the UI called it a Recipe system.
+
+Alternatives considered:
+- Keep the existing evaluator and only add more starter recipes
+- Build a large generic rule engine before any runnable vertical slice
+- Push the Recipe foundation work until after real provider integration
+
+Tradeoff:
+The new model is still incomplete and still mock-backed, but it is materially more future-proof. It introduces more schema and evaluation structure now so that future metrics, roles, and recipe versions can plug in without collapsing back into hardcoded strategy branches.
+
+Temporary:
+Partly. The metric catalog, formula registry, and condition schema should remain, but the specific V1 metric set and state heuristics will expand as more data sources arrive.
+
+Roadmap impact:
+High. This is the first foundation step that makes Recipe creation, Eye evaluation, alerting, and later Recipe improvement part of the same consistent architecture.
