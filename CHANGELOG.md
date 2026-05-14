@@ -44,3 +44,6 @@
 - Rebuilt the selected-stock experience into a dedicated workspace with Summary, Visual Analysis, Recipe Map, and Notes subviews.
 - Added stock search, state-aware stock filtering, compact stock tiles, and a denser grid-style evidence layout so stock review feels more like a purposeful finance workspace than a long stacked page.
 - Split recipe authoring, eye creation, alert review, and decision logging into separate workspaces so each destination has a narrower and clearer job.
+- Reworked Home from mixed Eye-level cards into stock-grouped review sections so one stock is no longer scattered across multiple independent monitor cards.
+- Compressed `Stocks > Visual Analysis` into a more visual 2-up metric-board pattern with compact square tiles, minimal default copy, and tap-to-expand detail.
+- Moved most explanation text out of the default stock tiles and into the expanded detail state so the stock workspace is faster to scan at a glance.

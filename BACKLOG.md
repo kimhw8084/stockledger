@@ -20,6 +20,7 @@
 - Add advanced backtesting and broader market scanning only after watchlist-first monitoring works consistently.
 - Add broker integration, production push notifications, paid data providers, and monetization decisions only after the core product loop proves value.
 - Upgrade the current stock Visual Analysis cards from first-slice mock visuals into richer context-aware charts after on-device validation and the first real data adapter.
+- Add a true sheet/panel presentation for stock metric detail so expanded tile content feels like a deliberate detail workspace instead of inline disclosure.
 
 ## Rejected
 

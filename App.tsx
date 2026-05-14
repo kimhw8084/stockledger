@@ -1002,54 +1002,80 @@ const WhatChangedPanel = ({ title, items }: { title: string; items: string[] }) 
   </View>
 );
 
-const EvidenceCardView = ({ card }: { card: VisualEvidenceCard }) => {
+const EvidenceCardView = ({
+  card,
+  compact = false,
+}: {
+  card: VisualEvidenceCard;
+  compact?: boolean;
+}) => {
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <View style={styles.evidenceCard}>
+    <Pressable onPress={() => setExpanded((current) => !current)} style={[styles.evidenceCard, compact ? styles.evidenceCardCompact : null]}>
       <View style={styles.inlineBetween}>
         <View style={styles.flexOne}>
           <Text style={styles.evidenceCardTitle}>{card.title}</Text>
-          <Text style={styles.evidenceRole}>{card.role}</Text>
+          {!compact ? <Text style={styles.evidenceRole}>{card.role}</Text> : null}
         </View>
         <View style={styles.evidenceBadgeStack}>
           <View style={statusTone(card.status)}>
             <Text style={styles.statusBadgeText}>{card.status}</Text>
           </View>
+          {compact ? null : (
+            <View style={freshnessTone(card.freshness)}>
+              <Text style={styles.freshnessBadgeText}>{card.freshness}</Text>
+            </View>
+          )}
+        </View>
+      </View>
+
+      {compact ? null : <Text style={styles.evidenceSummary}>{card.summary}</Text>}
+      <ThresholdBar card={card} />
+
+      {compact ? (
+        <View style={styles.compactEvidenceFooter}>
+          <Text style={styles.compactEvidenceValue}>{card.metric.currentLabel}</Text>
+          <Text style={styles.compactEvidenceThreshold}>{card.metric.thresholdLabel ?? card.metric.comparisonLabel ?? "Context"}</Text>
           <View style={freshnessTone(card.freshness)}>
             <Text style={styles.freshnessBadgeText}>{card.freshness}</Text>
           </View>
         </View>
-      </View>
+      ) : (
+        <View style={styles.evidenceMetricsRow}>
+          <DenseStat label="Current" value={card.metric.currentLabel} tone="strong" />
+          <DenseStat label="Threshold" value={card.metric.thresholdLabel ?? "Context only"} />
+        </View>
+      )}
 
-      <Text style={styles.evidenceSummary}>{card.summary}</Text>
-      <ThresholdBar card={card} />
-
-      <View style={styles.evidenceMetricsRow}>
-        <DenseStat label="Current" value={card.metric.currentLabel} tone="strong" />
-        <DenseStat label="Threshold" value={card.metric.thresholdLabel ?? "Context only"} />
-      </View>
-
-      {card.relatedConditionLabel ? (
+      {!compact && card.relatedConditionLabel ? (
         <Text style={styles.evidenceRelated}>Recipe link: {card.relatedConditionLabel}</Text>
       ) : null}
 
-      <Text style={styles.evidenceEffect}>Effect: {card.effect}</Text>
-      <Text style={styles.evidenceWhy}>Why it matters: {card.whyItMatters}</Text>
+      {!compact ? <Text style={styles.evidenceEffect}>Effect: {card.effect}</Text> : null}
+      {!compact ? <Text style={styles.evidenceWhy}>Why it matters: {card.whyItMatters}</Text> : null}
 
-      <View style={styles.metaRow}>
-        <MetaPill label={card.sourceType} />
-        {card.metric.comparisonLabel ? <MetaPill label={card.metric.comparisonLabel} /> : null}
-      </View>
+      {!compact ? (
+        <View style={styles.metaRow}>
+          <MetaPill label={card.sourceType} />
+          {card.metric.comparisonLabel ? <MetaPill label={card.metric.comparisonLabel} /> : null}
+        </View>
+      ) : null}
 
-      <Pressable onPress={() => setExpanded((current) => !current)} style={styles.formulaToggle}>
-        <Text style={styles.formulaToggleText}>
-          {expanded ? "Hide formula details" : "Show formula details"}
-        </Text>
-      </Pressable>
+      <Text style={styles.formulaToggleText}>{expanded ? "Hide details" : compact ? "Tap for details" : "Show formula details"}</Text>
 
       {expanded ? (
         <View style={styles.formulaPanel}>
+          <Text style={styles.evidenceRole}>{card.role}</Text>
+          <Text style={styles.evidenceSummary}>{card.summary}</Text>
+          {card.relatedConditionLabel ? <Text style={styles.evidenceRelated}>Recipe link: {card.relatedConditionLabel}</Text> : null}
+          <Text style={styles.evidenceEffect}>Effect: {card.effect}</Text>
+          <Text style={styles.evidenceWhy}>Why it matters: {card.whyItMatters}</Text>
+          <View style={styles.metaRow}>
+            <MetaPill label={card.sourceType} />
+            <MetaPill label={card.freshness} />
+            {card.metric.comparisonLabel ? <MetaPill label={card.metric.comparisonLabel} /> : null}
+          </View>
           <Text style={styles.formulaTitle}>{card.formulaName ?? "Formula detail"}</Text>
           <Text style={styles.formulaBody}>{card.formulaDescription ?? "No extra formula detail available."}</Text>
           <Text style={styles.formulaMeta}>
@@ -1057,7 +1083,7 @@ const EvidenceCardView = ({ card }: { card: VisualEvidenceCard }) => {
           </Text>
         </View>
       ) : null}
-    </View>
+    </Pressable>
   );
 };
 
@@ -1085,7 +1111,7 @@ const EvidenceGroupView = ({
         <View style={layout === "grid" ? styles.evidenceGrid : styles.stack}>
           {group.cards.map((card) => (
             <View key={card.id} style={layout === "grid" ? styles.evidenceGridItem : undefined}>
-              <EvidenceCardView card={card} />
+              <EvidenceCardView card={card} compact={layout === "grid"} />
             </View>
           ))}
         </View>
@@ -1202,6 +1228,83 @@ const RecipeConditionMapCard = ({
         </View>
       ) : null}
     </View>
+  );
+};
+
+const HomeStockGroupCard = ({
+  item,
+  recipes,
+  onOpenStock,
+}: {
+  item: {
+    stock: Stock;
+    eyes: Eye[];
+    snapshot?: {
+      price: number;
+      drawdownPct: number;
+      updatedAt: string;
+      freshness: FreshnessStatus;
+      isMock: boolean;
+    };
+    openAlerts: Alert[];
+    dominantEye?: Eye;
+  };
+  recipes: Recipe[];
+  onOpenStock: () => void;
+}) => {
+  const evaluation = item.dominantEye?.lastEvaluation;
+  const topSupport = evaluation?.supportingEvidence?.[0] ?? "No clear support captured yet.";
+  const topRisk =
+    evaluation?.hardDisqualifiers?.[0] ??
+    evaluation?.riskWarnings?.[0] ??
+    evaluation?.contradictingEvidence?.[0] ??
+    "No major risk flagged.";
+
+  return (
+    <Pressable onPress={onOpenStock}>
+      <Card highlighted>
+        <View style={styles.inlineBetween}>
+          <View style={styles.flexOne}>
+            <Text style={styles.cardEyebrow}>{item.stock.name}</Text>
+            <Text style={styles.cardTitle}>{item.stock.symbol}</Text>
+            <Text style={styles.stockGroupSummary}>{topSupport}</Text>
+          </View>
+          <Text style={stateTone(evaluation?.currentState)}>{evaluation?.currentState ?? "Unwatched"}</Text>
+        </View>
+
+        <View style={styles.stockGroupStats}>
+          <DenseStat label="Eyes" value={`${item.eyes.length}`} tone="strong" />
+          <DenseStat label="Alerts" value={`${item.openAlerts.length}`} tone={item.openAlerts.length > 0 ? "risk" : "neutral"} />
+          <DenseStat label="Urgency" value={evaluation?.actionUrgency ?? "Wait"} />
+          <DenseStat label="Data" value={item.snapshot?.freshness ?? "Unavailable"} tone={item.snapshot?.isMock ? "risk" : "neutral"} />
+        </View>
+
+        {item.snapshot ? (
+          <View style={styles.stockGroupMetricRow}>
+            <Text style={styles.compactMetricText}>${item.snapshot.price.toFixed(2)}</Text>
+            <Text style={styles.compactMetricText}>{item.snapshot.drawdownPct}% drawdown</Text>
+            <Text style={styles.compactMetricText}>Updated {formatDate(item.snapshot.updatedAt)}</Text>
+          </View>
+        ) : null}
+
+        <View style={styles.stockGroupEvidenceRow}>
+          <View style={styles.stockGroupEvidenceCol}>
+            <Text style={styles.stockGroupLabel}>Top support</Text>
+            <Text style={styles.stockGroupLine}>+ {topSupport}</Text>
+          </View>
+          <View style={styles.stockGroupEvidenceCol}>
+            <Text style={styles.stockGroupLabel}>Top risk</Text>
+            <Text style={styles.stockGroupLine}>- {topRisk}</Text>
+          </View>
+        </View>
+
+        <View style={styles.metaRow}>
+          {item.eyes.slice(0, 3).map((eye) => (
+            <MetaPill key={eye.id} label={recipeLabel(recipes, eye.recipeId)} />
+          ))}
+        </View>
+      </Card>
+    </Pressable>
   );
 };
 
@@ -1553,6 +1656,34 @@ export default function App() {
   const selectedStockRecipeMapEyes =
     selectedStockFilteredEyes.length > 0 ? selectedStockFilteredEyes : selectedStockEyes;
 
+  const homeUrgentStocks = useMemo(
+    () =>
+      stockDirectory.filter((item) =>
+        ["Attention Needed", "Thesis Risk Rising", "Thesis Broken"].includes(
+          item.dominantEye?.lastEvaluation?.currentState ?? "",
+        ),
+      ),
+    [stockDirectory],
+  );
+  const homeOpportunityStocks = useMemo(
+    () =>
+      stockDirectory.filter(
+        (item) => item.dominantEye?.lastEvaluation?.currentState === "Opportunity Zone Forming",
+      ),
+    [stockDirectory],
+  );
+  const homeStaleReviewStocks = useMemo(
+    () =>
+      stockDirectory.filter((item) =>
+        item.eyes.some((eye) => {
+          if (!eye.lastReviewedAt) return true;
+          const reviewedAt = new Date(eye.lastReviewedAt).getTime();
+          return Date.now() - reviewedAt > 1000 * 60 * 60 * 24 * 14;
+        }),
+      ),
+    [stockDirectory],
+  );
+
   const previewRecipe =
     draftConditions.length === 0
       ? undefined
@@ -1835,81 +1966,72 @@ export default function App() {
               </Reveal>
 
               <Reveal delay={80}>
-                <SectionHeader title="Open Alerts" note="Fastest queue for immediate review." />
+                <SectionHeader title="Needs Review By Stock" note="Home is grouped by stock so one name does not get scattered across multiple monitor cards." />
                 <View style={styles.stack}>
-                  {alertQueue.length === 0 ? (
+                  {homeUrgentStocks.length === 0 ? (
                     <Card>
-                      <Text style={styles.cardBody}>No open alerts are waiting right now.</Text>
+                      <Text style={styles.cardBody}>No stocks are in the urgent review bucket right now.</Text>
                     </Card>
                   ) : (
-                    alertQueue.slice(0, 4).map((alert) => {
-                      const eye = data.eyes.find((item) => item.id === alert.eyeId);
-                      return (
-                        <Pressable
-                          key={alert.id}
-                          onPress={() => {
-                            setSelectedAlertId(alert.id);
-                            if (eye) setSelectedEyeId(eye.id);
-                            setAlertWorkspaceTab("Detail");
-                            setTab("Alerts");
-                          }}
-                        >
-                          <Card highlighted={selectedAlert?.id === alert.id}>
-                            <View style={styles.inlineBetween}>
-                              <View style={styles.flexOne}>
-                                <Text style={styles.cardEyebrow}>{stockLabel(data.stocks, eye?.stockId ?? "")}</Text>
-                                <Text style={styles.alertTitle}>{alert.title}</Text>
-                                <Text style={styles.cardBody}>{alert.whyNow}</Text>
-                              </View>
-                              <View style={styles.priorityStack}>
-                                <View style={priorityTone(alert.priority)}>
-                                  <Text style={styles.priorityBadgeText}>{alert.priority}</Text>
-                                </View>
-                                <Text style={styles.timestampText}>{formatDate(alert.createdAt)}</Text>
-                              </View>
-                            </View>
-                            <View style={styles.metaRow}>
-                              <MetaPill label={alert.stateChange} />
-                              <MetaPill label={alert.dataQuality} />
-                            </View>
-                          </Card>
-                        </Pressable>
-                      );
-                    })
+                    homeUrgentStocks.slice(0, 4).map((item) => (
+                      <HomeStockGroupCard
+                        key={item.stock.id}
+                        item={item}
+                        recipes={data.recipes}
+                        onOpenStock={() => {
+                          setSelectedStockId(item.stock.id);
+                          setStockWorkspaceTab("Visual Analysis");
+                          setTab("Stocks");
+                        }}
+                      />
+                    ))
                   )}
                 </View>
               </Reveal>
 
               <Reveal delay={120}>
-                <SectionHeader title="Eyes Changing State" note="Monitor-level review without opening the builder." />
+                <SectionHeader title="Opportunity Stocks" note="Stocks that are forming but not yet urgent." />
                 <View style={styles.stack}>
-                  {eyesSorted.slice(0, 4).map((eye) => (
-                    <Pressable
-                      key={eye.id}
-                      onPress={() => {
-                        setSelectedEyeId(eye.id);
-                        setEyeWorkspaceTab("Active Eyes");
-                        setTab("Eyes");
+                  {homeOpportunityStocks.slice(0, 3).map((item) => (
+                    <HomeStockGroupCard
+                      key={item.stock.id}
+                      item={item}
+                      recipes={data.recipes}
+                      onOpenStock={() => {
+                        setSelectedStockId(item.stock.id);
+                        setStockWorkspaceTab("Visual Analysis");
+                        setTab("Stocks");
                       }}
-                    >
-                      <Card highlighted={selectedEye?.id === eye.id}>
-                        <View style={styles.inlineBetween}>
-                          <View style={styles.flexOne}>
-                            <Text style={styles.cardEyebrow}>{stockLabel(data.stocks, eye.stockId)}</Text>
-                            <Text style={styles.alertTitle}>{recipeLabel(data.recipes, eye.recipeId)}</Text>
-                            <Text style={styles.cardBody}>{topReason(eye)}</Text>
-                          </View>
-                          <Text style={stateTone(eye.lastEvaluation?.currentState)}>
-                            {eye.lastEvaluation?.currentState ?? "Not Evaluated"}
-                          </Text>
-                        </View>
-                        <View style={styles.metaRow}>
-                          <MetaPill label={eye.lastEvaluation?.actionUrgency ?? "Wait"} />
-                          <MetaPill label={`Setup ${eye.lastEvaluation?.setupStrength ?? "Low"}`} />
-                        </View>
-                      </Card>
-                    </Pressable>
+                    />
                   ))}
+                  {homeOpportunityStocks.length === 0 ? (
+                    <Card>
+                      <Text style={styles.cardBody}>No stocks are in the opportunity-forming bucket right now.</Text>
+                    </Card>
+                  ) : null}
+                </View>
+              </Reveal>
+
+              <Reveal delay={160}>
+                <SectionHeader title="Stale Thesis Reviews" note="Stocks whose Eyes should be revisited soon even without a fresh alert." />
+                <View style={styles.stack}>
+                  {homeStaleReviewStocks.slice(0, 3).map((item) => (
+                    <HomeStockGroupCard
+                      key={item.stock.id}
+                      item={item}
+                      recipes={data.recipes}
+                      onOpenStock={() => {
+                        setSelectedStockId(item.stock.id);
+                        setStockWorkspaceTab("Notes");
+                        setTab("Stocks");
+                      }}
+                    />
+                  ))}
+                  {homeStaleReviewStocks.length === 0 ? (
+                    <Card>
+                      <Text style={styles.cardBody}>No stale thesis reviews are currently flagged.</Text>
+                    </Card>
+                  ) : null}
                 </View>
               </Reveal>
             </>
@@ -3183,6 +3305,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffff",
     gap: 10,
   },
+  evidenceCardCompact: {
+    minHeight: 210,
+    justifyContent: "space-between",
+  },
   evidenceCardTitle: {
     color: "#0f172a",
     fontSize: 16,
@@ -3200,6 +3326,23 @@ const styles = StyleSheet.create({
   evidenceBadgeStack: {
     alignItems: "flex-end",
     gap: 6,
+  },
+  compactEvidenceFooter: {
+    gap: 6,
+  },
+  compactEvidenceValue: {
+    color: "#0f172a",
+    fontSize: 18,
+    lineHeight: 22,
+    fontWeight: "800",
+    fontFamily,
+  },
+  compactEvidenceThreshold: {
+    color: "#64748b",
+    fontSize: 12,
+    lineHeight: 16,
+    fontWeight: "700",
+    fontFamily,
   },
   statusBadge: {
     paddingHorizontal: 8,
@@ -3626,6 +3769,53 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 8,
+  },
+  stockGroupSummary: {
+    marginTop: 8,
+    color: "#334155",
+    fontSize: 13,
+    lineHeight: 19,
+    fontWeight: "600",
+    fontFamily,
+  },
+  stockGroupStats: {
+    marginTop: 12,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  stockGroupMetricRow: {
+    marginTop: 12,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+  },
+  stockGroupEvidenceRow: {
+    marginTop: 12,
+    gap: 10,
+  },
+  stockGroupEvidenceCol: {
+    padding: 12,
+    borderRadius: 7,
+    borderWidth: 1,
+    borderColor: "#e7edf4",
+    backgroundColor: "#f8fafc",
+  },
+  stockGroupLabel: {
+    color: "#64748b",
+    fontSize: 11,
+    fontWeight: "700",
+    letterSpacing: 0.5,
+    textTransform: "uppercase",
+    fontFamily,
+  },
+  stockGroupLine: {
+    marginTop: 6,
+    color: "#0f172a",
+    fontSize: 13,
+    lineHeight: 18,
+    fontWeight: "600",
+    fontFamily,
   },
   actionRow: {
     marginTop: 14,
