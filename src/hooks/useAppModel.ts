@@ -213,6 +213,19 @@ export const useAppModel = () => {
           eyes: [eye, ...data.eyes],
         });
       },
+      async deleteEye(eyeId: string) {
+        if (!data) return;
+        const removedDecisionIds = data.decisions
+          .filter((decision) => decision.eyeId === eyeId)
+          .map((decision) => decision.id);
+        await commit({
+          ...data,
+          eyes: data.eyes.filter((eye) => eye.id !== eyeId),
+          alerts: data.alerts.filter((alert) => alert.eyeId !== eyeId),
+          decisions: data.decisions.filter((decision) => decision.eyeId !== eyeId),
+          outcomes: data.outcomes.filter((outcome) => !removedDecisionIds.includes(outcome.decisionId)),
+        });
+      },
       async logDecision(input: {
         eyeId: string;
         alertId?: string;

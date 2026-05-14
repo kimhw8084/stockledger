@@ -37,9 +37,9 @@ type TabKey = "Home" | "Stocks" | "Recipes" | "Eyes" | "Alerts" | "Journal";
 type StockFilter = "All" | "Needs Review" | "Opportunity" | "Quiet";
 type RecipeWorkspaceTab = "Builder" | "Preview" | "Library";
 type EyeWorkspaceTab = "Active Eyes" | "Create Eye";
-type AlertWorkspaceTab = "Queue" | "Detail" | "Snoozed";
+type AlertWorkspaceTab = "Current" | "History" | "Detail";
 type JournalWorkspaceTab = "Log Decision" | "History";
-type StockWorkspaceTab = "Summary" | "Visual Analysis" | "Recipe Map" | "Notes";
+type StockWorkspaceTab = "Summary" | "Visual Analysis";
 type ConditionKind = RecipeCondition["kind"];
 type AnalysisBenchmark = "SPY" | "QQQ" | "Sector ETF";
 type AnalysisLookback = "20D" | "3M" | "6M";
@@ -85,9 +85,9 @@ const tabs: TabKey[] = ["Home", "Stocks", "Recipes", "Eyes", "Alerts", "Journal"
 const stockFilters: StockFilter[] = ["All", "Needs Review", "Opportunity", "Quiet"];
 const recipeWorkspaceTabs: RecipeWorkspaceTab[] = ["Builder", "Preview", "Library"];
 const eyeWorkspaceTabs: EyeWorkspaceTab[] = ["Active Eyes", "Create Eye"];
-const alertWorkspaceTabs: AlertWorkspaceTab[] = ["Queue", "Detail", "Snoozed"];
+const alertWorkspaceTabs: AlertWorkspaceTab[] = ["Current", "History", "Detail"];
 const journalWorkspaceTabs: JournalWorkspaceTab[] = ["Log Decision", "History"];
-const stockWorkspaceTabs: StockWorkspaceTab[] = ["Summary", "Visual Analysis", "Recipe Map", "Notes"];
+const stockWorkspaceTabs: StockWorkspaceTab[] = ["Summary", "Visual Analysis"];
 const recipeBuilderSteps: RecipeBuilderStep[] = ["Purpose", "Logic", "Risk & Alerts", "Review & Outcome"];
 const analysisBenchmarks: AnalysisBenchmark[] = ["SPY", "QQQ", "Sector ETF"];
 const analysisLookbacks: AnalysisLookback[] = ["20D", "3M", "6M"];
@@ -1008,14 +1008,23 @@ const WhatChangedPanel = ({ title, items }: { title: string; items: string[] }) 
 const EvidenceCardView = ({
   card,
   compact = false,
+  onOpen,
 }: {
   card: VisualEvidenceCard;
   compact?: boolean;
+  onOpen?: () => void;
 }) => {
   const [expanded, setExpanded] = useState(false);
+  const handlePress = () => {
+    if (compact && onOpen) {
+      onOpen();
+      return;
+    }
+    setExpanded((current) => !current);
+  };
 
   return (
-    <Pressable onPress={() => setExpanded((current) => !current)} style={[styles.evidenceCard, compact ? styles.evidenceCardCompact : null]}>
+    <Pressable onPress={handlePress} style={[styles.evidenceCard, compact ? styles.evidenceCardCompact : null]}>
       <View style={styles.inlineBetween}>
         <View style={styles.flexOne}>
           <Text style={styles.evidenceCardTitle}>{card.title}</Text>
@@ -1065,9 +1074,9 @@ const EvidenceCardView = ({
         </View>
       ) : null}
 
-      <Text style={styles.formulaToggleText}>{expanded ? "Hide details" : compact ? "Tap for details" : "Show formula details"}</Text>
+      <Text style={styles.formulaToggleText}>{expanded ? "Hide details" : compact ? "Open detail" : "Show formula details"}</Text>
 
-      {expanded ? (
+      {expanded && !onOpen ? (
         <View style={styles.formulaPanel}>
           <Text style={styles.evidenceRole}>{card.role}</Text>
           <Text style={styles.evidenceSummary}>{card.summary}</Text>
@@ -1234,6 +1243,34 @@ const RecipeConditionMapCard = ({
   );
 };
 
+const WindowPanel = ({
+  title,
+  subtitle,
+  onClose,
+  children,
+}: {
+  title: string;
+  subtitle?: string;
+  onClose: () => void;
+  children: React.ReactNode;
+}) => (
+  <View style={styles.windowBackdrop}>
+    <Pressable style={styles.windowDismissLayer} onPress={onClose} />
+    <View style={styles.windowPanel}>
+      <View style={styles.inlineBetween}>
+        <View style={styles.flexOne}>
+          <Text style={styles.cardTitle}>{title}</Text>
+          {subtitle ? <Text style={styles.cardBody}>{subtitle}</Text> : null}
+        </View>
+        <Button label="Close" tone="ghost" onPress={onClose} />
+      </View>
+      <ScrollView style={styles.windowScroll} contentContainerStyle={styles.stack} showsVerticalScrollIndicator={false}>
+        {children}
+      </ScrollView>
+    </View>
+  </View>
+);
+
 const HomeStockGroupCard = ({
   item,
   recipes,
@@ -1255,6 +1292,7 @@ const HomeStockGroupCard = ({
   recipes: Recipe[];
   onOpenStock: () => void;
 }) => {
+  const [expanded, setExpanded] = useState(false);
   const evaluation = item.dominantEye?.lastEvaluation;
   const topSupport = evaluation?.supportingEvidence?.[0] ?? "No clear support captured yet.";
   const topRisk =
@@ -1264,50 +1302,57 @@ const HomeStockGroupCard = ({
     "No major risk flagged.";
 
   return (
-    <Pressable onPress={onOpenStock}>
-      <Card highlighted>
-        <View style={styles.inlineBetween}>
-          <View style={styles.flexOne}>
-            <Text style={styles.cardEyebrow}>{item.stock.name}</Text>
-            <Text style={styles.cardTitle}>{item.stock.symbol}</Text>
-            <Text style={styles.stockGroupSummary}>{topSupport}</Text>
-          </View>
-          <Text style={stateTone(evaluation?.currentState)}>{evaluation?.currentState ?? "Unwatched"}</Text>
+    <Card highlighted>
+      <View style={styles.inlineBetween}>
+        <View style={styles.flexOne}>
+          <Text style={styles.cardEyebrow}>{item.stock.name}</Text>
+          <Text style={styles.alertTitle}>{item.stock.symbol}</Text>
+          <Text style={styles.stockGroupSummary}>{topSupport}</Text>
         </View>
+        <Text style={stateTone(evaluation?.currentState)}>{evaluation?.currentState ?? "Unwatched"}</Text>
+      </View>
 
-        <View style={styles.stockGroupStats}>
-          <DenseStat label="Eyes" value={`${item.eyes.length}`} tone="strong" />
-          <DenseStat label="Alerts" value={`${item.openAlerts.length}`} tone={item.openAlerts.length > 0 ? "risk" : "neutral"} />
-          <DenseStat label="Urgency" value={evaluation?.actionUrgency ?? "Wait"} />
-          <DenseStat label="Data" value={item.snapshot?.freshness ?? "Unavailable"} tone={item.snapshot?.isMock ? "risk" : "neutral"} />
-        </View>
+      <View style={styles.stockGroupStats}>
+        <DenseStat label="Eyes" value={`${item.eyes.length}`} tone="strong" />
+        <DenseStat label="Alerts" value={`${item.openAlerts.length}`} tone={item.openAlerts.length > 0 ? "risk" : "neutral"} />
+        <DenseStat label="Urgency" value={evaluation?.actionUrgency ?? "Wait"} />
+        <DenseStat label="Data" value={item.snapshot?.freshness ?? "Unavailable"} tone={item.snapshot?.isMock ? "risk" : "neutral"} />
+      </View>
 
-        {item.snapshot ? (
-          <View style={styles.stockGroupMetricRow}>
-            <Text style={styles.compactMetricText}>${item.snapshot.price.toFixed(2)}</Text>
-            <Text style={styles.compactMetricText}>{item.snapshot.drawdownPct}% drawdown</Text>
-            <Text style={styles.compactMetricText}>Updated {formatDate(item.snapshot.updatedAt)}</Text>
+      {expanded ? (
+        <>
+          {item.snapshot ? (
+            <View style={styles.stockGroupMetricRow}>
+              <Text style={styles.compactMetricText}>${item.snapshot.price.toFixed(2)}</Text>
+              <Text style={styles.compactMetricText}>{item.snapshot.drawdownPct}% drawdown</Text>
+              <Text style={styles.compactMetricText}>Updated {formatDate(item.snapshot.updatedAt)}</Text>
+            </View>
+          ) : null}
+
+          <View style={styles.stockGroupEvidenceRow}>
+            <View style={styles.stockGroupEvidenceCol}>
+              <Text style={styles.stockGroupLabel}>Top support</Text>
+              <Text style={styles.stockGroupLine}>+ {topSupport}</Text>
+            </View>
+            <View style={styles.stockGroupEvidenceCol}>
+              <Text style={styles.stockGroupLabel}>Top risk</Text>
+              <Text style={styles.stockGroupLine}>- {topRisk}</Text>
+            </View>
           </View>
-        ) : null}
 
-        <View style={styles.stockGroupEvidenceRow}>
-          <View style={styles.stockGroupEvidenceCol}>
-            <Text style={styles.stockGroupLabel}>Top support</Text>
-            <Text style={styles.stockGroupLine}>+ {topSupport}</Text>
+          <View style={styles.metaRow}>
+            {item.eyes.slice(0, 3).map((eye) => (
+              <MetaPill key={eye.id} label={recipeLabel(recipes, eye.recipeId)} />
+            ))}
           </View>
-          <View style={styles.stockGroupEvidenceCol}>
-            <Text style={styles.stockGroupLabel}>Top risk</Text>
-            <Text style={styles.stockGroupLine}>- {topRisk}</Text>
-          </View>
-        </View>
+        </>
+      ) : null}
 
-        <View style={styles.metaRow}>
-          {item.eyes.slice(0, 3).map((eye) => (
-            <MetaPill key={eye.id} label={recipeLabel(recipes, eye.recipeId)} />
-          ))}
-        </View>
-      </Card>
-    </Pressable>
+      <View style={styles.actionRow}>
+        <Button label={expanded ? "Collapse" : "Expand"} tone="secondary" onPress={() => setExpanded((current) => !current)} />
+        <Button label="Open Stock" onPress={onOpenStock} />
+      </View>
+    </Card>
   );
 };
 
@@ -1336,11 +1381,11 @@ export default function App() {
   const { data, loading, actions } = useAppModel();
   const [tab, setTab] = useState<TabKey>("Home");
   const [stockFilter, setStockFilter] = useState<StockFilter>("All");
-  const [recipeWorkspaceTab, setRecipeWorkspaceTab] = useState<RecipeWorkspaceTab>("Builder");
+  const [recipeWorkspaceTab, setRecipeWorkspaceTab] = useState<RecipeWorkspaceTab>("Library");
   const [recipeBuilderStep, setRecipeBuilderStep] = useState<RecipeBuilderStep>("Purpose");
   const [eyeWorkspaceTab, setEyeWorkspaceTab] = useState<EyeWorkspaceTab>("Active Eyes");
-  const [alertWorkspaceTab, setAlertWorkspaceTab] = useState<AlertWorkspaceTab>("Queue");
-  const [journalWorkspaceTab, setJournalWorkspaceTab] = useState<JournalWorkspaceTab>("Log Decision");
+  const [alertWorkspaceTab, setAlertWorkspaceTab] = useState<AlertWorkspaceTab>("Current");
+  const [journalWorkspaceTab, setJournalWorkspaceTab] = useState<JournalWorkspaceTab>("History");
   const [stockWorkspaceTab, setStockWorkspaceTab] = useState<StockWorkspaceTab>("Visual Analysis");
   const [analysisBenchmark, setAnalysisBenchmark] = useState<AnalysisBenchmark>("SPY");
   const [analysisLookback, setAnalysisLookback] = useState<AnalysisLookback>("3M");
@@ -1390,10 +1435,10 @@ export default function App() {
   const [selectedAlertId, setSelectedAlertId] = useState("");
   const [selectedStockId, setSelectedStockId] = useState("");
   const [previewStockId, setPreviewStockId] = useState("");
-  const [analysisRecipeFilter, setAnalysisRecipeFilter] = useState("All Recipes");
-  const [analysisNote, setAnalysisNote] = useState("");
   const [stockSearch, setStockSearch] = useState("");
   const [recentStockIds, setRecentStockIds] = useState<string[]>([]);
+  const [stockComposerOpen, setStockComposerOpen] = useState(false);
+  const [selectedEvidenceCard, setSelectedEvidenceCard] = useState<VisualEvidenceCard | null>(null);
   const deferredStockSearch = useDeferredValue(stockSearch);
 
   const eyesSorted = useMemo(
@@ -1415,13 +1460,6 @@ export default function App() {
         (a, b) => Number(a.reviewed) - Number(b.reviewed) || b.createdAt.localeCompare(a.createdAt),
       ),
     [data?.alerts],
-  );
-  const activeAlertQueue = useMemo(
-    () =>
-      alertQueue.filter(
-        (alert) => !alert.snoozedUntil || new Date(alert.snoozedUntil).getTime() <= Date.now(),
-      ),
-    [alertQueue],
   );
   const snoozedAlerts = useMemo(
     () =>
@@ -1520,10 +1558,6 @@ export default function App() {
   }, [selectedStockId, stockDirectory]);
 
   useEffect(() => {
-    setAnalysisRecipeFilter("All Recipes");
-  }, [selectedStockId]);
-
-  useEffect(() => {
     if (!selectedAlertId && alertQueue[0]) {
       setSelectedAlertId(alertQueue[0].id);
       return;
@@ -1592,6 +1626,7 @@ export default function App() {
   const selectedOperatorOptions = operatorOptionsForTemplate(selectedTemplate);
   const selectedAlert = alertQueue.find((alert) => alert.id === selectedAlertId) ?? alertQueue[0];
   const openAlerts = data.alerts.filter((alert) => !alert.reviewed).length;
+  const reviewedAlerts = data.alerts.filter((alert) => alert.reviewed);
   const criticalEyes = data.eyes.filter((eye) =>
     ["Attention Needed", "Thesis Risk Rising", "Thesis Broken"].includes(
       eye.lastEvaluation?.currentState ?? "",
@@ -1646,30 +1681,21 @@ export default function App() {
       : [];
 
   const selectedStockEyes = selectedStockSummary?.eyes ?? [];
-  const selectedStockRecipeOptions = [
-    "All Recipes",
-    ...selectedStockEyes
-      .map((eye) => data.recipes.find((recipe) => recipe.id === eye.recipeId)?.name)
-      .filter((name): name is string => Boolean(name)),
-  ].filter((name, index, list) => list.indexOf(name) === index);
-  const selectedStockFilteredEyes =
-    analysisRecipeFilter === "All Recipes"
-      ? selectedStockEyes
-      : selectedStockEyes.filter(
-          (eye) => data.recipes.find((recipe) => recipe.id === eye.recipeId)?.name === analysisRecipeFilter,
-        );
   const selectedStockAnalysisGroups =
     selectedStockSummary?.snapshot
       ? buildStockVisualAnalysisGroups({
           stock: selectedStockSummary.stock,
           snapshot: selectedStockSummary.snapshot,
-          eyes: selectedStockFilteredEyes,
+          eyes: [],
           recipes: data.recipes,
           benchmark: analysisBenchmark,
           lookbackLabel: analysisLookback,
         }).map((group) => ({
           ...group,
-          cards: group.cards.filter((card) => matchesAnalysisStatus(card.status, analysisStatusFilter)),
+          cards: group.cards.filter(
+            (card) =>
+              card.family !== "User Thesis Match" && matchesAnalysisStatus(card.status, analysisStatusFilter),
+          ),
         }))
       : [];
   const selectedStockAnalysisCards = selectedStockAnalysisGroups.flatMap((group) =>
@@ -1678,8 +1704,18 @@ export default function App() {
       title: card.title,
     })),
   );
-  const selectedStockRecipeMapEyes =
-    selectedStockFilteredEyes.length > 0 ? selectedStockFilteredEyes : selectedStockEyes;
+  const eyesByRecipe = data.recipes.map((recipe) => {
+    const subscriptions = data.eyes.filter((eye) => eye.recipeId === recipe.id);
+    const activeSubscriptions = subscriptions.filter((eye) =>
+      !["Not Relevant", "Thesis Broken"].includes(eye.lastEvaluation?.currentState ?? "Not Relevant"),
+    );
+    return {
+      recipe,
+      subscriptions,
+      activeSubscriptions,
+      inactiveSubscriptions: subscriptions.filter((eye) => !activeSubscriptions.includes(eye)),
+    };
+  });
 
   const selectedStockWhatChanged = (() => {
     if (!selectedStockSummary) return [];
@@ -1858,7 +1894,7 @@ export default function App() {
       return;
     }
     if (target === "Alerts") {
-      setAlertWorkspaceTab(alertId ? "Detail" : "Queue");
+      setAlertWorkspaceTab(alertId ? "Detail" : "Current");
       setTab("Alerts");
       return;
     }
@@ -1973,7 +2009,7 @@ export default function App() {
               label: "Alerts",
               onPress: () => {
                 setFabOpen(false);
-                setAlertWorkspaceTab("Queue");
+                setAlertWorkspaceTab("Current");
                 setTab("Alerts");
               },
             },
@@ -2019,7 +2055,7 @@ export default function App() {
                   label: "Review Queue",
                   onPress: () => {
                     setFabOpen(false);
-                    setAlertWorkspaceTab("Queue");
+                    setAlertWorkspaceTab("Current");
                   },
                 },
                 {
@@ -2052,6 +2088,26 @@ export default function App() {
     <SafeAreaView style={styles.screen}>
       <StatusBar style="dark" />
       <View style={styles.frame}>
+        <View style={styles.topBar}>
+          <View>
+            <Text style={styles.topBarTitle}>{tab}</Text>
+            <Text style={styles.topBarSubtitle}>Current workspace</Text>
+          </View>
+          <Pressable
+            onPress={() => {
+              setAlertWorkspaceTab("Current");
+              setTab("Alerts");
+            }}
+            style={styles.alertBell}
+          >
+            <Text style={styles.alertBellIcon}>!</Text>
+            {openAlerts > 0 ? (
+              <View style={styles.alertBellBadge}>
+                <Text style={styles.alertBellBadgeText}>{openAlerts}</Text>
+              </View>
+            ) : null}
+          </Pressable>
+        </View>
         <ScrollView contentContainerStyle={styles.page} showsVerticalScrollIndicator={false}>
           {tab === "Home" ? (
             <>
@@ -2159,7 +2215,7 @@ export default function App() {
                       key={item.stock.id}
                       item={item}
                       recipes={data.recipes}
-                      onOpenStock={() => openStockContext({ stockId: item.stock.id, stockTab: "Notes" })}
+                      onOpenStock={() => openStockContext({ stockId: item.stock.id, stockTab: "Summary" })}
                     />
                   ))}
                   {homeStaleReviewStocks.length === 0 ? (
@@ -2198,6 +2254,9 @@ export default function App() {
 
               <Reveal delay={40}>
                 <SectionHeader title="Stock Directory" note="Select a stock to open its dedicated workspace." />
+                <View style={styles.actionRow}>
+                  <Button label="Add Stock" onPress={() => setStockComposerOpen(true)} />
+                </View>
                 {recentStocks.length > 0 ? (
                   <View style={styles.recentStockStrip}>
                     <Text style={styles.inputLabel}>Recent</Text>
@@ -2252,49 +2311,9 @@ export default function App() {
                 </View>
               </Reveal>
 
-              <Reveal delay={60}>
-                <SectionHeader title="Add Stock" note="Keep the stock universe intentional and searchable." />
-                <Card>
-                  <View style={styles.dualColumn}>
-                    <View style={styles.evidenceColumn}>
-                      <Text style={styles.inputLabel}>Ticker</Text>
-                      <Input
-                        value={stockForm.symbol}
-                        onChangeText={(symbol) => setStockForm((current) => ({ ...current, symbol }))}
-                        placeholder="Ticker symbol"
-                        autoCapitalize="characters"
-                      />
-                    </View>
-                    <View style={styles.evidenceColumn}>
-                      <Text style={styles.inputLabel}>Company</Text>
-                      <Input
-                        value={stockForm.name}
-                        onChangeText={(name) => setStockForm((current) => ({ ...current, name }))}
-                        placeholder="Company name"
-                      />
-                    </View>
-                  </View>
-                  <Text style={styles.inputLabel}>Why track it</Text>
-                  <Input
-                    value={stockForm.thesis}
-                    onChangeText={(thesis) => setStockForm((current) => ({ ...current, thesis }))}
-                    placeholder="What makes this worth monitoring?"
-                    multiline
-                  />
-                  <Button
-                    label="Add Stock"
-                    onPress={() => {
-                      if (!stockForm.symbol.trim()) return;
-                      void actions.addStock(stockForm);
-                      setStockForm({ symbol: "", name: "", thesis: "" });
-                    }}
-                  />
-                </Card>
-              </Reveal>
-
               {selectedStockSummary ? (
                 <>
-                  <Reveal delay={80}>
+                  <Reveal delay={60}>
                     <SectionHeader
                       title={`${selectedStockSummary.stock.symbol} Workspace`}
                       note="Summary, parameter grid, recipe logic, and notes stay separate so the view does not collapse into one endless surface."
@@ -2330,7 +2349,6 @@ export default function App() {
                         </View>
                         <View style={styles.analysisActionRow}>
                           <Button label="Open Visual Analysis" onPress={() => setStockWorkspaceTab("Visual Analysis")} />
-                          <Button label="Open Recipe Map" tone="secondary" onPress={() => setStockWorkspaceTab("Recipe Map")} />
                           <Button
                             label="Create / Apply Eye"
                             tone="ghost"
@@ -2362,9 +2380,6 @@ export default function App() {
                           One continuous metric board for this stock. Tap any tile for details. Provider-backed and mock fallback data stay labeled.
                         </Text>
 
-                        <Text style={styles.inputLabel}>Recipe filter</Text>
-                        <HorizontalChoice options={selectedStockRecipeOptions} value={analysisRecipeFilter} onSelect={setAnalysisRecipeFilter} />
-
                         <View style={styles.dualColumn}>
                           <View style={styles.evidenceColumn}>
                             <Text style={styles.inputLabel}>Benchmark</Text>
@@ -2389,55 +2404,8 @@ export default function App() {
 
                         <View style={styles.metaRow}>
                           <MetaPill label={`Data ${selectedStockSummary.snapshot?.freshness ?? "Unavailable"}`} />
-                          <MetaPill label={`Filter ${analysisRecipeFilter}`} />
                           <MetaPill label={`Benchmark ${analysisBenchmark}`} />
-                        </View>
-
-                        <Text style={styles.inputLabel}>Review note</Text>
-                        <Input
-                          value={analysisNote}
-                          onChangeText={setAnalysisNote}
-                          placeholder="What changed since the last review?"
-                          multiline
-                        />
-
-                        <View style={styles.analysisActionRow}>
-                          <Button
-                            label="Mark Thesis Reviewed"
-                            onPress={() =>
-                              void actions.markEyesReviewed({
-                                stockId: selectedStockSummary.stock.id,
-                                recipeId:
-                                  analysisRecipeFilter === "All Recipes" ? undefined : selectedStockFilteredEyes[0]?.recipeId,
-                              })
-                            }
-                          />
-                          <Button
-                            label="Recipe Preview"
-                            tone="secondary"
-                            onPress={() => {
-                              setPreviewStockId(selectedStockSummary.stock.id);
-                              setRecentStockIds((current) => [selectedStockSummary.stock.id, ...current.filter((id) => id !== selectedStockSummary.stock.id)].slice(0, 6));
-                              setRecipeWorkspaceTab("Preview");
-                              setTab("Recipes");
-                            }}
-                          />
-                          <Button
-                            label="Decision Log"
-                            tone="ghost"
-                            onPress={() => {
-                              setDecisionForm((current) => ({
-                                ...current,
-                                eyeId: selectedStockFilteredEyes[0]?.id ?? selectedStockEyes[0]?.id ?? current.eyeId,
-                                note:
-                                  analysisNote.trim() ||
-                                  `Review note for ${selectedStockSummary.stock.symbol}: visual analysis reviewed.`,
-                              }));
-                              setRecentStockIds((current) => [selectedStockSummary.stock.id, ...current.filter((id) => id !== selectedStockSummary.stock.id)].slice(0, 6));
-                              setJournalWorkspaceTab("Log Decision");
-                              setTab("Journal");
-                            }}
-                          />
+                          <MetaPill label={selectedStockSummary.snapshot?.sourceName ?? "No source"} />
                         </View>
                       </Card>
 
@@ -2449,7 +2417,11 @@ export default function App() {
                                 key={`stock-card-${card.id}`}
                                 style={analysisDensity === "Compact" ? styles.stockAnalysisBoardItem : undefined}
                               >
-                                <EvidenceCardView card={card} compact={analysisDensity === "Compact"} />
+                                <EvidenceCardView
+                                  card={card}
+                                  compact={analysisDensity === "Compact"}
+                                  onOpen={analysisDensity === "Compact" ? () => setSelectedEvidenceCard(card) : undefined}
+                                />
                               </View>
                             ))}
                           </View>
@@ -2462,72 +2434,6 @@ export default function App() {
                     </Reveal>
                   ) : null}
 
-                  {stockWorkspaceTab === "Recipe Map" ? (
-                    <Reveal delay={100}>
-                      <SectionHeader title="Recipe Condition Map" note="See how each active Eye currently interprets this stock." />
-                      <View style={styles.stack}>
-                        {selectedStockRecipeMapEyes.length === 0 ? (
-                          <Card>
-                            <Text style={styles.cardBody}>No active Eyes are attached to this stock yet.</Text>
-                          </Card>
-                        ) : (
-                          selectedStockRecipeMapEyes.map((eye) => {
-                            const recipe = data.recipes.find((item) => item.id === eye.recipeId);
-                            return recipe ? (
-                              <RecipeConditionMapCard key={eye.id} eye={eye} recipe={recipe} stock={selectedStockSummary.stock} />
-                            ) : null;
-                          })
-                        )}
-                      </View>
-                      {selectedStockWhatChanged.length > 0 ? (
-                        <WhatChangedPanel title="Stock-level change summary" items={selectedStockWhatChanged} />
-                      ) : null}
-                    </Reveal>
-                  ) : null}
-
-                  {stockWorkspaceTab === "Notes" ? (
-                    <Reveal delay={100}>
-                      <Card>
-                        <Text style={styles.cardEyebrow}>Notes & Decisions</Text>
-                        <Text style={styles.cardTitle}>{selectedStockSummary.stock.symbol} thesis memory</Text>
-                        <Text style={styles.cardBody}>{selectedStockSummary.stock.thesis}</Text>
-                        <View style={styles.metaRow}>
-                          <MetaPill label={`${selectedStockSummary.eyes.length} eyes`} />
-                          <MetaPill label={`${selectedStockSummary.decisions.length} decisions`} />
-                          <MetaPill label={`${selectedStockSummary.openAlerts.length} open alerts`} />
-                        </View>
-                        <Text style={styles.inputLabel}>Current review note</Text>
-                        <Input value={analysisNote} onChangeText={setAnalysisNote} placeholder="Capture what changed in the thesis." multiline />
-                        <View style={styles.analysisActionRow}>
-                          <Button
-                            label="Log This Note"
-                            onPress={() => {
-                              setDecisionForm((current) => ({
-                                ...current,
-                                eyeId: selectedStockFilteredEyes[0]?.id ?? selectedStockEyes[0]?.id ?? current.eyeId,
-                                note: analysisNote.trim() || current.note,
-                              }));
-                              setJournalWorkspaceTab("Log Decision");
-                              setTab("Journal");
-                            }}
-                          />
-                          <Button label="Visual Analysis" tone="secondary" onPress={() => setStockWorkspaceTab("Visual Analysis")} />
-                        </View>
-                      </Card>
-
-                      <View style={styles.stack}>
-                        {selectedStockSummary.decisions.slice(0, 6).map((decision) => (
-                          <Card key={decision.id}>
-                            <Text style={styles.alertTitle}>{decision.action}</Text>
-                            <Text style={styles.cardBody}>{decision.note}</Text>
-                            <Text style={styles.metaLine}>
-                              {decision.stateAtDecision ?? "No state snapshot"} · {decision.dataQuality ?? "No data note"} · {formatDate(decision.createdAt)}
-                            </Text>
-                          </Card>
-                        ))}
-                      </View>
-                    </Reveal>
-                  ) : null}
                 </>
               ) : null}
             </>
@@ -2744,6 +2650,15 @@ export default function App() {
               {recipeWorkspaceTab === "Library" ? (
                 <Reveal delay={40}>
                   <SectionHeader title="Recipe Library" note="Saved logic stays readable and reusable." />
+                  <View style={styles.actionRow}>
+                    <Button
+                      label="New Recipe"
+                      onPress={() => {
+                        setRecipeBuilderStep("Purpose");
+                        setRecipeWorkspaceTab("Builder");
+                      }}
+                    />
+                  </View>
                   <View style={styles.stack}>
                     {data.recipes.map((recipe) => (
                       <Card key={recipe.id}>
@@ -2824,36 +2739,52 @@ export default function App() {
                   ) : null}
 
                   <Reveal delay={60}>
-                    <SectionHeader title="Active Monitor List" note="Pick a monitor, then branch to stock analysis or decision logging." />
+                    <SectionHeader title="Eye Inventory" note="Active and inactive subscriptions are grouped by recipe so the current monitoring set is easier to scan." />
+                    <View style={styles.actionRow}>
+                      <Button label="New Eye" onPress={() => setEyeWorkspaceTab("Create Eye")} />
+                    </View>
                     <View style={styles.stack}>
-                      {eyesSorted.map((eye) => (
-                        <Pressable
-                          key={eye.id}
-                          onPress={() =>
-                            openStockContext({
-                              stockId: eye.stockId,
-                              eyeId: eye.id,
-                              target: "Eyes",
-                            })
-                          }
-                        >
-                          <Card highlighted={selectedEye?.id === eye.id}>
-                            <View style={styles.inlineBetween}>
-                              <View style={styles.flexOne}>
-                                <Text style={styles.cardEyebrow}>{stockLabel(data.stocks, eye.stockId)}</Text>
-                                <Text style={styles.alertTitle}>{recipeLabel(data.recipes, eye.recipeId)}</Text>
-                                <Text style={styles.cardBody}>{eye.thesisSnapshot}</Text>
-                              </View>
-                              <Text style={stateTone(eye.lastEvaluation?.currentState)}>
-                                {eye.lastEvaluation?.currentState ?? "Not Evaluated"}
-                              </Text>
+                      {eyesByRecipe.map((group) => (
+                        <Card key={`eye-group-${group.recipe.id}`}>
+                          <View style={styles.inlineBetween}>
+                            <View style={styles.flexOne}>
+                              <Text style={styles.cardEyebrow}>Recipe subscription</Text>
+                              <Text style={styles.alertTitle}>{group.recipe.name}</Text>
+                              <Text style={styles.cardBody}>{group.recipe.purpose}</Text>
                             </View>
-                            <View style={styles.dualDenseGrid}>
-                              <DenseStat label="Entry zone" value={eye.plannedEntryLow !== undefined && eye.plannedEntryHigh !== undefined ? `$${eye.plannedEntryLow} to $${eye.plannedEntryHigh}` : "Unset"} />
-                              <DenseStat label="Last review" value={eye.lastReviewedAt ? formatShortDate(eye.lastReviewedAt) : "Unset"} />
+                            <View style={styles.priorityStack}>
+                              <MetaPill label={`${group.activeSubscriptions.length} active`} />
+                              <MetaPill label={`${group.inactiveSubscriptions.length} inactive`} />
                             </View>
-                          </Card>
-                        </Pressable>
+                          </View>
+                          <View style={styles.stack}>
+                            {group.subscriptions.map((eye) => (
+                              <Pressable
+                                key={eye.id}
+                                onPress={() =>
+                                  openStockContext({
+                                    stockId: eye.stockId,
+                                    eyeId: eye.id,
+                                    target: "Eyes",
+                                  })
+                                }
+                              >
+                                <View style={styles.eyeRow}>
+                                  <View style={styles.flexOne}>
+                                    <Text style={styles.eyeRowTitle}>{stockLabel(data.stocks, eye.stockId)}</Text>
+                                    <Text style={styles.eyeRowBody}>{eye.thesisSnapshot}</Text>
+                                  </View>
+                                  <View style={styles.priorityStack}>
+                                    <Text style={stateTone(eye.lastEvaluation?.currentState)}>
+                                      {eye.lastEvaluation?.currentState ?? "Not Evaluated"}
+                                    </Text>
+                                    <Button label="Delete" tone="ghost" onPress={() => void actions.deleteEye(eye.id)} />
+                                  </View>
+                                </View>
+                              </Pressable>
+                            ))}
+                          </View>
+                        </Card>
                       ))}
                     </View>
                   </Reveal>
@@ -2945,9 +2876,9 @@ export default function App() {
                 <HorizontalChoice options={alertWorkspaceTabs} value={alertWorkspaceTab} onSelect={setAlertWorkspaceTab} />
               </Reveal>
 
-              {alertWorkspaceTab === "Queue" ? (
+              {alertWorkspaceTab === "Current" ? (
                 <Reveal delay={40}>
-                  <SectionHeader title="Queue" note="Alerts are grouped by stock first so related signals stay together." />
+                  <SectionHeader title="Current Alerts" note="Alerts are grouped by stock first so related signals stay together." />
                   <View style={styles.stack}>
                     {groupedAlertQueue.length === 0 ? (
                       <Card>
@@ -3074,25 +3005,27 @@ export default function App() {
                 </Reveal>
               ) : null}
 
-              {alertWorkspaceTab === "Snoozed" ? (
+              {alertWorkspaceTab === "History" ? (
                 <Reveal delay={40}>
-                  <SectionHeader title="Snoozed Alerts" note="Temporarily deferred alerts stay visible here with their wake-up time." />
+                  <SectionHeader title="Alert History" note="Review acknowledged and snoozed alerts, and jump into linked journals when they exist." />
                   <View style={styles.stack}>
-                    {snoozedAlerts.length === 0 ? (
+                    {[...snoozedAlerts, ...reviewedAlerts].length === 0 ? (
                       <Card>
-                        <Text style={styles.cardBody}>No alerts are currently snoozed.</Text>
+                        <Text style={styles.cardBody}>No previous alerts are available yet.</Text>
                       </Card>
                     ) : (
-                      snoozedAlerts.map((alert) => {
+                      [...snoozedAlerts, ...reviewedAlerts].map((alert) => {
                         const eye = data.eyes.find((item) => item.id === alert.eyeId);
+                        const linkedDecision = data.decisions.find((decision) => decision.alertId === alert.id);
                         return (
-                          <Card key={`snoozed-${alert.id}`}>
+                          <Card key={`history-${alert.id}`}>
                             <Text style={styles.cardEyebrow}>{stockLabel(data.stocks, eye?.stockId ?? "")}</Text>
                             <Text style={styles.alertTitle}>{alert.title}</Text>
                             <Text style={styles.cardBody}>{alert.whyNow}</Text>
                             <View style={styles.metaRow}>
-                              <MetaPill label={`Until ${alert.snoozedUntil ? formatDate(alert.snoozedUntil) : "unknown"}`} />
+                              <MetaPill label={alert.reviewed ? "Acknowledged" : `Snoozed until ${alert.snoozedUntil ? formatDate(alert.snoozedUntil) : "unknown"}`} />
                               {alert.usefulness ? <MetaPill label={alert.usefulness} /> : null}
+                              {linkedDecision ? <MetaPill label={`Journal · ${linkedDecision.action}`} /> : null}
                             </View>
                             <View style={styles.actionRow}>
                               <Button label="Open Detail" onPress={() => {
@@ -3100,7 +3033,17 @@ export default function App() {
                                 openStockContext({ stockId: eye.stockId, eyeId: eye.id, alertId: alert.id, target: "Alerts" });
                                 setAlertWorkspaceTab("Detail");
                               }} />
-                              <Button label="Unsnooze" tone="secondary" onPress={() => void actions.snoozeAlert(alert.id, -1)} />
+                              {!alert.reviewed ? <Button label="Unsnooze" tone="secondary" onPress={() => void actions.snoozeAlert(alert.id, -1)} /> : null}
+                              {linkedDecision ? (
+                                <Button
+                                  label="Open Journal"
+                                  tone="ghost"
+                                  onPress={() => {
+                                    setJournalWorkspaceTab("History");
+                                    setTab("Journal");
+                                  }}
+                                />
+                              ) : null}
                             </View>
                           </Card>
                         );
@@ -3165,6 +3108,9 @@ export default function App() {
               {journalWorkspaceTab === "History" ? (
                 <Reveal delay={40}>
                   <SectionHeader title="History" note="Review decisions, state context, and data quality later." />
+                  <View style={styles.actionRow}>
+                    <Button label="New Journal Entry" onPress={() => setJournalWorkspaceTab("Log Decision")} />
+                  </View>
                   <View style={styles.stack}>
                     {data.decisions.map((decision) => (
                       <Card key={decision.id}>
@@ -3197,6 +3143,54 @@ export default function App() {
             </>
           ) : null}
         </ScrollView>
+
+        {stockComposerOpen ? (
+          <WindowPanel
+            title="Add Stock"
+            subtitle="Add a stock into the factual stock workspace."
+            onClose={() => setStockComposerOpen(false)}
+          >
+            <Text style={styles.inputLabel}>Ticker</Text>
+            <Input
+              value={stockForm.symbol}
+              onChangeText={(symbol) => setStockForm((current) => ({ ...current, symbol }))}
+              placeholder="Ticker symbol"
+              autoCapitalize="characters"
+            />
+            <Text style={styles.inputLabel}>Company</Text>
+            <Input
+              value={stockForm.name}
+              onChangeText={(name) => setStockForm((current) => ({ ...current, name }))}
+              placeholder="Company name"
+            />
+            <Text style={styles.inputLabel}>Why track it</Text>
+            <Input
+              value={stockForm.thesis}
+              onChangeText={(thesis) => setStockForm((current) => ({ ...current, thesis }))}
+              placeholder="What makes this worth monitoring?"
+              multiline
+            />
+            <Button
+              label="Add Stock"
+              onPress={() => {
+                if (!stockForm.symbol.trim()) return;
+                void actions.addStock(stockForm);
+                setStockForm({ symbol: "", name: "", thesis: "" });
+                setStockComposerOpen(false);
+              }}
+            />
+          </WindowPanel>
+        ) : null}
+
+        {selectedEvidenceCard ? (
+          <WindowPanel
+            title={selectedEvidenceCard.title}
+            subtitle={`${selectedStockSummary?.stock.symbol ?? "Stock"} · ${selectedEvidenceCard.freshness}`}
+            onClose={() => setSelectedEvidenceCard(null)}
+          >
+            <EvidenceCardView card={selectedEvidenceCard} />
+          </WindowPanel>
+        ) : null}
 
         {fabOpen ? (
           <View pointerEvents="box-none" style={styles.fabMenu}>
@@ -3249,6 +3243,63 @@ const styles = StyleSheet.create({
   frame: {
     flex: 1,
   },
+  topBar: {
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    paddingBottom: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderBottomWidth: 1,
+    borderBottomColor: "#e5ebf2",
+    backgroundColor: "#f6f8fb",
+  },
+  topBarTitle: {
+    color: "#0f172a",
+    fontSize: 22,
+    lineHeight: 26,
+    fontWeight: "800",
+    fontFamily,
+  },
+  topBarSubtitle: {
+    color: "#64748b",
+    fontSize: 12,
+    fontFamily,
+  },
+  alertBell: {
+    width: 42,
+    height: 42,
+    borderRadius: 12,
+    backgroundColor: "#ffffff",
+    borderWidth: 1,
+    borderColor: "#e5ebf2",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  alertBellIcon: {
+    color: "#0f172a",
+    fontSize: 18,
+    fontWeight: "800",
+    fontFamily,
+  },
+  alertBellBadge: {
+    position: "absolute",
+    top: -4,
+    right: -4,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 999,
+    backgroundColor: "#ef4444",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 4,
+  },
+  alertBellBadgeText: {
+    color: "#ffffff",
+    fontSize: 10,
+    fontWeight: "800",
+    fontFamily,
+  },
   loadingScreen: {
     flex: 1,
     alignItems: "center",
@@ -3263,7 +3314,7 @@ const styles = StyleSheet.create({
   },
   page: {
     paddingHorizontal: 16,
-    paddingTop: 10,
+    paddingTop: 14,
     paddingBottom: 140,
     gap: 14,
   },
@@ -4148,6 +4199,27 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontFamily,
   },
+  eyeRow: {
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#edf2f7",
+    flexDirection: "row",
+    gap: 12,
+    alignItems: "flex-start",
+  },
+  eyeRowTitle: {
+    color: "#0f172a",
+    fontSize: 14,
+    fontWeight: "800",
+    fontFamily,
+  },
+  eyeRowBody: {
+    marginTop: 4,
+    color: "#475569",
+    fontSize: 12,
+    lineHeight: 17,
+    fontFamily,
+  },
   actionRow: {
     marginTop: 14,
     flexDirection: "row",
@@ -4601,5 +4673,28 @@ const styles = StyleSheet.create({
   },
   navLabelActive: {
     color: "#0f172a",
+  },
+  windowBackdrop: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "flex-end",
+    backgroundColor: "rgba(15, 23, 42, 0.2)",
+  },
+  windowDismissLayer: {
+    flex: 1,
+  },
+  windowPanel: {
+    maxHeight: "82%",
+    borderTopLeftRadius: 18,
+    borderTopRightRadius: 18,
+    backgroundColor: "#ffffff",
+    borderTopWidth: 1,
+    borderColor: "#e5ebf2",
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 28,
+    gap: 12,
+  },
+  windowScroll: {
+    flexGrow: 0,
   },
 });

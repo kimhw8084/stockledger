@@ -57,3 +57,7 @@
 - Split the Recipe Builder into clearer guided sections for purpose, logic, risk/alerts, and review/outcome framing instead of one undifferentiated authoring block.
 - Added first-pass alert lifecycle controls including snoozing, usefulness feedback, grouped active queue handling, and a dedicated snoozed-alert view.
 - Enriched Journal history with linked outcome context so decision review shows at least the current outcome status, lesson, and recipe-improvement note.
+- Reworked the top-level usage of each workspace so tabs default to current inventory views first and push add/detail flows into triggered window panels where practical.
+- Added a global top bar with alert badge count, a stock-add window, and stock metric popup detail so the app relies less on long vertical forms.
+- Refocused Stocks on factual parameter visualization only by stripping recipe-linked controls from the main stock board and opening metric detail in a separate panel.
+- Reorganized Eyes into grouped subscription inventory by recipe and shifted Journal to default into history rather than immediate composition.
