@@ -42,11 +42,53 @@ interface ConditionTemplate {
   metricLabel: string;
   defaultOperator: ConditionOperator;
   defaultValue: string;
+  control:
+    | {
+        type: "number";
+        step: number;
+        min: number;
+        max: number;
+        unit?: string;
+      }
+    | {
+        type: "enum";
+        options: readonly string[];
+      };
 }
 
 const tabs: TabKey[] = ["Dashboard", "Watchlist", "Studio", "Journal"];
 const watchFilters: WatchFilter[] = ["All", "Attention", "Opportunity", "Quiet"];
 const studioPanels: StudioPanel[] = ["Recipes", "Eyes", "Stocks"];
+const opportunityTypes = [
+  "Temporary Mispricing",
+  "Leader Pullback",
+  "Recovery Setup",
+  "Event Reset",
+  "Risk Monitoring",
+] as const;
+const timeHorizons = ["1 to 2 weeks", "1 to 3 months", "3 to 12 months", "Multi-year"] as const;
+const useCaseOptions = [
+  "Watchlist Triage",
+  "Position Building",
+  "Post-Earnings Review",
+  "Thesis Protection",
+] as const;
+const reviewCadenceOptions = [3, 7, 14, 30, 60] as const;
+const alertCooldownOptions = [6, 12, 24, 48, 72] as const;
+const manualFlagOptions = [
+  "accounting issue",
+  "regulatory risk",
+  "guidance cut",
+  "management credibility damage",
+  "severe dilution risk",
+] as const;
+const reviewDateOptions = [
+  { label: "Today", daysAgo: 0 },
+  { label: "3D", daysAgo: 3 },
+  { label: "7D", daysAgo: 7 },
+  { label: "14D", daysAgo: 14 },
+  { label: "30D", daysAgo: 30 },
+] as const;
 const decisionActions: DecisionAction[] = [
   "Entered",
   "Skipped",
@@ -58,7 +100,6 @@ const decisionActions: DecisionAction[] = [
 const thesisValidityOptions = ["Yes", "Partly", "No"] as const;
 const timingOptions = ["Early", "On Time", "Late"] as const;
 const conditionKinds: ConditionKind[] = ["required", "supporting", "negative", "disqualifier"];
-const conditionOperators: readonly ConditionOperator[] = [">=", "<=", "is", "contains", "between"];
 const conditionCategories = [
   "Technical",
   "Valuation",
@@ -98,6 +139,7 @@ const conditionLibrary: ConditionTemplate[] = [
     metricLabel: "drawdown %",
     defaultOperator: "<=",
     defaultValue: "-25",
+    control: { type: "number", step: 5, min: -80, max: -5, unit: "%" },
   },
   {
     id: "support-hold",
@@ -106,11 +148,12 @@ const conditionLibrary: ConditionTemplate[] = [
     description: "Look for price behavior that is stabilizing around a prior support zone.",
     metricKey: "near_support",
     formulaKey: "near_support_bool",
-    defaultKind: "supporting",
+    defaultKind: "required",
     complexity: "Layered",
     metricLabel: "support zone",
-    defaultOperator: "within",
-    defaultValue: "3%",
+    defaultOperator: "is",
+    defaultValue: "true",
+    control: { type: "enum", options: ["true", "false"] },
   },
   {
     id: "moving-average-recovery",
@@ -122,8 +165,9 @@ const conditionLibrary: ConditionTemplate[] = [
     defaultKind: "supporting",
     complexity: "Layered",
     metricLabel: "moving average",
-    defaultOperator: "crosses",
-    defaultValue: "50D",
+    defaultOperator: ">=",
+    defaultValue: "0",
+    control: { type: "number", step: 1, min: -25, max: 25, unit: "%" },
   },
   {
     id: "valuation-discount",
@@ -135,8 +179,9 @@ const conditionLibrary: ConditionTemplate[] = [
     defaultKind: "supporting",
     complexity: "Layered",
     metricLabel: "valuation gap",
-    defaultOperator: "<=",
-    defaultValue: "-15%",
+    defaultOperator: "is",
+    defaultValue: "true",
+    control: { type: "enum", options: ["true", "false"] },
   },
   {
     id: "revenue-stability",
@@ -148,8 +193,9 @@ const conditionLibrary: ConditionTemplate[] = [
     defaultKind: "required",
     complexity: "Layered",
     metricLabel: "revenue trend",
-    defaultOperator: "is",
-    defaultValue: "stable",
+    defaultOperator: ">=",
+    defaultValue: "0",
+    control: { type: "number", step: 5, min: -50, max: 80, unit: "%" },
   },
   {
     id: "margin-deterioration",
@@ -161,8 +207,9 @@ const conditionLibrary: ConditionTemplate[] = [
     defaultKind: "negative",
     complexity: "Advanced",
     metricLabel: "margin trend",
-    defaultOperator: "is",
-    defaultValue: "falling",
+    defaultOperator: "<=",
+    defaultValue: "-5",
+    control: { type: "number", step: 1, min: -25, max: 15, unit: "pts" },
   },
   {
     id: "negative-news-cluster",
@@ -176,6 +223,7 @@ const conditionLibrary: ConditionTemplate[] = [
     metricLabel: "headline cluster",
     defaultOperator: "contains",
     defaultValue: "regulatory risk",
+    control: { type: "enum", options: manualFlagOptions },
   },
   {
     id: "earnings-proximity",
@@ -187,8 +235,9 @@ const conditionLibrary: ConditionTemplate[] = [
     defaultKind: "negative",
     complexity: "Simple",
     metricLabel: "days to earnings",
-    defaultOperator: "<=",
-    defaultValue: "10",
+    defaultOperator: "is",
+    defaultValue: "true",
+    control: { type: "enum", options: ["true", "false"] },
   },
   {
     id: "market-stress",
@@ -200,8 +249,9 @@ const conditionLibrary: ConditionTemplate[] = [
     defaultKind: "negative",
     complexity: "Layered",
     metricLabel: "market regime",
-    defaultOperator: "is",
-    defaultValue: "risk-off",
+    defaultOperator: "<=",
+    defaultValue: "-5",
+    control: { type: "number", step: 1, min: -25, max: 25, unit: "%" },
   },
   {
     id: "debt-risk",
@@ -213,8 +263,9 @@ const conditionLibrary: ConditionTemplate[] = [
     defaultKind: "disqualifier",
     complexity: "Advanced",
     metricLabel: "debt coverage",
-    defaultOperator: "<=",
-    defaultValue: "2.0x",
+    defaultOperator: "is",
+    defaultValue: "high",
+    control: { type: "enum", options: ["low", "medium", "high"] },
   },
   {
     id: "management-credibility",
@@ -228,6 +279,7 @@ const conditionLibrary: ConditionTemplate[] = [
     metricLabel: "credibility event",
     defaultOperator: "contains",
     defaultValue: "guidance cut",
+    control: { type: "enum", options: manualFlagOptions },
   },
   {
     id: "analyst-revisions",
@@ -241,10 +293,37 @@ const conditionLibrary: ConditionTemplate[] = [
     metricLabel: "revision trend",
     defaultOperator: "is",
     defaultValue: "weak",
+    control: { type: "enum", options: ["improving", "flat", "weak"] },
   },
 ];
 
 const createLocalId = (prefix: string) => `${prefix}-${Math.random().toString(36).slice(2, 10)}`;
+
+const isoDateDaysAgo = (daysAgo: number) => {
+  const date = new Date();
+  date.setHours(12, 0, 0, 0);
+  date.setDate(date.getDate() - daysAgo);
+  return date.toISOString();
+};
+
+const parseThresholdValue = (rawValue: string, template: ConditionTemplate) => {
+  if (template.control.type === "number") {
+    return Number(rawValue);
+  }
+  if (rawValue === "true") return true;
+  if (rawValue === "false") return false;
+  return rawValue;
+};
+
+const operatorOptionsForTemplate = (template: ConditionTemplate): readonly ConditionOperator[] =>
+  template.control.type === "number" ? [">=", "<=", ">", "<"] : template.defaultOperator === "contains" ? ["contains", "is"] : ["is"];
+
+const formatMetricThreshold = (template: ConditionTemplate, threshold: string) => {
+  if (template.control.type === "number") {
+    return `${threshold}${template.control.unit ? ` ${template.control.unit}` : ""}`;
+  }
+  return threshold === "true" ? "Yes" : threshold === "false" ? "No" : threshold;
+};
 
 const roleFromBuilderKind = (kind: ConditionKind): RecipeCondition["role"] => {
   switch (kind) {
@@ -265,6 +344,13 @@ const formatDate = (value: string) =>
     day: "numeric",
     hour: "numeric",
     minute: "2-digit",
+  });
+
+const formatShortDate = (value: string) =>
+  new Date(value).toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
   });
 
 const urgencyWeight = (value?: string) => {
@@ -437,11 +523,15 @@ const Input = ({
   onChangeText,
   placeholder,
   multiline,
+  keyboardType,
+  autoCapitalize,
 }: {
   value: string;
   onChangeText: (value: string) => void;
   placeholder: string;
   multiline?: boolean;
+  keyboardType?: "default" | "numeric";
+  autoCapitalize?: "none" | "sentences" | "characters";
 }) => (
   <TextInput
     value={value}
@@ -449,8 +539,53 @@ const Input = ({
     placeholder={placeholder}
     placeholderTextColor="#8da0b7"
     multiline={multiline}
+    keyboardType={keyboardType}
+    autoCapitalize={autoCapitalize}
     style={[styles.input, multiline ? styles.textArea : null]}
   />
+);
+
+const NumberStepper = ({
+  label,
+  value,
+  onChange,
+  step,
+  min,
+  max,
+  unit,
+}: {
+  label: string;
+  value: number;
+  onChange: (next: number) => void;
+  step: number;
+  min: number;
+  max: number;
+  unit?: string;
+}) => (
+  <View style={styles.stepper}>
+    <Text style={styles.stepperLabel}>{label}</Text>
+    <View style={styles.stepperTrack}>
+      <Pressable onPress={() => onChange(Math.max(min, Number((value - step).toFixed(2))))} style={styles.stepperButton}>
+        <Text style={styles.stepperButtonText}>-</Text>
+      </Pressable>
+      <View style={styles.stepperValueWrap}>
+        <Text style={styles.stepperValue}>
+          {value}
+          {unit ? ` ${unit}` : ""}
+        </Text>
+      </View>
+      <Pressable onPress={() => onChange(Math.min(max, Number((value + step).toFixed(2))))} style={styles.stepperButton}>
+        <Text style={styles.stepperButtonText}>+</Text>
+      </Pressable>
+    </View>
+  </View>
+);
+
+const DenseStat = ({ label, value, tone = "neutral" }: { label: string; value: string; tone?: "neutral" | "strong" | "risk" }) => (
+  <View style={[styles.denseStat, tone === "strong" ? styles.denseStatStrong : tone === "risk" ? styles.denseStatRisk : null]}>
+    <Text style={styles.denseStatLabel}>{label}</Text>
+    <Text style={styles.denseStatValue}>{value}</Text>
+  </View>
 );
 
 const MetricButton = ({
@@ -542,6 +677,27 @@ const StockSparkline = ({
   );
 };
 
+interface RecipeDraftForm {
+  name: string;
+  purpose: string;
+  opportunityType: (typeof opportunityTypes)[number];
+  timeHorizon: (typeof timeHorizons)[number];
+  intendedUseCase: (typeof useCaseOptions)[number];
+  notes: string;
+  reviewCadenceDays: number;
+  alertCooldownHours: number;
+}
+
+interface EyeDraftForm {
+  stockId: string;
+  recipeId: string;
+  thesisSnapshot: string;
+  plannedEntryLow: string;
+  plannedEntryHigh: string;
+  invalidationRule: string;
+  lastReviewedDaysAgo: number;
+}
+
 export default function App() {
   const { data, loading, actions } = useAppModel();
   const [tab, setTab] = useState<TabKey>("Dashboard");
@@ -551,14 +707,25 @@ export default function App() {
   const [fabOpen, setFabOpen] = useState(false);
 
   const [stockForm, setStockForm] = useState({ symbol: "", name: "", thesis: "" });
-  const [recipeForm, setRecipeForm] = useState({
+  const [recipeForm, setRecipeForm] = useState<RecipeDraftForm>({
     name: "",
     purpose: "",
-    timeHorizon: "",
-    intendedUseCase: "",
+    opportunityType: opportunityTypes[0],
+    timeHorizon: timeHorizons[1],
+    intendedUseCase: useCaseOptions[0],
     notes: "",
+    reviewCadenceDays: reviewCadenceOptions[2],
+    alertCooldownHours: alertCooldownOptions[2],
   });
-  const [eyeForm, setEyeForm] = useState({ stockId: "", recipeId: "", thesisSnapshot: "" });
+  const [eyeForm, setEyeForm] = useState<EyeDraftForm>({
+    stockId: "",
+    recipeId: "",
+    thesisSnapshot: "",
+    plannedEntryLow: "",
+    plannedEntryHigh: "",
+    invalidationRule: "",
+    lastReviewedDaysAgo: reviewDateOptions[2].daysAgo,
+  });
   const [decisionForm, setDecisionForm] = useState({
     eyeId: "",
     alertId: "",
@@ -687,6 +854,24 @@ export default function App() {
     }));
   }, [conditionBuilder.templateId]);
 
+  useEffect(() => {
+    if (!eyeForm.stockId || !data) return;
+    const snapshot = data.snapshots.find((item) => item.stockId === eyeForm.stockId);
+    if (!snapshot) return;
+
+    setEyeForm((current) => {
+      if (current.stockId !== eyeForm.stockId) return current;
+      if (current.plannedEntryLow && current.plannedEntryHigh) return current;
+      const low = (snapshot.price * 0.97).toFixed(2);
+      const high = snapshot.price.toFixed(2);
+      return {
+        ...current,
+        plannedEntryLow: current.plannedEntryLow || low,
+        plannedEntryHigh: current.plannedEntryHigh || high,
+      };
+    });
+  }, [data, eyeForm.stockId]);
+
   if (loading || !data) {
     return (
       <SafeAreaView style={styles.loadingScreen}>
@@ -704,6 +889,7 @@ export default function App() {
     stockSummaries[0];
   const selectedTemplate =
     conditionLibrary.find((item) => item.id === conditionBuilder.templateId) ?? conditionLibrary[0];
+  const selectedOperatorOptions = operatorOptionsForTemplate(selectedTemplate);
   const openAlerts = data.alerts.filter((alert) => !alert.reviewed).length;
   const criticalEyes = data.eyes.filter((eye) =>
     ["Attention Needed", "Thesis Risk Rising", "Thesis Broken"].includes(
@@ -751,7 +937,10 @@ export default function App() {
 
   const addDraftCondition = () => {
     const noteSuffix = conditionBuilder.note.trim() ? ` Notes: ${conditionBuilder.note.trim()}.` : "";
-    const label = `${selectedTemplate.title}: ${selectedTemplate.metricLabel} ${conditionBuilder.operator} ${conditionBuilder.threshold}.${noteSuffix}`;
+    const label = `${selectedTemplate.title}: ${selectedTemplate.metricLabel} ${conditionBuilder.operator} ${formatMetricThreshold(
+      selectedTemplate,
+      conditionBuilder.threshold,
+    )}.${noteSuffix}`;
     setDraftConditions((current) => [
       {
         id: createLocalId("condition"),
@@ -760,14 +949,7 @@ export default function App() {
         metricKey: selectedTemplate.metricKey,
         formulaKey: selectedTemplate.formulaKey,
         operator: conditionBuilder.operator,
-        value:
-          conditionBuilder.threshold === "true"
-            ? true
-            : conditionBuilder.threshold === "false"
-              ? false
-              : Number.isNaN(Number(conditionBuilder.threshold))
-                ? conditionBuilder.threshold
-                : Number(conditionBuilder.threshold),
+        value: parseThresholdValue(conditionBuilder.threshold, selectedTemplate),
         humanDescription: label,
         notes: conditionBuilder.note.trim(),
         availability: selectedTemplate.metricKey === "manual_flag_present" ? "manual" : "automated",
@@ -790,9 +972,12 @@ export default function App() {
     setRecipeForm({
       name: "",
       purpose: "",
-      timeHorizon: "",
-      intendedUseCase: "",
+      opportunityType: opportunityTypes[0],
+      timeHorizon: timeHorizons[1],
+      intendedUseCase: useCaseOptions[0],
       notes: "",
+      reviewCadenceDays: reviewCadenceOptions[2],
+      alertCooldownHours: alertCooldownOptions[2],
     });
     setDraftConditions([]);
   };
@@ -1100,6 +1285,18 @@ export default function App() {
                         stabilizationScore={selectedStockSummary.snapshot.stabilizationScore}
                       />
                     ) : null}
+                    {selectedStockSummary.snapshot ? (
+                      <View style={styles.dualDenseGrid}>
+                        <DenseStat label="Price" value={`$${selectedStockSummary.snapshot.price.toFixed(2)}`} tone="strong" />
+                        <DenseStat label="Drawdown" value={`${selectedStockSummary.snapshot.drawdownPct}%`} />
+                        <DenseStat
+                          label="RS vs SPY"
+                          value={`${selectedStockSummary.snapshot.relativeStrengthVsSpyPct ?? 0}%`}
+                          tone={(selectedStockSummary.snapshot.relativeStrengthVsSpyPct ?? 0) < 0 ? "risk" : "neutral"}
+                        />
+                        <DenseStat label="Freshness" value={selectedStockSummary.snapshot.freshness} />
+                      </View>
+                    ) : null}
                     <View style={styles.metaRow}>
                       <MetaPill label={`${selectedStockSummary.eyes.length} eyes`} />
                       <MetaPill label={`${selectedStockSummary.openAlerts.length} open alerts`} />
@@ -1134,6 +1331,15 @@ export default function App() {
                             stabilizationScore={item.snapshot.stabilizationScore}
                           />
                         ) : null}
+                        {item.snapshot ? (
+                          <View style={styles.compactMetricRow}>
+                            <Text style={styles.compactMetricText}>${item.snapshot.price.toFixed(2)}</Text>
+                            <Text style={styles.compactMetricText}>{item.snapshot.drawdownPct}% drawdown</Text>
+                            <Text style={styles.compactMetricText}>
+                              RS {item.snapshot.relativeStrengthVsSpyPct ?? 0}%
+                            </Text>
+                          </View>
+                        ) : null}
                         <View style={styles.metaRow}>
                           <MetaPill label={`${item.eyes.length} recipes watching`} />
                           <MetaPill label={`${item.openAlerts.length} alerts`} />
@@ -1162,46 +1368,81 @@ export default function App() {
                   <Reveal delay={60}>
                     <SectionHeader
                       title="Recipe Generator"
-                      note="Start with plain-language fields, then layer simple to advanced conditions."
+                      note="Guided, typed controls for logic, cadence, and alerts instead of loose parameter text."
                     />
                     <Card highlighted>
-                      <Text style={styles.inputLabel}>Recipe name</Text>
-                      <Input
-                        value={recipeForm.name}
-                        onChangeText={(name) => setRecipeForm((current) => ({ ...current, name }))}
-                        placeholder="Temporary Bargain Sale"
-                      />
-                      <Text style={styles.inputLabel}>Purpose</Text>
-                      <Input
-                        value={recipeForm.purpose}
-                        onChangeText={(purpose) => setRecipeForm((current) => ({ ...current, purpose }))}
-                        placeholder="What decision pattern is this recipe meant to capture?"
-                        multiline
-                      />
-                      <Text style={styles.inputLabel}>Time horizon</Text>
-                      <Input
-                        value={recipeForm.timeHorizon}
-                        onChangeText={(timeHorizon) =>
-                          setRecipeForm((current) => ({ ...current, timeHorizon }))
-                        }
-                        placeholder="Daily, weekly, or multi-month?"
-                      />
-                      <Text style={styles.inputLabel}>Use case</Text>
-                      <Input
-                        value={recipeForm.intendedUseCase}
-                        onChangeText={(intendedUseCase) =>
-                          setRecipeForm((current) => ({ ...current, intendedUseCase }))
-                        }
-                        placeholder="What investor situation does this recipe serve?"
-                        multiline
-                      />
-                      <Text style={styles.inputLabel}>Notes</Text>
-                      <Input
-                        value={recipeForm.notes}
-                        onChangeText={(notes) => setRecipeForm((current) => ({ ...current, notes }))}
-                        placeholder="Risks, review heuristics, or thesis warnings"
-                        multiline
-                      />
+                      <View style={styles.compactSection}>
+                        <Text style={styles.inputLabel}>Recipe name</Text>
+                        <Input
+                          value={recipeForm.name}
+                          onChangeText={(name) => setRecipeForm((current) => ({ ...current, name }))}
+                          placeholder="Temporary Bargain Sale"
+                        />
+
+                        <Text style={styles.inputLabel}>Opportunity type</Text>
+                        <HorizontalChoice
+                          options={opportunityTypes}
+                          value={recipeForm.opportunityType}
+                          onSelect={(opportunityType) =>
+                            setRecipeForm((current) => ({ ...current, opportunityType }))
+                          }
+                        />
+
+                        <Text style={styles.inputLabel}>Time horizon</Text>
+                        <HorizontalChoice
+                          options={timeHorizons}
+                          value={recipeForm.timeHorizon}
+                          onSelect={(timeHorizon) => setRecipeForm((current) => ({ ...current, timeHorizon }))}
+                        />
+
+                        <Text style={styles.inputLabel}>Primary use case</Text>
+                        <HorizontalChoice
+                          options={useCaseOptions}
+                          value={recipeForm.intendedUseCase}
+                          onSelect={(intendedUseCase) =>
+                            setRecipeForm((current) => ({ ...current, intendedUseCase }))
+                          }
+                        />
+
+                        <View style={styles.dualDenseGrid}>
+                          <DenseStat label="Review cadence" value={`${recipeForm.reviewCadenceDays} days`} tone="strong" />
+                          <DenseStat label="Alert cooldown" value={`${recipeForm.alertCooldownHours} hours`} />
+                        </View>
+
+                        <Text style={styles.inputLabel}>Review cadence</Text>
+                        <HorizontalChoice
+                          options={reviewCadenceOptions.map(String)}
+                          value={String(recipeForm.reviewCadenceDays)}
+                          onSelect={(value) =>
+                            setRecipeForm((current) => ({ ...current, reviewCadenceDays: Number(value) }))
+                          }
+                        />
+
+                        <Text style={styles.inputLabel}>Alert cooldown</Text>
+                        <HorizontalChoice
+                          options={alertCooldownOptions.map(String)}
+                          value={String(recipeForm.alertCooldownHours)}
+                          onSelect={(value) =>
+                            setRecipeForm((current) => ({ ...current, alertCooldownHours: Number(value) }))
+                          }
+                        />
+
+                        <Text style={styles.inputLabel}>Purpose</Text>
+                        <Input
+                          value={recipeForm.purpose}
+                          onChangeText={(purpose) => setRecipeForm((current) => ({ ...current, purpose }))}
+                          placeholder="What opportunity should this logic surface?"
+                          multiline
+                        />
+
+                        <Text style={styles.inputLabel}>Notes</Text>
+                        <Input
+                          value={recipeForm.notes}
+                          onChangeText={(notes) => setRecipeForm((current) => ({ ...current, notes }))}
+                          placeholder="Review triggers, downgrade rules, or thesis guardrails"
+                          multiline
+                        />
+                      </View>
 
                       <View style={styles.divider} />
 
@@ -1283,19 +1524,31 @@ export default function App() {
 
                       <Text style={styles.inputLabel}>Operator</Text>
                       <HorizontalChoice
-                        options={conditionOperators}
+                        options={selectedOperatorOptions}
                         value={conditionBuilder.operator}
                         onSelect={(operator) => setConditionBuilder((current) => ({ ...current, operator }))}
                       />
 
                       <Text style={styles.inputLabel}>Threshold / parameter</Text>
-                      <Input
-                        value={conditionBuilder.threshold}
-                        onChangeText={(threshold) =>
-                          setConditionBuilder((current) => ({ ...current, threshold }))
-                        }
-                        placeholder={selectedTemplate.defaultValue}
-                      />
+                      {selectedTemplate.control.type === "number" ? (
+                        <NumberStepper
+                          label={selectedTemplate.metricLabel}
+                          value={Number(conditionBuilder.threshold)}
+                          onChange={(next) =>
+                            setConditionBuilder((current) => ({ ...current, threshold: String(next) }))
+                          }
+                          step={selectedTemplate.control.step}
+                          min={selectedTemplate.control.min}
+                          max={selectedTemplate.control.max}
+                          unit={selectedTemplate.control.unit}
+                        />
+                      ) : (
+                        <HorizontalChoice
+                          options={selectedTemplate.control.options}
+                          value={conditionBuilder.threshold}
+                          onSelect={(threshold) => setConditionBuilder((current) => ({ ...current, threshold }))}
+                        />
+                      )}
 
                       <Text style={styles.inputLabel}>Why this matters</Text>
                       <Input
@@ -1309,7 +1562,10 @@ export default function App() {
                         <Text style={styles.previewLabel}>Preview</Text>
                         <Text style={styles.previewText}>
                           {selectedTemplate.title}: {selectedTemplate.metricLabel} {conditionBuilder.operator}{" "}
-                          {conditionBuilder.threshold || selectedTemplate.defaultValue}
+                          {formatMetricThreshold(
+                            selectedTemplate,
+                            conditionBuilder.threshold || selectedTemplate.defaultValue,
+                          )}
                         </Text>
                         <Text style={styles.previewHint}>{selectedTemplate.description}</Text>
                       </View>
@@ -1374,11 +1630,19 @@ export default function App() {
                           <Text style={styles.cardEyebrow}>Version {recipe.version}</Text>
                           <Text style={styles.cardTitle}>{recipe.name}</Text>
                           <Text style={styles.cardBody}>{recipe.purpose}</Text>
-                          <View style={styles.metaRow}>
-                            <MetaPill label={recipe.timeHorizon || "No horizon"} />
-                            <MetaPill label={`${recipe.conditions.length} conditions`} />
+                          <View style={styles.dualDenseGrid}>
+                            <DenseStat label="Type" value={recipe.opportunityType ?? "General"} tone="strong" />
+                            <DenseStat label="Horizon" value={recipe.timeHorizon || "Unset"} />
+                            <DenseStat
+                              label="Cadence"
+                              value={`${recipe.reviewConfig?.cadenceDays ?? 14}d`}
+                            />
+                            <DenseStat label="Conditions" value={String(recipe.conditions.length)} />
                           </View>
-                          <Text style={styles.metaLine}>Use case: {recipe.intendedUseCase || "Not specified yet"}</Text>
+                          <View style={styles.metaRow}>
+                            <MetaPill label={recipe.intendedUseCase || "No use case"} />
+                            <MetaPill label={`${recipe.alertConfig?.cooldownHours ?? 24}h cooldown`} />
+                          </View>
                         </Card>
                       ))}
                     </View>
@@ -1391,7 +1655,7 @@ export default function App() {
                   <Reveal delay={60}>
                     <SectionHeader
                       title="Create Eye"
-                      note="Bind one stock to one recipe with a specific thesis snapshot."
+                      note="Bind a stock to a recipe with entry zone, review date, and invalidation context."
                     />
                     <Card highlighted>
                       <Text style={styles.inputLabel}>Stock</Text>
@@ -1460,12 +1724,94 @@ export default function App() {
                         multiline
                       />
 
+                      <View style={styles.dualDenseGrid}>
+                        <NumberStepper
+                          label="Planned entry low"
+                          value={Number(eyeForm.plannedEntryLow || 0)}
+                          onChange={(next) =>
+                            setEyeForm((current) => ({ ...current, plannedEntryLow: next.toFixed(2) }))
+                          }
+                          step={0.5}
+                          min={0}
+                          max={10000}
+                        />
+                        <NumberStepper
+                          label="Planned entry high"
+                          value={Number(eyeForm.plannedEntryHigh || 0)}
+                          onChange={(next) =>
+                            setEyeForm((current) => ({ ...current, plannedEntryHigh: next.toFixed(2) }))
+                          }
+                          step={0.5}
+                          min={0}
+                          max={10000}
+                        />
+                      </View>
+
+                      <Text style={styles.inputLabel}>Last thesis review</Text>
+                      <HorizontalChoice
+                        options={reviewDateOptions.map((item) => item.label)}
+                        value={
+                          reviewDateOptions.find((item) => item.daysAgo === eyeForm.lastReviewedDaysAgo)?.label ??
+                          reviewDateOptions[2].label
+                        }
+                        onSelect={(label) =>
+                          setEyeForm((current) => ({
+                            ...current,
+                            lastReviewedDaysAgo:
+                              reviewDateOptions.find((item) => item.label === label)?.daysAgo ??
+                              reviewDateOptions[2].daysAgo,
+                          }))
+                        }
+                      />
+
+                      <Text style={styles.inputLabel}>Invalidation rule</Text>
+                      <Input
+                        value={eyeForm.invalidationRule}
+                        onChangeText={(invalidationRule) =>
+                          setEyeForm((current) => ({ ...current, invalidationRule }))
+                        }
+                        placeholder="What would break the thesis fast?"
+                        multiline
+                      />
+
+                      <View style={styles.dualDenseGrid}>
+                        <DenseStat
+                          label="Review stamp"
+                          value={formatShortDate(isoDateDaysAgo(eyeForm.lastReviewedDaysAgo))}
+                        />
+                        <DenseStat
+                          label="Entry band"
+                          value={
+                            eyeForm.plannedEntryLow && eyeForm.plannedEntryHigh
+                              ? `$${eyeForm.plannedEntryLow} to $${eyeForm.plannedEntryHigh}`
+                              : "Not set"
+                          }
+                          tone="strong"
+                        />
+                      </View>
+
                       <Button
                         label="Create Eye"
                         onPress={() => {
                           if (!eyeForm.stockId || !eyeForm.recipeId || !eyeForm.thesisSnapshot.trim()) return;
-                          void actions.addEye(eyeForm);
-                          setEyeForm({ stockId: "", recipeId: "", thesisSnapshot: "" });
+                          void actions.addEye({
+                            stockId: eyeForm.stockId,
+                            recipeId: eyeForm.recipeId,
+                            thesisSnapshot: eyeForm.thesisSnapshot,
+                            plannedEntryLow: Number(eyeForm.plannedEntryLow),
+                            plannedEntryHigh: Number(eyeForm.plannedEntryHigh),
+                            invalidationRule: eyeForm.invalidationRule,
+                            lastReviewedAt: isoDateDaysAgo(eyeForm.lastReviewedDaysAgo),
+                          });
+                          setEyeForm({
+                            stockId: "",
+                            recipeId: "",
+                            thesisSnapshot: "",
+                            plannedEntryLow: "",
+                            plannedEntryHigh: "",
+                            invalidationRule: "",
+                            lastReviewedDaysAgo: reviewDateOptions[2].daysAgo,
+                          });
                         }}
                       />
                     </Card>
@@ -1488,6 +1834,20 @@ export default function App() {
                               {eye.lastEvaluation?.currentState ?? "Not Evaluated"}
                             </Text>
                           </View>
+                          <View style={styles.dualDenseGrid}>
+                            <DenseStat
+                              label="Entry zone"
+                              value={
+                                eye.plannedEntryLow !== undefined && eye.plannedEntryHigh !== undefined
+                                  ? `$${eye.plannedEntryLow} to $${eye.plannedEntryHigh}`
+                                  : "Unset"
+                              }
+                            />
+                            <DenseStat
+                              label="Last review"
+                              value={eye.lastReviewedAt ? formatShortDate(eye.lastReviewedAt) : "Unset"}
+                            />
+                          </View>
                         </Card>
                       ))}
                     </View>
@@ -1508,6 +1868,7 @@ export default function App() {
                         value={stockForm.symbol}
                         onChangeText={(symbol) => setStockForm((current) => ({ ...current, symbol }))}
                         placeholder="Ticker symbol"
+                        autoCapitalize="characters"
                       />
                       <Text style={styles.inputLabel}>Company name</Text>
                       <Input
@@ -1641,6 +2002,10 @@ export default function App() {
                         {decision.action} · {decisionTitle(decision.eyeId, data.eyes, data.stocks, data.recipes)}
                       </Text>
                       <Text style={styles.cardBody}>{decision.note}</Text>
+                      <View style={styles.compactMetricRow}>
+                        <Text style={styles.compactMetricText}>{decision.stateAtDecision ?? "No state snapshot"}</Text>
+                        <Text style={styles.compactMetricText}>{decision.dataQuality ?? "No data note"}</Text>
+                      </View>
                       <Text style={styles.metaLine}>Concern: {decision.concern || "Not captured"}</Text>
                       <Text style={styles.metaLine}>
                         Thesis {decision.thesisValid} · Timing {decision.timing} · {formatDate(decision.createdAt)}
@@ -1699,7 +2064,7 @@ const SectionHeader = ({ title, note }: { title: string; note: string }) => (
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: "#f3f7fc",
+    backgroundColor: "#eef3f8",
   },
   frame: {
     flex: 1,
@@ -1708,7 +2073,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#f3f7fc",
+    backgroundColor: "#eef3f8",
   },
   loadingText: {
     color: "#0f172a",
@@ -1717,26 +2082,29 @@ const styles = StyleSheet.create({
     fontFamily,
   },
   page: {
-    paddingHorizontal: 18,
-    paddingTop: 14,
+    paddingHorizontal: 16,
+    paddingTop: 10,
     paddingBottom: 140,
-    gap: 18,
+    gap: 16,
   },
   card: {
     backgroundColor: "#ffffff",
-    borderRadius: 24,
-    padding: 18,
+    borderRadius: 12,
+    padding: 16,
     borderWidth: 1,
-    borderColor: "#d8e4f0",
+    borderColor: "#d9e3ee",
+    borderTopWidth: 3,
+    borderTopColor: "#c6d6e8",
     shadowColor: "#17324d",
-    shadowOpacity: 0.07,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 3,
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 2,
   },
   cardHighlighted: {
-    borderColor: "#b6d5ff",
-    shadowOpacity: 0.1,
+    borderColor: "#b9d4f5",
+    borderTopColor: "#2563eb",
+    shadowOpacity: 0.08,
   },
   heroEyebrow: {
     color: "#2563eb",
@@ -1762,19 +2130,19 @@ const styles = StyleSheet.create({
     fontFamily,
   },
   metricGrid: {
-    marginTop: 18,
+    marginTop: 16,
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 12,
+    gap: 8,
   },
   metricButton: {
-    width: "47%",
+    width: "48%",
     minWidth: 150,
-    padding: 14,
-    borderRadius: 18,
-    backgroundColor: "#f8fbff",
+    padding: 12,
+    borderRadius: 10,
+    backgroundColor: "#f7fafd",
     borderWidth: 1,
-    borderColor: "#d7e6fb",
+    borderColor: "#dbe4ef",
   },
   metricValue: {
     color: "#0f172a",
@@ -1800,10 +2168,13 @@ const styles = StyleSheet.create({
     marginTop: 14,
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 8,
+    gap: 6,
+  },
+  compactSection: {
+    gap: 10,
   },
   sectionHeader: {
-    gap: 4,
+    gap: 2,
   },
   sectionTitle: {
     color: "#0f172a",
@@ -1821,22 +2192,27 @@ const styles = StyleSheet.create({
   radarGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 12,
+    gap: 8,
   },
   radarCard: {
     flex: 1,
     minWidth: 100,
-    padding: 16,
-    borderRadius: 18,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderRadius: 10,
+    borderWidth: 1,
   },
   radarCritical: {
     backgroundColor: "#fee2e2",
+    borderColor: "#fecaca",
   },
   radarOpportunity: {
     backgroundColor: "#dcfce7",
+    borderColor: "#bbf7d0",
   },
   radarQuiet: {
     backgroundColor: "#e0f2fe",
+    borderColor: "#bae6fd",
   },
   radarValue: {
     color: "#0f172a",
@@ -1893,9 +2269,9 @@ const styles = StyleSheet.create({
   },
   statePill: {
     overflow: "hidden",
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+    borderRadius: 6,
     fontSize: 12,
     fontWeight: "700",
     fontFamily,
@@ -1930,11 +2306,11 @@ const styles = StyleSheet.create({
   },
   chartCard: {
     marginTop: 16,
-    padding: 14,
-    borderRadius: 18,
-    backgroundColor: "#f8fbff",
+    padding: 12,
+    borderRadius: 10,
+    backgroundColor: "#f7fafd",
     borderWidth: 1,
-    borderColor: "#d7e6fb",
+    borderColor: "#dbe4ef",
   },
   chartHeader: {
     flexDirection: "row",
@@ -1961,7 +2337,7 @@ const styles = StyleSheet.create({
   },
   chartBar: {
     flex: 1,
-    borderRadius: 999,
+    borderRadius: 2,
     minHeight: 20,
   },
   chartFootnote: {
@@ -1978,9 +2354,9 @@ const styles = StyleSheet.create({
   },
   metaPill: {
     paddingHorizontal: 10,
-    paddingVertical: 8,
-    borderRadius: 999,
-    backgroundColor: "#edf4fc",
+    paddingVertical: 7,
+    borderRadius: 6,
+    backgroundColor: "#eef3f8",
   },
   metaPillText: {
     color: "#46607f",
@@ -1994,10 +2370,10 @@ const styles = StyleSheet.create({
   },
   evidenceColumn: {
     padding: 14,
-    borderRadius: 18,
-    backgroundColor: "#f8fbff",
+    borderRadius: 10,
+    backgroundColor: "#f7fafd",
     borderWidth: 1,
-    borderColor: "#d7e6fb",
+    borderColor: "#dbe4ef",
   },
   columnTitle: {
     color: "#0f172a",
@@ -2014,14 +2390,14 @@ const styles = StyleSheet.create({
     fontFamily,
   },
   stack: {
-    gap: 12,
+    gap: 10,
   },
   priorityStack: {
     alignItems: "flex-end",
     gap: 8,
   },
   priorityBadge: {
-    borderRadius: 999,
+    borderRadius: 6,
     paddingHorizontal: 10,
     paddingVertical: 7,
   },
@@ -2056,13 +2432,13 @@ const styles = StyleSheet.create({
     marginTop: 14,
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 10,
+    gap: 8,
   },
   button: {
-    minHeight: 46,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 14,
+    minHeight: 42,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -2092,15 +2468,15 @@ const styles = StyleSheet.create({
     color: "#334155",
   },
   choiceRow: {
-    gap: 10,
+    gap: 8,
   },
   choiceChip: {
     paddingHorizontal: 12,
-    paddingVertical: 10,
-    borderRadius: 999,
-    backgroundColor: "#edf4fc",
+    paddingVertical: 9,
+    borderRadius: 8,
+    backgroundColor: "#eef3f8",
     borderWidth: 1,
-    borderColor: "#d7e6fb",
+    borderColor: "#dbe4ef",
   },
   choiceChipActive: {
     backgroundColor: "#0f172a",
@@ -2125,13 +2501,13 @@ const styles = StyleSheet.create({
     fontFamily,
   },
   input: {
-    minHeight: 48,
-    borderRadius: 16,
+    minHeight: 46,
+    borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#d7e6fb",
-    backgroundColor: "#f8fbff",
+    borderColor: "#dbe4ef",
+    backgroundColor: "#f7fafd",
     paddingHorizontal: 14,
-    paddingVertical: 12,
+    paddingVertical: 11,
     color: "#0f172a",
     fontSize: 15,
     fontFamily,
@@ -2162,10 +2538,10 @@ const styles = StyleSheet.create({
   templateCard: {
     width: 220,
     padding: 14,
-    borderRadius: 18,
-    backgroundColor: "#f8fbff",
+    borderRadius: 10,
+    backgroundColor: "#f7fafd",
     borderWidth: 1,
-    borderColor: "#d7e6fb",
+    borderColor: "#dbe4ef",
     gap: 6,
   },
   templateCardActive: {
@@ -2193,7 +2569,7 @@ const styles = StyleSheet.create({
   previewCard: {
     marginTop: 14,
     padding: 14,
-    borderRadius: 18,
+    borderRadius: 10,
     backgroundColor: "#eff6ff",
     borderWidth: 1,
     borderColor: "#bfdbfe",
@@ -2226,7 +2602,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     paddingHorizontal: 10,
     paddingVertical: 6,
-    borderRadius: 999,
+    borderRadius: 6,
     fontSize: 11,
     fontWeight: "700",
     textTransform: "uppercase",
@@ -2252,10 +2628,10 @@ const styles = StyleSheet.create({
     minWidth: 142,
     paddingHorizontal: 14,
     paddingVertical: 12,
-    borderRadius: 16,
-    backgroundColor: "#f8fbff",
+    borderRadius: 8,
+    backgroundColor: "#f7fafd",
     borderWidth: 1,
-    borderColor: "#d7e6fb",
+    borderColor: "#dbe4ef",
     gap: 4,
   },
   selectChipActive: {
@@ -2279,6 +2655,106 @@ const styles = StyleSheet.create({
   selectChipSubtitleActive: {
     color: "#cbd5e1",
   },
+  stepper: {
+    gap: 6,
+  },
+  stepperLabel: {
+    color: "#475569",
+    fontSize: 12,
+    fontWeight: "700",
+    textTransform: "uppercase",
+    letterSpacing: 0.4,
+    fontFamily,
+  },
+  stepperTrack: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#dbe4ef",
+    borderRadius: 8,
+    backgroundColor: "#f7fafd",
+    overflow: "hidden",
+  },
+  stepperButton: {
+    width: 44,
+    minHeight: 46,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#edf3f8",
+  },
+  stepperButtonText: {
+    color: "#0f172a",
+    fontSize: 20,
+    fontWeight: "700",
+    fontFamily,
+  },
+  stepperValueWrap: {
+    flex: 1,
+    minHeight: 46,
+    alignItems: "center",
+    justifyContent: "center",
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
+    borderColor: "#dbe4ef",
+  },
+  stepperValue: {
+    color: "#0f172a",
+    fontSize: 15,
+    fontWeight: "700",
+    fontFamily,
+  },
+  dualDenseGrid: {
+    marginTop: 12,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  denseStat: {
+    minWidth: 120,
+    flexGrow: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderWidth: 1,
+    borderColor: "#dbe4ef",
+    backgroundColor: "#f7fafd",
+    borderRadius: 8,
+  },
+  denseStatStrong: {
+    borderColor: "#bfd6f4",
+    backgroundColor: "#edf5ff",
+  },
+  denseStatRisk: {
+    borderColor: "#f5c8c8",
+    backgroundColor: "#fff2f2",
+  },
+  denseStatLabel: {
+    color: "#64748b",
+    fontSize: 11,
+    fontWeight: "700",
+    letterSpacing: 0.5,
+    textTransform: "uppercase",
+    fontFamily,
+  },
+  denseStatValue: {
+    marginTop: 5,
+    color: "#0f172a",
+    fontSize: 14,
+    lineHeight: 18,
+    fontWeight: "700",
+    fontFamily,
+  },
+  compactMetricRow: {
+    marginTop: 12,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+  },
+  compactMetricText: {
+    color: "#475569",
+    fontSize: 12,
+    fontWeight: "700",
+    fontFamily,
+  },
   fabMenu: {
     position: "absolute",
     right: 20,
@@ -2289,7 +2765,7 @@ const styles = StyleSheet.create({
   fabMenuItem: {
     paddingHorizontal: 14,
     paddingVertical: 11,
-    borderRadius: 999,
+    borderRadius: 10,
     backgroundColor: "#0f172a",
     shadowColor: "#0f172a",
     shadowOpacity: 0.18,
@@ -2309,7 +2785,7 @@ const styles = StyleSheet.create({
     bottom: 86,
     width: 58,
     height: 58,
-    borderRadius: 999,
+    borderRadius: 14,
     backgroundColor: "#2563eb",
     alignItems: "center",
     justifyContent: "center",
@@ -2335,14 +2811,14 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 8,
     paddingVertical: 10,
-    borderRadius: 26,
+    borderRadius: 14,
     backgroundColor: "#ffffff",
     borderWidth: 1,
-    borderColor: "#d7e6fb",
+    borderColor: "#dbe4ef",
     shadowColor: "#17324d",
-    shadowOpacity: 0.12,
-    shadowRadius: 18,
-    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
     elevation: 4,
   },
   navItem: {
@@ -2353,7 +2829,7 @@ const styles = StyleSheet.create({
   navIndicator: {
     width: 22,
     height: 3,
-    borderRadius: 999,
+    borderRadius: 2,
     backgroundColor: "transparent",
   },
   navIndicatorActive: {

@@ -28,3 +28,6 @@
 - Added `docs/09_RECIPE_BUILDER_SPEC.md` to define the Recipe Builder foundation around metrics, formulas, conditions, roles, state rules, alert rules, and version-aware evaluation.
 - Replaced the old bargain-only evaluator with a role-aware Recipe evaluation path that reads condition definitions, computes metric results, and maps them deterministically into Eye states.
 - Expanded seed recipes, mock snapshots, alerts, and decisions so Recipe version and evaluation context are preserved through the core loop.
+- Reduced the overuse of rounded rectangle surfaces by shifting cards, chips, nav, and action controls to tighter finance-dashboard geometry with denser information layouts.
+- Replaced loose Recipe Builder threshold inputs with safer typed controls, including numeric steppers, enum selectors, explicit cadence/cooldown choices, and review-date presets.
+- Extended Eye creation so entry zones, invalidation notes, and last-review context are stored structurally instead of being buried only in freeform text.

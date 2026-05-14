@@ -124,9 +124,12 @@ export const useAppModel = () => {
       async addRecipe(input: {
         name: string;
         purpose: string;
+        opportunityType: string;
         timeHorizon: string;
         intendedUseCase: string;
         notes: string;
+        reviewCadenceDays: number;
+        alertCooldownHours: number;
         conditions?: RecipeCondition[];
       }) {
         if (!data) return;
@@ -135,10 +138,21 @@ export const useAppModel = () => {
           version: 1,
           name: input.name.trim(),
           purpose: input.purpose.trim(),
+          opportunityType: input.opportunityType.trim(),
           timeHorizon: input.timeHorizon.trim(),
           intendedUseCase: input.intendedUseCase.trim(),
           notes: input.notes.trim(),
           createdAt: new Date().toISOString(),
+          reviewConfig: {
+            cadenceDays: input.reviewCadenceDays,
+            reviewTriggers: ["state_change", "manual_review_due"],
+          },
+          alertConfig: {
+            cooldownHours: input.alertCooldownHours,
+            dedupeKey: "state_change",
+            priorityOnAttention: "High",
+            priorityOnRisk: "High",
+          },
           conditions:
             input.conditions && input.conditions.length > 0
               ? input.conditions.map((condition) => ({
@@ -158,7 +172,15 @@ export const useAppModel = () => {
           recipes: [recipe, ...data.recipes],
         });
       },
-      async addEye(input: { stockId: string; recipeId: string; thesisSnapshot: string }) {
+      async addEye(input: {
+        stockId: string;
+        recipeId: string;
+        thesisSnapshot: string;
+        plannedEntryLow?: number;
+        plannedEntryHigh?: number;
+        invalidationRule?: string;
+        lastReviewedAt?: string;
+      }) {
         if (!data) return;
         const recipe = data.recipes.find((item) => item.id === input.recipeId);
         const eye: Eye = {
@@ -167,6 +189,10 @@ export const useAppModel = () => {
           recipeId: input.recipeId,
           thesisSnapshot: input.thesisSnapshot.trim(),
           recipeVersionAtCreation: recipe?.version,
+          plannedEntryLow: input.plannedEntryLow,
+          plannedEntryHigh: input.plannedEntryHigh,
+          invalidationRule: input.invalidationRule?.trim(),
+          lastReviewedAt: input.lastReviewedAt,
           createdAt: new Date().toISOString(),
         };
         await commit({
