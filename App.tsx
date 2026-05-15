@@ -45,6 +45,7 @@ type AnalysisStatusFilter =
   | "Warning"
   | "Blocked"
   | "Needs Review";
+type StockBoardMode = "Pinned First" | "Status" | "Family";
 
 type StockRouteTarget = "Stocks" | "Alerts" | "Eyes" | "Journal";
 type RecipeBuilderStep = "Purpose" | "Logic" | "Risk & Alerts" | "Review & Outcome";
@@ -87,6 +88,7 @@ const analysisStatusFilters: AnalysisStatusFilter[] = [
   "Blocked",
   "Needs Review",
 ];
+const stockBoardModes: StockBoardMode[] = ["Pinned First", "Status", "Family"];
 const opportunityTypes = [
   "Temporary Mispricing",
   "Leader Pullback",
@@ -381,6 +383,31 @@ const stockSearchScore = (query: string, item: { stock: Stock }) => {
   if (name.includes(normalizedQuery)) return 30;
   if (thesis.includes(normalizedQuery)) return 10;
   return 0;
+};
+
+const stockMetricPreferenceKey = (stockId: string, cardId: string) => `${stockId}:${cardId}`;
+
+const stockMetricStatusRank = (status: VisualEvidenceCard["status"]) => {
+  switch (status) {
+    case "Blocked":
+      return 0;
+    case "Warning":
+      return 1;
+    case "Near Trigger":
+      return 2;
+    case "Passed":
+      return 3;
+    case "Stale":
+      return 4;
+    case "Partial":
+      return 5;
+    case "Mock":
+      return 6;
+    case "Unavailable":
+      return 7;
+    default:
+      return 8;
+  }
 };
 
 const formatDate = (value: string) =>
@@ -1066,10 +1093,12 @@ const EvidenceCardView = ({
   card,
   compact = false,
   onOpen,
+  pinned = false,
 }: {
   card: VisualEvidenceCard;
   compact?: boolean;
   onOpen?: () => void;
+  pinned?: boolean;
 }) => {
   const [expanded, setExpanded] = useState(false);
   const handlePress = () => {
@@ -1097,7 +1126,10 @@ const EvidenceCardView = ({
           </Text>
           {!compact ? <Text style={styles.evidenceRole}>{card.role}</Text> : null}
         </View>
-        <StatusShape status={card.status} size={compact ? 10 : 14} />
+        <View style={styles.evidenceCardHeaderMeta}>
+          {pinned ? <Text style={styles.evidencePinnedMark}>Pinned</Text> : null}
+          <StatusShape status={card.status} size={compact ? 10 : 14} />
+        </View>
       </View>
 
       {!compact ? <Text style={styles.evidenceSummary}>{card.summary}</Text> : null}
@@ -1537,6 +1569,7 @@ export default function App() {
   const [analysisBenchmark, setAnalysisBenchmark] = useState<AnalysisBenchmark>("SPY");
   const [analysisLookback, setAnalysisLookback] = useState<AnalysisLookback>("3M");
   const [analysisStatusFilter, setAnalysisStatusFilter] = useState<AnalysisStatusFilter>("All Statuses");
+  const [stockBoardMode, setStockBoardMode] = useState<StockBoardMode>("Pinned First");
 
   const [stockForm, setStockForm] = useState({ symbol: "", name: "", thesis: "" });
   const [recipeForm, setRecipeForm] = useState<RecipeDraftForm>({
@@ -1582,6 +1615,7 @@ export default function App() {
   const [previewStockId, setPreviewStockId] = useState("");
   const [stockSearch, setStockSearch] = useState("");
   const [recentStockIds, setRecentStockIds] = useState<string[]>([]);
+  const [pinnedMetricKeys, setPinnedMetricKeys] = useState<string[]>([]);
   const [stockComposerOpen, setStockComposerOpen] = useState(false);
   const [selectedEvidenceCard, setSelectedEvidenceCard] = useState<VisualEvidenceCard | null>(null);
   const [recipeBuilderOpen, setRecipeBuilderOpen] = useState(false);
@@ -1811,8 +1845,36 @@ export default function App() {
       title: card.title,
     })),
   );
+  const sortedSelectedStockAnalysisCards = useMemo(() => {
+    if (!selectedStockSummary) return selectedStockAnalysisCards;
+
+    return [...selectedStockAnalysisCards].sort((left, right) => {
+      const leftPinned = pinnedMetricKeys.includes(stockMetricPreferenceKey(selectedStockSummary.stock.id, left.id));
+      const rightPinned = pinnedMetricKeys.includes(stockMetricPreferenceKey(selectedStockSummary.stock.id, right.id));
+
+      if (stockBoardMode === "Pinned First" && leftPinned !== rightPinned) {
+        return Number(rightPinned) - Number(leftPinned);
+      }
+
+      if (stockBoardMode === "Status") {
+        const statusDelta = stockMetricStatusRank(left.status) - stockMetricStatusRank(right.status);
+        if (statusDelta !== 0) return statusDelta;
+      }
+
+      if (stockBoardMode === "Family") {
+        const familyDelta = left.family.localeCompare(right.family);
+        if (familyDelta !== 0) return familyDelta;
+      }
+
+      if (leftPinned !== rightPinned) {
+        return Number(rightPinned) - Number(leftPinned);
+      }
+
+      return left.title.localeCompare(right.title);
+    });
+  }, [pinnedMetricKeys, selectedStockAnalysisCards, selectedStockSummary, stockBoardMode]);
   const selectedEvidenceIndex = selectedEvidenceCard
-    ? selectedStockAnalysisCards.findIndex((card) => card.id === selectedEvidenceCard.id)
+    ? sortedSelectedStockAnalysisCards.findIndex((card) => card.id === selectedEvidenceCard.id)
     : -1;
   const selectedStockTrendSeries = selectedStockSummary?.snapshot
     ? buildChartSeries(
@@ -1834,6 +1896,9 @@ export default function App() {
   const hasStockQuery = deferredStockSearch.trim().length > 0;
   const stockSuggestions = (hasStockQuery ? filteredStockDirectory : recentStocks).slice(0, 6);
   const topSuggestionId = hasStockQuery ? stockSuggestions[0]?.stock.id : "";
+  const pinnedCountForSelectedStock = selectedStockSummary
+    ? pinnedMetricKeys.filter((key) => key.startsWith(`${selectedStockSummary.stock.id}:`)).length
+    : 0;
 
   const activeEyesInventory = eyesSorted.filter(
     (eye) => !["Not Relevant", "Thesis Broken"].includes(eye.lastEvaluation?.currentState ?? "Not Relevant"),
@@ -1988,12 +2053,20 @@ export default function App() {
   };
 
   const cycleEvidenceCard = (direction: 1 | -1) => {
-    if (!selectedEvidenceCard || selectedStockAnalysisCards.length === 0) return;
-    const currentIndex = selectedStockAnalysisCards.findIndex((card) => card.id === selectedEvidenceCard.id);
+    if (!selectedEvidenceCard || sortedSelectedStockAnalysisCards.length === 0) return;
+    const currentIndex = sortedSelectedStockAnalysisCards.findIndex((card) => card.id === selectedEvidenceCard.id);
     if (currentIndex < 0) return;
     const nextIndex = currentIndex + direction;
-    if (nextIndex < 0 || nextIndex >= selectedStockAnalysisCards.length) return;
-    setSelectedEvidenceCard(selectedStockAnalysisCards[nextIndex]);
+    if (nextIndex < 0 || nextIndex >= sortedSelectedStockAnalysisCards.length) return;
+    setSelectedEvidenceCard(sortedSelectedStockAnalysisCards[nextIndex]);
+  };
+
+  const togglePinnedMetric = (card: VisualEvidenceCard) => {
+    if (!selectedStockSummary) return;
+    const key = stockMetricPreferenceKey(selectedStockSummary.stock.id, card.id);
+    setPinnedMetricKeys((current) =>
+      current.includes(key) ? current.filter((item) => item !== key) : [...current, key],
+    );
   };
 
   const quickDecision = async (alert: Alert, action: DecisionAction) => {
@@ -2461,20 +2534,35 @@ export default function App() {
                         <Text style={styles.inputLabel}>Status</Text>
                         <HorizontalChoice options={analysisStatusFilters} value={analysisStatusFilter} onSelect={setAnalysisStatusFilter} />
                       </View>
+                      <View style={styles.controlCard}>
+                        <Text style={styles.inputLabel}>Board</Text>
+                        <HorizontalChoice options={stockBoardModes} value={stockBoardMode} onSelect={setStockBoardMode} />
+                      </View>
                       <View style={styles.stockWorkspaceHint}>
                         <Text style={styles.stockWorkspaceHintTitle}>Explore the grid</Text>
                         <Text style={styles.stockWorkspaceHintBody}>
-                          Tap any square to open the larger visual, then move through the next metrics without leaving the sheet.
+                          Tap any square to open the larger visual. Pin the metrics you care about and keep them at the top of this stock board.
                         </Text>
+                        <Text style={styles.stockWorkspaceHintMeta}>{pinnedCountForSelectedStock} pinned on this stock</Text>
                       </View>
                     </View>
                   </Card>
 
                   <View style={styles.analysisGrid}>
-                    {selectedStockAnalysisCards.length > 0 ? (
-                      selectedStockAnalysisCards.map((card) => (
+                    {sortedSelectedStockAnalysisCards.length > 0 ? (
+                      sortedSelectedStockAnalysisCards.map((card) => (
                         <View key={`stock-card-${card.id}`} style={styles.analysisGridItem}>
-                          <EvidenceCardView card={card} compact={true} onOpen={() => setSelectedEvidenceCard(card)} />
+                          <EvidenceCardView
+                            card={card}
+                            compact={true}
+                            pinned={Boolean(
+                              selectedStockSummary &&
+                                pinnedMetricKeys.includes(
+                                  stockMetricPreferenceKey(selectedStockSummary.stock.id, card.id),
+                                ),
+                            )}
+                            onOpen={() => setSelectedEvidenceCard(card)}
+                          />
                         </View>
                       ))
                     ) : (
@@ -3160,11 +3248,11 @@ export default function App() {
         {selectedEvidenceCard ? (
           <WindowPanel
             title={selectedEvidenceCard.title}
-            subtitle={`${selectedStockSummary?.stock.symbol ?? "Stock"} · ${selectedEvidenceCard.freshness}${selectedEvidenceIndex >= 0 ? ` · ${selectedEvidenceIndex + 1} of ${selectedStockAnalysisCards.length}` : ""}`}
+            subtitle={`${selectedStockSummary?.stock.symbol ?? "Stock"} · ${selectedEvidenceCard.freshness}${selectedEvidenceIndex >= 0 ? ` · ${selectedEvidenceIndex + 1} of ${sortedSelectedStockAnalysisCards.length}` : ""}`}
             onClose={() => setSelectedEvidenceCard(null)}
           >
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.choiceRow}>
-              {selectedStockAnalysisCards.map((card) => (
+              {sortedSelectedStockAnalysisCards.map((card) => (
                 <Pressable
                   key={`jump-${card.id}`}
                   onPress={() => setSelectedEvidenceCard(card)}
@@ -3186,13 +3274,25 @@ export default function App() {
               ))}
             </ScrollView>
             <View style={styles.actionRow}>
+              <Button
+                label={
+                  selectedStockSummary &&
+                  pinnedMetricKeys.includes(
+                    stockMetricPreferenceKey(selectedStockSummary.stock.id, selectedEvidenceCard.id),
+                  )
+                    ? "Unpin"
+                    : "Pin"
+                }
+                tone="ghost"
+                onPress={() => togglePinnedMetric(selectedEvidenceCard)}
+              />
               <Button label="Previous" tone="secondary" onPress={() => cycleEvidenceCard(-1)} disabled={selectedEvidenceIndex <= 0} />
               <Button
                 label="Next"
                 tone="secondary"
                 onPress={() => cycleEvidenceCard(1)}
                 disabled={
-                  selectedEvidenceIndex < 0 || selectedEvidenceIndex >= selectedStockAnalysisCards.length - 1
+                  selectedEvidenceIndex < 0 || selectedEvidenceIndex >= sortedSelectedStockAnalysisCards.length - 1
                 }
               />
             </View>
@@ -3202,7 +3302,15 @@ export default function App() {
               <DenseStat label="Freshness" value={selectedEvidenceCard.freshness} tone={selectedEvidenceCard.freshness === "Fresh" ? "strong" : "neutral"} />
               <DenseStat label="Source" value={selectedEvidenceCard.sourceType} />
             </View>
-            <EvidenceCardView card={selectedEvidenceCard} />
+            <EvidenceCardView
+              card={selectedEvidenceCard}
+              pinned={Boolean(
+                selectedStockSummary &&
+                  pinnedMetricKeys.includes(
+                    stockMetricPreferenceKey(selectedStockSummary.stock.id, selectedEvidenceCard.id),
+                  ),
+              )}
+            />
           </WindowPanel>
         ) : null}
 
@@ -3659,6 +3767,14 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     fontFamily,
   },
+  stockWorkspaceHintMeta: {
+    color: "#ffffff",
+    fontSize: 11,
+    fontWeight: "800",
+    textTransform: "uppercase",
+    letterSpacing: 0.4,
+    fontFamily,
+  },
   stockTrendHero: {
     marginTop: 14,
     padding: 16,
@@ -3859,6 +3975,19 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     textTransform: "uppercase",
     color: "#6b7280",
+  },
+  evidenceCardHeaderMeta: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  evidencePinnedMark: {
+    color: "#0f766e",
+    fontSize: 9,
+    fontWeight: "800",
+    textTransform: "uppercase",
+    letterSpacing: 0.4,
+    fontFamily,
   },
   visualContainer: {
     height: 100,
