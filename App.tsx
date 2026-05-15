@@ -1488,6 +1488,8 @@ const StockTriageCard = ({
   recipes,
   onOpenStock,
   onOpenAlerts,
+  onOpenJournal,
+  onReview,
 }: {
   item: {
     stock: Stock;
@@ -1506,6 +1508,8 @@ const StockTriageCard = ({
   recipes: Recipe[];
   onOpenStock: () => void;
   onOpenAlerts?: () => void;
+  onOpenJournal?: () => void;
+  onReview?: () => void;
 }) => {
   const [expanded, setExpanded] = useState(false);
   const evaluation = item.dominantEye?.lastEvaluation;
@@ -1583,8 +1587,10 @@ const StockTriageCard = ({
 
       <View style={styles.actionRow}>
         <Button label={expanded ? "Collapse" : "Expand"} tone="secondary" onPress={() => setExpanded((current) => !current)} />
+        {onReview ? <Button label="Review" tone="ghost" onPress={onReview} /> : null}
         {onOpenAlerts ? <Button label="Alerts" tone="ghost" onPress={onOpenAlerts} /> : null}
-        <Button label="Open Stock" onPress={onOpenStock} />
+        {onOpenJournal && item.decisions.length > 0 ? <Button label="Journal" tone="ghost" onPress={onOpenJournal} /> : null}
+        <Button label="Stock" onPress={onOpenStock} />
       </View>
     </Card>
   );
@@ -2512,6 +2518,12 @@ export default function App() {
                         item={item}
                         recipes={data.recipes}
                         onOpenStock={() => openStockContext({ stockId: item.stock.id })}
+                        onReview={() => void actions.markEyesReviewed({ stockId: item.stock.id })}
+                        onOpenJournal={() => {
+                          if (!item.decisions[0]) return;
+                          setSelectedDecisionId(item.decisions[0].id);
+                          setTab("Journal");
+                        }}
                         onOpenAlerts={() => {
                           setSelectedStockId(item.stock.id);
                           setAlertWorkspaceTab("Current");
@@ -2539,6 +2551,12 @@ export default function App() {
                         item={item}
                         recipes={data.recipes}
                         onOpenStock={() => openStockContext({ stockId: item.stock.id })}
+                        onReview={() => void actions.markEyesReviewed({ stockId: item.stock.id })}
+                        onOpenJournal={() => {
+                          if (!item.decisions[0]) return;
+                          setSelectedDecisionId(item.decisions[0].id);
+                          setTab("Journal");
+                        }}
                       />
                     ))
                   )}
@@ -2561,6 +2579,12 @@ export default function App() {
                         item={item}
                         recipes={data.recipes}
                         onOpenStock={() => openStockContext({ stockId: item.stock.id })}
+                        onReview={() => void actions.markEyesReviewed({ stockId: item.stock.id })}
+                        onOpenJournal={() => {
+                          if (!item.decisions[0]) return;
+                          setSelectedDecisionId(item.decisions[0].id);
+                          setTab("Journal");
+                        }}
                       />
                     ))
                   )}
@@ -3545,6 +3569,16 @@ export default function App() {
               <MetaPill label={`${selectedRecipe.conditions.length} conditions`} />
               {selectedRecipe.notes ? <MetaPill label="Has notes" /> : null}
             </View>
+            {selectedRecipeLinkedEyes.length > 0 ? (
+              <View style={styles.detailCallout}>
+                <Text style={styles.detailCalloutLabel}>Tracked stocks</Text>
+                <View style={styles.metaRow}>
+                  {selectedRecipeLinkedEyes.slice(0, 6).map((eye) => (
+                    <MetaPill key={`recipe-stock-${eye.id}`} label={stockLabel(data.stocks, eye.stockId)} />
+                  ))}
+                </View>
+              </View>
+            ) : null}
             <View style={styles.actionRow}>
               <Button
                 label="Use for Eye"
