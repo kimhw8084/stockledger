@@ -1466,10 +1466,10 @@ const WindowPanel = ({
         <View style={styles.windowHandleTouch} {...dragResponder.panHandlers}>
           <View style={styles.windowGrabber} />
         </View>
-        <View style={styles.inlineBetween}>
+        <View style={styles.windowHeader}>
           <View style={styles.flexOne}>
-            <Text style={styles.cardTitle}>{title}</Text>
-            {subtitle ? <Text style={styles.cardBody}>{subtitle}</Text> : null}
+            <Text style={styles.windowTitle} numberOfLines={2}>{title}</Text>
+            {subtitle ? <Text style={styles.windowSubtitle} numberOfLines={2}>{subtitle}</Text> : null}
           </View>
           <Button label="Done" tone="ghost" onPress={animateClose} />
         </View>
@@ -3064,7 +3064,7 @@ export default function App() {
 
               {alertWorkspaceTab === "Current" ? (
                 <Reveal delay={40}>
-                  <SectionHeader title="Current Alerts" note="Alerts are grouped by stock first so related signals stay together." />
+                  <SectionHeader title={`Current Alerts · ${groupedAlertQueue.length}`} note="Alerts are grouped by stock first so related signals stay together." />
                   <View style={styles.stack}>
                     {groupedAlertQueue.length === 0 ? (
                       <Card>
@@ -3094,7 +3094,7 @@ export default function App() {
 
               {alertWorkspaceTab === "History" ? (
                 <Reveal delay={40}>
-                  <SectionHeader title="Alert History" note="Review acknowledged and snoozed alerts, and jump into linked journals when they exist." />
+                  <SectionHeader title={`Alert History · ${[...snoozedAlerts, ...reviewedAlerts].length}`} note="Review acknowledged and snoozed alerts, and jump into linked journals when they exist." />
                   <View style={styles.stack}>
                     {[...snoozedAlerts, ...reviewedAlerts].length === 0 ? (
                       <Card>
@@ -3106,20 +3106,25 @@ export default function App() {
                         const linkedDecision = data.decisions.find((decision) => decision.alertId === alert.id);
                         return (
                           <Card key={`history-${alert.id}`}>
-                            <Text style={styles.cardEyebrow}>{stockLabel(data.stocks, eye?.stockId ?? "")}</Text>
+                            <View style={styles.inlineBetween}>
+                              <Text style={styles.cardEyebrow}>{stockLabel(data.stocks, eye?.stockId ?? "")}</Text>
+                              <Text style={styles.inventoryRowMeta}>{formatDate(alert.createdAt)}</Text>
+                            </View>
                             <Text style={styles.alertTitle}>{alert.title}</Text>
-                            <Text style={styles.cardBody}>{alert.whyNow}</Text>
+                            <Text style={styles.cardBody} numberOfLines={2}>{alert.whyNow}</Text>
                             <View style={styles.metaRow}>
                               <MetaPill label={alert.reviewed ? "Acknowledged" : `Snoozed until ${alert.snoozedUntil ? formatDate(alert.snoozedUntil) : "unknown"}`} />
+                              <MetaPill label={alert.priority} />
                               {alert.usefulness ? <MetaPill label={alert.usefulness} /> : null}
                               {linkedDecision ? <MetaPill label={`Journal · ${linkedDecision.action}`} /> : null}
                             </View>
-                            <View style={styles.actionRow}>
+                            <View style={styles.analysisActionRow}>
                               <Button label="Open Detail" onPress={() => {
                                 setSelectedAlertId(alert.id);
                                 setAlertDetailOpen(true);
                               }} />
                               {!alert.reviewed ? <Button label="Unsnooze" tone="secondary" onPress={() => void actions.snoozeAlert(alert.id, -1)} /> : null}
+                              {eye ? <Button label="Open Stock" tone="secondary" onPress={() => openStockContext({ stockId: eye.stockId, eyeId: eye.id, alertId: alert.id, target: "Alerts" })} /> : null}
                               {linkedDecision ? (
                                 <Button
                                   label="Open Journal"
@@ -3689,6 +3694,12 @@ export default function App() {
             onClose={() => setAlertDetailOpen(false)}
           >
             <WhyNowPanel title="What happened" body={selectedAlert.whyNow} state={selectedAlertEvaluation.currentState} recipeVersion={`${selectedAlertRecipe.name} v${selectedAlertRecipe.version}`} />
+            <View style={styles.detailMetricStrip}>
+              <DenseStat label="Priority" value={selectedAlert.priority} tone={selectedAlert.priority === "High" ? "risk" : "strong"} />
+              <DenseStat label="State" value={selectedAlertEvaluation.currentState} />
+              <DenseStat label="Urgency" value={selectedAlertEvaluation.actionUrgency} />
+              <DenseStat label="Data" value={selectedAlert.dataQuality} tone={selectedAlert.dataQuality.includes("Mock") ? "risk" : "neutral"} />
+            </View>
             <View style={styles.dualColumn}>
               <View style={styles.evidenceColumn}>
                 <Text style={styles.columnTitle}>Biggest support</Text>
@@ -3700,10 +3711,25 @@ export default function App() {
               </View>
             </View>
             <WhatChangedPanel title="Review in 5 seconds" items={[`Priority is ${selectedAlert.priority}.`, `State change: ${selectedAlert.stateChange}.`, selectedAlert.dataQuality]} />
+            <View style={styles.metaRow}>
+              <MetaPill label={selectedAlert.reviewed ? "Acknowledged" : "Open"} />
+              <MetaPill label={selectedAlertSnapshot?.isMock ? "Mock-backed" : "Provider-backed"} />
+              <MetaPill label={selectedAlertSnapshot?.freshness ?? "Unavailable"} />
+              {selectedAlert.usefulness ? <MetaPill label={selectedAlert.usefulness} /> : null}
+            </View>
             <View style={styles.analysisActionRow}>
+              <Button
+                label="Open Stock"
+                tone="secondary"
+                onPress={() => {
+                  setAlertDetailOpen(false);
+                  openStockContext({ stockId: selectedAlertEye.stockId, eyeId: selectedAlertEye.id, alertId: selectedAlert.id, target: "Alerts" });
+                }}
+              />
               <Button label="Acknowledge" onPress={() => void actions.markAlertReviewed(selectedAlert.id)} />
               <Button label="Snooze 24H" tone="secondary" onPress={() => void actions.snoozeAlert(selectedAlert.id, 24)} />
               <Button label="Useful" tone="ghost" onPress={() => void actions.setAlertFeedback(selectedAlert.id, "Useful")} />
+              <Button label="Not Useful" tone="ghost" onPress={() => void actions.setAlertFeedback(selectedAlert.id, "Not Useful")} />
               {selectedAlertDecision ? (
                 <Button
                   label="Open Journal"
@@ -5671,6 +5697,27 @@ const styles = StyleSheet.create({
     paddingTop: 18,
     paddingBottom: 28,
     gap: 12,
+  },
+  windowHeader: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    gap: 12,
+  },
+  windowTitle: {
+    color: "#111827",
+    fontSize: 22,
+    lineHeight: 28,
+    fontWeight: "800",
+    fontFamily,
+  },
+  windowSubtitle: {
+    marginTop: 4,
+    color: "#6b7280",
+    fontSize: 13,
+    lineHeight: 19,
+    fontWeight: "600",
+    fontFamily,
   },
   windowHandleTouch: {
     alignSelf: "stretch",
