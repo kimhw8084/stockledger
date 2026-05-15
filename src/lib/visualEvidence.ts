@@ -499,10 +499,11 @@ export const buildStockVisualAnalysisGroups = ({
   const macroRisk = inferMacroRisk(snapshot, benchmark);
   const entryLow = eyes[0]?.plannedEntryLow ?? snapshot.plannedEntryLow;
   const entryHigh = eyes[0]?.plannedEntryHigh ?? snapshot.plannedEntryHigh;
-  const priceSeries = buildMiniSeries(snapshot.price, snapshot.drawdownPct, snapshot.stabilizationScore);
-  const rsSeries = buildComparisonSeries(snapshot.relativeStrengthVsSpyPct ?? 0);
+  const priceSeries = snapshot.priceHistorySeries ?? buildMiniSeries(snapshot.price, snapshot.drawdownPct, snapshot.stabilizationScore);
+  const rsSeries = snapshot.benchmarkHistorySeries ?? buildComparisonSeries(snapshot.relativeStrengthVsSpyPct ?? 0);
   const sectorSeries = buildComparisonSeries(sectorEdge);
-  const volumeSeries = buildComparisonSeries((snapshot.volumeSpike ? 6 : -4) + snapshot.stabilizationScore / 20);
+  const volumeSeries = snapshot.volumeHistorySeries ?? buildComparisonSeries((snapshot.volumeSpike ? 6 : -4) + snapshot.stabilizationScore / 20);
+  const volatilitySeries = snapshot.volatilityHistorySeries ?? buildComparisonSeries((snapshot.volatilityCompression ? -4 : 6) + (snapshot.averageRangePct ?? 0));
 
   const allCards: VisualEvidenceCard[] = [
     card({
@@ -586,6 +587,52 @@ export const buildStockVisualAnalysisGroups = ({
       },
     }),
     card({
+      id: `${stock.id}-trend-stack`,
+      family: "Trend & Stabilization",
+      title: "Trend stack vs 20D / 50D / 200D",
+      role: "Timing Trigger",
+      status:
+        (snapshot.movingAverage20DistancePct ?? -99) >= 0 && (snapshot.movingAverage50DistancePct ?? -99) >= 0
+          ? "Passed"
+          : (snapshot.movingAverage20DistancePct ?? -99) >= 0 || (snapshot.movingAverage50DistancePct ?? -99) >= -2
+            ? "Near Trigger"
+            : defaultFailureStatus(snapshot),
+      summary: `20D ${(snapshot.movingAverage20DistancePct ?? 0).toFixed(1)}%, 50D ${(snapshot.movingAverage50DistancePct ?? 0).toFixed(1)}%, 200D ${(snapshot.movingAverage200DistancePct ?? 0).toFixed(1)}%.`,
+      effect:
+        (snapshot.movingAverage20DistancePct ?? -99) >= 0 && (snapshot.movingAverage50DistancePct ?? -99) >= 0
+          ? "Supports a cleaner stabilization stack."
+          : "The longer trend stack is still mixed.",
+      whyItMatters: "A stock reclaiming shorter and medium baselines often becomes easier to trust than one only bouncing intraday.",
+      freshness,
+      sourceType: cardSource(snapshot),
+      relatedConditionLabel: "Trend stack is an additional factual readout and not yet a recipe-specific metric.",
+      metric: {
+        currentLabel: `${(snapshot.movingAverage20DistancePct ?? 0).toFixed(1)} / ${(snapshot.movingAverage50DistancePct ?? 0).toFixed(1)} / ${(snapshot.movingAverage200DistancePct ?? 0).toFixed(1)}%`,
+        thresholdLabel: "20D and 50D >= 0%",
+        comparisonLabel: "20D / 50D / 200D",
+      },
+      formulaName: "Moving-average stack",
+      formulaDescription: "Shows how far price is from the 20-day, 50-day, and 200-day moving averages at the same time.",
+      formulaInputs: ["price", "20-day MA", "50-day MA", "200-day MA"],
+      visual: {
+        kind: "checklist",
+        items: [
+          {
+            label: `20D ${(snapshot.movingAverage20DistancePct ?? 0).toFixed(1)}%`,
+            tone: (snapshot.movingAverage20DistancePct ?? -99) >= 0 ? "good" : "warning",
+          },
+          {
+            label: `50D ${(snapshot.movingAverage50DistancePct ?? 0).toFixed(1)}%`,
+            tone: (snapshot.movingAverage50DistancePct ?? -99) >= 0 ? "good" : (snapshot.movingAverage50DistancePct ?? -99) >= -2 ? "warning" : "danger",
+          },
+          {
+            label: `200D ${(snapshot.movingAverage200DistancePct ?? 0).toFixed(1)}%`,
+            tone: (snapshot.movingAverage200DistancePct ?? -99) >= 0 ? "good" : "neutral",
+          },
+        ],
+      },
+    }),
+    card({
       id: `${stock.id}-relative-strength`,
       family: "Relative Strength",
       title: `Relative strength vs ${benchmark}`,
@@ -660,6 +707,46 @@ export const buildStockVisualAnalysisGroups = ({
         current: snapshot.stabilizationScore,
         threshold: 60,
         markerLabel: "Cooling proxy",
+      },
+    }),
+    card({
+      id: `${stock.id}-volatility-compression`,
+      family: "Volume & Volatility",
+      title: "Volatility compression",
+      role: "Timing Trigger",
+      status:
+        snapshot.volatilityCompression === true
+          ? "Passed"
+          : snapshot.averageRangePct !== undefined && snapshot.averageRangePct <= 2.2
+            ? "Near Trigger"
+            : defaultFailureStatus(snapshot),
+      summary:
+        snapshot.volatilityCompression === true
+          ? `Recent trading range has compressed to about ${(snapshot.averageRangePct ?? 0).toFixed(2)}% per day.`
+          : `Recent average range is ${(snapshot.averageRangePct ?? 0).toFixed(2)}% per day, so the tape is not yet especially calm.`,
+      effect:
+        snapshot.volatilityCompression === true
+          ? "Supports the idea that panic is cooling."
+          : "Keeps timing from looking fully settled.",
+      whyItMatters: "Cleaner setups often appear once daily range starts narrowing after a sharp move.",
+      freshness,
+      sourceType: cardSource(snapshot),
+      relatedConditionLabel: "Volatility compression is an adapter-derived factual layer and not yet a recipe-specific metric.",
+      metric: {
+        currentLabel: `${(snapshot.averageRangePct ?? 0).toFixed(2)}%`,
+        thresholdLabel: "Compression active",
+        comparisonLabel: "Recent daily range",
+      },
+      formulaName: "Average range compression",
+      formulaDescription: "Compares the most recent daily trading ranges against the trailing baseline to see whether volatility is cooling.",
+      formulaInputs: ["daily high", "daily low", "trailing range average"],
+      visual: {
+        kind: "mini_trend",
+        series: volatilitySeries,
+        secondarySeries: buildMovingAverageSeries(volatilitySeries, 0.3),
+        current: snapshot.averageRangePct,
+        threshold: 2.2,
+        markerLabel: "Range compression",
       },
     }),
     card({

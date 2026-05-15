@@ -53,6 +53,21 @@ const pct = (current: number, base: number) => ((current - base) / base) * 100;
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
+const normalizedSeries = (values: number[]) => {
+  if (values.length === 0) return [];
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  return values.map((value) => Number((((value - min) / Math.max(max - min, 1)) * 100).toFixed(1)));
+};
+
+const returnOverWindow = (values: number[], lookback: number) => {
+  if (values.length <= lookback) return undefined;
+  const current = values.at(-1);
+  const base = values.at(-(lookback + 1));
+  if (!current || !base) return undefined;
+  return Number(pct(current, base).toFixed(1));
+};
+
 const stabilizationFromSeries = (bars: DailyBar[]) => {
   const closes = bars.map((bar) => bar.close);
   const price = closes.at(-1);
@@ -84,6 +99,21 @@ const volumeSpike = (bars: DailyBar[]) => {
   return latest > average * 1.35;
 };
 
+const averageRangePct = (bars: DailyBar[], length = 14) => {
+  if (bars.length < length) return undefined;
+  const window = bars.slice(-length);
+  const values = window.map((bar) => pct(bar.high, Math.max(bar.low, 0.01)));
+  return Number((values.reduce((sum, value) => sum + value, 0) / values.length).toFixed(2));
+};
+
+const volatilityCompression = (bars: DailyBar[]) => {
+  if (bars.length < 21) return undefined;
+  const recent = averageRangePct(bars.slice(-5), 5);
+  const baseline = averageRangePct(bars.slice(-21), 14);
+  if (recent === undefined || baseline === undefined) return undefined;
+  return recent <= baseline * 0.86;
+};
+
 const nearSupport = (bars: DailyBar[]) => {
   if (bars.length < 20) return undefined;
   const latest = bars.at(-1)?.close;
@@ -108,7 +138,17 @@ export const buildProviderSnapshot = async (stock: Stock): Promise<MockSnapshot>
 
     const closes = stockBars.map((bar) => bar.close);
     const high252 = Math.max(...stockBars.slice(-252).map((bar) => bar.high));
+    const ma20 = movingAverage(closes, 20);
     const ma50 = movingAverage(closes, 50);
+    const ma200 = movingAverage(closes, 200);
+    const recentPriceSeries = normalizedSeries(closes.slice(-24));
+    const recentBenchmarkSeries = normalizedSeries(spyBars.map((bar) => bar.close).slice(-24));
+    const recentVolumeSeries = normalizedSeries(stockBars.map((bar) => bar.volume).slice(-24));
+    const recentVolatilitySeries = normalizedSeries(
+      stockBars
+        .slice(-24)
+        .map((bar) => pct(bar.high, Math.max(bar.low, 0.01))),
+    );
 
     return {
       stockId: stock.id,
@@ -116,19 +156,29 @@ export const buildProviderSnapshot = async (stock: Stock): Promise<MockSnapshot>
       drawdownPct: Number(pct(latest.close, high252).toFixed(1)),
       nearSupport: nearSupport(stockBars),
       stabilizationScore: stabilizationFromSeries(stockBars),
+      movingAverage20DistancePct: ma20 ? Number(pct(latest.close, ma20).toFixed(1)) : undefined,
       valuationDiscount: undefined,
       analystRevisionTrend: undefined,
       earningsSoon: undefined,
       riskFlags: [],
       movingAverage50DistancePct: ma50 ? Number(pct(latest.close, ma50).toFixed(1)) : undefined,
+      movingAverage200DistancePct: ma200 ? Number(pct(latest.close, ma200).toFixed(1)) : undefined,
       relativeStrengthVsSpyPct: relativeStrengthVsSpy(stockBars, spyBars),
+      priceReturn20dPct: returnOverWindow(closes, 20),
+      priceReturn60dPct: returnOverWindow(closes, 60),
       volumeSpike: volumeSpike(stockBars),
+      volatilityCompression: volatilityCompression(stockBars),
+      averageRangePct: averageRangePct(stockBars),
       revenueGrowthYoY: undefined,
       marginChangePct: undefined,
       debtRiskLevel: undefined,
       plannedEntryLow: undefined,
       plannedEntryHigh: undefined,
       lastThesisReviewAt: fallback.lastThesisReviewAt,
+      priceHistorySeries: recentPriceSeries,
+      benchmarkHistorySeries: recentBenchmarkSeries,
+      volumeHistorySeries: recentVolumeSeries,
+      volatilityHistorySeries: recentVolatilitySeries,
       updatedAt: new Date().toISOString(),
       sourceName: "Stooq Daily Provider",
       freshness: "Delayed",
