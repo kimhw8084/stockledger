@@ -96,6 +96,10 @@ const analysisStatusFilters: AnalysisStatusFilter[] = [
   "Needs Review",
 ];
 const stockBoardModes: StockBoardMode[] = ["Pinned First", "Status", "Family"];
+const defaultAnalysisBenchmark: AnalysisBenchmark = "SPY";
+const defaultAnalysisLookback: AnalysisLookback = "3M";
+const defaultAnalysisStatusFilter: AnalysisStatusFilter = "All Statuses";
+const defaultStockBoardMode: StockBoardMode = "Pinned First";
 const homeBuckets: HomeBucket[] = ["All", "Review Now", "Forming", "Review Soon"];
 const recipeShelfFilters: RecipeShelfFilter[] = ["All", "Starter", "Custom", "Recent"];
 const eyesShelfFilters: EyesShelfFilter[] = ["All", "Needs Review", "Quiet"];
@@ -459,6 +463,28 @@ const compactStatusLabel = (status: VisualEvidenceCard["status"]) => {
   }
 };
 
+const analysisStatusFilterLabel = (filter: AnalysisStatusFilter) => {
+  switch (filter) {
+    case "All Statuses":
+      return "All";
+    case "Needs Review":
+      return "Needs Review";
+    case "Near Trigger":
+      return "Near";
+    default:
+      return filter;
+  }
+};
+
+const stockBoardModeLabel = (mode: StockBoardMode) => {
+  switch (mode) {
+    case "Pinned First":
+      return "Pinned";
+    default:
+      return mode;
+  }
+};
+
 const compactMetricContextLabel = (card: VisualEvidenceCard) => {
   const label = card.metric.thresholdLabel ?? card.metric.comparisonLabel ?? card.role;
   return label
@@ -792,29 +818,64 @@ const HorizontalChoice = <T extends string>({
   options,
   value,
   onSelect,
+  variant = "chip",
+  labelForOption,
 }: {
   options: readonly T[];
   value: T;
   onSelect: (next: T) => void;
-}) => (
-  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.choiceRow}>
-    {options.map((option) => (
-      <Pressable
-        key={option}
-        onPress={() => onSelect(option)}
-        style={({ pressed }) => [
-          styles.choiceChip,
-          option === value ? styles.choiceChipActive : null,
-          pressed ? styles.choiceChipPressed : null,
-        ]}
-      >
-        <Text style={[styles.choiceChipText, option === value ? styles.choiceChipTextActive : null]} numberOfLines={1}>
-          {option}
-        </Text>
-      </Pressable>
-    ))}
-  </ScrollView>
-);
+  variant?: "chip" | "segmented";
+  labelForOption?: (option: T) => string;
+}) => {
+  if (variant === "segmented") {
+    return (
+      <View style={styles.segmentedChoice}>
+        {options.map((option, index) => (
+          <Pressable
+            key={option}
+            onPress={() => onSelect(option)}
+            style={({ pressed }) => [
+              styles.segmentedChoiceItem,
+              option === value ? styles.segmentedChoiceItemActive : null,
+              index > 0 ? styles.segmentedChoiceItemDivider : null,
+              pressed ? styles.choiceChipPressed : null,
+            ]}
+          >
+            <Text
+              style={[
+                styles.segmentedChoiceText,
+                option === value ? styles.segmentedChoiceTextActive : null,
+              ]}
+              numberOfLines={1}
+            >
+              {labelForOption ? labelForOption(option) : option}
+            </Text>
+          </Pressable>
+        ))}
+      </View>
+    );
+  }
+
+  return (
+    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.choiceRow}>
+      {options.map((option) => (
+        <Pressable
+          key={option}
+          onPress={() => onSelect(option)}
+          style={({ pressed }) => [
+            styles.choiceChip,
+            option === value ? styles.choiceChipActive : null,
+            pressed ? styles.choiceChipPressed : null,
+          ]}
+        >
+          <Text style={[styles.choiceChipText, option === value ? styles.choiceChipTextActive : null]} numberOfLines={1}>
+            {labelForOption ? labelForOption(option) : option}
+          </Text>
+        </Pressable>
+      ))}
+    </ScrollView>
+  );
+};
 
 const StepFlow = ({
   steps,
@@ -2082,10 +2143,10 @@ export default function App() {
   const [tab, setTab] = useState<TabKey>("Home");
   const [recipeBuilderStep, setRecipeBuilderStep] = useState<RecipeBuilderStep>("Purpose");
   const [alertWorkspaceTab, setAlertWorkspaceTab] = useState<Exclude<AlertWorkspaceTab, "Detail">>("Current");
-  const [analysisBenchmark, setAnalysisBenchmark] = useState<AnalysisBenchmark>("SPY");
-  const [analysisLookback, setAnalysisLookback] = useState<AnalysisLookback>("3M");
-  const [analysisStatusFilter, setAnalysisStatusFilter] = useState<AnalysisStatusFilter>("All Statuses");
-  const [stockBoardMode, setStockBoardMode] = useState<StockBoardMode>("Pinned First");
+  const [analysisBenchmark, setAnalysisBenchmark] = useState<AnalysisBenchmark>(defaultAnalysisBenchmark);
+  const [analysisLookback, setAnalysisLookback] = useState<AnalysisLookback>(defaultAnalysisLookback);
+  const [analysisStatusFilter, setAnalysisStatusFilter] = useState<AnalysisStatusFilter>(defaultAnalysisStatusFilter);
+  const [stockBoardMode, setStockBoardMode] = useState<StockBoardMode>(defaultStockBoardMode);
   const [homeBucket, setHomeBucket] = useState<HomeBucket>("All");
   const [recipeShelfFilter, setRecipeShelfFilter] = useState<RecipeShelfFilter>("All");
   const [eyesShelfFilter, setEyesShelfFilter] = useState<EyesShelfFilter>("All");
@@ -2500,6 +2561,11 @@ export default function App() {
   const pinnedCountForSelectedStock = selectedStockSummary
     ? pinnedMetricKeys.filter((key) => key.startsWith(`${selectedStockSummary.stock.id}:`)).length
     : 0;
+  const stockControlsDirty =
+    analysisBenchmark !== defaultAnalysisBenchmark ||
+    analysisLookback !== defaultAnalysisLookback ||
+    analysisStatusFilter !== defaultAnalysisStatusFilter ||
+    stockBoardMode !== defaultStockBoardMode;
 
   useEffect(() => {
     if (selectedStockTrendSeries.length === 0) {
@@ -3221,11 +3287,21 @@ export default function App() {
                       <View style={styles.stockHeroControlRow}>
                         <View style={styles.stockHeroControlBlock}>
                           <Text style={styles.stockHeroControlLabel}>Lookback</Text>
-                          <HorizontalChoice options={analysisLookbacks} value={analysisLookback} onSelect={setAnalysisLookback} />
+                          <HorizontalChoice
+                            options={analysisLookbacks}
+                            value={analysisLookback}
+                            onSelect={setAnalysisLookback}
+                            variant="segmented"
+                          />
                         </View>
                         <View style={styles.stockHeroControlBlock}>
                           <Text style={styles.stockHeroControlLabel}>Benchmark</Text>
-                          <HorizontalChoice options={analysisBenchmarks} value={analysisBenchmark} onSelect={setAnalysisBenchmark} />
+                          <HorizontalChoice
+                            options={analysisBenchmarks}
+                            value={analysisBenchmark}
+                            onSelect={setAnalysisBenchmark}
+                            variant="segmented"
+                          />
                         </View>
                       </View>
                       <View style={styles.stockTrendChart}>
@@ -3309,14 +3385,46 @@ export default function App() {
                         <Text style={styles.stockTrendLegendText}>{analysisLookback} vs {analysisBenchmark}</Text>
                       </View>
                     </View>
-                    <View style={styles.stockControlStack}>
-                      <View style={styles.controlCard}>
-                        <Text style={styles.inputLabel}>Status</Text>
-                        <HorizontalChoice options={analysisStatusFilters} value={analysisStatusFilter} onSelect={setAnalysisStatusFilter} />
+                    <View style={styles.stockControlsPanel}>
+                      <View style={styles.stockControlsHeader}>
+                        <View style={styles.flexOne}>
+                          <Text style={styles.stockControlsTitle}>Board controls</Text>
+                          <Text style={styles.stockControlsMeta}>
+                            Showing {sortedSelectedStockAnalysisCards.length} of {selectedStockAnalysisCards.length} metrics
+                          </Text>
+                        </View>
+                        {stockControlsDirty ? (
+                          <Pressable
+                            onPress={() => {
+                              setAnalysisBenchmark(defaultAnalysisBenchmark);
+                              setAnalysisLookback(defaultAnalysisLookback);
+                              setAnalysisStatusFilter(defaultAnalysisStatusFilter);
+                              setStockBoardMode(defaultStockBoardMode);
+                            }}
+                            style={({ pressed }) => [pressed ? styles.choiceChipPressed : null]}
+                          >
+                            <Text style={styles.stockControlsReset}>Reset</Text>
+                          </Pressable>
+                        ) : null}
                       </View>
-                      <View style={styles.controlCard}>
-                        <Text style={styles.inputLabel}>Board</Text>
-                        <HorizontalChoice options={stockBoardModes} value={stockBoardMode} onSelect={setStockBoardMode} />
+                      <View style={styles.stockControlGroup}>
+                        <Text style={styles.stockControlGroupLabel}>Status</Text>
+                        <HorizontalChoice
+                          options={analysisStatusFilters}
+                          value={analysisStatusFilter}
+                          onSelect={setAnalysisStatusFilter}
+                          labelForOption={analysisStatusFilterLabel}
+                        />
+                      </View>
+                      <View style={styles.stockControlGroup}>
+                        <Text style={styles.stockControlGroupLabel}>Board</Text>
+                        <HorizontalChoice
+                          options={stockBoardModes}
+                          value={stockBoardMode}
+                          onSelect={setStockBoardMode}
+                          variant="segmented"
+                          labelForOption={stockBoardModeLabel}
+                        />
                       </View>
                     </View>
                   </Card>
@@ -4888,21 +4996,51 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontFamily,
   },
-  controlCard: {
-    width: "48.2%",
+  stockControlsPanel: {
+    marginTop: 14,
+    gap: 10,
     padding: 12,
     borderRadius: 16,
     backgroundColor: "#f8fafc",
     borderWidth: 1,
     borderColor: "#edf0f5",
-    minHeight: 88,
-    justifyContent: "space-between",
   },
-  stockControlStack: {
-    marginTop: 14,
-    gap: 10,
+  stockControlsHeader: {
     flexDirection: "row",
-    flexWrap: "wrap",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    gap: 10,
+  },
+  stockControlsTitle: {
+    color: "#111827",
+    fontSize: 13,
+    fontWeight: "800",
+    fontFamily,
+  },
+  stockControlsMeta: {
+    color: "#6b7280",
+    fontSize: 11,
+    lineHeight: 16,
+    fontWeight: "600",
+    fontFamily,
+    marginTop: 2,
+  },
+  stockControlsReset: {
+    color: "#2563eb",
+    fontSize: 12,
+    fontWeight: "800",
+    fontFamily,
+  },
+  stockControlGroup: {
+    gap: 6,
+  },
+  stockControlGroupLabel: {
+    color: "#6b7280",
+    fontSize: 10,
+    fontWeight: "800",
+    textTransform: "uppercase",
+    letterSpacing: 0.35,
+    fontFamily,
   },
   stockShellHeader: {
     flexDirection: "row",
@@ -5693,6 +5831,40 @@ const styles = StyleSheet.create({
     gap: 10,
     paddingVertical: 4,
     paddingRight: 8,
+  },
+  segmentedChoice: {
+    minHeight: 38,
+    borderRadius: 12,
+    backgroundColor: "#eef2f6",
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+    flexDirection: "row",
+    overflow: "hidden",
+  },
+  segmentedChoiceItem: {
+    flex: 1,
+    minWidth: 0,
+    minHeight: 38,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 8,
+    backgroundColor: "transparent",
+  },
+  segmentedChoiceItemDivider: {
+    borderLeftWidth: 1,
+    borderLeftColor: "#e5e7eb",
+  },
+  segmentedChoiceItemActive: {
+    backgroundColor: "#111827",
+  },
+  segmentedChoiceText: {
+    color: "#4b5563",
+    fontSize: 12,
+    fontWeight: "800",
+    fontFamily,
+  },
+  segmentedChoiceTextActive: {
+    color: "#ffffff",
   },
   choiceChip: {
     paddingHorizontal: 14,
