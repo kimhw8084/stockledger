@@ -1248,6 +1248,231 @@ const EvidenceCardView = ({
   );
 };
 
+const DetailedVisualHero = ({ card }: { card: VisualEvidenceCard }) => {
+  const visual = card.visual;
+  const primarySeries = visual.series ?? [];
+  const secondarySeries = visual.secondarySeries ?? [];
+  const tertiarySeries = visual.tertiarySeries ?? [];
+  const [selectedPoint, setSelectedPoint] = useState<number>(Math.max(primarySeries.length - 1, 0));
+
+  useEffect(() => {
+    setSelectedPoint(Math.max(primarySeries.length - 1, 0));
+  }, [card.id, primarySeries.length]);
+
+  if (visual.kind === "checklist") {
+    return (
+      <View style={styles.detailHeroCard}>
+        <View style={styles.detailHeroHeader}>
+          <Text style={styles.detailHeroEyebrow}>{card.family}</Text>
+          <Text style={styles.detailHeroValue}>{card.metric.currentLabel}</Text>
+        </View>
+        <View style={styles.detailChecklistStack}>
+          {(visual.items ?? []).map((item) => (
+            <View key={item.label} style={styles.detailChecklistRow}>
+              <View
+                style={[
+                  styles.detailChecklistMarker,
+                  item.tone === "good"
+                    ? styles.detailChecklistMarkerGood
+                    : item.tone === "warning"
+                      ? styles.detailChecklistMarkerWarning
+                      : item.tone === "danger"
+                        ? styles.detailChecklistMarkerDanger
+                        : styles.detailChecklistMarkerNeutral,
+                ]}
+              />
+              <Text style={styles.detailChecklistLabel} numberOfLines={1}>
+                {item.label}
+              </Text>
+            </View>
+          ))}
+        </View>
+        <Text style={styles.detailHeroFootnote}>{card.metric.thresholdLabel ?? "Context"}</Text>
+      </View>
+    );
+  }
+
+  if (visual.kind === "event_countdown") {
+    return (
+      <View style={styles.detailHeroCard}>
+        <View style={styles.detailHeroHeader}>
+          <Text style={styles.detailHeroEyebrow}>{card.family}</Text>
+          <Text style={styles.detailHeroValue}>{visual.countdownLabel ?? card.metric.currentLabel}</Text>
+        </View>
+        <View style={styles.detailCountdownWrap}>
+          <Text style={styles.detailCountdownDays}>{visual.countdownDays ?? "--"}</Text>
+          <Text style={styles.detailCountdownUnit}>days</Text>
+        </View>
+        <Text style={styles.detailHeroFootnote}>{card.summary}</Text>
+      </View>
+    );
+  }
+
+  if (visual.kind === "risk_gauge") {
+    const min = visual.min ?? 0;
+    const max = visual.max ?? 100;
+    const current = visual.current ?? min;
+    const threshold = visual.threshold ?? max;
+    const currentPct = ((current - min) / Math.max(max - min, 1)) * 100;
+    const thresholdPct = ((threshold - min) / Math.max(max - min, 1)) * 100;
+
+    return (
+      <View style={styles.detailHeroCard}>
+        <View style={styles.detailHeroHeader}>
+          <Text style={styles.detailHeroEyebrow}>{card.family}</Text>
+          <Text style={styles.detailHeroValue}>{card.metric.currentLabel}</Text>
+        </View>
+        <View style={styles.detailGaugeTrack}>
+          <View style={styles.detailGaugeSafe} />
+          <View style={styles.detailGaugeWarn} />
+          <View style={styles.detailGaugeDanger} />
+          <View style={[styles.detailGaugeThreshold, { left: `${Math.max(0, Math.min(100, thresholdPct))}%` }]} />
+          <View style={[styles.detailGaugeCurrent, { left: `${Math.max(0, Math.min(100, currentPct))}%` }]} />
+        </View>
+        <View style={styles.detailHeroLegend}>
+          <Text style={styles.detailHeroLegendText}>Lower risk</Text>
+          <Text style={styles.detailHeroLegendText}>Higher risk</Text>
+        </View>
+        <Text style={styles.detailHeroFootnote}>{card.metric.thresholdLabel ?? "Context"}</Text>
+      </View>
+    );
+  }
+
+  if (visual.kind === "entry_zone") {
+    const low = visual.low ?? 0;
+    const high = visual.high ?? low;
+    const current = visual.current ?? low;
+    const min = Math.max(0, low * 0.92);
+    const max = high * 1.08 || 1;
+    const start = ((low - min) / Math.max(max - min, 1)) * 100;
+    const width = ((high - low) / Math.max(max - min, 1)) * 100;
+    const marker = ((current - min) / Math.max(max - min, 1)) * 100;
+
+    return (
+      <View style={styles.detailHeroCard}>
+        <View style={styles.detailHeroHeader}>
+          <Text style={styles.detailHeroEyebrow}>{card.family}</Text>
+          <Text style={styles.detailHeroValue}>{card.metric.currentLabel}</Text>
+        </View>
+        <View style={styles.detailZoneTrack}>
+          <View style={[styles.detailZoneBand, { left: `${Math.max(0, start)}%`, width: `${Math.max(width, 6)}%` }]} />
+          <View style={[styles.detailZoneMarker, { left: `${Math.max(0, Math.min(100, marker))}%` }]} />
+        </View>
+        <View style={styles.detailHeroLegend}>
+          <Text style={styles.detailHeroLegendText}>${low.toFixed(2)}</Text>
+          <Text style={styles.detailHeroLegendText}>${current.toFixed(2)}</Text>
+          <Text style={styles.detailHeroLegendText}>${high.toFixed(2)}</Text>
+        </View>
+        <Text style={styles.detailHeroFootnote}>{card.metric.thresholdLabel ?? "Planned zone"}</Text>
+      </View>
+    );
+  }
+
+  const displaySeries = primarySeries.length > 0 ? primarySeries : [25, 32, 28, 36, 42, 40, 48, 54];
+  const selectedValue = displaySeries[Math.max(0, Math.min(selectedPoint, displaySeries.length - 1))] ?? displaySeries[displaySeries.length - 1];
+  const min = visual.min ?? Math.min(...displaySeries);
+  const max = visual.max ?? Math.max(...displaySeries);
+  const threshold = visual.threshold ?? min;
+  const thresholdPct = ((threshold - min) / Math.max(max - min, 1)) * 100;
+  const currentPct = ((selectedValue - min) / Math.max(max - min, 1)) * 100;
+  const currentLabel =
+    displaySeries.length > 1 && selectedPoint !== displaySeries.length - 1
+      ? `Point ${selectedPoint + 1}`
+      : "Latest";
+
+  return (
+    <View style={styles.detailHeroCard}>
+      <View style={styles.detailHeroHeader}>
+        <View style={styles.flexOne}>
+          <Text style={styles.detailHeroEyebrow}>{card.family}</Text>
+          <Text style={styles.detailHeroValue}>{card.metric.currentLabel}</Text>
+        </View>
+        <View style={styles.detailHeroBadge}>
+          <Text style={styles.detailHeroBadgeText}>{currentLabel}</Text>
+        </View>
+      </View>
+      <View style={styles.detailHeroChart}>
+        <View style={styles.detailHeroGrid}>
+          <View style={styles.detailHeroGridLine} />
+          <View style={styles.detailHeroGridLine} />
+          <View style={styles.detailHeroGridLine} />
+        </View>
+        <View style={[styles.detailHeroThresholdLine, { bottom: `${Math.max(0, Math.min(100, thresholdPct))}%` }]} />
+        <View style={[styles.detailHeroCurrentLine, { bottom: `${Math.max(0, Math.min(100, currentPct))}%` }]} />
+        <View style={styles.detailHeroBarsRow}>
+          {displaySeries.map((point, index) => {
+            const pointPct = ((point - min) / Math.max(max - min, 1)) * 100;
+            const seriesActive = index === selectedPoint;
+            return (
+              <Pressable
+                key={`${card.id}-detail-series-${index}`}
+                onPress={() => setSelectedPoint(index)}
+                style={[
+                  styles.detailHeroBarHit,
+                  seriesActive ? styles.detailHeroBarHitActive : null,
+                ]}
+              >
+                <View
+                  style={[
+                    styles.detailHeroBar,
+                    { height: `${Math.max(12, pointPct)}%` },
+                    seriesActive ? styles.detailHeroBarActive : null,
+                  ]}
+                />
+              </Pressable>
+            );
+          })}
+        </View>
+        {secondarySeries.length > 0 ? (
+          <View pointerEvents="none" style={styles.detailHeroLineOverlay}>
+            {secondarySeries.map((point, index) => {
+              const pointPct = ((point - min) / Math.max(max - min, 1)) * 100;
+              return (
+                <View
+                  key={`${card.id}-detail-secondary-${index}`}
+                  style={[
+                    styles.detailHeroLineDot,
+                    {
+                      left: `${(index / Math.max(secondarySeries.length - 1, 1)) * 100}%`,
+                      bottom: `${Math.max(0, Math.min(100, pointPct))}%`,
+                    },
+                  ]}
+                />
+              );
+            })}
+          </View>
+        ) : null}
+        {tertiarySeries.length > 0 ? (
+          <View pointerEvents="none" style={styles.detailHeroLineOverlay}>
+            {tertiarySeries.map((point, index) => {
+              const pointPct = ((point - min) / Math.max(max - min, 1)) * 100;
+              return (
+                <View
+                  key={`${card.id}-detail-tertiary-${index}`}
+                  style={[
+                    styles.detailHeroLineDotMuted,
+                    {
+                      left: `${(index / Math.max(tertiarySeries.length - 1, 1)) * 100}%`,
+                      bottom: `${Math.max(0, Math.min(100, pointPct))}%`,
+                    },
+                  ]}
+                />
+              );
+            })}
+          </View>
+        ) : null}
+      </View>
+      <View style={styles.detailHeroLegend}>
+        <Text style={styles.detailHeroLegendText}>{card.metric.thresholdLabel ?? "Threshold"}</Text>
+        <Text style={styles.detailHeroLegendText}>{visual.markerLabel ?? card.metric.comparisonLabel ?? "Series"}</Text>
+      </View>
+      <Text style={styles.detailHeroFootnote}>
+        Tap the chart bars to inspect earlier points without leaving the stock metric sheet.
+      </Text>
+    </View>
+  );
+};
+
 const EvidenceGroupView = ({
   group,
   layout = "stack",
@@ -4022,6 +4247,48 @@ export default function App() {
             subtitle={`${selectedStockSummary?.stock.symbol ?? "Stock"} · ${selectedEvidenceCard.freshness}${selectedEvidenceIndex >= 0 ? ` · ${selectedEvidenceIndex + 1} of ${sortedSelectedStockAnalysisCards.length}` : ""}`}
             onClose={() => setSelectedEvidenceCard(null)}
           >
+            <DetailedVisualHero card={selectedEvidenceCard} />
+            <View style={styles.detailMetricStrip}>
+              <DenseStat label="Current" value={selectedEvidenceCard.metric.currentLabel} tone="strong" />
+              <DenseStat label="Threshold" value={selectedEvidenceCard.metric.thresholdLabel ?? "Context"} />
+              <DenseStat label="Freshness" value={selectedEvidenceCard.freshness} tone={selectedEvidenceCard.freshness === "Fresh" ? "strong" : "neutral"} />
+              <DenseStat label="Source" value={selectedEvidenceCard.sourceType} />
+            </View>
+            <View style={styles.formulaPanel}>
+              <Text style={styles.formulaTitle}>What this means now</Text>
+              <Text style={styles.formulaBody}>{selectedEvidenceCard.summary}</Text>
+              <Text style={styles.formulaMeta}>{selectedEvidenceCard.effect}</Text>
+            </View>
+            <View style={styles.formulaPanel}>
+              <Text style={styles.formulaTitle}>Why it matters</Text>
+              <Text style={styles.formulaBody}>{selectedEvidenceCard.whyItMatters}</Text>
+              {selectedEvidenceCard.relatedConditionLabel ? (
+                <Text style={styles.formulaMeta}>Recipe link: {selectedEvidenceCard.relatedConditionLabel}</Text>
+              ) : null}
+            </View>
+            <View style={styles.actionRow}>
+              <Button label="Previous" tone="secondary" onPress={() => cycleEvidenceCard(-1)} disabled={selectedEvidenceIndex <= 0} />
+              <Button
+                label={
+                  selectedStockSummary &&
+                  pinnedMetricKeys.includes(
+                    stockMetricPreferenceKey(selectedStockSummary.stock.id, selectedEvidenceCard.id),
+                  )
+                    ? "Unpin"
+                    : "Pin"
+                }
+                tone="ghost"
+                onPress={() => togglePinnedMetric(selectedEvidenceCard)}
+              />
+              <Button
+                label="Next"
+                tone="secondary"
+                onPress={() => cycleEvidenceCard(1)}
+                disabled={
+                  selectedEvidenceIndex < 0 || selectedEvidenceIndex >= sortedSelectedStockAnalysisCards.length - 1
+                }
+              />
+            </View>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.choiceRow}>
               {sortedSelectedStockAnalysisCards.map((card) => (
                 <Pressable
@@ -4044,44 +4311,15 @@ export default function App() {
                 </Pressable>
               ))}
             </ScrollView>
-            <View style={styles.actionRow}>
-              <Button
-                label={
-                  selectedStockSummary &&
-                  pinnedMetricKeys.includes(
-                    stockMetricPreferenceKey(selectedStockSummary.stock.id, selectedEvidenceCard.id),
-                  )
-                    ? "Unpin"
-                    : "Pin"
-                }
-                tone="ghost"
-                onPress={() => togglePinnedMetric(selectedEvidenceCard)}
-              />
-              <Button label="Previous" tone="secondary" onPress={() => cycleEvidenceCard(-1)} disabled={selectedEvidenceIndex <= 0} />
-              <Button
-                label="Next"
-                tone="secondary"
-                onPress={() => cycleEvidenceCard(1)}
-                disabled={
-                  selectedEvidenceIndex < 0 || selectedEvidenceIndex >= sortedSelectedStockAnalysisCards.length - 1
-                }
-              />
+            <View style={styles.formulaPanel}>
+              <Text style={styles.formulaTitle}>{selectedEvidenceCard.formulaName ?? "Formula detail"}</Text>
+              <Text style={styles.formulaBody}>
+                {selectedEvidenceCard.formulaDescription ?? "No extra formula detail available."}
+              </Text>
+              <Text style={styles.formulaMeta}>
+                Inputs: {selectedEvidenceCard.formulaInputs?.join(", ") ?? "No explicit inputs recorded"}
+              </Text>
             </View>
-            <View style={styles.detailMetricStrip}>
-              <DenseStat label="Current" value={selectedEvidenceCard.metric.currentLabel} tone="strong" />
-              <DenseStat label="Threshold" value={selectedEvidenceCard.metric.thresholdLabel ?? "Context"} />
-              <DenseStat label="Freshness" value={selectedEvidenceCard.freshness} tone={selectedEvidenceCard.freshness === "Fresh" ? "strong" : "neutral"} />
-              <DenseStat label="Source" value={selectedEvidenceCard.sourceType} />
-            </View>
-            <EvidenceCardView
-              card={selectedEvidenceCard}
-              pinned={Boolean(
-                selectedStockSummary &&
-                  pinnedMetricKeys.includes(
-                    stockMetricPreferenceKey(selectedStockSummary.stock.id, selectedEvidenceCard.id),
-                  ),
-              )}
-            />
           </WindowPanel>
         ) : null}
 
@@ -4865,6 +5103,276 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 8,
+  },
+  detailHeroCard: {
+    padding: 16,
+    borderRadius: 18,
+    backgroundColor: "#0f172a",
+    borderWidth: 1,
+    borderColor: "#1e293b",
+    gap: 14,
+    overflow: "hidden",
+  },
+  detailHeroHeader: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    gap: 12,
+  },
+  detailHeroEyebrow: {
+    color: "#93c5fd",
+    fontSize: 11,
+    fontWeight: "800",
+    textTransform: "uppercase",
+    letterSpacing: 0.4,
+    fontFamily,
+  },
+  detailHeroValue: {
+    color: "#f8fafc",
+    fontSize: 24,
+    lineHeight: 30,
+    fontWeight: "800",
+    fontFamily,
+  },
+  detailHeroBadge: {
+    minHeight: 28,
+    paddingHorizontal: 10,
+    borderRadius: 10,
+    backgroundColor: "rgba(148, 163, 184, 0.18)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  detailHeroBadgeText: {
+    color: "#e2e8f0",
+    fontSize: 11,
+    fontWeight: "800",
+    fontFamily,
+  },
+  detailHeroChart: {
+    height: 248,
+    borderRadius: 16,
+    backgroundColor: "#111827",
+    borderWidth: 1,
+    borderColor: "#1f2937",
+    paddingHorizontal: 12,
+    paddingTop: 12,
+    paddingBottom: 10,
+    justifyContent: "flex-end",
+    overflow: "hidden",
+  },
+  detailHeroGrid: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "space-between",
+    paddingVertical: 18,
+  },
+  detailHeroGridLine: {
+    height: 1,
+    backgroundColor: "rgba(148, 163, 184, 0.15)",
+  },
+  detailHeroThresholdLine: {
+    position: "absolute",
+    left: 12,
+    right: 12,
+    height: 1,
+    backgroundColor: "rgba(248, 250, 252, 0.28)",
+    borderStyle: "dashed",
+  },
+  detailHeroCurrentLine: {
+    position: "absolute",
+    left: 12,
+    right: 12,
+    height: 2,
+    backgroundColor: "#22c55e",
+    opacity: 0.7,
+  },
+  detailHeroBarsRow: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    gap: 6,
+    flex: 1,
+  },
+  detailHeroBarHit: {
+    flex: 1,
+    height: "100%",
+    justifyContent: "flex-end",
+    alignItems: "center",
+    borderRadius: 10,
+    paddingBottom: 4,
+  },
+  detailHeroBarHitActive: {
+    backgroundColor: "rgba(148, 163, 184, 0.08)",
+  },
+  detailHeroBar: {
+    width: "100%",
+    borderRadius: 9,
+    backgroundColor: "rgba(96, 165, 250, 0.48)",
+    minHeight: 22,
+  },
+  detailHeroBarActive: {
+    backgroundColor: "#60a5fa",
+  },
+  detailHeroLineOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    pointerEvents: "none",
+  },
+  detailHeroLineDot: {
+    position: "absolute",
+    width: 8,
+    height: 8,
+    marginLeft: -4,
+    marginBottom: -4,
+    borderRadius: 4,
+    backgroundColor: "#f8fafc",
+  },
+  detailHeroLineDotMuted: {
+    position: "absolute",
+    width: 7,
+    height: 7,
+    marginLeft: -3.5,
+    marginBottom: -3.5,
+    borderRadius: 3.5,
+    backgroundColor: "#94a3b8",
+    opacity: 0.9,
+  },
+  detailHeroLegend: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: 10,
+  },
+  detailHeroLegendText: {
+    color: "#cbd5e1",
+    fontSize: 11,
+    fontWeight: "700",
+    fontFamily,
+    flexShrink: 1,
+  },
+  detailHeroFootnote: {
+    color: "#94a3b8",
+    fontSize: 12,
+    lineHeight: 17,
+    fontWeight: "600",
+    fontFamily,
+  },
+  detailChecklistStack: {
+    gap: 8,
+  },
+  detailChecklistRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    minHeight: 34,
+    paddingHorizontal: 10,
+    borderRadius: 12,
+    backgroundColor: "rgba(255, 255, 255, 0.04)",
+  },
+  detailChecklistMarker: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+  },
+  detailChecklistMarkerGood: {
+    backgroundColor: "#22c55e",
+  },
+  detailChecklistMarkerWarning: {
+    backgroundColor: "#f59e0b",
+  },
+  detailChecklistMarkerDanger: {
+    backgroundColor: "#ef4444",
+  },
+  detailChecklistMarkerNeutral: {
+    backgroundColor: "#94a3b8",
+  },
+  detailChecklistLabel: {
+    color: "#e5e7eb",
+    fontSize: 13,
+    fontWeight: "700",
+    flexShrink: 1,
+    fontFamily,
+  },
+  detailCountdownWrap: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    justifyContent: "center",
+    gap: 8,
+    minHeight: 140,
+  },
+  detailCountdownDays: {
+    color: "#f8fafc",
+    fontSize: 80,
+    lineHeight: 86,
+    fontWeight: "800",
+    fontFamily,
+  },
+  detailCountdownUnit: {
+    color: "#cbd5e1",
+    fontSize: 18,
+    lineHeight: 24,
+    fontWeight: "700",
+    marginBottom: 14,
+    fontFamily,
+  },
+  detailGaugeTrack: {
+    height: 34,
+    borderRadius: 18,
+    overflow: "hidden",
+    flexDirection: "row",
+    position: "relative",
+  },
+  detailGaugeSafe: {
+    flex: 1,
+    backgroundColor: "#14532d",
+  },
+  detailGaugeWarn: {
+    flex: 1,
+    backgroundColor: "#92400e",
+  },
+  detailGaugeDanger: {
+    flex: 1,
+    backgroundColor: "#7f1d1d",
+  },
+  detailGaugeThreshold: {
+    position: "absolute",
+    top: -3,
+    bottom: -3,
+    width: 2,
+    backgroundColor: "#f8fafc",
+    opacity: 0.65,
+  },
+  detailGaugeCurrent: {
+    position: "absolute",
+    top: -5,
+    bottom: -5,
+    width: 4,
+    borderRadius: 2,
+    backgroundColor: "#60a5fa",
+  },
+  detailZoneTrack: {
+    height: 52,
+    borderRadius: 16,
+    backgroundColor: "#111827",
+    borderWidth: 1,
+    borderColor: "#1f2937",
+    position: "relative",
+    justifyContent: "center",
+    overflow: "hidden",
+  },
+  detailZoneBand: {
+    position: "absolute",
+    top: 10,
+    bottom: 10,
+    borderRadius: 12,
+    backgroundColor: "rgba(34, 197, 94, 0.32)",
+    borderWidth: 1,
+    borderColor: "rgba(74, 222, 128, 0.8)",
+  },
+  detailZoneMarker: {
+    position: "absolute",
+    top: 4,
+    bottom: 4,
+    width: 4,
+    borderRadius: 2,
+    backgroundColor: "#f8fafc",
   },
   freshnessDot: {
     width: 6,
