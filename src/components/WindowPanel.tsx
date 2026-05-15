@@ -1,0 +1,233 @@
+import React, { useEffect, useRef } from "react";
+import {
+  Animated,
+  PanResponder,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+
+const fontFamily = "System";
+
+interface WindowPanelProps {
+  title: string;
+  subtitle?: string;
+  onClose: () => void;
+  children: React.ReactNode;
+}
+
+export const WindowPanel = ({ title, subtitle, onClose, children }: WindowPanelProps) => {
+  const overlayOpacity = useRef(new Animated.Value(0)).current;
+  const sheetOffset = useRef(new Animated.Value(28)).current;
+  const sheetScale = useRef(new Animated.Value(0.985)).current;
+  const closingRef = useRef(false);
+
+  const animateClose = () => {
+    if (closingRef.current) return;
+    closingRef.current = true;
+    Animated.parallel([
+      Animated.timing(overlayOpacity, {
+        toValue: 0,
+        duration: 180,
+        useNativeDriver: true,
+      }),
+      Animated.timing(sheetOffset, {
+        toValue: 42,
+        duration: 220,
+        useNativeDriver: true,
+      }),
+      Animated.timing(sheetScale, {
+        toValue: 0.98,
+        duration: 180,
+        useNativeDriver: true,
+      }),
+    ]).start(() => onClose());
+  };
+
+  const dragResponder = useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponder: (_, gesture) =>
+        Math.abs(gesture.dy) > 6 && Math.abs(gesture.dy) > Math.abs(gesture.dx),
+      onPanResponderMove: (_, gesture) => {
+        const nextOffset = Math.max(0, gesture.dy);
+        sheetOffset.setValue(nextOffset);
+        overlayOpacity.setValue(Math.max(0.08, 1 - nextOffset / 220));
+      },
+      onPanResponderRelease: (_, gesture) => {
+        if (gesture.dy > 96 || gesture.vy > 1.15) {
+          animateClose();
+          return;
+        }
+        Animated.parallel([
+          Animated.timing(overlayOpacity, {
+            toValue: 1,
+            duration: 180,
+            useNativeDriver: true,
+          }),
+          Animated.spring(sheetOffset, {
+            toValue: 0,
+            useNativeDriver: true,
+            damping: 18,
+            stiffness: 180,
+          }),
+          Animated.spring(sheetScale, {
+            toValue: 1,
+            useNativeDriver: true,
+            damping: 18,
+            stiffness: 180,
+          }),
+        ]).start();
+      },
+    }),
+  ).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(overlayOpacity, {
+        toValue: 1,
+        duration: 220,
+        useNativeDriver: true,
+      }),
+      Animated.spring(sheetOffset, {
+        toValue: 0,
+        useNativeDriver: true,
+        damping: 18,
+        stiffness: 180,
+      }),
+      Animated.spring(sheetScale, {
+        toValue: 1,
+        useNativeDriver: true,
+        damping: 18,
+        stiffness: 180,
+      }),
+    ]).start();
+  }, [overlayOpacity, sheetOffset, sheetScale]);
+
+  return (
+    <Animated.View style={[styles.windowBackdrop, { opacity: overlayOpacity }]}>
+      <Pressable style={styles.windowDismissLayer} onPress={animateClose} />
+      <Animated.View style={[styles.windowPanel, { transform: [{ translateY: sheetOffset }, { scale: sheetScale }] }]}>
+        <View style={styles.windowHandleTouch} {...dragResponder.panHandlers}>
+          <View style={styles.windowGrabber} />
+        </View>
+        <View style={styles.windowHeader}>
+          <View style={styles.flexOne}>
+            <Text style={styles.windowTitle} numberOfLines={2}>
+              {title}
+            </Text>
+            {subtitle ? (
+              <Text style={styles.windowSubtitle} numberOfLines={2}>
+                {subtitle}
+              </Text>
+            ) : null}
+          </View>
+          <Pressable onPress={animateClose} style={({ pressed }) => [styles.doneButton, pressed ? styles.doneButtonPressed : null]}>
+            <Text style={styles.doneButtonText}>Done</Text>
+          </Pressable>
+        </View>
+        <ScrollView
+          style={styles.windowScroll}
+          contentContainerStyle={styles.windowScrollContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          nestedScrollEnabled
+        >
+          {children}
+        </ScrollView>
+      </Animated.View>
+    </Animated.View>
+  );
+};
+
+const styles = StyleSheet.create({
+  flexOne: {
+    flex: 1,
+  },
+  windowBackdrop: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "flex-end",
+    backgroundColor: "rgba(15, 23, 42, 0.24)",
+  },
+  windowDismissLayer: {
+    flex: 1,
+  },
+  windowPanel: {
+    maxHeight: "84%",
+    borderTopLeftRadius: 26,
+    borderTopRightRadius: 26,
+    backgroundColor: "#ffffff",
+    borderTopWidth: 1,
+    borderColor: "#eceef2",
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 26,
+    gap: 10,
+    overflow: "hidden",
+  },
+  windowHandleTouch: {
+    alignSelf: "stretch",
+    alignItems: "center",
+    paddingTop: 2,
+    paddingBottom: 4,
+  },
+  windowGrabber: {
+    alignSelf: "center",
+    width: 42,
+    height: 5,
+    borderRadius: 999,
+    backgroundColor: "#d1d5db",
+    marginBottom: 8,
+  },
+  windowHeader: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    gap: 12,
+  },
+  windowTitle: {
+    color: "#111827",
+    fontSize: 22,
+    lineHeight: 28,
+    fontWeight: "800",
+    fontFamily,
+  },
+  windowSubtitle: {
+    marginTop: 4,
+    color: "#6b7280",
+    fontSize: 13,
+    lineHeight: 19,
+    fontWeight: "600",
+    fontFamily,
+  },
+  doneButton: {
+    minHeight: 36,
+    paddingHorizontal: 14,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+    backgroundColor: "#ffffff",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  doneButtonPressed: {
+    transform: [{ scale: 0.985 }],
+    opacity: 0.92,
+  },
+  doneButtonText: {
+    color: "#6b7280",
+    fontSize: 14,
+    fontWeight: "700",
+    fontFamily,
+  },
+  windowScroll: {
+    flex: 1,
+    minHeight: 0,
+  },
+  windowScrollContent: {
+    gap: 10,
+    paddingBottom: 12,
+    flexGrow: 1,
+  },
+});

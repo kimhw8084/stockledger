@@ -2,7 +2,6 @@ import { StatusBar } from "expo-status-bar";
 import React, { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import {
   Animated,
-  PanResponder,
   Platform,
   Pressable,
   SafeAreaView,
@@ -14,6 +13,8 @@ import {
 } from "react-native";
 
 import { useAppModel } from "./src/hooks/useAppModel";
+import { BottomNav } from "./src/components/BottomNav";
+import { WindowPanel } from "./src/components/WindowPanel";
 import {
   Alert,
   ConditionOperator,
@@ -1613,131 +1614,6 @@ const RecipeConditionMapCard = ({
   );
 };
 
-const WindowPanel = ({
-  title,
-  subtitle,
-  onClose,
-  children,
-}: {
-  title: string;
-  subtitle?: string;
-  onClose: () => void;
-  children: React.ReactNode;
-}) => {
-  const overlayOpacity = useRef(new Animated.Value(0)).current;
-  const sheetOffset = useRef(new Animated.Value(28)).current;
-  const sheetScale = useRef(new Animated.Value(0.985)).current;
-  const closingRef = useRef(false);
-
-  const animateClose = () => {
-    if (closingRef.current) return;
-    closingRef.current = true;
-    Animated.parallel([
-      Animated.timing(overlayOpacity, {
-        toValue: 0,
-        duration: 180,
-        useNativeDriver: true,
-      }),
-      Animated.timing(sheetOffset, {
-        toValue: 42,
-        duration: 220,
-        useNativeDriver: true,
-      }),
-      Animated.timing(sheetScale, {
-        toValue: 0.98,
-        duration: 180,
-        useNativeDriver: true,
-      }),
-    ]).start(() => onClose());
-  };
-
-  const dragResponder = useRef(
-    PanResponder.create({
-      onMoveShouldSetPanResponder: (_, gesture) =>
-        Math.abs(gesture.dy) > 6 && Math.abs(gesture.dy) > Math.abs(gesture.dx),
-      onPanResponderMove: (_, gesture) => {
-        const nextOffset = Math.max(0, gesture.dy);
-        sheetOffset.setValue(nextOffset);
-        overlayOpacity.setValue(Math.max(0.08, 1 - nextOffset / 220));
-      },
-      onPanResponderRelease: (_, gesture) => {
-        if (gesture.dy > 96 || gesture.vy > 1.15) {
-          animateClose();
-          return;
-        }
-        Animated.parallel([
-          Animated.timing(overlayOpacity, {
-            toValue: 1,
-            duration: 180,
-            useNativeDriver: true,
-          }),
-          Animated.spring(sheetOffset, {
-            toValue: 0,
-            useNativeDriver: true,
-            damping: 18,
-            stiffness: 180,
-          }),
-          Animated.spring(sheetScale, {
-            toValue: 1,
-            useNativeDriver: true,
-            damping: 18,
-            stiffness: 180,
-          }),
-        ]).start();
-      },
-    }),
-  ).current;
-
-  useEffect(() => {
-    Animated.parallel([
-      Animated.timing(overlayOpacity, {
-        toValue: 1,
-        duration: 220,
-        useNativeDriver: true,
-      }),
-      Animated.spring(sheetOffset, {
-        toValue: 0,
-        useNativeDriver: true,
-        damping: 18,
-        stiffness: 180,
-      }),
-      Animated.spring(sheetScale, {
-        toValue: 1,
-        useNativeDriver: true,
-        damping: 18,
-        stiffness: 180,
-      }),
-    ]).start();
-  }, [overlayOpacity, sheetOffset, sheetScale]);
-
-  return (
-    <Animated.View style={[styles.windowBackdrop, { opacity: overlayOpacity }]}>
-      <Pressable style={styles.windowDismissLayer} onPress={animateClose} />
-      <Animated.View style={[styles.windowPanel, { transform: [{ translateY: sheetOffset }, { scale: sheetScale }] }]}>
-        <View style={styles.windowHandleTouch} {...dragResponder.panHandlers}>
-          <View style={styles.windowGrabber} />
-        </View>
-        <View style={styles.windowHeader}>
-          <View style={styles.flexOne}>
-            <Text style={styles.windowTitle} numberOfLines={2}>{title}</Text>
-            {subtitle ? <Text style={styles.windowSubtitle} numberOfLines={2}>{subtitle}</Text> : null}
-          </View>
-          <Button label="Done" tone="ghost" onPress={animateClose} />
-        </View>
-        <ScrollView
-          style={styles.windowScroll}
-          contentContainerStyle={styles.windowScrollContent}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-          nestedScrollEnabled
-        >
-          {children}
-        </ScrollView>
-      </Animated.View>
-    </Animated.View>
-  );
-};
-
 const StockTriageCard = ({
   item,
   recipes,
@@ -2091,12 +1967,16 @@ export default function App() {
 
   const stockDirectory = useMemo(() => {
     if (!data) return [];
+    const now = Date.now();
     return data.stocks
       .map((stock) => {
         const eyes = data.eyes.filter((eye) => eye.stockId === stock.id);
         const snapshot = data.snapshots.find((item) => item.stockId === stock.id);
         const openAlerts = data.alerts.filter(
-          (alert) => !alert.reviewed && eyes.some((eye) => eye.id === alert.eyeId),
+          (alert) =>
+            !alert.reviewed &&
+            (!alert.snoozedUntil || new Date(alert.snoozedUntil).getTime() <= now) &&
+            eyes.some((eye) => eye.id === alert.eyeId),
         );
         const dominantEye = [...eyes].sort((a, b) => {
           const stateDelta =
@@ -2229,7 +2109,9 @@ export default function App() {
     conditionLibrary.find((item) => item.id === conditionBuilder.templateId) ?? conditionLibrary[0];
   const selectedOperatorOptions = operatorOptionsForTemplate(selectedTemplate);
   const selectedAlert = alertQueue.find((alert) => alert.id === selectedAlertId) ?? alertQueue[0];
-  const openAlerts = data.alerts.filter((alert) => !alert.reviewed).length;
+  const openAlerts = data.alerts.filter(
+    (alert) => !alert.reviewed && (!alert.snoozedUntil || new Date(alert.snoozedUntil).getTime() <= Date.now()),
+  ).length;
   const reviewedAlerts = data.alerts.filter((alert) => alert.reviewed);
   const criticalEyes = data.eyes.filter((eye) =>
     ["Attention Needed", "Thesis Risk Rising", "Thesis Broken"].includes(
@@ -4335,26 +4217,7 @@ export default function App() {
           </WindowPanel>
         ) : null}
 
-        <View style={styles.bottomNav}>
-          <View style={styles.bottomNavRow}>
-            {tabs.map((item) => (
-              <Pressable
-                key={item}
-                onPress={() => setTab(item)}
-                style={({ pressed }) => [
-                  styles.navItem,
-                  tab === item ? styles.navItemActive : null,
-                  pressed ? styles.navItemPressed : null,
-                ]}
-              >
-                <View style={[styles.navIndicator, tab === item ? styles.navIndicatorActive : null]} />
-                <Text style={[styles.navLabel, tab === item ? styles.navLabelActive : null]} numberOfLines={1}>
-                  {item}
-                </Text>
-              </Pressable>
-            ))}
-          </View>
-        </View>
+        <BottomNav tabs={tabs} currentTab={tab} onSelect={setTab} />
       </View>
     </SafeAreaView>
   );
@@ -5878,71 +5741,6 @@ const styles = StyleSheet.create({
     fontSize: 9,
     fontWeight: "700",
   },
-  // Navigation
-  bottomNav: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: "#fbfbfd",
-    borderTopWidth: 1,
-    borderTopColor: "#e5e7eb",
-    paddingTop: 8,
-    paddingBottom: 28,
-    paddingHorizontal: 10,
-  },
-  bottomNavRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    minHeight: 68,
-    paddingHorizontal: 8,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: "#ffffff",
-    borderWidth: 1,
-    borderColor: "#eceef2",
-    shadowColor: "#111827",
-    shadowOpacity: 0.05,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 8,
-  },
-  navItem: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 5,
-    minHeight: 52,
-    borderRadius: 14,
-    marginHorizontal: 2,
-    overflow: "hidden",
-  },
-  navItemActive: {
-    backgroundColor: "#111827",
-  },
-  navItemPressed: {
-    transform: [{ scale: 0.985 }],
-    opacity: 0.92,
-  },
-  navIndicator: {
-    width: 18,
-    height: 3,
-    borderRadius: 2,
-    backgroundColor: "#d1d5db",
-  },
-  navIndicatorActive: {
-    backgroundColor: "#ffffff",
-  },
-  navLabel: {
-    color: "#6b7280",
-    fontSize: 10,
-    fontWeight: "800",
-    fontFamily,
-  },
-  navLabelActive: {
-    color: "#ffffff",
-  },
   // Legacy/Required Compat
   card: {
     backgroundColor: "#ffffff",
@@ -6388,71 +6186,6 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     lineHeight: 17,
     fontFamily,
-  },
-  windowBackdrop: {
-    ...StyleSheet.absoluteFillObject,
-    justifyContent: "flex-end",
-    backgroundColor: "rgba(17, 24, 39, 0.18)",
-  },
-  windowDismissLayer: {
-    flex: 1,
-  },
-  windowPanel: {
-    maxHeight: "84%",
-    borderTopLeftRadius: 26,
-    borderTopRightRadius: 26,
-    backgroundColor: "#ffffff",
-    borderTopWidth: 1,
-    borderColor: "#eceef2",
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 26,
-    gap: 10,
-    overflow: "hidden",
-  },
-  windowHeader: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    justifyContent: "space-between",
-    gap: 12,
-  },
-  windowTitle: {
-    color: "#111827",
-    fontSize: 22,
-    lineHeight: 28,
-    fontWeight: "800",
-    fontFamily,
-  },
-  windowSubtitle: {
-    marginTop: 4,
-    color: "#6b7280",
-    fontSize: 13,
-    lineHeight: 19,
-    fontWeight: "600",
-    fontFamily,
-  },
-  windowHandleTouch: {
-    alignSelf: "stretch",
-    alignItems: "center",
-    paddingTop: 2,
-    paddingBottom: 4,
-  },
-  windowGrabber: {
-    alignSelf: "center",
-    width: 42,
-    height: 5,
-    borderRadius: 999,
-    backgroundColor: "#d1d5db",
-    marginBottom: 8,
-  },
-  windowScroll: {
-    flex: 1,
-    minHeight: 0,
-  },
-  windowScrollContent: {
-    gap: 10,
-    paddingBottom: 12,
-    flexGrow: 1,
   },
   stepFlow: {
     flexDirection: "row",
