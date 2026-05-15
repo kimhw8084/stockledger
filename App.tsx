@@ -3165,10 +3165,32 @@ export default function App() {
               {selectedStockSummary ? (
                 <Reveal delay={40}>
                   <Card highlighted>
-                    <View style={styles.inlineBetween}>
-                      <View style={styles.flexOne}>
+                    <View style={styles.stockShellHeader}>
+                      <View style={styles.stockShellIdentity}>
                         <Text style={styles.stockHeroSymbol}>{selectedStockSummary.stock.symbol}</Text>
                         <Text style={styles.stockHeroName}>{selectedStockSummary.stock.name}</Text>
+                        <View style={styles.stockShellMetaRow}>
+                          <Text style={styles.stockBoardMetaText}>{sortedSelectedStockAnalysisCards.length} metrics</Text>
+                          <Text style={styles.stockBoardMetaDivider}>•</Text>
+                          <Text style={styles.stockBoardMetaText}>{selectedStockSummary.eyes.length} eyes</Text>
+                          <Text style={styles.stockBoardMetaDivider}>•</Text>
+                          <Text style={styles.stockBoardMetaText}>{pinnedCountForSelectedStock} pinned</Text>
+                        </View>
+                      </View>
+                      <View style={styles.stockShellHeaderActions}>
+                        <View style={freshnessTone(selectedStockSummary.snapshot?.freshness ?? "Unavailable")}>
+                          <Text style={styles.freshnessBadgeText}>
+                            {selectedStockSummary.snapshot?.freshness ?? "Unavailable"}
+                          </Text>
+                        </View>
+                        <Button
+                          label="Clear"
+                          tone="ghost"
+                          onPress={() => {
+                            setSelectedStockId("");
+                            setStockSearch("");
+                          }}
+                        />
                       </View>
                     </View>
                     <View style={styles.stockTrendHero}>
@@ -3178,23 +3200,22 @@ export default function App() {
                             {selectedHeroPrice !== undefined ? `$${selectedHeroPrice.toFixed(2)}` : "--"}
                           </Text>
                           <Text style={styles.stockTrendCaption}>
-                            {selectedStockSummary.snapshot?.isMock ? "Mock-backed trend" : "Provider-backed trend"} · {selectedHeroPointLabel}
+                            {selectedHeroPointLabel} · {selectedStockSummary.snapshot?.isMock ? "Mock data" : "Provider data"}
                           </Text>
                         </View>
-                        <View style={styles.stockTrendHeaderActions}>
-                          <View style={freshnessTone(selectedStockSummary.snapshot?.freshness ?? "Unavailable")}>
-                            <Text style={styles.freshnessBadgeText}>
-                              {selectedStockSummary.snapshot?.freshness ?? "Unavailable"}
+                        <View style={styles.stockTrendSummaryMini}>
+                          <View style={styles.stockTrendSummaryMiniBlock}>
+                            <Text style={styles.stockTrendSummaryMiniLabel}>Range</Text>
+                            <Text style={styles.stockTrendSummaryMiniValue}>
+                              {selectedStockHeroRange ? `${Math.round(selectedStockHeroRange.high - selectedStockHeroRange.low)} pts` : "--"}
                             </Text>
                           </View>
-                          <Button
-                            label="Clear"
-                            tone="ghost"
-                            onPress={() => {
-                              setSelectedStockId("");
-                              setStockSearch("");
-                            }}
-                          />
+                          <View style={styles.stockTrendSummaryMiniBlock}>
+                            <Text style={styles.stockTrendSummaryMiniLabel}>Vs {analysisBenchmark}</Text>
+                            <Text style={styles.stockTrendSummaryMiniValue}>
+                              {selectedHeroBenchmarkDelta !== undefined ? `${selectedHeroBenchmarkDelta >= 0 ? "+" : ""}${selectedHeroBenchmarkDelta.toFixed(2)}` : "--"}
+                            </Text>
+                          </View>
                         </View>
                       </View>
                       <View style={styles.stockHeroControlRow}>
@@ -3205,26 +3226,6 @@ export default function App() {
                         <View style={styles.stockHeroControlBlock}>
                           <Text style={styles.stockHeroControlLabel}>Benchmark</Text>
                           <HorizontalChoice options={analysisBenchmarks} value={analysisBenchmark} onSelect={setAnalysisBenchmark} />
-                        </View>
-                      </View>
-                      <View style={styles.stockTrendSummaryRow}>
-                        <View style={styles.stockTrendSummaryCell}>
-                          <Text style={styles.stockTrendSummaryLabel}>Freshness</Text>
-                          <Text style={styles.stockTrendSummaryValue}>
-                            {selectedStockSummary.snapshot?.freshness ?? "Unavailable"}
-                          </Text>
-                        </View>
-                        <View style={styles.stockTrendSummaryCell}>
-                          <Text style={styles.stockTrendSummaryLabel}>Range</Text>
-                          <Text style={styles.stockTrendSummaryValue}>
-                            {selectedStockHeroRange ? `${Math.round(selectedStockHeroRange.high - selectedStockHeroRange.low)} pts` : "--"}
-                          </Text>
-                        </View>
-                        <View style={styles.stockTrendSummaryCell}>
-                          <Text style={styles.stockTrendSummaryLabel}>Vs {analysisBenchmark}</Text>
-                          <Text style={styles.stockTrendSummaryValue}>
-                            {selectedHeroBenchmarkDelta !== undefined ? `${selectedHeroBenchmarkDelta >= 0 ? "+" : ""}${selectedHeroBenchmarkDelta.toFixed(2)}` : "--"}
-                          </Text>
                         </View>
                       </View>
                       <View style={styles.stockTrendChart}>
@@ -3317,13 +3318,6 @@ export default function App() {
                         <Text style={styles.inputLabel}>Board</Text>
                         <HorizontalChoice options={stockBoardModes} value={stockBoardMode} onSelect={setStockBoardMode} />
                       </View>
-                    </View>
-                    <View style={styles.stockBoardMetaRow}>
-                      <Text style={styles.stockBoardMetaText}>{sortedSelectedStockAnalysisCards.length} metrics</Text>
-                      <Text style={styles.stockBoardMetaDivider}>•</Text>
-                      <Text style={styles.stockBoardMetaText}>{selectedStockSummary.eyes.length} eyes</Text>
-                      <Text style={styles.stockBoardMetaDivider}>•</Text>
-                      <Text style={styles.stockBoardMetaText}>{pinnedCountForSelectedStock} pinned</Text>
                     </View>
                   </Card>
 
@@ -4910,24 +4904,40 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
   },
+  stockShellHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    gap: 12,
+  },
+  stockShellIdentity: {
+    flex: 1,
+    gap: 4,
+  },
+  stockShellMetaRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: 6,
+  },
+  stockShellHeaderActions: {
+    alignItems: "flex-end",
+    gap: 8,
+  },
   stockTrendHero: {
-    marginTop: 14,
-    padding: 16,
+    marginTop: 12,
+    padding: 14,
     borderRadius: 18,
     backgroundColor: "#f8fafc",
     borderWidth: 1,
     borderColor: "#edf0f5",
-    gap: 12,
+    gap: 10,
   },
   stockTrendHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "flex-start",
+    alignItems: "center",
     gap: 10,
-  },
-  stockTrendHeaderActions: {
-    alignItems: "flex-end",
-    gap: 8,
   },
   stockHeroControlRow: {
     flexDirection: "row",
@@ -4945,20 +4955,16 @@ const styles = StyleSheet.create({
     letterSpacing: 0.35,
     fontFamily,
   },
-  stockTrendSummaryRow: {
+  stockTrendSummaryMini: {
     flexDirection: "row",
     gap: 8,
   },
-  stockTrendSummaryCell: {
-    flex: 1,
-    padding: 10,
-    borderRadius: 14,
-    backgroundColor: "#ffffff",
-    borderWidth: 1,
-    borderColor: "#eceef2",
-    gap: 4,
+  stockTrendSummaryMiniBlock: {
+    minWidth: 74,
+    alignItems: "flex-end",
+    gap: 2,
   },
-  stockTrendSummaryLabel: {
+  stockTrendSummaryMiniLabel: {
     color: "#6b7280",
     fontSize: 10,
     fontWeight: "700",
@@ -4966,7 +4972,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.4,
     fontFamily,
   },
-  stockTrendSummaryValue: {
+  stockTrendSummaryMiniValue: {
     color: "#111827",
     fontSize: 13,
     fontWeight: "800",
