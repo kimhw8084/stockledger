@@ -1724,7 +1724,13 @@ const WindowPanel = ({
           </View>
           <Button label="Done" tone="ghost" onPress={animateClose} />
         </View>
-        <ScrollView style={styles.windowScroll} contentContainerStyle={styles.stack} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          style={styles.windowScroll}
+          contentContainerStyle={styles.windowScrollContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          nestedScrollEnabled
+        >
           {children}
         </ScrollView>
       </Animated.View>
@@ -2738,7 +2744,12 @@ export default function App() {
             ) : null}
           </Pressable>
         </View>
-        <ScrollView contentContainerStyle={styles.page} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          contentContainerStyle={styles.page}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          nestedScrollEnabled
+        >
           {tab === "Home" ? (
             <>
               <Reveal>
@@ -4437,6 +4448,7 @@ const styles = StyleSheet.create({
     fontFamily,
   },
   page: {
+    flexGrow: 1,
     paddingHorizontal: 16,
     paddingTop: 16,
     paddingBottom: 136,
@@ -6429,7 +6441,13 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   windowScroll: {
-    flexGrow: 0,
+    flex: 1,
+    minHeight: 0,
+  },
+  windowScrollContent: {
+    gap: 10,
+    paddingBottom: 12,
+    flexGrow: 1,
   },
   stepFlow: {
     flexDirection: "row",
