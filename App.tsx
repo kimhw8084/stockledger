@@ -1924,6 +1924,7 @@ export default function App() {
   const [pinnedMetricKeys, setPinnedMetricKeys] = useState<string[]>([]);
   const [stockComposerOpen, setStockComposerOpen] = useState(false);
   const [selectedEvidenceCard, setSelectedEvidenceCard] = useState<VisualEvidenceCard | null>(null);
+  const [selectedHeroPointIndex, setSelectedHeroPointIndex] = useState(0);
   const [recipeBuilderOpen, setRecipeBuilderOpen] = useState(false);
   const [recipeDetailId, setRecipeDetailId] = useState("");
   const [selectedDecisionId, setSelectedDecisionId] = useState("");
@@ -2048,6 +2049,12 @@ export default function App() {
   useEffect(() => {
     if (!selectedStockId) {
       setSelectedEvidenceCard(null);
+    }
+  }, [selectedStockId]);
+
+  useEffect(() => {
+    if (!selectedStockId) {
+      setSelectedHeroPointIndex(0);
     }
   }, [selectedStockId]);
 
@@ -2250,6 +2257,20 @@ export default function App() {
         latest: selectedStockTrendSeries[selectedStockTrendSeries.length - 1],
       }
     : null;
+  const safeSelectedHeroPointIndex =
+    selectedStockTrendSeries.length > 0
+      ? Math.max(0, Math.min(selectedHeroPointIndex, selectedStockTrendSeries.length - 1))
+      : 0;
+  const selectedHeroPrice = selectedStockTrendSeries[safeSelectedHeroPointIndex];
+  const selectedHeroBenchmark = selectedStockBenchmarkSeries[safeSelectedHeroPointIndex];
+  const selectedHeroPointLabel =
+    selectedStockTrendSeries.length > 1 && safeSelectedHeroPointIndex !== selectedStockTrendSeries.length - 1
+      ? `Point ${safeSelectedHeroPointIndex + 1}`
+      : "Latest";
+  const selectedHeroBenchmarkDelta =
+    selectedHeroPrice !== undefined && selectedHeroBenchmark !== undefined
+      ? selectedHeroPrice - selectedHeroBenchmark
+      : undefined;
   const recentStocks = recentStockIds
     .map((id) => stockDirectory.find((item) => item.stock.id === id))
     .filter((item): item is NonNullable<typeof item> => Boolean(item));
@@ -2259,6 +2280,14 @@ export default function App() {
   const pinnedCountForSelectedStock = selectedStockSummary
     ? pinnedMetricKeys.filter((key) => key.startsWith(`${selectedStockSummary.stock.id}:`)).length
     : 0;
+
+  useEffect(() => {
+    if (selectedStockTrendSeries.length === 0) {
+      setSelectedHeroPointIndex(0);
+      return;
+    }
+    setSelectedHeroPointIndex(selectedStockTrendSeries.length - 1);
+  }, [selectedStockId, analysisLookback, analysisBenchmark, selectedStockTrendSeries.length]);
 
   const activeEyesInventory = eyesSorted.filter(
     (eye) => !["Not Relevant", "Thesis Broken"].includes(eye.lastEvaluation?.currentState ?? "Not Relevant"),
@@ -2926,10 +2955,10 @@ export default function App() {
                       <View style={styles.stockTrendHeader}>
                         <View style={styles.flexOne}>
                           <Text style={styles.stockTrendPrice}>
-                            ${selectedStockSummary.snapshot ? selectedStockSummary.snapshot.price.toFixed(2) : "--"}
+                            {selectedHeroPrice !== undefined ? `$${selectedHeroPrice.toFixed(2)}` : "--"}
                           </Text>
                           <Text style={styles.stockTrendCaption}>
-                            {selectedStockSummary.snapshot?.isMock ? "Mock-backed trend" : "Provider-backed trend"}
+                            {selectedStockSummary.snapshot?.isMock ? "Mock-backed trend" : "Provider-backed trend"} · {selectedHeroPointLabel}
                           </Text>
                         </View>
                         <View style={styles.stockTrendHeaderActions}>
@@ -2948,6 +2977,16 @@ export default function App() {
                           />
                         </View>
                       </View>
+                      <View style={styles.stockHeroControlRow}>
+                        <View style={styles.stockHeroControlBlock}>
+                          <Text style={styles.stockHeroControlLabel}>Lookback</Text>
+                          <HorizontalChoice options={analysisLookbacks} value={analysisLookback} onSelect={setAnalysisLookback} />
+                        </View>
+                        <View style={styles.stockHeroControlBlock}>
+                          <Text style={styles.stockHeroControlLabel}>Benchmark</Text>
+                          <HorizontalChoice options={analysisBenchmarks} value={analysisBenchmark} onSelect={setAnalysisBenchmark} />
+                        </View>
+                      </View>
                       <View style={styles.stockTrendSummaryRow}>
                         <View style={styles.stockTrendSummaryCell}>
                           <Text style={styles.stockTrendSummaryLabel}>Freshness</Text>
@@ -2962,9 +3001,9 @@ export default function App() {
                           </Text>
                         </View>
                         <View style={styles.stockTrendSummaryCell}>
-                          <Text style={styles.stockTrendSummaryLabel}>Setup</Text>
+                          <Text style={styles.stockTrendSummaryLabel}>Vs {analysisBenchmark}</Text>
                           <Text style={styles.stockTrendSummaryValue}>
-                            {selectedStockSummary.snapshot?.isMock ? "Mock" : "Provider"}
+                            {selectedHeroBenchmarkDelta !== undefined ? `${selectedHeroBenchmarkDelta >= 0 ? "+" : ""}${selectedHeroBenchmarkDelta.toFixed(2)}` : "--"}
                           </Text>
                         </View>
                       </View>
@@ -2975,13 +3014,25 @@ export default function App() {
                           <View style={styles.stockTrendGridLine} />
                         </View>
                         {selectedStockTrendDisplaySeries.map((point, index) => (
-                          <Animated.View
+                          <Pressable
                             key={`trend-${selectedStockSummary.stock.id}-${index}`}
+                            onPress={() => setSelectedHeroPointIndex(index)}
                             style={[
-                              styles.stockTrendBar,
-                              { height: `${Math.max(16, point)}%`, opacity: index === selectedStockTrendDisplaySeries.length - 1 ? 1 : 0.52 },
+                              styles.stockTrendBarHit,
+                              index === safeSelectedHeroPointIndex ? styles.stockTrendBarHitActive : null,
                             ]}
-                          />
+                          >
+                            <Animated.View
+                              style={[
+                                styles.stockTrendBar,
+                                {
+                                  height: `${Math.max(16, point)}%`,
+                                  opacity: index === safeSelectedHeroPointIndex ? 1 : 0.52,
+                                },
+                                index === safeSelectedHeroPointIndex ? styles.stockTrendBarActive : null,
+                              ]}
+                            />
+                          </Pressable>
                         ))}
                         <View style={styles.stockTrendLineOverlay}>
                           {selectedStockTrendDisplaySeries.map((point, index) => (
@@ -2993,7 +3044,7 @@ export default function App() {
                                   left: `${(index / Math.max(selectedStockTrendDisplaySeries.length - 1, 1)) * 100}%`,
                                   bottom: `${Math.max(6, Math.min(96, point))}%`,
                                 },
-                                index === selectedStockTrendDisplaySeries.length - 1 ? styles.stockTrendLineDotActive : null,
+                                index === safeSelectedHeroPointIndex ? styles.stockTrendLineDotActive : null,
                               ]}
                             />
                           ))}
@@ -3020,7 +3071,7 @@ export default function App() {
                                     6,
                                     Math.min(
                                       96,
-                                      selectedStockTrendDisplaySeries[selectedStockTrendDisplaySeries.length - 1] ?? 50,
+                                      selectedStockTrendDisplaySeries[safeSelectedHeroPointIndex] ?? 50,
                                     ),
                                   )
                                 }%`,
@@ -3030,22 +3081,14 @@ export default function App() {
                         ) : null}
                       </View>
                       <View style={styles.stockTrendLegend}>
-                        <Text style={styles.stockTrendLegendText}>Trend</Text>
+                        <Text style={styles.stockTrendLegendText}>{selectedHeroPointLabel}</Text>
                         <Text style={styles.stockTrendLegendText}>
                           Drawdown {selectedStockSummary.snapshot ? `${selectedStockSummary.snapshot.drawdownPct}%` : "N/A"}
                         </Text>
-                        <Text style={styles.stockTrendLegendText}>{analysisLookback}</Text>
+                        <Text style={styles.stockTrendLegendText}>{analysisLookback} vs {analysisBenchmark}</Text>
                       </View>
                     </View>
                     <View style={styles.stockControlStack}>
-                      <View style={styles.controlCard}>
-                        <Text style={styles.inputLabel}>Benchmark</Text>
-                        <HorizontalChoice options={analysisBenchmarks} value={analysisBenchmark} onSelect={setAnalysisBenchmark} />
-                      </View>
-                      <View style={styles.controlCard}>
-                        <Text style={styles.inputLabel}>Lookback</Text>
-                        <HorizontalChoice options={analysisLookbacks} value={analysisLookback} onSelect={setAnalysisLookback} />
-                      </View>
                       <View style={styles.controlCard}>
                         <Text style={styles.inputLabel}>Status</Text>
                         <HorizontalChoice options={analysisStatusFilters} value={analysisStatusFilter} onSelect={setAnalysisStatusFilter} />
@@ -4725,6 +4768,22 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
     gap: 8,
   },
+  stockHeroControlRow: {
+    flexDirection: "row",
+    gap: 8,
+  },
+  stockHeroControlBlock: {
+    flex: 1,
+    gap: 6,
+  },
+  stockHeroControlLabel: {
+    color: "#6b7280",
+    fontSize: 10,
+    fontWeight: "700",
+    textTransform: "uppercase",
+    letterSpacing: 0.35,
+    fontFamily,
+  },
   stockTrendSummaryRow: {
     flexDirection: "row",
     gap: 8,
@@ -4789,9 +4848,23 @@ const styles = StyleSheet.create({
     backgroundColor: "#eef1f5",
   },
   stockTrendBar: {
-    flex: 1,
+    width: "100%",
     borderRadius: 999,
     backgroundColor: "#111827",
+  },
+  stockTrendBarHit: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "flex-end",
+    height: "100%",
+    borderRadius: 8,
+    paddingBottom: 0,
+  },
+  stockTrendBarHitActive: {
+    backgroundColor: "rgba(17, 24, 39, 0.04)",
+  },
+  stockTrendBarActive: {
+    backgroundColor: "#2563eb",
   },
   stockTrendLineOverlay: {
     ...StyleSheet.absoluteFillObject,
