@@ -4322,19 +4322,24 @@ export default function App() {
         ) : null}
 
         <View style={styles.bottomNav}>
-          {tabs.map((item) => (
-            <Pressable
-              key={item}
-              onPress={() => setTab(item)}
-              style={({ pressed }) => [
-                styles.navItem,
-                tab === item ? styles.navItemActive : null,
-                pressed ? styles.navItemPressed : null,
-              ]}
-            >
-              <Text style={[styles.navLabel, tab === item ? styles.navLabelActive : null]}>{item}</Text>
-            </Pressable>
-          ))}
+          <View style={styles.bottomNavRow}>
+            {tabs.map((item) => (
+              <Pressable
+                key={item}
+                onPress={() => setTab(item)}
+                style={({ pressed }) => [
+                  styles.navItem,
+                  tab === item ? styles.navItemActive : null,
+                  pressed ? styles.navItemPressed : null,
+                ]}
+              >
+                <View style={[styles.navIndicator, tab === item ? styles.navIndicatorActive : null]} />
+                <Text style={[styles.navLabel, tab === item ? styles.navLabelActive : null]} numberOfLines={1}>
+                  {item}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
         </View>
       </View>
     </SafeAreaView>
@@ -5865,57 +5870,60 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    flexDirection: "row",
-    backgroundColor: "#ffffff",
+    backgroundColor: "#fbfbfd",
     borderTopWidth: 1,
     borderTopColor: "#e5e7eb",
-    borderTopLeftRadius: 22,
-    borderTopRightRadius: 22,
-    paddingTop: 10,
-    paddingBottom: 32,
-    minHeight: 96,
+    paddingTop: 8,
+    paddingBottom: 28,
+    paddingHorizontal: 10,
+  },
+  bottomNavRow: {
+    flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 12,
+    justifyContent: "space-between",
+    minHeight: 68,
+    paddingHorizontal: 8,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: "#ffffff",
+    borderWidth: 1,
+    borderColor: "#eceef2",
     shadowColor: "#111827",
-    shadowOpacity: 0.08,
-    shadowRadius: 18,
-    shadowOffset: { width: 0, height: -8 },
-    elevation: 10,
+    shadowOpacity: 0.05,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 8,
   },
   navItem: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    gap: 4,
-    minHeight: 50,
-    borderRadius: 12,
-    marginHorizontal: 3,
+    gap: 5,
+    minHeight: 52,
+    borderRadius: 14,
+    marginHorizontal: 2,
     overflow: "hidden",
   },
   navItemActive: {
     backgroundColor: "#111827",
-    shadowColor: "#111827",
-    shadowOpacity: 0.12,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
   },
   navItemPressed: {
-    transform: [{ scale: 0.98 }],
+    transform: [{ scale: 0.985 }],
     opacity: 0.92,
   },
   navIndicator: {
-    width: 20,
+    width: 18,
     height: 3,
     borderRadius: 2,
-    backgroundColor: "transparent",
+    backgroundColor: "#d1d5db",
   },
   navIndicatorActive: {
-    backgroundColor: "#111827",
+    backgroundColor: "#ffffff",
   },
   navLabel: {
     color: "#6b7280",
-    fontSize: 11,
-    fontWeight: "700",
+    fontSize: 10,
+    fontWeight: "800",
     fontFamily,
   },
   navLabelActive: {
