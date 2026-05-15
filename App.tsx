@@ -1884,34 +1884,36 @@ export default function App() {
       title: card.title,
     })),
   );
-  const sortedSelectedStockAnalysisCards = useMemo(() => {
-    if (!selectedStockSummary) return selectedStockAnalysisCards;
+  const sortedSelectedStockAnalysisCards = !selectedStockSummary
+    ? selectedStockAnalysisCards
+    : [...selectedStockAnalysisCards].sort((left, right) => {
+        const leftPinned = pinnedMetricKeys.includes(
+          stockMetricPreferenceKey(selectedStockSummary.stock.id, left.id),
+        );
+        const rightPinned = pinnedMetricKeys.includes(
+          stockMetricPreferenceKey(selectedStockSummary.stock.id, right.id),
+        );
 
-    return [...selectedStockAnalysisCards].sort((left, right) => {
-      const leftPinned = pinnedMetricKeys.includes(stockMetricPreferenceKey(selectedStockSummary.stock.id, left.id));
-      const rightPinned = pinnedMetricKeys.includes(stockMetricPreferenceKey(selectedStockSummary.stock.id, right.id));
+        if (stockBoardMode === "Pinned First" && leftPinned !== rightPinned) {
+          return Number(rightPinned) - Number(leftPinned);
+        }
 
-      if (stockBoardMode === "Pinned First" && leftPinned !== rightPinned) {
-        return Number(rightPinned) - Number(leftPinned);
-      }
+        if (stockBoardMode === "Status") {
+          const statusDelta = stockMetricStatusRank(left.status) - stockMetricStatusRank(right.status);
+          if (statusDelta !== 0) return statusDelta;
+        }
 
-      if (stockBoardMode === "Status") {
-        const statusDelta = stockMetricStatusRank(left.status) - stockMetricStatusRank(right.status);
-        if (statusDelta !== 0) return statusDelta;
-      }
+        if (stockBoardMode === "Family") {
+          const familyDelta = left.family.localeCompare(right.family);
+          if (familyDelta !== 0) return familyDelta;
+        }
 
-      if (stockBoardMode === "Family") {
-        const familyDelta = left.family.localeCompare(right.family);
-        if (familyDelta !== 0) return familyDelta;
-      }
+        if (leftPinned !== rightPinned) {
+          return Number(rightPinned) - Number(leftPinned);
+        }
 
-      if (leftPinned !== rightPinned) {
-        return Number(rightPinned) - Number(leftPinned);
-      }
-
-      return left.title.localeCompare(right.title);
-    });
-  }, [pinnedMetricKeys, selectedStockAnalysisCards, selectedStockSummary, stockBoardMode]);
+        return left.title.localeCompare(right.title);
+      });
   const selectedEvidenceIndex = selectedEvidenceCard
     ? sortedSelectedStockAnalysisCards.findIndex((card) => card.id === selectedEvidenceCard.id)
     : -1;
