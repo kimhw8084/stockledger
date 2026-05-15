@@ -2991,7 +2991,7 @@ export default function App() {
                     </View>
                     <View style={styles.stockTrendHero}>
                       <View style={styles.stockTrendHeader}>
-                        <View>
+                        <View style={styles.flexOne}>
                           <Text style={styles.stockTrendPrice}>
                             ${selectedStockSummary.snapshot ? selectedStockSummary.snapshot.price.toFixed(2) : "--"}
                           </Text>
@@ -2999,12 +2999,13 @@ export default function App() {
                             {selectedStockSummary.snapshot?.isMock ? "Mock-backed trend" : "Provider-backed trend"}
                           </Text>
                         </View>
-                        <View style={styles.panelBadges}>
+                        <View style={styles.stockTrendHeaderActions}>
                           <View style={freshnessTone(selectedStockSummary.snapshot?.freshness ?? "Unavailable")}>
                             <Text style={styles.freshnessBadgeText}>
                               {selectedStockSummary.snapshot?.freshness ?? "Unavailable"}
                             </Text>
                           </View>
+                          <Button label="Clear" tone="ghost" onPress={() => setSelectedStockId("")} />
                         </View>
                       </View>
                       <View style={styles.stockTrendSummaryRow}>
@@ -3085,20 +3086,6 @@ export default function App() {
                         </Text>
                         <Text style={styles.stockTrendLegendText}>{analysisLookback}</Text>
                       </View>
-                      <Text style={styles.stockTrendInsight}>
-                        {selectedStockSummary.snapshot
-                          ? `Price and parameter tiles below reflect the same ${analysisLookback} view with ${analysisBenchmark} as the comparison context.`
-                          : "No snapshot is available for this stock yet."}
-                      </Text>
-                    </View>
-                    <View style={styles.homeSummaryStrip}>
-                      <DenseStat label="Price" value={selectedStockSummary.snapshot ? `$${selectedStockSummary.snapshot.price.toFixed(2)}` : "--"} tone="strong" />
-                      <DenseStat label="Drawdown" value={selectedStockSummary.snapshot ? `${selectedStockSummary.snapshot.drawdownPct}%` : "N/A"} />
-                      <DenseStat label="Eyes" value={`${selectedStockSummary.eyes.length}`} />
-                      <DenseStat label="Data" value={selectedStockSummary.snapshot?.freshness ?? "Unavailable"} tone={selectedStockSummary.snapshot?.isMock ? "risk" : "neutral"} />
-                    </View>
-                    <View style={styles.stockWorkspaceActions}>
-                      <Button label="Clear Stock" tone="ghost" onPress={() => setSelectedStockId("")} />
                     </View>
                     <View style={styles.stockControlStack}>
                       <View style={styles.controlCard}>
@@ -3117,13 +3104,13 @@ export default function App() {
                         <Text style={styles.inputLabel}>Board</Text>
                         <HorizontalChoice options={stockBoardModes} value={stockBoardMode} onSelect={setStockBoardMode} />
                       </View>
-                      <View style={styles.stockWorkspaceHint}>
-                        <Text style={styles.stockWorkspaceHintTitle}>Explore the grid</Text>
-                        <Text style={styles.stockWorkspaceHintBody}>
-                          Tap any square to open the larger visual. Pin the metrics you care about and keep them at the top of this stock board.
-                        </Text>
-                        <Text style={styles.stockWorkspaceHintMeta}>{pinnedCountForSelectedStock} pinned on this stock</Text>
-                      </View>
+                    </View>
+                    <View style={styles.stockBoardMetaRow}>
+                      <Text style={styles.stockBoardMetaText}>{sortedSelectedStockAnalysisCards.length} metrics</Text>
+                      <Text style={styles.stockBoardMetaDivider}>•</Text>
+                      <Text style={styles.stockBoardMetaText}>{selectedStockSummary.eyes.length} eyes</Text>
+                      <Text style={styles.stockBoardMetaDivider}>•</Text>
+                      <Text style={styles.stockBoardMetaText}>{pinnedCountForSelectedStock} pinned</Text>
                     </View>
                   </Card>
 
@@ -4764,50 +4751,20 @@ const styles = StyleSheet.create({
     fontFamily,
   },
   controlCard: {
-    padding: 14,
+    width: "48.2%",
+    padding: 12,
     borderRadius: 16,
     backgroundColor: "#f8fafc",
     borderWidth: 1,
     borderColor: "#edf0f5",
-    minHeight: 96,
+    minHeight: 88,
     justifyContent: "space-between",
   },
   stockControlStack: {
     marginTop: 14,
-    gap: 12,
-  },
-  stockWorkspaceActions: {
-    marginTop: 10,
-    alignItems: "flex-start",
-  },
-  stockWorkspaceHint: {
-    padding: 14,
-    borderRadius: 16,
-    backgroundColor: "#111827",
-    gap: 6,
-  },
-  stockWorkspaceHintTitle: {
-    color: "#ffffff",
-    fontSize: 12,
-    fontWeight: "800",
-    textTransform: "uppercase",
-    letterSpacing: 0.4,
-    fontFamily,
-  },
-  stockWorkspaceHintBody: {
-    color: "#d1d5db",
-    fontSize: 13,
-    lineHeight: 19,
-    fontWeight: "500",
-    fontFamily,
-  },
-  stockWorkspaceHintMeta: {
-    color: "#ffffff",
-    fontSize: 11,
-    fontWeight: "800",
-    textTransform: "uppercase",
-    letterSpacing: 0.4,
-    fontFamily,
+    gap: 10,
+    flexDirection: "row",
+    flexWrap: "wrap",
   },
   stockTrendHero: {
     marginTop: 14,
@@ -4822,6 +4779,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
+    gap: 10,
+  },
+  stockTrendHeaderActions: {
+    alignItems: "flex-end",
+    gap: 8,
   },
   stockTrendSummaryRow: {
     flexDirection: "row",
@@ -4948,6 +4910,27 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 19,
     fontWeight: "500",
+    fontFamily,
+  },
+  stockBoardMetaRow: {
+    marginTop: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+  },
+  stockBoardMetaText: {
+    color: "#6b7280",
+    fontSize: 11,
+    fontWeight: "800",
+    textTransform: "uppercase",
+    letterSpacing: 0.35,
+    fontFamily,
+  },
+  stockBoardMetaDivider: {
+    color: "#9ca3af",
+    fontSize: 11,
+    fontWeight: "800",
     fontFamily,
   },
   // Grid Layouts
