@@ -1658,6 +1658,7 @@ export default function App() {
   const [recipeBuilderOpen, setRecipeBuilderOpen] = useState(false);
   const [recipeDetailId, setRecipeDetailId] = useState("");
   const [selectedDecisionId, setSelectedDecisionId] = useState("");
+  const [eyeDetailOpen, setEyeDetailOpen] = useState(false);
   const [eyeComposerOpen, setEyeComposerOpen] = useState(false);
   const [journalComposerOpen, setJournalComposerOpen] = useState(false);
   const [alertDetailOpen, setAlertDetailOpen] = useState(false);
@@ -1822,6 +1823,12 @@ export default function App() {
   }
 
   const selectedEye = eyesSorted.find((eye) => eye.id === selectedEyeId) ?? eyesSorted[0];
+  const selectedEyeStock = selectedEye
+    ? data.stocks.find((stock) => stock.id === selectedEye.stockId)
+    : undefined;
+  const selectedEyeRecipe = selectedEye
+    ? data.recipes.find((recipe) => recipe.id === selectedEye.recipeId)
+    : undefined;
   const selectedStockSummary =
     filteredStockDirectory.find((item) => item.stock.id === selectedStockId) ??
     stockDirectory.find((item) => item.stock.id === selectedStockId);
@@ -1850,6 +1857,9 @@ export default function App() {
     ? data.snapshots.find((snapshot) => snapshot.stockId === selectedAlertEye.stockId)
     : undefined;
   const selectedAlertEvaluation = selectedAlertEye?.lastEvaluation;
+  const selectedAlertDecision = selectedAlert
+    ? data.decisions.find((decision) => decision.alertId === selectedAlert.id)
+    : undefined;
   const selectedAlertEvidenceGroups =
     selectedAlertEye && selectedAlertRecipe && selectedAlertSnapshot && selectedAlertEvaluation
       ? buildEvidenceGroups({
@@ -2090,6 +2100,24 @@ export default function App() {
         : recipeBuilderStep === "Risk & Alerts"
           ? recipeForm.alertCooldownHours > 0
           : recipeForm.reviewCadenceDays > 0 && draftConditions.length > 0;
+  const recipeStepReadiness = [
+    {
+      step: "Purpose",
+      ready: recipeForm.name.trim().length > 0 && recipeForm.purpose.trim().length > 0,
+    },
+    {
+      step: "Logic",
+      ready: draftConditions.length > 0,
+    },
+    {
+      step: "Risk & Alerts",
+      ready: recipeForm.alertCooldownHours > 0,
+    },
+    {
+      step: "Review & Outcome",
+      ready: recipeForm.reviewCadenceDays > 0 && draftConditions.length > 0,
+    },
+  ] as const;
   const previewEvidenceGroups =
     previewRecipe && previewEye && previewSnapshot && previewEvaluation
       ? buildEvidenceGroups({
@@ -2764,7 +2792,14 @@ export default function App() {
                     </Card>
                   ) : (
                     filteredActiveEyesInventory.map((eye) => (
-                      <Card key={eye.id} highlighted={selectedEye?.id === eye.id}>
+                      <Pressable
+                        key={eye.id}
+                        onPress={() => {
+                          setSelectedEyeId(eye.id);
+                          setEyeDetailOpen(true);
+                        }}
+                      >
+                      <Card highlighted={selectedEye?.id === eye.id}>
                         <View style={styles.inlineBetween}>
                           <View style={styles.flexOne}>
                             <Text style={styles.cardEyebrow}>{recipeLabel(data.recipes, eye.recipeId)}</Text>
@@ -2783,16 +2818,16 @@ export default function App() {
                         <View style={styles.actionRow}>
                           <Button label="Open Stock" onPress={() => openStockContext({ stockId: eye.stockId, eyeId: eye.id })} />
                           <Button
-                            label="Add Journal"
+                            label="Details"
                             tone="secondary"
                             onPress={() => {
-                              setDecisionForm((current) => ({ ...current, eyeId: eye.id }));
-                              setJournalComposerOpen(true);
+                              setSelectedEyeId(eye.id);
+                              setEyeDetailOpen(true);
                             }}
                           />
-                          <Button label="Delete" tone="ghost" onPress={() => void actions.deleteEye(eye.id)} />
                         </View>
                       </Card>
+                      </Pressable>
                     ))
                   )}
                 </View>
@@ -2807,7 +2842,14 @@ export default function App() {
                     </Card>
                   ) : (
                     inactiveEyesInventory.map((eye) => (
-                      <Card key={`inactive-${eye.id}`}>
+                      <Pressable
+                        key={`inactive-${eye.id}`}
+                        onPress={() => {
+                          setSelectedEyeId(eye.id);
+                          setEyeDetailOpen(true);
+                        }}
+                      >
+                      <Card>
                         <View style={styles.inlineBetween}>
                           <View style={styles.flexOne}>
                             <Text style={styles.cardEyebrow}>{recipeLabel(data.recipes, eye.recipeId)}</Text>
@@ -2820,9 +2862,17 @@ export default function App() {
                         </View>
                         <View style={styles.actionRow}>
                           <Button label="Open Stock" onPress={() => openStockContext({ stockId: eye.stockId, eyeId: eye.id })} />
-                          <Button label="Delete" tone="ghost" onPress={() => void actions.deleteEye(eye.id)} />
+                          <Button
+                            label="Details"
+                            tone="secondary"
+                            onPress={() => {
+                              setSelectedEyeId(eye.id);
+                              setEyeDetailOpen(true);
+                            }}
+                          />
                         </View>
                       </Card>
+                      </Pressable>
                     ))
                   )}
                 </View>
@@ -2971,6 +3021,9 @@ export default function App() {
                                   label="Open Journal"
                                   tone="ghost"
                                   onPress={() => {
+                                    if (linkedDecision) {
+                                      setSelectedDecisionId(linkedDecision.id);
+                                    }
                                     setTab("Journal");
                                   }}
                                 />
@@ -3071,7 +3124,7 @@ export default function App() {
                 <Card>
                   <Text style={styles.cardTitle}>Free-tier policy</Text>
                   <Text style={styles.cardBody}>
-                    Stooq remains the background source for price/history refresh. Alpha Vantage, Twelve Data, and Marketaux are configured as on-demand sources so the app avoids burning through free-tier quotas in the background.
+                    The app is staying dummy-backed for daily use right now. These providers are configured and health-checked here, but they are parked until you explicitly switch real data back on.
                   </Text>
                 </Card>
               </Reveal>
@@ -3111,6 +3164,14 @@ export default function App() {
             <View style={styles.previewCard}>
               <Text style={styles.previewLabel}>{recipeBuilderStep}</Text>
               <Text style={styles.previewText}>{recipeStepPrompt}</Text>
+            </View>
+            <View style={styles.metaRow}>
+              {recipeStepReadiness.map((item) => (
+                <MetaPill
+                  key={`recipe-step-${item.step}`}
+                  label={`${item.step} · ${item.ready ? "Ready" : "Needs input"}`}
+                />
+              ))}
             </View>
 
             <Reveal key={`builder-step-${recipeBuilderStep}`}>
@@ -3297,6 +3358,48 @@ export default function App() {
               <DenseStat label="Cadence" value={`${selectedRecipe.reviewConfig?.cadenceDays ?? 14}d`} />
               <DenseStat label="Cooldown" value={`${selectedRecipe.alertConfig?.cooldownHours ?? 24}h`} />
             </View>
+            <View style={styles.actionRow}>
+              <Button
+                label="Use for Eye"
+                onPress={() => {
+                  setEyeForm((current) => ({ ...current, recipeId: selectedRecipe.id }));
+                  setRecipeDetailId("");
+                  setEyeComposerOpen(true);
+                }}
+              />
+              <Button
+                label="Open Builder"
+                tone="secondary"
+                onPress={() => {
+                  setRecipeForm({
+                    name: selectedRecipe.name,
+                    purpose: selectedRecipe.purpose,
+                    opportunityType: opportunityTypes.includes(
+                      selectedRecipe.opportunityType as (typeof opportunityTypes)[number],
+                    )
+                      ? (selectedRecipe.opportunityType as (typeof opportunityTypes)[number])
+                      : opportunityTypes[0],
+                    timeHorizon: timeHorizons.includes(
+                      selectedRecipe.timeHorizon as (typeof timeHorizons)[number],
+                    )
+                      ? (selectedRecipe.timeHorizon as (typeof timeHorizons)[number])
+                      : timeHorizons[1],
+                    intendedUseCase: useCaseOptions.includes(
+                      selectedRecipe.intendedUseCase as (typeof useCaseOptions)[number],
+                    )
+                      ? (selectedRecipe.intendedUseCase as (typeof useCaseOptions)[number])
+                      : useCaseOptions[0],
+                    notes: selectedRecipe.notes || "",
+                    reviewCadenceDays: selectedRecipe.reviewConfig?.cadenceDays ?? reviewCadenceOptions[2],
+                    alertCooldownHours: selectedRecipe.alertConfig?.cooldownHours ?? alertCooldownOptions[2],
+                  });
+                  setDraftConditions(selectedRecipe.conditions);
+                  setRecipeDetailId("");
+                  setRecipeBuilderStep("Purpose");
+                  setRecipeBuilderOpen(true);
+                }}
+              />
+            </View>
             <View style={styles.stack}>
               {selectedRecipe.conditions.map((condition) => (
                 <Card key={`recipe-condition-${condition.id}`}>
@@ -3304,6 +3407,74 @@ export default function App() {
                   <Text style={styles.cardBody}>{condition.label}</Text>
                 </Card>
               ))}
+            </View>
+          </WindowPanel>
+        ) : null}
+
+        {eyeDetailOpen && selectedEye ? (
+          <WindowPanel
+            title={stockLabel(data.stocks, selectedEye.stockId)}
+            subtitle={`${recipeLabel(data.recipes, selectedEye.recipeId)} · ${selectedEye.lastEvaluation?.currentState ?? "Not Evaluated"}`}
+            onClose={() => setEyeDetailOpen(false)}
+          >
+            <WhyNowPanel
+              title="Current Eye state"
+              body={
+                selectedEye.lastEvaluation?.whyNow ??
+                "This Eye has not produced a current evaluation summary yet."
+              }
+              state={selectedEye.lastEvaluation?.currentState ?? "Not Relevant"}
+              recipeVersion={`${selectedEyeRecipe?.name ?? "Unknown Recipe"} v${selectedEye.recipeVersionAtCreation ?? selectedEye.lastEvaluation?.recipeVersion ?? 1}`}
+            />
+            <View style={styles.dualDenseGrid}>
+              <DenseStat label="Urgency" value={selectedEye.lastEvaluation?.actionUrgency ?? "Wait"} tone="strong" />
+              <DenseStat label="Review" value={selectedEye.lastReviewedAt ? formatShortDate(selectedEye.lastReviewedAt) : "Due"} />
+              <DenseStat label="Entry Low" value={selectedEye.plannedEntryLow ? `$${selectedEye.plannedEntryLow.toFixed(2)}` : "Unset"} />
+              <DenseStat label="Entry High" value={selectedEye.plannedEntryHigh ? `$${selectedEye.plannedEntryHigh.toFixed(2)}` : "Unset"} />
+            </View>
+            <View style={styles.detailCallout}>
+              <Text style={styles.detailCalloutLabel}>Thesis snapshot</Text>
+              <Text style={styles.detailCalloutBody}>{selectedEye.thesisSnapshot}</Text>
+            </View>
+            <View style={styles.detailCallout}>
+              <Text style={styles.detailCalloutLabel}>Invalidation rule</Text>
+              <Text style={styles.detailCalloutBody}>{selectedEye.invalidationRule || "No explicit invalidation rule recorded."}</Text>
+            </View>
+            <View style={styles.actionRow}>
+              <Button
+                label="Open Stock"
+                onPress={() => {
+                  setEyeDetailOpen(false);
+                  openStockContext({ stockId: selectedEye.stockId, eyeId: selectedEye.id });
+                }}
+              />
+              <Button
+                label="Mark Reviewed"
+                tone="secondary"
+                onPress={() => void actions.markEyesReviewed({ stockId: selectedEye.stockId, recipeId: selectedEye.recipeId })}
+              />
+              <Button
+                label="Add Journal"
+                tone="secondary"
+                onPress={() => {
+                  setDecisionForm((current) => ({ ...current, eyeId: selectedEye.id }));
+                  setEyeDetailOpen(false);
+                  setJournalComposerOpen(true);
+                }}
+              />
+              <Button
+                label="Delete"
+                tone="ghost"
+                onPress={() => {
+                  setEyeDetailOpen(false);
+                  void actions.deleteEye(selectedEye.id);
+                }}
+              />
+            </View>
+            <View style={styles.metaRow}>
+              {selectedEyeStock ? <MetaPill label={selectedEyeStock.symbol} /> : null}
+              {selectedEyeRecipe ? <MetaPill label={selectedEyeRecipe.timeHorizon || "Unset horizon"} /> : null}
+              {selectedEye.lastEvaluation?.dataQuality ? <MetaPill label={selectedEye.lastEvaluation.dataQuality} /> : null}
             </View>
           </WindowPanel>
         ) : null}
@@ -3380,6 +3551,17 @@ export default function App() {
               <Button label="Acknowledge" onPress={() => void actions.markAlertReviewed(selectedAlert.id)} />
               <Button label="Snooze 24H" tone="secondary" onPress={() => void actions.snoozeAlert(selectedAlert.id, 24)} />
               <Button label="Useful" tone="ghost" onPress={() => void actions.setAlertFeedback(selectedAlert.id, "Useful")} />
+              {selectedAlertDecision ? (
+                <Button
+                  label="Open Journal"
+                  tone="ghost"
+                  onPress={() => {
+                    setSelectedDecisionId(selectedAlertDecision.id);
+                    setAlertDetailOpen(false);
+                    setTab("Journal");
+                  }}
+                />
+              ) : null}
             </View>
             <View style={styles.stack}>
               {selectedAlertEvidenceGroups.map((group) => (
@@ -3441,6 +3623,30 @@ export default function App() {
             <View style={styles.detailCallout}>
               <Text style={styles.detailCalloutLabel}>Concern</Text>
               <Text style={styles.detailCalloutBody}>{selectedDecision.concern || "No concern recorded."}</Text>
+            </View>
+            <View style={styles.actionRow}>
+              <Button
+                label="Open Stock"
+                onPress={() => {
+                  const linkedEye = data.eyes.find((eye) => eye.id === selectedDecision.eyeId);
+                  if (!linkedEye) return;
+                  setSelectedDecisionId("");
+                  openStockContext({ stockId: linkedEye.stockId, eyeId: linkedEye.id });
+                }}
+              />
+              {selectedDecision.alertId ? (
+                <Button
+                  label="Open Alert"
+                  tone="secondary"
+                  onPress={() => {
+                    setSelectedAlertId(selectedDecision.alertId ?? "");
+                    setSelectedDecisionId("");
+                    setAlertWorkspaceTab("History");
+                    setAlertDetailOpen(true);
+                    setTab("Alerts");
+                  }}
+                />
+              ) : null}
             </View>
             {data.outcomes.find((outcome) => outcome.decisionId === selectedDecision.id) ? (
               <View style={styles.formulaPanel}>

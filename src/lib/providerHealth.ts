@@ -160,8 +160,8 @@ export const getProviderHealth = async (): Promise<ProviderHealthEntry[]> => {
     provider: "Stooq",
     configured: true,
     status: "Healthy",
-    mode: "Background",
-    note: "Primary free daily-price source for background snapshot refresh.",
+    mode: "Disabled",
+    note: "Configured and available, but currently parked while the app stays dummy-backed.",
     endpoint: "q/d/l",
     lastCheckedAt: nowIso(),
   };
