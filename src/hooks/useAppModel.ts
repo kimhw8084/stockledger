@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { evaluateEye } from "../lib/evaluateEye";
 import { buildMockSnapshot } from "../lib/mockSnapshot";
@@ -90,16 +90,29 @@ const evaluateAllEyes = (data: AppData): AppData => {
   };
 };
 
+const buildSnapshotForStock = (stock: Stock, existing?: AppData["snapshots"][number]) => {
+  const generated = buildMockSnapshot(stock);
+  return {
+    ...generated,
+    plannedEntryLow: existing?.plannedEntryLow,
+    plannedEntryHigh: existing?.plannedEntryHigh,
+    lastThesisReviewAt: existing?.lastThesisReviewAt,
+    riskFlags: existing?.riskFlags ?? generated.riskFlags,
+  };
+};
+
 export const useAppModel = () => {
   const [data, setData] = useState<AppData | null>(null);
   const [loading, setLoading] = useState(true);
   const [providerHealth, setProviderHealth] = useState<ProviderHealthEntry[]>([]);
   const [providerHealthLoading, setProviderHealthLoading] = useState(true);
+  const dataRef = useRef<AppData | null>(null);
 
   useEffect(() => {
     loadAppData()
       .then((loaded) => {
         const evaluated = evaluateAllEyes(loaded);
+        dataRef.current = evaluated;
         setData(evaluated);
         return saveAppData(evaluated);
       })
@@ -109,11 +122,16 @@ export const useAppModel = () => {
   useEffect(() => {
     getProviderHealth()
       .then(setProviderHealth)
+      .catch(() => setProviderHealth([]))
       .finally(() => setProviderHealthLoading(false));
   }, []);
 
-  const commit = async (next: AppData) => {
-    const evaluated = evaluateAllEyes(next);
+  const commit = async (next: AppData | ((current: AppData) => AppData)) => {
+    const current = dataRef.current;
+    if (!current && typeof next === "function") return;
+    const resolved = typeof next === "function" ? next(current as AppData) : next;
+    const evaluated = evaluateAllEyes(resolved);
+    dataRef.current = evaluated;
     setData(evaluated);
     await saveAppData(evaluated);
   };
@@ -121,20 +139,41 @@ export const useAppModel = () => {
   const actions = useMemo(
     () => ({
       async addStock(input: { symbol: string; name: string; thesis: string }) {
-        if (!data) return;
+        const current = dataRef.current;
+        if (!current) return;
+        const normalizedSymbol = input.symbol.trim().toUpperCase();
+        const existing = current.stocks.find((stock) => stock.symbol.toUpperCase() === normalizedSymbol);
+        if (existing) {
+          await commit((prev) => {
+            const updatedStock: Stock = {
+              ...existing,
+              name: input.name.trim() || existing.name,
+              thesis: input.thesis.trim() || existing.thesis,
+            };
+            const existingSnapshot = prev.snapshots.find((snapshot) => snapshot.stockId === existing.id);
+            const nextSnapshot = existingSnapshot ?? buildSnapshotForStock(updatedStock);
+            return {
+              ...prev,
+              stocks: [updatedStock, ...prev.stocks.filter((stock) => stock.id !== existing.id)],
+              snapshots: [nextSnapshot, ...prev.snapshots.filter((snapshot) => snapshot.stockId !== existing.id)],
+            };
+          });
+          return;
+        }
+
         const stock: Stock = {
           id: createId("stock"),
-          symbol: input.symbol.trim().toUpperCase(),
+          symbol: normalizedSymbol,
           name: input.name.trim(),
           thesis: input.thesis.trim(),
           createdAt: new Date().toISOString(),
         };
-        const snapshot = buildMockSnapshot(stock);
-        await commit({
-          ...data,
-          stocks: [stock, ...data.stocks],
-          snapshots: [snapshot, ...data.snapshots],
-        });
+        const snapshot = buildSnapshotForStock(stock);
+        await commit((prev) => ({
+          ...prev,
+          stocks: [stock, ...prev.stocks],
+          snapshots: [snapshot, ...prev.snapshots],
+        }));
       },
       async addRecipe(input: {
         name: string;
@@ -147,7 +186,8 @@ export const useAppModel = () => {
         alertCooldownHours: number;
         conditions?: RecipeCondition[];
       }) {
-        if (!data) return;
+        const current = dataRef.current;
+        if (!current) return;
         const recipe: Recipe = {
           id: createId("recipe"),
           version: 1,
@@ -182,10 +222,10 @@ export const useAppModel = () => {
                   },
                 ],
         };
-        await commit({
-          ...data,
-          recipes: [recipe, ...data.recipes],
-        });
+        await commit((prev) => ({
+          ...prev,
+          recipes: [recipe, ...prev.recipes],
+        }));
       },
       async addEye(input: {
         stockId: string;
@@ -196,37 +236,69 @@ export const useAppModel = () => {
         invalidationRule?: string;
         lastReviewedAt?: string;
       }) {
-        if (!data) return;
-        const recipe = data.recipes.find((item) => item.id === input.recipeId);
-        const eye: Eye = {
-          id: createId("eye"),
-          stockId: input.stockId,
-          recipeId: input.recipeId,
-          thesisSnapshot: input.thesisSnapshot.trim(),
-          recipeVersionAtCreation: recipe?.version,
-          plannedEntryLow: input.plannedEntryLow,
-          plannedEntryHigh: input.plannedEntryHigh,
-          invalidationRule: input.invalidationRule?.trim(),
-          lastReviewedAt: input.lastReviewedAt,
-          createdAt: new Date().toISOString(),
-        };
-        await commit({
-          ...data,
-          eyes: [eye, ...data.eyes],
+        const current = dataRef.current;
+        if (!current) return;
+        const recipe = current.recipes.find((item) => item.id === input.recipeId);
+        const existing = current.eyes.find(
+          (eye) => eye.stockId === input.stockId && eye.recipeId === input.recipeId,
+        );
+        const reviewAt = input.lastReviewedAt ?? new Date().toISOString();
+
+        await commit((prev) => {
+          const nextEye: Eye = existing
+            ? {
+                ...existing,
+                thesisSnapshot: input.thesisSnapshot.trim() || existing.thesisSnapshot,
+                recipeVersionAtCreation: recipe?.version ?? existing.recipeVersionAtCreation,
+                plannedEntryLow: input.plannedEntryLow ?? existing.plannedEntryLow,
+                plannedEntryHigh: input.plannedEntryHigh ?? existing.plannedEntryHigh,
+                invalidationRule: input.invalidationRule?.trim() || existing.invalidationRule,
+                lastReviewedAt: reviewAt,
+              }
+            : {
+                id: createId("eye"),
+                stockId: input.stockId,
+                recipeId: input.recipeId,
+                thesisSnapshot: input.thesisSnapshot.trim(),
+                recipeVersionAtCreation: recipe?.version,
+                plannedEntryLow: input.plannedEntryLow,
+                plannedEntryHigh: input.plannedEntryHigh,
+                invalidationRule: input.invalidationRule?.trim(),
+                lastReviewedAt: reviewAt,
+                createdAt: new Date().toISOString(),
+              };
+
+          const nextSnapshots = prev.snapshots.map((snapshot) =>
+            snapshot.stockId === input.stockId
+              ? {
+                  ...snapshot,
+                  plannedEntryLow: nextEye.plannedEntryLow ?? snapshot.plannedEntryLow,
+                  plannedEntryHigh: nextEye.plannedEntryHigh ?? snapshot.plannedEntryHigh,
+                  lastThesisReviewAt: reviewAt,
+                }
+              : snapshot,
+          );
+
+          return {
+            ...prev,
+            eyes: [nextEye, ...prev.eyes.filter((eye) => eye.id !== nextEye.id)],
+            snapshots: nextSnapshots,
+          };
         });
       },
       async deleteEye(eyeId: string) {
-        if (!data) return;
-        const removedDecisionIds = data.decisions
+        const current = dataRef.current;
+        if (!current) return;
+        const removedDecisionIds = current.decisions
           .filter((decision) => decision.eyeId === eyeId)
           .map((decision) => decision.id);
-        await commit({
-          ...data,
-          eyes: data.eyes.filter((eye) => eye.id !== eyeId),
-          alerts: data.alerts.filter((alert) => alert.eyeId !== eyeId),
-          decisions: data.decisions.filter((decision) => decision.eyeId !== eyeId),
-          outcomes: data.outcomes.filter((outcome) => !removedDecisionIds.includes(outcome.decisionId)),
-        });
+        await commit((prev) => ({
+          ...prev,
+          eyes: prev.eyes.filter((eye) => eye.id !== eyeId),
+          alerts: prev.alerts.filter((alert) => alert.eyeId !== eyeId),
+          decisions: prev.decisions.filter((decision) => decision.eyeId !== eyeId),
+          outcomes: prev.outcomes.filter((outcome) => !removedDecisionIds.includes(outcome.decisionId)),
+        }));
       },
       async logDecision(input: {
         eyeId: string;
@@ -237,8 +309,10 @@ export const useAppModel = () => {
         thesisValid: "Yes" | "Partly" | "No";
         timing: "Early" | "On Time" | "Late";
       }) {
-        if (!data) return;
-        const eye = data.eyes.find((item) => item.id === input.eyeId);
+        const current = dataRef.current;
+        if (!current) return;
+        const eye = current.eyes.find((item) => item.id === input.eyeId);
+        if (!eye) return;
         const decision: Decision = {
           id: createId("decision"),
           ...input,
@@ -263,83 +337,105 @@ export const useAppModel = () => {
           recipeSuggestion: "Adjust the recipe only after enough reviewed outcomes accumulate.",
           createdAt: new Date().toISOString(),
         };
-        await commit({
-          ...data,
-          decisions: [decision, ...data.decisions],
-          outcomes: [outcome, ...data.outcomes],
-          alerts: data.alerts.map((alert) =>
+        await commit((prev) => ({
+          ...prev,
+          decisions: [decision, ...prev.decisions],
+          outcomes: [outcome, ...prev.outcomes],
+          alerts: prev.alerts.map((alert) =>
             alert.id === input.alertId ? { ...alert, reviewed: true } : alert,
           ),
-        });
+        }));
+        return decision.id;
       },
       async markAlertReviewed(alertId: string) {
-        if (!data) return;
-        await commit({
-          ...data,
-          alerts: data.alerts.map((alert) =>
+        const current = dataRef.current;
+        if (!current) return;
+        await commit((prev) => ({
+          ...prev,
+          alerts: prev.alerts.map((alert) =>
             alert.id === alertId ? { ...alert, reviewed: true } : alert,
           ),
-        });
+        }));
       },
       async snoozeAlert(alertId: string, hours: number) {
-        if (!data) return;
+        const current = dataRef.current;
+        if (!current) return;
         const snoozedUntil = new Date(Date.now() + hours * 60 * 60 * 1000).toISOString();
-        await commit({
-          ...data,
-          alerts: data.alerts.map((alert) =>
+        await commit((prev) => ({
+          ...prev,
+          alerts: prev.alerts.map((alert) =>
             alert.id === alertId ? { ...alert, snoozedUntil } : alert,
           ),
-        });
+        }));
       },
       async setAlertFeedback(alertId: string, usefulness: "Useful" | "Not Useful") {
-        if (!data) return;
-        await commit({
-          ...data,
-          alerts: data.alerts.map((alert) =>
+        const current = dataRef.current;
+        if (!current) return;
+        await commit((prev) => ({
+          ...prev,
+          alerts: prev.alerts.map((alert) =>
             alert.id === alertId ? { ...alert, usefulness } : alert,
           ),
-        });
+        }));
       },
       async markEyesReviewed(input: { stockId: string; recipeId?: string }) {
-        if (!data) return;
+        const current = dataRef.current;
+        if (!current) return;
         const reviewedAt = new Date().toISOString();
-        await commit({
-          ...data,
-          eyes: data.eyes.map((eye) =>
+        await commit((prev) => ({
+          ...prev,
+          eyes: prev.eyes.map((eye) =>
             eye.stockId === input.stockId && (!input.recipeId || eye.recipeId === input.recipeId)
               ? { ...eye, lastReviewedAt: reviewedAt }
               : eye,
           ),
-        });
+          snapshots: prev.snapshots.map((snapshot) =>
+            snapshot.stockId === input.stockId
+              ? { ...snapshot, lastThesisReviewAt: reviewedAt }
+              : snapshot,
+          ),
+        }));
       },
       async setOutcomeStatus(outcomeId: string, status: "Pending" | "Reviewed") {
-        if (!data) return;
-        await commit({
-          ...data,
-          outcomes: data.outcomes.map((outcome) =>
+        const current = dataRef.current;
+        if (!current) return;
+        await commit((prev) => ({
+          ...prev,
+          outcomes: prev.outcomes.map((outcome) =>
             outcome.id === outcomeId ? { ...outcome, status } : outcome,
           ),
-        });
+        }));
       },
       async refreshMockData() {
-        if (!data) return;
-        const refreshed = data.stocks.map(buildMockSnapshot);
-        await commit({
-          ...data,
+        const current = dataRef.current;
+        if (!current) return;
+        const refreshed = current.stocks.map((stock) =>
+          buildSnapshotForStock(
+            stock,
+            current.snapshots.find((snapshot) => snapshot.stockId === stock.id),
+          ),
+        );
+        await commit((prev) => ({
+          ...prev,
           snapshots: refreshed,
-        });
+        }));
       },
       async resetToSeed() {
-        await commit(seedData);
+        await commit(JSON.parse(JSON.stringify(seedData)) as AppData);
       },
       async refreshProviderHealth() {
         setProviderHealthLoading(true);
-        const next = await getProviderHealth();
-        setProviderHealth(next);
-        setProviderHealthLoading(false);
+        try {
+          const next = await getProviderHealth();
+          setProviderHealth(next);
+        } catch {
+          setProviderHealth([]);
+        } finally {
+          setProviderHealthLoading(false);
+        }
       },
     }),
-    [data],
+    [],
   );
 
   return {

@@ -2080,6 +2080,14 @@ export default function App() {
       ),
     [alertQueue],
   );
+  const alertHistory = useMemo(
+    () =>
+      alertQueue.filter(
+        (alert) =>
+          alert.reviewed || (Boolean(alert.snoozedUntil) && new Date(alert.snoozedUntil!).getTime() > Date.now()),
+      ),
+    [alertQueue],
+  );
 
   const stockDirectory = useMemo(() => {
     if (!data) return [];
@@ -2603,7 +2611,7 @@ export default function App() {
     const eye = data.eyes.find((item) => item.id === alert.eyeId);
     if (!eye) return;
 
-    await actions.logDecision({
+    const decisionId = await actions.logDecision({
       eyeId: eye.id,
       alertId: alert.id,
       action,
@@ -2613,6 +2621,9 @@ export default function App() {
       thesisValid: action === "Marked Thesis Broken" ? "No" : action === "Rejected" ? "Partly" : "Yes",
       timing: "On Time",
     });
+    if (decisionId) {
+      setSelectedDecisionId(decisionId);
+    }
     openStockContext({
       stockId: eye.stockId,
       eyeId: eye.id,
@@ -2706,7 +2717,10 @@ export default function App() {
   const saveDecision = async () => {
     setJournalFormAttempted(true);
     if (!decisionForm.eyeId || !decisionForm.note.trim()) return;
-    await actions.logDecision(decisionForm);
+    const decisionId = await actions.logDecision(decisionForm);
+    if (decisionId) {
+      setSelectedDecisionId(decisionId);
+    }
     setDecisionForm({
       eyeId: "",
       alertId: "",
@@ -3392,14 +3406,14 @@ export default function App() {
 
               {alertWorkspaceTab === "History" ? (
                 <Reveal delay={40}>
-                  <SectionHeader title={`Alert History · ${[...snoozedAlerts, ...reviewedAlerts].length}`} note="Review acknowledged and snoozed alerts, and jump into linked journals when they exist." />
+                  <SectionHeader title={`Alert History · ${alertHistory.length}`} note="Review acknowledged and snoozed alerts, and jump into linked journals when they exist." />
                   <View style={styles.stack}>
-                    {[...snoozedAlerts, ...reviewedAlerts].length === 0 ? (
+                    {alertHistory.length === 0 ? (
                       <Card>
                         <Text style={styles.cardBody}>No alert history yet.</Text>
                       </Card>
                     ) : (
-                      [...snoozedAlerts, ...reviewedAlerts].map((alert) => {
+                      alertHistory.map((alert) => {
                         const eye = data.eyes.find((item) => item.id === alert.eyeId);
                         const linkedDecision = data.decisions.find((decision) => decision.alertId === alert.id);
                         return (
