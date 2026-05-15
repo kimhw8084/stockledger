@@ -21,6 +21,7 @@ import {
   Eye,
   EyeState,
   FreshnessStatus,
+  ProviderHealthEntry,
   Recipe,
   RecipeCondition,
   Stock,
@@ -33,7 +34,7 @@ import {
   buildStockVisualAnalysisGroups,
 } from "./src/lib/visualEvidence";
 
-type TabKey = "Home" | "Stocks" | "Recipes" | "Eyes" | "Alerts" | "Journal";
+type TabKey = "Home" | "Stocks" | "Recipes" | "Eyes" | "Alerts" | "Journal" | "Settings";
 type AlertWorkspaceTab = "Current" | "History" | "Detail";
 type ConditionKind = RecipeCondition["kind"];
 type AnalysisBenchmark = "SPY" | "QQQ" | "Sector ETF";
@@ -80,7 +81,7 @@ interface ConditionTemplate {
       };
 }
 
-const tabs: TabKey[] = ["Home", "Stocks", "Recipes", "Eyes", "Alerts", "Journal"];
+const tabs: TabKey[] = ["Home", "Stocks", "Recipes", "Eyes", "Alerts", "Journal", "Settings"];
 const recipeBuilderSteps: RecipeBuilderStep[] = ["Purpose", "Logic", "Risk & Alerts", "Review & Outcome"];
 const analysisBenchmarks: AnalysisBenchmark[] = ["SPY", "QQQ", "Sector ETF"];
 const analysisLookbacks: AnalysisLookback[] = ["20D", "3M", "6M"];
@@ -497,6 +498,19 @@ const priorityTone = (priority: Alert["priority"]) => {
       return [styles.statusBadge, styles.statusWarning];
     default:
       return [styles.statusBadge, styles.statusPassed];
+  }
+};
+
+const providerHealthTone = (entry: ProviderHealthEntry) => {
+  switch (entry.status) {
+    case "Healthy":
+      return [styles.statusBadge, styles.statusPassed];
+    case "Plan Limited":
+      return [styles.statusBadge, styles.statusWarning];
+    case "Unconfigured":
+      return [styles.statusBadge, styles.statusPartial];
+    default:
+      return [styles.statusBadge, styles.statusBlocked];
   }
 };
 
@@ -1581,7 +1595,7 @@ interface EyeDraftForm {
 }
 
 export default function App() {
-  const { data, loading, actions } = useAppModel();
+  const { data, loading, providerHealth, providerHealthLoading, actions } = useAppModel();
   const [tab, setTab] = useState<TabKey>("Home");
   const [recipeBuilderStep, setRecipeBuilderStep] = useState<RecipeBuilderStep>("Purpose");
   const [alertWorkspaceTab, setAlertWorkspaceTab] = useState<Exclude<AlertWorkspaceTab, "Detail">>("Current");
@@ -3014,6 +3028,70 @@ export default function App() {
                       ) : null}
                     </Card>
                     </Pressable>
+                  ))}
+                </View>
+              </Reveal>
+            </>
+          ) : null}
+
+          {tab === "Settings" ? (
+            <>
+              <Reveal>
+                <SectionHeader note="Provider health, free-tier policy, and manual data controls live here." />
+                <View style={styles.homeSummaryStrip}>
+                  <DenseStat
+                    label="Healthy"
+                    value={`${providerHealth.filter((entry) => entry.status === "Healthy").length}`}
+                    tone="strong"
+                  />
+                  <DenseStat
+                    label="Limited"
+                    value={`${providerHealth.filter((entry) => entry.status === "Plan Limited").length}`}
+                    tone="risk"
+                  />
+                  <DenseStat
+                    label="Config Missing"
+                    value={`${providerHealth.filter((entry) => entry.status === "Unconfigured").length}`}
+                  />
+                  <DenseStat label="Tracked Stocks" value={`${data.stocks.length}`} />
+                </View>
+                <View style={styles.actionRow}>
+                  <Button
+                    label={providerHealthLoading ? "Checking..." : "Check API Health"}
+                    onPress={() => void actions.refreshProviderHealth()}
+                    disabled={providerHealthLoading}
+                  />
+                  <Button label="Refresh Snapshots" tone="secondary" onPress={() => void actions.refreshMockData()} />
+                </View>
+              </Reveal>
+
+              <Reveal delay={40}>
+                <Card>
+                  <Text style={styles.cardTitle}>Free-tier policy</Text>
+                  <Text style={styles.cardBody}>
+                    Stooq remains the background source for price/history refresh. Alpha Vantage, Twelve Data, and Marketaux are configured as on-demand sources so the app avoids burning through free-tier quotas in the background.
+                  </Text>
+                </Card>
+              </Reveal>
+
+              <Reveal delay={80}>
+                <View style={styles.stack}>
+                  {providerHealth.map((entry) => (
+                    <Card key={entry.provider} highlighted={entry.status !== "Healthy"}>
+                      <View style={styles.inlineBetween}>
+                        <View style={styles.flexOne}>
+                          <Text style={styles.cardEyebrow}>{entry.mode}</Text>
+                          <Text style={styles.alertTitle}>{entry.provider}</Text>
+                        </View>
+                        <Text style={providerHealthTone(entry)}>{entry.status}</Text>
+                      </View>
+                      <Text style={styles.cardBody}>{entry.note}</Text>
+                      <View style={styles.metaRow}>
+                        <MetaPill label={entry.configured ? "Configured" : "Missing key"} />
+                        {entry.endpoint ? <MetaPill label={entry.endpoint} /> : null}
+                        {entry.lastCheckedAt ? <MetaPill label={formatDate(entry.lastCheckedAt)} /> : null}
+                      </View>
+                    </Card>
                   ))}
                 </View>
               </Reveal>

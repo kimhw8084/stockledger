@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { evaluateEye } from "../lib/evaluateEye";
+import { getProviderHealth } from "../lib/providerHealth";
 import { buildProviderSnapshot, buildSnapshotsFromAdapters } from "../lib/providerSnapshot";
 import { seedData } from "../lib/seed";
 import { loadAppData, saveAppData } from "../lib/storage";
@@ -12,6 +13,7 @@ import {
   Eye,
   Evaluation,
   Outcome,
+  ProviderHealthEntry,
   Recipe,
   RecipeCondition,
   Stock,
@@ -91,6 +93,8 @@ const evaluateAllEyes = (data: AppData): AppData => {
 export const useAppModel = () => {
   const [data, setData] = useState<AppData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [providerHealth, setProviderHealth] = useState<ProviderHealthEntry[]>([]);
+  const [providerHealthLoading, setProviderHealthLoading] = useState(true);
 
   useEffect(() => {
     loadAppData()
@@ -108,6 +112,12 @@ export const useAppModel = () => {
         return saveAppData(evaluated);
       })
       .finally(() => setLoading(false));
+  }, []);
+
+  useEffect(() => {
+    getProviderHealth()
+      .then(setProviderHealth)
+      .finally(() => setProviderHealthLoading(false));
   }, []);
 
   const commit = async (next: AppData) => {
@@ -321,6 +331,12 @@ export const useAppModel = () => {
       async resetToSeed() {
         await commit(seedData);
       },
+      async refreshProviderHealth() {
+        setProviderHealthLoading(true);
+        const next = await getProviderHealth();
+        setProviderHealth(next);
+        setProviderHealthLoading(false);
+      },
     }),
     [data],
   );
@@ -328,6 +344,8 @@ export const useAppModel = () => {
   return {
     data,
     loading,
+    providerHealth,
+    providerHealthLoading,
     actions,
   };
 };

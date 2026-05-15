@@ -371,3 +371,13 @@ export interface AppData {
   outcomes: Outcome[];
   snapshots: MockSnapshot[];
 }
+
+export interface ProviderHealthEntry {
+  provider: "Stooq" | "Alpha Vantage" | "Twelve Data" | "Marketaux";
+  configured: boolean;
+  status: "Healthy" | "Unconfigured" | "Plan Limited" | "Error";
+  mode: "Background" | "On Demand" | "Disabled";
+  note: string;
+  endpoint?: string;
+  lastCheckedAt?: string;
+}
