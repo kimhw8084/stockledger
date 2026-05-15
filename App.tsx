@@ -2466,7 +2466,7 @@ export default function App() {
           {tab === "Home" ? (
             <>
               <Reveal>
-                <SectionHeader note="What needs attention now, grouped by stock and kept compact." />
+                <SectionHeader note="Stock-grouped triage." />
                 <View style={styles.homeSummaryStrip}>
                   <DenseStat label="Open alerts" value={`${openAlerts}`} tone={openAlerts > 0 ? "risk" : "strong"} />
                   <DenseStat label="Urgent stocks" value={`${homeUrgentStocks.length}`} tone={homeUrgentStocks.length > 0 ? "risk" : "neutral"} />
@@ -2552,7 +2552,7 @@ export default function App() {
           {tab === "Stocks" ? (
             <>
               <Reveal>
-                <SectionHeader note="Search a stock and immediately inspect the same visual board every time." />
+                <SectionHeader note="Search, select, inspect." />
                 <View style={styles.stockSearchShell}>
                   <View style={styles.stockSearchHeader}>
                     <View style={styles.flexOne}>
@@ -2862,7 +2862,7 @@ export default function App() {
           {tab === "Recipes" ? (
             <>
               <Reveal>
-                <SectionHeader note="See your recipe inventory first. Build or edit only when you trigger it." />
+                <SectionHeader note="Recipe inventory first." />
                 <View style={styles.homeSummaryStrip}>
                   <DenseStat label="Recipes" value={`${data.recipes.length}`} tone="strong" />
                   <DenseStat label="Starter" value={`${data.recipes.filter((recipe) => starterRecipeNames.includes(recipe.name)).length}`} />
@@ -2872,7 +2872,7 @@ export default function App() {
                 <HorizontalChoice options={recipeShelfFilters} value={recipeShelfFilter} onSelect={setRecipeShelfFilter} />
                 <View style={styles.actionRow}>
                   <Button
-                    label="New Recipe"
+                    label="New"
                     onPress={() => {
                       setRecipeBuilderStep("Purpose");
                       setRecipeBuilderOpen(true);
@@ -2927,7 +2927,7 @@ export default function App() {
           {tab === "Eyes" ? (
             <>
               <Reveal>
-                <SectionHeader note="Inventory of active and inactive stock subscriptions for your recipes." />
+                <SectionHeader note="Recipe subscriptions." />
                 <View style={styles.homeSummaryStrip}>
                   <DenseStat label="Active" value={`${activeEyesInventory.length}`} tone="strong" />
                   <DenseStat label="Inactive" value={`${inactiveEyesInventory.length}`} />
@@ -2936,7 +2936,7 @@ export default function App() {
                 </View>
                 <HorizontalChoice options={eyesShelfFilters} value={eyesShelfFilter} onSelect={setEyesShelfFilter} />
                 <View style={styles.actionRow}>
-                  <Button label="New Eye" onPress={() => setEyeComposerOpen(true)} />
+                  <Button label="New" onPress={() => setEyeComposerOpen(true)} />
                 </View>
               </Reveal>
 
@@ -2976,14 +2976,14 @@ export default function App() {
                           <MetaPill label={eye.lastReviewedAt ? formatShortDate(eye.lastReviewedAt) : "Review due"} />
                         </View>
                         <View style={styles.analysisActionRow}>
-                          <Button label="Open Stock" onPress={() => openStockContext({ stockId: eye.stockId, eyeId: eye.id })} />
+                          <Button label="Stock" onPress={() => openStockContext({ stockId: eye.stockId, eyeId: eye.id })} />
                           <Button
                             label="Review"
                             tone="secondary"
                             onPress={() => void actions.markEyesReviewed({ stockId: eye.stockId, recipeId: eye.recipeId })}
                           />
                           <Button
-                            label="Details"
+                            label="Detail"
                             tone="ghost"
                             onPress={() => {
                               setSelectedEyeId(eye.id);
@@ -3030,9 +3030,9 @@ export default function App() {
                           <MetaPill label={eye.lastReviewedAt ? formatShortDate(eye.lastReviewedAt) : "Review due"} />
                         </View>
                         <View style={styles.analysisActionRow}>
-                          <Button label="Open Stock" onPress={() => openStockContext({ stockId: eye.stockId, eyeId: eye.id })} />
+                          <Button label="Stock" onPress={() => openStockContext({ stockId: eye.stockId, eyeId: eye.id })} />
                           <Button
-                            label="Details"
+                            label="Detail"
                             tone="secondary"
                             onPress={() => {
                               setSelectedEyeId(eye.id);
@@ -3052,7 +3052,7 @@ export default function App() {
           {tab === "Alerts" ? (
             <>
               <Reveal>
-                <SectionHeader note="Alerts answer what happened, why now, and what deserves review first." />
+                <SectionHeader note="What changed and why now." />
                 <View style={styles.homeSummaryStrip}>
                   <DenseStat label="Open" value={`${groupedAlertQueue.reduce((sum, item) => sum + item.openAlerts.length, 0)}`} tone="risk" />
                   <DenseStat label="Grouped Stocks" value={`${groupedAlertQueue.length}`} />
@@ -3119,15 +3119,15 @@ export default function App() {
                               {linkedDecision ? <MetaPill label={`Journal · ${linkedDecision.action}`} /> : null}
                             </View>
                             <View style={styles.analysisActionRow}>
-                              <Button label="Open Detail" onPress={() => {
+                              <Button label="Detail" onPress={() => {
                                 setSelectedAlertId(alert.id);
                                 setAlertDetailOpen(true);
                               }} />
                               {!alert.reviewed ? <Button label="Unsnooze" tone="secondary" onPress={() => void actions.snoozeAlert(alert.id, -1)} /> : null}
-                              {eye ? <Button label="Open Stock" tone="secondary" onPress={() => openStockContext({ stockId: eye.stockId, eyeId: eye.id, alertId: alert.id, target: "Alerts" })} /> : null}
+                              {eye ? <Button label="Stock" tone="secondary" onPress={() => openStockContext({ stockId: eye.stockId, eyeId: eye.id, alertId: alert.id, target: "Alerts" })} /> : null}
                               {linkedDecision ? (
                                 <Button
-                                  label="Open Journal"
+                                  label="Journal"
                                   tone="ghost"
                                   onPress={() => {
                                     if (linkedDecision) {
@@ -3151,7 +3151,7 @@ export default function App() {
           {tab === "Journal" ? (
             <>
               <Reveal>
-                <SectionHeader note="See the journal inventory first. Add entries only when you trigger composition." />
+                <SectionHeader note="Decision history first." />
                 <View style={styles.homeSummaryStrip}>
                   <DenseStat label="Entries" value={`${data.decisions.length}`} tone="strong" />
                   <DenseStat label="Entered" value={`${data.decisions.filter((decision) => decision.action === "Entered").length}`} />
@@ -3160,7 +3160,7 @@ export default function App() {
                 </View>
                 <HorizontalChoice options={journalFilters} value={journalFilter} onSelect={setJournalFilter} />
                 <View style={styles.actionRow}>
-                  <Button label="New Journal Entry" onPress={() => setJournalComposerOpen(true)} />
+                  <Button label="New" onPress={() => setJournalComposerOpen(true)} />
                 </View>
               </Reveal>
 
@@ -3186,13 +3186,13 @@ export default function App() {
                           <Button label="Open" tone="secondary" onPress={() => setSelectedDecisionId(decision.id)} />
                           {linkedEye ? (
                             <Button
-                              label="Open Stock"
+                              label="Stock"
                               onPress={() => openStockContext({ stockId: linkedEye.stockId, eyeId: linkedEye.id })}
                             />
                           ) : null}
                           {decision.alertId ? (
                             <Button
-                              label="Open Alert"
+                              label="Alert"
                               tone="ghost"
                               onPress={() => {
                                 setSelectedAlertId(decision.alertId ?? "");
@@ -3222,7 +3222,7 @@ export default function App() {
           {tab === "Settings" ? (
             <>
               <Reveal>
-                <SectionHeader note="Provider health, free-tier policy, and manual data controls live here." />
+                <SectionHeader note="Provider health and controls." />
                 <View style={styles.homeSummaryStrip}>
                   <DenseStat
                     label="Healthy"
@@ -3600,7 +3600,7 @@ export default function App() {
             </View>
             <View style={styles.actionRow}>
               <Button
-                label="Open Stock"
+                label="Stock"
                 onPress={() => {
                   setEyeDetailOpen(false);
                   openStockContext({ stockId: selectedEye.stockId, eyeId: selectedEye.id });
@@ -3719,7 +3719,7 @@ export default function App() {
             </View>
             <View style={styles.analysisActionRow}>
               <Button
-                label="Open Stock"
+                label="Stock"
                 tone="secondary"
                 onPress={() => {
                   setAlertDetailOpen(false);
@@ -3732,7 +3732,7 @@ export default function App() {
               <Button label="Not Useful" tone="ghost" onPress={() => void actions.setAlertFeedback(selectedAlert.id, "Not Useful")} />
               {selectedAlertDecision ? (
                 <Button
-                  label="Open Journal"
+                  label="Journal"
                   tone="ghost"
                   onPress={() => {
                     setSelectedDecisionId(selectedAlertDecision.id);
@@ -3805,7 +3805,7 @@ export default function App() {
             </View>
             <View style={styles.actionRow}>
               <Button
-                label="Open Stock"
+                label="Stock"
                 onPress={() => {
                   const linkedEye = data.eyes.find((eye) => eye.id === selectedDecision.eyeId);
                   if (!linkedEye) return;
@@ -3815,7 +3815,7 @@ export default function App() {
               />
               {selectedDecision.alertId ? (
                 <Button
-                  label="Open Alert"
+                  label="Alert"
                   tone="secondary"
                   onPress={() => {
                     setSelectedAlertId(selectedDecision.alertId ?? "");
@@ -3975,10 +3975,10 @@ export default function App() {
   );
 }
 
-const SectionHeader = ({ title, note }: { title?: string; note: string }) => (
+const SectionHeader = ({ title, note }: { title?: string; note?: string }) => (
   <View style={styles.sectionHeader}>
     {title ? <Text style={styles.sectionTitle}>{title}</Text> : null}
-    <Text style={styles.sectionNote}>{note}</Text>
+    {note ? <Text style={styles.sectionNote}>{note}</Text> : null}
   </View>
 );
 
@@ -4072,7 +4072,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 16,
     paddingBottom: 136,
-    gap: 18,
+    gap: 16,
   },
   // Search Hero Styles
   searchHero: {
@@ -5275,19 +5275,19 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 8,
-    marginTop: 12,
+    marginTop: 10,
   },
   analysisActionRow: {
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 8,
-    marginTop: 10,
+    marginTop: 8,
   },
   metaRow: {
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 8,
-    marginTop: 10,
+    marginTop: 8,
   },
   dualDenseGrid: {
     flexDirection: "row",
@@ -5464,7 +5464,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   stack: {
-    gap: 12,
+    gap: 10,
   },
   thresholdWrap: {
     gap: 8,
