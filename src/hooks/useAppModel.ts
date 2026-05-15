@@ -312,6 +312,15 @@ export const useAppModel = () => {
           ),
         });
       },
+      async setOutcomeStatus(outcomeId: string, status: "Pending" | "Reviewed") {
+        if (!data) return;
+        await commit({
+          ...data,
+          outcomes: data.outcomes.map((outcome) =>
+            outcome.id === outcomeId ? { ...outcome, status } : outcome,
+          ),
+        });
+      },
       async refreshMockData() {
         if (!data) return;
         const refreshed = data.stocks.map(buildMockSnapshot);

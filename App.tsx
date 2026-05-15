@@ -17,6 +17,7 @@ import { useAppModel } from "./src/hooks/useAppModel";
 import {
   Alert,
   ConditionOperator,
+  Decision,
   DecisionAction,
   Eye,
   EyeState,
@@ -1491,6 +1492,7 @@ const StockTriageCard = ({
   item: {
     stock: Stock;
     eyes: Eye[];
+    decisions: Decision[];
     snapshot?: {
       price: number;
       drawdownPct: number;
@@ -1561,6 +1563,15 @@ const StockTriageCard = ({
             <Text style={styles.detailCalloutLabel}>Top risk</Text>
             <Text style={styles.detailCalloutBody}>{topRisk}</Text>
           </View>
+
+          {item.decisions.length > 0 ? (
+            <View style={styles.detailCallout}>
+              <Text style={styles.detailCalloutLabel}>Latest decision</Text>
+              <Text style={styles.detailCalloutBody}>
+                {item.decisions[0].action} · {formatShortDate(item.decisions[0].createdAt)}
+              </Text>
+            </View>
+          ) : null}
 
           <View style={styles.metaRow}>
             {item.eyes.slice(0, 3).map((eye) => (
@@ -2107,6 +2118,9 @@ export default function App() {
     return decision.thesisValid !== "Yes" || decision.action === "Marked Thesis Broken";
   });
   const selectedDecision = data.decisions.find((decision) => decision.id === selectedDecisionId);
+  const selectedDecisionOutcome = selectedDecision
+    ? data.outcomes.find((outcome) => outcome.decisionId === selectedDecision.id)
+    : undefined;
 
   const groupedAlertQueue = stockDirectory
     .map((item) => ({
@@ -2152,6 +2166,12 @@ export default function App() {
       return Date.now() - reviewedAt > 1000 * 60 * 60 * 24 * 14;
     }),
   );
+  const selectedEyeLinkedAlerts = selectedEye
+    ? data.alerts.filter((alert) => alert.eyeId === selectedEye.id)
+    : [];
+  const selectedEyeLinkedDecisions = selectedEye
+    ? data.decisions.filter((decision) => decision.eyeId === selectedEye.id)
+    : [];
   const snapshotDiagnostics = {
     provider: data.snapshots.filter((snapshot) => !snapshot.isMock).length,
     mock: data.snapshots.filter((snapshot) => snapshot.isMock).length,
@@ -3600,6 +3620,8 @@ export default function App() {
               <DenseStat label="Review" value={selectedEye.lastReviewedAt ? formatShortDate(selectedEye.lastReviewedAt) : "Due"} />
               <DenseStat label="Entry Low" value={selectedEye.plannedEntryLow ? `$${selectedEye.plannedEntryLow.toFixed(2)}` : "Unset"} />
               <DenseStat label="Entry High" value={selectedEye.plannedEntryHigh ? `$${selectedEye.plannedEntryHigh.toFixed(2)}` : "Unset"} />
+              <DenseStat label="Alerts" value={`${selectedEyeLinkedAlerts.length}`} />
+              <DenseStat label="Journal" value={`${selectedEyeLinkedDecisions.length}`} />
             </View>
             <View style={styles.detailCallout}>
               <Text style={styles.detailCalloutLabel}>Thesis snapshot</Text>
@@ -3609,6 +3631,14 @@ export default function App() {
               <Text style={styles.detailCalloutLabel}>Invalidation rule</Text>
               <Text style={styles.detailCalloutBody}>{selectedEye.invalidationRule || "No explicit invalidation rule recorded."}</Text>
             </View>
+            {selectedEyeLinkedDecisions[0] ? (
+              <View style={styles.detailCallout}>
+                <Text style={styles.detailCalloutLabel}>Last logged decision</Text>
+                <Text style={styles.detailCalloutBody}>
+                  {selectedEyeLinkedDecisions[0].action} · {formatShortDate(selectedEyeLinkedDecisions[0].createdAt)}
+                </Text>
+              </View>
+            ) : null}
             <View style={styles.actionRow}>
               <Button
                 label="Stock"
@@ -3631,6 +3661,17 @@ export default function App() {
                   setJournalComposerOpen(true);
                 }}
               />
+              {selectedEyeLinkedDecisions[0] ? (
+                <Button
+                  label="Journal"
+                  tone="ghost"
+                  onPress={() => {
+                    setSelectedDecisionId(selectedEyeLinkedDecisions[0].id);
+                    setEyeDetailOpen(false);
+                    setTab("Journal");
+                  }}
+                />
+              ) : null}
               <Button
                 label="Delete"
                 tone="ghost"
@@ -3837,18 +3878,30 @@ export default function App() {
                   }}
                 />
               ) : null}
+              {selectedDecisionOutcome ? (
+                <Button
+                  label={selectedDecisionOutcome.status === "Reviewed" ? "Outcome Done" : "Mark Outcome"}
+                  tone="secondary"
+                  onPress={() =>
+                    void actions.setOutcomeStatus(
+                      selectedDecisionOutcome.id,
+                      selectedDecisionOutcome.status === "Reviewed" ? "Pending" : "Reviewed",
+                    )
+                  }
+                />
+              ) : null}
             </View>
-            {data.outcomes.find((outcome) => outcome.decisionId === selectedDecision.id) ? (
+            {selectedDecisionOutcome ? (
               <View style={styles.formulaPanel}>
                 <Text style={styles.formulaTitle}>
-                  Outcome · {data.outcomes.find((outcome) => outcome.decisionId === selectedDecision.id)?.status ?? "Pending"}
+                  Outcome · {selectedDecisionOutcome.status ?? "Pending"}
                 </Text>
-                <Text style={styles.formulaBody}>
-                  {data.outcomes.find((outcome) => outcome.decisionId === selectedDecision.id)?.lesson}
-                </Text>
-                <Text style={styles.formulaMeta}>
-                  {data.outcomes.find((outcome) => outcome.decisionId === selectedDecision.id)?.recipeSuggestion}
-                </Text>
+                <Text style={styles.formulaBody}>{selectedDecisionOutcome.lesson}</Text>
+                <Text style={styles.formulaMeta}>{selectedDecisionOutcome.recipeSuggestion}</Text>
+                <View style={styles.metaRow}>
+                  <MetaPill label={selectedDecisionOutcome.reviewWindow} />
+                  <MetaPill label={selectedDecisionOutcome.priceChangeNote} />
+                </View>
               </View>
             ) : null}
           </WindowPanel>
