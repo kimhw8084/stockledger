@@ -404,6 +404,22 @@ const stockSearchScore = (query: string, item: { stock: Stock }) => {
 
 const stockMetricPreferenceKey = (stockId: string, cardId: string) => `${stockId}:${cardId}`;
 
+const stockMetricFamilyOrder = [
+  "Price Damage",
+  "Trend & Stabilization",
+  "Relative Strength",
+  "Volume & Volatility",
+  "Valuation",
+  "Financial Quality",
+  "Debt / Balance Sheet Risk",
+  "Earnings & Events",
+  "News & Thesis Risk",
+  "Sector & Market Context",
+  "Macro Context",
+  "User Thesis Match",
+  "Recipe Condition Map",
+] as const;
+
 const stockMetricStatusRank = (status: VisualEvidenceCard["status"]) => {
   switch (status) {
     case "Blocked":
@@ -424,6 +440,54 @@ const stockMetricStatusRank = (status: VisualEvidenceCard["status"]) => {
       return 7;
     default:
       return 8;
+  }
+};
+
+const stockMetricFamilyRank = (family: string) => {
+  const index = stockMetricFamilyOrder.indexOf(family as (typeof stockMetricFamilyOrder)[number]);
+  return index >= 0 ? index : stockMetricFamilyOrder.length;
+};
+
+const compactStatusLabel = (status: VisualEvidenceCard["status"]) => {
+  switch (status) {
+    case "Near Trigger":
+      return "Near";
+    case "Unavailable":
+      return "No Data";
+    default:
+      return status;
+  }
+};
+
+const compactMetricContextLabel = (card: VisualEvidenceCard) => {
+  const label = card.metric.thresholdLabel ?? card.metric.comparisonLabel ?? card.role;
+  return label
+    .replace(/^Need\s+/i, "")
+    .replace(/^Context only$/i, "Context")
+    .replace(/^Compared with\s+/i, "")
+    .trim();
+};
+
+const compactStatusAccentColor = (status: VisualEvidenceCard["status"]) => {
+  switch (status) {
+    case "Passed":
+      return "#22c55e";
+    case "Near Trigger":
+      return "#f59e0b";
+    case "Warning":
+      return "#f59e0b";
+    case "Blocked":
+      return "#ef4444";
+    case "Stale":
+      return "#94a3b8";
+    case "Partial":
+      return "#a855f7";
+    case "Mock":
+      return "#3b82f6";
+    case "Unavailable":
+      return "#9ca3af";
+    default:
+      return "#64748b";
   }
 };
 
@@ -1153,6 +1217,24 @@ const EvidenceCardView = ({
     }
     setExpanded((current) => !current);
   };
+  const compactCardTone =
+    compact && card.status === "Blocked"
+      ? styles.evidenceCardCompactBlocked
+      : compact && card.status === "Warning"
+        ? styles.evidenceCardCompactWarning
+        : compact && card.status === "Near Trigger"
+          ? styles.evidenceCardCompactNear
+          : compact && card.status === "Passed"
+            ? styles.evidenceCardCompactPassed
+            : compact && card.status === "Stale"
+              ? styles.evidenceCardCompactStale
+              : compact && card.status === "Partial"
+                ? styles.evidenceCardCompactPartial
+                : compact && card.status === "Mock"
+                  ? styles.evidenceCardCompactMock
+                  : compact && card.status === "Unavailable"
+                    ? styles.evidenceCardCompactUnavailable
+                    : null;
 
   return (
     <Pressable
@@ -1160,20 +1242,50 @@ const EvidenceCardView = ({
       style={({ pressed }) => [
         styles.evidenceCard,
         compact ? styles.evidenceCardCompact : null,
+        compact ? compactCardTone : null,
         compact ? styles.evidenceCardInteractive : null,
         pressed && compact ? styles.evidenceCardPressed : null,
       ]}
     >
+      {compact ? (
+        <View
+          style={[
+            styles.evidenceCompactAccent,
+            { backgroundColor: compactStatusAccentColor(card.status) },
+          ]}
+        />
+      ) : null}
       <View style={styles.inlineBetween}>
         <View style={styles.flexOne}>
-          <Text style={[styles.evidenceCardTitle, compact ? styles.evidenceCardTitleCompact : null]} numberOfLines={1}>
+          {compact ? (
+            <View style={styles.evidenceCompactHeaderRow}>
+              <Text style={styles.evidenceCardFamilyCompact} numberOfLines={1}>
+                {card.family}
+              </Text>
+              {pinned ? <Text style={styles.evidencePinnedMark}>Pinned</Text> : null}
+            </View>
+          ) : null}
+          <Text
+            style={[styles.evidenceCardTitle, compact ? styles.evidenceCardTitleCompact : null]}
+            numberOfLines={compact ? 2 : 1}
+          >
             {card.title}
           </Text>
           {!compact ? <Text style={styles.evidenceRole}>{card.role}</Text> : null}
         </View>
         <View style={styles.evidenceCardHeaderMeta}>
-          {pinned ? <Text style={styles.evidencePinnedMark}>Pinned</Text> : null}
-          <StatusShape status={card.status} size={compact ? 10 : 14} />
+          {compact ? (
+            <View style={[statusTone(card.status), styles.compactStatusBadge]}>
+              <Text style={styles.compactEvidenceStatusText} numberOfLines={1}>
+                {compactStatusLabel(card.status)}
+              </Text>
+            </View>
+          ) : (
+            <>
+              {pinned ? <Text style={styles.evidencePinnedMark}>Pinned</Text> : null}
+              <StatusShape status={card.status} size={14} />
+            </>
+          )}
         </View>
       </View>
 
@@ -1188,15 +1300,13 @@ const EvidenceCardView = ({
           <View style={styles.compactEvidenceFooter}>
             <Text style={styles.compactEvidenceValue}>{card.metric.currentLabel}</Text>
             <Text style={styles.compactEvidenceThreshold} numberOfLines={1}>
-              {card.metric.thresholdLabel ?? "Context"}
+              {compactMetricContextLabel(card)}
             </Text>
           </View>
           <View style={styles.compactEvidenceMetaRow}>
-            <View style={statusTone(card.status)}>
-              <Text style={styles.compactEvidenceStatusText} numberOfLines={1}>
-                {card.status}
-              </Text>
-            </View>
+            <Text style={styles.compactEvidenceEffect} numberOfLines={1}>
+              {card.effect}
+            </Text>
             <View style={styles.compactFreshnessWrap}>
               <View style={freshnessTone(card.freshness)}>
                 <View style={styles.freshnessDot} />
@@ -2314,13 +2424,19 @@ export default function App() {
         }
 
         if (stockBoardMode === "Family") {
-          const familyDelta = left.family.localeCompare(right.family);
+          const familyDelta = stockMetricFamilyRank(left.family) - stockMetricFamilyRank(right.family);
           if (familyDelta !== 0) return familyDelta;
         }
 
         if (leftPinned !== rightPinned) {
           return Number(rightPinned) - Number(leftPinned);
         }
+
+        const statusDelta = stockMetricStatusRank(left.status) - stockMetricStatusRank(right.status);
+        if (statusDelta !== 0) return statusDelta;
+
+        const familyDelta = stockMetricFamilyRank(left.family) - stockMetricFamilyRank(right.family);
+        if (familyDelta !== 0) return familyDelta;
 
         return left.title.localeCompare(right.title);
       });
@@ -5020,7 +5136,7 @@ const styles = StyleSheet.create({
   analysisGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 12,
+    gap: 10,
   },
   analysisGridItem: {
     width: "48.2%",
@@ -5036,9 +5152,34 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   evidenceCardCompact: {
-    padding: 11,
-    gap: 8,
-    minHeight: 158,
+    padding: 10,
+    gap: 7,
+    minHeight: 166,
+    borderColor: "#e5e7eb",
+  },
+  evidenceCardCompactPassed: {
+    borderColor: "#bbf7d0",
+  },
+  evidenceCardCompactNear: {
+    borderColor: "#fde68a",
+  },
+  evidenceCardCompactWarning: {
+    borderColor: "#fcd34d",
+  },
+  evidenceCardCompactBlocked: {
+    borderColor: "#fca5a5",
+  },
+  evidenceCardCompactStale: {
+    borderColor: "#cbd5e1",
+  },
+  evidenceCardCompactPartial: {
+    borderColor: "#d8b4fe",
+  },
+  evidenceCardCompactMock: {
+    borderColor: "#bfdbfe",
+  },
+  evidenceCardCompactUnavailable: {
+    borderColor: "#d1d5db",
   },
   evidenceCardInteractive: {
     shadowColor: "#111827",
@@ -5050,6 +5191,27 @@ const styles = StyleSheet.create({
   evidenceCardPressed: {
     transform: [{ scale: 0.985 }],
   },
+  evidenceCompactAccent: {
+    height: 3,
+    borderRadius: 999,
+    backgroundColor: "#e5e7eb",
+    marginBottom: 2,
+  },
+  evidenceCompactHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginBottom: 4,
+  },
+  evidenceCardFamilyCompact: {
+    color: "#6b7280",
+    fontSize: 9,
+    fontWeight: "800",
+    textTransform: "uppercase",
+    letterSpacing: 0.35,
+    flexShrink: 1,
+    fontFamily,
+  },
   evidenceCardTitle: {
     color: "#111827",
     fontSize: 14,
@@ -5057,15 +5219,16 @@ const styles = StyleSheet.create({
     fontFamily,
   },
   evidenceCardTitleCompact: {
-    fontSize: 10,
+    fontSize: 13,
     fontWeight: "800",
-    textTransform: "uppercase",
-    color: "#6b7280",
+    color: "#111827",
+    lineHeight: 17,
   },
   evidenceCardHeaderMeta: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
     gap: 6,
+    marginLeft: 8,
   },
   evidencePinnedMark: {
     color: "#0f766e",
@@ -5080,21 +5243,22 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   compactVisualContainer: {
-    height: 60,
+    height: 58,
     justifyContent: "center",
   },
   compactEvidenceFooter: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "flex-start",
     marginTop: 4,
     gap: 8,
   },
   compactEvidenceValue: {
     color: "#111827",
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: "800",
     flexShrink: 1,
+    fontFamily,
   },
   compactEvidenceThreshold: {
     color: "#6b7280",
@@ -5103,13 +5267,21 @@ const styles = StyleSheet.create({
     fontFamily,
     flexShrink: 1,
     textAlign: "right",
+    maxWidth: "52%",
   },
   compactEvidenceMetaRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    gap: 10,
-    marginTop: 2,
+    gap: 8,
+    marginTop: 3,
+  },
+  compactStatusBadge: {
+    minHeight: 22,
+    paddingHorizontal: 7,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
   },
   compactEvidenceStatusText: {
     color: "#111827",
@@ -5118,10 +5290,18 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
     fontFamily,
   },
+  compactEvidenceEffect: {
+    color: "#4b5563",
+    fontSize: 10,
+    fontWeight: "700",
+    fontFamily,
+    flex: 1,
+  },
   compactFreshnessWrap: {
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
+    maxWidth: "44%",
   },
   compactFreshnessText: {
     color: "#6b7280",
