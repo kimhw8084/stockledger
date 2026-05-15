@@ -2080,7 +2080,18 @@ export default function App() {
     }
     return eye.lastEvaluation?.currentState === "Not Relevant" || eye.lastEvaluation?.currentState === "Thesis Broken";
   });
+  const filteredInactiveEyesInventory = inactiveEyesInventory.filter((eye) => {
+    if (eyesShelfFilter === "All") return true;
+    if (eyesShelfFilter === "Quiet") return true;
+    return false;
+  });
   const selectedRecipe = data.recipes.find((recipe) => recipe.id === recipeDetailId);
+  const selectedRecipeLinkedEyes = selectedRecipe
+    ? data.eyes.filter((eye) => eye.recipeId === selectedRecipe.id)
+    : [];
+  const selectedRecipeWatchedStocks = selectedRecipe
+    ? new Set(selectedRecipeLinkedEyes.map((eye) => eye.stockId)).size
+    : 0;
   const filteredRecipes = data.recipes.filter((recipe) => {
     if (recipeShelfFilter === "All") return true;
     if (recipeShelfFilter === "Starter") return starterRecipeNames.includes(recipe.name);
@@ -2875,9 +2886,16 @@ export default function App() {
                   {filteredRecipes.map((recipe) => (
                     <Pressable key={recipe.id} onPress={() => setRecipeDetailId(recipe.id)}>
                       <Card>
-                        <Text style={styles.cardEyebrow}>Version {recipe.version}</Text>
-                        <Text style={styles.cardTitle}>{recipe.name}</Text>
-                        <Text style={styles.cardBody}>{recipe.purpose}</Text>
+                        <View style={styles.inlineBetween}>
+                          <View style={styles.flexOne}>
+                            <Text style={styles.cardEyebrow}>Version {recipe.version}</Text>
+                            <Text style={styles.cardTitle}>{recipe.name}</Text>
+                          </View>
+                          <Text style={styles.inventoryRowMeta}>
+                            {data.eyes.filter((eye) => eye.recipeId === recipe.id).length} Eyes
+                          </Text>
+                        </View>
+                        <Text style={styles.cardBody} numberOfLines={2}>{recipe.purpose}</Text>
                         <View style={styles.dualDenseGrid}>
                           <DenseStat label="Type" value={recipe.opportunityType ?? "General"} tone="strong" />
                           <DenseStat label="Horizon" value={recipe.timeHorizon || "Unset"} />
@@ -2887,6 +2905,16 @@ export default function App() {
                         <View style={styles.metaRow}>
                           <MetaPill label={starterRecipeNames.includes(recipe.name) ? "Starter" : "Custom"} />
                           <MetaPill label={recipe.intendedUseCase || "Use case pending"} />
+                        </View>
+                        <View style={styles.analysisActionRow}>
+                          <Button label="Open" tone="secondary" onPress={() => setRecipeDetailId(recipe.id)} />
+                          <Button
+                            label="Use for Eye"
+                            onPress={() => {
+                              setEyeForm((current) => ({ ...current, recipeId: recipe.id }));
+                              setEyeComposerOpen(true);
+                            }}
+                          />
                         </View>
                       </Card>
                     </Pressable>
@@ -2913,9 +2941,9 @@ export default function App() {
               </Reveal>
 
               <Reveal delay={40}>
-                <SectionHeader title="Active Eyes" note="These are the recipe subscriptions currently worth monitoring." />
+                <SectionHeader title={`Active Eyes · ${filteredActiveEyesInventory.length}`} note="These are the recipe subscriptions currently worth monitoring." />
                 <View style={styles.stack}>
-                  {activeEyesInventory.length === 0 ? (
+                  {filteredActiveEyesInventory.length === 0 ? (
                     <Card>
                       <Text style={styles.cardBody}>No active Eyes right now.</Text>
                     </Card>
@@ -2933,22 +2961,30 @@ export default function App() {
                           <View style={styles.flexOne}>
                             <Text style={styles.cardEyebrow}>{recipeLabel(data.recipes, eye.recipeId)}</Text>
                             <Text style={styles.alertTitle}>{stockLabel(data.stocks, eye.stockId)}</Text>
-                            <Text style={styles.cardBody}>{eye.thesisSnapshot}</Text>
+                            <Text style={styles.cardBody} numberOfLines={2}>{eye.thesisSnapshot}</Text>
                           </View>
                           <Text style={stateTone(eye.lastEvaluation?.currentState)}>
                             {eye.lastEvaluation?.currentState ?? "Not Evaluated"}
                           </Text>
+                        </View>
+                        <View style={styles.compactMetricRow}>
+                          <Text style={styles.compactMetricText}>{eye.lastEvaluation?.whyNow ?? "No current summary."}</Text>
                         </View>
                         <View style={styles.metaRow}>
                           <MetaPill label={eye.lastEvaluation?.actionUrgency ?? "Wait"} />
                           <MetaPill label={`v${eye.recipeVersionAtCreation ?? eye.lastEvaluation?.recipeVersion ?? 1}`} />
                           <MetaPill label={eye.lastReviewedAt ? formatShortDate(eye.lastReviewedAt) : "Review due"} />
                         </View>
-                        <View style={styles.actionRow}>
+                        <View style={styles.analysisActionRow}>
                           <Button label="Open Stock" onPress={() => openStockContext({ stockId: eye.stockId, eyeId: eye.id })} />
                           <Button
-                            label="Details"
+                            label="Review"
                             tone="secondary"
+                            onPress={() => void actions.markEyesReviewed({ stockId: eye.stockId, recipeId: eye.recipeId })}
+                          />
+                          <Button
+                            label="Details"
+                            tone="ghost"
                             onPress={() => {
                               setSelectedEyeId(eye.id);
                               setEyeDetailOpen(true);
@@ -2963,14 +2999,14 @@ export default function App() {
               </Reveal>
 
               <Reveal delay={60}>
-                <SectionHeader title="Inactive Eyes" note="Subscriptions that are quiet or thesis-broken remain here for reference." />
+                <SectionHeader title={`Inactive Eyes · ${filteredInactiveEyesInventory.length}`} note="Subscriptions that are quiet or thesis-broken remain here for reference." />
                 <View style={styles.stack}>
-                  {inactiveEyesInventory.length === 0 ? (
+                  {filteredInactiveEyesInventory.length === 0 ? (
                     <Card>
                       <Text style={styles.cardBody}>No inactive Eyes right now.</Text>
                     </Card>
                   ) : (
-                    inactiveEyesInventory.map((eye) => (
+                    filteredInactiveEyesInventory.map((eye) => (
                       <Pressable
                         key={`inactive-${eye.id}`}
                         onPress={() => {
@@ -2983,13 +3019,17 @@ export default function App() {
                           <View style={styles.flexOne}>
                             <Text style={styles.cardEyebrow}>{recipeLabel(data.recipes, eye.recipeId)}</Text>
                             <Text style={styles.alertTitle}>{stockLabel(data.stocks, eye.stockId)}</Text>
-                            <Text style={styles.cardBody}>{eye.thesisSnapshot}</Text>
+                            <Text style={styles.cardBody} numberOfLines={2}>{eye.thesisSnapshot}</Text>
                           </View>
                           <Text style={stateTone(eye.lastEvaluation?.currentState)}>
                             {eye.lastEvaluation?.currentState ?? "Not Evaluated"}
                           </Text>
                         </View>
-                        <View style={styles.actionRow}>
+                        <View style={styles.metaRow}>
+                          <MetaPill label={eye.lastEvaluation?.actionUrgency ?? "Wait"} />
+                          <MetaPill label={eye.lastReviewedAt ? formatShortDate(eye.lastReviewedAt) : "Review due"} />
+                        </View>
+                        <View style={styles.analysisActionRow}>
                           <Button label="Open Stock" onPress={() => openStockContext({ stockId: eye.stockId, eyeId: eye.id })} />
                           <Button
                             label="Details"
@@ -3121,33 +3161,54 @@ export default function App() {
 
               <Reveal delay={40}>
                 <View style={styles.stack}>
-                  {filteredJournalHistory.map((decision) => (
-                    <Pressable key={decision.id} onPress={() => setSelectedDecisionId(decision.id)}>
-                    <Card>
-                      <Text style={styles.alertTitle}>{decision.action} · {decisionTitle(decision.eyeId, data.eyes, data.stocks, data.recipes)}</Text>
-                      <Text style={styles.cardBody}>{decision.note}</Text>
-                      <View style={styles.compactMetricRow}>
-                        <Text style={styles.compactMetricText}>{decision.stateAtDecision ?? "No state snapshot"}</Text>
-                        <Text style={styles.compactMetricText}>{decision.dataQuality ?? "No data note"}</Text>
-                      </View>
-                      <Text style={styles.metaLine}>Concern: {decision.concern || "Not captured"}</Text>
-                      <Text style={styles.metaLine}>Thesis {decision.thesisValid} · Timing {decision.timing} · {formatDate(decision.createdAt)}</Text>
-                      {data.outcomes.find((outcome) => outcome.decisionId === decision.id) ? (
-                        <View style={styles.formulaPanel}>
-                          <Text style={styles.formulaTitle}>
-                            Outcome · {data.outcomes.find((outcome) => outcome.decisionId === decision.id)?.status ?? "Pending"}
-                          </Text>
-                          <Text style={styles.formulaBody}>
-                            {data.outcomes.find((outcome) => outcome.decisionId === decision.id)?.lesson}
-                          </Text>
-                          <Text style={styles.formulaMeta}>
-                            {data.outcomes.find((outcome) => outcome.decisionId === decision.id)?.recipeSuggestion}
-                          </Text>
+                  {filteredJournalHistory.map((decision) => {
+                    const linkedEye = data.eyes.find((eye) => eye.id === decision.eyeId);
+                    const linkedOutcome = data.outcomes.find((outcome) => outcome.decisionId === decision.id);
+                    return (
+                      <Pressable key={decision.id} onPress={() => setSelectedDecisionId(decision.id)}>
+                      <Card>
+                        <Text style={styles.cardEyebrow}>{formatDate(decision.createdAt)}</Text>
+                        <Text style={styles.alertTitle}>{decision.action} · {decisionTitle(decision.eyeId, data.eyes, data.stocks, data.recipes)}</Text>
+                        <Text style={styles.cardBody} numberOfLines={2}>{decision.note}</Text>
+                        <View style={styles.metaRow}>
+                          <MetaPill label={decision.stateAtDecision ?? "No state snapshot"} />
+                          <MetaPill label={decision.dataQuality ?? "No data note"} />
+                          <MetaPill label={`Thesis ${decision.thesisValid}`} />
+                          <MetaPill label={decision.timing} />
                         </View>
-                      ) : null}
-                    </Card>
-                    </Pressable>
-                  ))}
+                        <Text style={styles.metaLine}>Concern: {decision.concern || "Not captured"}</Text>
+                        <View style={styles.analysisActionRow}>
+                          <Button label="Open" tone="secondary" onPress={() => setSelectedDecisionId(decision.id)} />
+                          {linkedEye ? (
+                            <Button
+                              label="Open Stock"
+                              onPress={() => openStockContext({ stockId: linkedEye.stockId, eyeId: linkedEye.id })}
+                            />
+                          ) : null}
+                          {decision.alertId ? (
+                            <Button
+                              label="Open Alert"
+                              tone="ghost"
+                              onPress={() => {
+                                setSelectedAlertId(decision.alertId ?? "");
+                                setAlertWorkspaceTab("History");
+                                setAlertDetailOpen(true);
+                                setTab("Alerts");
+                              }}
+                            />
+                          ) : null}
+                        </View>
+                        {linkedOutcome ? (
+                          <View style={styles.formulaPanel}>
+                            <Text style={styles.formulaTitle}>Outcome · {linkedOutcome.status}</Text>
+                            <Text style={styles.formulaBody}>{linkedOutcome.lesson}</Text>
+                            <Text style={styles.formulaMeta}>{linkedOutcome.recipeSuggestion}</Text>
+                          </View>
+                        ) : null}
+                      </Card>
+                      </Pressable>
+                    );
+                  })}
                 </View>
               </Reveal>
             </>
@@ -3436,6 +3497,13 @@ export default function App() {
               <DenseStat label="Use case" value={selectedRecipe.intendedUseCase || "Unset"} />
               <DenseStat label="Cadence" value={`${selectedRecipe.reviewConfig?.cadenceDays ?? 14}d`} />
               <DenseStat label="Cooldown" value={`${selectedRecipe.alertConfig?.cooldownHours ?? 24}h`} />
+              <DenseStat label="Eyes" value={`${selectedRecipeLinkedEyes.length}`} />
+              <DenseStat label="Stocks" value={`${selectedRecipeWatchedStocks}`} />
+            </View>
+            <View style={styles.metaRow}>
+              <MetaPill label={starterRecipeNames.includes(selectedRecipe.name) ? "Starter" : "Custom"} />
+              <MetaPill label={`${selectedRecipe.conditions.length} conditions`} />
+              {selectedRecipe.notes ? <MetaPill label="Has notes" /> : null}
             </View>
             <View style={styles.actionRow}>
               <Button
@@ -3479,6 +3547,12 @@ export default function App() {
                 }}
               />
             </View>
+            {selectedRecipe.notes ? (
+              <View style={styles.detailCallout}>
+                <Text style={styles.detailCalloutLabel}>Builder notes</Text>
+                <Text style={styles.detailCalloutBody}>{selectedRecipe.notes}</Text>
+              </View>
+            ) : null}
             <View style={styles.stack}>
               {selectedRecipe.conditions.map((condition) => (
                 <Card key={`recipe-condition-${condition.id}`}>
@@ -3914,6 +3988,13 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontFamily,
     marginTop: 3,
+  },
+  inventoryRowMeta: {
+    color: "#6b7280",
+    fontSize: 11,
+    fontWeight: "700",
+    fontFamily,
+    marginLeft: 12,
   },
   alertBell: {
     width: 42,
