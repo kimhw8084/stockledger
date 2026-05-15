@@ -2,6 +2,7 @@ import { StatusBar } from "expo-status-bar";
 import React, { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import {
   Animated,
+  PanResponder,
   Platform,
   Pressable,
   SafeAreaView,
@@ -514,13 +515,15 @@ const Button = ({
   label,
   onPress,
   tone = "primary",
+  disabled = false,
 }: {
   label: string;
   onPress: () => void;
   tone?: "primary" | "secondary" | "ghost";
+  disabled?: boolean;
 }) => (
   <Pressable
-    onPress={onPress}
+    onPress={disabled ? undefined : onPress}
     style={[
       styles.button,
       tone === "primary"
@@ -528,6 +531,7 @@ const Button = ({
         : tone === "secondary"
           ? styles.buttonSecondary
           : styles.buttonGhost,
+      disabled ? styles.buttonDisabled : null,
     ]}
   >
     <Text
@@ -536,8 +540,9 @@ const Button = ({
         tone === "primary"
           ? styles.buttonPrimaryText
           : tone === "secondary"
-            ? styles.buttonSecondaryText
-            : styles.buttonGhostText,
+          ? styles.buttonSecondaryText
+          : styles.buttonGhostText,
+        disabled ? styles.buttonDisabledText : null,
       ]}
       numberOfLines={1}
     >
@@ -1279,7 +1284,55 @@ const WindowPanel = ({
   children: React.ReactNode;
 }) => {
   const overlayOpacity = useRef(new Animated.Value(0)).current;
-  const panelTranslateY = useRef(new Animated.Value(28)).current;
+  const sheetOffset = useRef(new Animated.Value(28)).current;
+  const closingRef = useRef(false);
+
+  const animateClose = () => {
+    if (closingRef.current) return;
+    closingRef.current = true;
+    Animated.parallel([
+      Animated.timing(overlayOpacity, {
+        toValue: 0,
+        duration: 180,
+        useNativeDriver: true,
+      }),
+      Animated.timing(sheetOffset, {
+        toValue: 42,
+        duration: 220,
+        useNativeDriver: true,
+      }),
+    ]).start(() => onClose());
+  };
+
+  const dragResponder = useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponder: (_, gesture) =>
+        Math.abs(gesture.dy) > 6 && Math.abs(gesture.dy) > Math.abs(gesture.dx),
+      onPanResponderMove: (_, gesture) => {
+        const nextOffset = Math.max(0, gesture.dy);
+        sheetOffset.setValue(nextOffset);
+        overlayOpacity.setValue(Math.max(0.08, 1 - nextOffset / 220));
+      },
+      onPanResponderRelease: (_, gesture) => {
+        if (gesture.dy > 96 || gesture.vy > 1.15) {
+          animateClose();
+          return;
+        }
+        Animated.parallel([
+          Animated.timing(overlayOpacity, {
+            toValue: 1,
+            duration: 180,
+            useNativeDriver: true,
+          }),
+          Animated.timing(sheetOffset, {
+            toValue: 0,
+            duration: 200,
+            useNativeDriver: true,
+          }),
+        ]).start();
+      },
+    }),
+  ).current;
 
   useEffect(() => {
     Animated.parallel([
@@ -1288,25 +1341,27 @@ const WindowPanel = ({
         duration: 220,
         useNativeDriver: true,
       }),
-      Animated.timing(panelTranslateY, {
+      Animated.timing(sheetOffset, {
         toValue: 0,
         duration: 260,
         useNativeDriver: true,
       }),
     ]).start();
-  }, [overlayOpacity, panelTranslateY]);
+  }, [overlayOpacity, sheetOffset]);
 
   return (
     <Animated.View style={[styles.windowBackdrop, { opacity: overlayOpacity }]}>
-      <Pressable style={styles.windowDismissLayer} onPress={onClose} />
-      <Animated.View style={[styles.windowPanel, { transform: [{ translateY: panelTranslateY }] }]}>
-        <View style={styles.windowGrabber} />
+      <Pressable style={styles.windowDismissLayer} onPress={animateClose} />
+      <Animated.View style={[styles.windowPanel, { transform: [{ translateY: sheetOffset }] }]}>
+        <View style={styles.windowHandleTouch} {...dragResponder.panHandlers}>
+          <View style={styles.windowGrabber} />
+        </View>
         <View style={styles.inlineBetween}>
           <View style={styles.flexOne}>
             <Text style={styles.cardTitle}>{title}</Text>
             {subtitle ? <Text style={styles.cardBody}>{subtitle}</Text> : null}
           </View>
-          <Button label="Done" tone="ghost" onPress={onClose} />
+          <Button label="Done" tone="ghost" onPress={animateClose} />
         </View>
         <ScrollView style={styles.windowScroll} contentContainerStyle={styles.stack} showsVerticalScrollIndicator={false}>
           {children}
@@ -1705,6 +1760,9 @@ export default function App() {
       title: card.title,
     })),
   );
+  const selectedEvidenceIndex = selectedEvidenceCard
+    ? selectedStockAnalysisCards.findIndex((card) => card.id === selectedEvidenceCard.id)
+    : -1;
   const selectedStockTrendSeries = selectedStockSummary?.snapshot
     ? buildChartSeries(
         selectedStockSummary.snapshot.price,
@@ -1868,6 +1926,15 @@ export default function App() {
       return;
     }
     setTab("Journal");
+  };
+
+  const cycleEvidenceCard = (direction: 1 | -1) => {
+    if (!selectedEvidenceCard || selectedStockAnalysisCards.length === 0) return;
+    const currentIndex = selectedStockAnalysisCards.findIndex((card) => card.id === selectedEvidenceCard.id);
+    if (currentIndex < 0) return;
+    const nextIndex = currentIndex + direction;
+    if (nextIndex < 0 || nextIndex >= selectedStockAnalysisCards.length) return;
+    setSelectedEvidenceCard(selectedStockAnalysisCards[nextIndex]);
   };
 
   const quickDecision = async (alert: Alert, action: DecisionAction) => {
@@ -2102,9 +2169,19 @@ export default function App() {
                         autoCapitalize="characters"
                       />
                     </View>
+                    {stockSearch.trim().length > 0 ? (
+                      <Button label="Clear" tone="ghost" onPress={() => setStockSearch("")} />
+                    ) : null}
                     <Button label="Add" tone="secondary" onPress={() => setStockComposerOpen(true)} />
                   </View>
-                  <Text style={styles.suggestionLabel}>{hasStockQuery ? "Suggestions" : "Recent search"}</Text>
+                  <View style={styles.inlineBetween}>
+                    <Text style={styles.suggestionLabel}>{hasStockQuery ? "Suggestions" : "Recent search"}</Text>
+                    {!hasStockQuery && recentStocks.length > 0 ? (
+                      <Pressable onPress={() => setRecentStockIds([])}>
+                        <Text style={styles.inlineUtilityText}>Clear recent</Text>
+                      </Pressable>
+                    ) : null}
+                  </View>
                   {stockSuggestions.length > 0 ? (
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.choiceRow}>
                       {stockSuggestions.map((item) => (
@@ -2125,6 +2202,14 @@ export default function App() {
                           >
                             {item.stock.name}
                           </Text>
+                          <View style={styles.stockSuggestionMetaRow}>
+                            <Text style={styles.stockSuggestionMeta} numberOfLines={1}>
+                              {item.snapshot ? `$${item.snapshot.price.toFixed(2)}` : "No feed"}
+                            </Text>
+                            <Text style={styles.stockSuggestionMeta} numberOfLines={1}>
+                              {item.snapshot?.freshness ?? "Unavailable"}
+                            </Text>
+                          </View>
                         </Pressable>
                       ))}
                     </ScrollView>
@@ -2193,7 +2278,10 @@ export default function App() {
                       <DenseStat label="Eyes" value={`${selectedStockSummary.eyes.length}`} />
                       <DenseStat label="Data" value={selectedStockSummary.snapshot?.freshness ?? "Unavailable"} tone={selectedStockSummary.snapshot?.isMock ? "risk" : "neutral"} />
                     </View>
-                    <View style={styles.dualColumn}>
+                    <View style={styles.stockWorkspaceActions}>
+                      <Button label="Clear Stock" tone="ghost" onPress={() => setSelectedStockId("")} />
+                    </View>
+                    <View style={styles.stockControlStack}>
                       <View style={styles.controlCard}>
                         <Text style={styles.inputLabel}>Benchmark</Text>
                         <HorizontalChoice options={analysisBenchmarks} value={analysisBenchmark} onSelect={setAnalysisBenchmark} />
@@ -2202,15 +2290,15 @@ export default function App() {
                         <Text style={styles.inputLabel}>Lookback</Text>
                         <HorizontalChoice options={analysisLookbacks} value={analysisLookback} onSelect={setAnalysisLookback} />
                       </View>
-                    </View>
-                    <View style={styles.dualColumn}>
                       <View style={styles.controlCard}>
                         <Text style={styles.inputLabel}>Status</Text>
                         <HorizontalChoice options={analysisStatusFilters} value={analysisStatusFilter} onSelect={setAnalysisStatusFilter} />
                       </View>
-                      <View style={styles.controlCard}>
-                        <Text style={styles.inputLabel}>Interaction</Text>
-                        <Text style={styles.sectionNote}>Tap any square to open the full visual detail panel.</Text>
+                      <View style={styles.stockWorkspaceHint}>
+                        <Text style={styles.stockWorkspaceHintTitle}>Explore the grid</Text>
+                        <Text style={styles.stockWorkspaceHintBody}>
+                          Tap any square to open the larger visual, then move through the next metrics without leaving the sheet.
+                        </Text>
                       </View>
                     </View>
                   </Card>
@@ -2905,9 +2993,20 @@ export default function App() {
         {selectedEvidenceCard ? (
           <WindowPanel
             title={selectedEvidenceCard.title}
-            subtitle={`${selectedStockSummary?.stock.symbol ?? "Stock"} · ${selectedEvidenceCard.freshness}`}
+            subtitle={`${selectedStockSummary?.stock.symbol ?? "Stock"} · ${selectedEvidenceCard.freshness}${selectedEvidenceIndex >= 0 ? ` · ${selectedEvidenceIndex + 1} of ${selectedStockAnalysisCards.length}` : ""}`}
             onClose={() => setSelectedEvidenceCard(null)}
           >
+            <View style={styles.actionRow}>
+              <Button label="Previous" tone="secondary" onPress={() => cycleEvidenceCard(-1)} disabled={selectedEvidenceIndex <= 0} />
+              <Button
+                label="Next"
+                tone="secondary"
+                onPress={() => cycleEvidenceCard(1)}
+                disabled={
+                  selectedEvidenceIndex < 0 || selectedEvidenceIndex >= selectedStockAnalysisCards.length - 1
+                }
+              />
+            </View>
             <EvidenceCardView card={selectedEvidenceCard} />
           </WindowPanel>
         ) : null}
@@ -3152,6 +3251,12 @@ const styles = StyleSheet.create({
     letterSpacing: 0.4,
     fontFamily,
   },
+  inlineUtilityText: {
+    color: "#111827",
+    fontSize: 12,
+    fontWeight: "700",
+    fontFamily,
+  },
   stockSuggestionPill: {
     width: 144,
     minHeight: 58,
@@ -3185,6 +3290,17 @@ const styles = StyleSheet.create({
   },
   stockSuggestionNameActive: {
     color: "#d1d5db",
+  },
+  stockSuggestionMetaRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 8,
+  },
+  stockSuggestionMeta: {
+    color: "#6b7280",
+    fontSize: 10,
+    fontWeight: "700",
+    fontFamily,
   },
   emptySearchState: {
     paddingVertical: 10,
@@ -3238,14 +3354,42 @@ const styles = StyleSheet.create({
     fontFamily,
   },
   controlCard: {
-    flex: 1,
     padding: 14,
     borderRadius: 16,
     backgroundColor: "#f8fafc",
     borderWidth: 1,
     borderColor: "#edf0f5",
-    minHeight: 108,
+    minHeight: 96,
     justifyContent: "space-between",
+  },
+  stockControlStack: {
+    marginTop: 14,
+    gap: 12,
+  },
+  stockWorkspaceActions: {
+    marginTop: 10,
+    alignItems: "flex-start",
+  },
+  stockWorkspaceHint: {
+    padding: 14,
+    borderRadius: 16,
+    backgroundColor: "#111827",
+    gap: 6,
+  },
+  stockWorkspaceHintTitle: {
+    color: "#ffffff",
+    fontSize: 12,
+    fontWeight: "800",
+    textTransform: "uppercase",
+    letterSpacing: 0.4,
+    fontFamily,
+  },
+  stockWorkspaceHintBody: {
+    color: "#d1d5db",
+    fontSize: 13,
+    lineHeight: 19,
+    fontWeight: "500",
+    fontFamily,
   },
   stockTrendHero: {
     marginTop: 14,
@@ -3334,10 +3478,10 @@ const styles = StyleSheet.create({
   analysisGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 12,
+    gap: 14,
   },
   analysisGridItem: {
-    width: "48%",
+    width: "47.8%",
   },
   // Evidence Cards
   evidenceCard: {
@@ -3393,6 +3537,7 @@ const styles = StyleSheet.create({
   choiceRow: {
     gap: 10,
     paddingVertical: 4,
+    paddingRight: 8,
   },
   choiceChip: {
     paddingHorizontal: 16,
@@ -4025,6 +4170,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "700",
   },
+  buttonDisabled: {
+    opacity: 0.42,
+  },
+  buttonDisabledText: {
+    color: "#9ca3af",
+  },
   input: {
     backgroundColor: "#ffffff",
     borderWidth: 1,
@@ -4271,7 +4422,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   windowPanel: {
-    maxHeight: "82%",
+    maxHeight: "86%",
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
     backgroundColor: "#ffffff",
@@ -4281,6 +4432,12 @@ const styles = StyleSheet.create({
     paddingTop: 18,
     paddingBottom: 28,
     gap: 12,
+  },
+  windowHandleTouch: {
+    alignSelf: "stretch",
+    alignItems: "center",
+    paddingTop: 2,
+    paddingBottom: 4,
   },
   windowGrabber: {
     alignSelf: "center",
