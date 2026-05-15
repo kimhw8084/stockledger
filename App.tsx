@@ -1517,7 +1517,10 @@ const StockTriageCard = ({
         <View style={styles.inlineBetween}>
           <View style={styles.flexOne}>
             <Text style={styles.cardEyebrow}>{item.stock.name}</Text>
-            <Text style={styles.alertTitle}>{item.stock.symbol}</Text>
+            <View style={styles.stockTriageTitleRow}>
+              <Text style={styles.alertTitle}>{item.stock.symbol}</Text>
+              <Text style={styles.stockTriageToggle}>{expanded ? "Hide" : "Open"}</Text>
+            </View>
           </View>
           <Text style={stateTone(evaluation?.currentState)}>{evaluation?.currentState ?? "Unwatched"}</Text>
         </View>
@@ -1533,7 +1536,7 @@ const StockTriageCard = ({
           <Text style={styles.stockTriageSecondaryMetric}>{item.snapshot?.freshness ?? "Unavailable"}</Text>
         </View>
 
-        <Text style={styles.stockGroupSummary} numberOfLines={expanded ? undefined : 1}>
+        <Text style={styles.stockGroupSummary} numberOfLines={expanded ? 3 : 1}>
           {topSupport}
         </Text>
       </Pressable>
@@ -1568,6 +1571,113 @@ const StockTriageCard = ({
         <Button label={expanded ? "Collapse" : "Expand"} tone="secondary" onPress={() => setExpanded((current) => !current)} />
         {onOpenAlerts ? <Button label="Alerts" tone="ghost" onPress={onOpenAlerts} /> : null}
         <Button label="Open Stock" onPress={onOpenStock} />
+      </View>
+    </Card>
+  );
+};
+
+const AlertClusterCard = ({
+  group,
+  selectedStockId,
+  onOpenStock,
+  onOpenDetail,
+  onQuickDecision,
+  onSnooze,
+  onReviewed,
+  onAcknowledgeAll,
+}: {
+  group: {
+    stock: Stock;
+    eyes: Eye[];
+    openAlerts: Alert[];
+    dominantEye?: Eye;
+    groupedAlerts: Record<string, Alert[]>;
+    highestPriority: "High" | "Medium";
+  };
+  selectedStockId: string;
+  onOpenStock: () => void;
+  onOpenDetail: (alertId: string) => void;
+  onQuickDecision: (alert: Alert, action: DecisionAction) => void;
+  onSnooze: (alertId: string) => void;
+  onReviewed: (alertId: string) => void;
+  onAcknowledgeAll: () => void;
+}) => {
+  const [expanded, setExpanded] = useState(false);
+  const leadAlert = group.openAlerts[0];
+  const nextAlert = group.openAlerts[1];
+  const supportLine = group.dominantEye?.lastEvaluation?.whyNow ?? leadAlert?.whyNow ?? "Review grouped signals on this stock.";
+
+  return (
+    <Card highlighted={selectedStockId === group.stock.id}>
+      <Pressable onPress={() => setExpanded((current) => !current)} style={styles.alertClusterHeader}>
+        <View style={styles.inlineBetween}>
+          <View style={styles.flexOne}>
+            <Text style={styles.cardEyebrow}>{group.stock.name}</Text>
+            <View style={styles.stockTriageTitleRow}>
+              <Text style={styles.cardTitle}>{group.stock.symbol}</Text>
+              <Text style={styles.stockTriageToggle}>{expanded ? "Hide" : "Open"}</Text>
+            </View>
+          </View>
+          <View style={styles.priorityStack}>
+            <View style={priorityTone(group.highestPriority)}>
+              <Text style={styles.priorityBadgeText}>{group.highestPriority}</Text>
+            </View>
+            <Text style={styles.timestampText}>{group.openAlerts.length} alerts</Text>
+          </View>
+        </View>
+
+        <View style={styles.metaRow}>
+          {Object.entries(group.groupedAlerts)
+            .slice(0, expanded ? undefined : 2)
+            .map(([recipeName, alerts]) => (
+              <MetaPill key={`${group.stock.id}-${recipeName}`} label={`${recipeName} · ${alerts.length}`} />
+            ))}
+        </View>
+
+        <Text style={styles.stockGroupSummary} numberOfLines={expanded ? 3 : 1}>
+          {supportLine}
+        </Text>
+
+        {!expanded && nextAlert ? (
+          <Text style={styles.alertClusterPreview} numberOfLines={1}>
+            Next: {nextAlert.title}
+          </Text>
+        ) : null}
+      </Pressable>
+
+      {expanded ? (
+        <View style={styles.stack}>
+          {group.openAlerts.map((alert) => (
+            <Pressable key={alert.id} onPress={() => onOpenDetail(alert.id)} style={styles.alertClusterItem}>
+              <View style={styles.inlineBetween}>
+                <View style={styles.flexOne}>
+                  <Text style={styles.alertMiniTitle}>{alert.title}</Text>
+                  <Text style={styles.alertMiniBody} numberOfLines={2}>{alert.whyNow}</Text>
+                </View>
+                <View style={styles.priorityStack}>
+                  <View style={priorityTone(alert.priority)}>
+                    <Text style={styles.priorityBadgeText}>{alert.priority}</Text>
+                  </View>
+                  <Text style={styles.timestampText}>{formatDate(alert.createdAt)}</Text>
+                </View>
+              </View>
+              <View style={styles.alertClusterActions}>
+                <Button label="Entered" onPress={() => onQuickDecision(alert, "Entered")} />
+                <Button label="Skip" tone="secondary" onPress={() => onQuickDecision(alert, "Skipped")} />
+                <Button label="Snooze" tone="secondary" onPress={() => onSnooze(alert.id)} />
+                <Button label="Done" tone="ghost" onPress={() => onReviewed(alert.id)} />
+              </View>
+            </Pressable>
+          ))}
+        </View>
+      ) : null}
+
+      <View style={styles.analysisActionRow}>
+        <Button label="Open Stock" onPress={onOpenStock} />
+        <Button label="Acknowledge All" tone="ghost" onPress={onAcknowledgeAll} />
+        {leadAlert ? (
+          <Button label={expanded ? "Lead Detail" : "Open Detail"} tone="secondary" onPress={() => onOpenDetail(leadAlert.id)} />
+        ) : null}
       </View>
     </Card>
   );
@@ -2118,6 +2228,22 @@ export default function App() {
       ready: recipeForm.reviewCadenceDays > 0 && draftConditions.length > 0,
     },
   ] as const;
+  const topBarSubtitle =
+    tab === "Home"
+      ? `${homeUrgentStocks.length} urgent · ${openAlerts} open alerts`
+      : tab === "Stocks"
+        ? selectedStockSummary
+          ? `${selectedStockSummary.stock.symbol} · ${sortedSelectedStockAnalysisCards.length} metrics`
+          : "Search any stock and inspect the full board"
+        : tab === "Recipes"
+          ? `${filteredRecipes.length} recipes in view`
+          : tab === "Eyes"
+            ? `${filteredActiveEyesInventory.length} active eyes`
+            : tab === "Alerts"
+              ? `${groupedAlertQueue.length} stocks with open alerts`
+              : tab === "Journal"
+                ? `${filteredJournalHistory.length} journal entries in view`
+                : `${providerHealth.filter((entry) => entry.status === "Healthy").length} healthy providers`;
   const previewEvidenceGroups =
     previewRecipe && previewEye && previewSnapshot && previewEvaluation
       ? buildEvidenceGroups({
@@ -2306,6 +2432,7 @@ export default function App() {
         <View style={styles.topBar}>
           <View>
             <Text style={styles.topBarTitle}>{tab}</Text>
+            <Text style={styles.topBarSubtitle}>{topBarSubtitle}</Text>
           </View>
           <Pressable
             onPress={() => {
@@ -2338,7 +2465,7 @@ export default function App() {
 
               {(homeBucket === "All" || homeBucket === "Review Now") ? (
               <Reveal delay={40}>
-                <SectionHeader title="Review Now" note="Highest-urgency stocks first." />
+                <SectionHeader title={`Review Now · ${homeUrgentStocks.length}`} note="Highest-urgency stocks first." />
                 <View style={styles.stack}>
                   {homeUrgentStocks.length === 0 ? (
                     <Card>
@@ -2365,7 +2492,7 @@ export default function App() {
 
               {(homeBucket === "All" || homeBucket === "Forming") ? (
               <Reveal delay={80}>
-                <SectionHeader title="Forming" note="Stocks becoming more interesting but not yet urgent." />
+                <SectionHeader title={`Forming · ${homeOpportunityStocks.length}`} note="Stocks becoming more interesting but not yet urgent." />
                 <View style={styles.stack}>
                   {homeOpportunityStocks.length === 0 ? (
                     <Card>
@@ -2387,7 +2514,7 @@ export default function App() {
 
               {(homeBucket === "All" || homeBucket === "Review Soon") ? (
               <Reveal delay={120}>
-                <SectionHeader title="Review Soon" note="Eyes that need a fresh thesis check even without a new alert." />
+                <SectionHeader title={`Review Soon · ${homeStaleReviewStocks.length}`} note="Eyes that need a fresh thesis check even without a new alert." />
                 <View style={styles.stack}>
                   {homeStaleReviewStocks.length === 0 ? (
                     <Card>
@@ -2901,87 +3028,22 @@ export default function App() {
                       <Card>
                         <Text style={styles.cardBody}>No alerts are open right now.</Text>
                       </Card>
-                    ) : (
+                  ) : (
                       groupedAlertQueue.map((group) => (
-                        <Card key={`alert-group-${group.stock.id}`} highlighted={selectedStockId === group.stock.id}>
-                          <View style={styles.inlineBetween}>
-                            <View style={styles.flexOne}>
-                              <Text style={styles.cardEyebrow}>{group.stock.name}</Text>
-                              <Text style={styles.cardTitle}>{group.stock.symbol}</Text>
-                              <Text style={styles.stockGroupSummary}>
-                                {group.dominantEye?.lastEvaluation?.whyNow ?? "Review grouped signals on this stock."}
-                              </Text>
-                            </View>
-                            <View style={styles.priorityStack}>
-                              <View style={priorityTone(group.highestPriority)}>
-                                <Text style={styles.priorityBadgeText}>{group.highestPriority}</Text>
-                              </View>
-                              <Text style={styles.timestampText}>{group.openAlerts.length} alerts</Text>
-                            </View>
-                          </View>
-
-                          <View style={styles.metaRow}>
-                            {Object.entries(group.groupedAlerts).map(([recipeName, alerts]) => (
-                              <MetaPill key={`${group.stock.id}-${recipeName}`} label={`${recipeName} · ${alerts.length}`} />
-                            ))}
-                          </View>
-
-                          <View style={styles.stack}>
-                            {group.openAlerts.slice(0, 3).map((alert) => {
-                              const eye = group.eyes.find((item) => item.id === alert.eyeId);
-                              return (
-                                <Pressable
-                                  key={alert.id}
-                                  onPress={() => {
-                                    setSelectedAlertId(alert.id);
-                                    setAlertDetailOpen(true);
-                                  }}
-                                >
-                                  <View style={styles.alertMiniRow}>
-                                    <View style={styles.flexOne}>
-                                      <Text style={styles.alertMiniTitle}>{alert.title}</Text>
-                                      <Text style={styles.alertMiniBody}>{alert.whyNow}</Text>
-                                    </View>
-                                    <View style={styles.priorityStack}>
-                                      <View style={priorityTone(alert.priority)}>
-                                        <Text style={styles.priorityBadgeText}>{alert.priority}</Text>
-                                      </View>
-                                      <Text style={styles.timestampText}>{formatDate(alert.createdAt)}</Text>
-                                    </View>
-                                  </View>
-                                  <View style={styles.actionRow}>
-                                    <Button label="Entered" onPress={() => void quickDecision(alert, "Entered")} />
-                                    <Button label="Skipped" tone="secondary" onPress={() => void quickDecision(alert, "Skipped")} />
-                                    <Button label="Snooze 24H" tone="secondary" onPress={() => void actions.snoozeAlert(alert.id, 24)} />
-                                    <Button label="Reviewed" tone="ghost" onPress={() => void actions.markAlertReviewed(alert.id)} />
-                                  </View>
-                                </Pressable>
-                              );
-                            })}
-                          </View>
-
-                          <View style={styles.analysisActionRow}>
-                            <Button
-                              label="Open Stock"
-                              onPress={() => openStockContext({ stockId: group.stock.id })}
-                            />
-                            <Button
-                              label="Acknowledge All"
-                              tone="ghost"
-                              onPress={() => void acknowledgeAlertGroup(group.openAlerts)}
-                            />
-                            <Button
-                              label="Open Detail"
-                              tone="secondary"
-                              onPress={() => {
-                                const firstAlert = group.openAlerts[0];
-                                if (!firstAlert) return;
-                                setSelectedAlertId(firstAlert.id);
-                                setAlertDetailOpen(true);
-                              }}
-                            />
-                          </View>
-                        </Card>
+                        <AlertClusterCard
+                          key={`alert-group-${group.stock.id}`}
+                          group={group}
+                          selectedStockId={selectedStockId}
+                          onOpenStock={() => openStockContext({ stockId: group.stock.id })}
+                          onOpenDetail={(alertId) => {
+                            setSelectedAlertId(alertId);
+                            setAlertDetailOpen(true);
+                          }}
+                          onQuickDecision={(alert, action) => void quickDecision(alert, action)}
+                          onSnooze={(alertId) => void actions.snoozeAlert(alertId, 24)}
+                          onReviewed={(alertId) => void actions.markAlertReviewed(alertId)}
+                          onAcknowledgeAll={() => void acknowledgeAlertGroup(group.openAlerts)}
+                        />
                       ))
                     )}
                   </View>
@@ -3813,7 +3875,7 @@ const styles = StyleSheet.create({
   topBar: {
     paddingHorizontal: 18,
     paddingTop: 12,
-    paddingBottom: 14,
+    paddingBottom: 12,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -3832,6 +3894,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "600",
     fontFamily,
+    marginTop: 3,
   },
   alertBell: {
     width: 42,
@@ -4930,10 +4993,24 @@ const styles = StyleSheet.create({
   stockTriageHeader: {
     gap: 10,
   },
+  stockTriageTitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginTop: 2,
+  },
+  stockTriageToggle: {
+    color: "#6b7280",
+    fontSize: 11,
+    fontWeight: "800",
+    textTransform: "uppercase",
+    letterSpacing: 0.4,
+    fontFamily,
+  },
   stockTriageSummaryRow: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 10,
+    gap: 8,
     alignItems: "center",
   },
   stockTriagePrimaryMetric: {
@@ -4944,9 +5021,29 @@ const styles = StyleSheet.create({
   },
   stockTriageSecondaryMetric: {
     color: "#6b7280",
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: "700",
     fontFamily,
+  },
+  alertClusterHeader: {
+    gap: 10,
+  },
+  alertClusterPreview: {
+    color: "#6b7280",
+    fontSize: 11,
+    fontWeight: "700",
+    fontFamily,
+  },
+  alertClusterItem: {
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: "#f0f2f5",
+    gap: 10,
+  },
+  alertClusterActions: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
   },
   statusBadge: {
     paddingHorizontal: 8,
@@ -4991,19 +5088,24 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: "#e5e7eb",
     paddingTop: 10,
-    paddingBottom: 26,
-    minHeight: 92,
+    paddingBottom: 30,
+    minHeight: 96,
     alignItems: "center",
-    paddingHorizontal: 10,
+    paddingHorizontal: 12,
+    shadowColor: "#111827",
+    shadowOpacity: 0.04,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: -4 },
+    elevation: 6,
   },
   navItem: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
     gap: 4,
-    minHeight: 52,
+    minHeight: 54,
     borderRadius: 14,
-    marginHorizontal: 4,
+    marginHorizontal: 3,
   },
   navItemActive: {
     backgroundColor: "#111827",
