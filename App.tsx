@@ -555,13 +555,13 @@ const Reveal = ({
     Animated.parallel([
       Animated.timing(opacity, {
         toValue: 1,
-        duration: 260,
+        duration: 220,
         delay,
         useNativeDriver: true,
       }),
       Animated.timing(translateY, {
         toValue: 0,
-        duration: 260,
+        duration: 240,
         delay,
         useNativeDriver: true,
       }),
@@ -596,13 +596,14 @@ const Button = ({
 }) => (
   <Pressable
     onPress={disabled ? undefined : onPress}
-    style={[
+    style={({ pressed }) => [
       styles.button,
       tone === "primary"
         ? styles.buttonPrimary
         : tone === "secondary"
           ? styles.buttonSecondary
           : styles.buttonGhost,
+      pressed && !disabled ? styles.buttonPressed : null,
       disabled ? styles.buttonDisabled : null,
     ]}
   >
@@ -2884,7 +2885,11 @@ export default function App() {
               <Reveal delay={40}>
                 <View style={styles.stack}>
                   {filteredRecipes.map((recipe) => (
-                    <Pressable key={recipe.id} onPress={() => setRecipeDetailId(recipe.id)}>
+                    <Pressable
+                      key={recipe.id}
+                      onPress={() => setRecipeDetailId(recipe.id)}
+                      style={({ pressed }) => [styles.pressableCardWrap, pressed ? styles.pressableCardWrapPressed : null]}
+                    >
                       <Card>
                         <View style={styles.inlineBetween}>
                           <View style={styles.flexOne}>
@@ -2955,6 +2960,7 @@ export default function App() {
                           setSelectedEyeId(eye.id);
                           setEyeDetailOpen(true);
                         }}
+                        style={({ pressed }) => [styles.pressableCardWrap, pressed ? styles.pressableCardWrapPressed : null]}
                       >
                       <Card highlighted={selectedEye?.id === eye.id}>
                         <View style={styles.inlineBetween}>
@@ -3013,6 +3019,7 @@ export default function App() {
                           setSelectedEyeId(eye.id);
                           setEyeDetailOpen(true);
                         }}
+                        style={({ pressed }) => [styles.pressableCardWrap, pressed ? styles.pressableCardWrapPressed : null]}
                       >
                       <Card>
                         <View style={styles.inlineBetween}>
@@ -3170,7 +3177,11 @@ export default function App() {
                     const linkedEye = data.eyes.find((eye) => eye.id === decision.eyeId);
                     const linkedOutcome = data.outcomes.find((outcome) => outcome.decisionId === decision.id);
                     return (
-                      <Pressable key={decision.id} onPress={() => setSelectedDecisionId(decision.id)}>
+                      <Pressable
+                        key={decision.id}
+                        onPress={() => setSelectedDecisionId(decision.id)}
+                        style={({ pressed }) => [styles.pressableCardWrap, pressed ? styles.pressableCardWrapPressed : null]}
+                      >
                       <Card>
                         <Text style={styles.cardEyebrow}>{formatDate(decision.createdAt)}</Text>
                         <Text style={styles.alertTitle}>{decision.action} · {decisionTitle(decision.eyeId, data.eyes, data.stocks, data.recipes)}</Text>
@@ -3964,7 +3975,11 @@ export default function App() {
             <Pressable
               key={item}
               onPress={() => setTab(item)}
-              style={[styles.navItem, tab === item ? styles.navItemActive : null]}
+              style={({ pressed }) => [
+                styles.navItem,
+                tab === item ? styles.navItemActive : null,
+                pressed ? styles.navItemPressed : null,
+              ]}
             >
               <Text style={[styles.navLabel, tab === item ? styles.navLabelActive : null]}>{item}</Text>
             </Pressable>
@@ -5213,16 +5228,18 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffff",
     borderTopWidth: 1,
     borderTopColor: "#e5e7eb",
-    paddingTop: 10,
-    paddingBottom: 30,
-    minHeight: 96,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingTop: 12,
+    paddingBottom: 34,
+    minHeight: 102,
     alignItems: "center",
     paddingHorizontal: 12,
     shadowColor: "#111827",
-    shadowOpacity: 0.04,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: -4 },
-    elevation: 6,
+    shadowOpacity: 0.08,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: -8 },
+    elevation: 10,
   },
   navItem: {
     flex: 1,
@@ -5235,6 +5252,14 @@ const styles = StyleSheet.create({
   },
   navItemActive: {
     backgroundColor: "#111827",
+    shadowColor: "#111827",
+    shadowOpacity: 0.12,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+  },
+  navItemPressed: {
+    transform: [{ scale: 0.98 }],
+    opacity: 0.92,
   },
   navIndicator: {
     width: 20,
@@ -5261,9 +5286,20 @@ const styles = StyleSheet.create({
     padding: 16,
     borderWidth: 1,
     borderColor: "#eceef2",
+    shadowColor: "#111827",
+    shadowOpacity: 0.03,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 3 },
   },
   cardHighlighted: {
     borderColor: "#d1d5db",
+  },
+  pressableCardWrap: {
+    borderRadius: 20,
+  },
+  pressableCardWrapPressed: {
+    transform: [{ scale: 0.988 }],
+    opacity: 0.96,
   },
   inputLabel: {
     color: "#6b7280",
@@ -5433,6 +5469,10 @@ const styles = StyleSheet.create({
   },
   buttonDisabled: {
     opacity: 0.42,
+  },
+  buttonPressed: {
+    transform: [{ scale: 0.985 }],
+    opacity: 0.92,
   },
   buttonDisabledText: {
     color: "#9ca3af",
