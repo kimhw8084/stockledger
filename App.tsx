@@ -2503,7 +2503,7 @@ export default function App() {
                 <View style={styles.stack}>
                   {homeUrgentStocks.length === 0 ? (
                     <Card>
-                      <Text style={styles.cardBody}>Nothing is in the urgent bucket right now.</Text>
+                      <Text style={styles.cardBody}>No stocks need immediate review right now.</Text>
                     </Card>
                   ) : (
                     homeUrgentStocks.slice(0, 4).map((item) => (
@@ -2530,7 +2530,7 @@ export default function App() {
                 <View style={styles.stack}>
                   {homeOpportunityStocks.length === 0 ? (
                     <Card>
-                      <Text style={styles.cardBody}>No stocks are in the opportunity-forming bucket right now.</Text>
+                      <Text style={styles.cardBody}>No stocks are forming a stronger setup right now.</Text>
                     </Card>
                   ) : (
                     homeOpportunityStocks.slice(0, 3).map((item) => (
@@ -2552,7 +2552,7 @@ export default function App() {
                 <View style={styles.stack}>
                   {homeStaleReviewStocks.length === 0 ? (
                     <Card>
-                      <Text style={styles.cardBody}>No stale thesis reviews are currently flagged.</Text>
+                      <Text style={styles.cardBody}>No stale thesis reviews are flagged right now.</Text>
                     </Card>
                   ) : (
                     homeStaleReviewStocks.slice(0, 3).map((item) => (
@@ -2642,7 +2642,7 @@ export default function App() {
                             </View>
                             <View style={styles.stockSuggestionRight}>
                               <Text style={styles.stockSuggestionPrice}>
-                                {item.snapshot ? `$${item.snapshot.price.toFixed(2)}` : "No feed"}
+                                {item.snapshot ? `$${item.snapshot.price.toFixed(2)}` : "--"}
                               </Text>
                               <Text style={styles.stockSuggestionMeta} numberOfLines={1}>
                                 {item.snapshot?.freshness ?? "Unavailable"}
@@ -2673,7 +2673,7 @@ export default function App() {
                             </Text>
                             <View style={styles.stockSuggestionMetaRow}>
                               <Text style={styles.stockSuggestionMeta} numberOfLines={1}>
-                                {item.snapshot ? `$${item.snapshot.price.toFixed(2)}` : "No feed"}
+                                {item.snapshot ? `$${item.snapshot.price.toFixed(2)}` : "--"}
                               </Text>
                               <Text style={styles.stockSuggestionMeta} numberOfLines={1}>
                                 {item.snapshot?.freshness ?? "Unavailable"}
@@ -2685,7 +2685,7 @@ export default function App() {
                     )
                   ) : (
                     <View style={styles.emptySearchState}>
-                      <Text style={styles.emptySearchTitle}>{hasStockQuery ? "No matching stocks yet" : "No recent search yet"}</Text>
+                      <Text style={styles.emptySearchTitle}>{hasStockQuery ? "No matching stocks" : "No recent searches"}</Text>
                       <Text style={styles.emptySearchBody}>
                         {hasStockQuery
                           ? "Try another ticker or company name."
@@ -2808,7 +2808,7 @@ export default function App() {
                       </Text>
                     </View>
                     <View style={styles.homeSummaryStrip}>
-                      <DenseStat label="Price" value={selectedStockSummary.snapshot ? `$${selectedStockSummary.snapshot.price.toFixed(2)}` : "No feed"} tone="strong" />
+                      <DenseStat label="Price" value={selectedStockSummary.snapshot ? `$${selectedStockSummary.snapshot.price.toFixed(2)}` : "--"} tone="strong" />
                       <DenseStat label="Drawdown" value={selectedStockSummary.snapshot ? `${selectedStockSummary.snapshot.drawdownPct}%` : "N/A"} />
                       <DenseStat label="Eyes" value={`${selectedStockSummary.eyes.length}`} />
                       <DenseStat label="Data" value={selectedStockSummary.snapshot?.freshness ?? "Unavailable"} tone={selectedStockSummary.snapshot?.isMock ? "risk" : "neutral"} />
@@ -2970,7 +2970,7 @@ export default function App() {
                 <View style={styles.stack}>
                   {filteredActiveEyesInventory.length === 0 ? (
                     <Card>
-                      <Text style={styles.cardBody}>No active Eyes right now.</Text>
+                      <Text style={styles.cardBody}>No active Eyes yet.</Text>
                     </Card>
                   ) : (
                     filteredActiveEyesInventory.map((eye) => (
@@ -2994,7 +2994,7 @@ export default function App() {
                           </Text>
                         </View>
                         <View style={styles.compactMetricRow}>
-                          <Text style={styles.compactMetricText}>{eye.lastEvaluation?.whyNow ?? "No current summary."}</Text>
+                          <Text style={styles.compactMetricText}>{eye.lastEvaluation?.whyNow ?? "Waiting for the next meaningful change."}</Text>
                         </View>
                         <View style={styles.metaRow}>
                           <MetaPill label={eye.lastEvaluation?.actionUrgency ?? "Wait"} />
@@ -3029,7 +3029,7 @@ export default function App() {
                 <View style={styles.stack}>
                   {filteredInactiveEyesInventory.length === 0 ? (
                     <Card>
-                      <Text style={styles.cardBody}>No inactive Eyes right now.</Text>
+                      <Text style={styles.cardBody}>No inactive Eyes yet.</Text>
                     </Card>
                   ) : (
                     filteredInactiveEyesInventory.map((eye) => (
@@ -3095,7 +3095,7 @@ export default function App() {
                   <View style={styles.stack}>
                     {groupedAlertQueue.length === 0 ? (
                       <Card>
-                        <Text style={styles.cardBody}>No alerts are open right now.</Text>
+                        <Text style={styles.cardBody}>No open alerts right now.</Text>
                       </Card>
                   ) : (
                       groupedAlertQueue.map((group) => (
@@ -3125,7 +3125,7 @@ export default function App() {
                   <View style={styles.stack}>
                     {[...snoozedAlerts, ...reviewedAlerts].length === 0 ? (
                       <Card>
-                        <Text style={styles.cardBody}>No previous alerts are available yet.</Text>
+                        <Text style={styles.cardBody}>No alert history yet.</Text>
                       </Card>
                     ) : (
                       [...snoozedAlerts, ...reviewedAlerts].map((alert) => {
@@ -3193,7 +3193,11 @@ export default function App() {
 
               <Reveal delay={40}>
                 <View style={styles.stack}>
-                  {filteredJournalHistory.map((decision) => {
+                  {filteredJournalHistory.length === 0 ? (
+                    <Card>
+                      <Text style={styles.cardBody}>No journal entries in this filter yet.</Text>
+                    </Card>
+                  ) : filteredJournalHistory.map((decision) => {
                     const linkedEye = data.eyes.find((eye) => eye.id === decision.eyeId);
                     const linkedOutcome = data.outcomes.find((outcome) => outcome.decisionId === decision.id);
                     return (
@@ -3610,7 +3614,7 @@ export default function App() {
               title="Current Eye state"
               body={
                 selectedEye.lastEvaluation?.whyNow ??
-                "This Eye has not produced a current evaluation summary yet."
+                "This Eye has not produced a meaningful review summary yet."
               }
               state={selectedEye.lastEvaluation?.currentState ?? "Not Relevant"}
               recipeVersion={`${selectedEyeRecipe?.name ?? "Unknown Recipe"} v${selectedEye.recipeVersionAtCreation ?? selectedEye.lastEvaluation?.recipeVersion ?? 1}`}
@@ -3629,7 +3633,7 @@ export default function App() {
             </View>
             <View style={styles.detailCallout}>
               <Text style={styles.detailCalloutLabel}>Invalidation rule</Text>
-              <Text style={styles.detailCalloutBody}>{selectedEye.invalidationRule || "No explicit invalidation rule recorded."}</Text>
+              <Text style={styles.detailCalloutBody}>{selectedEye.invalidationRule || "No invalidation rule recorded yet."}</Text>
             </View>
             {selectedEyeLinkedDecisions[0] ? (
               <View style={styles.detailCallout}>
@@ -3842,18 +3846,18 @@ export default function App() {
             <WhatChangedPanel
               title="Decision context"
               items={[
-                selectedDecision.stateAtDecision ?? "No state snapshot",
-                selectedDecision.dataQuality ?? "No data-quality note",
+                selectedDecision.stateAtDecision ?? "State snapshot unavailable",
+                selectedDecision.dataQuality ?? "Data-quality note unavailable",
                 `Thesis ${selectedDecision.thesisValid} · Timing ${selectedDecision.timing}`,
               ]}
             />
             <View style={styles.detailCallout}>
               <Text style={styles.detailCalloutLabel}>Decision note</Text>
-              <Text style={styles.detailCalloutBody}>{selectedDecision.note || "No note recorded."}</Text>
+              <Text style={styles.detailCalloutBody}>{selectedDecision.note || "No decision note recorded."}</Text>
             </View>
             <View style={styles.detailCallout}>
               <Text style={styles.detailCalloutLabel}>Concern</Text>
-              <Text style={styles.detailCalloutBody}>{selectedDecision.concern || "No concern recorded."}</Text>
+              <Text style={styles.detailCalloutBody}>{selectedDecision.concern || "No primary concern recorded."}</Text>
             </View>
             <View style={styles.actionRow}>
               <Button

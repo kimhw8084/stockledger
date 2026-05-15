@@ -256,11 +256,11 @@ export const useAppModel = () => {
           recipeVersion: decision.recipeVersion,
           reviewWindow: "30 days",
           status: "Pending",
-          priceChangeNote: "Pending later real price review.",
-          maxRunupNote: "Pending provider-backed outcome metrics.",
-          maxDrawdownNote: "Pending provider-backed outcome metrics.",
-          lesson: "Capture whether the thesis held and whether timing discipline improved.",
-          recipeSuggestion: "Refine false positives once enough outcomes accumulate.",
+          priceChangeNote: "Follow up with the next price review.",
+          maxRunupNote: "Review run-up after the follow-up window.",
+          maxDrawdownNote: "Review drawdown after the follow-up window.",
+          lesson: "Review whether the thesis held and whether timing discipline improved.",
+          recipeSuggestion: "Adjust the recipe only after enough reviewed outcomes accumulate.",
           createdAt: new Date().toISOString(),
         };
         await commit({
