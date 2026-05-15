@@ -366,6 +366,23 @@ const roleFromBuilderKind = (kind: ConditionKind): RecipeCondition["role"] => {
   }
 };
 
+const stockSearchScore = (query: string, item: { stock: Stock }) => {
+  const normalizedQuery = query.trim().toLowerCase();
+  if (!normalizedQuery) return 0;
+
+  const symbol = item.stock.symbol.toLowerCase();
+  const name = item.stock.name.toLowerCase();
+  const thesis = item.stock.thesis.toLowerCase();
+
+  if (symbol === normalizedQuery) return 100;
+  if (symbol.startsWith(normalizedQuery)) return 80;
+  if (name.startsWith(normalizedQuery)) return 60;
+  if (symbol.includes(normalizedQuery)) return 45;
+  if (name.includes(normalizedQuery)) return 30;
+  if (thesis.includes(normalizedQuery)) return 10;
+  return 0;
+};
+
 const formatDate = (value: string) =>
   new Date(value).toLocaleString(undefined, {
     month: "short",
@@ -1058,7 +1075,15 @@ const EvidenceCardView = ({
   };
 
   return (
-    <Pressable onPress={handlePress} style={[styles.evidenceCard, compact ? styles.evidenceCardCompact : null]}>
+    <Pressable
+      onPress={handlePress}
+      style={({ pressed }) => [
+        styles.evidenceCard,
+        compact ? styles.evidenceCardCompact : null,
+        compact ? styles.evidenceCardInteractive : null,
+        pressed && compact ? styles.evidenceCardPressed : null,
+      ]}
+    >
       <View style={styles.inlineBetween}>
         <View style={styles.flexOne}>
           <Text style={[styles.evidenceCardTitle, compact ? styles.evidenceCardTitleCompact : null]} numberOfLines={1}>
@@ -1076,12 +1101,29 @@ const EvidenceCardView = ({
       </View>
 
       {compact ? (
-        <View style={styles.compactEvidenceFooter}>
-          <Text style={styles.compactEvidenceValue}>{card.metric.currentLabel}</Text>
-          <View style={freshnessTone(card.freshness)}>
-            <View style={styles.freshnessDot} />
+        <>
+          <View style={styles.compactEvidenceFooter}>
+            <Text style={styles.compactEvidenceValue}>{card.metric.currentLabel}</Text>
+            <Text style={styles.compactEvidenceThreshold} numberOfLines={1}>
+              {card.metric.thresholdLabel ?? "Context"}
+            </Text>
           </View>
-        </View>
+          <View style={styles.compactEvidenceMetaRow}>
+            <View style={statusTone(card.status)}>
+              <Text style={styles.compactEvidenceStatusText} numberOfLines={1}>
+                {card.status}
+              </Text>
+            </View>
+            <View style={styles.compactFreshnessWrap}>
+              <View style={freshnessTone(card.freshness)}>
+                <View style={styles.freshnessDot} />
+              </View>
+              <Text style={styles.compactFreshnessText} numberOfLines={1}>
+                {card.freshness}
+              </Text>
+            </View>
+          </View>
+        </>
       ) : (
         <>
           <View style={styles.evidenceMetricsRow}>
@@ -1613,13 +1655,16 @@ export default function App() {
 
   const filteredStockDirectory = useMemo(() => {
     const normalizedQuery = deferredStockSearch.trim().toLowerCase();
-    return stockDirectory.filter((item) => {
+    const matches = stockDirectory.filter((item) => {
       if (!normalizedQuery) return true;
-      return (
-        item.stock.symbol.toLowerCase().includes(normalizedQuery) ||
-        item.stock.name.toLowerCase().includes(normalizedQuery) ||
-        item.stock.thesis.toLowerCase().includes(normalizedQuery)
-      );
+      return stockSearchScore(normalizedQuery, item) > 0;
+    });
+
+    if (!normalizedQuery) return matches;
+
+    return [...matches].sort((left, right) => {
+      const scoreDelta = stockSearchScore(normalizedQuery, right) - stockSearchScore(normalizedQuery, left);
+      return scoreDelta !== 0 ? scoreDelta : left.stock.symbol.localeCompare(right.stock.symbol);
     });
   }, [deferredStockSearch, stockDirectory]);
 
@@ -1775,6 +1820,7 @@ export default function App() {
     .filter((item): item is NonNullable<typeof item> => Boolean(item));
   const hasStockQuery = deferredStockSearch.trim().length > 0;
   const stockSuggestions = (hasStockQuery ? filteredStockDirectory : recentStocks).slice(0, 6);
+  const topSuggestionId = hasStockQuery ? stockSuggestions[0]?.stock.id : "";
 
   const activeEyesInventory = eyesSorted.filter(
     (eye) => !["Not Relevant", "Thesis Broken"].includes(eye.lastEvaluation?.currentState ?? "Not Relevant"),
@@ -2183,36 +2229,83 @@ export default function App() {
                     ) : null}
                   </View>
                   {stockSuggestions.length > 0 ? (
-                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.choiceRow}>
-                      {stockSuggestions.map((item) => (
-                        <Pressable
-                          key={`suggest-${item.stock.id}`}
-                          onPress={() => openStockContext({ stockId: item.stock.id })}
-                          style={[styles.stockSuggestionPill, selectedStockSummary?.stock.id === item.stock.id ? styles.stockSuggestionPillActive : null]}
-                        >
-                          <Text
-                            style={[styles.stockSuggestionSymbol, selectedStockSummary?.stock.id === item.stock.id ? styles.stockSuggestionSymbolActive : null]}
-                            numberOfLines={1}
+                    hasStockQuery ? (
+                      <View style={styles.stockSuggestionList}>
+                        {stockSuggestions.map((item) => (
+                          <Pressable
+                            key={`suggest-${item.stock.id}`}
+                            onPress={() => openStockContext({ stockId: item.stock.id })}
+                            style={({ pressed }) => [
+                              styles.stockSuggestionRow,
+                              selectedStockSummary?.stock.id === item.stock.id ? styles.stockSuggestionRowActive : null,
+                              pressed ? styles.stockSuggestionRowPressed : null,
+                            ]}
                           >
-                            {item.stock.symbol}
-                          </Text>
-                          <Text
-                            style={[styles.stockSuggestionName, selectedStockSummary?.stock.id === item.stock.id ? styles.stockSuggestionNameActive : null]}
-                            numberOfLines={1}
+                            <View style={styles.stockSuggestionLead}>
+                              <View style={styles.stockSuggestionAvatar}>
+                                <Text style={styles.stockSuggestionAvatarText}>{item.stock.symbol.slice(0, 4)}</Text>
+                              </View>
+                              <View style={styles.flexOne}>
+                                <View style={styles.stockSuggestionTitleRow}>
+                                  <Text
+                                    style={[styles.stockSuggestionSymbol, selectedStockSummary?.stock.id === item.stock.id ? styles.stockSuggestionSymbolActive : null]}
+                                    numberOfLines={1}
+                                  >
+                                    {item.stock.symbol}
+                                  </Text>
+                                  {topSuggestionId === item.stock.id ? <Text style={styles.stockTopMatchLabel}>Top match</Text> : null}
+                                </View>
+                                <Text
+                                  style={[styles.stockSuggestionName, selectedStockSummary?.stock.id === item.stock.id ? styles.stockSuggestionNameActive : null]}
+                                  numberOfLines={1}
+                                >
+                                  {item.stock.name}
+                                </Text>
+                              </View>
+                            </View>
+                            <View style={styles.stockSuggestionRight}>
+                              <Text style={styles.stockSuggestionPrice}>
+                                {item.snapshot ? `$${item.snapshot.price.toFixed(2)}` : "No feed"}
+                              </Text>
+                              <Text style={styles.stockSuggestionMeta} numberOfLines={1}>
+                                {item.snapshot?.freshness ?? "Unavailable"}
+                              </Text>
+                            </View>
+                          </Pressable>
+                        ))}
+                      </View>
+                    ) : (
+                      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.choiceRow}>
+                        {stockSuggestions.map((item) => (
+                          <Pressable
+                            key={`suggest-${item.stock.id}`}
+                            onPress={() => openStockContext({ stockId: item.stock.id })}
+                            style={[styles.stockSuggestionPill, selectedStockSummary?.stock.id === item.stock.id ? styles.stockSuggestionPillActive : null]}
                           >
-                            {item.stock.name}
-                          </Text>
-                          <View style={styles.stockSuggestionMetaRow}>
-                            <Text style={styles.stockSuggestionMeta} numberOfLines={1}>
-                              {item.snapshot ? `$${item.snapshot.price.toFixed(2)}` : "No feed"}
+                            <Text
+                              style={[styles.stockSuggestionSymbol, selectedStockSummary?.stock.id === item.stock.id ? styles.stockSuggestionSymbolActive : null]}
+                              numberOfLines={1}
+                            >
+                              {item.stock.symbol}
                             </Text>
-                            <Text style={styles.stockSuggestionMeta} numberOfLines={1}>
-                              {item.snapshot?.freshness ?? "Unavailable"}
+                            <Text
+                              style={[styles.stockSuggestionName, selectedStockSummary?.stock.id === item.stock.id ? styles.stockSuggestionNameActive : null]}
+                              numberOfLines={1}
+                            >
+                              {item.stock.name}
                             </Text>
-                          </View>
-                        </Pressable>
-                      ))}
-                    </ScrollView>
+                            <View style={styles.stockSuggestionMetaRow}>
+                              <Text style={styles.stockSuggestionMeta} numberOfLines={1}>
+                                {item.snapshot ? `$${item.snapshot.price.toFixed(2)}` : "No feed"}
+                              </Text>
+                              <Text style={styles.stockSuggestionMeta} numberOfLines={1}>
+                                {item.snapshot?.freshness ?? "Unavailable"}
+                              </Text>
+                            </View>
+                          </Pressable>
+                        ))}
+                      </ScrollView>
+                    )
                   ) : (
                     <View style={styles.emptySearchState}>
                       <Text style={styles.emptySearchTitle}>{hasStockQuery ? "No matching stocks yet" : "No recent search yet"}</Text>
@@ -2253,6 +2346,24 @@ export default function App() {
                           </View>
                         </View>
                       </View>
+                      <View style={styles.stockTrendSummaryRow}>
+                        <View style={styles.stockTrendSummaryCell}>
+                          <Text style={styles.stockTrendSummaryLabel}>State</Text>
+                          <Text style={styles.stockTrendSummaryValue}>
+                            {selectedStockSummary.dominantEye?.lastEvaluation?.currentState ?? "Unwatched"}
+                          </Text>
+                        </View>
+                        <View style={styles.stockTrendSummaryCell}>
+                          <Text style={styles.stockTrendSummaryLabel}>Urgency</Text>
+                          <Text style={styles.stockTrendSummaryValue}>
+                            {selectedStockSummary.dominantEye?.lastEvaluation?.actionUrgency ?? "None"}
+                          </Text>
+                        </View>
+                        <View style={styles.stockTrendSummaryCell}>
+                          <Text style={styles.stockTrendSummaryLabel}>Alerts</Text>
+                          <Text style={styles.stockTrendSummaryValue}>{selectedStockSummary.openAlerts.length}</Text>
+                        </View>
+                      </View>
                       <View style={styles.stockTrendChart}>
                         {selectedStockTrendSeries.map((point, index) => (
                           <Animated.View
@@ -2271,6 +2382,10 @@ export default function App() {
                         </Text>
                         <Text style={styles.stockTrendLegendText}>{analysisLookback}</Text>
                       </View>
+                      <Text style={styles.stockTrendInsight}>
+                        {selectedStockSummary.dominantEye?.lastEvaluation?.whyNow ??
+                          "No active Eye explanation yet. This board is showing the stock facts only."}
+                      </Text>
                     </View>
                     <View style={styles.homeSummaryStrip}>
                       <DenseStat label="Price" value={selectedStockSummary.snapshot ? `$${selectedStockSummary.snapshot.price.toFixed(2)}` : "No feed"} tone="strong" />
@@ -3291,6 +3406,73 @@ const styles = StyleSheet.create({
   stockSuggestionNameActive: {
     color: "#d1d5db",
   },
+  stockSuggestionList: {
+    gap: 8,
+  },
+  stockSuggestionRow: {
+    minHeight: 72,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderRadius: 16,
+    backgroundColor: "#f8fafc",
+    borderWidth: 1,
+    borderColor: "#eceef2",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 12,
+  },
+  stockSuggestionRowActive: {
+    borderColor: "#111827",
+    backgroundColor: "#f3f4f6",
+  },
+  stockSuggestionRowPressed: {
+    transform: [{ scale: 0.985 }],
+    opacity: 0.92,
+  },
+  stockSuggestionLead: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  stockSuggestionAvatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: "#111827",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  stockSuggestionAvatarText: {
+    color: "#ffffff",
+    fontSize: 11,
+    fontWeight: "800",
+    fontFamily,
+  },
+  stockSuggestionTitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  stockTopMatchLabel: {
+    color: "#0f766e",
+    fontSize: 10,
+    fontWeight: "800",
+    textTransform: "uppercase",
+    letterSpacing: 0.4,
+    fontFamily,
+  },
+  stockSuggestionRight: {
+    alignItems: "flex-end",
+    gap: 4,
+  },
+  stockSuggestionPrice: {
+    color: "#111827",
+    fontSize: 13,
+    fontWeight: "800",
+    fontFamily,
+  },
   stockSuggestionMetaRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -3405,6 +3587,33 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "flex-start",
   },
+  stockTrendSummaryRow: {
+    flexDirection: "row",
+    gap: 8,
+  },
+  stockTrendSummaryCell: {
+    flex: 1,
+    padding: 10,
+    borderRadius: 14,
+    backgroundColor: "#ffffff",
+    borderWidth: 1,
+    borderColor: "#eceef2",
+    gap: 4,
+  },
+  stockTrendSummaryLabel: {
+    color: "#6b7280",
+    fontSize: 10,
+    fontWeight: "700",
+    textTransform: "uppercase",
+    letterSpacing: 0.4,
+    fontFamily,
+  },
+  stockTrendSummaryValue: {
+    color: "#111827",
+    fontSize: 13,
+    fontWeight: "800",
+    fontFamily,
+  },
   stockTrendPrice: {
     color: "#111827",
     fontSize: 28,
@@ -3447,6 +3656,13 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     textTransform: "uppercase",
     letterSpacing: 0.4,
+    fontFamily,
+  },
+  stockTrendInsight: {
+    color: "#4b5563",
+    fontSize: 13,
+    lineHeight: 19,
+    fontWeight: "500",
     fontFamily,
   },
   // Grid Layouts
@@ -3497,6 +3713,16 @@ const styles = StyleSheet.create({
     gap: 8,
     minHeight: 168,
   },
+  evidenceCardInteractive: {
+    shadowColor: "#111827",
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 1,
+  },
+  evidenceCardPressed: {
+    transform: [{ scale: 0.985 }],
+  },
   evidenceCardTitle: {
     color: "#111827",
     fontSize: 14,
@@ -3527,6 +3753,37 @@ const styles = StyleSheet.create({
     color: "#111827",
     fontSize: 12,
     fontWeight: "800",
+  },
+  compactEvidenceThreshold: {
+    color: "#6b7280",
+    fontSize: 10,
+    fontWeight: "700",
+    fontFamily,
+  },
+  compactEvidenceMetaRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: 10,
+    marginTop: 2,
+  },
+  compactEvidenceStatusText: {
+    color: "#111827",
+    fontSize: 9,
+    fontWeight: "800",
+    textTransform: "uppercase",
+    fontFamily,
+  },
+  compactFreshnessWrap: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  compactFreshnessText: {
+    color: "#6b7280",
+    fontSize: 10,
+    fontWeight: "700",
+    fontFamily,
   },
   freshnessDot: {
     width: 6,
