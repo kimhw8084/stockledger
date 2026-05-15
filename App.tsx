@@ -543,6 +543,14 @@ const buildChartSeries = (price: number, drawdownPct: number, stabilizationScore
   return values.map((value) => ((value - min) / Math.max(max - min, 1)) * 100);
 };
 
+const normalizeSeries = (series: number[], bounds?: { min: number; max: number }) => {
+  if (series.length === 0) return [];
+  const min = bounds?.min ?? Math.min(...series);
+  const max = bounds?.max ?? Math.max(...series);
+  const range = Math.max(max - min, 1);
+  return series.map((value) => ((value - min) / range) * 100);
+};
+
 const Reveal = ({
   children,
   delay = 0,
@@ -2038,6 +2046,12 @@ export default function App() {
   }, [selectedStockId, stockDirectory]);
 
   useEffect(() => {
+    if (!selectedStockId) {
+      setSelectedEvidenceCard(null);
+    }
+  }, [selectedStockId]);
+
+  useEffect(() => {
     if (!selectedAlertId && alertQueue[0]) {
       setSelectedAlertId(alertQueue[0].id);
       return;
@@ -2202,6 +2216,12 @@ export default function App() {
   const selectedEvidenceIndex = selectedEvidenceCard
     ? sortedSelectedStockAnalysisCards.findIndex((card) => card.id === selectedEvidenceCard.id)
     : -1;
+
+  useEffect(() => {
+    if (!selectedEvidenceCard) return;
+    if (selectedEvidenceIndex >= 0) return;
+    setSelectedEvidenceCard(null);
+  }, [selectedEvidenceCard, selectedEvidenceIndex]);
   const selectedStockTrendSeries = selectedStockSummary?.snapshot
     ? selectedStockSummary.snapshot.priceHistorySeries ??
       buildChartSeries(
@@ -2211,6 +2231,18 @@ export default function App() {
       )
     : [];
   const selectedStockBenchmarkSeries = selectedStockSummary?.snapshot?.benchmarkHistorySeries ?? [];
+  const selectedStockChartBounds =
+    selectedStockTrendSeries.length > 0 || selectedStockBenchmarkSeries.length > 0
+      ? {
+          min: Math.min(...[...selectedStockTrendSeries, ...selectedStockBenchmarkSeries]),
+          max: Math.max(...[...selectedStockTrendSeries, ...selectedStockBenchmarkSeries]),
+        }
+      : undefined;
+  const selectedStockTrendDisplaySeries = normalizeSeries(selectedStockTrendSeries, selectedStockChartBounds);
+  const selectedStockBenchmarkDisplaySeries = normalizeSeries(
+    selectedStockBenchmarkSeries,
+    selectedStockChartBounds,
+  );
   const selectedStockHeroRange = selectedStockTrendSeries.length
     ? {
         low: Math.min(...selectedStockTrendSeries),
@@ -2451,6 +2483,7 @@ export default function App() {
     target?: StockRouteTarget;
   }) => {
     setSelectedStockId(stockId);
+    setStockSearch("");
     if (eyeId) setSelectedEyeId(eyeId);
     if (alertId) setSelectedAlertId(alertId);
     setRecentStockIds((current) => [stockId, ...current.filter((id) => id !== stockId)].slice(0, 6));
@@ -2837,7 +2870,11 @@ export default function App() {
                           <Pressable
                             key={`suggest-${item.stock.id}`}
                             onPress={() => openStockContext({ stockId: item.stock.id })}
-                            style={[styles.stockSuggestionPill, selectedStockSummary?.stock.id === item.stock.id ? styles.stockSuggestionPillActive : null]}
+                            style={({ pressed }) => [
+                              styles.stockSuggestionPill,
+                              selectedStockSummary?.stock.id === item.stock.id ? styles.stockSuggestionPillActive : null,
+                              pressed ? styles.stockSuggestionPillPressed : null,
+                            ]}
                           >
                             <Text
                               style={[styles.stockSuggestionSymbol, selectedStockSummary?.stock.id === item.stock.id ? styles.stockSuggestionSymbolActive : null]}
@@ -2901,7 +2938,14 @@ export default function App() {
                               {selectedStockSummary.snapshot?.freshness ?? "Unavailable"}
                             </Text>
                           </View>
-                          <Button label="Clear" tone="ghost" onPress={() => setSelectedStockId("")} />
+                          <Button
+                            label="Clear"
+                            tone="ghost"
+                            onPress={() => {
+                              setSelectedStockId("");
+                              setStockSearch("");
+                            }}
+                          />
                         </View>
                       </View>
                       <View style={styles.stockTrendSummaryRow}>
@@ -2930,37 +2974,37 @@ export default function App() {
                           <View style={styles.stockTrendGridLine} />
                           <View style={styles.stockTrendGridLine} />
                         </View>
-                        {selectedStockTrendSeries.map((point, index) => (
+                        {selectedStockTrendDisplaySeries.map((point, index) => (
                           <Animated.View
                             key={`trend-${selectedStockSummary.stock.id}-${index}`}
                             style={[
                               styles.stockTrendBar,
-                              { height: 20 + point * 0.72, opacity: index === selectedStockTrendSeries.length - 1 ? 1 : 0.52 },
+                              { height: `${Math.max(16, point)}%`, opacity: index === selectedStockTrendDisplaySeries.length - 1 ? 1 : 0.52 },
                             ]}
                           />
                         ))}
                         <View style={styles.stockTrendLineOverlay}>
-                          {selectedStockTrendSeries.map((point, index) => (
+                          {selectedStockTrendDisplaySeries.map((point, index) => (
                             <View
                               key={`trend-dot-${selectedStockSummary.stock.id}-${index}`}
                               style={[
                                 styles.stockTrendLineDot,
                                 {
-                                  left: `${(index / Math.max(selectedStockTrendSeries.length - 1, 1)) * 100}%`,
-                                  bottom: `${14 + point * 0.68}%`,
+                                  left: `${(index / Math.max(selectedStockTrendDisplaySeries.length - 1, 1)) * 100}%`,
+                                  bottom: `${Math.max(6, Math.min(96, point))}%`,
                                 },
-                                index === selectedStockTrendSeries.length - 1 ? styles.stockTrendLineDotActive : null,
+                                index === selectedStockTrendDisplaySeries.length - 1 ? styles.stockTrendLineDotActive : null,
                               ]}
                             />
                           ))}
-                          {selectedStockBenchmarkSeries.map((point, index) => (
+                          {selectedStockBenchmarkDisplaySeries.map((point, index) => (
                             <View
                               key={`benchmark-dot-${selectedStockSummary.stock.id}-${index}`}
                               style={[
                                 styles.stockTrendBenchmarkDot,
                                 {
-                                  left: `${(index / Math.max(selectedStockBenchmarkSeries.length - 1, 1)) * 100}%`,
-                                  bottom: `${14 + point * 0.68}%`,
+                                  left: `${(index / Math.max(selectedStockBenchmarkDisplaySeries.length - 1, 1)) * 100}%`,
+                                  bottom: `${Math.max(6, Math.min(96, point))}%`,
                                 },
                               ]}
                             />
@@ -2970,7 +3014,17 @@ export default function App() {
                           <View
                             style={[
                               styles.stockTrendCurrentMarker,
-                              { bottom: `${14 + selectedStockHeroRange.latest * 0.68}%` },
+                              {
+                                bottom: `${
+                                  Math.max(
+                                    6,
+                                    Math.min(
+                                      96,
+                                      selectedStockTrendDisplaySeries[selectedStockTrendDisplaySeries.length - 1] ?? 50,
+                                    ),
+                                  )
+                                }%`,
+                              },
                             ]}
                           />
                         ) : null}
@@ -4484,6 +4538,10 @@ const styles = StyleSheet.create({
   stockSuggestionPillActive: {
     backgroundColor: "#111827",
     borderColor: "#111827",
+  },
+  stockSuggestionPillPressed: {
+    transform: [{ scale: 0.985 }],
+    opacity: 0.94,
   },
   stockSuggestionSymbol: {
     color: "#111827",
