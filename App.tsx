@@ -539,6 +539,7 @@ const Button = ({
             ? styles.buttonSecondaryText
             : styles.buttonGhostText,
       ]}
+      numberOfLines={1}
     >
       {label}
     </Text>
@@ -610,14 +611,20 @@ const NumberStepper = ({
 
 const DenseStat = ({ label, value, tone = "neutral" }: { label: string; value: string; tone?: "neutral" | "strong" | "risk" }) => (
   <View style={[styles.denseStat, tone === "strong" ? styles.denseStatStrong : tone === "risk" ? styles.denseStatRisk : null]}>
-    <Text style={styles.denseStatLabel}>{label}</Text>
-    <Text style={styles.denseStatValue}>{value}</Text>
+    <Text style={styles.denseStatLabel} numberOfLines={1}>
+      {label}
+    </Text>
+    <Text style={styles.denseStatValue} numberOfLines={1}>
+      {value}
+    </Text>
   </View>
 );
 
 const MetaPill = ({ label }: { label: string }) => (
   <View style={styles.metaPill}>
-    <Text style={styles.metaPillText}>{label}</Text>
+    <Text style={styles.metaPillText} numberOfLines={1}>
+      {label}
+    </Text>
   </View>
 );
 
@@ -637,7 +644,7 @@ const HorizontalChoice = <T extends string>({
         onPress={() => onSelect(option)}
         style={[styles.choiceChip, option === value ? styles.choiceChipActive : null]}
       >
-        <Text style={[styles.choiceChipText, option === value ? styles.choiceChipTextActive : null]}>
+        <Text style={[styles.choiceChipText, option === value ? styles.choiceChipTextActive : null]} numberOfLines={1}>
           {option}
         </Text>
       </Pressable>
@@ -2030,10 +2037,16 @@ export default function App() {
                         onPress={() => openStockContext({ stockId: item.stock.id })}
                         style={[styles.stockSuggestionPill, selectedStockSummary?.stock.id === item.stock.id ? styles.stockSuggestionPillActive : null]}
                       >
-                        <Text style={[styles.stockSuggestionSymbol, selectedStockSummary?.stock.id === item.stock.id ? styles.stockSuggestionSymbolActive : null]}>
+                        <Text
+                          style={[styles.stockSuggestionSymbol, selectedStockSummary?.stock.id === item.stock.id ? styles.stockSuggestionSymbolActive : null]}
+                          numberOfLines={1}
+                        >
                           {item.stock.symbol}
                         </Text>
-                        <Text style={[styles.stockSuggestionName, selectedStockSummary?.stock.id === item.stock.id ? styles.stockSuggestionNameActive : null]}>
+                        <Text
+                          style={[styles.stockSuggestionName, selectedStockSummary?.stock.id === item.stock.id ? styles.stockSuggestionNameActive : null]}
+                          numberOfLines={1}
+                        >
                           {item.stock.name}
                         </Text>
                       </Pressable>
@@ -2545,8 +2558,8 @@ export default function App() {
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.choiceRow}>
                       {data.stocks.map((stock) => (
                         <Pressable key={stock.id} onPress={() => setPreviewStockId(stock.id)} style={[styles.selectChip, previewStockId === stock.id ? styles.selectChipActive : null]}>
-                          <Text style={[styles.selectChipTitle, previewStockId === stock.id ? styles.selectChipTitleActive : null]}>{stock.symbol}</Text>
-                          <Text style={[styles.selectChipSubtitle, previewStockId === stock.id ? styles.selectChipSubtitleActive : null]}>{stock.name}</Text>
+                          <Text style={[styles.selectChipTitle, previewStockId === stock.id ? styles.selectChipTitleActive : null]} numberOfLines={1}>{stock.symbol}</Text>
+                          <Text style={[styles.selectChipSubtitle, previewStockId === stock.id ? styles.selectChipSubtitleActive : null]} numberOfLines={1}>{stock.name}</Text>
                         </Pressable>
                       ))}
                     </ScrollView>
@@ -2617,8 +2630,8 @@ export default function App() {
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.choiceRow}>
               {data.stocks.map((stock) => (
                 <Pressable key={stock.id} onPress={() => setEyeForm((current) => ({ ...current, stockId: stock.id }))} style={[styles.selectChip, eyeForm.stockId === stock.id ? styles.selectChipActive : null]}>
-                  <Text style={[styles.selectChipTitle, eyeForm.stockId === stock.id ? styles.selectChipTitleActive : null]}>{stock.symbol}</Text>
-                  <Text style={[styles.selectChipSubtitle, eyeForm.stockId === stock.id ? styles.selectChipSubtitleActive : null]}>{stock.name}</Text>
+                  <Text style={[styles.selectChipTitle, eyeForm.stockId === stock.id ? styles.selectChipTitleActive : null]} numberOfLines={1}>{stock.symbol}</Text>
+                  <Text style={[styles.selectChipSubtitle, eyeForm.stockId === stock.id ? styles.selectChipSubtitleActive : null]} numberOfLines={1}>{stock.name}</Text>
                 </Pressable>
               ))}
             </ScrollView>
@@ -2627,8 +2640,8 @@ export default function App() {
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.choiceRow}>
               {data.recipes.map((recipe) => (
                 <Pressable key={recipe.id} onPress={() => setEyeForm((current) => ({ ...current, recipeId: recipe.id }))} style={[styles.selectChip, eyeForm.recipeId === recipe.id ? styles.selectChipActive : null]}>
-                  <Text style={[styles.selectChipTitle, eyeForm.recipeId === recipe.id ? styles.selectChipTitleActive : null]}>{recipe.name}</Text>
-                  <Text style={[styles.selectChipSubtitle, eyeForm.recipeId === recipe.id ? styles.selectChipSubtitleActive : null]}>{recipe.timeHorizon}</Text>
+                  <Text style={[styles.selectChipTitle, eyeForm.recipeId === recipe.id ? styles.selectChipTitleActive : null]} numberOfLines={1}>{recipe.name}</Text>
+                  <Text style={[styles.selectChipSubtitle, eyeForm.recipeId === recipe.id ? styles.selectChipSubtitleActive : null]} numberOfLines={1}>{recipe.timeHorizon}</Text>
                 </Pressable>
               ))}
             </ScrollView>
@@ -2698,8 +2711,8 @@ export default function App() {
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.choiceRow}>
               {data.eyes.map((eye) => (
                 <Pressable key={eye.id} onPress={() => setDecisionForm((current) => ({ ...current, eyeId: eye.id }))} style={[styles.selectChip, decisionForm.eyeId === eye.id ? styles.selectChipActive : null]}>
-                  <Text style={[styles.selectChipTitle, decisionForm.eyeId === eye.id ? styles.selectChipTitleActive : null]}>{stockLabel(data.stocks, eye.stockId)}</Text>
-                  <Text style={[styles.selectChipSubtitle, decisionForm.eyeId === eye.id ? styles.selectChipSubtitleActive : null]}>{recipeLabel(data.recipes, eye.recipeId)}</Text>
+                  <Text style={[styles.selectChipTitle, decisionForm.eyeId === eye.id ? styles.selectChipTitleActive : null]} numberOfLines={1}>{stockLabel(data.stocks, eye.stockId)}</Text>
+                  <Text style={[styles.selectChipSubtitle, decisionForm.eyeId === eye.id ? styles.selectChipSubtitleActive : null]} numberOfLines={1}>{recipeLabel(data.recipes, eye.recipeId)}</Text>
                 </Pressable>
               ))}
             </ScrollView>
@@ -2794,10 +2807,11 @@ const SectionHeader = ({ title, note }: { title: string; note: string }) => (
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: "#f5f5f7",
+    backgroundColor: "#ffffff",
   },
   frame: {
     flex: 1,
+    backgroundColor: "#f5f5f7",
   },
   topBar: {
     paddingHorizontal: 18,
@@ -2871,7 +2885,7 @@ const styles = StyleSheet.create({
   page: {
     paddingHorizontal: 16,
     paddingTop: 16,
-    paddingBottom: 110,
+    paddingBottom: 132,
     gap: 16,
   },
   // Search Hero Styles
@@ -2989,20 +3003,22 @@ const styles = StyleSheet.create({
   stockSearchShell: {
     gap: 10,
     padding: 14,
-    borderRadius: 20,
+    borderRadius: 18,
     backgroundColor: "#ffffff",
     borderWidth: 1,
     borderColor: "#eceef2",
   },
   stockSuggestionPill: {
-    minWidth: 126,
+    width: 144,
+    minHeight: 58,
     paddingHorizontal: 14,
-    paddingVertical: 10,
+    paddingVertical: 0,
     borderRadius: 14,
     backgroundColor: "#f3f4f6",
     borderWidth: 1,
     borderColor: "#e5e7eb",
     gap: 3,
+    justifyContent: "center",
   },
   stockSuggestionPillActive: {
     backgroundColor: "#111827",
@@ -3067,6 +3083,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#f8fafc",
     borderWidth: 1,
     borderColor: "#edf0f5",
+    minHeight: 108,
+    justifyContent: "space-between",
   },
   // Grid Layouts
   suggestionGrid: {
@@ -3114,6 +3132,7 @@ const styles = StyleSheet.create({
   evidenceCardCompact: {
     padding: 12,
     gap: 8,
+    minHeight: 168,
   },
   evidenceCardTitle: {
     color: "#111827",
@@ -3158,13 +3177,14 @@ const styles = StyleSheet.create({
   },
   choiceChip: {
     paddingHorizontal: 16,
-    paddingVertical: 10,
+    minHeight: 40,
     borderRadius: 12,
     backgroundColor: "#f3f4f6",
     borderWidth: 1,
     borderColor: "#e5e7eb",
     minWidth: 80,
     alignItems: "center",
+    justifyContent: "center",
   },
   choiceChipActive: {
     backgroundColor: "#111827",
@@ -3209,15 +3229,17 @@ const styles = StyleSheet.create({
     color: "#4b5563",
   },
   selectChip: {
+    width: "48.5%",
+    minHeight: 74,
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 10,
     borderRadius: 14,
     backgroundColor: "#f3f4f6",
     borderWidth: 1,
     borderColor: "#e5e7eb",
     gap: 4,
-    minWidth: 120,
     alignItems: "center",
+    justifyContent: "center",
   },
   selectChipActive: {
     borderColor: "#111827",
@@ -3333,11 +3355,12 @@ const styles = StyleSheet.create({
   },
   metaPill: {
     paddingHorizontal: 8,
-    paddingVertical: 4,
+    minHeight: 24,
     borderRadius: 999,
     backgroundColor: "#f3f4f6",
     borderWidth: 1,
     borderColor: "#e5e7eb",
+    justifyContent: "center",
   },
   stepper: {
     flex: 1,
@@ -3380,13 +3403,15 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   denseStat: {
-    flex: 1,
+    width: "48.5%",
     padding: 12,
     borderRadius: 16,
     backgroundColor: "#ffffff",
     borderWidth: 1,
     borderColor: "#eceef2",
     alignItems: "center",
+    justifyContent: "center",
+    minHeight: 74,
   },
   denseStatStrong: {
     borderColor: "#d1d5db",
@@ -3565,16 +3590,20 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     flexDirection: "row",
-    backgroundColor: "rgba(255, 255, 255, 0.98)",
+    backgroundColor: "#ffffff",
     borderTopWidth: 1,
     borderTopColor: "#e5e7eb",
-    paddingBottom: 20,
     paddingTop: 10,
+    paddingBottom: 30,
+    minHeight: 88,
+    alignItems: "center",
   },
   navItem: {
     flex: 1,
     alignItems: "center",
+    justifyContent: "center",
     gap: 4,
+    minHeight: 48,
   },
   navIndicator: {
     width: 20,
@@ -3734,7 +3763,7 @@ const styles = StyleSheet.create({
   },
   button: {
     paddingHorizontal: 16,
-    paddingVertical: 10,
+    minHeight: 44,
     borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
