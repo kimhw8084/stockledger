@@ -729,7 +729,11 @@ const HorizontalChoice = <T extends string>({
       <Pressable
         key={option}
         onPress={() => onSelect(option)}
-        style={[styles.choiceChip, option === value ? styles.choiceChipActive : null]}
+        style={({ pressed }) => [
+          styles.choiceChip,
+          option === value ? styles.choiceChipActive : null,
+          pressed ? styles.choiceChipPressed : null,
+        ]}
       >
         <Text style={[styles.choiceChipText, option === value ? styles.choiceChipTextActive : null]} numberOfLines={1}>
           {option}
@@ -1397,6 +1401,7 @@ const WindowPanel = ({
 }) => {
   const overlayOpacity = useRef(new Animated.Value(0)).current;
   const sheetOffset = useRef(new Animated.Value(28)).current;
+  const sheetScale = useRef(new Animated.Value(0.985)).current;
   const closingRef = useRef(false);
 
   const animateClose = () => {
@@ -1411,6 +1416,11 @@ const WindowPanel = ({
       Animated.timing(sheetOffset, {
         toValue: 42,
         duration: 220,
+        useNativeDriver: true,
+      }),
+      Animated.timing(sheetScale, {
+        toValue: 0.98,
+        duration: 180,
         useNativeDriver: true,
       }),
     ]).start(() => onClose());
@@ -1436,10 +1446,17 @@ const WindowPanel = ({
             duration: 180,
             useNativeDriver: true,
           }),
-          Animated.timing(sheetOffset, {
+          Animated.spring(sheetOffset, {
             toValue: 0,
-            duration: 200,
             useNativeDriver: true,
+            damping: 18,
+            stiffness: 180,
+          }),
+          Animated.spring(sheetScale, {
+            toValue: 1,
+            useNativeDriver: true,
+            damping: 18,
+            stiffness: 180,
           }),
         ]).start();
       },
@@ -1453,18 +1470,25 @@ const WindowPanel = ({
         duration: 220,
         useNativeDriver: true,
       }),
-      Animated.timing(sheetOffset, {
+      Animated.spring(sheetOffset, {
         toValue: 0,
-        duration: 260,
         useNativeDriver: true,
+        damping: 18,
+        stiffness: 180,
+      }),
+      Animated.spring(sheetScale, {
+        toValue: 1,
+        useNativeDriver: true,
+        damping: 18,
+        stiffness: 180,
       }),
     ]).start();
-  }, [overlayOpacity, sheetOffset]);
+  }, [overlayOpacity, sheetOffset, sheetScale]);
 
   return (
     <Animated.View style={[styles.windowBackdrop, { opacity: overlayOpacity }]}>
       <Pressable style={styles.windowDismissLayer} onPress={animateClose} />
-      <Animated.View style={[styles.windowPanel, { transform: [{ translateY: sheetOffset }] }]}>
+      <Animated.View style={[styles.windowPanel, { transform: [{ translateY: sheetOffset }, { scale: sheetScale }] }]}>
         <View style={styles.windowHandleTouch} {...dragResponder.panHandlers}>
           <View style={styles.windowGrabber} />
         </View>
@@ -4178,7 +4202,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 16,
     paddingBottom: 136,
-    gap: 16,
+    gap: 14,
   },
   // Search Hero Styles
   searchHero: {
@@ -4293,12 +4317,13 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   stockSearchShell: {
-    gap: 12,
-    padding: 14,
-    borderRadius: 20,
+    gap: 10,
+    padding: 12,
+    borderRadius: 18,
     backgroundColor: "#ffffff",
     borderWidth: 1,
     borderColor: "#eceef2",
+    overflow: "hidden",
   },
   stockSearchHeader: {
     flexDirection: "row",
@@ -4704,24 +4729,25 @@ const styles = StyleSheet.create({
   analysisGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 14,
+    gap: 12,
   },
   analysisGridItem: {
-    width: "47.8%",
+    width: "48.2%",
   },
   // Evidence Cards
   evidenceCard: {
     backgroundColor: "#ffffff",
-    borderRadius: 18,
-    padding: 14,
+    borderRadius: 16,
+    padding: 12,
     borderWidth: 1,
     borderColor: "#eceef2",
-    gap: 10,
+    gap: 8,
+    overflow: "hidden",
   },
   evidenceCardCompact: {
-    padding: 12,
+    padding: 11,
     gap: 8,
-    minHeight: 168,
+    minHeight: 158,
   },
   evidenceCardInteractive: {
     shadowColor: "#111827",
@@ -4771,17 +4797,21 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginTop: 4,
+    gap: 8,
   },
   compactEvidenceValue: {
     color: "#111827",
     fontSize: 12,
     fontWeight: "800",
+    flexShrink: 1,
   },
   compactEvidenceThreshold: {
     color: "#6b7280",
     fontSize: 10,
     fontWeight: "700",
     fontFamily,
+    flexShrink: 1,
+    textAlign: "right",
   },
   compactEvidenceMetaRow: {
     flexDirection: "row",
@@ -4809,13 +4839,14 @@ const styles = StyleSheet.create({
     fontFamily,
   },
   metricJumpChip: {
-    paddingHorizontal: 12,
-    minHeight: 34,
-    borderRadius: 12,
+    paddingHorizontal: 11,
+    minHeight: 32,
+    borderRadius: 11,
     backgroundColor: "#f3f4f6",
     borderWidth: 1,
     borderColor: "#e5e7eb",
     justifyContent: "center",
+    overflow: "hidden",
   },
   metricJumpChipActive: {
     backgroundColor: "#111827",
@@ -4847,15 +4878,20 @@ const styles = StyleSheet.create({
     paddingRight: 8,
   },
   choiceChip: {
-    paddingHorizontal: 16,
-    minHeight: 40,
-    borderRadius: 12,
+    paddingHorizontal: 14,
+    minHeight: 38,
+    borderRadius: 11,
     backgroundColor: "#f3f4f6",
     borderWidth: 1,
     borderColor: "#e5e7eb",
     minWidth: 80,
     alignItems: "center",
     justifyContent: "center",
+    overflow: "hidden",
+  },
+  choiceChipPressed: {
+    transform: [{ scale: 0.985 }],
+    opacity: 0.94,
   },
   choiceChipActive: {
     backgroundColor: "#111827",
@@ -4901,16 +4937,17 @@ const styles = StyleSheet.create({
   },
   selectChip: {
     width: "48%",
-    minHeight: 74,
-    paddingHorizontal: 16,
+    minHeight: 70,
+    paddingHorizontal: 14,
     paddingVertical: 10,
-    borderRadius: 14,
+    borderRadius: 12,
     backgroundColor: "#f3f4f6",
     borderWidth: 1,
     borderColor: "#e5e7eb",
     gap: 4,
     alignItems: "center",
     justifyContent: "center",
+    overflow: "hidden",
   },
   selectChipActive: {
     borderColor: "#111827",
@@ -5023,15 +5060,18 @@ const styles = StyleSheet.create({
     color: "#4b5563",
     fontSize: 10,
     fontWeight: "700",
+    flexShrink: 1,
   },
   metaPill: {
     paddingHorizontal: 8,
-    minHeight: 24,
+    minHeight: 22,
     borderRadius: 999,
     backgroundColor: "#f3f4f6",
     borderWidth: 1,
     borderColor: "#e5e7eb",
     justifyContent: "center",
+    maxWidth: "100%",
+    overflow: "hidden",
   },
   stepper: {
     flex: 1,
@@ -5047,14 +5087,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#ffffff",
-    borderRadius: 12,
+    borderRadius: 11,
     borderWidth: 1,
     borderColor: "#e5e7eb",
     overflow: "hidden",
   },
   stepperButton: {
-    width: 40,
-    height: 40,
+    width: 38,
+    height: 38,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#f3f4f6",
@@ -5075,14 +5115,16 @@ const styles = StyleSheet.create({
   },
   denseStat: {
     width: "48%",
-    padding: 12,
-    borderRadius: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 14,
     backgroundColor: "#ffffff",
     borderWidth: 1,
     borderColor: "#eceef2",
-    alignItems: "center",
+    alignItems: "flex-start",
     justifyContent: "center",
-    minHeight: 74,
+    minHeight: 68,
+    overflow: "hidden",
   },
   denseStatStrong: {
     borderColor: "#d1d5db",
@@ -5096,18 +5138,21 @@ const styles = StyleSheet.create({
     color: "#6b7280",
     fontSize: 10,
     fontWeight: "700",
+    width: "100%",
   },
   denseStatValue: {
     color: "#111827",
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: "800",
     marginTop: 4,
+    width: "100%",
   },
   alertTitle: {
     color: "#111827",
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: "800",
     marginTop: 4,
+    flexShrink: 1,
   },
   cardEyebrow: {
     color: "#6b7280",
@@ -5119,17 +5164,19 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     color: "#111827",
-    fontSize: 22,
-    lineHeight: 28,
+    fontSize: 20,
+    lineHeight: 26,
     fontWeight: "800",
     fontFamily,
+    flexShrink: 1,
   },
   cardBody: {
     color: "#4b5563",
     fontSize: 14,
-    lineHeight: 20,
+    lineHeight: 19,
     fontWeight: "500",
     fontFamily,
+    flexShrink: 1,
   },
   metaLine: {
     color: "#6b7280",
@@ -5319,11 +5366,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffff",
     borderTopWidth: 1,
     borderTopColor: "#e5e7eb",
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    paddingTop: 12,
-    paddingBottom: 34,
-    minHeight: 102,
+    borderTopLeftRadius: 22,
+    borderTopRightRadius: 22,
+    paddingTop: 10,
+    paddingBottom: 32,
+    minHeight: 96,
     alignItems: "center",
     paddingHorizontal: 12,
     shadowColor: "#111827",
@@ -5337,9 +5384,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: 4,
-    minHeight: 54,
-    borderRadius: 14,
+    minHeight: 50,
+    borderRadius: 12,
     marginHorizontal: 3,
+    overflow: "hidden",
   },
   navItemActive: {
     backgroundColor: "#111827",
@@ -5373,20 +5421,21 @@ const styles = StyleSheet.create({
   // Legacy/Required Compat
   card: {
     backgroundColor: "#ffffff",
-    borderRadius: 20,
-    padding: 16,
+    borderRadius: 18,
+    padding: 14,
     borderWidth: 1,
     borderColor: "#eceef2",
     shadowColor: "#111827",
     shadowOpacity: 0.03,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 3 },
+    overflow: "hidden",
   },
   cardHighlighted: {
     borderColor: "#d1d5db",
   },
   pressableCardWrap: {
-    borderRadius: 20,
+    borderRadius: 18,
   },
   pressableCardWrapPressed: {
     transform: [{ scale: 0.988 }],
@@ -5520,11 +5569,13 @@ const styles = StyleSheet.create({
     fontFamily,
   },
   button: {
-    paddingHorizontal: 16,
-    minHeight: 44,
-    borderRadius: 12,
+    paddingHorizontal: 14,
+    minHeight: 42,
+    borderRadius: 11,
     alignItems: "center",
     justifyContent: "center",
+    maxWidth: "100%",
+    overflow: "hidden",
   },
   buttonPrimary: {
     backgroundColor: "#111827",
@@ -5801,13 +5852,17 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     color: "#111827",
-    fontSize: 24,
+    fontSize: 21,
     fontWeight: "800",
+    lineHeight: 26,
+    fontFamily,
   },
   sectionNote: {
     color: "#6b7280",
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: "500",
+    lineHeight: 17,
+    fontFamily,
   },
   windowBackdrop: {
     ...StyleSheet.absoluteFillObject,
@@ -5818,16 +5873,17 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   windowPanel: {
-    maxHeight: "86%",
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
+    maxHeight: "84%",
+    borderTopLeftRadius: 26,
+    borderTopRightRadius: 26,
     backgroundColor: "#ffffff",
     borderTopWidth: 1,
     borderColor: "#eceef2",
-    paddingHorizontal: 18,
-    paddingTop: 18,
-    paddingBottom: 28,
-    gap: 12,
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 26,
+    gap: 10,
+    overflow: "hidden",
   },
   windowHeader: {
     flexDirection: "row",
