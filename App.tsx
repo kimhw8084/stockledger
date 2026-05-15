@@ -33,7 +33,6 @@ import {
 } from "./src/lib/visualEvidence";
 
 type TabKey = "Home" | "Stocks" | "Recipes" | "Eyes" | "Alerts" | "Journal";
-type StockFilter = "All" | "Needs Review" | "Opportunity" | "Quiet";
 type AlertWorkspaceTab = "Current" | "History" | "Detail";
 type ConditionKind = RecipeCondition["kind"];
 type AnalysisBenchmark = "SPY" | "QQQ" | "Sector ETF";
@@ -46,7 +45,6 @@ type AnalysisStatusFilter =
   | "Blocked"
   | "Needs Review";
 
-type AnalysisDensity = "Compact" | "Comfortable";
 type StockRouteTarget = "Stocks" | "Alerts" | "Eyes" | "Journal";
 type RecipeBuilderStep = "Purpose" | "Logic" | "Risk & Alerts" | "Review & Outcome";
 
@@ -77,7 +75,6 @@ interface ConditionTemplate {
 }
 
 const tabs: TabKey[] = ["Home", "Stocks", "Recipes", "Eyes", "Alerts", "Journal"];
-const stockFilters: StockFilter[] = ["All", "Needs Review", "Opportunity", "Quiet"];
 const recipeBuilderSteps: RecipeBuilderStep[] = ["Purpose", "Logic", "Risk & Alerts", "Review & Outcome"];
 const analysisBenchmarks: AnalysisBenchmark[] = ["SPY", "QQQ", "Sector ETF"];
 const analysisLookbacks: AnalysisLookback[] = ["20D", "3M", "6M"];
@@ -89,7 +86,6 @@ const analysisStatusFilters: AnalysisStatusFilter[] = [
   "Blocked",
   "Needs Review",
 ];
-const analysisDensityOptions: AnalysisDensity[] = ["Compact", "Comfortable"];
 const opportunityTypes = [
   "Temporary Mispricing",
   "Leader Pullback",
@@ -418,30 +414,30 @@ const topReason = (eye: Eye) =>
 const stateTone = (state?: string) => {
   switch (state) {
     case "Attention Needed":
-      return [styles.statePill, styles.statePillAttention];
+      return [styles.statusBadge, styles.statusNear];
     case "Opportunity Zone Forming":
-      return [styles.statePill, styles.statePillOpportunity];
+      return [styles.statusBadge, styles.statusPassed];
     case "Thesis Risk Rising":
-      return [styles.statePill, styles.statePillRisk];
+      return [styles.statusBadge, styles.statusWarning];
     case "Thesis Broken":
-      return [styles.statePill, styles.statePillBroken];
+      return [styles.statusBadge, styles.statusBlocked];
     case "Watch Closely":
-      return [styles.statePill, styles.statePillWatch];
+      return [styles.statusBadge, styles.statusNear];
     case "Becoming Interesting":
-      return [styles.statePill, styles.statePillInteresting];
+      return [styles.statusBadge, styles.statusNear];
     default:
-      return [styles.statePill, styles.statePillQuiet];
+      return [styles.statusBadge, styles.statusFailed];
   }
 };
 
 const priorityTone = (priority: Alert["priority"]) => {
   switch (priority) {
     case "High":
-      return [styles.priorityBadge, styles.priorityHigh];
+      return [styles.statusBadge, styles.statusBlocked];
     case "Medium":
-      return [styles.priorityBadge, styles.priorityMedium];
+      return [styles.statusBadge, styles.statusWarning];
     default:
-      return [styles.priorityBadge, styles.priorityLow];
+      return [styles.statusBadge, styles.statusPassed];
   }
 };
 
@@ -909,11 +905,11 @@ const WhyNowPanel = ({
   state: string;
   recipeVersion: string;
 }) => (
-  <View style={styles.panel}>
+  <View style={styles.card}>
     <View style={styles.inlineBetween}>
       <View style={styles.flexOne}>
-        <Text style={styles.panelLabel}>{title}</Text>
-        <Text style={styles.panelBody}>{body}</Text>
+        <Text style={styles.inputLabel}>{title}</Text>
+        <Text style={[styles.cardBody, { fontWeight: "700" }]}>{body}</Text>
       </View>
       <View style={styles.panelBadges}>
         <Text style={stateTone(state)}>{state}</Text>
@@ -924,17 +920,62 @@ const WhyNowPanel = ({
 );
 
 const WhatChangedPanel = ({ title, items }: { title: string; items: string[] }) => (
-  <View style={styles.panel}>
-    <Text style={styles.panelLabel}>{title}</Text>
-    <View style={styles.panelList}>
+  <View style={styles.card}>
+    <Text style={styles.inputLabel}>{title}</Text>
+    <View style={styles.stack}>
       {items.map((item) => (
-        <Text key={item} style={styles.panelListItem}>
+        <Text key={item} style={[styles.cardBody, { marginTop: 4 }]}>
           • {item}
         </Text>
       ))}
     </View>
   </View>
 );
+
+const StatusShape = ({ status, size = 12 }: { status: VisualEvidenceCard["status"]; size?: number }) => {
+  const tone = statusTone(status);
+  const color = (tone as any[]).find((s: any) => s?.backgroundColor)?.backgroundColor || "#64748b";
+
+  if (status === "Blocked") {
+    return (
+      <View
+        style={{
+          width: size,
+          height: size,
+          backgroundColor: color,
+          borderRadius: 2,
+          transform: [{ rotate: "45deg" }],
+        }}
+      />
+    );
+  }
+  if (status === "Warning" || status === "Near Trigger") {
+    return (
+      <View
+        style={{
+          width: 0,
+          height: 0,
+          borderLeftWidth: size / 2,
+          borderRightWidth: size / 2,
+          borderBottomWidth: size,
+          borderLeftColor: "transparent",
+          borderRightColor: "transparent",
+          borderBottomColor: color,
+        }}
+      />
+    );
+  }
+  return (
+    <View
+      style={{
+        width: size,
+        height: size,
+        backgroundColor: color,
+        borderRadius: status === "Passed" ? size / 2 : 2,
+      }}
+    />
+  );
+};
 
 const EvidenceCardView = ({
   card,
@@ -958,54 +999,53 @@ const EvidenceCardView = ({
     <Pressable onPress={handlePress} style={[styles.evidenceCard, compact ? styles.evidenceCardCompact : null]}>
       <View style={styles.inlineBetween}>
         <View style={styles.flexOne}>
-          <Text style={styles.evidenceCardTitle}>{card.title}</Text>
+          <Text style={[styles.evidenceCardTitle, compact ? styles.evidenceCardTitleCompact : null]} numberOfLines={1}>
+            {card.title}
+          </Text>
           {!compact ? <Text style={styles.evidenceRole}>{card.role}</Text> : null}
         </View>
-        <View style={styles.evidenceBadgeStack}>
-          <View style={statusTone(card.status)}>
-            <Text style={styles.statusBadgeText}>{card.status}</Text>
-          </View>
-          {compact ? null : (
-            <View style={freshnessTone(card.freshness)}>
-              <Text style={styles.freshnessBadgeText}>{card.freshness}</Text>
-            </View>
-          )}
-        </View>
+        <StatusShape status={card.status} size={compact ? 10 : 14} />
       </View>
 
-      {compact ? null : <Text style={styles.evidenceSummary}>{card.summary}</Text>}
-      <ThresholdBar card={card} />
+      {!compact ? <Text style={styles.evidenceSummary}>{card.summary}</Text> : null}
+      
+      <View style={compact ? styles.compactVisualContainer : styles.visualContainer}>
+        <ThresholdBar card={card} />
+      </View>
 
       {compact ? (
         <View style={styles.compactEvidenceFooter}>
           <Text style={styles.compactEvidenceValue}>{card.metric.currentLabel}</Text>
-          <Text style={styles.compactEvidenceThreshold}>{card.metric.thresholdLabel ?? card.metric.comparisonLabel ?? "Context"}</Text>
           <View style={freshnessTone(card.freshness)}>
-            <Text style={styles.freshnessBadgeText}>{card.freshness}</Text>
+            <View style={styles.freshnessDot} />
           </View>
         </View>
       ) : (
-        <View style={styles.evidenceMetricsRow}>
-          <DenseStat label="Current" value={card.metric.currentLabel} tone="strong" />
-          <DenseStat label="Threshold" value={card.metric.thresholdLabel ?? "Context only"} />
-        </View>
+        <>
+          <View style={styles.evidenceMetricsRow}>
+            <DenseStat label="Current" value={card.metric.currentLabel} tone="strong" />
+            <DenseStat label="Threshold" value={card.metric.thresholdLabel ?? "Context only"} />
+          </View>
+
+          {card.relatedConditionLabel ? (
+            <Text style={styles.evidenceRelated}>Recipe link: {card.relatedConditionLabel}</Text>
+          ) : null}
+
+          <Text style={styles.evidenceEffect}>Effect: {card.effect}</Text>
+          <Text style={styles.evidenceWhy}>Why it matters: {card.whyItMatters}</Text>
+
+          <View style={styles.metaRow}>
+            <MetaPill label={card.sourceType} />
+            {card.metric.comparisonLabel ? <MetaPill label={card.metric.comparisonLabel} /> : null}
+          </View>
+        </>
       )}
 
-      {!compact && card.relatedConditionLabel ? (
-        <Text style={styles.evidenceRelated}>Recipe link: {card.relatedConditionLabel}</Text>
-      ) : null}
-
-      {!compact ? <Text style={styles.evidenceEffect}>Effect: {card.effect}</Text> : null}
-      {!compact ? <Text style={styles.evidenceWhy}>Why it matters: {card.whyItMatters}</Text> : null}
-
       {!compact ? (
-        <View style={styles.metaRow}>
-          <MetaPill label={card.sourceType} />
-          {card.metric.comparisonLabel ? <MetaPill label={card.metric.comparisonLabel} /> : null}
-        </View>
+        <Text style={styles.formulaToggleText}>
+          {expanded ? "Hide details" : "Show formula details"}
+        </Text>
       ) : null}
-
-      <Text style={styles.formulaToggleText}>{expanded ? "Hide details" : compact ? "Open detail" : "Show formula details"}</Text>
 
       {expanded && !onOpen ? (
         <View style={styles.formulaPanel}>
@@ -1086,7 +1126,7 @@ const RecipeConditionMapCard = ({
     failed[0];
 
   return (
-    <View style={styles.recipeMapCard}>
+    <View style={styles.card}>
       <View style={styles.inlineBetween}>
         <View style={styles.flexOne}>
           <Text style={styles.evidenceCardTitle}>{recipe.name}</Text>
@@ -1099,26 +1139,26 @@ const RecipeConditionMapCard = ({
         </View>
       </View>
 
-      <Text style={styles.evidenceSummary}>{evaluation.whyNow}</Text>
+      <Text style={[styles.cardBody, { fontWeight: "700" }]}>{evaluation.whyNow}</Text>
 
-      <View style={styles.recipeMapStats}>
+      <View style={styles.homeStatsGrid}>
         <DenseStat label="Passed" value={`${passed.length}`} tone="strong" />
         <DenseStat label="Failed" value={`${failed.length}`} />
         <DenseStat label="Warnings" value={`${warnings.length}`} tone={warnings.length > 0 ? "risk" : "neutral"} />
         <DenseStat label="Blockers" value={`${blockers.length}`} tone={blockers.length > 0 ? "risk" : "neutral"} />
       </View>
 
-      <View style={styles.dualColumn}>
-        <View style={styles.evidenceColumn}>
-          <Text style={styles.columnTitle}>Top support</Text>
+      <View style={styles.analysisGrid}>
+        <View style={[styles.analysisGridItem, styles.evidenceCard]}>
+          <Text style={styles.inputLabel}>Support</Text>
           {(evaluation.supportingEvidence ?? []).slice(0, 3).map((item) => (
-            <Text key={item} style={styles.listLine}>
+            <Text key={item} style={[styles.cardBody, { color: "#047857", fontSize: 11, marginTop: 4 }]}>
               + {item}
             </Text>
           ))}
         </View>
-        <View style={styles.evidenceColumn}>
-          <Text style={styles.columnTitle}>Top risks</Text>
+        <View style={[styles.analysisGridItem, styles.evidenceCard]}>
+          <Text style={styles.inputLabel}>Risks</Text>
           {[
             ...(evaluation.contradictingEvidence ?? []),
             ...(evaluation.riskWarnings ?? []),
@@ -1126,7 +1166,7 @@ const RecipeConditionMapCard = ({
           ]
             .slice(0, 3)
             .map((item) => (
-              <Text key={item} style={styles.listLine}>
+              <Text key={item} style={[styles.cardBody, { color: "#b91c1c", fontSize: 11, marginTop: 4 }]}>
                 - {item}
               </Text>
             ))}
@@ -1134,37 +1174,33 @@ const RecipeConditionMapCard = ({
       </View>
 
       <View style={styles.metaRow}>
-        <MetaPill label={`Last state change ${evaluation.stateChanged ? "now" : "unchanged"}`} />
-        <MetaPill label={`Urgency ${evaluation.actionUrgency}`} />
+        <MetaPill label={`State: ${evaluation.stateChanged ? "Changed" : "Stable"}`} />
+        <MetaPill label={`Urgency: ${evaluation.actionUrgency}`} />
         <MetaPill label={evaluation.setupStrength} />
       </View>
 
       {nextTrigger ? (
-        <Text style={styles.evidenceWhy}>Next likely trigger: {nextTrigger.explanation}</Text>
+        <Text style={[styles.cardBody, { color: "#111827", fontSize: 12 }]}>Next trigger: {nextTrigger.explanation}</Text>
       ) : null}
 
-      {(evaluation.missingData.length > 0 || evaluation.staleData.length > 0) ? (
-        <Text style={styles.evidenceEffect}>
+      {evaluation.missingData.length > 0 || evaluation.staleData.length > 0 ? (
+        <Text style={[styles.cardBody, { color: "#92400e", fontSize: 11 }]}>
           Data issues: {[...evaluation.missingData, ...evaluation.staleData].slice(0, 2).join(" | ")}
         </Text>
       ) : null}
 
-      <Pressable onPress={() => setExpanded((current) => !current)} style={styles.formulaToggle}>
-        <Text style={styles.formulaToggleText}>{expanded ? "Hide condition matrix" : "Show condition matrix"}</Text>
+      <Pressable onPress={() => setExpanded((current) => !current)} style={styles.actionRow}>
+        <Text style={styles.buttonPrimaryText}>{expanded ? "Hide matrix" : "Show matrix"}</Text>
       </Pressable>
 
       {expanded ? (
-        <View style={styles.recipeMatrix}>
+        <View style={[styles.stack, { marginTop: 12 }]}>
           {(evaluation.conditionResults ?? []).map((item) => (
-            <View key={item.conditionId} style={styles.recipeMatrixRow}>
-              <View style={statusTone(item.missingData ? "Partial" : item.passed ? "Passed" : item.role === "Hard Disqualifier" ? "Blocked" : item.role === "Risk Warning" ? "Warning" : "Failed")}>
-                <Text style={styles.statusBadgeText}>
-                  {item.missingData ? "Partial" : item.passed ? "Passed" : item.role === "Hard Disqualifier" ? "Blocked" : item.role === "Risk Warning" ? "Warning" : "Failed"}
-                </Text>
-              </View>
-              <View style={styles.flexOne}>
-                <Text style={styles.recipeMatrixTitle}>{item.metricKey ?? "Condition"}</Text>
-                <Text style={styles.recipeMatrixBody}>{item.explanation}</Text>
+            <View key={item.conditionId} style={styles.inlineBetween}>
+              <StatusShape status={item.missingData ? "Partial" : item.passed ? "Passed" : item.role === "Hard Disqualifier" ? "Blocked" : item.role === "Risk Warning" ? "Warning" : "Failed"} size={8} />
+              <View style={[styles.flexOne, { marginLeft: 10 }]}>
+                <Text style={[styles.evidenceCardTitle, { fontSize: 13 }]}>{item.metricKey ?? "Condition"}</Text>
+                <Text style={[styles.cardBody, { fontSize: 12, marginTop: 2 }]}>{item.explanation}</Text>
               </View>
             </View>
           ))}
@@ -1202,10 +1238,11 @@ const WindowPanel = ({
   </View>
 );
 
-const HomeStockGroupCard = ({
+const StockTriageCard = ({
   item,
   recipes,
   onOpenStock,
+  onOpenAlerts,
 }: {
   item: {
     stock: Stock;
@@ -1222,53 +1259,55 @@ const HomeStockGroupCard = ({
   };
   recipes: Recipe[];
   onOpenStock: () => void;
+  onOpenAlerts?: () => void;
 }) => {
   const [expanded, setExpanded] = useState(false);
   const evaluation = item.dominantEye?.lastEvaluation;
-  const topSupport = evaluation?.supportingEvidence?.[0] ?? "No clear support captured yet.";
+  const topSupport = evaluation?.supportingEvidence?.[0] ?? evaluation?.whyNow ?? "No strong change recorded.";
   const topRisk =
     evaluation?.hardDisqualifiers?.[0] ??
     evaluation?.riskWarnings?.[0] ??
     evaluation?.contradictingEvidence?.[0] ??
-    "No major risk flagged.";
+    "No immediate risk surfaced.";
 
   return (
-    <Card highlighted>
+    <Card highlighted={Boolean(item.openAlerts.length)}>
       <View style={styles.inlineBetween}>
         <View style={styles.flexOne}>
           <Text style={styles.cardEyebrow}>{item.stock.name}</Text>
           <Text style={styles.alertTitle}>{item.stock.symbol}</Text>
-          <Text style={styles.stockGroupSummary}>{topSupport}</Text>
         </View>
         <Text style={stateTone(evaluation?.currentState)}>{evaluation?.currentState ?? "Unwatched"}</Text>
       </View>
 
-      <View style={styles.stockGroupStats}>
-        <DenseStat label="Eyes" value={`${item.eyes.length}`} tone="strong" />
-        <DenseStat label="Alerts" value={`${item.openAlerts.length}`} tone={item.openAlerts.length > 0 ? "risk" : "neutral"} />
-        <DenseStat label="Urgency" value={evaluation?.actionUrgency ?? "Wait"} />
-        <DenseStat label="Data" value={item.snapshot?.freshness ?? "Unavailable"} tone={item.snapshot?.isMock ? "risk" : "neutral"} />
+      <View style={styles.compactStatRow}>
+        <MetaPill label={`${item.eyes.length} eyes`} />
+        <MetaPill label={`${item.openAlerts.length} alerts`} />
+        <MetaPill label={item.snapshot?.freshness ?? "Unavailable"} />
       </View>
 
+      <Text style={styles.stockGroupSummary} numberOfLines={expanded ? undefined : 2}>
+        {topSupport}
+      </Text>
+
       {expanded ? (
-        <>
+        <View style={styles.stack}>
           {item.snapshot ? (
-            <View style={styles.stockGroupMetricRow}>
-              <Text style={styles.compactMetricText}>${item.snapshot.price.toFixed(2)}</Text>
-              <Text style={styles.compactMetricText}>{item.snapshot.drawdownPct}% drawdown</Text>
-              <Text style={styles.compactMetricText}>Updated {formatDate(item.snapshot.updatedAt)}</Text>
+            <View style={styles.dualDenseGrid}>
+              <DenseStat label="Price" value={`$${item.snapshot.price.toFixed(2)}`} tone="strong" />
+              <DenseStat label="Drawdown" value={`${item.snapshot.drawdownPct}%`} />
+              <DenseStat label="Updated" value={formatShortDate(item.snapshot.updatedAt)} />
+              <DenseStat label="Data" value={item.snapshot.isMock ? "Mock" : "Provider"} tone={item.snapshot.isMock ? "risk" : "neutral"} />
             </View>
           ) : null}
 
-          <View style={styles.stockGroupEvidenceRow}>
-            <View style={styles.stockGroupEvidenceCol}>
-              <Text style={styles.stockGroupLabel}>Top support</Text>
-              <Text style={styles.stockGroupLine}>+ {topSupport}</Text>
-            </View>
-            <View style={styles.stockGroupEvidenceCol}>
-              <Text style={styles.stockGroupLabel}>Top risk</Text>
-              <Text style={styles.stockGroupLine}>- {topRisk}</Text>
-            </View>
+          <View style={styles.detailCallout}>
+            <Text style={styles.detailCalloutLabel}>Top support</Text>
+            <Text style={styles.detailCalloutBody}>{topSupport}</Text>
+          </View>
+          <View style={styles.detailCallout}>
+            <Text style={styles.detailCalloutLabel}>Top risk</Text>
+            <Text style={styles.detailCalloutBody}>{topRisk}</Text>
           </View>
 
           <View style={styles.metaRow}>
@@ -1276,11 +1315,12 @@ const HomeStockGroupCard = ({
               <MetaPill key={eye.id} label={recipeLabel(recipes, eye.recipeId)} />
             ))}
           </View>
-        </>
+        </View>
       ) : null}
 
       <View style={styles.actionRow}>
-        <Button label={expanded ? "Collapse" : "Expand"} tone="secondary" onPress={() => setExpanded((current) => !current)} />
+        <Button label={expanded ? "Less" : "More"} tone="secondary" onPress={() => setExpanded((current) => !current)} />
+        {onOpenAlerts ? <Button label="Alerts" tone="ghost" onPress={onOpenAlerts} /> : null}
         <Button label="Open Stock" onPress={onOpenStock} />
       </View>
     </Card>
@@ -1311,14 +1351,11 @@ interface EyeDraftForm {
 export default function App() {
   const { data, loading, actions } = useAppModel();
   const [tab, setTab] = useState<TabKey>("Home");
-  const [stockFilter, setStockFilter] = useState<StockFilter>("All");
   const [recipeBuilderStep, setRecipeBuilderStep] = useState<RecipeBuilderStep>("Purpose");
   const [alertWorkspaceTab, setAlertWorkspaceTab] = useState<Exclude<AlertWorkspaceTab, "Detail">>("Current");
   const [analysisBenchmark, setAnalysisBenchmark] = useState<AnalysisBenchmark>("SPY");
   const [analysisLookback, setAnalysisLookback] = useState<AnalysisLookback>("3M");
   const [analysisStatusFilter, setAnalysisStatusFilter] = useState<AnalysisStatusFilter>("All Statuses");
-  const [analysisDensity, setAnalysisDensity] = useState<AnalysisDensity>("Compact");
-  const [fabOpen, setFabOpen] = useState(false);
 
   const [stockForm, setStockForm] = useState({ symbol: "", name: "", thesis: "" });
   const [recipeForm, setRecipeForm] = useState<RecipeDraftForm>({
@@ -1443,7 +1480,7 @@ export default function App() {
 
   const filteredStockDirectory = useMemo(() => {
     const normalizedQuery = deferredStockSearch.trim().toLowerCase();
-    const baseList = stockDirectory.filter((item) => {
+    return stockDirectory.filter((item) => {
       if (!normalizedQuery) return true;
       return (
         item.stock.symbol.toLowerCase().includes(normalizedQuery) ||
@@ -1451,26 +1488,7 @@ export default function App() {
         item.stock.thesis.toLowerCase().includes(normalizedQuery)
       );
     });
-
-    if (stockFilter === "All") return baseList;
-    if (stockFilter === "Needs Review") {
-      return baseList.filter((item) =>
-        ["Attention Needed", "Thesis Risk Rising", "Thesis Broken"].includes(
-          item.dominantEye?.lastEvaluation?.currentState ?? "",
-        ),
-      );
-    }
-    if (stockFilter === "Opportunity") {
-      return baseList.filter(
-        (item) => item.dominantEye?.lastEvaluation?.currentState === "Opportunity Zone Forming",
-      );
-    }
-    return baseList.filter((item) =>
-      ["Watch Closely", "Becoming Interesting", "Not Relevant"].includes(
-        item.dominantEye?.lastEvaluation?.currentState ?? "",
-      ),
-    );
-  }, [deferredStockSearch, stockDirectory, stockFilter]);
+  }, [deferredStockSearch, stockDirectory]);
 
   useEffect(() => {
     if (!selectedEyeId && eyesSorted[0]) {
@@ -1890,110 +1908,6 @@ export default function App() {
     setJournalFormAttempted(false);
   };
 
-  const fabActions =
-    tab === "Home"
-      ? [
-          {
-            label: "Sync Data",
-            onPress: () => {
-              setFabOpen(false);
-              void actions.refreshMockData();
-            },
-          },
-          {
-            label: "Log Decision",
-            onPress: () => {
-              setFabOpen(false);
-              setJournalComposerOpen(true);
-            },
-          },
-        ]
-      : tab === "Stocks"
-        ? [
-          {
-              label: "Add Stock",
-              onPress: () => {
-                setFabOpen(false);
-                setStockComposerOpen(true);
-              },
-            },
-            {
-              label: "Create Eye",
-              onPress: () => {
-                setFabOpen(false);
-                setEyeComposerOpen(true);
-              },
-            },
-          ]
-        : tab === "Recipes"
-          ? [
-              {
-                label: "New Recipe",
-                onPress: () => {
-                  setFabOpen(false);
-                  setRecipeBuilderOpen(true);
-                },
-              },
-              {
-                label: "Preview Draft",
-                onPress: () => {
-                  setFabOpen(false);
-                  setRecipeBuilderOpen(true);
-                  setRecipeBuilderStep("Review & Outcome");
-                },
-              },
-            ]
-          : tab === "Eyes"
-            ? [
-                {
-                  label: "Create Eye",
-                  onPress: () => {
-                    setFabOpen(false);
-                    setEyeComposerOpen(true);
-                  },
-                },
-                {
-                  label: "Stocks",
-                  onPress: () => {
-                    setFabOpen(false);
-                    setTab("Stocks");
-                  },
-                },
-              ]
-          : tab === "Alerts"
-            ? [
-                {
-                  label: "Review Queue",
-                  onPress: () => {
-                    setFabOpen(false);
-                    setAlertWorkspaceTab("Current");
-                  },
-                },
-              {
-                  label: "Journal",
-                  onPress: () => {
-                    setFabOpen(false);
-                    setJournalComposerOpen(true);
-                  },
-                },
-              ]
-          : [
-              {
-                label: "New Decision",
-                onPress: () => {
-                  setFabOpen(false);
-                  setJournalComposerOpen(true);
-                },
-              },
-              {
-                label: "Load Seed",
-                onPress: () => {
-                  setFabOpen(false);
-                  void actions.resetToSeed();
-                },
-              },
-            ];
-
   return (
     <SafeAreaView style={styles.screen}>
       <StatusBar style="dark" />
@@ -2022,33 +1936,51 @@ export default function App() {
           {tab === "Home" ? (
             <>
               <Reveal>
-                <SectionHeader title="Home" note="Compact stock-first triage. See what matters, then expand only if you want detail." />
-                <Card>
-                  <View style={styles.dualDenseGrid}>
-                    <DenseStat label="Open alerts" value={`${openAlerts}`} tone={openAlerts > 0 ? "risk" : "strong"} />
-                    <DenseStat label="Urgent stocks" value={`${homeUrgentStocks.length}`} tone={homeUrgentStocks.length > 0 ? "risk" : "neutral"} />
-                    <DenseStat label="Forming" value={`${homeOpportunityStocks.length}`} />
-                    <DenseStat label="Stale reviews" value={`${homeStaleReviewStocks.length}`} />
-                  </View>
-                  <View style={styles.summaryRow}>
-                    <MetaPill label={`${snapshotDiagnostics.provider} provider-backed`} />
-                    <MetaPill label={`${snapshotDiagnostics.mock} mock fallback`} />
-                    <MetaPill label={`${data.decisions.length} journal entries`} />
-                  </View>
-                </Card>
+                <SectionHeader title="Home" note="What needs attention now, grouped by stock and kept compact." />
+                <View style={styles.homeSummaryStrip}>
+                  <DenseStat label="Open alerts" value={`${openAlerts}`} tone={openAlerts > 0 ? "risk" : "strong"} />
+                  <DenseStat label="Urgent stocks" value={`${homeUrgentStocks.length}`} tone={homeUrgentStocks.length > 0 ? "risk" : "neutral"} />
+                  <DenseStat label="Opportunity" value={`${homeOpportunityStocks.length}`} />
+                  <DenseStat label="Stale review" value={`${homeStaleReviewStocks.length}`} />
+                </View>
               </Reveal>
 
               <Reveal delay={40}>
-                <SectionHeader title="Needs Review" note="Grouped by stock so one name does not get scattered across multiple rows." />
+                <SectionHeader title="Review Now" note="Highest-urgency stocks first." />
                 <View style={styles.stack}>
                   {homeUrgentStocks.length === 0 ? (
                     <Card>
-                      <Text style={styles.cardBody}>No stocks are in the urgent review bucket right now.</Text>
+                      <Text style={styles.cardBody}>Nothing is in the urgent bucket right now.</Text>
                     </Card>
                   ) : (
                     homeUrgentStocks.slice(0, 4).map((item) => (
-                      <HomeStockGroupCard
-                        key={item.stock.id}
+                      <StockTriageCard
+                        key={`urgent-${item.stock.id}`}
+                        item={item}
+                        recipes={data.recipes}
+                        onOpenStock={() => openStockContext({ stockId: item.stock.id })}
+                        onOpenAlerts={() => {
+                          setSelectedStockId(item.stock.id);
+                          setAlertWorkspaceTab("Current");
+                          setTab("Alerts");
+                        }}
+                      />
+                    ))
+                  )}
+                </View>
+              </Reveal>
+
+              <Reveal delay={80}>
+                <SectionHeader title="Forming" note="Stocks becoming more interesting but not yet urgent." />
+                <View style={styles.stack}>
+                  {homeOpportunityStocks.length === 0 ? (
+                    <Card>
+                      <Text style={styles.cardBody}>No stocks are in the opportunity-forming bucket right now.</Text>
+                    </Card>
+                  ) : (
+                    homeOpportunityStocks.slice(0, 3).map((item) => (
+                      <StockTriageCard
+                        key={`forming-${item.stock.id}`}
                         item={item}
                         recipes={data.recipes}
                         onOpenStock={() => openStockContext({ stockId: item.stock.id })}
@@ -2058,41 +1990,23 @@ export default function App() {
                 </View>
               </Reveal>
 
-              <Reveal delay={60}>
-                <SectionHeader title="Opportunity Stocks" note="Stocks that are forming but not yet urgent." />
+              <Reveal delay={120}>
+                <SectionHeader title="Review Soon" note="Eyes that need a fresh thesis check even without a new alert." />
                 <View style={styles.stack}>
-                  {homeOpportunityStocks.slice(0, 3).map((item) => (
-                    <HomeStockGroupCard
-                      key={item.stock.id}
-                      item={item}
-                      recipes={data.recipes}
-                      onOpenStock={() => openStockContext({ stockId: item.stock.id })}
-                    />
-                  ))}
-                  {homeOpportunityStocks.length === 0 ? (
-                    <Card>
-                      <Text style={styles.cardBody}>No stocks are in the opportunity-forming bucket right now.</Text>
-                    </Card>
-                  ) : null}
-                </View>
-              </Reveal>
-
-              <Reveal delay={80}>
-                <SectionHeader title="Stale Thesis Reviews" note="Stocks whose Eyes should be revisited soon even without a fresh alert." />
-                <View style={styles.stack}>
-                  {homeStaleReviewStocks.slice(0, 3).map((item) => (
-                      <HomeStockGroupCard
-                        key={item.stock.id}
-                        item={item}
-                        recipes={data.recipes}
-                        onOpenStock={() => openStockContext({ stockId: item.stock.id })}
-                      />
-                  ))}
                   {homeStaleReviewStocks.length === 0 ? (
                     <Card>
                       <Text style={styles.cardBody}>No stale thesis reviews are currently flagged.</Text>
                     </Card>
-                  ) : null}
+                  ) : (
+                    homeStaleReviewStocks.slice(0, 3).map((item) => (
+                      <StockTriageCard
+                        key={`stale-${item.stock.id}`}
+                        item={item}
+                        recipes={data.recipes}
+                        onOpenStock={() => openStockContext({ stockId: item.stock.id })}
+                      />
+                    ))
+                  )}
                 </View>
               </Reveal>
             </>
@@ -2101,40 +2015,31 @@ export default function App() {
           {tab === "Stocks" ? (
             <>
               <Reveal>
-                <SectionHeader
-                  title="Stocks"
-                  note="Search, select, and immediately inspect the factual visual board. No recipe or journal clutter here."
-                />
-                <Card highlighted>
-                  <Text style={styles.inputLabel}>Search stocks</Text>
+                <SectionHeader title="Stocks" note="Search a stock and immediately inspect the same visual board every time." />
+                <View style={styles.stockSearchShell}>
                   <Input
                     value={stockSearch}
                     onChangeText={setStockSearch}
-                    placeholder="Search ticker, company, or thesis"
-                    autoCapitalize="none"
+                    placeholder="Search ticker or company"
+                    autoCapitalize="characters"
                   />
-                  <View style={styles.actionRow}>
-                    <Button label="Add Stock" onPress={() => setStockComposerOpen(true)} />
-                    <Button label="Refresh Data" tone="secondary" onPress={() => void actions.refreshMockData()} />
-                  </View>
-                  <Text style={styles.inputLabel}>Suggestions</Text>
                   <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.choiceRow}>
                     {stockSuggestions.map((item) => (
                       <Pressable
-                        key={`stock-suggestion-${item.stock.id}`}
+                        key={`suggest-${item.stock.id}`}
                         onPress={() => openStockContext({ stockId: item.stock.id })}
-                        style={[styles.selectChip, selectedStockSummary?.stock.id === item.stock.id ? styles.selectChipActive : null]}
+                        style={[styles.stockSuggestionPill, selectedStockSummary?.stock.id === item.stock.id ? styles.stockSuggestionPillActive : null]}
                       >
-                        <Text style={[styles.selectChipTitle, selectedStockSummary?.stock.id === item.stock.id ? styles.selectChipTitleActive : null]}>
+                        <Text style={[styles.stockSuggestionSymbol, selectedStockSummary?.stock.id === item.stock.id ? styles.stockSuggestionSymbolActive : null]}>
                           {item.stock.symbol}
                         </Text>
-                        <Text style={[styles.selectChipSubtitle, selectedStockSummary?.stock.id === item.stock.id ? styles.selectChipSubtitleActive : null]}>
+                        <Text style={[styles.stockSuggestionName, selectedStockSummary?.stock.id === item.stock.id ? styles.stockSuggestionNameActive : null]}>
                           {item.stock.name}
                         </Text>
                       </Pressable>
                     ))}
                   </ScrollView>
-                </Card>
+                </View>
               </Reveal>
 
               {selectedStockSummary ? (
@@ -2142,54 +2047,46 @@ export default function App() {
                   <Card highlighted>
                     <View style={styles.inlineBetween}>
                       <View style={styles.flexOne}>
-                        <Text style={styles.cardEyebrow}>{selectedStockSummary.stock.name}</Text>
-                        <Text style={styles.cardTitle}>{selectedStockSummary.stock.symbol}</Text>
+                        <Text style={styles.stockHeroSymbol}>{selectedStockSummary.stock.symbol}</Text>
+                        <Text style={styles.stockHeroName}>{selectedStockSummary.stock.name}</Text>
                       </View>
-                      <View style={styles.panelBadges}>
-                        <MetaPill label={selectedStockSummary.snapshot?.freshness ?? "Unavailable"} />
-                        <MetaPill label={selectedStockSummary.snapshot?.sourceName ?? "No source"} />
-                      </View>
+                      <Button label="Add Stock" tone="secondary" onPress={() => setStockComposerOpen(true)} />
                     </View>
-
+                    <View style={styles.homeSummaryStrip}>
+                      <DenseStat label="Price" value={selectedStockSummary.snapshot ? `$${selectedStockSummary.snapshot.price.toFixed(2)}` : "No feed"} tone="strong" />
+                      <DenseStat label="Drawdown" value={selectedStockSummary.snapshot ? `${selectedStockSummary.snapshot.drawdownPct}%` : "N/A"} />
+                      <DenseStat label="Eyes" value={`${selectedStockSummary.eyes.length}`} />
+                      <DenseStat label="Data" value={selectedStockSummary.snapshot?.freshness ?? "Unavailable"} tone={selectedStockSummary.snapshot?.isMock ? "risk" : "neutral"} />
+                    </View>
                     <View style={styles.dualColumn}>
-                      <View style={styles.evidenceColumn}>
+                      <View style={styles.controlCard}>
                         <Text style={styles.inputLabel}>Benchmark</Text>
                         <HorizontalChoice options={analysisBenchmarks} value={analysisBenchmark} onSelect={setAnalysisBenchmark} />
                       </View>
-                      <View style={styles.evidenceColumn}>
+                      <View style={styles.controlCard}>
                         <Text style={styles.inputLabel}>Lookback</Text>
                         <HorizontalChoice options={analysisLookbacks} value={analysisLookback} onSelect={setAnalysisLookback} />
                       </View>
                     </View>
-
                     <View style={styles.dualColumn}>
-                      <View style={styles.evidenceColumn}>
+                      <View style={styles.controlCard}>
                         <Text style={styles.inputLabel}>Status</Text>
                         <HorizontalChoice options={analysisStatusFilters} value={analysisStatusFilter} onSelect={setAnalysisStatusFilter} />
                       </View>
-                      <View style={styles.evidenceColumn}>
-                        <Text style={styles.inputLabel}>Density</Text>
-                        <HorizontalChoice options={analysisDensityOptions} value={analysisDensity} onSelect={setAnalysisDensity} />
+                      <View style={styles.controlCard}>
+                        <Text style={styles.inputLabel}>Insights</Text>
+                        <Text style={styles.sectionNote}>Two-up visual grid. Tap any square for detail.</Text>
                       </View>
                     </View>
                   </Card>
 
-                  <View style={styles.stack}>
+                  <View style={styles.analysisGrid}>
                     {selectedStockAnalysisCards.length > 0 ? (
-                      <View style={analysisDensity === "Compact" ? styles.stockAnalysisBoard : styles.stack}>
-                        {selectedStockAnalysisCards.map((card) => (
-                          <View
-                            key={`stock-card-${card.id}`}
-                            style={analysisDensity === "Compact" ? styles.stockAnalysisBoardItem : undefined}
-                          >
-                            <EvidenceCardView
-                              card={card}
-                              compact={analysisDensity === "Compact"}
-                              onOpen={() => setSelectedEvidenceCard(card)}
-                            />
-                          </View>
-                        ))}
-                      </View>
+                      selectedStockAnalysisCards.map((card) => (
+                        <View key={`stock-card-${card.id}`} style={styles.analysisGridItem}>
+                          <EvidenceCardView card={card} compact={true} onOpen={() => setSelectedEvidenceCard(card)} />
+                        </View>
+                      ))
                     ) : (
                       <Card>
                         <Text style={styles.cardBody}>No parameters match the current filters.</Text>
@@ -2870,30 +2767,11 @@ export default function App() {
           </WindowPanel>
         ) : null}
 
-        {fabOpen ? (
-          <View pointerEvents="box-none" style={styles.fabMenu}>
-            {fabActions.map((action, index) => (
-              <Reveal key={action.label} delay={index * 40}>
-                <Pressable onPress={action.onPress} style={styles.fabMenuItem}>
-                  <Text style={styles.fabMenuText}>{action.label}</Text>
-                </Pressable>
-              </Reveal>
-            ))}
-          </View>
-        ) : null}
-
-        <Pressable onPress={() => setFabOpen((current) => !current)} style={styles.fabButton}>
-          <Text style={styles.fabButtonText}>{fabOpen ? "×" : "+"}</Text>
-        </Pressable>
-
         <View style={styles.bottomNav}>
           {tabs.map((item) => (
             <Pressable
               key={item}
-              onPress={() => {
-                setFabOpen(false);
-                setTab(item);
-              }}
+              onPress={() => setTab(item)}
               style={styles.navItem}
             >
               <View style={[styles.navIndicator, tab === item ? styles.navIndicatorActive : null]} />
@@ -2916,32 +2794,32 @@ const SectionHeader = ({ title, note }: { title: string; note: string }) => (
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: "#f6f8fb",
+    backgroundColor: "#f5f5f7",
   },
   frame: {
     flex: 1,
   },
   topBar: {
-    paddingHorizontal: 16,
-    paddingTop: 8,
-    paddingBottom: 10,
+    paddingHorizontal: 18,
+    paddingTop: 10,
+    paddingBottom: 12,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     borderBottomWidth: 1,
-    borderBottomColor: "#e5ebf2",
-    backgroundColor: "#f6f8fb",
+    borderBottomColor: "#e5e7eb",
+    backgroundColor: "#fbfbfd",
   },
   topBarTitle: {
-    color: "#0f172a",
+    color: "#111827",
     fontSize: 22,
-    lineHeight: 26,
     fontWeight: "800",
     fontFamily,
   },
   topBarSubtitle: {
-    color: "#64748b",
+    color: "#6b7280",
     fontSize: 12,
+    fontWeight: "600",
     fontFamily,
   },
   alertBell: {
@@ -2950,13 +2828,13 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: "#ffffff",
     borderWidth: 1,
-    borderColor: "#e5ebf2",
+    borderColor: "#e5e7eb",
     alignItems: "center",
     justifyContent: "center",
   },
   alertBellIcon: {
-    color: "#0f172a",
-    fontSize: 18,
+    color: "#111827",
+    fontSize: 16,
     fontWeight: "800",
     fontFamily,
   },
@@ -2982,566 +2860,994 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#f6f8fb",
+    backgroundColor: "#f5f5f7",
   },
   loadingText: {
-    color: "#0f172a",
+    color: "#111827",
     fontSize: 18,
     fontWeight: "700",
     fontFamily,
   },
   page: {
     paddingHorizontal: 16,
-    paddingTop: 14,
-    paddingBottom: 140,
-    gap: 14,
+    paddingTop: 16,
+    paddingBottom: 110,
+    gap: 16,
   },
-  card: {
-    backgroundColor: "#fbfcfe",
-    borderRadius: 10,
-    padding: 15,
-    borderWidth: 1,
-    borderColor: "#e5ebf2",
+  // Search Hero Styles
+  searchHero: {
+    marginTop: 40,
+    gap: 32,
   },
-  cardHighlighted: {
-    backgroundColor: "#ffffff",
-    borderColor: "#d8e2ee",
-  },
-  heroEyebrow: {
-    color: "#5b6b80",
-    fontSize: 12,
-    fontWeight: "700",
-    letterSpacing: 1,
-    textTransform: "uppercase",
+  searchHeroTitle: {
+    color: "#f8fafc",
+    fontSize: 32,
+    fontWeight: "900",
+    textAlign: "center",
     fontFamily,
   },
-  heroTitle: {
+  searchHeroSubtitle: {
     marginTop: 8,
-    color: "#0f172a",
-    fontSize: 30,
-    lineHeight: 34,
+    color: "#94a3b8",
+    fontSize: 16,
+    fontWeight: "600",
+    textAlign: "center",
+    fontFamily,
+  },
+  searchBarContainer: {
+    flexDirection: "row",
+    gap: 10,
+    backgroundColor: "#1e293b",
+    padding: 8,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#334155",
+  },
+  heroSearchInput: {
+    flex: 1,
+    backgroundColor: "transparent",
+    color: "#f8fafc",
+    fontSize: 16,
+    fontWeight: "700",
+  },
+  inlineSearchInput: {
+    flex: 1,
+    backgroundColor: "#1e293b",
+    color: "#f8fafc",
+    fontSize: 14,
+    fontWeight: "700",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  recentTitle: {
+    color: "#64748b",
+    fontSize: 12,
+    fontWeight: "900",
+    textTransform: "uppercase",
+    letterSpacing: 1,
+    marginBottom: 12,
+  },
+  recentScroll: {
+    gap: 12,
+  },
+  recentChip: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: "#1e293b",
+    borderWidth: 1,
+    borderColor: "#334155",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  recentChipSymbol: {
+    color: "#f8fafc",
+    fontSize: 12,
+    fontWeight: "900",
+  },
+  homeStatsGrid: {
+    flexDirection: "row",
+    gap: 12,
+  },
+  homeStatCard: {
+    flex: 1,
+    backgroundColor: "#1e293b",
+    borderRadius: 12,
+    padding: 16,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#334155",
+  },
+  homeStatValue: {
+    color: "#f8fafc",
+    fontSize: 24,
+    fontWeight: "900",
+  },
+  homeStatLabel: {
+    color: "#64748b",
+    fontSize: 10,
+    fontWeight: "800",
+    textTransform: "uppercase",
+    marginTop: 4,
+  },
+  // Stock Hero
+  stockHero: {
+    gap: 4,
+    marginBottom: 10,
+  },
+  stockHeroSymbol: {
+    color: "#111827",
+    fontSize: 34,
+    fontWeight: "800",
+  },
+  stockHeroName: {
+    color: "#6b7280",
+    fontSize: 15,
+    fontWeight: "600",
+  },
+  stockSearchShell: {
+    gap: 10,
+    padding: 14,
+    borderRadius: 20,
+    backgroundColor: "#ffffff",
+    borderWidth: 1,
+    borderColor: "#eceef2",
+  },
+  stockSuggestionPill: {
+    minWidth: 126,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 14,
+    backgroundColor: "#f3f4f6",
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+    gap: 3,
+  },
+  stockSuggestionPillActive: {
+    backgroundColor: "#111827",
+    borderColor: "#111827",
+  },
+  stockSuggestionSymbol: {
+    color: "#111827",
+    fontSize: 13,
     fontWeight: "800",
     fontFamily,
   },
-  heroSubtitle: {
-    marginTop: 8,
-    color: "#5d6b7d",
-    fontSize: 15,
-    lineHeight: 22,
+  stockSuggestionSymbolActive: {
+    color: "#ffffff",
+  },
+  stockSuggestionName: {
+    color: "#6b7280",
+    fontSize: 11,
+    fontWeight: "600",
     fontFamily,
   },
-  metricGrid: {
-    marginTop: 16,
+  stockSuggestionNameActive: {
+    color: "#d1d5db",
+  },
+  homeSummaryStrip: {
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 8,
   },
-  metricButton: {
-    width: "48%",
-    minWidth: 150,
+  compactStatRow: {
+    marginTop: 10,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  detailCallout: {
+    padding: 12,
+    borderRadius: 14,
+    backgroundColor: "#f8fafc",
+    borderWidth: 1,
+    borderColor: "#edf0f5",
+  },
+  detailCalloutLabel: {
+    color: "#6b7280",
+    fontSize: 11,
+    fontWeight: "700",
+    textTransform: "uppercase",
+    letterSpacing: 0.4,
+    fontFamily,
+  },
+  detailCalloutBody: {
+    marginTop: 4,
+    color: "#111827",
+    fontSize: 13,
+    lineHeight: 19,
+    fontWeight: "600",
+    fontFamily,
+  },
+  controlCard: {
+    flex: 1,
+    padding: 12,
+    borderRadius: 16,
+    backgroundColor: "#f8fafc",
+    borderWidth: 1,
+    borderColor: "#edf0f5",
+  },
+  // Grid Layouts
+  suggestionGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+    marginTop: 16,
+  },
+  suggestionCard: {
+    width: "31%",
+    backgroundColor: "#1e293b",
     padding: 12,
     borderRadius: 8,
-    backgroundColor: "#ffffff",
     borderWidth: 1,
-    borderColor: "#e7edf4",
+    borderColor: "#334155",
   },
-  metricValue: {
-    color: "#0f172a",
-    fontSize: 24,
+  suggestionSymbol: {
+    color: "#f8fafc",
+    fontSize: 14,
+    fontWeight: "900",
+  },
+  suggestionName: {
+    color: "#64748b",
+    fontSize: 10,
+    fontWeight: "700",
+    marginTop: 2,
+  },
+  analysisGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+  },
+  analysisGridItem: {
+    width: "48.5%",
+  },
+  // Evidence Cards
+  evidenceCard: {
+    backgroundColor: "#ffffff",
+    borderRadius: 18,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: "#eceef2",
+    gap: 10,
+  },
+  evidenceCardCompact: {
+    padding: 12,
+    gap: 8,
+  },
+  evidenceCardTitle: {
+    color: "#111827",
+    fontSize: 14,
     fontWeight: "800",
     fontFamily,
   },
-  metricLabel: {
+  evidenceCardTitleCompact: {
+    fontSize: 10,
+    fontWeight: "800",
+    textTransform: "uppercase",
+    color: "#6b7280",
+  },
+  visualContainer: {
+    height: 100,
+    justifyContent: "center",
+  },
+  compactVisualContainer: {
+    height: 60,
+    justifyContent: "center",
+  },
+  compactEvidenceFooter: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginTop: 4,
-    color: "#1e293b",
+  },
+  compactEvidenceValue: {
+    color: "#111827",
+    fontSize: 12,
+    fontWeight: "800",
+  },
+  freshnessDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: "#10b981", // Green
+  },
+  choiceRow: {
+    gap: 12,
+    paddingVertical: 4,
+  },
+  choiceChip: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 12,
+    backgroundColor: "#f3f4f6",
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+    minWidth: 80,
+    alignItems: "center",
+  },
+  choiceChipActive: {
+    backgroundColor: "#111827",
+    borderColor: "#111827",
+  },
+  choiceChipText: {
+    color: "#4b5563",
     fontSize: 13,
     fontWeight: "700",
     fontFamily,
   },
-  metricNote: {
-    marginTop: 6,
-    color: "#64748b",
-    fontSize: 12,
-    lineHeight: 18,
-    fontFamily,
+  choiceChipTextActive: {
+    color: "#ffffff",
   },
-  summaryRow: {
-    marginTop: 14,
-    flexDirection: "row",
-    flexWrap: "wrap",
+  templateCard: {
+    width: 200,
+    padding: 16,
+    borderRadius: 16,
+    backgroundColor: "#ffffff",
+    borderWidth: 1,
+    borderColor: "#eceef2",
+    gap: 8,
+  },
+  templateCardActive: {
+    borderColor: "#111827",
+    backgroundColor: "#f8fafc",
+  },
+  templateTitle: {
+    color: "#111827",
+    fontSize: 14,
+    fontWeight: "800",
+  },
+  templateTitleActive: {
+    color: "#111827",
+  },
+  templateSubtitle: {
+    color: "#6b7280",
+    fontSize: 11,
+    fontWeight: "600",
+  },
+  templateSubtitleActive: {
+    color: "#4b5563",
+  },
+  selectChip: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 14,
+    backgroundColor: "#f3f4f6",
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+    gap: 4,
+    minWidth: 120,
+    alignItems: "center",
+  },
+  selectChipActive: {
+    borderColor: "#111827",
+    backgroundColor: "#111827",
+  },
+  selectChipTitle: {
+    color: "#111827",
+    fontSize: 14,
+    fontWeight: "800",
+  },
+  selectChipTitleActive: {
+    color: "#ffffff",
+  },
+  selectChipSubtitle: {
+    color: "#6b7280",
+    fontSize: 10,
+    fontWeight: "700",
+  },
+  selectChipSubtitleActive: {
+    color: "#d1d5db",
+  },
+  validationText: {
+    color: "#ef4444",
+    fontSize: 12,
+    fontWeight: "800",
+    marginTop: 4,
+  },
+  previewDisclosure: {
+    color: "#64748b",
+    fontSize: 11,
+    fontWeight: "700",
+    textAlign: "center",
+    marginTop: 12,
+  },
+  statusBadgeText: {
+    color: "#111827",
+    fontSize: 10,
+    fontWeight: "800",
+    textTransform: "uppercase",
+  },
+  panelBadges: {
+    alignItems: "flex-end",
     gap: 6,
   },
-  compactSection: {
-    gap: 10,
+  formulaPanel: {
+    marginTop: 12,
+    padding: 16,
+    borderRadius: 16,
+    backgroundColor: "#f8fafc",
+    borderWidth: 1,
+    borderColor: "#eceef2",
+    gap: 12,
   },
-  sectionHeader: {
-    gap: 2,
+  formulaTitle: {
+    color: "#111827",
+    fontSize: 14,
+    fontWeight: "800",
   },
-  sectionTitle: {
-    color: "#0f172a",
-    fontSize: 24,
+  formulaBody: {
+    color: "#4b5563",
+    fontSize: 13,
+    fontWeight: "500",
+    lineHeight: 18,
+  },
+  formulaMeta: {
+    color: "#6b7280",
+    fontSize: 12,
+    fontWeight: "600",
+  },
+  formulaToggleText: {
+    color: "#111827",
+    fontSize: 12,
+    fontWeight: "700",
+    textTransform: "uppercase",
+  },
+  evidenceRelated: {
+    color: "#6b7280",
+    fontSize: 11,
+    fontWeight: "700",
+    textTransform: "uppercase",
+  },
+  evidenceEffect: {
+    color: "#111827",
+    fontSize: 13,
+    fontWeight: "700",
+  },
+  evidenceWhy: {
+    color: "#6b7280",
+    fontSize: 13,
+    fontWeight: "500",
+  },
+  evidenceRole: {
+    color: "#6b7280",
+    fontSize: 10,
+    fontWeight: "700",
+    textTransform: "uppercase",
+    marginTop: 2,
+  },
+  evidenceSummary: {
+    color: "#374151",
+    fontSize: 14,
+    fontWeight: "500",
+    lineHeight: 20,
+  },
+  evidenceMetricsRow: {
+    flexDirection: "row",
+    gap: 12,
+  },
+  metaPillText: {
+    color: "#4b5563",
+    fontSize: 10,
+    fontWeight: "700",
+  },
+  metaPill: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 999,
+    backgroundColor: "#f3f4f6",
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+  },
+  stepper: {
+    flex: 1,
+    gap: 8,
+  },
+  stepperLabel: {
+    color: "#6b7280",
+    fontSize: 10,
+    fontWeight: "700",
+    textTransform: "uppercase",
+  },
+  stepperTrack: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#ffffff",
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+    overflow: "hidden",
+  },
+  stepperButton: {
+    width: 40,
+    height: 40,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#f3f4f6",
+  },
+  stepperButtonText: {
+    color: "#111827",
+    fontSize: 20,
+    fontWeight: "700",
+  },
+  stepperValueWrap: {
+    flex: 1,
+    alignItems: "center",
+  },
+  stepperValue: {
+    color: "#111827",
+    fontSize: 14,
+    fontWeight: "700",
+  },
+  denseStat: {
+    flex: 1,
+    padding: 12,
+    borderRadius: 16,
+    backgroundColor: "#ffffff",
+    borderWidth: 1,
+    borderColor: "#eceef2",
+    alignItems: "center",
+  },
+  denseStatStrong: {
+    borderColor: "#d1d5db",
+    backgroundColor: "#ffffff",
+  },
+  denseStatRisk: {
+    borderColor: "#fecaca",
+    backgroundColor: "#fff7f7",
+  },
+  denseStatLabel: {
+    color: "#6b7280",
+    fontSize: 10,
+    fontWeight: "700",
+  },
+  denseStatValue: {
+    color: "#111827",
+    fontSize: 16,
+    fontWeight: "800",
+    marginTop: 4,
+  },
+  alertTitle: {
+    color: "#111827",
+    fontSize: 18,
+    fontWeight: "800",
+    marginTop: 4,
+  },
+  cardEyebrow: {
+    color: "#6b7280",
+    fontSize: 11,
+    fontWeight: "700",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+    fontFamily,
+  },
+  cardTitle: {
+    color: "#111827",
+    fontSize: 22,
     lineHeight: 28,
     fontWeight: "800",
     fontFamily,
   },
-  sectionNote: {
-    color: "#64748b",
+  cardBody: {
+    color: "#4b5563",
     fontSize: 14,
     lineHeight: 20,
+    fontWeight: "500",
     fontFamily,
   },
-  radarGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-  },
-  radarCard: {
-    flex: 1,
-    minWidth: 100,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    borderRadius: 8,
-    borderWidth: 1,
-  },
-  radarCritical: {
-    backgroundColor: "#fff5f5",
-    borderColor: "#f0d7da",
-  },
-  radarOpportunity: {
-    backgroundColor: "#f2fbf6",
-    borderColor: "#d6e9dd",
-  },
-  radarQuiet: {
-    backgroundColor: "#f4f7fb",
-    borderColor: "#dde5ee",
-  },
-  radarValue: {
-    color: "#0f172a",
-    fontSize: 24,
-    fontWeight: "800",
-    fontFamily,
-  },
-  radarLabel: {
-    marginTop: 6,
-    color: "#334155",
-    fontSize: 13,
+  metaLine: {
+    color: "#6b7280",
+    fontSize: 12,
     lineHeight: 18,
+    fontWeight: "500",
     fontFamily,
   },
-  inlineBetween: {
+  dualColumn: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    gap: 14,
+    gap: 10,
   },
-  flexOne: {
-    flex: 1,
-  },
-  cardEyebrow: {
-    color: "#5b6b80",
-    fontSize: 11,
-    fontWeight: "700",
-    letterSpacing: 1,
-    textTransform: "uppercase",
-    fontFamily,
-  },
-  cardTitle: {
-    marginTop: 6,
-    color: "#0f172a",
-    fontSize: 22,
-    lineHeight: 26,
-    fontWeight: "800",
-    fontFamily,
-  },
-  alertTitle: {
-    marginTop: 6,
-    color: "#0f172a",
-    fontSize: 18,
-    lineHeight: 22,
-    fontWeight: "800",
-    fontFamily,
-  },
-  cardBody: {
-    marginTop: 8,
-    color: "#334155",
-    fontSize: 15,
-    lineHeight: 22,
-    fontFamily,
-  },
-  statePill: {
-    overflow: "hidden",
-    paddingHorizontal: 10,
-    paddingVertical: 7,
-    borderRadius: 6,
+  columnTitle: {
+    color: "#111827",
     fontSize: 12,
     fontWeight: "700",
     fontFamily,
   },
+  listLine: {
+    color: "#4b5563",
+    fontSize: 13,
+    lineHeight: 19,
+    fontWeight: "500",
+    fontFamily,
+  },
+  priorityStack: {
+    alignItems: "flex-end",
+    gap: 6,
+  },
+  statePill: {
+    overflow: "hidden",
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 999,
+    fontSize: 11,
+    fontWeight: "700",
+    fontFamily,
+  },
   statePillAttention: {
-    color: "#ffffff",
-    backgroundColor: "#ef4444",
+    color: "#991b1b",
+    backgroundColor: "#fee2e2",
   },
   statePillOpportunity: {
-    color: "#14532d",
-    backgroundColor: "#86efac",
+    color: "#166534",
+    backgroundColor: "#dcfce7",
   },
   statePillRisk: {
-    color: "#991b1b",
-    backgroundColor: "#fecaca",
+    color: "#92400e",
+    backgroundColor: "#fef3c7",
   },
   statePillBroken: {
     color: "#ffffff",
-    backgroundColor: "#7f1d1d",
+    backgroundColor: "#111827",
   },
   statePillWatch: {
     color: "#1d4ed8",
     backgroundColor: "#dbeafe",
   },
   statePillInteresting: {
-    color: "#155e75",
-    backgroundColor: "#cffafe",
+    color: "#0f766e",
+    backgroundColor: "#ccfbf1",
   },
   statePillQuiet: {
-    color: "#475569",
-    backgroundColor: "#e2e8f0",
+    color: "#4b5563",
+    backgroundColor: "#f3f4f6",
   },
-  chartCard: {
-    marginTop: 16,
-    padding: 12,
-    borderRadius: 8,
-    backgroundColor: "#f3f6fa",
+  priorityBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+  },
+  priorityHigh: { backgroundColor: "#ef4444" },
+  priorityMedium: { backgroundColor: "#f59e0b" },
+  priorityLow: { backgroundColor: "#10b981" },
+  priorityBadgeText: {
+    color: "#f8fafc",
+    fontSize: 10,
+    fontWeight: "900",
+  },
+  timestampText: {
+    color: "#6b7280",
+    fontSize: 11,
+    fontWeight: "600",
+    marginTop: 4,
+  },
+  stockGroupSummary: {
+    color: "#4b5563",
+    fontSize: 13,
+    lineHeight: 19,
+    fontWeight: "500",
+    marginTop: 6,
+  },
+  statusBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
     borderWidth: 1,
-    borderColor: "#e3e9f1",
   },
-  chartHeader: {
+  statusPassed: { backgroundColor: "rgba(16, 185, 129, 0.1)", borderColor: "#10b981" },
+  statusNear: { backgroundColor: "rgba(56, 189, 248, 0.1)", borderColor: "#38bdf8" },
+  statusWarning: { backgroundColor: "rgba(245, 158, 11, 0.1)", borderColor: "#f59e0b" },
+  statusBlocked: { backgroundColor: "rgba(239, 68, 68, 0.1)", borderColor: "#ef4444" },
+  statusPartial: { backgroundColor: "#f3f4f6", borderColor: "#d1d5db" },
+  statusUnavailable: { backgroundColor: "#f3f4f6", borderColor: "#d1d5db" },
+  statusStale: { backgroundColor: "#fef3c7", borderColor: "#f59e0b" },
+  statusMock: { backgroundColor: "rgba(167, 139, 250, 0.1)", borderColor: "#a78bfa" },
+  statusFailed: { backgroundColor: "#f3f4f6", borderColor: "#d1d5db" },
+  freshnessBadge: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    borderWidth: 1,
+  },
+  freshnessFresh: { backgroundColor: "rgba(16, 185, 129, 0.1)", borderColor: "#10b981" },
+  freshnessDelayed: { backgroundColor: "rgba(245, 158, 11, 0.1)", borderColor: "#f59e0b" },
+  freshnessPartial: { backgroundColor: "#f3f4f6", borderColor: "#d1d5db" },
+  freshnessUnavailable: { backgroundColor: "#f3f4f6", borderColor: "#d1d5db" },
+  freshnessStale: { backgroundColor: "#fef3c7", borderColor: "#f59e0b" },
+  freshnessMock: { backgroundColor: "rgba(167, 139, 250, 0.1)", borderColor: "#a78bfa" },
+  freshnessBadgeText: {
+    color: "#111827",
+    fontSize: 9,
+    fontWeight: "700",
+  },
+  // Navigation
+  bottomNav: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    flexDirection: "row",
+    backgroundColor: "rgba(255, 255, 255, 0.98)",
+    borderTopWidth: 1,
+    borderTopColor: "#e5e7eb",
+    paddingBottom: 20,
+    paddingTop: 10,
+  },
+  navItem: {
+    flex: 1,
+    alignItems: "center",
+    gap: 4,
+  },
+  navIndicator: {
+    width: 20,
+    height: 3,
+    borderRadius: 2,
+    backgroundColor: "transparent",
+  },
+  navIndicatorActive: {
+    backgroundColor: "#111827",
+  },
+  navLabel: {
+    color: "#6b7280",
+    fontSize: 10,
+    fontWeight: "700",
+    fontFamily,
+  },
+  navLabelActive: {
+    color: "#111827",
+  },
+  // Legacy/Required Compat
+  card: {
+    backgroundColor: "#ffffff",
+    borderRadius: 20,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: "#eceef2",
+  },
+  cardHighlighted: {
+    borderColor: "#d1d5db",
+  },
+  inputLabel: {
+    color: "#6b7280",
+    fontSize: 11,
+    fontWeight: "700",
+    marginBottom: 8,
+  },
+  actionRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    marginTop: 12,
+  },
+  analysisActionRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    marginTop: 10,
+  },
+  metaRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    marginTop: 10,
+  },
+  dualDenseGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  compactMetricRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+    marginTop: 10,
+  },
+  compactMetricText: {
+    color: "#6b7280",
+    fontSize: 12,
+    fontWeight: "600",
+    fontFamily,
+  },
+  evidenceGroup: {
+    gap: 10,
+  },
+  groupHeaderButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  groupHeaderToggle: {
+    color: "#6b7280",
+    fontSize: 12,
+    fontWeight: "700",
+    fontFamily,
+  },
+  evidenceGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+  },
+  evidenceGridItem: {
+    width: "48.5%",
+  },
+  alertMiniRow: {
+    paddingVertical: 10,
+    gap: 10,
+    flexDirection: "row",
+    alignItems: "flex-start",
+    borderBottomWidth: 1,
+    borderBottomColor: "#f0f2f5",
+  },
+  alertMiniTitle: {
+    color: "#111827",
+    fontSize: 13,
+    lineHeight: 18,
+    fontWeight: "700",
+    fontFamily,
+  },
+  alertMiniBody: {
+    marginTop: 4,
+    color: "#6b7280",
+    fontSize: 12,
+    lineHeight: 17,
+    fontWeight: "500",
+    fontFamily,
+  },
+  evidenceColumn: {
+    flex: 1,
+    padding: 12,
+    borderRadius: 16,
+    backgroundColor: "#f8fafc",
+    borderWidth: 1,
+    borderColor: "#eceef2",
+  },
+  previewCard: {
+    padding: 14,
+    borderRadius: 16,
+    backgroundColor: "#f8fafc",
+    borderWidth: 1,
+    borderColor: "#eceef2",
+  },
+  previewLabel: {
+    color: "#6b7280",
+    fontSize: 11,
+    fontWeight: "700",
+    textTransform: "uppercase",
+    fontFamily,
+  },
+  previewText: {
+    marginTop: 6,
+    color: "#111827",
+    fontSize: 14,
+    lineHeight: 20,
+    fontWeight: "700",
+    fontFamily,
+  },
+  kindPill: {
+    alignSelf: "flex-start",
+    overflow: "hidden",
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 999,
+    fontSize: 11,
+    fontWeight: "700",
+    textTransform: "uppercase",
+    fontFamily,
+  },
+  button: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  buttonPrimary: {
+    backgroundColor: "#111827",
+  },
+  buttonPrimaryText: {
+    color: "#ffffff",
+    fontSize: 14,
+    fontWeight: "700",
+  },
+  buttonSecondary: {
+    backgroundColor: "#f3f4f6",
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+  },
+  buttonSecondaryText: {
+    color: "#111827",
+    fontSize: 14,
+    fontWeight: "700",
+  },
+  buttonGhost: {
+    backgroundColor: "#ffffff",
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+  },
+  buttonGhostText: {
+    color: "#6b7280",
+    fontSize: 14,
+    fontWeight: "700",
+  },
+  buttonText: {
+    fontSize: 14,
+    fontWeight: "700",
+  },
+  input: {
+    backgroundColor: "#ffffff",
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+    color: "#111827",
+    padding: 14,
+    borderRadius: 14,
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  textArea: {
+    minHeight: 100,
+    textAlignVertical: "top",
+  },
+  inlineBetween: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
-  chartTitle: {
-    color: "#0f172a",
-    fontSize: 13,
-    fontWeight: "700",
-    fontFamily,
-  },
-  chartLegend: {
-    color: "#64748b",
-    fontSize: 12,
-    fontFamily,
-  },
-  chartBars: {
-    marginTop: 14,
-    height: 104,
-    flexDirection: "row",
-    alignItems: "flex-end",
-    gap: 4,
-  },
-  chartBar: {
+  flexOne: {
     flex: 1,
-    borderRadius: 2,
-    minHeight: 20,
-  },
-  chartFootnote: {
-    marginTop: 12,
-    color: "#64748b",
-    fontSize: 12,
-    fontFamily,
-  },
-  metaRow: {
-    marginTop: 14,
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-  },
-  metaPill: {
-    paddingHorizontal: 10,
-    paddingVertical: 7,
-    borderRadius: 5,
-    backgroundColor: "#f1f4f8",
-  },
-  metaPillText: {
-    color: "#58677a",
-    fontSize: 12,
-    fontWeight: "600",
-    fontFamily,
-  },
-  panel: {
-    marginTop: 14,
-    padding: 14,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#e5ebf2",
-    backgroundColor: "#f8fafc",
-    gap: 8,
-  },
-  panelLabel: {
-    color: "#475569",
-    fontSize: 11,
-    fontWeight: "700",
-    letterSpacing: 0.8,
-    textTransform: "uppercase",
-    fontFamily,
-  },
-  panelBody: {
-    marginTop: 8,
-    color: "#0f172a",
-    fontSize: 15,
-    lineHeight: 22,
-    fontWeight: "600",
-    fontFamily,
-  },
-  panelBadges: {
-    alignItems: "flex-end",
-    gap: 8,
-  },
-  panelList: {
-    gap: 6,
-  },
-  panelListItem: {
-    color: "#334155",
-    fontSize: 14,
-    lineHeight: 20,
-    fontFamily,
-  },
-  dualColumn: {
-    marginTop: 16,
-    gap: 12,
-  },
-  evidenceColumn: {
-    padding: 14,
-    borderRadius: 8,
-    backgroundColor: "#f5f7fa",
-    borderWidth: 1,
-    borderColor: "#e6ebf2",
-  },
-  columnTitle: {
-    color: "#0f172a",
-    fontSize: 13,
-    fontWeight: "700",
-    marginBottom: 8,
-    fontFamily,
-  },
-  listLine: {
-    color: "#334155",
-    fontSize: 14,
-    lineHeight: 21,
-    marginTop: 4,
-    fontFamily,
   },
   stack: {
-    gap: 10,
-  },
-  evidenceGroup: {
-    marginTop: 16,
-    gap: 10,
-  },
-  evidenceCard: {
-    padding: 14,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#e4eaf1",
-    backgroundColor: "#ffffff",
-    gap: 10,
-  },
-  evidenceCardCompact: {
-    minHeight: 210,
-    justifyContent: "space-between",
-  },
-  evidenceCardTitle: {
-    color: "#0f172a",
-    fontSize: 16,
-    lineHeight: 20,
-    fontWeight: "800",
-    fontFamily,
-  },
-  evidenceRole: {
-    marginTop: 4,
-    color: "#64748b",
-    fontSize: 12,
-    fontWeight: "700",
-    fontFamily,
-  },
-  evidenceBadgeStack: {
-    alignItems: "flex-end",
-    gap: 6,
-  },
-  compactEvidenceFooter: {
-    gap: 6,
-  },
-  compactEvidenceValue: {
-    color: "#0f172a",
-    fontSize: 18,
-    lineHeight: 22,
-    fontWeight: "800",
-    fontFamily,
-  },
-  compactEvidenceThreshold: {
-    color: "#64748b",
-    fontSize: 12,
-    lineHeight: 16,
-    fontWeight: "700",
-    fontFamily,
-  },
-  statusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 5,
-    borderRadius: 5,
-  },
-  statusPassed: {
-    backgroundColor: "#eaf6ee",
-  },
-  statusNear: {
-    backgroundColor: "#eef6ff",
-  },
-  statusFailed: {
-    backgroundColor: "#f3f4f6",
-  },
-  statusWarning: {
-    backgroundColor: "#fff4e5",
-  },
-  statusBlocked: {
-    backgroundColor: "#fee2e2",
-  },
-  statusPartial: {
-    backgroundColor: "#eef2ff",
-  },
-  statusUnavailable: {
-    backgroundColor: "#e5e7eb",
-  },
-  statusStale: {
-    backgroundColor: "#fef3c7",
-  },
-  statusMock: {
-    backgroundColor: "#e0f2fe",
-  },
-  statusBadgeText: {
-    color: "#0f172a",
-    fontSize: 11,
-    fontWeight: "800",
-    fontFamily,
-  },
-  freshnessBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 5,
-    borderRadius: 5,
-  },
-  freshnessFresh: {
-    backgroundColor: "#eefbf3",
-  },
-  freshnessDelayed: {
-    backgroundColor: "#eef2ff",
-  },
-  freshnessPartial: {
-    backgroundColor: "#fff7ed",
-  },
-  freshnessUnavailable: {
-    backgroundColor: "#f3f4f6",
-  },
-  freshnessStale: {
-    backgroundColor: "#fef3c7",
-  },
-  freshnessMock: {
-    backgroundColor: "#e0f2fe",
-  },
-  freshnessBadgeText: {
-    color: "#334155",
-    fontSize: 11,
-    fontWeight: "700",
-    fontFamily,
-  },
-  evidenceSummary: {
-    color: "#334155",
-    fontSize: 14,
-    lineHeight: 21,
-    fontFamily,
-  },
-  evidenceMetricsRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-  },
-  evidenceRelated: {
-    color: "#64748b",
-    fontSize: 12,
-    lineHeight: 18,
-    fontFamily,
+    gap: 12,
   },
   thresholdWrap: {
     gap: 8,
   },
   thresholdTrack: {
-    height: 10,
-    borderRadius: 999,
-    backgroundColor: "#e8eef5",
+    height: 6,
+    backgroundColor: "#e5e7eb",
+    borderRadius: 3,
     overflow: "hidden",
-    position: "relative",
-  },
-  thresholdMarkerThreshold: {
-    position: "absolute",
-    top: -3,
-    bottom: -3,
-    width: 2,
-    backgroundColor: "#64748b",
-    marginLeft: -1,
   },
   thresholdMarkerCurrent: {
     position: "absolute",
-    top: -5,
-    bottom: -5,
-    width: 4,
-    borderRadius: 4,
-    backgroundColor: "#0f172a",
-    marginLeft: -2,
+    top: 0,
+    bottom: 0,
+    width: 2,
+    backgroundColor: "#111827",
+  },
+  thresholdMarkerThreshold: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    width: 2,
+    backgroundColor: "#9ca3af",
   },
   entryZoneBand: {
     position: "absolute",
     top: 0,
     bottom: 0,
-    borderRadius: 999,
-    backgroundColor: "#dbeafe",
+    backgroundColor: "rgba(16, 185, 129, 0.3)",
   },
   thresholdLegend: {
     flexDirection: "row",
     justifyContent: "space-between",
-    gap: 8,
   },
   thresholdLegendText: {
     color: "#64748b",
-    fontSize: 11,
-    fontWeight: "700",
+    fontSize: 9,
+    fontWeight: "800",
+    textTransform: "uppercase",
+  },
+  freshnessVisual: {
+    gap: 8,
+  },
+  freshnessTrack: {
+    height: 8,
+    borderRadius: 999,
+    backgroundColor: "#e5e7eb",
+  },
+  freshnessVisualText: {
+    color: "#6b7280",
+    fontSize: 12,
+    fontWeight: "600",
     fontFamily,
-  },
-  sparklineOverlay: {
-    height: 42,
-    flexDirection: "row",
-    alignItems: "flex-end",
-    gap: 3,
-    position: "relative",
-    overflow: "hidden",
-  },
-  sparklineBar: {
-    flex: 1,
-    borderRadius: 2,
-    backgroundColor: "#d7e5f6",
-  },
-  sparklineBarActive: {
-    backgroundColor: "#0f172a",
-  },
-  sparklineLine: {
-    position: "absolute",
-    width: 6,
-    height: 2,
-    marginLeft: -3,
-    borderRadius: 999,
-    backgroundColor: "#4f83cc",
-  },
-  sparklineLineMuted: {
-    position: "absolute",
-    width: 5,
-    height: 2,
-    marginLeft: -2.5,
-    borderRadius: 999,
-    backgroundColor: "#93a9bf",
   },
   binaryVisual: {
     flexDirection: "row",
@@ -3554,832 +3860,195 @@ const styles = StyleSheet.create({
     borderRadius: 999,
   },
   binaryDotActive: {
-    backgroundColor: "#0f172a",
+    backgroundColor: "#111827",
   },
   binaryDotMuted: {
-    backgroundColor: "#cbd5e1",
+    backgroundColor: "#d1d5db",
   },
   binaryVisualText: {
-    color: "#475569",
-    fontSize: 13,
-    fontWeight: "700",
-    fontFamily,
-  },
-  freshnessVisual: {
-    gap: 8,
-  },
-  freshnessTrack: {
-    height: 8,
-    borderRadius: 999,
-    backgroundColor: "#dbeafe",
-  },
-  freshnessVisualText: {
-    color: "#475569",
+    color: "#4b5563",
     fontSize: 12,
-    fontWeight: "700",
+    fontWeight: "600",
     fontFamily,
+  },
+  miniTrendVisual: {
+    height: 40,
+  },
+  miniTrendBars: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    gap: 2,
+    height: 30,
+  },
+  miniTrendBar: {
+    flex: 1,
+    backgroundColor: "#d1d5db",
+    borderRadius: 1,
+  },
+  miniTrendBarActive: {
+    backgroundColor: "#111827",
+  },
+  riskGaugeTrack: {
+    height: 6,
+    flexDirection: "row",
+    borderRadius: 3,
+    overflow: "hidden",
+  },
+  riskGaugeSafe: {
+    flex: 3,
+    backgroundColor: "#10b981",
+  },
+  riskGaugeWarn: {
+    flex: 1,
+    backgroundColor: "#f59e0b",
+  },
+  riskGaugeDanger: {
+    flex: 1,
+    backgroundColor: "#ef4444",
   },
   checklistVisual: {
-    gap: 8,
+    gap: 6,
   },
   checklistItem: {
     flexDirection: "row",
-    alignItems: "flex-start",
+    alignItems: "center",
     gap: 8,
   },
   checklistDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 999,
-    marginTop: 5,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
   },
-  checklistDotGood: {
-    backgroundColor: "#16a34a",
-  },
-  checklistDotNeutral: {
-    backgroundColor: "#94a3b8",
-  },
-  checklistDotWarning: {
-    backgroundColor: "#d97706",
-  },
-  checklistDotDanger: {
-    backgroundColor: "#dc2626",
-  },
+  checklistDotGood: { backgroundColor: "#10b981" },
+  checklistDotNeutral: { backgroundColor: "#9ca3af" },
+  checklistDotWarning: { backgroundColor: "#f59e0b" },
+  checklistDotDanger: { backgroundColor: "#ef4444" },
   checklistText: {
+    color: "#4b5563",
+    fontSize: 11,
+    fontWeight: "700",
+  },
+  sparklineOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    flexDirection: "row",
+    alignItems: "flex-end",
+    gap: 1,
+    paddingHorizontal: 2,
+    opacity: 0.4,
+  },
+  sparklineBar: {
     flex: 1,
-    color: "#334155",
-    fontSize: 13,
-    lineHeight: 18,
-    fontFamily,
+    backgroundColor: "#d1d5db",
+    borderRadius: 1,
+  },
+  sparklineBarActive: {
+    backgroundColor: "#111827",
+  },
+  sparklineLine: {
+    position: "absolute",
+    width: 2,
+    height: 2,
+    borderRadius: 1,
+    backgroundColor: "#38bdf8",
+  },
+  sparklineLineMuted: {
+    position: "absolute",
+    width: 2,
+    height: 2,
+    borderRadius: 1,
+    backgroundColor: "#94a3b8",
   },
   eventCountdown: {
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
-    paddingVertical: 2,
   },
   eventCountdownBadge: {
     minWidth: 52,
-    borderRadius: 8,
-    paddingVertical: 10,
     paddingHorizontal: 10,
+    paddingVertical: 10,
+    borderRadius: 14,
     alignItems: "center",
   },
   eventCountdownUrgent: {
-    backgroundColor: "#fff1f2",
+    backgroundColor: "#fff7ed",
   },
   eventCountdownCalm: {
     backgroundColor: "#eff6ff",
   },
   eventCountdownValue: {
-    color: "#0f172a",
+    color: "#111827",
     fontSize: 18,
     fontWeight: "800",
     fontFamily,
   },
   eventCountdownLabel: {
-    color: "#0f172a",
+    color: "#111827",
     fontSize: 13,
-    fontWeight: "800",
+    fontWeight: "700",
     fontFamily,
   },
   eventCountdownMeta: {
-    color: "#64748b",
+    color: "#6b7280",
     fontSize: 12,
     lineHeight: 18,
+    fontWeight: "500",
     fontFamily,
   },
-  riskGaugeTrack: {
-    height: 10,
-    borderRadius: 999,
-    overflow: "hidden",
-    flexDirection: "row",
-    position: "relative",
+  sectionHeader: {
+    gap: 2,
   },
-  riskGaugeSafe: {
-    flex: 1,
-    backgroundColor: "#dcfce7",
-  },
-  riskGaugeWarn: {
-    flex: 1,
-    backgroundColor: "#fef3c7",
-  },
-  riskGaugeDanger: {
-    flex: 1,
-    backgroundColor: "#fee2e2",
-  },
-  miniTrendVisual: {
-    gap: 8,
-  },
-  miniTrendBars: {
-    height: 48,
-    flexDirection: "row",
-    alignItems: "flex-end",
-    gap: 3,
-  },
-  miniTrendBar: {
-    flex: 1,
-    borderRadius: 2,
-    backgroundColor: "#d7e5f6",
-  },
-  miniTrendBarActive: {
-    backgroundColor: "#0f172a",
-  },
-  evidenceEffect: {
-    color: "#0f172a",
-    fontSize: 13,
-    lineHeight: 19,
-    fontWeight: "700",
-    fontFamily,
-  },
-  evidenceWhy: {
-    color: "#475569",
-    fontSize: 13,
-    lineHeight: 20,
-    fontFamily,
-  },
-  recipeMapCard: {
-    padding: 16,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#e4eaf1",
-    backgroundColor: "#ffffff",
-    gap: 12,
-  },
-  recipeMapStats: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-  },
-  recipeMatrix: {
-    gap: 10,
-  },
-  recipeMatrixRow: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: 10,
-  },
-  recipeMatrixTitle: {
-    color: "#0f172a",
-    fontSize: 13,
+  sectionTitle: {
+    color: "#111827",
+    fontSize: 24,
     fontWeight: "800",
-    fontFamily,
   },
-  recipeMatrixBody: {
-    color: "#475569",
-    fontSize: 12,
-    lineHeight: 18,
-    fontFamily,
-  },
-  formulaToggle: {
-    paddingTop: 2,
-  },
-  formulaToggleText: {
-    color: "#0f172a",
+  sectionNote: {
+    color: "#6b7280",
     fontSize: 13,
-    fontWeight: "700",
-    fontFamily,
-  },
-  formulaPanel: {
-    padding: 12,
-    borderRadius: 7,
-    backgroundColor: "#f8fafc",
-    borderWidth: 1,
-    borderColor: "#e4eaf1",
-    gap: 6,
-  },
-  formulaTitle: {
-    color: "#0f172a",
-    fontSize: 13,
-    fontWeight: "800",
-    fontFamily,
-  },
-  formulaBody: {
-    color: "#475569",
-    fontSize: 13,
-    lineHeight: 19,
-    fontFamily,
-  },
-  formulaMeta: {
-    color: "#64748b",
-    fontSize: 12,
-    lineHeight: 18,
-    fontFamily,
-  },
-  priorityStack: {
-    alignItems: "flex-end",
-    gap: 8,
-  },
-  priorityBadge: {
-    borderRadius: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 7,
-  },
-  priorityHigh: {
-    backgroundColor: "#dd5a5f",
-  },
-  priorityMedium: {
-    backgroundColor: "#c9872d",
-  },
-  priorityLow: {
-    backgroundColor: "#c8d2de",
-  },
-  priorityBadgeText: {
-    color: "#ffffff",
-    fontSize: 11,
-    fontWeight: "700",
-    fontFamily,
-  },
-  timestampText: {
-    color: "#64748b",
-    fontSize: 12,
-    fontFamily,
-  },
-  metaLine: {
-    marginTop: 10,
-    color: "#475569",
-    fontSize: 13,
-    lineHeight: 20,
-    fontFamily,
-  },
-  analysisActionRow: {
-    marginTop: 12,
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-  },
-  stockGroupSummary: {
-    marginTop: 8,
-    color: "#334155",
-    fontSize: 13,
-    lineHeight: 19,
-    fontWeight: "600",
-    fontFamily,
-  },
-  stockGroupStats: {
-    marginTop: 12,
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-  },
-  stockGroupMetricRow: {
-    marginTop: 12,
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 10,
-  },
-  alertMiniRow: {
-    paddingVertical: 10,
-    gap: 10,
-    flexDirection: "row",
-    alignItems: "flex-start",
-    borderBottomWidth: 1,
-    borderBottomColor: "#edf2f7",
-  },
-  alertMiniTitle: {
-    color: "#0f172a",
-    fontSize: 13,
-    lineHeight: 18,
-    fontWeight: "800",
-    fontFamily,
-  },
-  alertMiniBody: {
-    marginTop: 4,
-    color: "#475569",
-    fontSize: 12,
-    lineHeight: 17,
-    fontFamily,
-  },
-  stockGroupEvidenceRow: {
-    marginTop: 12,
-    gap: 10,
-  },
-  stockGroupEvidenceCol: {
-    padding: 12,
-    borderRadius: 7,
-    borderWidth: 1,
-    borderColor: "#e7edf4",
-    backgroundColor: "#f8fafc",
-  },
-  stockGroupLabel: {
-    color: "#64748b",
-    fontSize: 11,
-    fontWeight: "700",
-    letterSpacing: 0.5,
-    textTransform: "uppercase",
-    fontFamily,
-  },
-  stockGroupLine: {
-    marginTop: 6,
-    color: "#0f172a",
-    fontSize: 13,
-    lineHeight: 18,
-    fontWeight: "600",
-    fontFamily,
-  },
-  eyeRow: {
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#edf2f7",
-    flexDirection: "row",
-    gap: 12,
-    alignItems: "flex-start",
-  },
-  eyeRowTitle: {
-    color: "#0f172a",
-    fontSize: 14,
-    fontWeight: "800",
-    fontFamily,
-  },
-  eyeRowBody: {
-    marginTop: 4,
-    color: "#475569",
-    fontSize: 12,
-    lineHeight: 17,
-    fontFamily,
-  },
-  actionRow: {
-    marginTop: 14,
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-  },
-  button: {
-    minHeight: 42,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  buttonPrimary: {
-    backgroundColor: "#0f172a",
-  },
-  buttonSecondary: {
-    backgroundColor: "#eef3f8",
-  },
-  buttonGhost: {
-    backgroundColor: "#fbfcfe",
-    borderWidth: 1,
-    borderColor: "#e1e7ef",
-  },
-  buttonText: {
-    fontSize: 13,
-    fontWeight: "700",
-    fontFamily,
-  },
-  buttonPrimaryText: {
-    color: "#f8fafc",
-  },
-  buttonSecondaryText: {
-    color: "#1f2937",
-  },
-  buttonGhostText: {
-    color: "#334155",
-  },
-  choiceRow: {
-    gap: 8,
-  },
-  choiceChip: {
-    paddingHorizontal: 12,
-    paddingVertical: 9,
-    borderRadius: 6,
-    backgroundColor: "#f2f5f8",
-    borderWidth: 1,
-    borderColor: "#e3e9f0",
-  },
-  choiceChipActive: {
-    backgroundColor: "#0f172a",
-    borderColor: "#0f172a",
-  },
-  choiceChipText: {
-    color: "#46607f",
-    fontSize: 13,
-    fontWeight: "700",
-    fontFamily,
-  },
-  choiceChipTextActive: {
-    color: "#f8fafc",
-  },
-  inputLabel: {
-    marginTop: 6,
-    color: "#64748b",
-    fontSize: 12,
-    fontWeight: "700",
-    letterSpacing: 0.5,
-    textTransform: "uppercase",
-    fontFamily,
-  },
-  input: {
-    minHeight: 46,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: "#e1e7ef",
-    backgroundColor: "#ffffff",
-    paddingHorizontal: 14,
-    paddingVertical: 11,
-    color: "#0f172a",
-    fontSize: 15,
-    fontFamily,
-  },
-  textArea: {
-    minHeight: 96,
-    textAlignVertical: "top",
-  },
-  divider: {
-    marginVertical: 18,
-    height: 1,
-    backgroundColor: "#e2edf7",
-  },
-  formTitle: {
-    color: "#0f172a",
-    fontSize: 20,
-    lineHeight: 24,
-    fontWeight: "800",
-    fontFamily,
-  },
-  formNote: {
-    marginTop: 4,
-    color: "#64748b",
-    fontSize: 14,
-    lineHeight: 20,
-    fontFamily,
-  },
-  validationText: {
-    color: "#b91c1c",
-    fontSize: 12,
-    lineHeight: 18,
-    fontWeight: "700",
-    fontFamily,
-  },
-  templateCard: {
-    width: 220,
-    padding: 14,
-    borderRadius: 8,
-    backgroundColor: "#f5f7fa",
-    borderWidth: 1,
-    borderColor: "#e5ebf2",
-    gap: 6,
-  },
-  templateCardActive: {
-    backgroundColor: "#0f172a",
-    borderColor: "#0f172a",
-  },
-  templateTitle: {
-    color: "#0f172a",
-    fontSize: 14,
-    fontWeight: "800",
-    fontFamily,
-  },
-  templateTitleActive: {
-    color: "#f8fafc",
-  },
-  templateSubtitle: {
-    color: "#64748b",
-    fontSize: 12,
-    lineHeight: 18,
-    fontFamily,
-  },
-  templateSubtitleActive: {
-    color: "#cbd5e1",
-  },
-  previewCard: {
-    marginTop: 14,
-    padding: 14,
-    borderRadius: 8,
-    backgroundColor: "#f4f7fb",
-    borderWidth: 1,
-    borderColor: "#dde6f0",
-  },
-  previewLabel: {
-    color: "#526276",
-    fontSize: 11,
-    fontWeight: "700",
-    letterSpacing: 0.8,
-    textTransform: "uppercase",
-    fontFamily,
-  },
-  previewText: {
-    marginTop: 8,
-    color: "#0f172a",
-    fontSize: 15,
-    lineHeight: 22,
-    fontWeight: "700",
-    fontFamily,
-  },
-  previewHint: {
-    marginTop: 6,
-    color: "#475569",
-    fontSize: 13,
-    lineHeight: 20,
-    fontFamily,
-  },
-  previewDisclosure: {
-    marginTop: 14,
-    color: "#7c8ba1",
-    fontSize: 12,
-    lineHeight: 18,
-    fontWeight: "700",
-    fontFamily,
-  },
-  kindPill: {
-    alignSelf: "flex-start",
-    overflow: "hidden",
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 6,
-    fontSize: 11,
-    fontWeight: "700",
-    textTransform: "uppercase",
-    fontFamily,
-  },
-  conditionRequired: {
-    backgroundColor: "#e8eef6",
-    color: "#40556d",
-  },
-  conditionSupporting: {
-    backgroundColor: "#e7f3eb",
-    color: "#276245",
-  },
-  conditionNegative: {
-    backgroundColor: "#f7ecd9",
-    color: "#8a5a20",
-  },
-  conditionDisqualifier: {
-    backgroundColor: "#f8e3e5",
-    color: "#9a3740",
-  },
-  selectChip: {
-    minWidth: 142,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    borderRadius: 6,
-    backgroundColor: "#f5f7fa",
-    borderWidth: 1,
-    borderColor: "#e4eaf1",
-    gap: 4,
-  },
-  selectChipActive: {
-    backgroundColor: "#0f172a",
-    borderColor: "#0f172a",
-  },
-  selectChipTitle: {
-    color: "#0f172a",
-    fontSize: 14,
-    fontWeight: "700",
-    fontFamily,
-  },
-  selectChipTitleActive: {
-    color: "#f8fafc",
-  },
-  selectChipSubtitle: {
-    color: "#64748b",
-    fontSize: 12,
-    fontFamily,
-  },
-  selectChipSubtitleActive: {
-    color: "#cbd5e1",
-  },
-  stepper: {
-    gap: 6,
-  },
-  stepperLabel: {
-    color: "#475569",
-    fontSize: 12,
-    fontWeight: "700",
-    textTransform: "uppercase",
-    letterSpacing: 0.4,
-    fontFamily,
-  },
-  stepperTrack: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: "#e1e7ef",
-    borderRadius: 6,
-    backgroundColor: "#ffffff",
-    overflow: "hidden",
-  },
-  stepperButton: {
-    width: 44,
-    minHeight: 46,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#f3f6fa",
-  },
-  stepperButtonText: {
-    color: "#0f172a",
-    fontSize: 20,
-    fontWeight: "700",
-    fontFamily,
-  },
-  stepperValueWrap: {
-    flex: 1,
-    minHeight: 46,
-    alignItems: "center",
-    justifyContent: "center",
-    borderLeftWidth: 1,
-    borderRightWidth: 1,
-    borderColor: "#e1e7ef",
-  },
-  stepperValue: {
-    color: "#0f172a",
-    fontSize: 15,
-    fontWeight: "700",
-    fontFamily,
-  },
-  dualDenseGrid: {
-    marginTop: 12,
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-  },
-  stockGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 10,
-  },
-  recentStockStrip: {
-    marginBottom: 12,
-    gap: 8,
-  },
-  stockGridItem: {
-    width: "48.5%",
-  },
-  stockAnalysisBoard: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 10,
-  },
-  stockAnalysisBoardItem: {
-    width: "48.5%",
-  },
-  groupHeaderButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
-  groupHeaderToggle: {
-    color: "#0f172a",
-    fontSize: 12,
-    fontWeight: "700",
-    textTransform: "uppercase",
-    letterSpacing: 0.5,
-    fontFamily,
-  },
-  evidenceGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 10,
-  },
-  evidenceGridItem: {
-    width: "48.5%",
-  },
-  denseStat: {
-    minWidth: 120,
-    flexGrow: 1,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    borderWidth: 1,
-    borderColor: "#e4eaf1",
-    backgroundColor: "#f8fafc",
-    borderRadius: 6,
-  },
-  denseStatStrong: {
-    borderColor: "#d7e2ef",
-    backgroundColor: "#ffffff",
-  },
-  denseStatRisk: {
-    borderColor: "#edd8da",
-    backgroundColor: "#fff7f7",
-  },
-  denseStatLabel: {
-    color: "#64748b",
-    fontSize: 11,
-    fontWeight: "700",
-    letterSpacing: 0.5,
-    textTransform: "uppercase",
-    fontFamily,
-  },
-  denseStatValue: {
-    marginTop: 5,
-    color: "#0f172a",
-    fontSize: 14,
-    lineHeight: 18,
-    fontWeight: "700",
-    fontFamily,
-  },
-  compactMetricRow: {
-    marginTop: 12,
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 10,
-  },
-  compactMetricText: {
-    color: "#475569",
-    fontSize: 12,
-    fontWeight: "700",
-    fontFamily,
-  },
-  fabMenu: {
-    position: "absolute",
-    right: 20,
-    bottom: 116,
-    gap: 10,
-    alignItems: "flex-end",
-  },
-  fabMenuItem: {
-    paddingHorizontal: 14,
-    paddingVertical: 11,
-    borderRadius: 8,
-    backgroundColor: "#0f172a",
-    borderWidth: 1,
-    borderColor: "#1f2937",
-  },
-  fabMenuText: {
-    color: "#f8fafc",
-    fontSize: 13,
-    fontWeight: "700",
-    fontFamily,
-  },
-  fabButton: {
-    position: "absolute",
-    right: 20,
-    bottom: 86,
-    width: 58,
-    height: 58,
-    borderRadius: 12,
-    backgroundColor: "#111827",
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderColor: "#1f2937",
-  },
-  fabButtonText: {
-    color: "#f8fafc",
-    fontSize: 28,
-    lineHeight: 30,
-    fontWeight: "400",
-    fontFamily,
-  },
-  bottomNav: {
-    position: "absolute",
-    left: 14,
-    right: 14,
-    bottom: 16,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingHorizontal: 6,
-    paddingVertical: 10,
-    borderRadius: 12,
-    backgroundColor: "rgba(255,255,255,0.96)",
-    borderWidth: 1,
-    borderColor: "#e2e8f0",
-  },
-  navItem: {
-    flex: 1,
-    alignItems: "center",
-    gap: 6,
-  },
-  navIndicator: {
-    width: 22,
-    height: 3,
-    borderRadius: 2,
-    backgroundColor: "transparent",
-  },
-  navIndicatorActive: {
-    backgroundColor: "#111827",
-  },
-  navLabel: {
-    color: "#64748b",
-    fontSize: 11,
-    fontWeight: "700",
-    fontFamily,
-  },
-  navLabelActive: {
-    color: "#0f172a",
+    fontWeight: "500",
   },
   windowBackdrop: {
     ...StyleSheet.absoluteFillObject,
     justifyContent: "flex-end",
-    backgroundColor: "rgba(15, 23, 42, 0.2)",
+    backgroundColor: "rgba(17, 24, 39, 0.18)",
   },
   windowDismissLayer: {
     flex: 1,
   },
   windowPanel: {
     maxHeight: "82%",
-    borderTopLeftRadius: 18,
-    borderTopRightRadius: 18,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
     backgroundColor: "#ffffff",
     borderTopWidth: 1,
-    borderColor: "#e5ebf2",
-    paddingHorizontal: 16,
-    paddingTop: 16,
+    borderColor: "#eceef2",
+    paddingHorizontal: 18,
+    paddingTop: 18,
     paddingBottom: 28,
     gap: 12,
   },
   windowScroll: {
     flexGrow: 0,
+  },
+  conditionRequired: {
+    backgroundColor: "#1e293b",
+    borderWidth: 1,
+    borderColor: "#38bdf8",
+  },
+  conditionSupporting: {
+    backgroundColor: "#1e293b",
+    borderWidth: 1,
+    borderColor: "#10b981",
+  },
+  conditionNegative: {
+    backgroundColor: "#1e293b",
+    borderWidth: 1,
+    borderColor: "#f59e0b",
+  },
+  conditionDisqualifier: {
+    backgroundColor: "#1e293b",
+    borderWidth: 1,
+    borderColor: "#ef4444",
   },
 });
