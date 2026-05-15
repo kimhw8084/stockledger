@@ -575,6 +575,8 @@ const Input = ({
   multiline,
   keyboardType,
   autoCapitalize,
+  onSubmitEditing,
+  returnKeyType,
 }: {
   value: string;
   onChangeText: (value: string) => void;
@@ -582,6 +584,8 @@ const Input = ({
   multiline?: boolean;
   keyboardType?: "default" | "numeric";
   autoCapitalize?: "none" | "sentences" | "characters";
+  onSubmitEditing?: () => void;
+  returnKeyType?: "done" | "go" | "next" | "search";
 }) => (
   <TextInput
     value={value}
@@ -591,6 +595,8 @@ const Input = ({
     multiline={multiline}
     keyboardType={keyboardType}
     autoCapitalize={autoCapitalize}
+    onSubmitEditing={onSubmitEditing}
+    returnKeyType={returnKeyType}
     style={[styles.input, multiline ? styles.textArea : null]}
   />
 );
@@ -1815,6 +1821,13 @@ export default function App() {
         selectedStockSummary.snapshot.stabilizationScore ?? 50,
       )
     : [];
+  const selectedStockHeroRange = selectedStockTrendSeries.length
+    ? {
+        low: Math.min(...selectedStockTrendSeries),
+        high: Math.max(...selectedStockTrendSeries),
+        latest: selectedStockTrendSeries[selectedStockTrendSeries.length - 1],
+      }
+    : null;
   const recentStocks = recentStockIds
     .map((id) => stockDirectory.find((item) => item.stock.id === id))
     .filter((item): item is NonNullable<typeof item> => Boolean(item));
@@ -2213,6 +2226,11 @@ export default function App() {
                         onChangeText={setStockSearch}
                         placeholder="Search ticker or company"
                         autoCapitalize="characters"
+                        returnKeyType="search"
+                        onSubmitEditing={() => {
+                          if (!topSuggestionId) return;
+                          openStockContext({ stockId: topSuggestionId });
+                        }}
                       />
                     </View>
                     {stockSearch.trim().length > 0 ? (
@@ -2228,6 +2246,9 @@ export default function App() {
                       </Pressable>
                     ) : null}
                   </View>
+                  {hasStockQuery && topSuggestionId ? (
+                    <Text style={styles.searchAssistText}>Press return to open the top match immediately.</Text>
+                  ) : null}
                   {stockSuggestions.length > 0 ? (
                     hasStockQuery ? (
                       <View style={styles.stockSuggestionList}>
@@ -2348,23 +2369,30 @@ export default function App() {
                       </View>
                       <View style={styles.stockTrendSummaryRow}>
                         <View style={styles.stockTrendSummaryCell}>
-                          <Text style={styles.stockTrendSummaryLabel}>State</Text>
+                          <Text style={styles.stockTrendSummaryLabel}>Freshness</Text>
                           <Text style={styles.stockTrendSummaryValue}>
-                            {selectedStockSummary.dominantEye?.lastEvaluation?.currentState ?? "Unwatched"}
+                            {selectedStockSummary.snapshot?.freshness ?? "Unavailable"}
                           </Text>
                         </View>
                         <View style={styles.stockTrendSummaryCell}>
-                          <Text style={styles.stockTrendSummaryLabel}>Urgency</Text>
+                          <Text style={styles.stockTrendSummaryLabel}>Range</Text>
                           <Text style={styles.stockTrendSummaryValue}>
-                            {selectedStockSummary.dominantEye?.lastEvaluation?.actionUrgency ?? "None"}
+                            {selectedStockHeroRange ? `${Math.round(selectedStockHeroRange.high - selectedStockHeroRange.low)} pts` : "--"}
                           </Text>
                         </View>
                         <View style={styles.stockTrendSummaryCell}>
-                          <Text style={styles.stockTrendSummaryLabel}>Alerts</Text>
-                          <Text style={styles.stockTrendSummaryValue}>{selectedStockSummary.openAlerts.length}</Text>
+                          <Text style={styles.stockTrendSummaryLabel}>Setup</Text>
+                          <Text style={styles.stockTrendSummaryValue}>
+                            {selectedStockSummary.snapshot?.isMock ? "Mock" : "Provider"}
+                          </Text>
                         </View>
                       </View>
                       <View style={styles.stockTrendChart}>
+                        <View style={styles.stockTrendGrid}>
+                          <View style={styles.stockTrendGridLine} />
+                          <View style={styles.stockTrendGridLine} />
+                          <View style={styles.stockTrendGridLine} />
+                        </View>
                         {selectedStockTrendSeries.map((point, index) => (
                           <Animated.View
                             key={`trend-${selectedStockSummary.stock.id}-${index}`}
@@ -2374,6 +2402,29 @@ export default function App() {
                             ]}
                           />
                         ))}
+                        <View style={styles.stockTrendLineOverlay}>
+                          {selectedStockTrendSeries.map((point, index) => (
+                            <View
+                              key={`trend-dot-${selectedStockSummary.stock.id}-${index}`}
+                              style={[
+                                styles.stockTrendLineDot,
+                                {
+                                  left: `${(index / Math.max(selectedStockTrendSeries.length - 1, 1)) * 100}%`,
+                                  bottom: `${14 + point * 0.68}%`,
+                                },
+                                index === selectedStockTrendSeries.length - 1 ? styles.stockTrendLineDotActive : null,
+                              ]}
+                            />
+                          ))}
+                        </View>
+                        {selectedStockHeroRange ? (
+                          <View
+                            style={[
+                              styles.stockTrendCurrentMarker,
+                              { bottom: `${14 + selectedStockHeroRange.latest * 0.68}%` },
+                            ]}
+                          />
+                        ) : null}
                       </View>
                       <View style={styles.stockTrendLegend}>
                         <Text style={styles.stockTrendLegendText}>Trend</Text>
@@ -2383,8 +2434,9 @@ export default function App() {
                         <Text style={styles.stockTrendLegendText}>{analysisLookback}</Text>
                       </View>
                       <Text style={styles.stockTrendInsight}>
-                        {selectedStockSummary.dominantEye?.lastEvaluation?.whyNow ??
-                          "No active Eye explanation yet. This board is showing the stock facts only."}
+                        {selectedStockSummary.snapshot
+                          ? `Price and parameter tiles below reflect the same ${analysisLookback} view with ${analysisBenchmark} as the comparison context.`
+                          : "No snapshot is available for this stock yet."}
                       </Text>
                     </View>
                     <View style={styles.homeSummaryStrip}>
@@ -3111,6 +3163,28 @@ export default function App() {
             subtitle={`${selectedStockSummary?.stock.symbol ?? "Stock"} · ${selectedEvidenceCard.freshness}${selectedEvidenceIndex >= 0 ? ` · ${selectedEvidenceIndex + 1} of ${selectedStockAnalysisCards.length}` : ""}`}
             onClose={() => setSelectedEvidenceCard(null)}
           >
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.choiceRow}>
+              {selectedStockAnalysisCards.map((card) => (
+                <Pressable
+                  key={`jump-${card.id}`}
+                  onPress={() => setSelectedEvidenceCard(card)}
+                  style={[
+                    styles.metricJumpChip,
+                    selectedEvidenceCard.id === card.id ? styles.metricJumpChipActive : null,
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.metricJumpChipText,
+                      selectedEvidenceCard.id === card.id ? styles.metricJumpChipTextActive : null,
+                    ]}
+                    numberOfLines={1}
+                  >
+                    {card.title}
+                  </Text>
+                </Pressable>
+              ))}
+            </ScrollView>
             <View style={styles.actionRow}>
               <Button label="Previous" tone="secondary" onPress={() => cycleEvidenceCard(-1)} disabled={selectedEvidenceIndex <= 0} />
               <Button
@@ -3121,6 +3195,12 @@ export default function App() {
                   selectedEvidenceIndex < 0 || selectedEvidenceIndex >= selectedStockAnalysisCards.length - 1
                 }
               />
+            </View>
+            <View style={styles.detailMetricStrip}>
+              <DenseStat label="Current" value={selectedEvidenceCard.metric.currentLabel} tone="strong" />
+              <DenseStat label="Threshold" value={selectedEvidenceCard.metric.thresholdLabel ?? "Context"} />
+              <DenseStat label="Freshness" value={selectedEvidenceCard.freshness} tone={selectedEvidenceCard.freshness === "Fresh" ? "strong" : "neutral"} />
+              <DenseStat label="Source" value={selectedEvidenceCard.sourceType} />
             </View>
             <EvidenceCardView card={selectedEvidenceCard} />
           </WindowPanel>
@@ -3370,6 +3450,12 @@ const styles = StyleSheet.create({
     color: "#111827",
     fontSize: 12,
     fontWeight: "700",
+    fontFamily,
+  },
+  searchAssistText: {
+    color: "#6b7280",
+    fontSize: 12,
+    fontWeight: "500",
     fontFamily,
   },
   stockSuggestionPill: {
@@ -3641,10 +3727,49 @@ const styles = StyleSheet.create({
     gap: 4,
     overflow: "hidden",
   },
+  stockTrendGrid: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "space-between",
+    paddingVertical: 18,
+  },
+  stockTrendGridLine: {
+    height: 1,
+    backgroundColor: "#eef1f5",
+  },
   stockTrendBar: {
     flex: 1,
     borderRadius: 999,
     backgroundColor: "#111827",
+  },
+  stockTrendLineOverlay: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  stockTrendLineDot: {
+    position: "absolute",
+    width: 4,
+    height: 4,
+    borderRadius: 999,
+    marginLeft: -2,
+    marginBottom: -2,
+    backgroundColor: "#9ca3af",
+  },
+  stockTrendLineDotActive: {
+    width: 8,
+    height: 8,
+    marginLeft: -4,
+    marginBottom: -4,
+    backgroundColor: "#111827",
+    borderWidth: 2,
+    borderColor: "#ffffff",
+  },
+  stockTrendCurrentMarker: {
+    position: "absolute",
+    left: 8,
+    right: 8,
+    height: 1,
+    borderStyle: "dashed",
+    borderWidth: 1,
+    borderColor: "rgba(17, 24, 39, 0.14)",
   },
   stockTrendLegend: {
     flexDirection: "row",
@@ -3784,6 +3909,33 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: "700",
     fontFamily,
+  },
+  metricJumpChip: {
+    paddingHorizontal: 12,
+    minHeight: 34,
+    borderRadius: 12,
+    backgroundColor: "#f3f4f6",
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+    justifyContent: "center",
+  },
+  metricJumpChipActive: {
+    backgroundColor: "#111827",
+    borderColor: "#111827",
+  },
+  metricJumpChipText: {
+    color: "#4b5563",
+    fontSize: 12,
+    fontWeight: "700",
+    fontFamily,
+  },
+  metricJumpChipTextActive: {
+    color: "#ffffff",
+  },
+  detailMetricStrip: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
   },
   freshnessDot: {
     width: 6,
