@@ -652,6 +652,56 @@ const HorizontalChoice = <T extends string>({
   </ScrollView>
 );
 
+const StepFlow = ({
+  steps,
+  current,
+  onSelect,
+}: {
+  steps: readonly RecipeBuilderStep[];
+  current: RecipeBuilderStep;
+  onSelect: (step: RecipeBuilderStep) => void;
+}) => {
+  const currentIndex = steps.indexOf(current);
+
+  return (
+    <View style={styles.stepFlow}>
+      {steps.map((step, index) => {
+        const active = step === current;
+        const complete = index < currentIndex;
+
+        return (
+          <React.Fragment key={step}>
+            {index > 0 ? (
+              <View style={[styles.stepConnector, complete ? styles.stepConnectorActive : null]} />
+            ) : null}
+            <Pressable onPress={() => onSelect(step)} style={styles.stepNode}>
+              <View
+                style={[
+                  styles.stepDot,
+                  active ? styles.stepDotActive : null,
+                  complete ? styles.stepDotComplete : null,
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.stepDotText,
+                    active || complete ? styles.stepDotTextActive : null,
+                  ]}
+                >
+                  {index + 1}
+                </Text>
+              </View>
+              <Text style={[styles.stepLabel, active ? styles.stepLabelActive : null]} numberOfLines={1}>
+                {step}
+              </Text>
+            </Pressable>
+          </React.Fragment>
+        );
+      })}
+    </View>
+  );
+};
+
 const statusTone = (status: VisualEvidenceCard["status"]) => {
   switch (status) {
     case "Passed":
@@ -1227,23 +1277,44 @@ const WindowPanel = ({
   subtitle?: string;
   onClose: () => void;
   children: React.ReactNode;
-}) => (
-  <View style={styles.windowBackdrop}>
-    <Pressable style={styles.windowDismissLayer} onPress={onClose} />
-    <View style={styles.windowPanel}>
-      <View style={styles.inlineBetween}>
-        <View style={styles.flexOne}>
-          <Text style={styles.cardTitle}>{title}</Text>
-          {subtitle ? <Text style={styles.cardBody}>{subtitle}</Text> : null}
+}) => {
+  const overlayOpacity = useRef(new Animated.Value(0)).current;
+  const panelTranslateY = useRef(new Animated.Value(28)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(overlayOpacity, {
+        toValue: 1,
+        duration: 220,
+        useNativeDriver: true,
+      }),
+      Animated.timing(panelTranslateY, {
+        toValue: 0,
+        duration: 260,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [overlayOpacity, panelTranslateY]);
+
+  return (
+    <Animated.View style={[styles.windowBackdrop, { opacity: overlayOpacity }]}>
+      <Pressable style={styles.windowDismissLayer} onPress={onClose} />
+      <Animated.View style={[styles.windowPanel, { transform: [{ translateY: panelTranslateY }] }]}>
+        <View style={styles.windowGrabber} />
+        <View style={styles.inlineBetween}>
+          <View style={styles.flexOne}>
+            <Text style={styles.cardTitle}>{title}</Text>
+            {subtitle ? <Text style={styles.cardBody}>{subtitle}</Text> : null}
+          </View>
+          <Button label="Done" tone="ghost" onPress={onClose} />
         </View>
-        <Button label="Close" tone="ghost" onPress={onClose} />
-      </View>
-      <ScrollView style={styles.windowScroll} contentContainerStyle={styles.stack} showsVerticalScrollIndicator={false}>
-        {children}
-      </ScrollView>
-    </View>
-  </View>
-);
+        <ScrollView style={styles.windowScroll} contentContainerStyle={styles.stack} showsVerticalScrollIndicator={false}>
+          {children}
+        </ScrollView>
+      </Animated.View>
+    </Animated.View>
+  );
+};
 
 const StockTriageCard = ({
   item,
@@ -1508,12 +1579,8 @@ export default function App() {
   }, [eyesSorted, selectedEyeId]);
 
   useEffect(() => {
-    if (!selectedStockId && stockDirectory[0]) {
-      setSelectedStockId(stockDirectory[0].stock.id);
-      return;
-    }
     if (selectedStockId && !stockDirectory.some((item) => item.stock.id === selectedStockId)) {
-      setSelectedStockId(stockDirectory[0]?.stock.id ?? "");
+      setSelectedStockId("");
     }
   }, [selectedStockId, stockDirectory]);
 
@@ -1578,9 +1645,7 @@ export default function App() {
   const selectedEye = eyesSorted.find((eye) => eye.id === selectedEyeId) ?? eyesSorted[0];
   const selectedStockSummary =
     filteredStockDirectory.find((item) => item.stock.id === selectedStockId) ??
-    stockDirectory.find((item) => item.stock.id === selectedStockId) ??
-    filteredStockDirectory[0] ??
-    stockDirectory[0];
+    stockDirectory.find((item) => item.stock.id === selectedStockId);
   const selectedTemplate =
     conditionLibrary.find((item) => item.id === conditionBuilder.templateId) ?? conditionLibrary[0];
   const selectedOperatorOptions = operatorOptionsForTemplate(selectedTemplate);
@@ -1640,13 +1705,18 @@ export default function App() {
       title: card.title,
     })),
   );
+  const selectedStockTrendSeries = selectedStockSummary?.snapshot
+    ? buildChartSeries(
+        selectedStockSummary.snapshot.price,
+        selectedStockSummary.snapshot.drawdownPct,
+        selectedStockSummary.snapshot.stabilizationScore ?? 50,
+      )
+    : [];
   const recentStocks = recentStockIds
     .map((id) => stockDirectory.find((item) => item.stock.id === id))
     .filter((item): item is NonNullable<typeof item> => Boolean(item));
-
-  const stockSuggestions = (
-    deferredStockSearch.trim().length > 0 ? filteredStockDirectory : recentStocks.length > 0 ? recentStocks : stockDirectory
-  ).slice(0, 6);
+  const hasStockQuery = deferredStockSearch.trim().length > 0;
+  const stockSuggestions = (hasStockQuery ? filteredStockDirectory : recentStocks).slice(0, 6);
 
   const activeEyesInventory = eyesSorted.filter(
     (eye) => !["Not Relevant", "Thesis Broken"].includes(eye.lastEvaluation?.currentState ?? "Not Relevant"),
@@ -1922,7 +1992,6 @@ export default function App() {
         <View style={styles.topBar}>
           <View>
             <Text style={styles.topBarTitle}>{tab}</Text>
-            <Text style={styles.topBarSubtitle}>Current workspace</Text>
           </View>
           <Pressable
             onPress={() => {
@@ -1943,7 +2012,7 @@ export default function App() {
           {tab === "Home" ? (
             <>
               <Reveal>
-                <SectionHeader title="Home" note="What needs attention now, grouped by stock and kept compact." />
+                <SectionHeader note="What needs attention now, grouped by stock and kept compact." />
                 <View style={styles.homeSummaryStrip}>
                   <DenseStat label="Open alerts" value={`${openAlerts}`} tone={openAlerts > 0 ? "risk" : "strong"} />
                   <DenseStat label="Urgent stocks" value={`${homeUrgentStocks.length}`} tone={homeUrgentStocks.length > 0 ? "risk" : "neutral"} />
@@ -2022,36 +2091,53 @@ export default function App() {
           {tab === "Stocks" ? (
             <>
               <Reveal>
-                <SectionHeader title="Stocks" note="Search a stock and immediately inspect the same visual board every time." />
+                <SectionHeader note="Search a stock and immediately inspect the same visual board every time." />
                 <View style={styles.stockSearchShell}>
-                  <Input
-                    value={stockSearch}
-                    onChangeText={setStockSearch}
-                    placeholder="Search ticker or company"
-                    autoCapitalize="characters"
-                  />
-                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.choiceRow}>
-                    {stockSuggestions.map((item) => (
-                      <Pressable
-                        key={`suggest-${item.stock.id}`}
-                        onPress={() => openStockContext({ stockId: item.stock.id })}
-                        style={[styles.stockSuggestionPill, selectedStockSummary?.stock.id === item.stock.id ? styles.stockSuggestionPillActive : null]}
-                      >
-                        <Text
-                          style={[styles.stockSuggestionSymbol, selectedStockSummary?.stock.id === item.stock.id ? styles.stockSuggestionSymbolActive : null]}
-                          numberOfLines={1}
+                  <View style={styles.stockSearchHeader}>
+                    <View style={styles.flexOne}>
+                      <Input
+                        value={stockSearch}
+                        onChangeText={setStockSearch}
+                        placeholder="Search ticker or company"
+                        autoCapitalize="characters"
+                      />
+                    </View>
+                    <Button label="Add" tone="secondary" onPress={() => setStockComposerOpen(true)} />
+                  </View>
+                  <Text style={styles.suggestionLabel}>{hasStockQuery ? "Suggestions" : "Recent search"}</Text>
+                  {stockSuggestions.length > 0 ? (
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.choiceRow}>
+                      {stockSuggestions.map((item) => (
+                        <Pressable
+                          key={`suggest-${item.stock.id}`}
+                          onPress={() => openStockContext({ stockId: item.stock.id })}
+                          style={[styles.stockSuggestionPill, selectedStockSummary?.stock.id === item.stock.id ? styles.stockSuggestionPillActive : null]}
                         >
-                          {item.stock.symbol}
-                        </Text>
-                        <Text
-                          style={[styles.stockSuggestionName, selectedStockSummary?.stock.id === item.stock.id ? styles.stockSuggestionNameActive : null]}
-                          numberOfLines={1}
-                        >
-                          {item.stock.name}
-                        </Text>
-                      </Pressable>
-                    ))}
-                  </ScrollView>
+                          <Text
+                            style={[styles.stockSuggestionSymbol, selectedStockSummary?.stock.id === item.stock.id ? styles.stockSuggestionSymbolActive : null]}
+                            numberOfLines={1}
+                          >
+                            {item.stock.symbol}
+                          </Text>
+                          <Text
+                            style={[styles.stockSuggestionName, selectedStockSummary?.stock.id === item.stock.id ? styles.stockSuggestionNameActive : null]}
+                            numberOfLines={1}
+                          >
+                            {item.stock.name}
+                          </Text>
+                        </Pressable>
+                      ))}
+                    </ScrollView>
+                  ) : (
+                    <View style={styles.emptySearchState}>
+                      <Text style={styles.emptySearchTitle}>{hasStockQuery ? "No matching stocks yet" : "No recent search yet"}</Text>
+                      <Text style={styles.emptySearchBody}>
+                        {hasStockQuery
+                          ? "Try another ticker or company name."
+                          : "Search a stock to open its visual analysis board."}
+                      </Text>
+                    </View>
+                  )}
                 </View>
               </Reveal>
 
@@ -2063,7 +2149,43 @@ export default function App() {
                         <Text style={styles.stockHeroSymbol}>{selectedStockSummary.stock.symbol}</Text>
                         <Text style={styles.stockHeroName}>{selectedStockSummary.stock.name}</Text>
                       </View>
-                      <Button label="Add Stock" tone="secondary" onPress={() => setStockComposerOpen(true)} />
+                    </View>
+                    <View style={styles.stockTrendHero}>
+                      <View style={styles.stockTrendHeader}>
+                        <View>
+                          <Text style={styles.stockTrendPrice}>
+                            ${selectedStockSummary.snapshot ? selectedStockSummary.snapshot.price.toFixed(2) : "--"}
+                          </Text>
+                          <Text style={styles.stockTrendCaption}>
+                            {selectedStockSummary.snapshot?.isMock ? "Mock-backed trend" : "Provider-backed trend"}
+                          </Text>
+                        </View>
+                        <View style={styles.panelBadges}>
+                          <View style={freshnessTone(selectedStockSummary.snapshot?.freshness ?? "Unavailable")}>
+                            <Text style={styles.freshnessBadgeText}>
+                              {selectedStockSummary.snapshot?.freshness ?? "Unavailable"}
+                            </Text>
+                          </View>
+                        </View>
+                      </View>
+                      <View style={styles.stockTrendChart}>
+                        {selectedStockTrendSeries.map((point, index) => (
+                          <Animated.View
+                            key={`trend-${selectedStockSummary.stock.id}-${index}`}
+                            style={[
+                              styles.stockTrendBar,
+                              { height: 20 + point * 0.72, opacity: index === selectedStockTrendSeries.length - 1 ? 1 : 0.52 },
+                            ]}
+                          />
+                        ))}
+                      </View>
+                      <View style={styles.stockTrendLegend}>
+                        <Text style={styles.stockTrendLegendText}>Trend</Text>
+                        <Text style={styles.stockTrendLegendText}>
+                          Drawdown {selectedStockSummary.snapshot ? `${selectedStockSummary.snapshot.drawdownPct}%` : "N/A"}
+                        </Text>
+                        <Text style={styles.stockTrendLegendText}>{analysisLookback}</Text>
+                      </View>
                     </View>
                     <View style={styles.homeSummaryStrip}>
                       <DenseStat label="Price" value={selectedStockSummary.snapshot ? `$${selectedStockSummary.snapshot.price.toFixed(2)}` : "No feed"} tone="strong" />
@@ -2087,8 +2209,8 @@ export default function App() {
                         <HorizontalChoice options={analysisStatusFilters} value={analysisStatusFilter} onSelect={setAnalysisStatusFilter} />
                       </View>
                       <View style={styles.controlCard}>
-                        <Text style={styles.inputLabel}>Insights</Text>
-                        <Text style={styles.sectionNote}>Two-up visual grid. Tap any square for detail.</Text>
+                        <Text style={styles.inputLabel}>Interaction</Text>
+                        <Text style={styles.sectionNote}>Tap any square to open the full visual detail panel.</Text>
                       </View>
                     </View>
                   </Card>
@@ -2107,14 +2229,23 @@ export default function App() {
                     )}
                   </View>
                 </Reveal>
-              ) : null}
+              ) : (
+                <Reveal delay={40}>
+                  <Card>
+                    <Text style={styles.emptySearchTitle}>No stock selected</Text>
+                    <Text style={styles.emptySearchBody}>
+                      Search a ticker or company name, choose a suggestion, and the visual analysis board will open here.
+                    </Text>
+                  </Card>
+                </Reveal>
+              )}
             </>
           ) : null}
 
           {tab === "Recipes" ? (
             <>
               <Reveal>
-                <SectionHeader title="Recipes" note="See your recipe inventory first. Build or edit only when you trigger it." />
+                <SectionHeader note="See your recipe inventory first. Build or edit only when you trigger it." />
                 <View style={styles.actionRow}>
                   <Button
                     label="New Recipe"
@@ -2151,7 +2282,7 @@ export default function App() {
           {tab === "Eyes" ? (
             <>
               <Reveal>
-                <SectionHeader title="Eyes" note="Inventory of active and inactive stock subscriptions for your recipes." />
+                <SectionHeader note="Inventory of active and inactive stock subscriptions for your recipes." />
                 <View style={styles.actionRow}>
                   <Button label="New Eye" onPress={() => setEyeComposerOpen(true)} />
                 </View>
@@ -2235,7 +2366,7 @@ export default function App() {
           {tab === "Alerts" ? (
             <>
               <Reveal>
-                <SectionHeader title="Alerts" note="Alerts answer what happened, why now, and what deserves review first." />
+                <SectionHeader note="Alerts answer what happened, why now, and what deserves review first." />
                 <HorizontalChoice options={["Current", "History"]} value={alertWorkspaceTab} onSelect={(value) => setAlertWorkspaceTab(value as "Current" | "History")} />
               </Reveal>
 
@@ -2380,7 +2511,7 @@ export default function App() {
           {tab === "Journal" ? (
             <>
               <Reveal>
-                <SectionHeader title="Journal" note="See the journal inventory first. Add entries only when you trigger composition." />
+                <SectionHeader note="See the journal inventory first. Add entries only when you trigger composition." />
                 <View style={styles.actionRow}>
                   <Button label="New Journal Entry" onPress={() => setJournalComposerOpen(true)} />
                 </View>
@@ -2425,11 +2556,11 @@ export default function App() {
             subtitle="Guided pages. Fill the required fields, move step by step, and preview before saving."
             onClose={() => setRecipeBuilderOpen(false)}
           >
-            <Text style={styles.inputLabel}>Step</Text>
-            <HorizontalChoice options={recipeBuilderSteps} value={recipeBuilderStep} onSelect={setRecipeBuilderStep} />
+            <StepFlow steps={recipeBuilderSteps} current={recipeBuilderStep} onSelect={setRecipeBuilderStep} />
 
-            {recipeBuilderStep === "Purpose" ? (
-              <>
+            <Reveal key={`builder-step-${recipeBuilderStep}`}>
+              {recipeBuilderStep === "Purpose" ? (
+                <>
                 <Text style={styles.inputLabel}>Recipe name</Text>
                 <Input value={recipeForm.name} onChangeText={(name) => setRecipeForm((current) => ({ ...current, name }))} placeholder="Temporary Bargain Sale" />
                 {recipeFormAttempted && !recipeForm.name.trim() ? <Text style={styles.validationText}>Recipe name is required.</Text> : null}
@@ -2442,11 +2573,11 @@ export default function App() {
                 <Text style={styles.inputLabel}>Purpose</Text>
                 <Input value={recipeForm.purpose} onChangeText={(purpose) => setRecipeForm((current) => ({ ...current, purpose }))} placeholder="What opportunity should this logic surface?" multiline />
                 {recipeFormAttempted && !recipeForm.purpose.trim() ? <Text style={styles.validationText}>Purpose is required.</Text> : null}
-              </>
-            ) : null}
+                </>
+              ) : null}
 
-            {recipeBuilderStep === "Logic" ? (
-              <>
+              {recipeBuilderStep === "Logic" ? (
+                <>
                 <Text style={styles.inputLabel}>Category</Text>
                 <HorizontalChoice
                   options={conditionCategories}
@@ -2528,11 +2659,11 @@ export default function App() {
                   </View>
                 ) : null}
                 {recipeFormAttempted && draftConditions.length === 0 ? <Text style={styles.validationText}>Add at least one condition.</Text> : null}
-              </>
-            ) : null}
+                </>
+              ) : null}
 
-            {recipeBuilderStep === "Risk & Alerts" ? (
-              <>
+              {recipeBuilderStep === "Risk & Alerts" ? (
+                <>
                 <View style={styles.dualDenseGrid}>
                   <DenseStat label="Alert cooldown" value={`${recipeForm.alertCooldownHours}h`} tone="strong" />
                   <DenseStat label="Risk rules" value={`${draftConditions.filter((condition) => condition.kind === "negative" || condition.kind === "disqualifier").length}`} />
@@ -2541,11 +2672,11 @@ export default function App() {
                 <HorizontalChoice options={alertCooldownOptions.map(String)} value={String(recipeForm.alertCooldownHours)} onSelect={(value) => setRecipeForm((current) => ({ ...current, alertCooldownHours: Number(value) }))} />
                 <Text style={styles.inputLabel}>Notes</Text>
                 <Input value={recipeForm.notes} onChangeText={(notes) => setRecipeForm((current) => ({ ...current, notes }))} placeholder="Downgrade rules, blockers, and alert expectations" multiline />
-              </>
-            ) : null}
+                </>
+              ) : null}
 
-            {recipeBuilderStep === "Review & Outcome" ? (
-              <>
+              {recipeBuilderStep === "Review & Outcome" ? (
+                <>
                 <View style={styles.dualDenseGrid}>
                   <DenseStat label="Review cadence" value={`${recipeForm.reviewCadenceDays}d`} tone="strong" />
                   <DenseStat label="Draft conditions" value={`${draftConditions.length}`} />
@@ -2569,8 +2700,9 @@ export default function App() {
                 ) : (
                   <Text style={styles.cardBody}>Add draft conditions first to unlock preview.</Text>
                 )}
-              </>
-            ) : null}
+                </>
+              ) : null}
+            </Reveal>
 
             <View style={styles.actionRow}>
               {recipeBuilderStep !== "Purpose" ? (
@@ -2785,9 +2917,8 @@ export default function App() {
             <Pressable
               key={item}
               onPress={() => setTab(item)}
-              style={styles.navItem}
+              style={[styles.navItem, tab === item ? styles.navItemActive : null]}
             >
-              <View style={[styles.navIndicator, tab === item ? styles.navIndicatorActive : null]} />
               <Text style={[styles.navLabel, tab === item ? styles.navLabelActive : null]}>{item}</Text>
             </Pressable>
           ))}
@@ -2797,9 +2928,9 @@ export default function App() {
   );
 }
 
-const SectionHeader = ({ title, note }: { title: string; note: string }) => (
+const SectionHeader = ({ title, note }: { title?: string; note: string }) => (
   <View style={styles.sectionHeader}>
-    <Text style={styles.sectionTitle}>{title}</Text>
+    {title ? <Text style={styles.sectionTitle}>{title}</Text> : null}
     <Text style={styles.sectionNote}>{note}</Text>
   </View>
 );
@@ -2815,8 +2946,8 @@ const styles = StyleSheet.create({
   },
   topBar: {
     paddingHorizontal: 18,
-    paddingTop: 10,
-    paddingBottom: 12,
+    paddingTop: 12,
+    paddingBottom: 14,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -2885,8 +3016,8 @@ const styles = StyleSheet.create({
   page: {
     paddingHorizontal: 16,
     paddingTop: 16,
-    paddingBottom: 132,
-    gap: 16,
+    paddingBottom: 136,
+    gap: 18,
   },
   // Search Hero Styles
   searchHero: {
@@ -3001,12 +3132,25 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   stockSearchShell: {
-    gap: 10,
+    gap: 12,
     padding: 14,
-    borderRadius: 18,
+    borderRadius: 20,
     backgroundColor: "#ffffff",
     borderWidth: 1,
     borderColor: "#eceef2",
+  },
+  stockSearchHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  suggestionLabel: {
+    color: "#6b7280",
+    fontSize: 11,
+    fontWeight: "700",
+    textTransform: "uppercase",
+    letterSpacing: 0.4,
+    fontFamily,
   },
   stockSuggestionPill: {
     width: 144,
@@ -3041,6 +3185,23 @@ const styles = StyleSheet.create({
   },
   stockSuggestionNameActive: {
     color: "#d1d5db",
+  },
+  emptySearchState: {
+    paddingVertical: 10,
+    gap: 4,
+  },
+  emptySearchTitle: {
+    color: "#111827",
+    fontSize: 16,
+    fontWeight: "800",
+    fontFamily,
+  },
+  emptySearchBody: {
+    color: "#6b7280",
+    fontSize: 13,
+    lineHeight: 19,
+    fontWeight: "500",
+    fontFamily,
   },
   homeSummaryStrip: {
     flexDirection: "row",
@@ -3078,13 +3239,71 @@ const styles = StyleSheet.create({
   },
   controlCard: {
     flex: 1,
-    padding: 12,
+    padding: 14,
     borderRadius: 16,
     backgroundColor: "#f8fafc",
     borderWidth: 1,
     borderColor: "#edf0f5",
     minHeight: 108,
     justifyContent: "space-between",
+  },
+  stockTrendHero: {
+    marginTop: 14,
+    padding: 16,
+    borderRadius: 18,
+    backgroundColor: "#f8fafc",
+    borderWidth: 1,
+    borderColor: "#edf0f5",
+    gap: 12,
+  },
+  stockTrendHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+  },
+  stockTrendPrice: {
+    color: "#111827",
+    fontSize: 28,
+    fontWeight: "800",
+    fontFamily,
+  },
+  stockTrendCaption: {
+    marginTop: 2,
+    color: "#6b7280",
+    fontSize: 12,
+    fontWeight: "600",
+    fontFamily,
+  },
+  stockTrendChart: {
+    height: 148,
+    borderRadius: 16,
+    backgroundColor: "#ffffff",
+    borderWidth: 1,
+    borderColor: "#eceef2",
+    paddingHorizontal: 10,
+    paddingBottom: 10,
+    paddingTop: 18,
+    flexDirection: "row",
+    alignItems: "flex-end",
+    gap: 4,
+    overflow: "hidden",
+  },
+  stockTrendBar: {
+    flex: 1,
+    borderRadius: 999,
+    backgroundColor: "#111827",
+  },
+  stockTrendLegend: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  stockTrendLegendText: {
+    color: "#6b7280",
+    fontSize: 10,
+    fontWeight: "700",
+    textTransform: "uppercase",
+    letterSpacing: 0.4,
+    fontFamily,
   },
   // Grid Layouts
   suggestionGrid: {
@@ -3115,10 +3334,10 @@ const styles = StyleSheet.create({
   analysisGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 10,
+    gap: 12,
   },
   analysisGridItem: {
-    width: "48.5%",
+    width: "48%",
   },
   // Evidence Cards
   evidenceCard: {
@@ -3172,7 +3391,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#10b981", // Green
   },
   choiceRow: {
-    gap: 12,
+    gap: 10,
     paddingVertical: 4,
   },
   choiceChip: {
@@ -3229,7 +3448,7 @@ const styles = StyleSheet.create({
     color: "#4b5563",
   },
   selectChip: {
-    width: "48.5%",
+    width: "48%",
     minHeight: 74,
     paddingHorizontal: 16,
     paddingVertical: 10,
@@ -3403,7 +3622,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   denseStat: {
-    width: "48.5%",
+    width: "48%",
     padding: 12,
     borderRadius: 16,
     backgroundColor: "#ffffff",
@@ -3469,7 +3688,7 @@ const styles = StyleSheet.create({
   },
   dualColumn: {
     flexDirection: "row",
-    gap: 10,
+    gap: 12,
   },
   columnTitle: {
     color: "#111827",
@@ -3594,16 +3813,22 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: "#e5e7eb",
     paddingTop: 10,
-    paddingBottom: 30,
-    minHeight: 88,
+    paddingBottom: 26,
+    minHeight: 92,
     alignItems: "center",
+    paddingHorizontal: 10,
   },
   navItem: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
     gap: 4,
-    minHeight: 48,
+    minHeight: 52,
+    borderRadius: 14,
+    marginHorizontal: 4,
+  },
+  navItemActive: {
+    backgroundColor: "#111827",
   },
   navIndicator: {
     width: 20,
@@ -3616,12 +3841,12 @@ const styles = StyleSheet.create({
   },
   navLabel: {
     color: "#6b7280",
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: "700",
     fontFamily,
   },
   navLabelActive: {
-    color: "#111827",
+    color: "#ffffff",
   },
   // Legacy/Required Compat
   card: {
@@ -4025,7 +4250,7 @@ const styles = StyleSheet.create({
     fontFamily,
   },
   sectionHeader: {
-    gap: 2,
+    gap: 4,
   },
   sectionTitle: {
     color: "#111827",
@@ -4057,8 +4282,72 @@ const styles = StyleSheet.create({
     paddingBottom: 28,
     gap: 12,
   },
+  windowGrabber: {
+    alignSelf: "center",
+    width: 42,
+    height: 5,
+    borderRadius: 999,
+    backgroundColor: "#d1d5db",
+    marginBottom: 8,
+  },
   windowScroll: {
     flexGrow: 0,
+  },
+  stepFlow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 4,
+  },
+  stepConnector: {
+    flex: 1,
+    height: 2,
+    backgroundColor: "#e5e7eb",
+    marginHorizontal: 6,
+  },
+  stepConnectorActive: {
+    backgroundColor: "#111827",
+  },
+  stepNode: {
+    width: 72,
+    alignItems: "center",
+    gap: 6,
+  },
+  stepDot: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: "#d1d5db",
+    backgroundColor: "#ffffff",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  stepDotActive: {
+    backgroundColor: "#111827",
+    borderColor: "#111827",
+  },
+  stepDotComplete: {
+    backgroundColor: "#e5e7eb",
+    borderColor: "#e5e7eb",
+  },
+  stepDotText: {
+    color: "#6b7280",
+    fontSize: 12,
+    fontWeight: "800",
+    fontFamily,
+  },
+  stepDotTextActive: {
+    color: "#ffffff",
+  },
+  stepLabel: {
+    color: "#6b7280",
+    fontSize: 10,
+    fontWeight: "700",
+    textAlign: "center",
+    fontFamily,
+  },
+  stepLabelActive: {
+    color: "#111827",
   },
   conditionRequired: {
     backgroundColor: "#1e293b",
