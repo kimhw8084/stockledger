@@ -632,6 +632,7 @@ const Input = ({
   autoCapitalize,
   onSubmitEditing,
   returnKeyType,
+  invalid,
 }: {
   value: string;
   onChangeText: (value: string) => void;
@@ -641,6 +642,7 @@ const Input = ({
   autoCapitalize?: "none" | "sentences" | "characters";
   onSubmitEditing?: () => void;
   returnKeyType?: "done" | "go" | "next" | "search";
+  invalid?: boolean;
 }) => (
   <TextInput
     value={value}
@@ -652,7 +654,7 @@ const Input = ({
     autoCapitalize={autoCapitalize}
     onSubmitEditing={onSubmitEditing}
     returnKeyType={returnKeyType}
-    style={[styles.input, multiline ? styles.textArea : null]}
+    style={[styles.input, invalid ? styles.inputInvalid : null, multiline ? styles.textArea : null]}
   />
 );
 
@@ -3227,6 +3229,12 @@ export default function App() {
               <Text style={styles.previewLabel}>{recipeBuilderStep}</Text>
               <Text style={styles.previewText}>{recipeStepPrompt}</Text>
             </View>
+            <View style={styles.homeSummaryStrip}>
+              <DenseStat label="Conditions" value={`${draftConditions.length}`} tone={draftConditions.length > 0 ? "strong" : "neutral"} />
+              <DenseStat label="Risk Rules" value={`${draftConditions.filter((condition) => condition.kind === "negative" || condition.kind === "disqualifier").length}`} />
+              <DenseStat label="Cadence" value={`${recipeForm.reviewCadenceDays}d`} />
+              <DenseStat label="Cooldown" value={`${recipeForm.alertCooldownHours}h`} />
+            </View>
             <View style={styles.metaRow}>
               {recipeStepReadiness.map((item) => (
                 <MetaPill
@@ -3240,7 +3248,7 @@ export default function App() {
               {recipeBuilderStep === "Purpose" ? (
                 <>
                 <Text style={styles.inputLabel}>Recipe name</Text>
-                <Input value={recipeForm.name} onChangeText={(name) => setRecipeForm((current) => ({ ...current, name }))} placeholder="Temporary Bargain Sale" />
+                <Input value={recipeForm.name} onChangeText={(name) => setRecipeForm((current) => ({ ...current, name }))} placeholder="Temporary Bargain Sale" invalid={recipeFormAttempted && !recipeForm.name.trim()} />
                 {recipeFormAttempted && !recipeForm.name.trim() ? <Text style={styles.validationText}>Recipe name is required.</Text> : null}
                 <Text style={styles.inputLabel}>Opportunity type</Text>
                 <HorizontalChoice options={opportunityTypes} value={recipeForm.opportunityType} onSelect={(opportunityType) => setRecipeForm((current) => ({ ...current, opportunityType }))} />
@@ -3249,7 +3257,7 @@ export default function App() {
                 <Text style={styles.inputLabel}>Primary use case</Text>
                 <HorizontalChoice options={useCaseOptions} value={recipeForm.intendedUseCase} onSelect={(intendedUseCase) => setRecipeForm((current) => ({ ...current, intendedUseCase }))} />
                 <Text style={styles.inputLabel}>Purpose</Text>
-                <Input value={recipeForm.purpose} onChangeText={(purpose) => setRecipeForm((current) => ({ ...current, purpose }))} placeholder="What opportunity should this logic surface?" multiline />
+                <Input value={recipeForm.purpose} onChangeText={(purpose) => setRecipeForm((current) => ({ ...current, purpose }))} placeholder="What opportunity should this logic surface?" multiline invalid={recipeFormAttempted && !recipeForm.purpose.trim()} />
                 {recipeFormAttempted && !recipeForm.purpose.trim() ? <Text style={styles.validationText}>Purpose is required.</Text> : null}
                 </>
               ) : null}
@@ -3378,6 +3386,15 @@ export default function App() {
                 ) : (
                   <Text style={styles.cardBody}>Add draft conditions first to unlock preview.</Text>
                 )}
+                <View style={styles.formulaPanel}>
+                  <Text style={styles.formulaTitle}>Ready to save</Text>
+                  <Text style={styles.formulaBody}>
+                    {recipeForm.name.trim() || "Untitled Recipe"} is set up for {recipeForm.opportunityType} with {draftConditions.length} conditions, a {recipeForm.reviewCadenceDays}-day review cadence, and a {recipeForm.alertCooldownHours}-hour alert cooldown.
+                  </Text>
+                  <Text style={styles.formulaMeta}>
+                    Save only when the draft logic reads like a clear investing rule, not a checklist of indicators.
+                  </Text>
+                </View>
                 </>
               ) : null}
             </Reveal>
@@ -3568,7 +3585,7 @@ export default function App() {
             </ScrollView>
             {eyeFormAttempted && !eyeForm.recipeId ? <Text style={styles.validationText}>Select a recipe.</Text> : null}
             <Text style={styles.inputLabel}>Specific thesis snapshot</Text>
-            <Input value={eyeForm.thesisSnapshot} onChangeText={(thesisSnapshot) => setEyeForm((current) => ({ ...current, thesisSnapshot }))} placeholder="Why does this stock under this recipe deserve repeated attention?" multiline />
+            <Input value={eyeForm.thesisSnapshot} onChangeText={(thesisSnapshot) => setEyeForm((current) => ({ ...current, thesisSnapshot }))} placeholder="Why does this stock under this recipe deserve repeated attention?" multiline invalid={eyeFormAttempted && !eyeForm.thesisSnapshot.trim()} />
             {eyeFormAttempted && !eyeForm.thesisSnapshot.trim() ? <Text style={styles.validationText}>Thesis snapshot is required.</Text> : null}
             <View style={styles.dualDenseGrid}>
               <NumberStepper label="Planned entry low" value={Number(eyeForm.plannedEntryLow || 0)} onChange={(next) => setEyeForm((current) => ({ ...current, plannedEntryLow: next.toFixed(2) }))} step={0.5} min={0} max={10000} />
@@ -3652,7 +3669,7 @@ export default function App() {
             <Text style={styles.inputLabel}>Action</Text>
             <HorizontalChoice options={decisionActions} value={decisionForm.action} onSelect={(action) => setDecisionForm((current) => ({ ...current, action }))} />
             <Text style={styles.inputLabel}>Why did you act this way?</Text>
-            <Input value={decisionForm.note} onChangeText={(note) => setDecisionForm((current) => ({ ...current, note }))} placeholder="Why did you enter, skip, or revise?" multiline />
+            <Input value={decisionForm.note} onChangeText={(note) => setDecisionForm((current) => ({ ...current, note }))} placeholder="Why did you enter, skip, or revise?" multiline invalid={journalFormAttempted && !decisionForm.note.trim()} />
             {journalFormAttempted && !decisionForm.note.trim() ? <Text style={styles.validationText}>A decision note is required.</Text> : null}
             <Text style={styles.inputLabel}>Main concern</Text>
             <Input value={decisionForm.concern} onChangeText={(concern) => setDecisionForm((current) => ({ ...current, concern }))} placeholder="What risk mattered most?" multiline />
@@ -3741,6 +3758,7 @@ export default function App() {
               onChangeText={(symbol) => setStockForm((current) => ({ ...current, symbol }))}
               placeholder="Ticker symbol"
               autoCapitalize="characters"
+              invalid={stockFormAttempted && !stockForm.symbol.trim()}
             />
             {stockFormAttempted && !stockForm.symbol.trim() ? <Text style={styles.validationText}>Ticker is required.</Text> : null}
             <Text style={styles.inputLabel}>Company</Text>
@@ -3748,6 +3766,7 @@ export default function App() {
               value={stockForm.name}
               onChangeText={(name) => setStockForm((current) => ({ ...current, name }))}
               placeholder="Company name"
+              invalid={stockFormAttempted && !stockForm.name.trim()}
             />
             {stockFormAttempted && !stockForm.name.trim() ? <Text style={styles.validationText}>Company name is required.</Text> : null}
             <Text style={styles.inputLabel}>Why track it</Text>
@@ -5320,6 +5339,10 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     fontSize: 14,
     fontWeight: "600",
+  },
+  inputInvalid: {
+    borderColor: "#ef4444",
+    backgroundColor: "#fff8f8",
   },
   textArea: {
     minHeight: 100,
