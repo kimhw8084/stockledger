@@ -1482,6 +1482,110 @@ const DetailedVisualHero = ({ card }: { card: VisualEvidenceCard }) => {
   );
 };
 
+const StockMetricDetailContent = ({
+  card,
+  selectedEvidenceIndex,
+  total,
+  sortedCards,
+  isPinned,
+  onPrevious,
+  onNext,
+  onTogglePin,
+  onSelectCard,
+}: {
+  card: VisualEvidenceCard;
+  selectedEvidenceIndex: number;
+  total: number;
+  sortedCards: VisualEvidenceCard[];
+  isPinned: boolean;
+  onPrevious: () => void;
+  onNext: () => void;
+  onTogglePin: () => void;
+  onSelectCard: (next: VisualEvidenceCard) => void;
+}) => {
+  const [showFormulaDetails, setShowFormulaDetails] = useState(false);
+
+  return (
+    <>
+      <DetailedVisualHero card={card} />
+      <View style={styles.detailNarrativePanel}>
+        <View style={styles.detailNarrativeHeader}>
+          <Text style={styles.formulaTitle}>What stands out now</Text>
+          <MetaPill label={`${selectedEvidenceIndex >= 0 ? selectedEvidenceIndex + 1 : 1} of ${total}`} />
+        </View>
+        <Text style={styles.detailNarrativeLead}>{card.summary}</Text>
+        <View style={styles.detailNarrativeSplit}>
+          <View style={styles.detailNarrativeBlock}>
+            <Text style={styles.detailNarrativeLabel}>Effect</Text>
+            <Text style={styles.formulaMeta}>{card.effect}</Text>
+          </View>
+          <View style={styles.detailNarrativeBlock}>
+            <Text style={styles.detailNarrativeLabel}>Why it matters</Text>
+            <Text style={styles.formulaMeta}>{card.whyItMatters}</Text>
+          </View>
+        </View>
+        {card.relatedConditionLabel ? <MetaPill label={`Recipe: ${card.relatedConditionLabel}`} /> : null}
+      </View>
+      <View style={styles.detailMetricStrip}>
+        <DenseStat label="Current" value={card.metric.currentLabel} tone="strong" />
+        <DenseStat label="Threshold" value={card.metric.thresholdLabel ?? "Context"} />
+        <DenseStat label="Freshness" value={card.freshness} tone={card.freshness === "Fresh" ? "strong" : "neutral"} />
+        <DenseStat label="Source" value={card.sourceType} />
+      </View>
+      <View style={styles.detailSheetActionRow}>
+        <Button label="Previous" tone="secondary" onPress={onPrevious} disabled={selectedEvidenceIndex <= 0} />
+        <Button label={isPinned ? "Unpin" : "Pin"} tone="ghost" onPress={onTogglePin} />
+        <Button label="Next" tone="secondary" onPress={onNext} disabled={selectedEvidenceIndex < 0 || selectedEvidenceIndex >= total - 1} />
+      </View>
+      <View style={styles.detailJumpSection}>
+        <Text style={styles.detailJumpTitle}>Browse more metrics</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.detailJumpRow}>
+          {sortedCards.map((jumpCard) => (
+            <Pressable
+              key={`jump-${jumpCard.id}`}
+              onPress={() => onSelectCard(jumpCard)}
+              style={[
+                styles.metricJumpChip,
+                card.id === jumpCard.id ? styles.metricJumpChipActive : null,
+              ]}
+            >
+              <Text
+                style={[
+                  styles.metricJumpChipText,
+                  card.id === jumpCard.id ? styles.metricJumpChipTextActive : null,
+                ]}
+                numberOfLines={1}
+              >
+                {jumpCard.title}
+              </Text>
+            </Pressable>
+          ))}
+        </ScrollView>
+      </View>
+      <Pressable onPress={() => setShowFormulaDetails((current) => !current)} style={styles.detailDisclosurePanel}>
+        <View style={styles.flexOne}>
+          <Text style={styles.formulaTitle}>{showFormulaDetails ? "Hide formula detail" : "Show formula detail"}</Text>
+          <Text style={styles.formulaMeta} numberOfLines={showFormulaDetails ? undefined : 1}>
+            {card.formulaName ?? "How this metric is calculated"}
+          </Text>
+        </View>
+        <Text style={styles.groupHeaderToggle}>{showFormulaDetails ? "Hide" : "Show"}</Text>
+      </Pressable>
+      {showFormulaDetails ? (
+        <View style={styles.formulaPanel}>
+          <Text style={styles.formulaTitle}>{card.formulaName ?? "Formula detail"}</Text>
+          <Text style={styles.formulaBody}>
+            {card.formulaDescription ?? "No extra formula detail available."}
+          </Text>
+          <Text style={styles.formulaMeta}>
+            Inputs: {card.formulaInputs?.join(", ") ?? "No explicit inputs recorded"}
+          </Text>
+        </View>
+      ) : null}
+    </>
+  );
+};
+
 const EvidenceGroupView = ({
   group,
   layout = "stack",
@@ -4238,79 +4342,20 @@ export default function App() {
             subtitle={`${selectedStockSummary?.stock.symbol ?? "Stock"} · ${selectedEvidenceCard.freshness}${selectedEvidenceIndex >= 0 ? ` · ${selectedEvidenceIndex + 1} of ${sortedSelectedStockAnalysisCards.length}` : ""}`}
             onClose={() => setSelectedEvidenceCard(null)}
           >
-            <DetailedVisualHero card={selectedEvidenceCard} />
-            <View style={styles.detailMetricStrip}>
-              <DenseStat label="Current" value={selectedEvidenceCard.metric.currentLabel} tone="strong" />
-              <DenseStat label="Threshold" value={selectedEvidenceCard.metric.thresholdLabel ?? "Context"} />
-              <DenseStat label="Freshness" value={selectedEvidenceCard.freshness} tone={selectedEvidenceCard.freshness === "Fresh" ? "strong" : "neutral"} />
-              <DenseStat label="Source" value={selectedEvidenceCard.sourceType} />
-            </View>
-            <View style={styles.formulaPanel}>
-              <Text style={styles.formulaTitle}>What this means now</Text>
-              <Text style={styles.formulaBody}>{selectedEvidenceCard.summary}</Text>
-              <Text style={styles.formulaMeta}>{selectedEvidenceCard.effect}</Text>
-            </View>
-            <View style={styles.formulaPanel}>
-              <Text style={styles.formulaTitle}>Why it matters</Text>
-              <Text style={styles.formulaBody}>{selectedEvidenceCard.whyItMatters}</Text>
-              {selectedEvidenceCard.relatedConditionLabel ? (
-                <Text style={styles.formulaMeta}>Recipe link: {selectedEvidenceCard.relatedConditionLabel}</Text>
-              ) : null}
-            </View>
-            <View style={styles.actionRow}>
-              <Button label="Previous" tone="secondary" onPress={() => cycleEvidenceCard(-1)} disabled={selectedEvidenceIndex <= 0} />
-              <Button
-                label={
-                  selectedStockSummary &&
-                  pinnedMetricKeys.includes(
-                    stockMetricPreferenceKey(selectedStockSummary.stock.id, selectedEvidenceCard.id),
-                  )
-                    ? "Unpin"
-                    : "Pin"
-                }
-                tone="ghost"
-                onPress={() => togglePinnedMetric(selectedEvidenceCard)}
-              />
-              <Button
-                label="Next"
-                tone="secondary"
-                onPress={() => cycleEvidenceCard(1)}
-                disabled={
-                  selectedEvidenceIndex < 0 || selectedEvidenceIndex >= sortedSelectedStockAnalysisCards.length - 1
-                }
-              />
-            </View>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.choiceRow}>
-              {sortedSelectedStockAnalysisCards.map((card) => (
-                <Pressable
-                  key={`jump-${card.id}`}
-                  onPress={() => setSelectedEvidenceCard(card)}
-                  style={[
-                    styles.metricJumpChip,
-                    selectedEvidenceCard.id === card.id ? styles.metricJumpChipActive : null,
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.metricJumpChipText,
-                      selectedEvidenceCard.id === card.id ? styles.metricJumpChipTextActive : null,
-                    ]}
-                    numberOfLines={1}
-                  >
-                    {card.title}
-                  </Text>
-                </Pressable>
-              ))}
-            </ScrollView>
-            <View style={styles.formulaPanel}>
-              <Text style={styles.formulaTitle}>{selectedEvidenceCard.formulaName ?? "Formula detail"}</Text>
-              <Text style={styles.formulaBody}>
-                {selectedEvidenceCard.formulaDescription ?? "No extra formula detail available."}
-              </Text>
-              <Text style={styles.formulaMeta}>
-                Inputs: {selectedEvidenceCard.formulaInputs?.join(", ") ?? "No explicit inputs recorded"}
-              </Text>
-            </View>
+            <StockMetricDetailContent
+              card={selectedEvidenceCard}
+              selectedEvidenceIndex={selectedEvidenceIndex}
+              total={sortedSelectedStockAnalysisCards.length}
+              sortedCards={sortedSelectedStockAnalysisCards}
+              isPinned={
+                !!selectedStockSummary &&
+                pinnedMetricKeys.includes(stockMetricPreferenceKey(selectedStockSummary.stock.id, selectedEvidenceCard.id))
+              }
+              onPrevious={() => cycleEvidenceCard(-1)}
+              onNext={() => cycleEvidenceCard(1)}
+              onTogglePin={() => togglePinnedMetric(selectedEvidenceCard)}
+              onSelectCard={setSelectedEvidenceCard}
+            />
           </WindowPanel>
         ) : null}
 
@@ -5112,6 +5157,42 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     gap: 8,
   },
+  detailNarrativePanel: {
+    marginTop: 12,
+    padding: 15,
+    borderRadius: 16,
+    backgroundColor: "#f8fafc",
+    borderWidth: 1,
+    borderColor: "#eceef2",
+    gap: 10,
+  },
+  detailNarrativeHeader: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    gap: 8,
+  },
+  detailNarrativeLead: {
+    color: "#111827",
+    fontSize: 15,
+    lineHeight: 22,
+    fontWeight: "700",
+    fontFamily,
+  },
+  detailNarrativeSplit: {
+    gap: 10,
+  },
+  detailNarrativeBlock: {
+    gap: 4,
+  },
+  detailNarrativeLabel: {
+    color: "#6b7280",
+    fontSize: 11,
+    fontWeight: "800",
+    textTransform: "uppercase",
+    letterSpacing: 0.3,
+    fontFamily,
+  },
   detailHeroCard: {
     padding: 16,
     borderRadius: 18,
@@ -5261,6 +5342,40 @@ const styles = StyleSheet.create({
     lineHeight: 17,
     fontWeight: "600",
     fontFamily,
+  },
+  detailSheetActionRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    marginTop: 10,
+  },
+  detailJumpSection: {
+    marginTop: 10,
+    gap: 8,
+  },
+  detailJumpTitle: {
+    color: "#6b7280",
+    fontSize: 11,
+    fontWeight: "800",
+    textTransform: "uppercase",
+    letterSpacing: 0.3,
+    fontFamily,
+  },
+  detailJumpRow: {
+    gap: 8,
+    paddingRight: 6,
+  },
+  detailDisclosurePanel: {
+    marginTop: 12,
+    padding: 14,
+    borderRadius: 16,
+    backgroundColor: "#ffffff",
+    borderWidth: 1,
+    borderColor: "#eceef2",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 10,
   },
   detailChecklistStack: {
     gap: 8,
