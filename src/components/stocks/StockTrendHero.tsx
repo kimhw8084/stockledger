@@ -24,10 +24,10 @@ export const StockTrendHero = ({
   isCompactPhone,
   freshnessTone,
   stockSnapshotModeLabel,
-  HorizontalChoice,
   Button,
   onClearStock,
-  stockControlsChildren,
+  lookbackControl,
+  benchmarkControl,
 }: {
   styles: any;
   stock: Stock;
@@ -48,10 +48,10 @@ export const StockTrendHero = ({
   isCompactPhone: boolean;
   freshnessTone: (freshness: FreshnessStatus) => any;
   stockSnapshotModeLabel: (snapshot?: { isMock: boolean } | null) => string;
-  HorizontalChoice: React.ComponentType<any>;
   Button: React.ComponentType<any>;
   onClearStock: () => void;
-  stockControlsChildren: React.ReactNode;
+  lookbackControl: React.ReactNode;
+  benchmarkControl: React.ReactNode;
 }) => (
   <>
     <MotionSwap
@@ -114,11 +114,11 @@ export const StockTrendHero = ({
         <View style={[styles.stockHeroControlRow, isCompactPhone ? styles.stockHeroControlRowCompact : null]}>
           <View style={[styles.stockHeroControlBlock, isCompactPhone ? styles.stockHeroControlBlockCompact : null]}>
             <Text style={styles.stockHeroControlLabel}>Lookback</Text>
-            {stockControlsChildren && React.Children.toArray(stockControlsChildren)[0]}
+            {lookbackControl}
           </View>
           <View style={[styles.stockHeroControlBlock, isCompactPhone ? styles.stockHeroControlBlockCompact : null]}>
             <Text style={styles.stockHeroControlLabel}>Benchmark</Text>
-            {stockControlsChildren && React.Children.toArray(stockControlsChildren)[1]}
+            {benchmarkControl}
           </View>
         </View>
         <View style={[styles.stockTrendChart, isCompactPhone ? styles.stockTrendChartCompact : null]}>

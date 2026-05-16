@@ -2924,28 +2924,27 @@ export default function App() {
                       isCompactPhone={isCompactPhone}
                       freshnessTone={freshnessTone}
                       stockSnapshotModeLabel={stockSnapshotModeLabel}
-                      HorizontalChoice={HorizontalChoice}
                       Button={Button}
                       onClearStock={() => {
                         setSelectedStockId("");
                         setStockSearch("");
                       }}
-                      stockControlsChildren={[
+                      lookbackControl={
                         <HorizontalChoice
-                          key="lookback"
                           options={analysisLookbacks}
                           value={analysisLookback}
                           onSelect={setAnalysisLookback}
                           variant="segmented"
-                        />,
+                        />
+                      }
+                      benchmarkControl={
                         <HorizontalChoice
-                          key="benchmark"
                           options={analysisBenchmarks}
                           value={analysisBenchmark}
                           onSelect={setAnalysisBenchmark}
                           variant="segmented"
-                        />,
-                      ]}
+                        />
+                      }
                     />
                     <MotionSwap
                       swapKey={`controls-${selectedStockSummary.stock.id}-${analysisStatusFilter}-${stockBoardMode}`}
