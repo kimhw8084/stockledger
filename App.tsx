@@ -9,6 +9,7 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  useWindowDimensions,
   View,
 } from "react-native";
 
@@ -1264,11 +1265,13 @@ const EvidenceCardView = ({
   compact = false,
   onOpen,
   pinned = false,
+  dense = false,
 }: {
   card: VisualEvidenceCard;
   compact?: boolean;
   onOpen?: () => void;
   pinned?: boolean;
+  dense?: boolean;
 }) => {
   const [expanded, setExpanded] = useState(false);
   const handlePress = () => {
@@ -1303,6 +1306,7 @@ const EvidenceCardView = ({
       style={({ pressed }) => [
         styles.evidenceCard,
         compact ? styles.evidenceCardCompact : null,
+        compact && dense ? styles.evidenceCardCompactDense : null,
         compact ? compactCardTone : null,
         compact ? styles.evidenceCardInteractive : null,
         pressed && compact ? styles.evidenceCardPressed : null,
@@ -1320,14 +1324,21 @@ const EvidenceCardView = ({
         <View style={styles.flexOne}>
           {compact ? (
             <View style={styles.evidenceCompactHeaderRow}>
-              <Text style={styles.evidenceCardFamilyCompact} numberOfLines={1}>
+              <Text
+                style={[styles.evidenceCardFamilyCompact, dense ? styles.evidenceCardFamilyCompactDense : null]}
+                numberOfLines={1}
+              >
                 {card.family}
               </Text>
               {pinned ? <Text style={styles.evidencePinnedMark}>Pinned</Text> : null}
             </View>
           ) : null}
           <Text
-            style={[styles.evidenceCardTitle, compact ? styles.evidenceCardTitleCompact : null]}
+            style={[
+              styles.evidenceCardTitle,
+              compact ? styles.evidenceCardTitleCompact : null,
+              compact && dense ? styles.evidenceCardTitleCompactDense : null,
+            ]}
             numberOfLines={compact ? 2 : 1}
           >
             {card.title}
@@ -1336,8 +1347,8 @@ const EvidenceCardView = ({
         </View>
         <View style={styles.evidenceCardHeaderMeta}>
           {compact ? (
-            <View style={[statusTone(card.status), styles.compactStatusBadge]}>
-              <Text style={styles.compactEvidenceStatusText} numberOfLines={1}>
+            <View style={[statusTone(card.status), styles.compactStatusBadge, dense ? styles.compactStatusBadgeDense : null]}>
+              <Text style={[styles.compactEvidenceStatusText, dense ? styles.compactEvidenceStatusTextDense : null]} numberOfLines={1}>
                 {compactStatusLabel(card.status)}
               </Text>
             </View>
@@ -1359,20 +1370,20 @@ const EvidenceCardView = ({
       {compact ? (
         <>
           <View style={styles.compactEvidenceFooter}>
-            <Text style={styles.compactEvidenceValue}>{card.metric.currentLabel}</Text>
-            <Text style={styles.compactEvidenceThreshold} numberOfLines={1}>
+            <Text style={[styles.compactEvidenceValue, dense ? styles.compactEvidenceValueDense : null]}>{card.metric.currentLabel}</Text>
+            <Text style={[styles.compactEvidenceThreshold, dense ? styles.compactEvidenceThresholdDense : null]} numberOfLines={1}>
               {compactMetricContextLabel(card)}
             </Text>
           </View>
           <View style={styles.compactEvidenceMetaRow}>
-            <Text style={styles.compactEvidenceEffect} numberOfLines={1}>
+            <Text style={[styles.compactEvidenceEffect, dense ? styles.compactEvidenceEffectDense : null]} numberOfLines={1}>
               {card.effect}
             </Text>
             <View style={styles.compactFreshnessWrap}>
               <View style={freshnessTone(card.freshness)}>
                 <View style={styles.freshnessDot} />
               </View>
-              <Text style={styles.compactFreshnessText} numberOfLines={1}>
+              <Text style={[styles.compactFreshnessText, dense ? styles.compactFreshnessTextDense : null]} numberOfLines={1}>
                 {card.freshness}
               </Text>
             </View>
@@ -1428,7 +1439,13 @@ const EvidenceCardView = ({
   );
 };
 
-const DetailedVisualHero = ({ card }: { card: VisualEvidenceCard }) => {
+const DetailedVisualHero = ({
+  card,
+  compactLayout = false,
+}: {
+  card: VisualEvidenceCard;
+  compactLayout?: boolean;
+}) => {
   const visual = card.visual;
   const primarySeries = visual.series ?? [];
   const secondarySeries = visual.secondarySeries ?? [];
@@ -1441,10 +1458,10 @@ const DetailedVisualHero = ({ card }: { card: VisualEvidenceCard }) => {
 
   if (visual.kind === "checklist") {
     return (
-      <View style={styles.detailHeroCard}>
-        <View style={styles.detailHeroHeader}>
+      <View style={[styles.detailHeroCard, compactLayout ? styles.detailHeroCardCompact : null]}>
+        <View style={[styles.detailHeroHeader, compactLayout ? styles.detailHeroHeaderCompact : null]}>
           <Text style={styles.detailHeroEyebrow}>{card.family}</Text>
-          <Text style={styles.detailHeroValue}>{card.metric.currentLabel}</Text>
+          <Text style={[styles.detailHeroValue, compactLayout ? styles.detailHeroValueCompact : null]}>{card.metric.currentLabel}</Text>
         </View>
         <View style={styles.detailChecklistStack}>
           {(visual.items ?? []).map((item) => (
@@ -1474,10 +1491,12 @@ const DetailedVisualHero = ({ card }: { card: VisualEvidenceCard }) => {
 
   if (visual.kind === "event_countdown") {
     return (
-      <View style={styles.detailHeroCard}>
-        <View style={styles.detailHeroHeader}>
+      <View style={[styles.detailHeroCard, compactLayout ? styles.detailHeroCardCompact : null]}>
+        <View style={[styles.detailHeroHeader, compactLayout ? styles.detailHeroHeaderCompact : null]}>
           <Text style={styles.detailHeroEyebrow}>{card.family}</Text>
-          <Text style={styles.detailHeroValue}>{visual.countdownLabel ?? card.metric.currentLabel}</Text>
+          <Text style={[styles.detailHeroValue, compactLayout ? styles.detailHeroValueCompact : null]}>
+            {visual.countdownLabel ?? card.metric.currentLabel}
+          </Text>
         </View>
         <View style={styles.detailCountdownWrap}>
           <Text style={styles.detailCountdownDays}>{visual.countdownDays ?? "--"}</Text>
@@ -1497,10 +1516,10 @@ const DetailedVisualHero = ({ card }: { card: VisualEvidenceCard }) => {
     const thresholdPct = ((threshold - min) / Math.max(max - min, 1)) * 100;
 
     return (
-      <View style={styles.detailHeroCard}>
-        <View style={styles.detailHeroHeader}>
+      <View style={[styles.detailHeroCard, compactLayout ? styles.detailHeroCardCompact : null]}>
+        <View style={[styles.detailHeroHeader, compactLayout ? styles.detailHeroHeaderCompact : null]}>
           <Text style={styles.detailHeroEyebrow}>{card.family}</Text>
-          <Text style={styles.detailHeroValue}>{card.metric.currentLabel}</Text>
+          <Text style={[styles.detailHeroValue, compactLayout ? styles.detailHeroValueCompact : null]}>{card.metric.currentLabel}</Text>
         </View>
         <View style={styles.detailGaugeTrack}>
           <View style={styles.detailGaugeSafe} />
@@ -1509,7 +1528,7 @@ const DetailedVisualHero = ({ card }: { card: VisualEvidenceCard }) => {
           <View style={[styles.detailGaugeThreshold, { left: `${Math.max(0, Math.min(100, thresholdPct))}%` }]} />
           <View style={[styles.detailGaugeCurrent, { left: `${Math.max(0, Math.min(100, currentPct))}%` }]} />
         </View>
-        <View style={styles.detailHeroLegend}>
+        <View style={[styles.detailHeroLegend, compactLayout ? styles.detailHeroLegendCompact : null]}>
           <Text style={styles.detailHeroLegendText}>Lower risk</Text>
           <Text style={styles.detailHeroLegendText}>Higher risk</Text>
         </View>
@@ -1529,16 +1548,16 @@ const DetailedVisualHero = ({ card }: { card: VisualEvidenceCard }) => {
     const marker = ((current - min) / Math.max(max - min, 1)) * 100;
 
     return (
-      <View style={styles.detailHeroCard}>
-        <View style={styles.detailHeroHeader}>
+      <View style={[styles.detailHeroCard, compactLayout ? styles.detailHeroCardCompact : null]}>
+        <View style={[styles.detailHeroHeader, compactLayout ? styles.detailHeroHeaderCompact : null]}>
           <Text style={styles.detailHeroEyebrow}>{card.family}</Text>
-          <Text style={styles.detailHeroValue}>{card.metric.currentLabel}</Text>
+          <Text style={[styles.detailHeroValue, compactLayout ? styles.detailHeroValueCompact : null]}>{card.metric.currentLabel}</Text>
         </View>
         <View style={styles.detailZoneTrack}>
           <View style={[styles.detailZoneBand, { left: `${Math.max(0, start)}%`, width: `${Math.max(width, 6)}%` }]} />
           <View style={[styles.detailZoneMarker, { left: `${Math.max(0, Math.min(100, marker))}%` }]} />
         </View>
-        <View style={styles.detailHeroLegend}>
+        <View style={[styles.detailHeroLegend, compactLayout ? styles.detailHeroLegendCompact : null]}>
           <Text style={styles.detailHeroLegendText}>${low.toFixed(2)}</Text>
           <Text style={styles.detailHeroLegendText}>${current.toFixed(2)}</Text>
           <Text style={styles.detailHeroLegendText}>${high.toFixed(2)}</Text>
@@ -1561,17 +1580,17 @@ const DetailedVisualHero = ({ card }: { card: VisualEvidenceCard }) => {
       : "Latest";
 
   return (
-    <View style={styles.detailHeroCard}>
-      <View style={styles.detailHeroHeader}>
+    <View style={[styles.detailHeroCard, compactLayout ? styles.detailHeroCardCompact : null]}>
+      <View style={[styles.detailHeroHeader, compactLayout ? styles.detailHeroHeaderCompact : null]}>
         <View style={styles.flexOne}>
           <Text style={styles.detailHeroEyebrow}>{card.family}</Text>
-          <Text style={styles.detailHeroValue}>{card.metric.currentLabel}</Text>
+          <Text style={[styles.detailHeroValue, compactLayout ? styles.detailHeroValueCompact : null]}>{card.metric.currentLabel}</Text>
         </View>
         <View style={styles.detailHeroBadge}>
           <Text style={styles.detailHeroBadgeText}>{currentLabel}</Text>
         </View>
       </View>
-      <View style={styles.detailHeroChart}>
+      <View style={[styles.detailHeroChart, compactLayout ? styles.detailHeroChartCompact : null]}>
         <View style={styles.detailHeroGrid}>
           <View style={styles.detailHeroGridLine} />
           <View style={styles.detailHeroGridLine} />
@@ -1642,7 +1661,7 @@ const DetailedVisualHero = ({ card }: { card: VisualEvidenceCard }) => {
           </View>
         ) : null}
       </View>
-      <View style={styles.detailHeroLegend}>
+      <View style={[styles.detailHeroLegend, compactLayout ? styles.detailHeroLegendCompact : null]}>
         <Text style={styles.detailHeroLegendText}>{card.metric.thresholdLabel ?? "Threshold"}</Text>
         <Text style={styles.detailHeroLegendText}>{visual.markerLabel ?? card.metric.comparisonLabel ?? "Series"}</Text>
       </View>
@@ -1663,6 +1682,7 @@ const StockMetricDetailContent = ({
   onNext,
   onTogglePin,
   onSelectCard,
+  compactLayout = false,
 }: {
   card: VisualEvidenceCard;
   selectedEvidenceIndex: number;
@@ -1673,19 +1693,20 @@ const StockMetricDetailContent = ({
   onNext: () => void;
   onTogglePin: () => void;
   onSelectCard: (next: VisualEvidenceCard) => void;
+  compactLayout?: boolean;
 }) => {
   const [showFormulaDetails, setShowFormulaDetails] = useState(false);
 
   return (
     <>
-      <DetailedVisualHero card={card} />
-      <View style={styles.detailNarrativePanel}>
-        <View style={styles.detailNarrativeHeader}>
+      <DetailedVisualHero card={card} compactLayout={compactLayout} />
+      <View style={[styles.detailNarrativePanel, compactLayout ? styles.detailNarrativePanelCompact : null]}>
+        <View style={[styles.detailNarrativeHeader, compactLayout ? styles.detailNarrativeHeaderCompact : null]}>
           <Text style={styles.formulaTitle}>What stands out now</Text>
           <MetaPill label={`${selectedEvidenceIndex >= 0 ? selectedEvidenceIndex + 1 : 1} of ${total}`} />
         </View>
         <Text style={styles.detailNarrativeLead}>{card.summary}</Text>
-        <View style={styles.detailNarrativeSplit}>
+        <View style={[styles.detailNarrativeSplit, compactLayout ? styles.detailNarrativeSplitCompact : null]}>
           <View style={styles.detailNarrativeBlock}>
             <Text style={styles.detailNarrativeLabel}>Effect</Text>
             <Text style={styles.formulaMeta}>{card.effect}</Text>
@@ -1697,18 +1718,18 @@ const StockMetricDetailContent = ({
         </View>
         {card.relatedConditionLabel ? <MetaPill label={`Recipe: ${card.relatedConditionLabel}`} /> : null}
       </View>
-      <View style={styles.detailMetricStrip}>
+      <View style={[styles.detailMetricStrip, compactLayout ? styles.detailMetricStripCompact : null]}>
         <DenseStat label="Current" value={card.metric.currentLabel} tone="strong" />
         <DenseStat label="Threshold" value={card.metric.thresholdLabel ?? "Context"} />
         <DenseStat label="Freshness" value={card.freshness} tone={card.freshness === "Fresh" ? "strong" : "neutral"} />
         <DenseStat label="Source" value={card.sourceType} />
       </View>
-      <View style={styles.detailSheetActionRow}>
-        <Button label="Previous" tone="secondary" onPress={onPrevious} disabled={selectedEvidenceIndex <= 0} />
+      <View style={[styles.detailSheetActionRow, compactLayout ? styles.detailSheetActionRowCompact : null]}>
+        <Button label={compactLayout ? "Prev" : "Previous"} tone="secondary" onPress={onPrevious} disabled={selectedEvidenceIndex <= 0} />
         <Button label={isPinned ? "Unpin" : "Pin"} tone="ghost" onPress={onTogglePin} />
         <Button label="Next" tone="secondary" onPress={onNext} disabled={selectedEvidenceIndex < 0 || selectedEvidenceIndex >= total - 1} />
       </View>
-      <View style={styles.detailJumpSection}>
+      <View style={[styles.detailJumpSection, compactLayout ? styles.detailJumpSectionCompact : null]}>
         <Text style={styles.detailJumpTitle}>Browse more metrics</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.detailJumpRow}>
           {sortedCards.map((jumpCard) => (
@@ -2212,6 +2233,9 @@ export default function App() {
   const [journalFormAttempted, setJournalFormAttempted] = useState(false);
   const [stockFormAttempted, setStockFormAttempted] = useState(false);
   const deferredStockSearch = useDeferredValue(stockSearch);
+  const { width: viewportWidth } = useWindowDimensions();
+  const isCompactPhone = viewportWidth < 390;
+  const isVeryCompactPhone = viewportWidth < 360;
 
   const eyesSorted = useMemo(
     () =>
@@ -3176,8 +3200,8 @@ export default function App() {
             <>
               <Reveal>
                 <SectionHeader note="Search, select, inspect." />
-                <View style={styles.stockSearchShell}>
-                  <View style={styles.stockSearchHeader}>
+                <View style={[styles.stockSearchShell, isCompactPhone ? styles.stockSearchShellCompact : null]}>
+                  <View style={[styles.stockSearchHeader, isVeryCompactPhone ? styles.stockSearchHeaderCompact : null]}>
                     <View style={styles.flexOne}>
                       <Input
                         value={stockSearch}
@@ -3194,7 +3218,7 @@ export default function App() {
                     {stockSearch.trim().length > 0 ? (
                       <Button label="Clear" tone="ghost" onPress={() => setStockSearch("")} />
                     ) : null}
-                    <Button label="Add" tone="secondary" onPress={() => setStockComposerOpen(true)} />
+                    <Button label={isVeryCompactPhone ? "New" : "Add"} tone="secondary" onPress={() => setStockComposerOpen(true)} />
                   </View>
                   <View style={styles.inlineBetween}>
                     <View style={styles.searchSectionMeta}>
@@ -3227,6 +3251,7 @@ export default function App() {
                             onPress={() => openStockContext({ stockId: item.stock.id })}
                             style={({ pressed }) => [
                               styles.stockSuggestionRow,
+                              isCompactPhone ? styles.stockSuggestionRowCompact : null,
                               isSelected ? styles.stockSuggestionRowActive : null,
                               pressed ? styles.stockSuggestionRowPressed : null,
                             ]}
@@ -3300,7 +3325,7 @@ export default function App() {
               {selectedStockSummary ? (
                 <Reveal delay={40}>
                   <Card highlighted>
-                    <View style={styles.stockShellHeader}>
+                    <View style={[styles.stockShellHeader, isCompactPhone ? styles.stockShellHeaderCompact : null]}>
                       <View style={styles.stockShellIdentity}>
                         <Text style={styles.stockHeroSymbol}>{selectedStockSummary.stock.symbol}</Text>
                         <Text style={styles.stockHeroName}>{selectedStockSummary.stock.name}</Text>
@@ -3328,24 +3353,24 @@ export default function App() {
                         />
                       </View>
                     </View>
-                    <View style={styles.stockTrendHero}>
-                      <View style={styles.stockTrendHeader}>
+                    <View style={[styles.stockTrendHero, isCompactPhone ? styles.stockTrendHeroCompact : null]}>
+                      <View style={[styles.stockTrendHeader, isCompactPhone ? styles.stockTrendHeaderCompact : null]}>
                         <View style={styles.flexOne}>
-                          <Text style={styles.stockTrendPrice}>
+                          <Text style={[styles.stockTrendPrice, isCompactPhone ? styles.stockTrendPriceCompact : null]}>
                             {selectedHeroPrice !== undefined ? `$${selectedHeroPrice.toFixed(2)}` : "--"}
                           </Text>
                           <Text style={styles.stockTrendCaption}>
                             {selectedHeroPointLabel} · {selectedStockSummary.snapshot?.isMock ? "Mock data" : "Provider data"}
                           </Text>
                         </View>
-                        <View style={styles.stockTrendSummaryMini}>
-                          <View style={styles.stockTrendSummaryMiniBlock}>
+                        <View style={[styles.stockTrendSummaryMini, isCompactPhone ? styles.stockTrendSummaryMiniCompact : null]}>
+                          <View style={[styles.stockTrendSummaryMiniBlock, isCompactPhone ? styles.stockTrendSummaryMiniBlockCompact : null]}>
                             <Text style={styles.stockTrendSummaryMiniLabel}>Range</Text>
                             <Text style={styles.stockTrendSummaryMiniValue}>
                               {selectedStockHeroRange ? `${Math.round(selectedStockHeroRange.high - selectedStockHeroRange.low)} pts` : "--"}
                             </Text>
                           </View>
-                          <View style={styles.stockTrendSummaryMiniBlock}>
+                          <View style={[styles.stockTrendSummaryMiniBlock, isCompactPhone ? styles.stockTrendSummaryMiniBlockCompact : null]}>
                             <Text style={styles.stockTrendSummaryMiniLabel}>Vs {analysisBenchmark}</Text>
                             <Text style={styles.stockTrendSummaryMiniValue}>
                               {selectedHeroBenchmarkDelta !== undefined ? `${selectedHeroBenchmarkDelta >= 0 ? "+" : ""}${selectedHeroBenchmarkDelta.toFixed(2)}` : "--"}
@@ -3353,8 +3378,8 @@ export default function App() {
                           </View>
                         </View>
                       </View>
-                      <View style={styles.stockHeroControlRow}>
-                        <View style={styles.stockHeroControlBlock}>
+                      <View style={[styles.stockHeroControlRow, isCompactPhone ? styles.stockHeroControlRowCompact : null]}>
+                        <View style={[styles.stockHeroControlBlock, isCompactPhone ? styles.stockHeroControlBlockCompact : null]}>
                           <Text style={styles.stockHeroControlLabel}>Lookback</Text>
                           <HorizontalChoice
                             options={analysisLookbacks}
@@ -3363,7 +3388,7 @@ export default function App() {
                             variant="segmented"
                           />
                         </View>
-                        <View style={styles.stockHeroControlBlock}>
+                        <View style={[styles.stockHeroControlBlock, isCompactPhone ? styles.stockHeroControlBlockCompact : null]}>
                           <Text style={styles.stockHeroControlLabel}>Benchmark</Text>
                           <HorizontalChoice
                             options={analysisBenchmarks}
@@ -3373,7 +3398,7 @@ export default function App() {
                           />
                         </View>
                       </View>
-                      <View style={styles.stockTrendChart}>
+                      <View style={[styles.stockTrendChart, isCompactPhone ? styles.stockTrendChartCompact : null]}>
                         <View style={styles.stockTrendGrid}>
                           <View style={styles.stockTrendGridLine} />
                           <View style={styles.stockTrendGridLine} />
@@ -3446,7 +3471,7 @@ export default function App() {
                           />
                         ) : null}
                       </View>
-                      <View style={styles.stockTrendLegend}>
+                      <View style={[styles.stockTrendLegend, isCompactPhone ? styles.stockTrendLegendCompact : null]}>
                         <Text style={styles.stockTrendLegendText}>{selectedHeroPointLabel}</Text>
                         <Text style={styles.stockTrendLegendText}>
                           Drawdown {selectedStockSummary.snapshot ? `${selectedStockSummary.snapshot.drawdownPct}%` : "N/A"}
@@ -3454,7 +3479,7 @@ export default function App() {
                         <Text style={styles.stockTrendLegendText}>{analysisLookback} vs {analysisBenchmark}</Text>
                       </View>
                     </View>
-                    <View style={styles.stockControlsPanel}>
+                    <View style={[styles.stockControlsPanel, isCompactPhone ? styles.stockControlsPanelCompact : null]}>
                       <View style={styles.stockControlsHeader}>
                         <View style={styles.flexOne}>
                           <Text style={styles.stockControlsTitle}>Board controls</Text>
@@ -3498,13 +3523,21 @@ export default function App() {
                     </View>
                   </Card>
 
-                  <View style={styles.analysisGrid}>
+                  <View style={[styles.analysisGrid, isCompactPhone ? styles.analysisGridCompact : null]}>
                     {sortedSelectedStockAnalysisCards.length > 0 ? (
                       sortedSelectedStockAnalysisCards.map((card) => (
-                        <View key={`stock-card-${card.id}`} style={styles.analysisGridItem}>
+                        <View
+                          key={`stock-card-${card.id}`}
+                          style={[
+                            styles.analysisGridItem,
+                            isCompactPhone ? styles.analysisGridItemCompact : null,
+                            isVeryCompactPhone ? styles.analysisGridItemVeryCompact : null,
+                          ]}
+                        >
                           <EvidenceCardView
                             card={card}
                             compact={true}
+                            dense={isCompactPhone}
                             pinned={Boolean(
                               selectedStockSummary &&
                                 pinnedMetricKeys.includes(
@@ -4634,6 +4667,7 @@ export default function App() {
               selectedEvidenceIndex={selectedEvidenceIndex}
               total={sortedSelectedStockAnalysisCards.length}
               sortedCards={sortedSelectedStockAnalysisCards}
+              compactLayout={isCompactPhone}
               isPinned={
                 !!selectedStockSummary &&
                 pinnedMetricKeys.includes(stockMetricPreferenceKey(selectedStockSummary.stock.id, selectedEvidenceCard.id))
@@ -4873,10 +4907,18 @@ const styles = StyleSheet.create({
     borderColor: "#eceef2",
     overflow: "hidden",
   },
+  stockSearchShellCompact: {
+    gap: 8,
+    padding: 10,
+    borderRadius: 16,
+  },
   stockSearchHeader: {
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
+  },
+  stockSearchHeaderCompact: {
+    gap: 8,
   },
   suggestionLabel: {
     color: "#6b7280",
@@ -4962,6 +5004,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     gap: 12,
+  },
+  stockSuggestionRowCompact: {
+    minHeight: 68,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 14,
+    gap: 10,
   },
   stockSuggestionRowActive: {
     borderColor: "#111827",
@@ -5100,6 +5149,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#edf0f5",
   },
+  stockControlsPanelCompact: {
+    marginTop: 12,
+    gap: 8,
+    padding: 10,
+    borderRadius: 14,
+  },
   stockControlsHeader: {
     flexDirection: "row",
     alignItems: "flex-start",
@@ -5143,6 +5198,9 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     gap: 12,
   },
+  stockShellHeaderCompact: {
+    gap: 10,
+  },
   stockShellIdentity: {
     flex: 1,
     gap: 4,
@@ -5166,19 +5224,37 @@ const styles = StyleSheet.create({
     borderColor: "#edf0f5",
     gap: 10,
   },
+  stockTrendHeroCompact: {
+    marginTop: 10,
+    padding: 12,
+    borderRadius: 16,
+    gap: 8,
+  },
   stockTrendHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     gap: 10,
   },
+  stockTrendHeaderCompact: {
+    alignItems: "flex-start",
+    flexWrap: "wrap",
+    gap: 8,
+  },
   stockHeroControlRow: {
     flexDirection: "row",
+    gap: 8,
+  },
+  stockHeroControlRowCompact: {
+    flexDirection: "column",
     gap: 8,
   },
   stockHeroControlBlock: {
     flex: 1,
     gap: 6,
+  },
+  stockHeroControlBlockCompact: {
+    width: "100%",
   },
   stockHeroControlLabel: {
     color: "#6b7280",
@@ -5192,10 +5268,18 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 8,
   },
+  stockTrendSummaryMiniCompact: {
+    width: "100%",
+    justifyContent: "space-between",
+  },
   stockTrendSummaryMiniBlock: {
     minWidth: 74,
     alignItems: "flex-end",
     gap: 2,
+  },
+  stockTrendSummaryMiniBlockCompact: {
+    minWidth: 0,
+    flex: 1,
   },
   stockTrendSummaryMiniLabel: {
     color: "#6b7280",
@@ -5217,6 +5301,9 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     fontFamily,
   },
+  stockTrendPriceCompact: {
+    fontSize: 24,
+  },
   stockTrendCaption: {
     marginTop: 2,
     color: "#6b7280",
@@ -5237,6 +5324,13 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
     gap: 4,
     overflow: "hidden",
+  },
+  stockTrendChartCompact: {
+    height: 136,
+    paddingHorizontal: 8,
+    paddingBottom: 8,
+    paddingTop: 16,
+    gap: 3,
   },
   stockTrendGrid: {
     ...StyleSheet.absoluteFillObject,
@@ -5310,6 +5404,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
   },
+  stockTrendLegendCompact: {
+    flexWrap: "wrap",
+    gap: 6,
+  },
   stockTrendLegendText: {
     color: "#6b7280",
     fontSize: 10,
@@ -5377,8 +5475,17 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     gap: 10,
   },
+  analysisGridCompact: {
+    gap: 8,
+  },
   analysisGridItem: {
     width: "48.2%",
+  },
+  analysisGridItemCompact: {
+    width: "48.8%",
+  },
+  analysisGridItemVeryCompact: {
+    width: "48.9%",
   },
   // Evidence Cards
   evidenceCard: {
@@ -5395,6 +5502,11 @@ const styles = StyleSheet.create({
     gap: 7,
     minHeight: 166,
     borderColor: "#e5e7eb",
+  },
+  evidenceCardCompactDense: {
+    padding: 9,
+    gap: 6,
+    minHeight: 154,
   },
   evidenceCardCompactPassed: {
     borderColor: "#bbf7d0",
@@ -5451,6 +5563,9 @@ const styles = StyleSheet.create({
     flexShrink: 1,
     fontFamily,
   },
+  evidenceCardFamilyCompactDense: {
+    fontSize: 8,
+  },
   evidenceCardTitle: {
     color: "#111827",
     fontSize: 14,
@@ -5462,6 +5577,10 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     color: "#111827",
     lineHeight: 17,
+  },
+  evidenceCardTitleCompactDense: {
+    fontSize: 12,
+    lineHeight: 16,
   },
   evidenceCardHeaderMeta: {
     flexDirection: "row",
@@ -5499,6 +5618,9 @@ const styles = StyleSheet.create({
     flexShrink: 1,
     fontFamily,
   },
+  compactEvidenceValueDense: {
+    fontSize: 13,
+  },
   compactEvidenceThreshold: {
     color: "#6b7280",
     fontSize: 10,
@@ -5507,6 +5629,10 @@ const styles = StyleSheet.create({
     flexShrink: 1,
     textAlign: "right",
     maxWidth: "52%",
+  },
+  compactEvidenceThresholdDense: {
+    fontSize: 9,
+    maxWidth: "54%",
   },
   compactEvidenceMetaRow: {
     flexDirection: "row",
@@ -5522,6 +5648,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  compactStatusBadgeDense: {
+    minHeight: 20,
+    paddingHorizontal: 6,
+  },
   compactEvidenceStatusText: {
     color: "#111827",
     fontSize: 9,
@@ -5529,12 +5659,18 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
     fontFamily,
   },
+  compactEvidenceStatusTextDense: {
+    fontSize: 8,
+  },
   compactEvidenceEffect: {
     color: "#4b5563",
     fontSize: 10,
     fontWeight: "700",
     fontFamily,
     flex: 1,
+  },
+  compactEvidenceEffectDense: {
+    fontSize: 9,
   },
   compactFreshnessWrap: {
     flexDirection: "row",
@@ -5547,6 +5683,9 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: "700",
     fontFamily,
+  },
+  compactFreshnessTextDense: {
+    fontSize: 9,
   },
   metricJumpChip: {
     paddingHorizontal: 11,
@@ -5576,6 +5715,9 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     gap: 8,
   },
+  detailMetricStripCompact: {
+    gap: 6,
+  },
   detailNarrativePanel: {
     marginTop: 12,
     padding: 15,
@@ -5585,11 +5727,19 @@ const styles = StyleSheet.create({
     borderColor: "#eceef2",
     gap: 10,
   },
+  detailNarrativePanelCompact: {
+    marginTop: 10,
+    padding: 12,
+    gap: 8,
+  },
   detailNarrativeHeader: {
     flexDirection: "row",
     alignItems: "flex-start",
     justifyContent: "space-between",
     gap: 8,
+  },
+  detailNarrativeHeaderCompact: {
+    gap: 6,
   },
   detailNarrativeLead: {
     color: "#111827",
@@ -5600,6 +5750,9 @@ const styles = StyleSheet.create({
   },
   detailNarrativeSplit: {
     gap: 10,
+  },
+  detailNarrativeSplitCompact: {
+    gap: 8,
   },
   detailNarrativeBlock: {
     gap: 4,
@@ -5621,11 +5774,19 @@ const styles = StyleSheet.create({
     gap: 14,
     overflow: "hidden",
   },
+  detailHeroCardCompact: {
+    padding: 12,
+    borderRadius: 16,
+    gap: 10,
+  },
   detailHeroHeader: {
     flexDirection: "row",
     alignItems: "flex-start",
     justifyContent: "space-between",
     gap: 12,
+  },
+  detailHeroHeaderCompact: {
+    gap: 10,
   },
   detailHeroEyebrow: {
     color: "#93c5fd",
@@ -5641,6 +5802,10 @@ const styles = StyleSheet.create({
     lineHeight: 30,
     fontWeight: "800",
     fontFamily,
+  },
+  detailHeroValueCompact: {
+    fontSize: 21,
+    lineHeight: 27,
   },
   detailHeroBadge: {
     minHeight: 28,
@@ -5667,6 +5832,12 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     justifyContent: "flex-end",
     overflow: "hidden",
+  },
+  detailHeroChartCompact: {
+    height: 216,
+    paddingHorizontal: 10,
+    paddingTop: 10,
+    paddingBottom: 8,
   },
   detailHeroGrid: {
     ...StyleSheet.absoluteFillObject,
@@ -5748,6 +5919,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 10,
   },
+  detailHeroLegendCompact: {
+    gap: 6,
+  },
   detailHeroLegendText: {
     color: "#cbd5e1",
     fontSize: 11,
@@ -5768,9 +5942,17 @@ const styles = StyleSheet.create({
     gap: 8,
     marginTop: 10,
   },
+  detailSheetActionRowCompact: {
+    gap: 6,
+    marginTop: 8,
+  },
   detailJumpSection: {
     marginTop: 10,
     gap: 8,
+  },
+  detailJumpSectionCompact: {
+    marginTop: 8,
+    gap: 6,
   },
   detailJumpTitle: {
     color: "#6b7280",
