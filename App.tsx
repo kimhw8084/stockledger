@@ -676,6 +676,63 @@ const Reveal = ({
   );
 };
 
+const MotionSwap = ({
+  children,
+  swapKey,
+  y = 10,
+  scaleFrom = 0.985,
+  duration = 220,
+}: {
+  children: React.ReactNode;
+  swapKey: string;
+  y?: number;
+  scaleFrom?: number;
+  duration?: number;
+}) => {
+  const opacity = useRef(new Animated.Value(1)).current;
+  const translateY = useRef(new Animated.Value(0)).current;
+  const scale = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    opacity.setValue(0);
+    translateY.setValue(y);
+    scale.setValue(scaleFrom);
+
+    Animated.parallel([
+      Animated.timing(opacity, {
+        toValue: 1,
+        duration,
+        useNativeDriver: true,
+      }),
+      Animated.spring(translateY, {
+        toValue: 0,
+        stiffness: 240,
+        damping: 24,
+        mass: 0.9,
+        useNativeDriver: true,
+      }),
+      Animated.spring(scale, {
+        toValue: 1,
+        stiffness: 260,
+        damping: 22,
+        mass: 0.9,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [duration, opacity, scale, scaleFrom, swapKey, translateY, y]);
+
+  return (
+    <Animated.View
+      style={{
+        opacity,
+        transform: [{ translateY }, { scale }],
+      }}
+    >
+      {children}
+    </Animated.View>
+  );
+};
+
 const Card = ({
   children,
   highlighted,
@@ -3237,6 +3294,14 @@ export default function App() {
                     <Text style={styles.searchAssistText}>Press return to open the top match immediately.</Text>
                   ) : null}
                   {stockSuggestions.length > 0 ? (
+                    <MotionSwap
+                      swapKey={`${hasStockQuery ? "query" : "recent"}-${deferredStockSearch.trim().toLowerCase()}-${stockSuggestions
+                        .map((item) => item.stock.id)
+                        .join("|")}`}
+                      y={8}
+                      scaleFrom={0.99}
+                      duration={180}
+                    >
                     <View style={styles.stockSuggestionList}>
                       {stockSuggestions.map((item) => {
                         const isSelected = selectedStockSummary?.stock.id === item.stock.id;
@@ -3308,6 +3373,7 @@ export default function App() {
                         );
                       })}
                     </View>
+                    </MotionSwap>
                   ) : (
                     <View style={styles.emptySearchState}>
                       <Text style={styles.emptySearchTitle}>{hasStockQuery ? "No matching stocks" : "No recent searches"}</Text>
@@ -3325,6 +3391,11 @@ export default function App() {
               {selectedStockSummary ? (
                 <Reveal delay={40}>
                   <Card highlighted>
+                    <MotionSwap
+                      swapKey={`shell-${selectedStockSummary.stock.id}-${analysisLookback}-${analysisBenchmark}-${selectedHeroPointLabel}`}
+                      y={10}
+                      scaleFrom={0.992}
+                    >
                     <View style={[styles.stockShellHeader, isCompactPhone ? styles.stockShellHeaderCompact : null]}>
                       <View style={styles.stockShellIdentity}>
                         <Text style={styles.stockHeroSymbol}>{selectedStockSummary.stock.symbol}</Text>
@@ -3353,6 +3424,12 @@ export default function App() {
                         />
                       </View>
                     </View>
+                    </MotionSwap>
+                    <MotionSwap
+                      swapKey={`hero-${selectedStockSummary.stock.id}-${analysisLookback}-${analysisBenchmark}-${safeSelectedHeroPointIndex}`}
+                      y={12}
+                      scaleFrom={0.99}
+                    >
                     <View style={[styles.stockTrendHero, isCompactPhone ? styles.stockTrendHeroCompact : null]}>
                       <View style={[styles.stockTrendHeader, isCompactPhone ? styles.stockTrendHeaderCompact : null]}>
                         <View style={styles.flexOne}>
@@ -3479,6 +3556,13 @@ export default function App() {
                         <Text style={styles.stockTrendLegendText}>{analysisLookback} vs {analysisBenchmark}</Text>
                       </View>
                     </View>
+                    </MotionSwap>
+                    <MotionSwap
+                      swapKey={`controls-${selectedStockSummary.stock.id}-${analysisStatusFilter}-${stockBoardMode}`}
+                      y={8}
+                      scaleFrom={0.994}
+                      duration={180}
+                    >
                     <View style={[styles.stockControlsPanel, isCompactPhone ? styles.stockControlsPanelCompact : null]}>
                       <View style={styles.stockControlsHeader}>
                         <View style={styles.flexOne}>
@@ -3521,8 +3605,16 @@ export default function App() {
                         />
                       </View>
                     </View>
+                    </MotionSwap>
                   </Card>
 
+                  <MotionSwap
+                    swapKey={`grid-${selectedStockSummary.stock.id}-${analysisStatusFilter}-${stockBoardMode}-${pinnedCountForSelectedStock}-${sortedSelectedStockAnalysisCards
+                      .map((card) => card.id)
+                      .join("|")}`}
+                    y={10}
+                    scaleFrom={0.992}
+                  >
                   <View style={[styles.analysisGrid, isCompactPhone ? styles.analysisGridCompact : null]}>
                     {sortedSelectedStockAnalysisCards.length > 0 ? (
                       sortedSelectedStockAnalysisCards.map((card) => (
@@ -3554,6 +3646,7 @@ export default function App() {
                       </Card>
                     )}
                   </View>
+                  </MotionSwap>
                 </Reveal>
               ) : (
                 <Reveal delay={40}>
@@ -4662,6 +4755,11 @@ export default function App() {
             subtitle={`${selectedStockSummary?.stock.symbol ?? "Stock"} · ${selectedEvidenceCard.freshness}${selectedEvidenceIndex >= 0 ? ` · ${selectedEvidenceIndex + 1} of ${sortedSelectedStockAnalysisCards.length}` : ""}`}
             onClose={() => setSelectedEvidenceCard(null)}
           >
+            <MotionSwap
+              swapKey={`metric-sheet-${selectedEvidenceCard.id}-${selectedEvidenceIndex}`}
+              y={12}
+              scaleFrom={0.992}
+            >
             <StockMetricDetailContent
               card={selectedEvidenceCard}
               selectedEvidenceIndex={selectedEvidenceIndex}
@@ -4677,6 +4775,7 @@ export default function App() {
               onTogglePin={() => togglePinnedMetric(selectedEvidenceCard)}
               onSelectCard={setSelectedEvidenceCard}
             />
+            </MotionSwap>
           </WindowPanel>
         ) : null}
 
