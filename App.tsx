@@ -16,6 +16,10 @@ import {
 import { useAppModel } from "./src/hooks/useAppModel";
 import { BottomNav } from "./src/components/BottomNav";
 import { WindowPanel } from "./src/components/WindowPanel";
+import { MotionSwap } from "./src/components/MotionSwap";
+import { StockSearchPanel } from "./src/components/stocks/StockSearchPanel";
+import { StockTrendHero } from "./src/components/stocks/StockTrendHero";
+import { StockMetricDetailSheet } from "./src/components/stocks/StockMetricDetailSheet";
 import {
   Alert,
   ConditionOperator,
@@ -671,63 +675,6 @@ const Reveal = ({
 
   return (
     <Animated.View style={{ opacity, transform: [{ translateY }] }}>
-      {children}
-    </Animated.View>
-  );
-};
-
-const MotionSwap = ({
-  children,
-  swapKey,
-  y = 10,
-  scaleFrom = 0.985,
-  duration = 220,
-}: {
-  children: React.ReactNode;
-  swapKey: string;
-  y?: number;
-  scaleFrom?: number;
-  duration?: number;
-}) => {
-  const opacity = useRef(new Animated.Value(1)).current;
-  const translateY = useRef(new Animated.Value(0)).current;
-  const scale = useRef(new Animated.Value(1)).current;
-
-  useEffect(() => {
-    opacity.setValue(0);
-    translateY.setValue(y);
-    scale.setValue(scaleFrom);
-
-    Animated.parallel([
-      Animated.timing(opacity, {
-        toValue: 1,
-        duration,
-        useNativeDriver: true,
-      }),
-      Animated.spring(translateY, {
-        toValue: 0,
-        stiffness: 240,
-        damping: 24,
-        mass: 0.9,
-        useNativeDriver: true,
-      }),
-      Animated.spring(scale, {
-        toValue: 1,
-        stiffness: 260,
-        damping: 22,
-        mass: 0.9,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, [duration, opacity, scale, scaleFrom, swapKey, translateY, y]);
-
-  return (
-    <Animated.View
-      style={{
-        opacity,
-        transform: [{ translateY }, { scale }],
-      }}
-    >
       {children}
     </Animated.View>
   );
@@ -1508,349 +1455,6 @@ const EvidenceCardView = ({
         </View>
       ) : null}
     </Pressable>
-  );
-};
-
-const DetailedVisualHero = ({
-  card,
-  compactLayout = false,
-}: {
-  card: VisualEvidenceCard;
-  compactLayout?: boolean;
-}) => {
-  const visual = card.visual;
-  const primarySeries = visual.series ?? [];
-  const secondarySeries = visual.secondarySeries ?? [];
-  const tertiarySeries = visual.tertiarySeries ?? [];
-  const [selectedPoint, setSelectedPoint] = useState<number>(Math.max(primarySeries.length - 1, 0));
-
-  useEffect(() => {
-    setSelectedPoint(Math.max(primarySeries.length - 1, 0));
-  }, [card.id, primarySeries.length]);
-
-  if (visual.kind === "checklist") {
-    return (
-      <View style={[styles.detailHeroCard, compactLayout ? styles.detailHeroCardCompact : null]}>
-        <View style={[styles.detailHeroHeader, compactLayout ? styles.detailHeroHeaderCompact : null]}>
-          <Text style={styles.detailHeroEyebrow}>{card.family}</Text>
-          <Text style={[styles.detailHeroValue, compactLayout ? styles.detailHeroValueCompact : null]}>{card.metric.currentLabel}</Text>
-        </View>
-        <View style={styles.detailChecklistStack}>
-          {(visual.items ?? []).map((item) => (
-            <View key={item.label} style={styles.detailChecklistRow}>
-              <View
-                style={[
-                  styles.detailChecklistMarker,
-                  item.tone === "good"
-                    ? styles.detailChecklistMarkerGood
-                    : item.tone === "warning"
-                      ? styles.detailChecklistMarkerWarning
-                      : item.tone === "danger"
-                        ? styles.detailChecklistMarkerDanger
-                        : styles.detailChecklistMarkerNeutral,
-                ]}
-              />
-              <Text style={styles.detailChecklistLabel} numberOfLines={1}>
-                {item.label}
-              </Text>
-            </View>
-          ))}
-        </View>
-        <Text style={styles.detailHeroFootnote}>{card.metric.thresholdLabel ?? "Context"}</Text>
-      </View>
-    );
-  }
-
-  if (visual.kind === "event_countdown") {
-    return (
-      <View style={[styles.detailHeroCard, compactLayout ? styles.detailHeroCardCompact : null]}>
-        <View style={[styles.detailHeroHeader, compactLayout ? styles.detailHeroHeaderCompact : null]}>
-          <Text style={styles.detailHeroEyebrow}>{card.family}</Text>
-          <Text style={[styles.detailHeroValue, compactLayout ? styles.detailHeroValueCompact : null]}>
-            {visual.countdownLabel ?? card.metric.currentLabel}
-          </Text>
-        </View>
-        <View style={styles.detailCountdownWrap}>
-          <Text style={styles.detailCountdownDays}>{visual.countdownDays ?? "--"}</Text>
-          <Text style={styles.detailCountdownUnit}>days</Text>
-        </View>
-        <Text style={styles.detailHeroFootnote}>{card.summary}</Text>
-      </View>
-    );
-  }
-
-  if (visual.kind === "risk_gauge") {
-    const min = visual.min ?? 0;
-    const max = visual.max ?? 100;
-    const current = visual.current ?? min;
-    const threshold = visual.threshold ?? max;
-    const currentPct = ((current - min) / Math.max(max - min, 1)) * 100;
-    const thresholdPct = ((threshold - min) / Math.max(max - min, 1)) * 100;
-
-    return (
-      <View style={[styles.detailHeroCard, compactLayout ? styles.detailHeroCardCompact : null]}>
-        <View style={[styles.detailHeroHeader, compactLayout ? styles.detailHeroHeaderCompact : null]}>
-          <Text style={styles.detailHeroEyebrow}>{card.family}</Text>
-          <Text style={[styles.detailHeroValue, compactLayout ? styles.detailHeroValueCompact : null]}>{card.metric.currentLabel}</Text>
-        </View>
-        <View style={styles.detailGaugeTrack}>
-          <View style={styles.detailGaugeSafe} />
-          <View style={styles.detailGaugeWarn} />
-          <View style={styles.detailGaugeDanger} />
-          <View style={[styles.detailGaugeThreshold, { left: `${Math.max(0, Math.min(100, thresholdPct))}%` }]} />
-          <View style={[styles.detailGaugeCurrent, { left: `${Math.max(0, Math.min(100, currentPct))}%` }]} />
-        </View>
-        <View style={[styles.detailHeroLegend, compactLayout ? styles.detailHeroLegendCompact : null]}>
-          <Text style={styles.detailHeroLegendText}>Lower risk</Text>
-          <Text style={styles.detailHeroLegendText}>Higher risk</Text>
-        </View>
-        <Text style={styles.detailHeroFootnote}>{card.metric.thresholdLabel ?? "Context"}</Text>
-      </View>
-    );
-  }
-
-  if (visual.kind === "entry_zone") {
-    const low = visual.low ?? 0;
-    const high = visual.high ?? low;
-    const current = visual.current ?? low;
-    const min = Math.max(0, low * 0.92);
-    const max = high * 1.08 || 1;
-    const start = ((low - min) / Math.max(max - min, 1)) * 100;
-    const width = ((high - low) / Math.max(max - min, 1)) * 100;
-    const marker = ((current - min) / Math.max(max - min, 1)) * 100;
-
-    return (
-      <View style={[styles.detailHeroCard, compactLayout ? styles.detailHeroCardCompact : null]}>
-        <View style={[styles.detailHeroHeader, compactLayout ? styles.detailHeroHeaderCompact : null]}>
-          <Text style={styles.detailHeroEyebrow}>{card.family}</Text>
-          <Text style={[styles.detailHeroValue, compactLayout ? styles.detailHeroValueCompact : null]}>{card.metric.currentLabel}</Text>
-        </View>
-        <View style={styles.detailZoneTrack}>
-          <View style={[styles.detailZoneBand, { left: `${Math.max(0, start)}%`, width: `${Math.max(width, 6)}%` }]} />
-          <View style={[styles.detailZoneMarker, { left: `${Math.max(0, Math.min(100, marker))}%` }]} />
-        </View>
-        <View style={[styles.detailHeroLegend, compactLayout ? styles.detailHeroLegendCompact : null]}>
-          <Text style={styles.detailHeroLegendText}>${low.toFixed(2)}</Text>
-          <Text style={styles.detailHeroLegendText}>${current.toFixed(2)}</Text>
-          <Text style={styles.detailHeroLegendText}>${high.toFixed(2)}</Text>
-        </View>
-        <Text style={styles.detailHeroFootnote}>{card.metric.thresholdLabel ?? "Planned zone"}</Text>
-      </View>
-    );
-  }
-
-  const displaySeries = primarySeries.length > 0 ? primarySeries : [25, 32, 28, 36, 42, 40, 48, 54];
-  const selectedValue = displaySeries[Math.max(0, Math.min(selectedPoint, displaySeries.length - 1))] ?? displaySeries[displaySeries.length - 1];
-  const min = visual.min ?? Math.min(...displaySeries);
-  const max = visual.max ?? Math.max(...displaySeries);
-  const threshold = visual.threshold ?? min;
-  const thresholdPct = ((threshold - min) / Math.max(max - min, 1)) * 100;
-  const currentPct = ((selectedValue - min) / Math.max(max - min, 1)) * 100;
-  const currentLabel =
-    displaySeries.length > 1 && selectedPoint !== displaySeries.length - 1
-      ? `Point ${selectedPoint + 1}`
-      : "Latest";
-
-  return (
-    <View style={[styles.detailHeroCard, compactLayout ? styles.detailHeroCardCompact : null]}>
-      <View style={[styles.detailHeroHeader, compactLayout ? styles.detailHeroHeaderCompact : null]}>
-        <View style={styles.flexOne}>
-          <Text style={styles.detailHeroEyebrow}>{card.family}</Text>
-          <Text style={[styles.detailHeroValue, compactLayout ? styles.detailHeroValueCompact : null]}>{card.metric.currentLabel}</Text>
-        </View>
-        <View style={styles.detailHeroBadge}>
-          <Text style={styles.detailHeroBadgeText}>{currentLabel}</Text>
-        </View>
-      </View>
-      <View style={[styles.detailHeroChart, compactLayout ? styles.detailHeroChartCompact : null]}>
-        <View style={styles.detailHeroGrid}>
-          <View style={styles.detailHeroGridLine} />
-          <View style={styles.detailHeroGridLine} />
-          <View style={styles.detailHeroGridLine} />
-        </View>
-        <View style={[styles.detailHeroThresholdLine, { bottom: `${Math.max(0, Math.min(100, thresholdPct))}%` }]} />
-        <View style={[styles.detailHeroCurrentLine, { bottom: `${Math.max(0, Math.min(100, currentPct))}%` }]} />
-        <View style={styles.detailHeroBarsRow}>
-          {displaySeries.map((point, index) => {
-            const pointPct = ((point - min) / Math.max(max - min, 1)) * 100;
-            const seriesActive = index === selectedPoint;
-            return (
-              <Pressable
-                key={`${card.id}-detail-series-${index}`}
-                onPress={() => setSelectedPoint(index)}
-                style={[
-                  styles.detailHeroBarHit,
-                  seriesActive ? styles.detailHeroBarHitActive : null,
-                ]}
-              >
-                <View
-                  style={[
-                    styles.detailHeroBar,
-                    { height: `${Math.max(12, pointPct)}%` },
-                    seriesActive ? styles.detailHeroBarActive : null,
-                  ]}
-                />
-              </Pressable>
-            );
-          })}
-        </View>
-        {secondarySeries.length > 0 ? (
-          <View pointerEvents="none" style={styles.detailHeroLineOverlay}>
-            {secondarySeries.map((point, index) => {
-              const pointPct = ((point - min) / Math.max(max - min, 1)) * 100;
-              return (
-                <View
-                  key={`${card.id}-detail-secondary-${index}`}
-                  style={[
-                    styles.detailHeroLineDot,
-                    {
-                      left: `${(index / Math.max(secondarySeries.length - 1, 1)) * 100}%`,
-                      bottom: `${Math.max(0, Math.min(100, pointPct))}%`,
-                    },
-                  ]}
-                />
-              );
-            })}
-          </View>
-        ) : null}
-        {tertiarySeries.length > 0 ? (
-          <View pointerEvents="none" style={styles.detailHeroLineOverlay}>
-            {tertiarySeries.map((point, index) => {
-              const pointPct = ((point - min) / Math.max(max - min, 1)) * 100;
-              return (
-                <View
-                  key={`${card.id}-detail-tertiary-${index}`}
-                  style={[
-                    styles.detailHeroLineDotMuted,
-                    {
-                      left: `${(index / Math.max(tertiarySeries.length - 1, 1)) * 100}%`,
-                      bottom: `${Math.max(0, Math.min(100, pointPct))}%`,
-                    },
-                  ]}
-                />
-              );
-            })}
-          </View>
-        ) : null}
-      </View>
-      <View style={[styles.detailHeroLegend, compactLayout ? styles.detailHeroLegendCompact : null]}>
-        <Text style={styles.detailHeroLegendText}>{card.metric.thresholdLabel ?? "Threshold"}</Text>
-        <Text style={styles.detailHeroLegendText}>{visual.markerLabel ?? card.metric.comparisonLabel ?? "Series"}</Text>
-      </View>
-      <Text style={styles.detailHeroFootnote}>
-        Tap the chart bars to inspect earlier points without leaving the stock metric sheet.
-      </Text>
-    </View>
-  );
-};
-
-const StockMetricDetailContent = ({
-  card,
-  selectedEvidenceIndex,
-  total,
-  sortedCards,
-  isPinned,
-  onPrevious,
-  onNext,
-  onTogglePin,
-  onSelectCard,
-  compactLayout = false,
-}: {
-  card: VisualEvidenceCard;
-  selectedEvidenceIndex: number;
-  total: number;
-  sortedCards: VisualEvidenceCard[];
-  isPinned: boolean;
-  onPrevious: () => void;
-  onNext: () => void;
-  onTogglePin: () => void;
-  onSelectCard: (next: VisualEvidenceCard) => void;
-  compactLayout?: boolean;
-}) => {
-  const [showFormulaDetails, setShowFormulaDetails] = useState(false);
-
-  return (
-    <>
-      <DetailedVisualHero card={card} compactLayout={compactLayout} />
-      <View style={[styles.detailNarrativePanel, compactLayout ? styles.detailNarrativePanelCompact : null]}>
-        <View style={[styles.detailNarrativeHeader, compactLayout ? styles.detailNarrativeHeaderCompact : null]}>
-          <Text style={styles.formulaTitle}>What stands out now</Text>
-          <MetaPill label={`${selectedEvidenceIndex >= 0 ? selectedEvidenceIndex + 1 : 1} of ${total}`} />
-        </View>
-        <Text style={styles.detailNarrativeLead}>{card.summary}</Text>
-        <View style={[styles.detailNarrativeSplit, compactLayout ? styles.detailNarrativeSplitCompact : null]}>
-          <View style={styles.detailNarrativeBlock}>
-            <Text style={styles.detailNarrativeLabel}>Effect</Text>
-            <Text style={styles.formulaMeta}>{card.effect}</Text>
-          </View>
-          <View style={styles.detailNarrativeBlock}>
-            <Text style={styles.detailNarrativeLabel}>Why it matters</Text>
-            <Text style={styles.formulaMeta}>{card.whyItMatters}</Text>
-          </View>
-        </View>
-        {card.relatedConditionLabel ? <MetaPill label={`Recipe: ${card.relatedConditionLabel}`} /> : null}
-      </View>
-      <View style={[styles.detailMetricStrip, compactLayout ? styles.detailMetricStripCompact : null]}>
-        <DenseStat label="Current" value={card.metric.currentLabel} tone="strong" />
-        <DenseStat label="Threshold" value={card.metric.thresholdLabel ?? "Context"} />
-        <DenseStat
-          label="Freshness"
-          value={card.freshness === "Mock Data" ? "Dummy" : card.freshness}
-          tone={card.freshness === "Fresh" ? "strong" : "neutral"}
-        />
-        <DenseStat label="Source" value={sourceTypeLabel(card.sourceType)} />
-      </View>
-      <View style={[styles.detailSheetActionRow, compactLayout ? styles.detailSheetActionRowCompact : null]}>
-        <Button label={compactLayout ? "Prev" : "Previous"} tone="secondary" onPress={onPrevious} disabled={selectedEvidenceIndex <= 0} />
-        <Button label={isPinned ? "Unpin" : "Pin"} tone="ghost" onPress={onTogglePin} />
-        <Button label="Next" tone="secondary" onPress={onNext} disabled={selectedEvidenceIndex < 0 || selectedEvidenceIndex >= total - 1} />
-      </View>
-      <View style={[styles.detailJumpSection, compactLayout ? styles.detailJumpSectionCompact : null]}>
-        <Text style={styles.detailJumpTitle}>Browse more metrics</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.detailJumpRow}>
-          {sortedCards.map((jumpCard) => (
-            <Pressable
-              key={`jump-${jumpCard.id}`}
-              onPress={() => onSelectCard(jumpCard)}
-              style={[
-                styles.metricJumpChip,
-                card.id === jumpCard.id ? styles.metricJumpChipActive : null,
-              ]}
-            >
-              <Text
-                style={[
-                  styles.metricJumpChipText,
-                  card.id === jumpCard.id ? styles.metricJumpChipTextActive : null,
-                ]}
-                numberOfLines={1}
-              >
-                {jumpCard.title}
-              </Text>
-            </Pressable>
-          ))}
-        </ScrollView>
-      </View>
-      <Pressable onPress={() => setShowFormulaDetails((current) => !current)} style={styles.detailDisclosurePanel}>
-        <View style={styles.flexOne}>
-          <Text style={styles.formulaTitle}>{showFormulaDetails ? "Hide formula detail" : "Show formula detail"}</Text>
-          <Text style={styles.formulaMeta} numberOfLines={showFormulaDetails ? undefined : 1}>
-            {card.formulaName ?? "How this metric is calculated"}
-          </Text>
-        </View>
-        <Text style={styles.groupHeaderToggle}>{showFormulaDetails ? "Hide" : "Show"}</Text>
-      </Pressable>
-      {showFormulaDetails ? (
-        <View style={styles.formulaPanel}>
-          <Text style={styles.formulaTitle}>{card.formulaName ?? "Formula detail"}</Text>
-          <Text style={styles.formulaBody}>
-            {card.formulaDescription ?? "No extra formula detail available."}
-          </Text>
-          <Text style={styles.formulaMeta}>
-            Inputs: {card.formulaInputs?.join(", ") ?? "No explicit inputs recorded"}
-          </Text>
-        </View>
-      ) : null}
-    </>
   );
 };
 
@@ -3276,310 +2880,73 @@ export default function App() {
             <>
               <Reveal>
                 <SectionHeader note="Search, select, inspect." />
-                <View style={[styles.stockSearchShell, isCompactPhone ? styles.stockSearchShellCompact : null]}>
-                  <View style={[styles.stockSearchHeader, isVeryCompactPhone ? styles.stockSearchHeaderCompact : null]}>
-                    <View style={styles.flexOne}>
-                      <Input
-                        value={stockSearch}
-                        onChangeText={setStockSearch}
-                        placeholder="Search ticker or company"
-                        autoCapitalize="characters"
-                        returnKeyType="search"
-                        onSubmitEditing={() => {
-                          if (!topSuggestionId) return;
-                          openStockContext({ stockId: topSuggestionId });
-                        }}
-                      />
-                    </View>
-                    {stockSearch.trim().length > 0 ? (
-                      <Button label="Clear" tone="ghost" onPress={() => setStockSearch("")} />
-                    ) : null}
-                    <Button label={isVeryCompactPhone ? "New" : "Add"} tone="secondary" onPress={() => setStockComposerOpen(true)} />
-                  </View>
-                  <View style={styles.inlineBetween}>
-                    <View style={styles.searchSectionMeta}>
-                      <Text style={styles.suggestionLabel}>{hasStockQuery ? "Suggestions" : "Recent search"}</Text>
-                      <Text style={styles.searchResultCount}>
-                        {stockSuggestions.length > 0 ? `${stockSuggestions.length} shown` : hasStockQuery ? "0 shown" : "None"}
-                      </Text>
-                    </View>
-                    {!hasStockQuery && recentStocks.length > 0 ? (
-                      <Pressable onPress={() => setRecentStockIds([])} hitSlop={8}>
-                        <Text style={styles.inlineUtilityText}>Clear recent</Text>
-                      </Pressable>
-                    ) : null}
-                  </View>
-                  {hasStockQuery && topSuggestionId ? (
-                    <Text style={styles.searchAssistText}>Press return to open the top match immediately.</Text>
-                  ) : null}
-                  {stockSuggestions.length > 0 ? (
-                    <MotionSwap
-                      swapKey={`${hasStockQuery ? "query" : "recent"}-${deferredStockSearch.trim().toLowerCase()}-${stockSuggestions
-                        .map((item) => item.stock.id)
-                        .join("|")}`}
-                      y={8}
-                      scaleFrom={0.99}
-                      duration={180}
-                    >
-                    <View style={styles.stockSuggestionList}>
-                      {stockSuggestions.map((item) => {
-                        const isSelected = selectedStockSummary?.stock.id === item.stock.id;
-                        const isTopMatch = hasStockQuery && topSuggestionId === item.stock.id;
-                        const isExactSymbolMatch =
-                          hasStockQuery &&
-                          item.stock.symbol.toLowerCase() === deferredStockSearch.trim().toLowerCase();
-
-                        return (
-                          <Pressable
-                            key={`suggest-${item.stock.id}`}
-                            onPress={() => openStockContext({ stockId: item.stock.id })}
-                            style={({ pressed }) => [
-                              styles.stockSuggestionRow,
-                              isCompactPhone ? styles.stockSuggestionRowCompact : null,
-                              isSelected ? styles.stockSuggestionRowActive : null,
-                              pressed ? styles.stockSuggestionRowPressed : null,
-                            ]}
-                          >
-                            <View style={styles.stockSuggestionLead}>
-                              <View style={styles.stockSuggestionAvatar}>
-                                <Text style={styles.stockSuggestionAvatarText}>{item.stock.symbol.slice(0, 4)}</Text>
-                              </View>
-                              <View style={styles.flexOne}>
-                                <View style={styles.stockSuggestionTitleRow}>
-                                  <Text
-                                    style={[styles.stockSuggestionSymbol, isSelected ? styles.stockSuggestionSymbolActive : null]}
-                                    numberOfLines={1}
-                                  >
-                                    {item.stock.symbol}
-                                  </Text>
-                                  {isExactSymbolMatch ? (
-                                    <Text style={styles.stockTopMatchLabel}>Exact</Text>
-                                  ) : isTopMatch ? (
-                                    <Text style={styles.stockTopMatchLabel}>Top match</Text>
-                                  ) : !hasStockQuery ? (
-                                    <Text style={styles.stockRecentLabel}>Recent</Text>
-                                  ) : null}
-                                </View>
-                                <Text
-                                  style={[styles.stockSuggestionName, isSelected ? styles.stockSuggestionNameActive : null]}
-                                  numberOfLines={1}
-                                >
-                                  {item.stock.name}
-                                </Text>
-                              </View>
-                            </View>
-                            <View style={styles.stockSuggestionRight}>
-                              <Text style={styles.stockSuggestionPrice}>
-                                {item.snapshot ? `$${item.snapshot.price.toFixed(2)}` : "--"}
-                              </Text>
-                              <Text style={styles.stockSuggestionMeta} numberOfLines={1}>
-                                {stockSuggestionTrustLabel(item.snapshot)}
-                              </Text>
-                              {!hasStockQuery ? (
-                                <Pressable
-                                  onPress={() =>
-                                    setRecentStockIds((current) =>
-                                      current.filter((candidate) => candidate !== item.stock.id),
-                                    )
-                                  }
-                                  hitSlop={8}
-                                >
-                                  <Text style={styles.stockSuggestionRemove}>Remove</Text>
-                                </Pressable>
-                              ) : null}
-                            </View>
-                          </Pressable>
-                        );
-                      })}
-                    </View>
-                    </MotionSwap>
-                  ) : (
-                    <View style={styles.emptySearchState}>
-                      <Text style={styles.emptySearchTitle}>{hasStockQuery ? "No matching stocks" : "No recent searches"}</Text>
-                      <Text style={styles.emptySearchBody}>
-                        {hasStockQuery
-                          ? "Try another ticker or company name, or clear the search to return to recent stocks."
-                          : "Search a stock to open its visual analysis board."}
-                      </Text>
-                      {hasStockQuery ? <Button label="Clear Search" tone="secondary" onPress={() => setStockSearch("")} /> : null}
-                    </View>
-                  )}
-                </View>
+                <StockSearchPanel
+                  styles={styles}
+                  stockSearch={stockSearch}
+                  setStockSearch={setStockSearch}
+                  topSuggestionId={topSuggestionId}
+                  openStockContext={({ stockId }) => openStockContext({ stockId })}
+                  hasStockQuery={hasStockQuery}
+                  stockSuggestions={stockSuggestions}
+                  selectedStockId={selectedStockSummary?.stock.id ?? ""}
+                  deferredStockSearch={deferredStockSearch}
+                  recentStocksCount={recentStocks.length}
+                  setRecentStockIds={setRecentStockIds}
+                  onAddStock={() => setStockComposerOpen(true)}
+                  isCompactPhone={isCompactPhone}
+                  isVeryCompactPhone={isVeryCompactPhone}
+                  Input={Input}
+                  Button={Button}
+                  stockSuggestionTrustLabel={stockSuggestionTrustLabel}
+                />
               </Reveal>
 
               {selectedStockSummary ? (
                 <Reveal delay={40}>
                   <Card highlighted>
-                    <MotionSwap
-                      swapKey={`shell-${selectedStockSummary.stock.id}-${analysisLookback}-${analysisBenchmark}-${selectedHeroPointLabel}`}
-                      y={10}
-                      scaleFrom={0.992}
-                    >
-                    <View style={[styles.stockShellHeader, isCompactPhone ? styles.stockShellHeaderCompact : null]}>
-                      <View style={styles.stockShellIdentity}>
-                        <Text style={styles.stockHeroSymbol}>{selectedStockSummary.stock.symbol}</Text>
-                        <Text style={styles.stockHeroName}>{selectedStockSummary.stock.name}</Text>
-                        <View style={styles.stockShellMetaRow}>
-                          <Text style={styles.stockBoardMetaText}>{sortedSelectedStockAnalysisCards.length} metrics</Text>
-                          <Text style={styles.stockBoardMetaDivider}>•</Text>
-                          <Text style={styles.stockBoardMetaText}>{selectedStockSummary.eyes.length} eyes</Text>
-                          <Text style={styles.stockBoardMetaDivider}>•</Text>
-                          <Text style={styles.stockBoardMetaText}>{pinnedCountForSelectedStock} pinned</Text>
-                          <Text style={styles.stockBoardMetaDivider}>•</Text>
-                          <Text style={styles.stockBoardMetaText}>
-                            {stockSnapshotModeLabel(selectedStockSummary.snapshot)}
-                          </Text>
-                        </View>
-                      </View>
-                      <View style={styles.stockShellHeaderActions}>
-                        <View style={freshnessTone(selectedStockSummary.snapshot?.freshness ?? "Unavailable")}>
-                          <Text style={styles.freshnessBadgeText}>
-                            {selectedStockSummary.snapshot?.freshness ?? "Unavailable"}
-                          </Text>
-                        </View>
-                        <Button
-                          label="Clear"
-                          tone="ghost"
-                          onPress={() => {
-                            setSelectedStockId("");
-                            setStockSearch("");
-                          }}
-                        />
-                      </View>
-                    </View>
-                    </MotionSwap>
-                    <MotionSwap
-                      swapKey={`hero-${selectedStockSummary.stock.id}-${analysisLookback}-${analysisBenchmark}-${safeSelectedHeroPointIndex}`}
-                      y={12}
-                      scaleFrom={0.99}
-                    >
-                    <View style={[styles.stockTrendHero, isCompactPhone ? styles.stockTrendHeroCompact : null]}>
-                      <View style={[styles.stockTrendHeader, isCompactPhone ? styles.stockTrendHeaderCompact : null]}>
-                        <View style={styles.flexOne}>
-                          <Text style={[styles.stockTrendPrice, isCompactPhone ? styles.stockTrendPriceCompact : null]}>
-                            {selectedHeroPrice !== undefined ? `$${selectedHeroPrice.toFixed(2)}` : "--"}
-                          </Text>
-                          <Text style={styles.stockTrendCaption}>
-                            {selectedHeroPointLabel}
-                          </Text>
-                        </View>
-                        <View style={[styles.stockTrendSummaryMini, isCompactPhone ? styles.stockTrendSummaryMiniCompact : null]}>
-                          <View style={[styles.stockTrendSummaryMiniBlock, isCompactPhone ? styles.stockTrendSummaryMiniBlockCompact : null]}>
-                            <Text style={styles.stockTrendSummaryMiniLabel}>Range</Text>
-                            <Text style={styles.stockTrendSummaryMiniValue}>
-                              {selectedStockHeroRange ? `${Math.round(selectedStockHeroRange.high - selectedStockHeroRange.low)} pts` : "--"}
-                            </Text>
-                          </View>
-                          <View style={[styles.stockTrendSummaryMiniBlock, isCompactPhone ? styles.stockTrendSummaryMiniBlockCompact : null]}>
-                            <Text style={styles.stockTrendSummaryMiniLabel}>Vs {analysisBenchmark}</Text>
-                            <Text style={styles.stockTrendSummaryMiniValue}>
-                              {selectedHeroBenchmarkDelta !== undefined ? `${selectedHeroBenchmarkDelta >= 0 ? "+" : ""}${selectedHeroBenchmarkDelta.toFixed(2)}` : "--"}
-                            </Text>
-                          </View>
-                        </View>
-                      </View>
-                      <View style={[styles.stockHeroControlRow, isCompactPhone ? styles.stockHeroControlRowCompact : null]}>
-                        <View style={[styles.stockHeroControlBlock, isCompactPhone ? styles.stockHeroControlBlockCompact : null]}>
-                          <Text style={styles.stockHeroControlLabel}>Lookback</Text>
-                          <HorizontalChoice
-                            options={analysisLookbacks}
-                            value={analysisLookback}
-                            onSelect={setAnalysisLookback}
-                            variant="segmented"
-                          />
-                        </View>
-                        <View style={[styles.stockHeroControlBlock, isCompactPhone ? styles.stockHeroControlBlockCompact : null]}>
-                          <Text style={styles.stockHeroControlLabel}>Benchmark</Text>
-                          <HorizontalChoice
-                            options={analysisBenchmarks}
-                            value={analysisBenchmark}
-                            onSelect={setAnalysisBenchmark}
-                            variant="segmented"
-                          />
-                        </View>
-                      </View>
-                      <View style={[styles.stockTrendChart, isCompactPhone ? styles.stockTrendChartCompact : null]}>
-                        <View style={styles.stockTrendGrid}>
-                          <View style={styles.stockTrendGridLine} />
-                          <View style={styles.stockTrendGridLine} />
-                          <View style={styles.stockTrendGridLine} />
-                        </View>
-                        {selectedStockTrendDisplaySeries.map((point, index) => (
-                          <Pressable
-                            key={`trend-${selectedStockSummary.stock.id}-${index}`}
-                            onPress={() => setSelectedHeroPointIndex(index)}
-                            style={[
-                              styles.stockTrendBarHit,
-                              index === safeSelectedHeroPointIndex ? styles.stockTrendBarHitActive : null,
-                            ]}
-                          >
-                            <Animated.View
-                              style={[
-                                styles.stockTrendBar,
-                                {
-                                  height: `${Math.max(16, point)}%`,
-                                  opacity: index === safeSelectedHeroPointIndex ? 1 : 0.52,
-                                },
-                                index === safeSelectedHeroPointIndex ? styles.stockTrendBarActive : null,
-                              ]}
-                            />
-                          </Pressable>
-                        ))}
-                        <View style={styles.stockTrendLineOverlay}>
-                          {selectedStockTrendDisplaySeries.map((point, index) => (
-                            <View
-                              key={`trend-dot-${selectedStockSummary.stock.id}-${index}`}
-                              style={[
-                                styles.stockTrendLineDot,
-                                {
-                                  left: `${(index / Math.max(selectedStockTrendDisplaySeries.length - 1, 1)) * 100}%`,
-                                  bottom: `${Math.max(6, Math.min(96, point))}%`,
-                                },
-                                index === safeSelectedHeroPointIndex ? styles.stockTrendLineDotActive : null,
-                              ]}
-                            />
-                          ))}
-                          {selectedStockBenchmarkDisplaySeries.map((point, index) => (
-                            <View
-                              key={`benchmark-dot-${selectedStockSummary.stock.id}-${index}`}
-                              style={[
-                                styles.stockTrendBenchmarkDot,
-                                {
-                                  left: `${(index / Math.max(selectedStockBenchmarkDisplaySeries.length - 1, 1)) * 100}%`,
-                                  bottom: `${Math.max(6, Math.min(96, point))}%`,
-                                },
-                              ]}
-                            />
-                          ))}
-                        </View>
-                        {selectedStockHeroRange ? (
-                          <View
-                            style={[
-                              styles.stockTrendCurrentMarker,
-                              {
-                                bottom: `${
-                                  Math.max(
-                                    6,
-                                    Math.min(
-                                      96,
-                                      selectedStockTrendDisplaySeries[safeSelectedHeroPointIndex] ?? 50,
-                                    ),
-                                  )
-                                }%`,
-                              },
-                            ]}
-                          />
-                        ) : null}
-                      </View>
-                      <View style={[styles.stockTrendLegend, isCompactPhone ? styles.stockTrendLegendCompact : null]}>
-                        <Text style={styles.stockTrendLegendText}>{selectedHeroPointLabel}</Text>
-                        <Text style={styles.stockTrendLegendText}>
-                          Drawdown {selectedStockSummary.snapshot ? `${selectedStockSummary.snapshot.drawdownPct}%` : "N/A"}
-                        </Text>
-                        <Text style={styles.stockTrendLegendText}>{analysisLookback} vs {analysisBenchmark}</Text>
-                      </View>
-                    </View>
-                    </MotionSwap>
+                    <StockTrendHero
+                      styles={styles}
+                      stock={selectedStockSummary.stock}
+                      snapshot={selectedStockSummary.snapshot}
+                      eyesCount={selectedStockSummary.eyes.length}
+                      pinnedCount={pinnedCountForSelectedStock}
+                      metricCount={sortedSelectedStockAnalysisCards.length}
+                      analysisLookback={analysisLookback}
+                      analysisBenchmark={analysisBenchmark}
+                      selectedHeroPrice={selectedHeroPrice}
+                      selectedHeroPointLabel={selectedHeroPointLabel}
+                      selectedHeroBenchmarkDelta={selectedHeroBenchmarkDelta}
+                      selectedStockHeroRange={selectedStockHeroRange}
+                      selectedStockTrendDisplaySeries={selectedStockTrendDisplaySeries}
+                      selectedStockBenchmarkDisplaySeries={selectedStockBenchmarkDisplaySeries}
+                      safeSelectedHeroPointIndex={safeSelectedHeroPointIndex}
+                      setSelectedHeroPointIndex={setSelectedHeroPointIndex}
+                      isCompactPhone={isCompactPhone}
+                      freshnessTone={freshnessTone}
+                      stockSnapshotModeLabel={stockSnapshotModeLabel}
+                      HorizontalChoice={HorizontalChoice}
+                      Button={Button}
+                      onClearStock={() => {
+                        setSelectedStockId("");
+                        setStockSearch("");
+                      }}
+                      stockControlsChildren={[
+                        <HorizontalChoice
+                          key="lookback"
+                          options={analysisLookbacks}
+                          value={analysisLookback}
+                          onSelect={setAnalysisLookback}
+                          variant="segmented"
+                        />,
+                        <HorizontalChoice
+                          key="benchmark"
+                          options={analysisBenchmarks}
+                          value={analysisBenchmark}
+                          onSelect={setAnalysisBenchmark}
+                          variant="segmented"
+                        />,
+                      ]}
+                    />
                     <MotionSwap
                       swapKey={`controls-${selectedStockSummary.stock.id}-${analysisStatusFilter}-${stockBoardMode}`}
                       y={8}
@@ -4785,12 +4152,16 @@ export default function App() {
               y={12}
               scaleFrom={0.992}
             >
-            <StockMetricDetailContent
+            <StockMetricDetailSheet
               card={selectedEvidenceCard}
               selectedEvidenceIndex={selectedEvidenceIndex}
               total={sortedSelectedStockAnalysisCards.length}
               sortedCards={sortedSelectedStockAnalysisCards}
               compactLayout={isCompactPhone}
+              styles={styles}
+              MetaPill={MetaPill}
+              DenseStat={DenseStat}
+              Button={Button}
               isPinned={
                 !!selectedStockSummary &&
                 pinnedMetricKeys.includes(stockMetricPreferenceKey(selectedStockSummary.stock.id, selectedEvidenceCard.id))
