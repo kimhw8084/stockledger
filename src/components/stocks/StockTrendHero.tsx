@@ -2,6 +2,8 @@ import React from "react";
 import { Animated, Pressable, Text, View } from "react-native";
 
 import { FreshnessStatus, MockSnapshot, Stock } from "../../types";
+import { localizedFreshness, t } from "../../lib/i18n";
+import { AppLanguage } from "../../lib/preferences";
 import { MotionSwap } from "../MotionSwap";
 
 export const StockTrendHero = ({
@@ -28,6 +30,7 @@ export const StockTrendHero = ({
   onClearStock,
   lookbackControl,
   benchmarkControl,
+  language,
 }: {
   styles: any;
   stock: Stock;
@@ -52,6 +55,7 @@ export const StockTrendHero = ({
   onClearStock: () => void;
   lookbackControl: React.ReactNode;
   benchmarkControl: React.ReactNode;
+  language: AppLanguage;
 }) => (
   <>
     <MotionSwap
@@ -64,11 +68,11 @@ export const StockTrendHero = ({
           <Text style={styles.stockHeroSymbol}>{stock.symbol}</Text>
           <Text style={styles.stockHeroName}>{stock.name}</Text>
           <View style={styles.stockShellMetaRow}>
-            <Text style={styles.stockBoardMetaText}>{metricCount} metrics</Text>
+            <Text style={styles.stockBoardMetaText}>{metricCount} {t(language, "common.metrics")}</Text>
             <Text style={styles.stockBoardMetaDivider}>•</Text>
-            <Text style={styles.stockBoardMetaText}>{eyesCount} eyes</Text>
+            <Text style={styles.stockBoardMetaText}>{eyesCount} {t(language, "common.eyes")}</Text>
             <Text style={styles.stockBoardMetaDivider}>•</Text>
-            <Text style={styles.stockBoardMetaText}>{pinnedCount} pinned</Text>
+            <Text style={styles.stockBoardMetaText}>{pinnedCount} {t(language, "common.pinned")}</Text>
             <Text style={styles.stockBoardMetaDivider}>•</Text>
             <Text style={styles.stockBoardMetaText}>{stockSnapshotModeLabel(snapshot)}</Text>
           </View>
@@ -76,10 +80,10 @@ export const StockTrendHero = ({
         <View style={styles.stockShellHeaderActions}>
           <View style={freshnessTone(snapshot?.freshness ?? "Unavailable")}>
             <Text style={styles.freshnessBadgeText}>
-              {snapshot?.freshness ?? "Unavailable"}
+              {localizedFreshness(language, snapshot?.freshness ?? "Unavailable")}
             </Text>
           </View>
-          <Button label="Clear" tone="ghost" onPress={onClearStock} />
+          <Button label={t(language, "stocks.hero.clear")} tone="ghost" onPress={onClearStock} />
         </View>
       </View>
     </MotionSwap>
@@ -98,13 +102,13 @@ export const StockTrendHero = ({
           </View>
           <View style={[styles.stockTrendSummaryMini, isCompactPhone ? styles.stockTrendSummaryMiniCompact : null]}>
             <View style={[styles.stockTrendSummaryMiniBlock, isCompactPhone ? styles.stockTrendSummaryMiniBlockCompact : null]}>
-              <Text style={styles.stockTrendSummaryMiniLabel}>Range</Text>
+              <Text style={styles.stockTrendSummaryMiniLabel}>{t(language, "common.range")}</Text>
               <Text style={styles.stockTrendSummaryMiniValue}>
                 {selectedStockHeroRange ? `${Math.round(selectedStockHeroRange.high - selectedStockHeroRange.low)} pts` : "--"}
               </Text>
             </View>
             <View style={[styles.stockTrendSummaryMiniBlock, isCompactPhone ? styles.stockTrendSummaryMiniBlockCompact : null]}>
-              <Text style={styles.stockTrendSummaryMiniLabel}>Vs {analysisBenchmark}</Text>
+              <Text style={styles.stockTrendSummaryMiniLabel}>{t(language, "stocks.hero.vs", { benchmark: analysisBenchmark })}</Text>
               <Text style={styles.stockTrendSummaryMiniValue}>
                 {selectedHeroBenchmarkDelta !== undefined ? `${selectedHeroBenchmarkDelta >= 0 ? "+" : ""}${selectedHeroBenchmarkDelta.toFixed(2)}` : "--"}
               </Text>
@@ -113,11 +117,11 @@ export const StockTrendHero = ({
         </View>
         <View style={[styles.stockHeroControlRow, isCompactPhone ? styles.stockHeroControlRowCompact : null]}>
           <View style={[styles.stockHeroControlBlock, isCompactPhone ? styles.stockHeroControlBlockCompact : null]}>
-            <Text style={styles.stockHeroControlLabel}>Lookback</Text>
+            <Text style={styles.stockHeroControlLabel}>{t(language, "stocks.hero.lookback")}</Text>
             {lookbackControl}
           </View>
           <View style={[styles.stockHeroControlBlock, isCompactPhone ? styles.stockHeroControlBlockCompact : null]}>
-            <Text style={styles.stockHeroControlLabel}>Benchmark</Text>
+            <Text style={styles.stockHeroControlLabel}>{t(language, "stocks.hero.benchmark")}</Text>
             {benchmarkControl}
           </View>
         </View>
@@ -186,7 +190,7 @@ export const StockTrendHero = ({
         <View style={[styles.stockTrendLegend, isCompactPhone ? styles.stockTrendLegendCompact : null]}>
           <Text style={styles.stockTrendLegendText}>{selectedHeroPointLabel}</Text>
           <Text style={styles.stockTrendLegendText}>
-            Drawdown {snapshot ? `${snapshot.drawdownPct}%` : "N/A"}
+            {t(language, "stocks.hero.drawdown", { value: snapshot ? `${snapshot.drawdownPct}%` : "N/A" })}
           </Text>
           <Text style={styles.stockTrendLegendText}>{analysisLookback} vs {analysisBenchmark}</Text>
         </View>

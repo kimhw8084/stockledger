@@ -2,15 +2,19 @@ import React, { useEffect, useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 
 import { VisualEvidenceCard } from "../../types";
+import { t } from "../../lib/i18n";
+import { AppLanguage } from "../../lib/preferences";
 
 const DetailedVisualHero = ({
   card,
   compactLayout = false,
   styles,
+  language,
 }: {
   card: VisualEvidenceCard;
   compactLayout?: boolean;
   styles: any;
+  language: AppLanguage;
 }) => {
   const visual = card.visual;
   const primarySeries = visual.series ?? [];
@@ -50,7 +54,7 @@ const DetailedVisualHero = ({
             </View>
           ))}
         </View>
-        <Text style={styles.detailHeroFootnote}>{card.metric.thresholdLabel ?? "Context"}</Text>
+        <Text style={styles.detailHeroFootnote}>{card.metric.thresholdLabel ?? t(language, "stocks.detail.context")}</Text>
       </View>
     );
   }
@@ -66,7 +70,7 @@ const DetailedVisualHero = ({
         </View>
         <View style={styles.detailCountdownWrap}>
           <Text style={styles.detailCountdownDays}>{visual.countdownDays ?? "--"}</Text>
-          <Text style={styles.detailCountdownUnit}>days</Text>
+          <Text style={styles.detailCountdownUnit}>{t(language, "stocks.detail.days")}</Text>
         </View>
         <Text style={styles.detailHeroFootnote}>{card.summary}</Text>
       </View>
@@ -95,10 +99,10 @@ const DetailedVisualHero = ({
           <View style={[styles.detailGaugeCurrent, { left: `${Math.max(0, Math.min(100, currentPct))}%` }]} />
         </View>
         <View style={[styles.detailHeroLegend, compactLayout ? styles.detailHeroLegendCompact : null]}>
-          <Text style={styles.detailHeroLegendText}>Lower risk</Text>
-          <Text style={styles.detailHeroLegendText}>Higher risk</Text>
+          <Text style={styles.detailHeroLegendText}>{t(language, "stocks.detail.lowerRisk")}</Text>
+          <Text style={styles.detailHeroLegendText}>{t(language, "stocks.detail.higherRisk")}</Text>
         </View>
-        <Text style={styles.detailHeroFootnote}>{card.metric.thresholdLabel ?? "Context"}</Text>
+        <Text style={styles.detailHeroFootnote}>{card.metric.thresholdLabel ?? t(language, "stocks.detail.context")}</Text>
       </View>
     );
   }
@@ -128,7 +132,7 @@ const DetailedVisualHero = ({
           <Text style={styles.detailHeroLegendText}>${current.toFixed(2)}</Text>
           <Text style={styles.detailHeroLegendText}>${high.toFixed(2)}</Text>
         </View>
-        <Text style={styles.detailHeroFootnote}>{card.metric.thresholdLabel ?? "Planned zone"}</Text>
+        <Text style={styles.detailHeroFootnote}>{card.metric.thresholdLabel ?? t(language, "stocks.detail.plannedZone")}</Text>
       </View>
     );
   }
@@ -143,7 +147,7 @@ const DetailedVisualHero = ({
   const currentLabel =
     displaySeries.length > 1 && selectedPoint !== displaySeries.length - 1
       ? `Point ${selectedPoint + 1}`
-      : "Latest";
+      : t(language, "stocks.detail.latest");
 
   return (
     <View style={[styles.detailHeroCard, compactLayout ? styles.detailHeroCardCompact : null]}>
@@ -225,11 +229,11 @@ const DetailedVisualHero = ({
         ) : null}
       </View>
       <View style={[styles.detailHeroLegend, compactLayout ? styles.detailHeroLegendCompact : null]}>
-        <Text style={styles.detailHeroLegendText}>{card.metric.thresholdLabel ?? "Threshold"}</Text>
-        <Text style={styles.detailHeroLegendText}>{visual.markerLabel ?? card.metric.comparisonLabel ?? "Series"}</Text>
+        <Text style={styles.detailHeroLegendText}>{card.metric.thresholdLabel ?? t(language, "stocks.detail.threshold")}</Text>
+        <Text style={styles.detailHeroLegendText}>{visual.markerLabel ?? card.metric.comparisonLabel ?? t(language, "stocks.detail.series")}</Text>
       </View>
       <Text style={styles.detailHeroFootnote}>
-        Tap the chart bars to inspect earlier points without leaving the stock metric sheet.
+        {t(language, "stocks.detail.tapChart")}
       </Text>
     </View>
   );
@@ -250,6 +254,7 @@ export const StockMetricDetailSheet = ({
   MetaPill,
   DenseStat,
   Button,
+  language,
 }: {
   card: VisualEvidenceCard;
   selectedEvidenceIndex: number;
@@ -270,56 +275,57 @@ export const StockMetricDetailSheet = ({
     tone?: "primary" | "secondary" | "ghost";
     disabled?: boolean;
   }>;
+  language: AppLanguage;
 }) => {
   const [showFormulaDetails, setShowFormulaDetails] = useState(false);
 
   return (
     <>
-      <DetailedVisualHero card={card} compactLayout={compactLayout} styles={styles} />
+      <DetailedVisualHero card={card} compactLayout={compactLayout} styles={styles} language={language} />
       <View style={[styles.detailNarrativePanel, compactLayout ? styles.detailNarrativePanelCompact : null]}>
         <View style={[styles.detailNarrativeHeader, compactLayout ? styles.detailNarrativeHeaderCompact : null]}>
-          <Text style={styles.formulaTitle}>What stands out now</Text>
+          <Text style={styles.formulaTitle}>{t(language, "stocks.detail.whatStandsOut")}</Text>
           <MetaPill label={`${selectedEvidenceIndex >= 0 ? selectedEvidenceIndex + 1 : 1} of ${total}`} />
         </View>
         <Text style={styles.detailNarrativeLead}>{card.summary}</Text>
         <View style={[styles.detailNarrativeSplit, compactLayout ? styles.detailNarrativeSplitCompact : null]}>
           <View style={styles.detailNarrativeBlock}>
-            <Text style={styles.detailNarrativeLabel}>Effect</Text>
+            <Text style={styles.detailNarrativeLabel}>{t(language, "stocks.detail.effect")}</Text>
             <Text style={styles.formulaMeta}>{card.effect}</Text>
           </View>
           <View style={styles.detailNarrativeBlock}>
-            <Text style={styles.detailNarrativeLabel}>Why it matters</Text>
+            <Text style={styles.detailNarrativeLabel}>{t(language, "stocks.detail.whyItMatters")}</Text>
             <Text style={styles.formulaMeta}>{card.whyItMatters}</Text>
           </View>
         </View>
-        {card.relatedConditionLabel ? <MetaPill label={`Recipe: ${card.relatedConditionLabel}`} /> : null}
+        {card.relatedConditionLabel ? <MetaPill label={t(language, "stocks.detail.recipeLink", { label: card.relatedConditionLabel })} /> : null}
       </View>
       <View style={[styles.detailMetricStrip, compactLayout ? styles.detailMetricStripCompact : null]}>
-        <DenseStat label="Current" value={card.metric.currentLabel} tone="strong" />
-        <DenseStat label="Threshold" value={card.metric.thresholdLabel ?? "Context"} />
+        <DenseStat label={t(language, "common.current")} value={card.metric.currentLabel} tone="strong" />
+        <DenseStat label={t(language, "common.threshold")} value={card.metric.thresholdLabel ?? t(language, "stocks.detail.context")} />
         <DenseStat
-          label="Freshness"
-          value={card.freshness === "Mock Data" ? "Dummy" : card.freshness}
+          label={t(language, "common.freshness")}
+          value={card.freshness === "Mock Data" ? t(language, "stocks.data.dummy") : card.freshness}
           tone={card.freshness === "Fresh" ? "strong" : "neutral"}
         />
         <DenseStat
-          label="Source"
+          label={t(language, "common.source")}
           value={
             card.sourceType === "Mock Adapter"
-              ? "Dummy"
+              ? t(language, "stocks.data.dummy")
               : card.sourceType === "Provider Adapter"
-                ? "Provider"
-                : "Manual"
+                ? t(language, "stocks.data.provider")
+                : t(language, "stocks.data.manual")
           }
         />
       </View>
       <View style={[styles.detailSheetActionRow, compactLayout ? styles.detailSheetActionRowCompact : null]}>
-        <Button label={compactLayout ? "Prev" : "Previous"} tone="secondary" onPress={onPrevious} disabled={selectedEvidenceIndex <= 0} />
-        <Button label={isPinned ? "Unpin" : "Pin"} tone="ghost" onPress={onTogglePin} />
-        <Button label="Next" tone="secondary" onPress={onNext} disabled={selectedEvidenceIndex < 0 || selectedEvidenceIndex >= total - 1} />
+        <Button label={compactLayout ? t(language, "common.prev") : t(language, "common.previous")} tone="secondary" onPress={onPrevious} disabled={selectedEvidenceIndex <= 0} />
+        <Button label={isPinned ? t(language, "common.unpin") : t(language, "common.pin")} tone="ghost" onPress={onTogglePin} />
+        <Button label={t(language, "common.next")} tone="secondary" onPress={onNext} disabled={selectedEvidenceIndex < 0 || selectedEvidenceIndex >= total - 1} />
       </View>
       <View style={[styles.detailJumpSection, compactLayout ? styles.detailJumpSectionCompact : null]}>
-        <Text style={styles.detailJumpTitle}>Browse more metrics</Text>
+        <Text style={styles.detailJumpTitle}>{t(language, "stocks.detail.browseMore")}</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.detailJumpRow}>
           {sortedCards.map((jumpCard) => (
             <Pressable
@@ -339,21 +345,23 @@ export const StockMetricDetailSheet = ({
       </View>
       <Pressable onPress={() => setShowFormulaDetails((current) => !current)} style={styles.detailDisclosurePanel}>
         <View style={styles.flexOne}>
-          <Text style={styles.formulaTitle}>{showFormulaDetails ? "Hide formula detail" : "Show formula detail"}</Text>
+          <Text style={styles.formulaTitle}>{showFormulaDetails ? t(language, "stocks.detail.hideFormula") : t(language, "stocks.detail.showFormula")}</Text>
           <Text style={styles.formulaMeta} numberOfLines={showFormulaDetails ? undefined : 1}>
-            {card.formulaName ?? "How this metric is calculated"}
+            {card.formulaName ?? t(language, "stocks.detail.formulaFallback")}
           </Text>
         </View>
-        <Text style={styles.groupHeaderToggle}>{showFormulaDetails ? "Hide" : "Show"}</Text>
+        <Text style={styles.groupHeaderToggle}>{showFormulaDetails ? t(language, "stocks.detail.hideFormula") : t(language, "stocks.detail.showFormula")}</Text>
       </Pressable>
       {showFormulaDetails ? (
         <View style={styles.formulaPanel}>
-          <Text style={styles.formulaTitle}>{card.formulaName ?? "Formula detail"}</Text>
+          <Text style={styles.formulaTitle}>{card.formulaName ?? t(language, "stocks.detail.formulaDetail")}</Text>
           <Text style={styles.formulaBody}>
-            {card.formulaDescription ?? "No extra formula detail available."}
+            {card.formulaDescription ?? t(language, "stocks.detail.formulaMissing")}
           </Text>
           <Text style={styles.formulaMeta}>
-            Inputs: {card.formulaInputs?.join(", ") ?? "No explicit inputs recorded"}
+            {t(language, "stocks.detail.inputs", {
+              inputs: card.formulaInputs?.join(", ") ?? (language === "ko" ? "기록된 입력값 없음" : "No explicit inputs recorded"),
+            })}
           </Text>
         </View>
       ) : null}

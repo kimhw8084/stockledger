@@ -2,6 +2,8 @@ import React from "react";
 import { Pressable, Text, View } from "react-native";
 
 import { FreshnessStatus, MockSnapshot, Stock } from "../../types";
+import { t } from "../../lib/i18n";
+import { AppLanguage } from "../../lib/preferences";
 import { MotionSwap } from "../MotionSwap";
 
 interface StockSuggestionItem {
@@ -27,6 +29,7 @@ export const StockSearchPanel = ({
   Input,
   Button,
   stockSuggestionTrustLabel,
+  language,
 }: {
   styles: any;
   stockSearch: string;
@@ -45,6 +48,7 @@ export const StockSearchPanel = ({
   Input: React.ComponentType<any>;
   Button: React.ComponentType<any>;
   stockSuggestionTrustLabel: (snapshot?: { isMock: boolean; freshness: FreshnessStatus } | null) => string;
+  language: AppLanguage;
 }) => (
   <View style={[styles.stockSearchShell, isCompactPhone ? styles.stockSearchShellCompact : null]}>
     <View style={[styles.stockSearchHeader, isVeryCompactPhone ? styles.stockSearchHeaderCompact : null]}>
@@ -52,7 +56,7 @@ export const StockSearchPanel = ({
         <Input
           value={stockSearch}
           onChangeText={setStockSearch}
-          placeholder="Search ticker or company"
+          placeholder={t(language, "stocks.search.placeholder")}
           autoCapitalize="characters"
           returnKeyType="search"
           onSubmitEditing={() => {
@@ -61,24 +65,24 @@ export const StockSearchPanel = ({
           }}
         />
       </View>
-      {stockSearch.trim().length > 0 ? <Button label="Clear" tone="ghost" onPress={() => setStockSearch("")} /> : null}
-      <Button label={isVeryCompactPhone ? "New" : "Add"} tone="secondary" onPress={onAddStock} />
+      {stockSearch.trim().length > 0 ? <Button label={t(language, "common.clear")} tone="ghost" onPress={() => setStockSearch("")} /> : null}
+      <Button label={isVeryCompactPhone ? t(language, "common.new") : t(language, "common.add")} tone="secondary" onPress={onAddStock} />
     </View>
     <View style={styles.inlineBetween}>
       <View style={styles.searchSectionMeta}>
-        <Text style={styles.suggestionLabel}>{hasStockQuery ? "Suggestions" : "Recent search"}</Text>
+        <Text style={styles.suggestionLabel}>{hasStockQuery ? t(language, "stocks.search.suggestions") : t(language, "stocks.search.recent")}</Text>
         <Text style={styles.searchResultCount}>
-          {stockSuggestions.length > 0 ? `${stockSuggestions.length} shown` : hasStockQuery ? "0 shown" : "None"}
+          {stockSuggestions.length > 0 ? t(language, "stocks.search.resultCount", { count: stockSuggestions.length }) : hasStockQuery ? t(language, "stocks.search.resultCount", { count: 0 }) : t(language, "stocks.search.resultNone")}
         </Text>
       </View>
       {!hasStockQuery && recentStocksCount > 0 ? (
         <Pressable onPress={() => setRecentStockIds([])} hitSlop={8}>
-          <Text style={styles.inlineUtilityText}>Clear recent</Text>
+          <Text style={styles.inlineUtilityText}>{t(language, "stocks.search.clearRecent")}</Text>
         </Pressable>
       ) : null}
     </View>
     {hasStockQuery && topSuggestionId ? (
-      <Text style={styles.searchAssistText}>Press return to open the top match immediately.</Text>
+      <Text style={styles.searchAssistText}>{t(language, "stocks.search.assist")}</Text>
     ) : null}
     {stockSuggestions.length > 0 ? (
       <MotionSwap
@@ -121,11 +125,11 @@ export const StockSearchPanel = ({
                         {item.stock.symbol}
                       </Text>
                       {isExactSymbolMatch ? (
-                        <Text style={styles.stockTopMatchLabel}>Exact</Text>
+                        <Text style={styles.stockTopMatchLabel}>{t(language, "stocks.search.exact")}</Text>
                       ) : isTopMatch ? (
-                        <Text style={styles.stockTopMatchLabel}>Top match</Text>
+                        <Text style={styles.stockTopMatchLabel}>{t(language, "stocks.search.topMatch")}</Text>
                       ) : !hasStockQuery ? (
-                        <Text style={styles.stockRecentLabel}>Recent</Text>
+                        <Text style={styles.stockRecentLabel}>{t(language, "stocks.search.recentBadge")}</Text>
                       ) : null}
                     </View>
                     <Text
@@ -152,7 +156,7 @@ export const StockSearchPanel = ({
                       }
                       hitSlop={8}
                     >
-                      <Text style={styles.stockSuggestionRemove}>Remove</Text>
+                      <Text style={styles.stockSuggestionRemove}>{t(language, "common.remove")}</Text>
                     </Pressable>
                   ) : null}
                 </View>
@@ -163,13 +167,13 @@ export const StockSearchPanel = ({
       </MotionSwap>
     ) : (
       <View style={styles.emptySearchState}>
-        <Text style={styles.emptySearchTitle}>{hasStockQuery ? "No matching stocks" : "No recent searches"}</Text>
+        <Text style={styles.emptySearchTitle}>{hasStockQuery ? t(language, "stocks.search.noMatchTitle") : t(language, "stocks.search.noRecentTitle")}</Text>
         <Text style={styles.emptySearchBody}>
           {hasStockQuery
-            ? "Try another ticker or company name, or clear the search to return to recent stocks."
-            : "Search a stock to open its visual analysis board."}
+            ? t(language, "stocks.search.noMatchBody")
+            : t(language, "stocks.search.noRecentBody")}
         </Text>
-        {hasStockQuery ? <Button label="Clear Search" tone="secondary" onPress={() => setStockSearch("")} /> : null}
+        {hasStockQuery ? <Button label={t(language, "stocks.search.clearSearch")} tone="secondary" onPress={() => setStockSearch("")} /> : null}
       </View>
     )}
   </View>

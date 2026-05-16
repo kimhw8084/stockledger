@@ -21,6 +21,18 @@ import { StockSearchPanel } from "./src/components/stocks/StockSearchPanel";
 import { StockTrendHero } from "./src/components/stocks/StockTrendHero";
 import { StockMetricDetailSheet } from "./src/components/stocks/StockMetricDetailSheet";
 import {
+  localizedFreshness,
+  localizedProviderStatus,
+  localizedSnapshotMode,
+  localizedSourceType,
+  localizedStatus,
+  localizedSuggestionTrust,
+  subtitleLabel,
+  t,
+  tabLabel,
+} from "./src/lib/i18n";
+import { AppLanguage, loadAppLanguage, saveAppLanguage } from "./src/lib/preferences";
+import {
   Alert,
   ConditionOperator,
   Decision,
@@ -109,6 +121,7 @@ const homeBuckets: HomeBucket[] = ["All", "Review Now", "Forming", "Review Soon"
 const recipeShelfFilters: RecipeShelfFilter[] = ["All", "Starter", "Custom", "Recent"];
 const eyesShelfFilters: EyesShelfFilter[] = ["All", "Needs Review", "Quiet"];
 const journalFilters: JournalFilter[] = ["All", "Entered", "Skipped", "Risky"];
+const languageOptions: AppLanguage[] = ["en", "ko"];
 const starterRecipeNames = [
   "Temporary Bargain Sale",
   "Sector Leader Pullback",
@@ -983,22 +996,18 @@ const freshnessTone = (freshness: FreshnessStatus) => {
   }
 };
 
-const sourceTypeLabel = (sourceType: VisualEvidenceCard["sourceType"]) =>
-  sourceType === "Mock Adapter"
-    ? "Dummy"
-    : sourceType === "Provider Adapter"
-      ? "Provider"
-      : "Manual";
+const sourceTypeLabel = (language: AppLanguage, sourceType: VisualEvidenceCard["sourceType"]) =>
+  localizedSourceType(language, sourceType);
 
-const stockSnapshotModeLabel = (snapshot?: { isMock: boolean } | null) =>
-  snapshot?.isMock ? "Dummy-backed" : "Provider-backed";
+const stockSnapshotModeLabel = (language: AppLanguage, snapshot?: { isMock: boolean } | null) =>
+  localizedSnapshotMode(language, snapshot?.isMock);
 
-const stockSuggestionTrustLabel = (snapshot?: { isMock: boolean; freshness: FreshnessStatus } | null) => {
-  if (!snapshot) return "Unavailable";
-  return snapshot.isMock ? "Dummy-backed" : snapshot.freshness;
-};
+const stockSuggestionTrustLabel = (
+  language: AppLanguage,
+  snapshot?: { isMock: boolean; freshness: FreshnessStatus } | null,
+) => localizedSuggestionTrust(language, snapshot);
 
-const ThresholdBar = ({ card }: { card: VisualEvidenceCard }) => {
+const ThresholdBar = ({ card, language = "en" }: { card: VisualEvidenceCard; language?: AppLanguage }) => {
   const { visual } = card;
   if (visual.kind === "freshness") {
     return (
@@ -1078,9 +1087,9 @@ const ThresholdBar = ({ card }: { card: VisualEvidenceCard }) => {
           <View style={[styles.thresholdMarkerCurrent, { left: `${Math.max(0, Math.min(100, currentPct))}%` }]} />
         </View>
         <View style={styles.thresholdLegend}>
-          <Text style={styles.thresholdLegendText}>Lower risk</Text>
+          <Text style={styles.thresholdLegendText}>{t(language, "stocks.detail.lowerRisk")}</Text>
           <Text style={styles.thresholdLegendText}>{card.metric.currentLabel}</Text>
-          <Text style={styles.thresholdLegendText}>Higher risk</Text>
+          <Text style={styles.thresholdLegendText}>{t(language, "stocks.detail.higherRisk")}</Text>
         </View>
       </View>
     );
@@ -1102,9 +1111,9 @@ const ThresholdBar = ({ card }: { card: VisualEvidenceCard }) => {
           ))}
         </View>
         <View style={styles.thresholdLegend}>
-          <Text style={styles.thresholdLegendText}>{visual.markerLabel ?? "Trend"}</Text>
+          <Text style={styles.thresholdLegendText}>{visual.markerLabel ?? (language === "ko" ? "추세" : "Trend")}</Text>
           <Text style={styles.thresholdLegendText}>
-            Need {card.metric.thresholdLabel ?? "context"}
+            {language === "ko" ? "기준" : "Need"} {card.metric.thresholdLabel ?? (language === "ko" ? "참고값" : "context")}
           </Text>
         </View>
       </View>
@@ -1128,9 +1137,9 @@ const ThresholdBar = ({ card }: { card: VisualEvidenceCard }) => {
           <View style={[styles.thresholdMarkerCurrent, { left: `${Math.max(0, Math.min(100, marker))}%` }]} />
         </View>
         <View style={styles.thresholdLegend}>
-          <Text style={styles.thresholdLegendText}>Zone ${low.toFixed(2)}</Text>
-          <Text style={styles.thresholdLegendText}>Now ${current.toFixed(2)}</Text>
-          <Text style={styles.thresholdLegendText}>Zone ${high.toFixed(2)}</Text>
+          <Text style={styles.thresholdLegendText}>{`${t(language, "stocks.detail.plannedZone")} $${low.toFixed(2)}`}</Text>
+          <Text style={styles.thresholdLegendText}>{`${t(language, "stocks.evidence.current")} $${current.toFixed(2)}`}</Text>
+          <Text style={styles.thresholdLegendText}>{`${t(language, "stocks.detail.plannedZone")} $${high.toFixed(2)}`}</Text>
         </View>
       </View>
     );
@@ -1189,7 +1198,7 @@ const ThresholdBar = ({ card }: { card: VisualEvidenceCard }) => {
       ) : null}
       <View style={styles.thresholdLegend}>
         <Text style={styles.thresholdLegendText}>{min}</Text>
-        <Text style={styles.thresholdLegendText}>Need {card.metric.thresholdLabel ?? "-"}</Text>
+        <Text style={styles.thresholdLegendText}>{language === "ko" ? "기준" : "Need"} {card.metric.thresholdLabel ?? "-"}</Text>
         <Text style={styles.thresholdLegendText}>{max}</Text>
       </View>
     </View>
@@ -1285,12 +1294,14 @@ const EvidenceCardView = ({
   onOpen,
   pinned = false,
   dense = false,
+  language = "en",
 }: {
   card: VisualEvidenceCard;
   compact?: boolean;
   onOpen?: () => void;
   pinned?: boolean;
   dense?: boolean;
+  language?: AppLanguage;
 }) => {
   const [expanded, setExpanded] = useState(false);
   const handlePress = () => {
@@ -1349,7 +1360,7 @@ const EvidenceCardView = ({
               >
                 {card.family}
               </Text>
-              {pinned ? <Text style={styles.evidencePinnedMark}>Pinned</Text> : null}
+              {pinned ? <Text style={styles.evidencePinnedMark}>{t(language, "stocks.evidence.pinned")}</Text> : null}
             </View>
           ) : null}
           <Text
@@ -1368,12 +1379,12 @@ const EvidenceCardView = ({
           {compact ? (
             <View style={[statusTone(card.status), styles.compactStatusBadge, dense ? styles.compactStatusBadgeDense : null]}>
               <Text style={[styles.compactEvidenceStatusText, dense ? styles.compactEvidenceStatusTextDense : null]} numberOfLines={1}>
-                {compactStatusLabel(card.status)}
+                {localizedStatus(language, card.status)}
               </Text>
             </View>
           ) : (
             <>
-              {pinned ? <Text style={styles.evidencePinnedMark}>Pinned</Text> : null}
+              {pinned ? <Text style={styles.evidencePinnedMark}>{t(language, "stocks.evidence.pinned")}</Text> : null}
               <StatusShape status={card.status} size={14} />
             </>
           )}
@@ -1383,7 +1394,7 @@ const EvidenceCardView = ({
       {!compact ? <Text style={styles.evidenceSummary}>{card.summary}</Text> : null}
       
       <View style={compact ? styles.compactVisualContainer : styles.visualContainer}>
-        <ThresholdBar card={card} />
+        <ThresholdBar card={card} language={language} />
       </View>
 
       {compact ? (
@@ -1403,7 +1414,9 @@ const EvidenceCardView = ({
                 <View style={styles.freshnessDot} />
               </View>
               <Text style={[styles.compactFreshnessText, dense ? styles.compactFreshnessTextDense : null]} numberOfLines={1}>
-                {card.freshness === "Mock Data" ? "Dummy" : card.freshness === "Unavailable" ? "No Data" : card.freshness}
+                {card.freshness === "Unavailable"
+                  ? t(language, "stocks.data.noData")
+                  : localizedFreshness(language, card.freshness)}
               </Text>
             </View>
           </View>
@@ -1411,19 +1424,22 @@ const EvidenceCardView = ({
       ) : (
         <>
           <View style={styles.evidenceMetricsRow}>
-            <DenseStat label="Current" value={card.metric.currentLabel} tone="strong" />
-            <DenseStat label="Threshold" value={card.metric.thresholdLabel ?? "Context only"} />
+            <DenseStat label={t(language, "stocks.evidence.current")} value={card.metric.currentLabel} tone="strong" />
+            <DenseStat
+              label={t(language, "stocks.evidence.threshold")}
+              value={card.metric.thresholdLabel ?? t(language, "stocks.evidence.contextOnly")}
+            />
           </View>
 
           {card.relatedConditionLabel ? (
-            <Text style={styles.evidenceRelated}>Recipe link: {card.relatedConditionLabel}</Text>
+            <Text style={styles.evidenceRelated}>{t(language, "stocks.evidence.recipeLink", { label: card.relatedConditionLabel })}</Text>
           ) : null}
 
-          <Text style={styles.evidenceEffect}>Effect: {card.effect}</Text>
-          <Text style={styles.evidenceWhy}>Why it matters: {card.whyItMatters}</Text>
+          <Text style={styles.evidenceEffect}>{t(language, "stocks.evidence.effect", { label: card.effect })}</Text>
+          <Text style={styles.evidenceWhy}>{t(language, "stocks.evidence.why", { label: card.whyItMatters })}</Text>
 
           <View style={styles.metaRow}>
-            <MetaPill label={sourceTypeLabel(card.sourceType)} />
+            <MetaPill label={sourceTypeLabel(language, card.sourceType)} />
             {card.metric.comparisonLabel ? <MetaPill label={card.metric.comparisonLabel} /> : null}
           </View>
         </>
@@ -1431,7 +1447,7 @@ const EvidenceCardView = ({
 
       {!compact ? (
         <Text style={styles.formulaToggleText}>
-          {expanded ? "Hide details" : "Show formula details"}
+          {expanded ? t(language, "stocks.evidence.hideDetails") : t(language, "stocks.evidence.showDetails")}
         </Text>
       ) : null}
 
@@ -1439,18 +1455,20 @@ const EvidenceCardView = ({
         <View style={styles.formulaPanel}>
           <Text style={styles.evidenceRole}>{card.role}</Text>
           <Text style={styles.evidenceSummary}>{card.summary}</Text>
-          {card.relatedConditionLabel ? <Text style={styles.evidenceRelated}>Recipe link: {card.relatedConditionLabel}</Text> : null}
-          <Text style={styles.evidenceEffect}>Effect: {card.effect}</Text>
-          <Text style={styles.evidenceWhy}>Why it matters: {card.whyItMatters}</Text>
+          {card.relatedConditionLabel ? <Text style={styles.evidenceRelated}>{t(language, "stocks.evidence.recipeLink", { label: card.relatedConditionLabel })}</Text> : null}
+          <Text style={styles.evidenceEffect}>{t(language, "stocks.evidence.effect", { label: card.effect })}</Text>
+          <Text style={styles.evidenceWhy}>{t(language, "stocks.evidence.why", { label: card.whyItMatters })}</Text>
           <View style={styles.metaRow}>
-            <MetaPill label={sourceTypeLabel(card.sourceType)} />
-            <MetaPill label={card.freshness === "Mock Data" ? "Dummy" : card.freshness} />
+            <MetaPill label={sourceTypeLabel(language, card.sourceType)} />
+            <MetaPill label={localizedFreshness(language, card.freshness)} />
             {card.metric.comparisonLabel ? <MetaPill label={card.metric.comparisonLabel} /> : null}
           </View>
-          <Text style={styles.formulaTitle}>{card.formulaName ?? "Formula detail"}</Text>
-          <Text style={styles.formulaBody}>{card.formulaDescription ?? "No extra formula detail available."}</Text>
+          <Text style={styles.formulaTitle}>{card.formulaName ?? t(language, "stocks.evidence.formulaDetail")}</Text>
+          <Text style={styles.formulaBody}>{card.formulaDescription ?? t(language, "stocks.evidence.formulaMissing")}</Text>
           <Text style={styles.formulaMeta}>
-            Inputs: {card.formulaInputs?.join(", ") ?? "No explicit inputs recorded"}
+            {t(language, "stocks.evidence.inputs", {
+              inputs: card.formulaInputs?.join(", ") ?? (language === "ko" ? "기록된 입력값 없음" : "No explicit inputs recorded"),
+            })}
           </Text>
         </View>
       ) : null}
@@ -1462,10 +1480,12 @@ const EvidenceGroupView = ({
   group,
   layout = "stack",
   defaultExpanded = true,
+  language = "en",
 }: {
   group: VisualEvidenceGroup;
   layout?: "stack" | "grid";
   defaultExpanded?: boolean;
+  language?: AppLanguage;
 }) => {
   const [expanded, setExpanded] = useState(defaultExpanded);
 
@@ -1476,13 +1496,13 @@ const EvidenceGroupView = ({
           <Text style={styles.sectionTitle}>{group.title}</Text>
           <Text style={styles.sectionNote}>{group.note}</Text>
         </View>
-        <Text style={styles.groupHeaderToggle}>{expanded ? "Hide" : "Show"}</Text>
+        <Text style={styles.groupHeaderToggle}>{expanded ? t(language, "common.hide") : t(language, "common.show")}</Text>
       </Pressable>
       {expanded ? (
         <View style={layout === "grid" ? styles.evidenceGrid : styles.stack}>
           {group.cards.map((card) => (
             <View key={card.id} style={layout === "grid" ? styles.evidenceGridItem : undefined}>
-              <EvidenceCardView card={card} compact={layout === "grid"} />
+              <EvidenceCardView card={card} compact={layout === "grid"} language={language} />
             </View>
           ))}
         </View>
@@ -1605,6 +1625,7 @@ const StockTriageCard = ({
   onOpenAlerts,
   onOpenJournal,
   onReview,
+  language = "en",
 }: {
   item: {
     stock: Stock;
@@ -1625,15 +1646,16 @@ const StockTriageCard = ({
   onOpenAlerts?: () => void;
   onOpenJournal?: () => void;
   onReview?: () => void;
+  language?: AppLanguage;
 }) => {
   const [expanded, setExpanded] = useState(false);
   const evaluation = item.dominantEye?.lastEvaluation;
-  const topSupport = evaluation?.supportingEvidence?.[0] ?? evaluation?.whyNow ?? "No strong change recorded.";
+  const topSupport = evaluation?.supportingEvidence?.[0] ?? evaluation?.whyNow ?? (language === "ko" ? "뚜렷한 변화는 아직 없습니다." : "No strong change recorded.");
   const topRisk =
     evaluation?.hardDisqualifiers?.[0] ??
     evaluation?.riskWarnings?.[0] ??
     evaluation?.contradictingEvidence?.[0] ??
-    "No immediate risk surfaced.";
+    (language === "ko" ? "즉시 확인할 큰 위험은 아직 없습니다." : "No immediate risk surfaced.");
 
   return (
     <Card highlighted={Boolean(item.openAlerts.length)}>
@@ -1643,21 +1665,21 @@ const StockTriageCard = ({
             <Text style={styles.cardEyebrow}>{item.stock.name}</Text>
             <View style={styles.stockTriageTitleRow}>
               <Text style={styles.alertTitle}>{item.stock.symbol}</Text>
-              <Text style={styles.stockTriageToggle}>{expanded ? "Hide" : "Open"}</Text>
+              <Text style={styles.stockTriageToggle}>{expanded ? t(language, "common.hide") : t(language, "common.open")}</Text>
             </View>
           </View>
-          <Text style={stateTone(evaluation?.currentState)}>{evaluation?.currentState ?? "Unwatched"}</Text>
+          <Text style={stateTone(evaluation?.currentState)}>{evaluation?.currentState ?? (language === "ko" ? "미추적" : "Unwatched")}</Text>
         </View>
 
         <View style={styles.stockTriageSummaryRow}>
           <Text style={styles.stockTriagePrimaryMetric}>
-            {item.snapshot ? `$${item.snapshot.price.toFixed(2)}` : "No feed"}
+            {item.snapshot ? `$${item.snapshot.price.toFixed(2)}` : "--"}
           </Text>
           <Text style={styles.stockTriageSecondaryMetric}>
-            {item.snapshot ? `${item.snapshot.drawdownPct}% drawdown` : "No drawdown"}
+            {item.snapshot ? t(language, "stocks.hero.drawdown", { value: `${item.snapshot.drawdownPct}%` }) : "--"}
           </Text>
-          <Text style={styles.stockTriageSecondaryMetric}>{item.openAlerts.length} alerts</Text>
-          <Text style={styles.stockTriageSecondaryMetric}>{item.snapshot?.freshness ?? "Unavailable"}</Text>
+          <Text style={styles.stockTriageSecondaryMetric}>{item.openAlerts.length} {t(language, "common.alerts")}</Text>
+          <Text style={styles.stockTriageSecondaryMetric}>{localizedFreshness(language, item.snapshot?.freshness ?? "Unavailable")}</Text>
         </View>
 
         <Text style={styles.stockGroupSummary} numberOfLines={expanded ? 3 : 1}>
@@ -1668,24 +1690,24 @@ const StockTriageCard = ({
       {expanded ? (
         <View style={styles.stack}>
           <View style={styles.metaRow}>
-            <MetaPill label={`${item.eyes.length} eyes`} />
-            <MetaPill label={`${item.openAlerts.length} alerts`} />
-            <MetaPill label={item.snapshot?.freshness ?? "Unavailable"} />
-            {item.snapshot ? <MetaPill label={item.snapshot.isMock ? "Mock" : "Provider"} /> : null}
+            <MetaPill label={`${item.eyes.length} ${t(language, "common.eyes")}`} />
+            <MetaPill label={`${item.openAlerts.length} ${t(language, "common.alerts")}`} />
+            <MetaPill label={localizedFreshness(language, item.snapshot?.freshness ?? "Unavailable")} />
+            {item.snapshot ? <MetaPill label={item.snapshot.isMock ? t(language, "stocks.data.dummy") : t(language, "stocks.data.provider")} /> : null}
           </View>
 
           <View style={styles.detailCallout}>
-            <Text style={styles.detailCalloutLabel}>Top support</Text>
+            <Text style={styles.detailCalloutLabel}>{language === "ko" ? "가장 큰 근거" : "Top support"}</Text>
             <Text style={styles.detailCalloutBody}>{topSupport}</Text>
           </View>
           <View style={styles.detailCallout}>
-            <Text style={styles.detailCalloutLabel}>Top risk</Text>
+            <Text style={styles.detailCalloutLabel}>{language === "ko" ? "가장 큰 위험" : "Top risk"}</Text>
             <Text style={styles.detailCalloutBody}>{topRisk}</Text>
           </View>
 
           {item.decisions.length > 0 ? (
             <View style={styles.detailCallout}>
-              <Text style={styles.detailCalloutLabel}>Latest decision</Text>
+              <Text style={styles.detailCalloutLabel}>{language === "ko" ? "최근 결정" : "Latest decision"}</Text>
               <Text style={styles.detailCalloutBody}>
                 {item.decisions[0].action} · {formatShortDate(item.decisions[0].createdAt)}
               </Text>
@@ -1701,11 +1723,11 @@ const StockTriageCard = ({
       ) : null}
 
       <View style={styles.actionRow}>
-        <Button label={expanded ? "Collapse" : "Expand"} tone="secondary" onPress={() => setExpanded((current) => !current)} />
-        {onReview ? <Button label="Review" tone="ghost" onPress={onReview} /> : null}
-        {onOpenAlerts ? <Button label="Alerts" tone="ghost" onPress={onOpenAlerts} /> : null}
-        {onOpenJournal && item.decisions.length > 0 ? <Button label="Journal" tone="ghost" onPress={onOpenJournal} /> : null}
-        <Button label="Stock" onPress={onOpenStock} />
+        <Button label={expanded ? t(language, "common.collapse") : t(language, "common.expand")} tone="secondary" onPress={() => setExpanded((current) => !current)} />
+        {onReview ? <Button label={t(language, "common.review")} tone="ghost" onPress={onReview} /> : null}
+        {onOpenAlerts ? <Button label={t(language, "common.alerts")} tone="ghost" onPress={onOpenAlerts} /> : null}
+        {onOpenJournal && item.decisions.length > 0 ? <Button label={t(language, "common.journal")} tone="ghost" onPress={onOpenJournal} /> : null}
+        <Button label={t(language, "common.stock")} onPress={onOpenStock} />
       </View>
     </Card>
   );
@@ -1720,6 +1742,7 @@ const AlertClusterCard = ({
   onSnooze,
   onReviewed,
   onAcknowledgeAll,
+  language = "en",
 }: {
   group: {
     stock: Stock;
@@ -1736,11 +1759,12 @@ const AlertClusterCard = ({
   onSnooze: (alertId: string) => void;
   onReviewed: (alertId: string) => void;
   onAcknowledgeAll: () => void;
+  language?: AppLanguage;
 }) => {
   const [expanded, setExpanded] = useState(false);
   const leadAlert = group.openAlerts[0];
   const nextAlert = group.openAlerts[1];
-  const supportLine = group.dominantEye?.lastEvaluation?.whyNow ?? leadAlert?.whyNow ?? "Review grouped signals on this stock.";
+  const supportLine = group.dominantEye?.lastEvaluation?.whyNow ?? leadAlert?.whyNow ?? (language === "ko" ? "이 종목에 묶인 신호를 함께 검토하세요." : "Review grouped signals on this stock.");
 
   return (
     <Card highlighted={selectedStockId === group.stock.id}>
@@ -1750,14 +1774,14 @@ const AlertClusterCard = ({
             <Text style={styles.cardEyebrow}>{group.stock.name}</Text>
             <View style={styles.stockTriageTitleRow}>
               <Text style={styles.cardTitle}>{group.stock.symbol}</Text>
-              <Text style={styles.stockTriageToggle}>{expanded ? "Hide" : "Open"}</Text>
+              <Text style={styles.stockTriageToggle}>{expanded ? t(language, "common.hide") : t(language, "common.open")}</Text>
             </View>
           </View>
           <View style={styles.priorityStack}>
             <View style={priorityTone(group.highestPriority)}>
               <Text style={styles.priorityBadgeText}>{group.highestPriority}</Text>
             </View>
-            <Text style={styles.timestampText}>{group.openAlerts.length} alerts</Text>
+            <Text style={styles.timestampText}>{group.openAlerts.length} {t(language, "common.alerts")}</Text>
           </View>
         </View>
 
@@ -1775,7 +1799,7 @@ const AlertClusterCard = ({
 
         {!expanded && nextAlert ? (
           <Text style={styles.alertClusterPreview} numberOfLines={1}>
-            Next: {nextAlert.title}
+            {language === "ko" ? "다음" : "Next"}: {nextAlert.title}
           </Text>
         ) : null}
       </Pressable>
@@ -1800,7 +1824,7 @@ const AlertClusterCard = ({
                 <Button label="Entered" onPress={() => onQuickDecision(alert, "Entered")} />
                 <Button label="Skip" tone="secondary" onPress={() => onQuickDecision(alert, "Skipped")} />
                 <Button label="Snooze" tone="secondary" onPress={() => onSnooze(alert.id)} />
-                <Button label="Done" tone="ghost" onPress={() => onReviewed(alert.id)} />
+                <Button label={t(language, "common.done")} tone="ghost" onPress={() => onReviewed(alert.id)} />
               </View>
             </Pressable>
           ))}
@@ -1808,10 +1832,10 @@ const AlertClusterCard = ({
       ) : null}
 
       <View style={styles.analysisActionRow}>
-        <Button label="Open Stock" onPress={onOpenStock} />
-        <Button label="Acknowledge All" tone="ghost" onPress={onAcknowledgeAll} />
+        <Button label={language === "ko" ? "종목 열기" : "Open Stock"} onPress={onOpenStock} />
+        <Button label={language === "ko" ? "모두 확인" : "Acknowledge All"} tone="ghost" onPress={onAcknowledgeAll} />
         {leadAlert ? (
-          <Button label={expanded ? "Lead Detail" : "Open Detail"} tone="secondary" onPress={() => onOpenDetail(leadAlert.id)} />
+          <Button label={expanded ? (language === "ko" ? "대표 알림 상세" : "Lead Detail") : (language === "ko" ? "상세 열기" : "Open Detail")} tone="secondary" onPress={() => onOpenDetail(leadAlert.id)} />
         ) : null}
       </View>
     </Card>
@@ -1841,6 +1865,7 @@ interface EyeDraftForm {
 
 export default function App() {
   const { data, loading, providerHealth, providerHealthLoading, actions } = useAppModel();
+  const [language, setLanguage] = useState<AppLanguage>("en");
   const [tab, setTab] = useState<TabKey>("Home");
   const [recipeBuilderStep, setRecipeBuilderStep] = useState<RecipeBuilderStep>("Purpose");
   const [alertWorkspaceTab, setAlertWorkspaceTab] = useState<Exclude<AlertWorkspaceTab, "Detail">>("Current");
@@ -1916,6 +1941,10 @@ export default function App() {
   const { width: viewportWidth } = useWindowDimensions();
   const isCompactPhone = viewportWidth < 390;
   const isVeryCompactPhone = viewportWidth < 360;
+
+  useEffect(() => {
+    loadAppLanguage().then(setLanguage);
+  }, []);
 
   const eyesSorted = useMemo(
     () =>
@@ -2178,7 +2207,7 @@ export default function App() {
     return (
       <SafeAreaView style={styles.loadingScreen}>
         <StatusBar style="dark" />
-        <Text style={styles.loadingText}>Loading StockLedger...</Text>
+        <Text style={styles.loadingText}>{t(language, "common.loading")}</Text>
       </SafeAreaView>
     );
   }
@@ -2538,22 +2567,47 @@ export default function App() {
       ready: recipeForm.reviewCadenceDays > 0 && draftConditions.length > 0,
     },
   ] as const;
+  const tabLabels: Record<TabKey, string> = {
+    Home: tabLabel(language, "Home"),
+    Stocks: tabLabel(language, "Stocks"),
+    Recipes: tabLabel(language, "Recipes"),
+    Eyes: tabLabel(language, "Eyes"),
+    Alerts: tabLabel(language, "Alerts"),
+    Journal: tabLabel(language, "Journal"),
+    Settings: tabLabel(language, "Settings"),
+  };
   const topBarSubtitle =
     tab === "Home"
-      ? `${homeUrgentStocks.length} urgent · ${openAlerts} open alerts`
+      ? language === "ko"
+        ? `긴급 ${homeUrgentStocks.length}개 · 열림 알림 ${openAlerts}개`
+        : `${homeUrgentStocks.length} urgent · ${openAlerts} open alerts`
       : tab === "Stocks"
         ? selectedStockSummary
-          ? `${selectedStockSummary.stock.symbol} · ${sortedSelectedStockAnalysisCards.length} metrics`
-          : "Search any stock and inspect the full board"
+          ? language === "ko"
+            ? `${selectedStockSummary.stock.symbol} · 지표 ${sortedSelectedStockAnalysisCards.length}개`
+            : `${selectedStockSummary.stock.symbol} · ${sortedSelectedStockAnalysisCards.length} metrics`
+          : language === "ko"
+            ? "종목을 검색해 전체 분석 보드를 확인하세요"
+            : "Search any stock and inspect the full board"
         : tab === "Recipes"
-          ? `${filteredRecipes.length} recipes in view`
+          ? language === "ko"
+            ? `현재 레시피 ${filteredRecipes.length}개`
+            : `${filteredRecipes.length} recipes in view`
           : tab === "Eyes"
-            ? `${filteredActiveEyesInventory.length} active eyes`
+            ? language === "ko"
+              ? `활성 모니터 ${filteredActiveEyesInventory.length}개`
+              : `${filteredActiveEyesInventory.length} active eyes`
             : tab === "Alerts"
-              ? `${groupedAlertQueue.length} stocks with open alerts`
+              ? language === "ko"
+                ? `열린 알림 종목 ${groupedAlertQueue.length}개`
+                : `${groupedAlertQueue.length} stocks with open alerts`
               : tab === "Journal"
-                ? `${filteredJournalHistory.length} journal entries in view`
-                : `${providerHealth.filter((entry) => entry.status === "Healthy").length} healthy providers`;
+                ? language === "ko"
+                  ? `기록 ${filteredJournalHistory.length}개`
+                  : `${filteredJournalHistory.length} journal entries in view`
+                : language === "ko"
+                  ? `정상 제공자 ${providerHealth.filter((entry) => entry.status === "Healthy").length}개`
+                  : `${providerHealth.filter((entry) => entry.status === "Healthy").length} healthy providers`;
   const previewEvidenceGroups =
     previewRecipe && previewEye && previewSnapshot && previewEvaluation
       ? buildEvidenceGroups({
@@ -2748,7 +2802,7 @@ export default function App() {
       <View style={styles.frame}>
         <View style={styles.topBar}>
           <View>
-            <Text style={styles.topBarTitle}>{tab}</Text>
+            <Text style={styles.topBarTitle}>{tabLabels[tab]}</Text>
             <Text style={styles.topBarSubtitle}>{topBarSubtitle}</Text>
           </View>
           <Pressable
@@ -2775,23 +2829,23 @@ export default function App() {
           {tab === "Home" ? (
             <>
               <Reveal>
-                <SectionHeader note="Stock-grouped triage." />
+                <SectionHeader note={subtitleLabel(language, "Home")} />
                 <View style={styles.homeSummaryStrip}>
-                  <DenseStat label="Open alerts" value={`${openAlerts}`} tone={openAlerts > 0 ? "risk" : "strong"} />
-                  <DenseStat label="Urgent stocks" value={`${homeUrgentStocks.length}`} tone={homeUrgentStocks.length > 0 ? "risk" : "neutral"} />
-                  <DenseStat label="Opportunity" value={`${homeOpportunityStocks.length}`} />
-                  <DenseStat label="Stale review" value={`${homeStaleReviewStocks.length}`} />
+                  <DenseStat label={language === "ko" ? "열린 알림" : "Open alerts"} value={`${openAlerts}`} tone={openAlerts > 0 ? "risk" : "strong"} />
+                  <DenseStat label={language === "ko" ? "긴급 종목" : "Urgent stocks"} value={`${homeUrgentStocks.length}`} tone={homeUrgentStocks.length > 0 ? "risk" : "neutral"} />
+                  <DenseStat label={language === "ko" ? "기회 형성" : "Opportunity"} value={`${homeOpportunityStocks.length}`} />
+                  <DenseStat label={language === "ko" ? "검토 지연" : "Stale review"} value={`${homeStaleReviewStocks.length}`} />
                 </View>
                 <HorizontalChoice options={homeBuckets} value={homeBucket} onSelect={setHomeBucket} />
               </Reveal>
 
               {(homeBucket === "All" || homeBucket === "Review Now") ? (
               <Reveal delay={40}>
-                <SectionHeader title={`Review Now · ${homeUrgentStocks.length}`} note="Highest-urgency stocks first." />
+                <SectionHeader title={`${language === "ko" ? "지금 검토" : "Review Now"} · ${homeUrgentStocks.length}`} note={language === "ko" ? "가장 긴급한 종목부터 보여줍니다." : "Highest-urgency stocks first."} />
                 <View style={styles.stack}>
                   {homeUrgentStocks.length === 0 ? (
                     <Card>
-                      <Text style={styles.cardBody}>No stocks need immediate review right now.</Text>
+                      <Text style={styles.cardBody}>{language === "ko" ? "지금 바로 검토할 종목은 없습니다." : "No stocks need immediate review right now."}</Text>
                     </Card>
                   ) : (
                     homeUrgentStocks.slice(0, 4).map((item) => (
@@ -2799,6 +2853,7 @@ export default function App() {
                         key={`urgent-${item.stock.id}`}
                         item={item}
                         recipes={data.recipes}
+                        language={language}
                         onOpenStock={() => openStockContext({ stockId: item.stock.id })}
                         onReview={() => void actions.markEyesReviewed({ stockId: item.stock.id })}
                         onOpenJournal={() => {
@@ -2820,11 +2875,11 @@ export default function App() {
 
               {(homeBucket === "All" || homeBucket === "Forming") ? (
               <Reveal delay={80}>
-                <SectionHeader title={`Forming · ${homeOpportunityStocks.length}`} note="Stocks becoming more interesting but not yet urgent." />
+                <SectionHeader title={`${language === "ko" ? "형성 중" : "Forming"} · ${homeOpportunityStocks.length}`} note={language === "ko" ? "관심이 커지고 있지만 아직 긴급하지는 않은 종목입니다." : "Stocks becoming more interesting but not yet urgent."} />
                 <View style={styles.stack}>
                   {homeOpportunityStocks.length === 0 ? (
                     <Card>
-                      <Text style={styles.cardBody}>No stocks are forming a stronger setup right now.</Text>
+                      <Text style={styles.cardBody}>{language === "ko" ? "지금 더 강한 구도를 만들고 있는 종목은 없습니다." : "No stocks are forming a stronger setup right now."}</Text>
                     </Card>
                   ) : (
                     homeOpportunityStocks.slice(0, 3).map((item) => (
@@ -2832,6 +2887,7 @@ export default function App() {
                         key={`forming-${item.stock.id}`}
                         item={item}
                         recipes={data.recipes}
+                        language={language}
                         onOpenStock={() => openStockContext({ stockId: item.stock.id })}
                         onReview={() => void actions.markEyesReviewed({ stockId: item.stock.id })}
                         onOpenJournal={() => {
@@ -2848,11 +2904,11 @@ export default function App() {
 
               {(homeBucket === "All" || homeBucket === "Review Soon") ? (
               <Reveal delay={120}>
-                <SectionHeader title={`Review Soon · ${homeStaleReviewStocks.length}`} note="Eyes that need a fresh thesis check even without a new alert." />
+                <SectionHeader title={`${language === "ko" ? "곧 검토" : "Review Soon"} · ${homeStaleReviewStocks.length}`} note={language === "ko" ? "새 알림이 없어도 논리를 다시 확인해야 하는 모니터입니다." : "Eyes that need a fresh thesis check even without a new alert."} />
                 <View style={styles.stack}>
                   {homeStaleReviewStocks.length === 0 ? (
                     <Card>
-                      <Text style={styles.cardBody}>No stale thesis reviews are flagged right now.</Text>
+                      <Text style={styles.cardBody}>{language === "ko" ? "지금 오래된 논리 검토 항목은 없습니다." : "No stale thesis reviews are flagged right now."}</Text>
                     </Card>
                   ) : (
                     homeStaleReviewStocks.slice(0, 3).map((item) => (
@@ -2860,6 +2916,7 @@ export default function App() {
                         key={`stale-${item.stock.id}`}
                         item={item}
                         recipes={data.recipes}
+                        language={language}
                         onOpenStock={() => openStockContext({ stockId: item.stock.id })}
                         onReview={() => void actions.markEyesReviewed({ stockId: item.stock.id })}
                         onOpenJournal={() => {
@@ -2879,7 +2936,7 @@ export default function App() {
           {tab === "Stocks" ? (
             <>
               <Reveal>
-                <SectionHeader note="Search, select, inspect." />
+                <SectionHeader note={subtitleLabel(language, "Stocks")} />
                 <StockSearchPanel
                   styles={styles}
                   stockSearch={stockSearch}
@@ -2897,7 +2954,8 @@ export default function App() {
                   isVeryCompactPhone={isVeryCompactPhone}
                   Input={Input}
                   Button={Button}
-                  stockSuggestionTrustLabel={stockSuggestionTrustLabel}
+                  stockSuggestionTrustLabel={(snapshot) => stockSuggestionTrustLabel(language, snapshot)}
+                  language={language}
                 />
               </Reveal>
 
@@ -2923,8 +2981,9 @@ export default function App() {
                       setSelectedHeroPointIndex={setSelectedHeroPointIndex}
                       isCompactPhone={isCompactPhone}
                       freshnessTone={freshnessTone}
-                      stockSnapshotModeLabel={stockSnapshotModeLabel}
+                      stockSnapshotModeLabel={(snapshot) => stockSnapshotModeLabel(language, snapshot)}
                       Button={Button}
+                      language={language}
                       onClearStock={() => {
                         setSelectedStockId("");
                         setStockSearch("");
@@ -2955,9 +3014,12 @@ export default function App() {
                     <View style={[styles.stockControlsPanel, isCompactPhone ? styles.stockControlsPanelCompact : null]}>
                       <View style={styles.stockControlsHeader}>
                         <View style={styles.flexOne}>
-                          <Text style={styles.stockControlsTitle}>Board controls</Text>
+                          <Text style={styles.stockControlsTitle}>{t(language, "stocks.hero.boardControls")}</Text>
                           <Text style={styles.stockControlsMeta}>
-                            Showing {sortedSelectedStockAnalysisCards.length} of {selectedStockAnalysisCards.length} metrics
+                            {t(language, "stocks.hero.showing", {
+                              shown: sortedSelectedStockAnalysisCards.length,
+                              total: selectedStockAnalysisCards.length,
+                            })}
                           </Text>
                         </View>
                         {stockControlsDirty ? (
@@ -2970,12 +3032,12 @@ export default function App() {
                             }}
                             style={({ pressed }) => [pressed ? styles.choiceChipPressed : null]}
                           >
-                            <Text style={styles.stockControlsReset}>Reset</Text>
+                            <Text style={styles.stockControlsReset}>{t(language, "common.reset")}</Text>
                           </Pressable>
                         ) : null}
                       </View>
                       <View style={styles.stockControlGroup}>
-                        <Text style={styles.stockControlGroupLabel}>Status</Text>
+                        <Text style={styles.stockControlGroupLabel}>{t(language, "stocks.hero.status")}</Text>
                         <HorizontalChoice
                           options={analysisStatusFilters}
                           value={analysisStatusFilter}
@@ -2984,7 +3046,7 @@ export default function App() {
                         />
                       </View>
                       <View style={styles.stockControlGroup}>
-                        <Text style={styles.stockControlGroupLabel}>Board</Text>
+                        <Text style={styles.stockControlGroupLabel}>{t(language, "stocks.hero.board")}</Text>
                         <HorizontalChoice
                           options={stockBoardModes}
                           value={stockBoardMode}
@@ -3026,12 +3088,13 @@ export default function App() {
                                 ),
                             )}
                             onOpen={() => setSelectedEvidenceCard(card)}
+                            language={language}
                           />
                         </View>
                       ))
                     ) : (
                       <Card>
-                        <Text style={styles.cardBody}>No parameters match the current filters.</Text>
+                        <Text style={styles.cardBody}>{t(language, "stocks.hero.noParameters")}</Text>
                       </Card>
                     )}
                   </View>
@@ -3040,10 +3103,8 @@ export default function App() {
               ) : (
                 <Reveal delay={40}>
                   <Card>
-                    <Text style={styles.emptySearchTitle}>No stock selected</Text>
-                    <Text style={styles.emptySearchBody}>
-                      Search a ticker or company name, choose a suggestion, and the visual analysis board will open here.
-                    </Text>
+                    <Text style={styles.emptySearchTitle}>{t(language, "stocks.hero.noStockTitle")}</Text>
+                    <Text style={styles.emptySearchBody}>{t(language, "stocks.hero.noStockBody")}</Text>
                   </Card>
                 </Reveal>
               )}
@@ -3053,7 +3114,7 @@ export default function App() {
           {tab === "Recipes" ? (
             <>
               <Reveal>
-                <SectionHeader note="Recipe inventory first." />
+                <SectionHeader note={subtitleLabel(language, "Recipes")} />
                 <View style={styles.homeSummaryStrip}>
                   <DenseStat label="Recipes" value={`${data.recipes.length}`} tone="strong" />
                   <DenseStat label="Starter" value={`${data.recipes.filter((recipe) => starterRecipeNames.includes(recipe.name)).length}`} />
@@ -3122,7 +3183,7 @@ export default function App() {
           {tab === "Eyes" ? (
             <>
               <Reveal>
-                <SectionHeader note="Recipe subscriptions." />
+                <SectionHeader note={subtitleLabel(language, "Eyes")} />
                 <View style={styles.homeSummaryStrip}>
                   <DenseStat label="Active" value={`${activeEyesInventory.length}`} tone="strong" />
                   <DenseStat label="Inactive" value={`${inactiveEyesInventory.length}`} />
@@ -3249,7 +3310,7 @@ export default function App() {
           {tab === "Alerts" ? (
             <>
               <Reveal>
-                <SectionHeader note="What changed and why now." />
+                <SectionHeader note={subtitleLabel(language, "Alerts")} />
                 <View style={styles.homeSummaryStrip}>
                   <DenseStat label="Open" value={`${groupedAlertQueue.reduce((sum, item) => sum + item.openAlerts.length, 0)}`} tone="risk" />
                   <DenseStat label="Grouped Stocks" value={`${groupedAlertQueue.length}`} />
@@ -3272,6 +3333,7 @@ export default function App() {
                         <AlertClusterCard
                           key={`alert-group-${group.stock.id}`}
                           group={group}
+                          language={language}
                           selectedStockId={selectedStockId}
                           onOpenStock={() => openStockContext({ stockId: group.stock.id })}
                           onOpenDetail={(alertId) => {
@@ -3348,7 +3410,7 @@ export default function App() {
           {tab === "Journal" ? (
             <>
               <Reveal>
-                <SectionHeader note="Decision history first." />
+                <SectionHeader note={subtitleLabel(language, "Journal")} />
                 <View style={styles.homeSummaryStrip}>
                   <DenseStat label="Entries" value={`${data.decisions.length}`} tone="strong" />
                   <DenseStat label="Entered" value={`${data.decisions.filter((decision) => decision.action === "Entered").length}`} />
@@ -3427,40 +3489,56 @@ export default function App() {
           {tab === "Settings" ? (
             <>
               <Reveal>
-                <SectionHeader note="Provider health and controls." />
+                <SectionHeader note={subtitleLabel(language, "Settings")} />
                 <View style={styles.homeSummaryStrip}>
                   <DenseStat
-                    label="Healthy"
+                    label={t(language, "settings.providers.summaryHealthy")}
                     value={`${providerHealth.filter((entry) => entry.status === "Healthy").length}`}
                     tone="strong"
                   />
                   <DenseStat
-                    label="Limited"
+                    label={t(language, "settings.providers.summaryLimited")}
                     value={`${providerHealth.filter((entry) => entry.status === "Plan Limited").length}`}
                     tone="risk"
                   />
                   <DenseStat
-                    label="Config Missing"
+                    label={t(language, "settings.providers.summaryUnconfigured")}
                     value={`${providerHealth.filter((entry) => entry.status === "Unconfigured").length}`}
                   />
-                  <DenseStat label="Tracked Stocks" value={`${data.stocks.length}`} />
+                  <DenseStat label={t(language, "settings.providers.summaryTrackedStocks")} value={`${data.stocks.length}`} />
+                </View>
+                <View style={styles.stockControlGroup}>
+                  <Text style={styles.stockControlGroupLabel}>{t(language, "settings.language.title")}</Text>
+                  <Text style={styles.cardBody}>{t(language, "settings.language.note")}</Text>
+                  <HorizontalChoice
+                    options={languageOptions}
+                    value={language}
+                    onSelect={(next) => {
+                      setLanguage(next);
+                      void saveAppLanguage(next);
+                    }}
+                    variant="segmented"
+                    labelForOption={(option) =>
+                      option === "en"
+                        ? t(language, "settings.language.english")
+                        : t(language, "settings.language.korean")
+                    }
+                  />
                 </View>
                 <View style={styles.actionRow}>
                   <Button
-                    label={providerHealthLoading ? "Checking..." : "Check API Health"}
+                    label={providerHealthLoading ? t(language, "settings.providers.checking") : t(language, "settings.providers.check")}
                     onPress={() => void actions.refreshProviderHealth()}
                     disabled={providerHealthLoading}
                   />
-                  <Button label="Refresh Snapshots" tone="secondary" onPress={() => void actions.refreshMockData()} />
+                  <Button label={t(language, "settings.providers.refresh")} tone="secondary" onPress={() => void actions.refreshMockData()} />
                 </View>
               </Reveal>
 
               <Reveal delay={40}>
                 <Card>
-                  <Text style={styles.cardTitle}>Free-tier policy</Text>
-                  <Text style={styles.cardBody}>
-                    The app is staying dummy-backed for daily use right now. These providers are configured and health-checked here, but they are parked until you explicitly switch real data back on.
-                  </Text>
+                  <Text style={styles.cardTitle}>{t(language, "settings.providers.title")}</Text>
+                  <Text style={styles.cardBody}>{t(language, "settings.providers.note")}</Text>
                 </Card>
               </Reveal>
 
@@ -3470,14 +3548,20 @@ export default function App() {
                     <Card key={entry.provider} highlighted={entry.status !== "Healthy"}>
                       <View style={styles.inlineBetween}>
                         <View style={styles.flexOne}>
-                          <Text style={styles.cardEyebrow}>{entry.mode}</Text>
+                          <Text style={styles.cardEyebrow}>
+                            {entry.mode === "Background"
+                              ? t(language, "settings.providers.modeBackground")
+                              : entry.mode === "On Demand"
+                                ? t(language, "settings.providers.modeOnDemand")
+                                : t(language, "settings.providers.modeDisabled")}
+                          </Text>
                           <Text style={styles.alertTitle}>{entry.provider}</Text>
                         </View>
-                        <Text style={providerHealthTone(entry)}>{entry.status}</Text>
+                        <Text style={providerHealthTone(entry)}>{localizedProviderStatus(language, entry.status)}</Text>
                       </View>
                       <Text style={styles.cardBody}>{entry.note}</Text>
                       <View style={styles.metaRow}>
-                        <MetaPill label={entry.configured ? "Configured" : "Missing key"} />
+                        <MetaPill label={entry.configured ? t(language, "settings.providers.configured") : t(language, "settings.providers.missingKey")} />
                         {entry.endpoint ? <MetaPill label={entry.endpoint} /> : null}
                         {entry.lastCheckedAt ? <MetaPill label={formatDate(entry.lastCheckedAt)} /> : null}
                       </View>
@@ -3491,9 +3575,14 @@ export default function App() {
 
         {recipeBuilderOpen ? (
           <WindowPanel
-            title="Recipe Builder"
-            subtitle="Guided pages. Fill the required fields, move step by step, and preview before saving."
+            title={language === "ko" ? "레시피 만들기" : "Recipe Builder"}
+            subtitle={
+              language === "ko"
+                ? "필수 항목을 채우고 단계별로 이동한 뒤 저장 전에 미리 확인하세요."
+                : "Guided pages. Fill the required fields, move step by step, and preview before saving."
+            }
             onClose={() => setRecipeBuilderOpen(false)}
+            closeLabel={t(language, "common.done")}
           >
             <StepFlow steps={recipeBuilderSteps} current={recipeBuilderStep} onSelect={setRecipeBuilderStep} />
             <View style={styles.previewCard}>
@@ -3700,6 +3789,7 @@ export default function App() {
             title={selectedRecipe.name}
             subtitle={`Version ${selectedRecipe.version} · ${selectedRecipe.timeHorizon}`}
             onClose={() => setRecipeDetailId("")}
+            closeLabel={t(language, "common.done")}
           >
             <Text style={styles.cardBody}>{selectedRecipe.purpose}</Text>
             <View style={styles.dualDenseGrid}>
@@ -3787,17 +3877,18 @@ export default function App() {
         {eyeDetailOpen && selectedEye ? (
           <WindowPanel
             title={stockLabel(data.stocks, selectedEye.stockId)}
-            subtitle={`${recipeLabel(data.recipes, selectedEye.recipeId)} · ${selectedEye.lastEvaluation?.currentState ?? "Not Evaluated"}`}
+            subtitle={`${recipeLabel(data.recipes, selectedEye.recipeId)} · ${selectedEye.lastEvaluation?.currentState ?? (language === "ko" ? "평가 전" : "Not Evaluated")}`}
             onClose={() => setEyeDetailOpen(false)}
+            closeLabel={t(language, "common.done")}
           >
             <WhyNowPanel
-              title="Current Eye state"
+              title={language === "ko" ? "현재 모니터 상태" : "Current Eye state"}
               body={
                 selectedEye.lastEvaluation?.whyNow ??
-                "This Eye has not produced a meaningful review summary yet."
+                (language === "ko" ? "이 모니터에는 아직 의미 있는 검토 요약이 없습니다." : "This Eye has not produced a meaningful review summary yet.")
               }
               state={selectedEye.lastEvaluation?.currentState ?? "Not Relevant"}
-              recipeVersion={`${selectedEyeRecipe?.name ?? "Unknown Recipe"} v${selectedEye.recipeVersionAtCreation ?? selectedEye.lastEvaluation?.recipeVersion ?? 1}`}
+              recipeVersion={`${selectedEyeRecipe?.name ?? (language === "ko" ? "알 수 없는 레시피" : "Unknown Recipe")} v${selectedEye.recipeVersionAtCreation ?? selectedEye.lastEvaluation?.recipeVersion ?? 1}`}
             />
             <View style={styles.dualDenseGrid}>
               <DenseStat label="Urgency" value={selectedEye.lastEvaluation?.actionUrgency ?? "Wait"} tone="strong" />
@@ -3875,9 +3966,10 @@ export default function App() {
 
         {eyeComposerOpen ? (
           <WindowPanel
-            title="Create Eye"
-            subtitle="Subscribe a selected stock to a selected recipe with your thesis snapshot."
+            title={language === "ko" ? "모니터 만들기" : "Create Eye"}
+            subtitle={language === "ko" ? "선택한 종목과 레시피를 연결하고 현재 투자 논리를 남기세요." : "Subscribe a selected stock to a selected recipe with your thesis snapshot."}
             onClose={() => setEyeComposerOpen(false)}
+            closeLabel={t(language, "common.done")}
           >
             <Text style={styles.inputLabel}>Stock</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.choiceRow}>
@@ -3928,8 +4020,9 @@ export default function App() {
             title={selectedAlert.title}
             subtitle={`${stockLabel(data.stocks, selectedAlertEye.stockId)} · ${selectedAlert.priority}`}
             onClose={() => setAlertDetailOpen(false)}
+            closeLabel={t(language, "common.done")}
           >
-            <WhyNowPanel title="What happened" body={selectedAlert.whyNow} state={selectedAlertEvaluation.currentState} recipeVersion={`${selectedAlertRecipe.name} v${selectedAlertRecipe.version}`} />
+            <WhyNowPanel title={language === "ko" ? "무슨 일이 있었나" : "What happened"} body={selectedAlert.whyNow} state={selectedAlertEvaluation.currentState} recipeVersion={`${selectedAlertRecipe.name} v${selectedAlertRecipe.version}`} />
             <View style={styles.detailMetricStrip}>
               <DenseStat label="Priority" value={selectedAlert.priority} tone={selectedAlert.priority === "High" ? "risk" : "strong"} />
               <DenseStat label="State" value={selectedAlertEvaluation.currentState} />
@@ -3938,19 +4031,26 @@ export default function App() {
             </View>
             <View style={styles.dualColumn}>
               <View style={styles.evidenceColumn}>
-                <Text style={styles.columnTitle}>Biggest support</Text>
-                <Text style={styles.listLine}>+ {selectedAlert.supportingEvidence[0] ?? "No strong support recorded."}</Text>
+                <Text style={styles.columnTitle}>{language === "ko" ? "가장 큰 근거" : "Biggest support"}</Text>
+                <Text style={styles.listLine}>+ {selectedAlert.supportingEvidence[0] ?? (language === "ko" ? "강한 근거는 아직 기록되지 않았습니다." : "No strong support recorded.")}</Text>
               </View>
               <View style={styles.evidenceColumn}>
-                <Text style={styles.columnTitle}>Biggest risk</Text>
-                <Text style={styles.listLine}>- {selectedAlert.risks[0] ?? "No major risk recorded."}</Text>
+                <Text style={styles.columnTitle}>{language === "ko" ? "가장 큰 위험" : "Biggest risk"}</Text>
+                <Text style={styles.listLine}>- {selectedAlert.risks[0] ?? (language === "ko" ? "큰 위험은 아직 기록되지 않았습니다." : "No major risk recorded.")}</Text>
               </View>
             </View>
-            <WhatChangedPanel title="Review in 5 seconds" items={[`Priority is ${selectedAlert.priority}.`, `State change: ${selectedAlert.stateChange}.`, selectedAlert.dataQuality]} />
+            <WhatChangedPanel
+              title={language === "ko" ? "5초 요약" : "Review in 5 seconds"}
+              items={
+                language === "ko"
+                  ? [`우선순위: ${selectedAlert.priority}`, `상태 변화: ${selectedAlert.stateChange}`, selectedAlert.dataQuality]
+                  : [`Priority is ${selectedAlert.priority}.`, `State change: ${selectedAlert.stateChange}.`, selectedAlert.dataQuality]
+              }
+            />
             <View style={styles.metaRow}>
-              <MetaPill label={selectedAlert.reviewed ? "Acknowledged" : "Open"} />
-              <MetaPill label={selectedAlertSnapshot?.isMock ? "Mock-backed" : "Provider-backed"} />
-              <MetaPill label={selectedAlertSnapshot?.freshness ?? "Unavailable"} />
+              <MetaPill label={selectedAlert.reviewed ? (language === "ko" ? "확인됨" : "Acknowledged") : (language === "ko" ? "열림" : "Open")} />
+              <MetaPill label={selectedAlertSnapshot?.isMock ? t(language, "stocks.data.dummyBacked") : t(language, "stocks.data.providerBacked")} />
+              <MetaPill label={localizedFreshness(language, selectedAlertSnapshot?.freshness ?? "Unavailable")} />
               {selectedAlert.usefulness ? <MetaPill label={selectedAlert.usefulness} /> : null}
             </View>
             <View style={styles.analysisActionRow}>
@@ -3980,7 +4080,7 @@ export default function App() {
             </View>
             <View style={styles.stack}>
               {selectedAlertEvidenceGroups.map((group) => (
-                <EvidenceGroupView key={`alert-${group.key}`} group={group} defaultExpanded={group.key === "supporting-evidence"} />
+                <EvidenceGroupView key={`alert-${group.key}`} group={group} defaultExpanded={group.key === "supporting-evidence"} language={language} />
               ))}
             </View>
           </WindowPanel>
@@ -3988,9 +4088,10 @@ export default function App() {
 
         {journalComposerOpen ? (
           <WindowPanel
-            title="New Journal Entry"
-            subtitle="Capture the decision only when you choose to add one."
+            title={language === "ko" ? "새 기록 추가" : "New Journal Entry"}
+            subtitle={language === "ko" ? "원할 때만 직접 결정 기록을 남기세요." : "Capture the decision only when you choose to add one."}
             onClose={() => setJournalComposerOpen(false)}
+            closeLabel={t(language, "common.done")}
           >
             <Text style={styles.inputLabel}>Eye</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.choiceRow}>
@@ -4022,13 +4123,16 @@ export default function App() {
             title={selectedDecision.action}
             subtitle={decisionTitle(selectedDecision.eyeId, data.eyes, data.stocks, data.recipes)}
             onClose={() => setSelectedDecisionId("")}
+            closeLabel={t(language, "common.done")}
           >
             <WhatChangedPanel
-              title="Decision context"
+              title={language === "ko" ? "결정 맥락" : "Decision context"}
               items={[
-                selectedDecision.stateAtDecision ?? "State snapshot unavailable",
-                selectedDecision.dataQuality ?? "Data-quality note unavailable",
-                `Thesis ${selectedDecision.thesisValid} · Timing ${selectedDecision.timing}`,
+                selectedDecision.stateAtDecision ?? (language === "ko" ? "상태 스냅샷 없음" : "State snapshot unavailable"),
+                selectedDecision.dataQuality ?? (language === "ko" ? "데이터 품질 메모 없음" : "Data-quality note unavailable"),
+                language === "ko"
+                  ? `논리 ${selectedDecision.thesisValid} · 타이밍 ${selectedDecision.timing}`
+                  : `Thesis ${selectedDecision.thesisValid} · Timing ${selectedDecision.timing}`,
               ]}
             />
             <View style={styles.detailCallout}>
@@ -4093,12 +4197,13 @@ export default function App() {
 
         {stockComposerOpen ? (
           <WindowPanel
-            title="Add Stock"
-            subtitle="Add a stock into the factual stock workspace."
+            title={language === "ko" ? "종목 추가" : "Add Stock"}
+            subtitle={language === "ko" ? "사실 기반 종목 작업공간에 새 종목을 추가합니다." : "Add a stock into the factual stock workspace."}
             onClose={() => {
               setStockComposerOpen(false);
               setStockFormAttempted(false);
             }}
+            closeLabel={t(language, "common.done")}
           >
             <Text style={styles.inputLabel}>Ticker</Text>
             <Input
@@ -4141,10 +4246,17 @@ export default function App() {
         {selectedEvidenceCard ? (
           <WindowPanel
             title={selectedEvidenceCard.title}
-            subtitle={`${selectedStockSummary?.stock.symbol ?? "Stock"} · ${sourceTypeLabel(selectedEvidenceCard.sourceType)} · ${
-              selectedEvidenceCard.freshness === "Mock Data" ? "Dummy" : selectedEvidenceCard.freshness
-            }${selectedEvidenceIndex >= 0 ? ` · ${selectedEvidenceIndex + 1} of ${sortedSelectedStockAnalysisCards.length}` : ""}`}
+            subtitle={`${selectedStockSummary?.stock.symbol ?? (language === "ko" ? "종목" : "Stock")} · ${sourceTypeLabel(language, selectedEvidenceCard.sourceType)} · ${
+              localizedFreshness(language, selectedEvidenceCard.freshness)
+            }${
+              selectedEvidenceIndex >= 0
+                ? language === "ko"
+                  ? ` · ${sortedSelectedStockAnalysisCards.length}개 중 ${selectedEvidenceIndex + 1}번째`
+                  : ` · ${selectedEvidenceIndex + 1} of ${sortedSelectedStockAnalysisCards.length}`
+                : ""
+            }`}
             onClose={() => setSelectedEvidenceCard(null)}
+            closeLabel={t(language, "common.done")}
           >
             <MotionSwap
               swapKey={`metric-sheet-${selectedEvidenceCard.id}-${selectedEvidenceIndex}`}
@@ -4153,6 +4265,7 @@ export default function App() {
             >
             <StockMetricDetailSheet
               card={selectedEvidenceCard}
+              language={language}
               selectedEvidenceIndex={selectedEvidenceIndex}
               total={sortedSelectedStockAnalysisCards.length}
               sortedCards={sortedSelectedStockAnalysisCards}
@@ -4174,7 +4287,7 @@ export default function App() {
           </WindowPanel>
         ) : null}
 
-        <BottomNav tabs={tabs} currentTab={tab} onSelect={setTab} />
+        <BottomNav tabs={tabs} currentTab={tab} onSelect={setTab} labels={tabLabels} />
       </View>
     </SafeAreaView>
   );

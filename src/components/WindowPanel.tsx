@@ -16,9 +16,10 @@ interface WindowPanelProps {
   subtitle?: string;
   onClose: () => void;
   children: React.ReactNode;
+  closeLabel?: string;
 }
 
-export const WindowPanel = ({ title, subtitle, onClose, children }: WindowPanelProps) => {
+export const WindowPanel = ({ title, subtitle, onClose, children, closeLabel = "Done" }: WindowPanelProps) => {
   const overlayOpacity = useRef(new Animated.Value(0)).current;
   const sheetOffset = useRef(new Animated.Value(28)).current;
   const sheetScale = useRef(new Animated.Value(0.985)).current;
@@ -124,7 +125,7 @@ export const WindowPanel = ({ title, subtitle, onClose, children }: WindowPanelP
             ) : null}
           </View>
           <Pressable onPress={animateClose} style={({ pressed }) => [styles.doneButton, pressed ? styles.doneButtonPressed : null]}>
-            <Text style={styles.doneButtonText}>Done</Text>
+            <Text style={styles.doneButtonText}>{closeLabel}</Text>
           </Pressable>
         </View>
         <ScrollView

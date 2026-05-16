@@ -7,9 +7,10 @@ interface BottomNavProps<T extends string> {
   tabs: readonly T[];
   currentTab: T;
   onSelect: (tab: T) => void;
+  labels?: Partial<Record<T, string>>;
 }
 
-export const BottomNav = <T extends string>({ tabs, currentTab, onSelect }: BottomNavProps<T>) => (
+export const BottomNav = <T extends string>({ tabs, currentTab, onSelect, labels }: BottomNavProps<T>) => (
   <View style={styles.bottomNav}>
     <View style={styles.bottomNavRow}>
       {tabs.map((item) => (
@@ -24,7 +25,7 @@ export const BottomNav = <T extends string>({ tabs, currentTab, onSelect }: Bott
         >
           <View style={[styles.navIndicator, currentTab === item ? styles.navIndicatorActive : null]} />
           <Text style={[styles.navLabel, currentTab === item ? styles.navLabelActive : null]} numberOfLines={1}>
-            {item}
+            {labels?.[item] ?? item}
           </Text>
         </Pressable>
       ))}
