@@ -2123,16 +2123,14 @@ export default function App() {
       ? buildStockVisualAnalysisGroups({
           stock: preSelectedStockSummary.stock,
           snapshot: preSelectedStockSummary.snapshot,
-          eyes: [],
+          eyes: preSelectedStockSummary.eyes,
           recipes: data?.recipes ?? [],
           benchmark: analysisBenchmark,
           lookbackLabel: analysisLookback,
+          language,
         }).map((group) => ({
           ...group,
-          cards: group.cards.filter(
-            (card) =>
-              card.family !== "User Thesis Match" && matchesAnalysisStatus(card.status, analysisStatusFilter),
-          ),
+          cards: group.cards.filter((card) => matchesAnalysisStatus(card.status, analysisStatusFilter)),
         }))
       : [];
   const preSelectedStockAnalysisCards = preSelectedStockAnalysisGroups.flatMap((group) =>
@@ -2268,16 +2266,14 @@ export default function App() {
       ? buildStockVisualAnalysisGroups({
           stock: selectedStockSummary.stock,
           snapshot: selectedStockSummary.snapshot,
-          eyes: [],
+          eyes: selectedStockSummary.eyes,
           recipes: data.recipes,
           benchmark: analysisBenchmark,
           lookbackLabel: analysisLookback,
+          language,
         }).map((group) => ({
           ...group,
-          cards: group.cards.filter(
-            (card) =>
-              card.family !== "User Thesis Match" && matchesAnalysisStatus(card.status, analysisStatusFilter),
-          ),
+          cards: group.cards.filter((card) => matchesAnalysisStatus(card.status, analysisStatusFilter)),
         }))
       : [];
   const selectedStockAnalysisCards = selectedStockAnalysisGroups.flatMap((group) =>
@@ -4919,7 +4915,7 @@ const styles = StyleSheet.create({
     fontFamily,
   },
   stockTrendChart: {
-    height: 148,
+    height: 180,
     borderRadius: 16,
     backgroundColor: "#ffffff",
     borderWidth: 1,
@@ -4933,7 +4929,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   stockTrendChartCompact: {
-    height: 136,
+    height: 164,
     paddingHorizontal: 8,
     paddingBottom: 8,
     paddingTop: 16,
@@ -5429,7 +5425,7 @@ const styles = StyleSheet.create({
     fontFamily,
   },
   detailHeroChart: {
-    height: 248,
+    height: 296,
     borderRadius: 16,
     backgroundColor: "#111827",
     borderWidth: 1,
@@ -5441,7 +5437,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   detailHeroChartCompact: {
-    height: 216,
+    height: 250,
     paddingHorizontal: 10,
     paddingTop: 10,
     paddingBottom: 8,

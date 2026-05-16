@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import {
   Animated,
+  Modal,
   PanResponder,
   Pressable,
   ScrollView,
@@ -107,38 +108,40 @@ export const WindowPanel = ({ title, subtitle, onClose, children, closeLabel = "
   }, [overlayOpacity, sheetOffset, sheetScale]);
 
   return (
-    <Animated.View style={[styles.windowBackdrop, { opacity: overlayOpacity }]}>
-      <Pressable style={styles.windowDismissLayer} onPress={animateClose} />
-      <Animated.View style={[styles.windowPanel, { transform: [{ translateY: sheetOffset }, { scale: sheetScale }] }]}>
-        <View style={styles.windowHandleTouch} {...dragResponder.panHandlers}>
-          <View style={styles.windowGrabber} />
-        </View>
-        <View style={styles.windowHeader}>
-          <View style={styles.flexOne}>
-            <Text style={styles.windowTitle} numberOfLines={2}>
-              {title}
-            </Text>
-            {subtitle ? (
-              <Text style={styles.windowSubtitle} numberOfLines={2}>
-                {subtitle}
-              </Text>
-            ) : null}
+    <Modal transparent animationType="none" visible onRequestClose={animateClose} statusBarTranslucent>
+      <Animated.View style={[styles.windowBackdrop, { opacity: overlayOpacity }]}>
+        <Pressable style={styles.windowDismissLayer} onPress={animateClose} />
+        <Animated.View style={[styles.windowPanel, { transform: [{ translateY: sheetOffset }, { scale: sheetScale }] }]}>
+          <View style={styles.windowHandleTouch} {...dragResponder.panHandlers}>
+            <View style={styles.windowGrabber} />
           </View>
-          <Pressable onPress={animateClose} style={({ pressed }) => [styles.doneButton, pressed ? styles.doneButtonPressed : null]}>
-            <Text style={styles.doneButtonText}>{closeLabel}</Text>
-          </Pressable>
-        </View>
-        <ScrollView
-          style={styles.windowScroll}
-          contentContainerStyle={styles.windowScrollContent}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-          nestedScrollEnabled
-        >
-          {children}
-        </ScrollView>
+          <View style={styles.windowHeader}>
+            <View style={styles.flexOne}>
+              <Text style={styles.windowTitle} numberOfLines={2}>
+                {title}
+              </Text>
+              {subtitle ? (
+                <Text style={styles.windowSubtitle} numberOfLines={2}>
+                  {subtitle}
+                </Text>
+              ) : null}
+            </View>
+            <Pressable onPress={animateClose} style={({ pressed }) => [styles.doneButton, pressed ? styles.doneButtonPressed : null]}>
+              <Text style={styles.doneButtonText}>{closeLabel}</Text>
+            </Pressable>
+          </View>
+          <ScrollView
+            style={styles.windowScroll}
+            contentContainerStyle={styles.windowScrollContent}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            nestedScrollEnabled
+          >
+            {children}
+          </ScrollView>
+        </Animated.View>
       </Animated.View>
-    </Animated.View>
+    </Modal>
   );
 };
 

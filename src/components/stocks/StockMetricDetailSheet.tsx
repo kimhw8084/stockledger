@@ -146,7 +146,9 @@ const DetailedVisualHero = ({
   const currentPct = ((selectedValue - min) / Math.max(max - min, 1)) * 100;
   const currentLabel =
     displaySeries.length > 1 && selectedPoint !== displaySeries.length - 1
-      ? `Point ${selectedPoint + 1}`
+      ? language === "ko"
+        ? `${selectedPoint + 1}번째 지점`
+        : `Point ${selectedPoint + 1}`
       : t(language, "stocks.detail.latest");
 
   return (

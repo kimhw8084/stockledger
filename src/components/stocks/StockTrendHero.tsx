@@ -104,7 +104,11 @@ export const StockTrendHero = ({
             <View style={[styles.stockTrendSummaryMiniBlock, isCompactPhone ? styles.stockTrendSummaryMiniBlockCompact : null]}>
               <Text style={styles.stockTrendSummaryMiniLabel}>{t(language, "common.range")}</Text>
               <Text style={styles.stockTrendSummaryMiniValue}>
-                {selectedStockHeroRange ? `${Math.round(selectedStockHeroRange.high - selectedStockHeroRange.low)} pts` : "--"}
+                {selectedStockHeroRange
+                  ? language === "ko"
+                    ? `${Math.round(selectedStockHeroRange.high - selectedStockHeroRange.low)}포인트`
+                    : `${Math.round(selectedStockHeroRange.high - selectedStockHeroRange.low)} pts`
+                  : "--"}
               </Text>
             </View>
             <View style={[styles.stockTrendSummaryMiniBlock, isCompactPhone ? styles.stockTrendSummaryMiniBlockCompact : null]}>
@@ -192,7 +196,9 @@ export const StockTrendHero = ({
           <Text style={styles.stockTrendLegendText}>
             {t(language, "stocks.hero.drawdown", { value: snapshot ? `${snapshot.drawdownPct}%` : "N/A" })}
           </Text>
-          <Text style={styles.stockTrendLegendText}>{analysisLookback} vs {analysisBenchmark}</Text>
+          <Text style={styles.stockTrendLegendText}>
+            {language === "ko" ? `${analysisLookback} · ${analysisBenchmark} 비교` : `${analysisLookback} vs ${analysisBenchmark}`}
+          </Text>
         </View>
       </View>
     </MotionSwap>
