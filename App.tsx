@@ -1036,6 +1036,21 @@ const freshnessTone = (freshness: FreshnessStatus) => {
   }
 };
 
+const sourceTypeLabel = (sourceType: VisualEvidenceCard["sourceType"]) =>
+  sourceType === "Mock Adapter"
+    ? "Dummy"
+    : sourceType === "Provider Adapter"
+      ? "Provider"
+      : "Manual";
+
+const stockSnapshotModeLabel = (snapshot?: { isMock: boolean } | null) =>
+  snapshot?.isMock ? "Dummy-backed" : "Provider-backed";
+
+const stockSuggestionTrustLabel = (snapshot?: { isMock: boolean; freshness: FreshnessStatus } | null) => {
+  if (!snapshot) return "Unavailable";
+  return snapshot.isMock ? "Dummy-backed" : snapshot.freshness;
+};
+
 const ThresholdBar = ({ card }: { card: VisualEvidenceCard }) => {
   const { visual } = card;
   if (visual.kind === "freshness") {
@@ -1441,7 +1456,7 @@ const EvidenceCardView = ({
                 <View style={styles.freshnessDot} />
               </View>
               <Text style={[styles.compactFreshnessText, dense ? styles.compactFreshnessTextDense : null]} numberOfLines={1}>
-                {card.freshness}
+                {card.freshness === "Mock Data" ? "Dummy" : card.freshness === "Unavailable" ? "No Data" : card.freshness}
               </Text>
             </View>
           </View>
@@ -1461,7 +1476,7 @@ const EvidenceCardView = ({
           <Text style={styles.evidenceWhy}>Why it matters: {card.whyItMatters}</Text>
 
           <View style={styles.metaRow}>
-            <MetaPill label={card.sourceType} />
+            <MetaPill label={sourceTypeLabel(card.sourceType)} />
             {card.metric.comparisonLabel ? <MetaPill label={card.metric.comparisonLabel} /> : null}
           </View>
         </>
@@ -1481,8 +1496,8 @@ const EvidenceCardView = ({
           <Text style={styles.evidenceEffect}>Effect: {card.effect}</Text>
           <Text style={styles.evidenceWhy}>Why it matters: {card.whyItMatters}</Text>
           <View style={styles.metaRow}>
-            <MetaPill label={card.sourceType} />
-            <MetaPill label={card.freshness} />
+            <MetaPill label={sourceTypeLabel(card.sourceType)} />
+            <MetaPill label={card.freshness === "Mock Data" ? "Dummy" : card.freshness} />
             {card.metric.comparisonLabel ? <MetaPill label={card.metric.comparisonLabel} /> : null}
           </View>
           <Text style={styles.formulaTitle}>{card.formulaName ?? "Formula detail"}</Text>
@@ -1778,8 +1793,12 @@ const StockMetricDetailContent = ({
       <View style={[styles.detailMetricStrip, compactLayout ? styles.detailMetricStripCompact : null]}>
         <DenseStat label="Current" value={card.metric.currentLabel} tone="strong" />
         <DenseStat label="Threshold" value={card.metric.thresholdLabel ?? "Context"} />
-        <DenseStat label="Freshness" value={card.freshness} tone={card.freshness === "Fresh" ? "strong" : "neutral"} />
-        <DenseStat label="Source" value={card.sourceType} />
+        <DenseStat
+          label="Freshness"
+          value={card.freshness === "Mock Data" ? "Dummy" : card.freshness}
+          tone={card.freshness === "Fresh" ? "strong" : "neutral"}
+        />
+        <DenseStat label="Source" value={sourceTypeLabel(card.sourceType)} />
       </View>
       <View style={[styles.detailSheetActionRow, compactLayout ? styles.detailSheetActionRowCompact : null]}>
         <Button label={compactLayout ? "Prev" : "Previous"} tone="secondary" onPress={onPrevious} disabled={selectedEvidenceIndex <= 0} />
@@ -3354,7 +3373,7 @@ export default function App() {
                                 {item.snapshot ? `$${item.snapshot.price.toFixed(2)}` : "--"}
                               </Text>
                               <Text style={styles.stockSuggestionMeta} numberOfLines={1}>
-                                {item.snapshot?.freshness ?? "Unavailable"}
+                                {stockSuggestionTrustLabel(item.snapshot)}
                               </Text>
                               {!hasStockQuery ? (
                                 <Pressable
@@ -3406,6 +3425,10 @@ export default function App() {
                           <Text style={styles.stockBoardMetaText}>{selectedStockSummary.eyes.length} eyes</Text>
                           <Text style={styles.stockBoardMetaDivider}>•</Text>
                           <Text style={styles.stockBoardMetaText}>{pinnedCountForSelectedStock} pinned</Text>
+                          <Text style={styles.stockBoardMetaDivider}>•</Text>
+                          <Text style={styles.stockBoardMetaText}>
+                            {stockSnapshotModeLabel(selectedStockSummary.snapshot)}
+                          </Text>
                         </View>
                       </View>
                       <View style={styles.stockShellHeaderActions}>
@@ -3437,7 +3460,7 @@ export default function App() {
                             {selectedHeroPrice !== undefined ? `$${selectedHeroPrice.toFixed(2)}` : "--"}
                           </Text>
                           <Text style={styles.stockTrendCaption}>
-                            {selectedHeroPointLabel} · {selectedStockSummary.snapshot?.isMock ? "Mock data" : "Provider data"}
+                            {selectedHeroPointLabel}
                           </Text>
                         </View>
                         <View style={[styles.stockTrendSummaryMini, isCompactPhone ? styles.stockTrendSummaryMiniCompact : null]}>
@@ -4752,7 +4775,9 @@ export default function App() {
         {selectedEvidenceCard ? (
           <WindowPanel
             title={selectedEvidenceCard.title}
-            subtitle={`${selectedStockSummary?.stock.symbol ?? "Stock"} · ${selectedEvidenceCard.freshness}${selectedEvidenceIndex >= 0 ? ` · ${selectedEvidenceIndex + 1} of ${sortedSelectedStockAnalysisCards.length}` : ""}`}
+            subtitle={`${selectedStockSummary?.stock.symbol ?? "Stock"} · ${sourceTypeLabel(selectedEvidenceCard.sourceType)} · ${
+              selectedEvidenceCard.freshness === "Mock Data" ? "Dummy" : selectedEvidenceCard.freshness
+            }${selectedEvidenceIndex >= 0 ? ` · ${selectedEvidenceIndex + 1} of ${sortedSelectedStockAnalysisCards.length}` : ""}`}
             onClose={() => setSelectedEvidenceCard(null)}
           >
             <MotionSwap
