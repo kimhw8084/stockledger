@@ -2382,6 +2382,94 @@ export default function App() {
     });
   }, [data, eyeForm.stockId]);
 
+  const preSelectedStockSummary =
+    filteredStockDirectory.find((item) => item.stock.id === selectedStockId) ??
+    stockDirectory.find((item) => item.stock.id === selectedStockId);
+  const preSelectedStockAnalysisGroups =
+    preSelectedStockSummary?.snapshot
+      ? buildStockVisualAnalysisGroups({
+          stock: preSelectedStockSummary.stock,
+          snapshot: preSelectedStockSummary.snapshot,
+          eyes: [],
+          recipes: data?.recipes ?? [],
+          benchmark: analysisBenchmark,
+          lookbackLabel: analysisLookback,
+        }).map((group) => ({
+          ...group,
+          cards: group.cards.filter(
+            (card) =>
+              card.family !== "User Thesis Match" && matchesAnalysisStatus(card.status, analysisStatusFilter),
+          ),
+        }))
+      : [];
+  const preSelectedStockAnalysisCards = preSelectedStockAnalysisGroups.flatMap((group) =>
+    group.cards.map((card) => ({
+      ...card,
+      title: card.title,
+    })),
+  );
+  const preSortedSelectedStockAnalysisCards = !preSelectedStockSummary
+    ? preSelectedStockAnalysisCards
+    : [...preSelectedStockAnalysisCards].sort((left, right) => {
+        const leftPinned = pinnedMetricKeys.includes(
+          stockMetricPreferenceKey(preSelectedStockSummary.stock.id, left.id),
+        );
+        const rightPinned = pinnedMetricKeys.includes(
+          stockMetricPreferenceKey(preSelectedStockSummary.stock.id, right.id),
+        );
+
+        if (stockBoardMode === "Pinned First" && leftPinned !== rightPinned) {
+          return Number(rightPinned) - Number(leftPinned);
+        }
+
+        if (stockBoardMode === "Status") {
+          const statusDelta = stockMetricStatusRank(left.status) - stockMetricStatusRank(right.status);
+          if (statusDelta !== 0) return statusDelta;
+        }
+
+        if (stockBoardMode === "Family") {
+          const familyDelta = stockMetricFamilyRank(left.family) - stockMetricFamilyRank(right.family);
+          if (familyDelta !== 0) return familyDelta;
+        }
+
+        if (leftPinned !== rightPinned) {
+          return Number(rightPinned) - Number(leftPinned);
+        }
+
+        const statusDelta = stockMetricStatusRank(left.status) - stockMetricStatusRank(right.status);
+        if (statusDelta !== 0) return statusDelta;
+
+        const familyDelta = stockMetricFamilyRank(left.family) - stockMetricFamilyRank(right.family);
+        if (familyDelta !== 0) return familyDelta;
+
+        return left.title.localeCompare(right.title);
+      });
+  const preSelectedEvidenceIndex = selectedEvidenceCard
+    ? preSortedSelectedStockAnalysisCards.findIndex((card) => card.id === selectedEvidenceCard.id)
+    : -1;
+  const preSelectedStockTrendSeries = preSelectedStockSummary?.snapshot
+    ? preSelectedStockSummary.snapshot.priceHistorySeries ??
+      buildChartSeries(
+        preSelectedStockSummary.snapshot.price,
+        preSelectedStockSummary.snapshot.drawdownPct,
+        preSelectedStockSummary.snapshot.stabilizationScore ?? 50,
+      )
+    : [];
+
+  useEffect(() => {
+    if (!selectedEvidenceCard) return;
+    if (preSelectedEvidenceIndex >= 0) return;
+    setSelectedEvidenceCard(null);
+  }, [selectedEvidenceCard, preSelectedEvidenceIndex]);
+
+  useEffect(() => {
+    if (preSelectedStockTrendSeries.length === 0) {
+      setSelectedHeroPointIndex(0);
+      return;
+    }
+    setSelectedHeroPointIndex(preSelectedStockTrendSeries.length - 1);
+  }, [selectedStockId, analysisLookback, analysisBenchmark, preSelectedStockTrendSeries.length]);
+
   if (loading || !data) {
     return (
       <SafeAreaView style={styles.loadingScreen}>
@@ -2504,12 +2592,6 @@ export default function App() {
   const selectedEvidenceIndex = selectedEvidenceCard
     ? sortedSelectedStockAnalysisCards.findIndex((card) => card.id === selectedEvidenceCard.id)
     : -1;
-
-  useEffect(() => {
-    if (!selectedEvidenceCard) return;
-    if (selectedEvidenceIndex >= 0) return;
-    setSelectedEvidenceCard(null);
-  }, [selectedEvidenceCard, selectedEvidenceIndex]);
   const selectedStockTrendSeries = selectedStockSummary?.snapshot
     ? selectedStockSummary.snapshot.priceHistorySeries ??
       buildChartSeries(
@@ -2566,14 +2648,6 @@ export default function App() {
     analysisLookback !== defaultAnalysisLookback ||
     analysisStatusFilter !== defaultAnalysisStatusFilter ||
     stockBoardMode !== defaultStockBoardMode;
-
-  useEffect(() => {
-    if (selectedStockTrendSeries.length === 0) {
-      setSelectedHeroPointIndex(0);
-      return;
-    }
-    setSelectedHeroPointIndex(selectedStockTrendSeries.length - 1);
-  }, [selectedStockId, analysisLookback, analysisBenchmark, selectedStockTrendSeries.length]);
 
   const activeEyesInventory = eyesSorted.filter(
     (eye) => !["Not Relevant", "Thesis Broken"].includes(eye.lastEvaluation?.currentState ?? "Not Relevant"),
@@ -3123,9 +3197,14 @@ export default function App() {
                     <Button label="Add" tone="secondary" onPress={() => setStockComposerOpen(true)} />
                   </View>
                   <View style={styles.inlineBetween}>
-                    <Text style={styles.suggestionLabel}>{hasStockQuery ? "Suggestions" : "Recent search"}</Text>
+                    <View style={styles.searchSectionMeta}>
+                      <Text style={styles.suggestionLabel}>{hasStockQuery ? "Suggestions" : "Recent search"}</Text>
+                      <Text style={styles.searchResultCount}>
+                        {stockSuggestions.length > 0 ? `${stockSuggestions.length} shown` : hasStockQuery ? "0 shown" : "None"}
+                      </Text>
+                    </View>
                     {!hasStockQuery && recentStocks.length > 0 ? (
-                      <Pressable onPress={() => setRecentStockIds([])}>
+                      <Pressable onPress={() => setRecentStockIds([])} hitSlop={8}>
                         <Text style={styles.inlineUtilityText}>Clear recent</Text>
                       </Pressable>
                     ) : null}
@@ -3134,15 +3213,21 @@ export default function App() {
                     <Text style={styles.searchAssistText}>Press return to open the top match immediately.</Text>
                   ) : null}
                   {stockSuggestions.length > 0 ? (
-                    hasStockQuery ? (
-                      <View style={styles.stockSuggestionList}>
-                        {stockSuggestions.map((item) => (
+                    <View style={styles.stockSuggestionList}>
+                      {stockSuggestions.map((item) => {
+                        const isSelected = selectedStockSummary?.stock.id === item.stock.id;
+                        const isTopMatch = hasStockQuery && topSuggestionId === item.stock.id;
+                        const isExactSymbolMatch =
+                          hasStockQuery &&
+                          item.stock.symbol.toLowerCase() === deferredStockSearch.trim().toLowerCase();
+
+                        return (
                           <Pressable
                             key={`suggest-${item.stock.id}`}
                             onPress={() => openStockContext({ stockId: item.stock.id })}
                             style={({ pressed }) => [
                               styles.stockSuggestionRow,
-                              selectedStockSummary?.stock.id === item.stock.id ? styles.stockSuggestionRowActive : null,
+                              isSelected ? styles.stockSuggestionRowActive : null,
                               pressed ? styles.stockSuggestionRowPressed : null,
                             ]}
                           >
@@ -3153,15 +3238,21 @@ export default function App() {
                               <View style={styles.flexOne}>
                                 <View style={styles.stockSuggestionTitleRow}>
                                   <Text
-                                    style={[styles.stockSuggestionSymbol, selectedStockSummary?.stock.id === item.stock.id ? styles.stockSuggestionSymbolActive : null]}
+                                    style={[styles.stockSuggestionSymbol, isSelected ? styles.stockSuggestionSymbolActive : null]}
                                     numberOfLines={1}
                                   >
                                     {item.stock.symbol}
                                   </Text>
-                                  {topSuggestionId === item.stock.id ? <Text style={styles.stockTopMatchLabel}>Top match</Text> : null}
+                                  {isExactSymbolMatch ? (
+                                    <Text style={styles.stockTopMatchLabel}>Exact</Text>
+                                  ) : isTopMatch ? (
+                                    <Text style={styles.stockTopMatchLabel}>Top match</Text>
+                                  ) : !hasStockQuery ? (
+                                    <Text style={styles.stockRecentLabel}>Recent</Text>
+                                  ) : null}
                                 </View>
                                 <Text
-                                  style={[styles.stockSuggestionName, selectedStockSummary?.stock.id === item.stock.id ? styles.stockSuggestionNameActive : null]}
+                                  style={[styles.stockSuggestionName, isSelected ? styles.stockSuggestionNameActive : null]}
                                   numberOfLines={1}
                                 >
                                   {item.stock.name}
@@ -3175,54 +3266,32 @@ export default function App() {
                               <Text style={styles.stockSuggestionMeta} numberOfLines={1}>
                                 {item.snapshot?.freshness ?? "Unavailable"}
                               </Text>
+                              {!hasStockQuery ? (
+                                <Pressable
+                                  onPress={() =>
+                                    setRecentStockIds((current) =>
+                                      current.filter((candidate) => candidate !== item.stock.id),
+                                    )
+                                  }
+                                  hitSlop={8}
+                                >
+                                  <Text style={styles.stockSuggestionRemove}>Remove</Text>
+                                </Pressable>
+                              ) : null}
                             </View>
                           </Pressable>
-                        ))}
-                      </View>
-                    ) : (
-                      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.choiceRow}>
-                        {stockSuggestions.map((item) => (
-                          <Pressable
-                            key={`suggest-${item.stock.id}`}
-                            onPress={() => openStockContext({ stockId: item.stock.id })}
-                            style={({ pressed }) => [
-                              styles.stockSuggestionPill,
-                              selectedStockSummary?.stock.id === item.stock.id ? styles.stockSuggestionPillActive : null,
-                              pressed ? styles.stockSuggestionPillPressed : null,
-                            ]}
-                          >
-                            <Text
-                              style={[styles.stockSuggestionSymbol, selectedStockSummary?.stock.id === item.stock.id ? styles.stockSuggestionSymbolActive : null]}
-                              numberOfLines={1}
-                            >
-                              {item.stock.symbol}
-                            </Text>
-                            <Text
-                              style={[styles.stockSuggestionName, selectedStockSummary?.stock.id === item.stock.id ? styles.stockSuggestionNameActive : null]}
-                              numberOfLines={1}
-                            >
-                              {item.stock.name}
-                            </Text>
-                            <View style={styles.stockSuggestionMetaRow}>
-                              <Text style={styles.stockSuggestionMeta} numberOfLines={1}>
-                                {item.snapshot ? `$${item.snapshot.price.toFixed(2)}` : "--"}
-                              </Text>
-                              <Text style={styles.stockSuggestionMeta} numberOfLines={1}>
-                                {item.snapshot?.freshness ?? "Unavailable"}
-                              </Text>
-                            </View>
-                          </Pressable>
-                        ))}
-                      </ScrollView>
-                    )
+                        );
+                      })}
+                    </View>
                   ) : (
                     <View style={styles.emptySearchState}>
                       <Text style={styles.emptySearchTitle}>{hasStockQuery ? "No matching stocks" : "No recent searches"}</Text>
                       <Text style={styles.emptySearchBody}>
                         {hasStockQuery
-                          ? "Try another ticker or company name."
+                          ? "Try another ticker or company name, or clear the search to return to recent stocks."
                           : "Search a stock to open its visual analysis board."}
                       </Text>
+                      {hasStockQuery ? <Button label="Clear Search" tone="secondary" onPress={() => setStockSearch("")} /> : null}
                     </View>
                   )}
                 </View>
@@ -4817,6 +4886,17 @@ const styles = StyleSheet.create({
     letterSpacing: 0.4,
     fontFamily,
   },
+  searchSectionMeta: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  searchResultCount: {
+    color: "#94a3b8",
+    fontSize: 11,
+    fontWeight: "700",
+    fontFamily,
+  },
   inlineUtilityText: {
     color: "#111827",
     fontSize: 12,
@@ -4924,6 +5004,14 @@ const styles = StyleSheet.create({
     letterSpacing: 0.4,
     fontFamily,
   },
+  stockRecentLabel: {
+    color: "#64748b",
+    fontSize: 10,
+    fontWeight: "800",
+    textTransform: "uppercase",
+    letterSpacing: 0.35,
+    fontFamily,
+  },
   stockSuggestionRight: {
     alignItems: "flex-end",
     gap: 4,
@@ -4945,9 +5033,16 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     fontFamily,
   },
+  stockSuggestionRemove: {
+    color: "#475569",
+    fontSize: 10,
+    fontWeight: "800",
+    fontFamily,
+  },
   emptySearchState: {
     paddingVertical: 10,
     gap: 4,
+    alignItems: "flex-start",
   },
   emptySearchTitle: {
     color: "#111827",
