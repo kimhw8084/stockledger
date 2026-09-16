@@ -88,7 +88,7 @@ export const StockTrendHero = ({
             </Text>
           </View>
           <Button label={language === "ko" ? "수정" : "Edit"} tone="ghost" onPress={onEditStock} />
-          <Button label={language === "ko" ? "삭제" : "Delete"} tone="ghost" onPress={onDeleteStock} />
+          <Button label={language === "ko" ? "보관" : "Archive"} tone="ghost" onPress={onDeleteStock} />
           <Button label={t(language, "stocks.hero.clear")} tone="ghost" onPress={onClearStock} />
         </View>
       </View>
@@ -120,7 +120,7 @@ export const StockTrendHero = ({
             <View style={[styles.stockTrendSummaryMiniBlock, isCompactPhone ? styles.stockTrendSummaryMiniBlockCompact : null]}>
               <Text style={styles.stockTrendSummaryMiniLabel}>{t(language, "stocks.hero.vs", { benchmark: analysisBenchmark })}</Text>
               <Text style={styles.stockTrendSummaryMiniValue}>
-                {selectedHeroBenchmarkDelta !== undefined ? `${selectedHeroBenchmarkDelta >= 0 ? "+" : ""}${selectedHeroBenchmarkDelta.toFixed(2)}` : "--"}
+                {selectedHeroBenchmarkDelta !== undefined ? `${selectedHeroBenchmarkDelta >= 0 ? "+" : ""}${selectedHeroBenchmarkDelta.toFixed(2)} pp` : "--"}
               </Text>
             </View>
           </View>
@@ -144,6 +144,9 @@ export const StockTrendHero = ({
           {selectedStockTrendDisplaySeries.map((point, index) => (
             <Pressable
               key={`trend-${stock.id}-${index}`}
+              accessibilityRole="button"
+              accessibilityLabel={`Select chart observation ${index + 1}`}
+              accessibilityState={{ selected: index === safeSelectedHeroPointIndex }}
               onPress={() => setSelectedHeroPointIndex(index)}
               style={[styles.stockTrendBarHit, index === safeSelectedHeroPointIndex ? styles.stockTrendBarHitActive : null]}
             >

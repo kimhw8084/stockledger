@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Animated, Pressable, StyleSheet, Text, View } from "react-native";
+import { useReducedMotion } from "../hooks/useReducedMotion";
 
 const fontFamily = "System";
 
@@ -12,6 +13,7 @@ interface BottomNavProps<T extends string> {
 }
 
 export const BottomNav = <T extends string>({ tabs, currentTab, onSelect, labels, icons }: BottomNavProps<T>) => {
+  const reduced = useReducedMotion();
   const [itemFrames, setItemFrames] = useState<Record<string, { x: number; y: number; width: number; height: number }>>({});
   const pillX = useRef(new Animated.Value(0)).current;
   const pillY = useRef(new Animated.Value(0)).current;
@@ -21,7 +23,8 @@ export const BottomNav = <T extends string>({ tabs, currentTab, onSelect, labels
 
   useEffect(() => {
     if (!activeFrame) return;
-    Animated.parallel([
+    if (reduced) { pillX.setValue(activeFrame.x + 6); pillY.setValue(activeFrame.y + 6); pillWidth.setValue(Math.max(0, activeFrame.width - 12)); pillHeight.setValue(Math.max(0, activeFrame.height - 12)); return; }
+    const animation = Animated.parallel([
       Animated.spring(pillX, {
         toValue: activeFrame.x + 6,
         useNativeDriver: false,
@@ -50,8 +53,9 @@ export const BottomNav = <T extends string>({ tabs, currentTab, onSelect, labels
         damping: 26,
         mass: 0.9,
       }),
-    ]).start();
-  }, [activeFrame, pillHeight, pillWidth, pillX, pillY]);
+    ]);
+    animation.start(); return () => animation.stop();
+  }, [activeFrame, pillHeight, pillWidth, pillX, pillY, reduced]);
 
   return (
     <View style={styles.bottomNav}>
@@ -76,6 +80,10 @@ export const BottomNav = <T extends string>({ tabs, currentTab, onSelect, labels
             return (
               <Pressable
                 key={item}
+                accessibilityRole="tab"
+                accessibilityLabel={labels?.[item] ?? item}
+                accessibilityState={{ selected: active }}
+                aria-selected={active}
                 onPress={() => onSelect(item)}
                 onLayout={(event) => {
                   const { x, y, width, height } = event.nativeEvent.layout;

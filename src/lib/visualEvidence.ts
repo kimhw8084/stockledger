@@ -1,3 +1,4 @@
+import { providerEvidence } from "./providerEvidence";
 import {
   ConditionEvaluationResult,
   Eye,
@@ -149,7 +150,8 @@ const visualForResult = (
   eye: Eye,
   snapshot: MockSnapshot,
 ): VisualEvidenceCard["visual"] => {
-  const priceSeries = buildMiniSeries(snapshot.price, snapshot.drawdownPct, snapshot.stabilizationScore);
+  const priceSeries = snapshot.priceHistorySeries ?? [];
+  if (!snapshot.isMock) return { kind: "checklist", items: [{ label: result.explanation, tone: result.missingData ? "warning" : "neutral" }] };
 
   switch (result.metricKey) {
     case "drawdown_from_recent_high":
@@ -871,6 +873,7 @@ export const buildStockVisualAnalysisGroups = ({
   lookbackLabel: "20D" | "3M" | "6M";
   language?: AppLanguage;
 }): VisualEvidenceGroup[] => {
+  if (!snapshot.isMock) return providerEvidence(stock, snapshot, language);
   const freshness = freshnessForCard(snapshot);
   const thesisAge = daysSince(eyes[0]?.lastReviewedAt ?? snapshot.lastThesisReviewAt);
   const eventDays = inferEventDays(snapshot, stock);

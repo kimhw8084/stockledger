@@ -2,6 +2,8 @@ import React, { useEffect, useRef } from "react";
 import {
   Animated,
   Modal,
+  KeyboardAvoidingView,
+  Platform,
   PanResponder,
   Pressable,
   ScrollView,
@@ -9,6 +11,8 @@ import {
   Text,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useReducedMotion } from "../hooks/useReducedMotion";
 
 const fontFamily = "System";
 
@@ -21,6 +25,8 @@ interface WindowPanelProps {
 }
 
 export const WindowPanel = ({ title, subtitle, onClose, children, closeLabel = "Done" }: WindowPanelProps) => {
+  const insets = useSafeAreaInsets();
+  const reduced = useReducedMotion();
   const overlayOpacity = useRef(new Animated.Value(0)).current;
   const sheetOffset = useRef(new Animated.Value(28)).current;
   const sheetScale = useRef(new Animated.Value(0.985)).current;
@@ -29,6 +35,7 @@ export const WindowPanel = ({ title, subtitle, onClose, children, closeLabel = "
   const animateClose = () => {
     if (closingRef.current) return;
     closingRef.current = true;
+    if (reduced) { onClose(); return; }
     Animated.parallel([
       Animated.timing(overlayOpacity, {
         toValue: 0,
@@ -86,7 +93,8 @@ export const WindowPanel = ({ title, subtitle, onClose, children, closeLabel = "
   ).current;
 
   useEffect(() => {
-    Animated.parallel([
+    if (reduced) { overlayOpacity.setValue(1); sheetOffset.setValue(0); sheetScale.setValue(1); return; }
+    const animation = Animated.parallel([
       Animated.timing(overlayOpacity, {
         toValue: 1,
         duration: 220,
@@ -104,14 +112,16 @@ export const WindowPanel = ({ title, subtitle, onClose, children, closeLabel = "
         damping: 18,
         stiffness: 180,
       }),
-    ]).start();
-  }, [overlayOpacity, sheetOffset, sheetScale]);
+    ]);
+    animation.start(); return () => animation.stop();
+  }, [overlayOpacity, sheetOffset, sheetScale, reduced]);
 
   return (
     <Modal transparent animationType="none" visible onRequestClose={animateClose} statusBarTranslucent>
-      <Animated.View style={[styles.windowBackdrop, { opacity: overlayOpacity }]}>
-        <Pressable style={styles.windowDismissLayer} onPress={animateClose} />
-        <Animated.View style={[styles.windowPanel, { transform: [{ translateY: sheetOffset }, { scale: sheetScale }] }]}>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : "height"}>
+      <Animated.View style={[styles.windowBackdrop, { opacity: overlayOpacity, paddingTop: insets.top }]}>
+        <Pressable accessibilityRole="button" accessibilityLabel="Close dialog" style={styles.windowDismissLayer} onPress={animateClose} />
+        <Animated.View accessibilityViewIsModal style={[styles.windowPanel, { paddingBottom: Math.max(16, insets.bottom), transform: [{ translateY: sheetOffset }, { scale: sheetScale }] }]}>
           <View style={styles.windowHandleTouch} {...dragResponder.panHandlers}>
             <View style={styles.windowGrabber} />
           </View>
@@ -126,7 +136,7 @@ export const WindowPanel = ({ title, subtitle, onClose, children, closeLabel = "
                 </Text>
               ) : null}
             </View>
-            <Pressable onPress={animateClose} style={({ pressed }) => [styles.doneButton, pressed ? styles.doneButtonPressed : null]}>
+            <Pressable accessibilityRole="button" accessibilityLabel={closeLabel} onPress={animateClose} style={({ pressed }) => [styles.doneButton, pressed ? styles.doneButtonPressed : null]}>
               <Text style={styles.doneButtonText}>{closeLabel}</Text>
             </Pressable>
           </View>
@@ -141,6 +151,7 @@ export const WindowPanel = ({ title, subtitle, onClose, children, closeLabel = "
           </ScrollView>
         </Animated.View>
       </Animated.View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 };
@@ -150,7 +161,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   windowBackdrop: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     justifyContent: "flex-end",
     backgroundColor: "rgba(15, 23, 42, 0.24)",
   },
@@ -159,7 +170,7 @@ const styles = StyleSheet.create({
   },
   windowPanel: {
     height: "88%",
-    minHeight: 420,
+    minHeight: 0,
     flexShrink: 1,
     borderTopLeftRadius: 26,
     borderTopRightRadius: 26,
@@ -208,7 +219,7 @@ const styles = StyleSheet.create({
     fontFamily,
   },
   doneButton: {
-    minHeight: 36,
+    minHeight: 44,
     paddingHorizontal: 14,
     borderRadius: 12,
     borderWidth: 1,

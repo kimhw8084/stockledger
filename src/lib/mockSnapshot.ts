@@ -46,10 +46,10 @@ export const buildMockSnapshot = (stock: Stock): MockSnapshot => {
   const average = (values: number[]) => values.reduce((sum, value) => sum + value, 0) / values.length;
   const ma20 = average(priceHistorySeries.slice(-20));
   const ma50 = average(priceHistorySeries.slice(-50));
-  const ma90 = average(priceHistorySeries);
+  const ma200 = average(priceHistorySeries.slice(-200));
   const movingAverage20DistancePct = Number((((price / ma20) - 1) * 100).toFixed(1));
   const movingAverage50DistancePct = Number((((price / ma50) - 1) * 100).toFixed(1));
-  const movingAverage200DistancePct = Number((((price / ma90) - 1) * 100).toFixed(1));
+  const movingAverage200DistancePct = Number((((price / ma200) - 1) * 100).toFixed(1));
   const recentLow = Math.min(...priceHistorySeries.slice(-15));
   const nearSupport = price >= recentLow && price <= recentLow * 1.05;
   const price20Base = priceHistorySeries.at(-21) ?? priceHistorySeries[0];
@@ -62,10 +62,10 @@ export const buildMockSnapshot = (stock: Stock): MockSnapshot => {
   const relativeStrengthVsSpyPct = Number((priceReturn60dPct - benchmarkReturn60dPct).toFixed(1));
   const recentVolume = volumeHistorySeries.at(-1) ?? 0;
   const baselineVolume = average(volumeHistorySeries.slice(-21, -1));
-  const volumeSpike = recentVolume > baselineVolume * 1.35;
+  const volumeSpike = recentVolume > baselineVolume * 1.4;
   const averageRangePct = Number(average(volatilityHistorySeries.slice(-10)).toFixed(1));
-  const earlierAverageRangePct = average(volatilityHistorySeries.slice(-30, -10));
-  const volatilityCompression = averageRangePct < earlierAverageRangePct * 0.86;
+  const earlierAverageRangePct = average(volatilityHistorySeries.slice(-30));
+  const volatilityCompression = averageRangePct < earlierAverageRangePct * 0.85;
   const stabilizationScore = Math.max(
     18,
     Math.min(

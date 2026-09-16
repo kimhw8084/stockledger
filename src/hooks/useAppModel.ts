@@ -1,19 +1,23 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { evaluateEye } from "../lib/evaluateEye";
-import { buildMockSnapshot } from "../lib/mockSnapshot";
+import { evaluateWorkspace } from "../domain/evaluateWorkspace";
+import { contentHash } from "../domain/contentHash";
+import { validateEntryRange } from "../domain/inputValidation";
+import { mergeWatchlist, parseWatchlistCsv } from "../domain/watchlistImport";
+import { publishRecipeRevision } from "../domain/recipeRevision";
 import { getProviderHealth } from "../lib/providerHealth";
 import { seedData } from "../lib/seed";
-import { loadAppData, saveAppData } from "../lib/storage";
-import { latestCompletedTradingDate, shouldRunAfterClose } from "../lib/marketCalendar";
+import { createDemoAppData, createEmptyAppData, loadAppData, parseExport, saveAppData, serializeExport } from "../lib/storage";
+import { unavailableSnapshot, snapshotFromBars } from "../domain/marketSnapshot";
+import { normalizeToSchema, write_raw_archive } from "../lib/eodDataProvider";
+import { buildSnapshotsFromAdapters } from "../lib/providerSnapshot";
+import { createCommandQueue } from "../domain/commandQueue";
 import { createReviewLogEntry, runDailyStockConditionScan } from "../lib/stockConditionScanner";
 import {
-  Alert,
   AppData,
   Decision,
   DecisionAction,
   Eye,
-  Evaluation,
   LogicRule,
   LogicSet,
   MetricDefinition,
@@ -23,82 +27,10 @@ import {
   RecipeCondition,
   Stock,
 } from "../types";
-import { metricCatalog } from "../lib/metricCatalog";
-
-const createId = (prefix: string) => `${prefix}-${Math.random().toString(36).slice(2, 10)}`;
-
-const buildAlertFromEvaluation = (
-  eye: Eye,
-  evaluation: Evaluation,
-  stockSymbol: string,
-): Alert => ({
-  id: createId("alert"),
-  eyeId: eye.id,
-  recipeId: evaluation.recipeId,
-  recipeVersion: evaluation.recipeVersion,
-  title: `${evaluation.currentState} for ${stockSymbol}`,
-  stateChange: `${evaluation.previousState} -> ${evaluation.currentState}`,
-  whyNow: evaluation.whyNow,
-  supportingEvidence: evaluation.supportingEvidence,
-  risks: [
-    ...evaluation.contradictingEvidence,
-    ...(evaluation.riskWarnings ?? []),
-    ...(evaluation.hardDisqualifiers ?? []),
-  ],
-  dataQuality: evaluation.dataQuality,
-  evaluationContext: {
-    currentState: evaluation.currentState,
-    conditionResults: evaluation.conditionResults,
-    staleData: evaluation.staleData,
-    missingData: evaluation.missingData,
-  },
-  priority:
-    evaluation.currentState === "Attention Needed" || evaluation.currentState === "Thesis Broken"
-      ? "High"
-      : "Medium",
-  createdAt: evaluation.evaluatedAt,
-  reviewed: false,
-});
-
-const evaluateAllEyes = (data: AppData): AppData => {
-  const alerts = [...data.alerts];
-  const allMetrics = [...metricCatalog, ...(data.customMetrics ?? [])];
-  const eyes = data.eyes.map((eye) => {
-    const recipe = data.recipes.find((item) => item.id === eye.recipeId);
-    const snapshot = data.snapshots.find((item) => item.stockId === eye.stockId);
-    const stock = data.stocks.find((item) => item.id === eye.stockId);
-
-    if (!recipe || !snapshot) {
-      return eye;
-    }
-
-    const evaluation = evaluateEye(eye, recipe, snapshot, allMetrics);
-    if (evaluation.alertSuggested) {
-      const hasDuplicate = alerts.some(
-        (alert) =>
-          alert.eyeId === eye.id &&
-          alert.stateChange === `${evaluation.previousState} -> ${evaluation.currentState}`,
-      );
-      if (!hasDuplicate) {
-        alerts.unshift(buildAlertFromEvaluation(eye, evaluation, stock?.symbol ?? "Unknown"));
-      }
-    }
-
-    return {
-      ...eye,
-      lastEvaluation: evaluation,
-    };
-  });
-
-  return {
-    ...data,
-    eyes,
-    alerts,
-  };
-};
+import { createId } from "../platform/identity";
 
 const buildSnapshotForStock = (stock: Stock, existing?: AppData["snapshots"][number]) => {
-  const generated = buildMockSnapshot(stock);
+  const generated = unavailableSnapshot(stock);
   return {
     ...generated,
     plannedEntryLow: existing?.plannedEntryLow,
@@ -107,42 +39,6 @@ const buildSnapshotForStock = (stock: Stock, existing?: AppData["snapshots"][num
     riskFlags: existing?.riskFlags ?? generated.riskFlags,
   };
 };
-
-const materializeRecipeFromLogicSet = (
-  logicSet: LogicSet,
-  logicRules: LogicRule[],
-): Recipe => ({
-  id: logicSet.id,
-  lineageId: logicSet.lineageId ?? logicSet.id,
-  version: logicSet.version,
-  name: logicSet.name,
-  purpose: logicSet.purpose,
-  opportunityType: logicSet.opportunityType,
-  timeHorizon: logicSet.timeHorizon,
-  intendedUseCase: logicSet.intendedUseCase,
-  notes: logicSet.notes,
-  createdAt: logicSet.createdAt,
-  retiredAt: logicSet.retiredAt,
-  reviewConfig: logicSet.reviewConfig,
-  alertConfig: logicSet.alertConfig,
-  outcomeConfig: logicSet.outcomeConfig,
-  conditions: logicRules
-    .filter((rule) => rule.setId === logicSet.id)
-    .map((rule) => ({
-      id: rule.id,
-      label: rule.label,
-      kind: rule.kind,
-      role: rule.role,
-      metricKey: rule.metricKey,
-      formulaKey: rule.formulaKey,
-      operator: rule.operator,
-      value: rule.value,
-      unit: rule.unit,
-      humanDescription: rule.humanDescription,
-      notes: rule.notes,
-      availability: rule.availability,
-    })),
-});
 
 const syncLogicModel = (prev: AppData, nextRecipes: Recipe[]) => {
   const nextLogicSets: LogicSet[] = nextRecipes.map((recipe) => ({
@@ -164,7 +60,7 @@ const syncLogicModel = (prev: AppData, nextRecipes: Recipe[]) => {
   const nextLogicRules: LogicRule[] = nextRecipes.flatMap((recipe) =>
     recipe.conditions.map((condition) => ({
       id: condition.id,
-      lineageId: prev.logicRules.find((rule) => rule.id === condition.id)?.lineageId ?? condition.id,
+      lineageId: condition.lineageId ?? prev.logicRules.find((rule) => rule.id === condition.id)?.lineageId ?? condition.id,
       setId: recipe.id,
       setVersion: recipe.version,
       label: condition.label,
@@ -197,17 +93,32 @@ export const useAppModel = () => {
   const [providerHealthLoading, setProviderHealthLoading] = useState(true);
   const dataRef = useRef<AppData | null>(null);
   const autoScanStartedRef = useRef(false);
+  const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [scanning, setScanning] = useState(false);
+  const [loadAttempt, setLoadAttempt] = useState(0);
+  const pendingWrites = useRef(0);
+  const queueRef = useRef<ReturnType<typeof createCommandQueue<AppData>> | null>(null);
+  if (!queueRef.current) queueRef.current = createCommandQueue(
+    () => dataRef.current, saveAppData,
+    next => { dataRef.current = next; setData(next); },
+  );
 
   useEffect(() => {
-    loadAppData()
-      .then((loaded) => {
-        const evaluated = evaluateAllEyes(loaded);
-        dataRef.current = evaluated;
-        setData(evaluated);
-        return saveAppData(evaluated);
-      })
-      .finally(() => setLoading(false));
-  }, []);
+    let active = true;
+    setLoading(true);
+    setError(null);
+    loadAppData().then(async loaded => {
+      if (!active) return;
+      dataRef.current = loaded;
+      setData(loaded);
+      const evaluated = evaluateWorkspace(loaded);
+      if (contentHash(evaluated) !== contentHash(loaded)) await commit(current => current);
+    }).catch(cause => {
+      if (active) setError(cause instanceof Error ? cause.message : "Could not load saved data.");
+    }).finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, [loadAttempt]);
 
   useEffect(() => {
     getProviderHealth()
@@ -216,58 +127,16 @@ export const useAppModel = () => {
       .finally(() => setProviderHealthLoading(false));
   }, []);
 
-  useEffect(() => {
-    const current = dataRef.current;
-    if (!current || autoScanStartedRef.current) return;
-    if (!shouldRunAfterClose(new Date(), current.scannerSettings.providerDelayMinutesAfterClose)) return;
-    const latestCompleted = latestCompletedTradingDate(
-      new Date(),
-      current.scannerSettings.providerDelayMinutesAfterClose,
-    );
-    const lastRun = current.scanRuns[0]?.scanDate;
-    if (lastRun === latestCompleted) return;
-    autoScanStartedRef.current = true;
-    runDailyStockConditionScan({
-      existingBatches: current.rawBarArchives,
-      existingSignals: current.scanSignals,
-      existingForwardProof: current.forwardProofLedger,
-      scannerSettings: current.scannerSettings,
-      previousUniverseSnapshot: current.universeSnapshots[0],
-    })
-      .then(async (result) => {
-        await commit((prev) => ({
-          ...prev,
-          rawBarArchives: result.rawArchiveBatch
-            ? [result.rawArchiveBatch, ...prev.rawBarArchives.filter((entry) => entry.id !== result.rawArchiveBatch!.id)]
-            : prev.rawBarArchives,
-          universeSnapshots: [
-            result.universeSnapshot,
-            ...prev.universeSnapshots.filter((entry) => entry.id !== result.universeSnapshot.id),
-          ],
-          processedFeatures: [
-            ...result.processedFeatures,
-            ...prev.processedFeatures.filter(
-              (entry) => !result.processedFeatures.some((next) => next.id === entry.id),
-            ),
-          ],
-          scanRuns: [result.scanRun, ...prev.scanRuns.filter((entry) => entry.id !== result.scanRun.id)],
-          scanSignals: result.scanSignals,
-          forwardProofLedger: result.forwardProofLedger,
-        }));
-      })
-      .finally(() => {
-        autoScanStartedRef.current = false;
-      });
-  }, [loading]);
-
   const commit = async (next: AppData | ((current: AppData) => AppData)) => {
-    const current = dataRef.current;
-    if (!current && typeof next === "function") return;
-    const resolved = typeof next === "function" ? next(current as AppData) : next;
-    const evaluated = evaluateAllEyes(resolved);
-    dataRef.current = evaluated;
-    setData(evaluated);
-    await saveAppData(evaluated);
+    pendingWrites.current += 1;
+    setSaving(true);
+    setError(null);
+    try {
+      return await queueRef.current!(current => evaluateWorkspace(typeof next === "function" ? next(current) : next));
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Save failed. Your last saved data is intact.");
+      throw cause;
+    } finally { pendingWrites.current -= 1; setSaving(pendingWrites.current > 0); }
   };
 
   const actions = useMemo(
@@ -282,11 +151,11 @@ export const useAppModel = () => {
         invalidationRule?: string;
         lastReviewedAt?: string;
       }) {
-        const current = dataRef.current;
-        if (!current) return;
+        validateEntryRange(input.plannedEntryLow, input.plannedEntryHigh);
         const normalizedSymbol = input.symbol.trim().toUpperCase();
-        
-        let stock = current.stocks.find(s => s.symbol === normalizedSymbol);
+        if (!/^[A-Z0-9][A-Z0-9.-]{0,15}$/.test(normalizedSymbol)) throw new Error("Enter a valid ticker.");
+        await commit((prev) => {
+        let stock = prev.stocks.find(s => s.symbol === normalizedSymbol);
         if (!stock) {
           stock = {
             id: createId("stock"),
@@ -297,18 +166,19 @@ export const useAppModel = () => {
           };
         }
 
-        const recipe = current.recipes.find((item) => item.id === input.recipeId);
-        const existing = current.eyes.find(
+        const recipe = prev.recipes.find((item) => item.id === input.recipeId && !item.retiredAt);
+        if (!recipe) throw new Error("Choose an active recipe.");
+        const existing = prev.eyes.find(
           (eye) => eye.stockId === stock!.id && eye.recipeId === input.recipeId,
         );
         const reviewAt = input.lastReviewedAt ?? new Date().toISOString();
 
-        await commit((prev) => {
           const nextEye: Eye = existing
             ? {
                 ...existing,
+                archivedAt: undefined,
                 thesisSnapshot: input.thesis.trim() || existing.thesisSnapshot,
-                recipeVersionAtCreation: recipe?.version ?? existing.recipeVersionAtCreation,
+                recipeVersionAtCreation: existing.recipeVersionAtCreation,
                 plannedEntryLow: input.plannedEntryLow ?? existing.plannedEntryLow,
                 plannedEntryHigh: input.plannedEntryHigh ?? existing.plannedEntryHigh,
                 invalidationRule: input.invalidationRule?.trim() || existing.invalidationRule,
@@ -362,41 +232,32 @@ export const useAppModel = () => {
           lastReviewedAt?: string;
         },
       ) {
-        const current = dataRef.current;
-        if (!current) return;
-        const eye = current.eyes.find((item) => item.id === eyeId);
-        if (!eye) return;
-        const recipe = current.recipes.find((item) => item.id === input.recipeId);
-        const reviewAt = input.lastReviewedAt ?? eye.lastReviewedAt ?? new Date().toISOString();
-        await commit((prev) => ({
-          ...prev,
-          eyes: prev.eyes.map((item) =>
-            item.id === eyeId
-              ? {
-                  ...item,
-                  recipeId: input.recipeId,
-                  thesisSnapshot: input.thesisSnapshot.trim(),
-                  recipeVersionAtCreation: recipe?.version ?? item.recipeVersionAtCreation,
-                  plannedEntryLow: input.plannedEntryLow,
-                  plannedEntryHigh: input.plannedEntryHigh,
-                  invalidationRule: input.invalidationRule?.trim(),
-                  lastReviewedAt: reviewAt,
-                }
-              : item,
-          ),
-          snapshots: prev.snapshots.map((snapshot) =>
-            snapshot.stockId === eye.stockId
-              ? {
-                  ...snapshot,
-                  plannedEntryLow: input.plannedEntryLow ?? snapshot.plannedEntryLow,
-                  plannedEntryHigh: input.plannedEntryHigh ?? snapshot.plannedEntryHigh,
-                  lastThesisReviewAt: reviewAt,
-                }
-              : snapshot,
-          ),
-        }));
+        validateEntryRange(input.plannedEntryLow, input.plannedEntryHigh);
+        await commit(prev => {
+          const eye = prev.eyes.find(item => item.id === eyeId);
+          const recipe = prev.recipes.find(item => item.id === input.recipeId && !item.retiredAt);
+          if (!eye || !recipe) throw new Error("Select an existing Eye and active recipe.");
+          const now = new Date().toISOString();
+          const changingRecipe = eye.recipeId !== recipe.id;
+          const updated: Eye = { ...eye, ...input, thesisSnapshot: input.thesisSnapshot.trim(),
+            id: changingRecipe ? createId("eye") : eye.id,
+            createdAt: changingRecipe ? now : eye.createdAt,
+            recipeVersionAtCreation: changingRecipe ? recipe.version : eye.recipeVersionAtCreation,
+            lastEvaluation: changingRecipe ? undefined : eye.lastEvaluation,
+            archivedAt: undefined, lastReviewedAt: input.lastReviewedAt ?? eye.lastReviewedAt ?? now,
+          };
+          return { ...prev, eyes: changingRecipe
+            ? [updated, ...prev.eyes.map(item => item.id === eyeId ? { ...item, archivedAt: now } : item)]
+            : prev.eyes.map(item => item.id === eyeId ? updated : item),
+          snapshots: prev.snapshots.map(snapshot => snapshot.stockId === eye.stockId ? { ...snapshot, plannedEntryLow: input.plannedEntryLow, plannedEntryHigh: input.plannedEntryHigh, lastThesisReviewAt: updated.lastReviewedAt } : snapshot) };
+        });
       },
       async runDailyScanner() {
+        if (autoScanStartedRef.current) return;
+        autoScanStartedRef.current = true;
+        setScanning(true);
+        setError(null);
+        try {
         const current = dataRef.current;
         if (!current) return;
         const result = await runDailyStockConditionScan({
@@ -425,6 +286,9 @@ export const useAppModel = () => {
           scanSignals: result.scanSignals,
           forwardProofLedger: result.forwardProofLedger,
         }));
+       } catch (cause) {
+          setError(cause instanceof Error ? cause.message : "Scan failed. History was preserved.");
+        } finally { autoScanStartedRef.current = false; setScanning(false); }
       },
       async addSignalReviewLog(input: {
         signalId: string;
@@ -455,18 +319,10 @@ export const useAppModel = () => {
         }));
       },
       async deleteEye(eyeId: string) {
-        const current = dataRef.current;
-        if (!current) return;
-        const removedDecisionIds = current.decisions
-          .filter((decision) => decision.eyeId === eyeId)
-          .map((decision) => decision.id);
-        await commit((prev) => ({
-          ...prev,
-          eyes: prev.eyes.filter((eye) => eye.id !== eyeId),
-          alerts: prev.alerts.filter((alert) => alert.eyeId !== eyeId),
-          decisions: prev.decisions.filter((decision) => decision.eyeId !== eyeId),
-          outcomes: prev.outcomes.filter((outcome) => !removedDecisionIds.includes(outcome.decisionId)),
-        }));
+        await commit(prev => ({ ...prev, eyes: prev.eyes.map(eye => eye.id === eyeId ? { ...eye, archivedAt: new Date().toISOString() } : eye) }));
+      },
+      async restoreEye(eyeId: string) {
+        await commit(prev => ({ ...prev, eyes: prev.eyes.map(eye => eye.id === eyeId ? { ...eye, archivedAt: undefined } : eye) }));
       },
       async addRecipe(input: {
         name: string;
@@ -535,47 +391,28 @@ export const useAppModel = () => {
       ) {
         const current = dataRef.current;
         if (!current) return;
-        await commit((prev) =>
-          syncLogicModel(
-            prev,
-            prev.recipes.map((recipe) =>
-              recipe.id === recipeId
-                ? {
-                    ...recipe,
-                    name: input.name.trim(),
-                    purpose: input.purpose.trim(),
-                    opportunityType: input.opportunityType.trim(),
-                    timeHorizon: input.timeHorizon.trim(),
-                    intendedUseCase: input.intendedUseCase.trim(),
-                    notes: input.notes.trim(),
-                    reviewConfig: {
-                      cadenceDays: input.reviewCadenceDays,
-                      reviewTriggers: recipe.reviewConfig?.reviewTriggers ?? ["state_change", "manual_review_due"],
-                    },
-                    alertConfig: {
-                      cooldownHours: input.alertCooldownHours,
-                      dedupeKey: recipe.alertConfig?.dedupeKey ?? "state_change",
-                      priorityOnAttention: recipe.alertConfig?.priorityOnAttention ?? "High",
-                      priorityOnRisk: recipe.alertConfig?.priorityOnRisk ?? "High",
-                    },
-                    conditions:
-                      input.conditions && input.conditions.length > 0
-                        ? input.conditions.map((condition) => ({
-                            ...condition,
-                            id: condition.id || createId("condition"),
-                          }))
-                        : recipe.conditions,
-                  }
-                : recipe,
-            ),
-          ),
-        );
+        let nextId = "";
+        await commit(prev => {
+          const source = prev.recipes.find(recipe => recipe.id === recipeId);
+          if (!source) throw new Error("Recipe not found.");
+          const revised = publishRecipeRevision(prev.recipes, source, {
+            name: input.name.trim(), purpose: input.purpose.trim(), opportunityType: input.opportunityType.trim(),
+            timeHorizon: input.timeHorizon.trim(), intendedUseCase: input.intendedUseCase.trim(), notes: input.notes.trim(),
+            conditions: input.conditions ?? source.conditions,
+            reviewConfig: { cadenceDays: input.reviewCadenceDays, reviewTriggers: source.reviewConfig?.reviewTriggers ?? ["state_change", "manual_review_due"] },
+            alertConfig: { cooldownHours: input.alertCooldownHours, dedupeKey: source.alertConfig?.dedupeKey ?? "state_change", priorityOnAttention: source.alertConfig?.priorityOnAttention ?? "High", priorityOnRisk: source.alertConfig?.priorityOnRisk ?? "High" },
+          }, createId("recipe"));
+          nextId = revised.id;
+          return syncLogicModel(prev, [revised, ...prev.recipes]);
+        });
+        return nextId;
       },
       async addMetric(metric: MetricDefinition) {
         const current = dataRef.current;
         if (!current) return;
         await commit((prev) => {
           const existing = prev.customMetrics.find((item) => item.key === metric.key);
+          if (existing && prev.recipes.some(recipe => recipe.conditions.some(condition => condition.metricKey === metric.key))) throw new Error("This metric belongs to published recipes. Duplicate it before changing its definition.");
           const nextMetric: MetricDefinition = {
             ...metric,
             origin: "custom",
@@ -625,60 +462,22 @@ export const useAppModel = () => {
         return duplicated.id;
       },
       async createRecipeVersion(recipeId: string) {
-        const current = dataRef.current;
-        if (!current) return;
-        const source = current.recipes.find((recipe) => recipe.id === recipeId);
-        if (!source) return;
-        const lineageId = source.lineageId ?? source.id;
-        const nextVersion =
-          Math.max(
-            ...current.recipes
-              .filter((recipe) => (recipe.lineageId ?? recipe.id) === lineageId)
-              .map((recipe) => recipe.version),
-          ) + 1;
-        const nextId = createId("recipe");
-        const versioned: Recipe = {
-          ...source,
-          id: nextId,
-          lineageId,
-          version: nextVersion,
-          retiredAt: undefined,
-          createdAt: new Date().toISOString(),
-          conditions: source.conditions.map((condition) => ({
-            ...condition,
-            id: createId("condition"),
-          })),
-        };
-        await commit((prev) => syncLogicModel(prev, [versioned, ...prev.recipes]));
-        return versioned.id;
+        const id = createId("recipe");
+        await commit(prev => {
+          const source = prev.recipes.find(recipe => recipe.id === recipeId);
+          if (!source) throw new Error("Recipe not found.");
+          return syncLogicModel(prev, [publishRecipeRevision(prev.recipes, source, {}, id), ...prev.recipes]);
+        });
+        return id;
       },
       async restoreRecipeVersion(recipeId: string) {
-        const current = dataRef.current;
-        if (!current) return;
-        const source = current.recipes.find((recipe) => recipe.id === recipeId);
-        if (!source) return;
-        const lineageId = source.lineageId ?? source.id;
-        const nextVersion =
-          Math.max(
-            ...current.recipes
-              .filter((recipe) => (recipe.lineageId ?? recipe.id) === lineageId)
-              .map((recipe) => recipe.version),
-          ) + 1;
-        const nextId = createId("recipe");
-        const restored: Recipe = {
-          ...source,
-          id: nextId,
-          lineageId,
-          version: nextVersion,
-          retiredAt: undefined,
-          createdAt: new Date().toISOString(),
-          conditions: source.conditions.map((condition) => ({
-            ...condition,
-            id: createId("condition"),
-          })),
-        };
-        await commit((prev) => syncLogicModel(prev, [restored, ...prev.recipes]));
-        return restored.id;
+        const id = createId("recipe");
+        await commit(prev => {
+          const source = prev.recipes.find(recipe => recipe.id === recipeId);
+          if (!source) throw new Error("Recipe not found.");
+          return syncLogicModel(prev, [publishRecipeRevision(prev.recipes, source, {}, id), ...prev.recipes]);
+        });
+        return id;
       },
       async deleteRecipe(recipeId: string) {
         const current = dataRef.current;
@@ -729,6 +528,8 @@ export const useAppModel = () => {
         const decision: Decision = {
           id: createId("decision"),
           ...input,
+          alertId: input.alertId || undefined,
+          evaluationId: eye.lastEvaluation?.id,
           recipeId: eye?.recipeId,
           recipeVersion: eye?.lastEvaluation?.recipeVersion ?? eye?.recipeVersionAtCreation,
           stateAtDecision: eye?.lastEvaluation?.currentState,
@@ -741,13 +542,13 @@ export const useAppModel = () => {
           decisionId: decision.id,
           recipeId: decision.recipeId,
           recipeVersion: decision.recipeVersion,
-          reviewWindow: "30일",
+          reviewWindow: "30 trading sessions",
           status: "Pending",
-          priceChangeNote: "TBD",
-          maxRunupNote: "TBD",
-          maxDrawdownNote: "TBD",
-          lesson: "Review thesis maintainability.",
-          recipeSuggestion: "Accumulate more outcomes before evolving logic.",
+          priceChangeNote: "",
+          maxRunupNote: "",
+          maxDrawdownNote: "",
+          lesson: "",
+          recipeSuggestion: "",
           createdAt: new Date().toISOString(),
         };
         await commit((prev) => ({
@@ -783,11 +584,9 @@ export const useAppModel = () => {
               ? {
                   ...decision,
                   ...input,
-                  recipeId: eye.recipeId,
-                  recipeVersion: eye.lastEvaluation?.recipeVersion ?? eye.recipeVersionAtCreation,
-                  stateAtDecision: eye.lastEvaluation?.currentState,
-                  conditionResults: eye.lastEvaluation?.conditionResults,
-                  dataQuality: eye.lastEvaluation?.dataQuality,
+                  amendments: [...(decision.amendments ?? []), { amendedAt: new Date().toISOString(), action: decision.action, note: decision.note, concern: decision.concern, thesisValid: decision.thesisValid, timing: decision.timing }],
+                  eyeId: decision.eyeId,
+                  alertId: decision.alertId,
                 }
               : decision,
           ),
@@ -798,9 +597,11 @@ export const useAppModel = () => {
         if (!current) return;
         await commit((prev) => ({
           ...prev,
-          decisions: prev.decisions.filter((decision) => decision.id !== decisionId),
-          outcomes: prev.outcomes.filter((outcome) => outcome.decisionId !== decisionId),
+          decisions: prev.decisions.map(decision => decision.id === decisionId ? { ...decision, archivedAt: new Date().toISOString() } : decision),
         }));
+      },
+      async restoreDecision(decisionId: string) {
+        await commit(prev => ({ ...prev, decisions: prev.decisions.map(decision => decision.id === decisionId ? { ...decision, archivedAt: undefined } : decision) }));
       },
       async markAlertReviewed(alertId: string) {
         const current = dataRef.current;
@@ -811,6 +612,10 @@ export const useAppModel = () => {
             alert.id === alertId ? { ...alert, reviewed: true } : alert,
           ),
         }));
+      },
+      async markAlertsReviewed(ids: string[]) {
+        const selected = new Set(ids);
+        await commit(prev => ({ ...prev, alerts: prev.alerts.map(alert => selected.has(alert.id) ? { ...alert, reviewed: true } : alert) }));
       },
       async snoozeAlert(alertId: string, hours: number) {
         const current = dataRef.current;
@@ -861,23 +666,87 @@ export const useAppModel = () => {
           ),
         }));
       },
-      async refreshMockData() {
+      async updateOutcome(outcomeId: string, input: Pick<Outcome, "reviewWindow" | "priceChangeNote" | "maxRunupNote" | "maxDrawdownNote" | "lesson" | "recipeSuggestion">) {
+        if (!input.lesson.trim()) throw new Error("Add a lesson before completing the review.");
+        await commit(prev => ({ ...prev, outcomes: prev.outcomes.map(outcome => outcome.id === outcomeId ? {
+          ...outcome, reviewWindow: input.reviewWindow.trim(), priceChangeNote: input.priceChangeNote.trim(), maxRunupNote: input.maxRunupNote.trim(), maxDrawdownNote: input.maxDrawdownNote.trim(), lesson: input.lesson.trim(), recipeSuggestion: input.recipeSuggestion.trim(), status: "Reviewed",
+        } : outcome) }));
+      },
+      async refreshMarketData() {
         const current = dataRef.current;
         if (!current) return;
-        const refreshed = current.stocks.map((stock) =>
-          buildSnapshotForStock(
-            stock,
-            current.snapshots.find((snapshot) => snapshot.stockId === stock.id),
-          ),
-        );
-        await commit((prev) => ({
-          ...prev,
-          snapshots: refreshed,
-        }));
+        const results = await buildSnapshotsFromAdapters(current.stocks.filter(stock => !stock.archivedAt));
+        await commit(prev => ({ ...prev, snapshots: prev.snapshots.map(existing => {
+          const result = results.find(item => item.stockId === existing.stockId);
+          if (!result?.snapshot) return existing;
+          return { ...result.snapshot, plannedEntryLow: existing.plannedEntryLow, plannedEntryHigh: existing.plannedEntryHigh, lastThesisReviewAt: existing.lastThesisReviewAt, riskFlags: existing.riskFlags };
+        }) }));
+        const failed = results.filter(result => result.error);
+        if (failed.length) setError(`${failed.length} symbol(s) could not refresh. Their saved data was preserved.`);
+      },
+      async evaluateSavedData() { await commit(current => current); },
+      async saveStock(input: { id?: string; symbol: string; name: string; thesis: string }) {
+        const symbol = input.symbol.trim().toUpperCase();
+        if (!/^[A-Z0-9][A-Z0-9.-]{0,15}$/.test(symbol)) throw new Error("Enter a valid US ticker (up to 16 characters).");
+        if (!input.name.trim()) throw new Error("Company name is required.");
+        let savedId = "";
+        await commit(prev => {
+          const existing = prev.stocks.find(stock => stock.id === input.id || stock.symbol === symbol);
+          if (existing && existing.symbol !== symbol) throw new Error("Create a separate stock to change its ticker; historical identity is retained.");
+          const stock: Stock = { ...existing, id: existing?.id ?? createId("stock"), symbol, name: input.name.trim(), thesis: input.thesis.trim(), createdAt: existing?.createdAt ?? new Date().toISOString(), archivedAt: undefined };
+          savedId = stock.id;
+          return { ...prev, stocks: [stock, ...prev.stocks.filter(item => item.id !== stock.id)], snapshots: prev.snapshots.some(snapshot => snapshot.stockId === stock.id) ? prev.snapshots : [...prev.snapshots, unavailableSnapshot(stock)] };
+        });
+        return savedId;
+      },
+      async archiveStock(stockId: string) {
+        await commit(prev => ({ ...prev, stocks: prev.stocks.map(stock => stock.id === stockId ? { ...stock, archivedAt: new Date().toISOString() } : stock) }));
+      },
+      async importWatchlist(csv: string) {
+        const rows = parseWatchlistCsv(csv);
+        await commit(prev => mergeWatchlist(prev, rows));
+      },
+      async importPriceCsv(stockId: string, csv: string, adjustment: "adjusted" | "unadjusted" | "unknown", benchmarkCsv = "") {
+        await commit(prev => {
+          const stock = prev.stocks.find(item => item.id === stockId);
+          if (!stock) throw new Error("Select a stock first.");
+          const bars = normalizeToSchema(stock.symbol, csv);
+          const benchmark = benchmarkCsv.trim() ? normalizeToSchema("SPY", benchmarkCsv) : [];
+          const imported = snapshotFromBars(stock, bars, benchmark, { source: "User CSV import", origin: "import", adjustment, datasetId: "pending" });
+          const { batch } = write_raw_archive("User CSV import", [{ symbol: stock.symbol, rows: bars }, ...(benchmark.length && stock.symbol !== "SPY" ? [{ symbol: "SPY", rows: benchmark }] : [])], imported.provenance!.observedDate, prev.rawBarArchives, adjustment);
+          batch.adjustedStatus = adjustment;
+          imported.provenance!.datasetId = batch.id;
+          const existing = prev.snapshots.find(item => item.stockId === stock.id);
+          return { ...prev, rawBarArchives: [batch, ...prev.rawBarArchives.filter(existing => existing.id !== batch.id)], snapshots: [{ ...imported, plannedEntryLow: existing?.plannedEntryLow, plannedEntryHigh: existing?.plannedEntryHigh, lastThesisReviewAt: existing?.lastThesisReviewAt, riskFlags: existing?.riskFlags ?? [] }, ...prev.snapshots.filter(item => item.stockId !== stockId)] };
+        });
       },
       async resetToSeed() {
-        await commit(JSON.parse(JSON.stringify(seedData)) as AppData);
+        if (dataRef.current?.stocks.length || dataRef.current?.decisions.length) throw new Error("Demo data can only be loaded into an empty workspace.");
+        await commit(createDemoAppData());
       },
+      async addStarterRecipes() {
+        await commit(prev => syncLogicModel(prev, [...prev.recipes, ...seedData.recipes.filter(recipe => !prev.recipes.some(existing => existing.id === recipe.id))]));
+      },
+      async importBackup(raw: string) {
+        const imported = parseExport(raw);
+        await commit({ ...imported, workspaceId: createId("restored") });
+      },
+      async startPersonalWorkspace() {
+        if (!dataRef.current?.snapshots.some(snapshot => snapshot.isMock)) throw new Error("This action is only for leaving the sample workspace.");
+        await commit(createEmptyAppData());
+      },
+      async applyCloudData(expectedHash: string, next: AppData) {
+        await commit(prev => {
+          if (contentHash(prev) !== expectedHash) throw new Error("The workspace changed while syncing. Your edits are saved; retry sync.");
+          return next;
+        });
+      },
+      exportBackup() {
+        if (!dataRef.current) throw new Error("Workspace is not loaded.");
+        return serializeExport(dataRef.current);
+      },
+      retryLoad() { setLoadAttempt(value => value + 1); },
+      dismissError() { setError(null); },
       async refreshProviderHealth() {
         setProviderHealthLoading(true);
         try {
@@ -896,6 +765,7 @@ export const useAppModel = () => {
   return {
     data,
     loading,
+    error, saving, scanning,
     providerHealth,
     providerHealthLoading,
     actions,

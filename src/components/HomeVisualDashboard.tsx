@@ -20,6 +20,7 @@ import { buildLogicLabScorecard, logicThesisRiskLabel } from "../lib/logicHelper
 import { Alert, Decision, Eye, Evaluation, MockSnapshot, Outcome, Stock } from "../types";
 import { Card, Reveal } from "./common";
 import { WindowPanel } from "./WindowPanel";
+import { useReducedMotion } from "../hooks/useReducedMotion";
 
 if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -315,6 +316,7 @@ const HomeVisualDashboard: React.FC<HomeVisualDashboardProps> = ({
   onOpenLogicLab,
   onOpenJournal,
 }) => {
+  const reduced = useReducedMotion();
   const pulseAnim = useRef(new Animated.Value(0)).current;
   const floatAnim = useRef(new Animated.Value(0)).current;
   const [bucket, setBucket] = useState<HomeBucket>("Review Now");
@@ -322,7 +324,8 @@ const HomeVisualDashboard: React.FC<HomeVisualDashboardProps> = ({
   const [helpTarget, setHelpTarget] = useState<HomeHelpTarget | "">("");
 
   useEffect(() => {
-    Animated.loop(
+    if (reduced) { pulseAnim.setValue(0); floatAnim.setValue(0); return; }
+    const pulse = Animated.loop(
       Animated.sequence([
         Animated.timing(pulseAnim, {
           toValue: 1,
@@ -335,8 +338,8 @@ const HomeVisualDashboard: React.FC<HomeVisualDashboardProps> = ({
           useNativeDriver: true,
         }),
       ]),
-    ).start();
-    Animated.loop(
+    );
+    const float = Animated.loop(
       Animated.sequence([
         Animated.timing(floatAnim, {
           toValue: 1,
@@ -349,8 +352,10 @@ const HomeVisualDashboard: React.FC<HomeVisualDashboardProps> = ({
           useNativeDriver: true,
         }),
       ]),
-    ).start();
-  }, [floatAnim, pulseAnim]);
+    );
+    pulse.start(); float.start();
+    return () => { pulse.stop(); float.stop(); };
+  }, [floatAnim, pulseAnim, reduced]);
 
   const riskRisingStocks = useMemo(
     () =>
@@ -413,7 +418,7 @@ const HomeVisualDashboard: React.FC<HomeVisualDashboardProps> = ({
   ];
 
   const toggleExpand = (stockId: string) => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    if (!reduced) LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setExpandedStockIds((current) =>
       current.includes(stockId) ? current.filter((id) => id !== stockId) : [...current, stockId],
     );

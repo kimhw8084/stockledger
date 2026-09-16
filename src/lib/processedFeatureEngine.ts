@@ -3,7 +3,7 @@ import { ScannerSector, scannerSectorEtfMap } from "./frozenScannerRules";
 
 const avg = (values: number[]) => values.reduce((sum, value) => sum + value, 0) / values.length;
 const rollingMean = (values: number[], length: number) =>
-  values.length >= length ? avg(values.slice(-length)) : null;
+  values.length >= length && values.slice(-length).every(Number.isFinite) ? avg(values.slice(-length)) : null;
 const rollingMax = (values: number[], length: number) =>
   values.length >= length ? Math.max(...values.slice(-length)) : null;
 const rollingMin = (values: number[], length: number) =>
@@ -11,9 +11,9 @@ const rollingMin = (values: number[], length: number) =>
 const pctReturn = (current: number | null, base: number | null) =>
   current !== null && base !== null && base !== 0 ? current / base - 1 : null;
 
-const latestValue = (values: number[]) => (values.length ? values[values.length - 1] : null);
+const latestValue = (values: number[]) => (values.length && Number.isFinite(values[values.length - 1]) ? values[values.length - 1] : null);
 const shiftValue = (values: number[], lookback: number) =>
-  values.length > lookback ? values[values.length - 1 - lookback] : null;
+  values.length > lookback && Number.isFinite(values[values.length - 1 - lookback]) ? values[values.length - 1 - lookback] : null;
 
 const featureMeta = (
   formula: string,
@@ -27,7 +27,7 @@ const featureMeta = (
   warmupDays,
   pointInTimeSafe: true,
   computedAfterCloseOnly: true,
-  featureVersion: "scanner_v1",
+  featureVersion: "scanner_v2_date_aligned",
 });
 
 export const computeProcessedFeaturesForSymbol = (
@@ -40,8 +40,12 @@ export const computeProcessedFeaturesForSymbol = (
   const closes = stockBars.map((bar) => bar.close);
   const lows = stockBars.map((bar) => bar.low);
   const volumes = stockBars.map((bar) => bar.volume);
-  const spyCloses = spyBars.map((bar) => bar.close);
-  const sectorCloses = sectorBars.map((bar) => bar.close);
+  // Join on stock sessions; missing benchmark sessions remain unknown, never
+  // shift array positions or fill from a different trading date.
+  const spyByDate = new Map(spyBars.map(bar => [bar.date, bar.close]));
+  const sectorByDate = new Map(sectorBars.map(bar => [bar.date, bar.close]));
+  const spyCloses = stockBars.map(bar => spyByDate.get(bar.date) ?? Number.NaN);
+  const sectorCloses = stockBars.map(bar => sectorByDate.get(bar.date) ?? Number.NaN);
 
   const close = latestValue(closes);
   if (close === null) return null;
@@ -60,7 +64,7 @@ export const computeProcessedFeaturesForSymbol = (
   const exret20Sector =
     ret20Stock !== null && ret20Sector !== null ? ret20Stock - ret20Sector : null;
   const volSpike20 =
-    latestValue(volumes) !== null && rollingMean(volumes, 20) !== null
+    latestValue(volumes) !== null && (rollingMean(volumes, 20) ?? 0) > 0
       ? (latestValue(volumes) as number) / (rollingMean(volumes, 20) as number)
       : null;
   const sectorAboveMa50 =
@@ -98,7 +102,7 @@ export const computeProcessedFeaturesForSymbol = (
     asOfDate,
     sector,
     sectorEtf: scannerSectorEtfMap[sector],
-    featureSemanticsVersion: "app_v1",
+    featureSemanticsVersion: "app_v2_date_aligned",
     computedAtUtc: new Date().toISOString(),
     featureValues: {
       Close: close,
@@ -132,18 +136,18 @@ export const computeProcessedFeaturesForSymbol = (
     },
     featureMeta: {
       MA10: featureMeta("rolling_mean(Close, 10)", ["Close"], 10, 10),
-      MA20: featureMeta("rolling_mean(Close, 20)", ["Close"], 20, 20),
+      MA20: featureMeta("rolling_mean(Close, 20)", ["Close"], 20, 21),
       MA50: featureMeta("rolling_mean(Close, 50)", ["Close"], 50, 50),
       DD_126: featureMeta("Close / rolling_max(Close, 126) - 1", ["Close"], 126, 126),
-      RET_20_STOCK: featureMeta("Close / Close.shift(20) - 1", ["Close"], 20, 20),
-      RET_20_SPY: featureMeta("SPY_Close / SPY_Close.shift(20) - 1", ["SPY_Close"], 20, 20),
-      RET_20_SECTOR: featureMeta("SectorETF_Close / SectorETF_Close.shift(20) - 1", ["SectorETF_Close"], 20, 20),
+      RET_20_STOCK: featureMeta("Close / Close.shift(20) - 1", ["Close"], 20, 21),
+      RET_20_SPY: featureMeta("SPY_Close / SPY_Close.shift(20) - 1", ["SPY_Close"], 20, 21),
+      RET_20_SECTOR: featureMeta("SectorETF_Close / SectorETF_Close.shift(20) - 1", ["SectorETF_Close"], 20, 21),
       EXRET_20_SPY: featureMeta("RET_20_STOCK - RET_20_SPY", ["RET_20_STOCK", "RET_20_SPY"], 20, 20),
       EXRET_20_SECTOR: featureMeta("RET_20_STOCK - RET_20_SECTOR", ["RET_20_STOCK", "RET_20_SECTOR"], 20, 20),
       VOL_SPIKE_20: featureMeta("Volume / rolling_mean(Volume, 20)", ["Volume"], 20, 20),
       SECTOR_ABOVE_MA50: featureMeta("SectorETF_Close > rolling_mean(SectorETF_Close, 50)", ["SectorETF_Close"], 50, 50),
       RS_SERIES_SPY: featureMeta("Close / SPY_Close", ["Close", "SPY_Close"], 1, 1),
-      RS_IMPROVE_5: featureMeta("RS_SERIES_SPY / RS_SERIES_SPY.shift(5) - 1", ["RS_SERIES_SPY"], 5, 5),
+      RS_IMPROVE_5: featureMeta("RS_SERIES_SPY / RS_SERIES_SPY.shift(5) - 1", ["RS_SERIES_SPY"], 5, 6),
       prior_low_45: featureMeta("rolling_min(Low.shift(1), 45)", ["Low"], 45, 46),
       prior_low_63: featureMeta("rolling_min(Low.shift(1), 63)", ["Low"], 63, 64),
       prior_low_90: featureMeta("rolling_min(Low.shift(1), 90)", ["Low"], 90, 91),

@@ -3,7 +3,7 @@ import {
   Evaluation, 
   RecipeCondition, 
   MockSnapshot, 
-  FreshnessStatus 
+  FreshnessStatus, ConditionEvaluationResult,
 } from "../types";
 import { localizedFreshness } from "./i18n";
 
@@ -21,7 +21,7 @@ export const buildLogicLabScorecard = (evaluation?: Evaluation) => {
     };
   }
 
-  const percentFromResults = (results: any[]) => {
+  const percentFromResults = (results: ConditionEvaluationResult[]) => {
     if (results.length === 0) return 0;
     return Math.round((results.filter((r) => r.passed).length / results.length) * 100);
   };
@@ -33,10 +33,10 @@ export const buildLogicLabScorecard = (evaluation?: Evaluation) => {
     (result) => result.role === "Timing Trigger" || result.role === "Review Trigger",
   );
   const blockerResults = conditionResults.filter(
-    (result) => result.role === "Hard Disqualifier" && !result.passed,
+    (result) => result.role === "Hard Disqualifier" && result.passed,
   );
   const riskPenalty =
-    conditionResults.filter((result) => result.role === "Risk Warning" && !result.passed).length * 12;
+    conditionResults.filter((result) => result.role === "Risk Warning" && result.passed).length * 12;
   const dataIssues = evaluation.missingData.length + evaluation.staleData.length;
   const dataQuality = Math.max(0, 100 - dataIssues * 15);
   const eligibility = percentFromResults(eligibilityResults);
@@ -123,9 +123,9 @@ export const logicRoleAlertEffect = (language: AppLanguage, role?: RecipeConditi
     case "Timing Trigger":
       return language === "ko" ? "즉시 확인 알림을 유도할 수 있습니다." : "Can trigger review-now style alerts.";
     case "Risk Warning":
-      return language === "ko" ? "위험 감지 시 즉시 경고 알림을 보냅니다." : "Triggers risk-alert logic when failed.";
+      return language === "ko" ? "위험 감지 시 즉시 경고 알림을 보냅니다." : "Triggers risk-alert logic when true.";
     case "Hard Disqualifier":
-      return language === "ko" ? "조건 실패 시 즉시 논리 훼손 알림을 보냅니다." : "Triggers thesis-broken alert when failed.";
+      return language === "ko" ? "조건 충족 시 즉시 논리 훼손 알림을 보냅니다." : "Triggers thesis-broken alert when true.";
     case "Review Trigger":
       return language === "ko" ? "검토 필요 시 알림 리스트에 올립니다." : "Adds to review queue when triggered.";
     default:
@@ -146,10 +146,10 @@ export const logicDataQualityLabel = (
 
 export const logicThesisRiskLabel = (language: AppLanguage, evaluation: Evaluation) => {
   const penalty = (evaluation.conditionResults ?? []).filter(
-    (r) => r.role === "Risk Warning" && !r.passed,
+    (r) => r.role === "Risk Warning" && r.passed,
   ).length;
   const blockers = (evaluation.conditionResults ?? []).filter(
-    (r) => r.role === "Hard Disqualifier" && !r.passed,
+    (r) => r.role === "Hard Disqualifier" && r.passed,
   ).length;
 
   if (blockers > 0) return language === "ko" ? "논리 훼손 (차단됨)" : "Thesis Broken (Blocked)";

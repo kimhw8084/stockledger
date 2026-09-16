@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { Animated } from "react-native";
+import { useReducedMotion } from "../hooks/useReducedMotion";
 
 export const MotionSwap = ({
   children,
@@ -14,16 +15,18 @@ export const MotionSwap = ({
   scaleFrom?: number;
   duration?: number;
 }) => {
+  const reduced = useReducedMotion();
   const opacity = useRef(new Animated.Value(1)).current;
   const translateY = useRef(new Animated.Value(0)).current;
   const scale = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
+    if (reduced) { opacity.setValue(1); translateY.setValue(0); scale.setValue(1); return; }
     opacity.setValue(0);
     translateY.setValue(y);
     scale.setValue(scaleFrom);
 
-    Animated.parallel([
+    const animation = Animated.parallel([
       Animated.timing(opacity, {
         toValue: 1,
         duration,
@@ -43,8 +46,9 @@ export const MotionSwap = ({
         mass: 0.9,
         useNativeDriver: true,
       }),
-    ]).start();
-  }, [duration, opacity, scale, scaleFrom, swapKey, translateY, y]);
+    ]);
+    animation.start(); return () => animation.stop();
+  }, [duration, opacity, scale, scaleFrom, swapKey, translateY, y, reduced]);
 
   return (
     <Animated.View

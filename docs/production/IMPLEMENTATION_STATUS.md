@@ -1,0 +1,129 @@
+# StockLedger 0.2.0 implementation and release evidence
+
+Implementation began September 15, 2026, from `02e54c5`. Verification continued into September 16 UTC. The design and SL improvement backlog remain the target specification; this file is the current completion authority.
+
+**Release assessment: usable local-first beta candidate, with a separately gated cloud-sync pilot.** This is a substantial implementation, not completion of every item in the production roadmap. No public deployment, paid service, live trading integration, or native store release was performed.
+
+## Delivered behavior
+
+### Trustworthy data and calculations
+
+- Replaced runtime JavaScript expression execution with a bounded arithmetic grammar. Unsupported inputs, missing observations and insufficient warmup remain unknown.
+- Required/eligibility gates and risk conditions now control interpretation consistently. Incomplete critical data cannot become a confident opportunity signal.
+- Daily observations retain actual prices, dates, source, retrieval time and adjustment status. Personal workspaces no longer manufacture missing prices, financials, event dates or sector evidence.
+- NYSE session handling covers 2024–2028, holidays, early closes, DST and the January 2025 special closure. Outside coverage fails explicitly.
+- Relative performance and forward outcomes join matching dates. Full metric warmups are enforced. Forward excursions exclude signal day; incomplete later inputs do not erase completed observations.
+- Raw batches, evaluations, scan runs and signal revisions use content identities. Corrected inputs retain earlier evidence. Failed and blocked scanner results stay visible.
+- Network work has response/time/symbol bounds and concurrency limits. The free path can operate entirely from user-supplied CSV files.
+
+### Durable personal workspace
+
+- Empty personal onboarding; sample workspace is explicit and labelled. Sample data cannot upload to a personal cloud account. Leaving sample mode exports a copy first.
+- Schema-validated migration preserves original legacy bytes. Startup does not overwrite real saved data with seed values or reset malformed data silently.
+- IndexedDB on web and SQLite on native support atomic compare-and-save revisions and previous-copy recovery. Serialized commands publish success only after durable persistence.
+- Corrupt storage can be exported as original bytes; restoring the previous copy is explicit. Failed saves preserve drafts and surface errors.
+- JSON export/import round-trips the full workspace with validation and backup before replacement. JSON file imports allow 100 MB; CSV imports allow 20 MB. Both remain in-memory operations, not unlimited archive storage.
+- Real stock creation/editing, reversible archiving/restoring, watchlist CSV preview, duplicate detection, stored pins/recents, and paginated directories are connected.
+
+### Research and review loop
+
+- Recipes publish new versions with stable condition lineage. Changing an Eye's recipe preserves its historical binding. Referenced custom metrics are copied before revision.
+- Evaluation and alert detail preserve captured evidence instead of substituting the latest live conditions.
+- Decisions require deliberate thesis/timing choices. Editing preserves authored amendments and original context; deletion becomes reversible archive.
+- Outcome review supports lessons and notes. Weekly Markdown reports join current review activity and coverage without inventing return or productivity claims.
+- Today, Watchlist, Recipes and Journal are the main tabs. Workspace hash routes survive browser refresh/back; native hardware back uses a history stack.
+- Charts use actual dated lookback windows and comparable returns. Unsupported benchmarks show unavailable coverage.
+- Shared controls expose accessibility state/errors and pending actions. Main decorative animations respect reduced motion; sheets use safe areas and keyboard avoidance.
+
+### Runnable independent worker
+
+- `server/worker` uses the shared engine and local CSV observations while the UI is closed. No server subscription is required.
+- SQLite WAL storage, expected revisions, job leases, capped retries, atomic result/outbox commits and restart idempotency are implemented.
+- Consistent SQLite backups and isolated restore tests pass. Importing a later app export requires a matching worker revision and creates a before-import backup.
+- Worker/app handoff is explicit export/import. Outbox rows record intent; email/push transport and a real user scheduler are not installed.
+
+### Optional cloud pilot
+
+- Supabase Auth sign-in/sign-up, explicit account adoption, native SecureStore sessions and personal record sync are implemented.
+- Owner-scoped SQL records, RLS, restricted grants, server-derived identity, atomic revision checks, immutable published history, retry receipts and resource limits are implemented.
+- Three-way sync detects conflicts; explicit choices are tied to the exact versions displayed. A durable local merge must precede acknowledgement. Local edits during a request are retained and require retry.
+- Raw prices/scanner archives remain local. The pilot reads complete owner records in bounded pages; it does not yet implement the production cursor/outbox protocol.
+- Cloud account lifecycle, managed data jobs, notification delivery and billing are incomplete. See the deployment runbook before enabling cloud for anyone else.
+
+## Verification ledger
+
+| Check | Recorded result |
+| --- | --- |
+| Strict TypeScript and Vitest | **61 tests across 11 files passed** on Node 22.23.2. Includes recovery/CAS, domain/date/warmup behavior, immutable history, sync conflicts, embedded PostgreSQL ownership/atomicity, worker restart/leases and SQLite restore. |
+| Browser journeys | **8 passed:** four workflows in Chromium desktop and Pixel 7 browser emulation. Covers real watchlist persistence and backup restore; deliberate sample/navigation; corrupt-store recovery export; decision → outcome → amendment. |
+| Expo bundle export | **Web, iOS and Android passed** on SDK 57 / React Native 0.86. Web JS about 2 MB; native Hermes bundles about 3.8 MB each. This is bundle validation, not native-device QA. |
+| Expo diagnostics | **21 of 21 checks passed.** |
+| Dependency audit | **0 findings** at verification. The scoped xcode/uuid override also passed a CommonJS UUID generation smoke check. |
+| Client boundaries | Public environment allowlist, no runtime eval/Function and no server/Node client imports passed. |
+| Repository hygiene | Whitespace check passed; no generated DB/export/environment files selected; credential-pattern scan found no matches. A pattern scan is not a comprehensive security audit. |
+| Full local Supabase integration | CI job prepared; result pending the first synchronized implementation commit. Local Docker startup/listing was unresponsive, so the Mac result is not claimed. |
+| GitHub clean-environment checks | Pending the implementation push; results will be appended after the workflow completes. |
+
+Browser screenshots were inspected locally. Desktop/browser-emulated phone coverage does not establish screen-reader, real-device, tablet, landscape, Korean or large-text acceptance.
+
+The synthetic worker fixture processed **100 stocks × 260 sessions in 2,036 ms**, producing 100 Eye evaluations and 200 scanner rows. Export: **5,656,231 bytes**; SQLite/WAL: **11,736,672 bytes**; ending RSS: **251,641,856 bytes**; integrity check passed. This is one local run, not p95, a load test or a user-count capacity guarantee. Reproduce with `npm run benchmark:worker`.
+
+## Backlog reconciliation
+
+“Implemented scope” below describes shipped behavior; **partial** means the original item's complete acceptance criteria remain open. Nothing in this table marks the entire roadmap complete.
+
+| SL items | Implemented scope / remaining acceptance |
+| --- | --- |
+| 001–006 | Recovery, observation separation, gates/risk, exchange sessions and date joins implemented and tested. Broader real-provider/corporate-action fixtures remain. |
+| 007 | Warmups implemented; complete versioned registry consolidation/parity is **partial**. |
+| 008 | Recipe/evaluation/decision history and amendments implemented; full visual diff/version migration UX remains **partial**. |
+| 009 | Cooldown, semantic dedupe and existing snooze wired; quiet hours/escalation/channel lifecycle **partial**. |
+| 010 | Explicit provider configuration, truthful unavailable/partial/stale provenance implemented; licensed managed adapters remain. |
+| 011 | Bounded downloads, validation and retained blocked/failed results; resumable per-symbol distributed ingestion **partial**. |
+| 012–015 | Forward outcome preservation, safe expressions, client secret separation, dependency updates and regression suite implemented. More independent market fixtures still desirable. |
+| 020–024 | Stock editing/import, honest chart/evidence basis and four main destinations implemented. Only SPY comparison is supported; other benchmarks are visibly unavailable. |
+| 025–028 | Back/refresh routes, accessible primitives, reduced motion and responsive sheet behavior implemented; entity deep links, full focus management and device/accessibility matrix **partial**. |
+| 029–031 | Optional numeric validation, durable action feedback, explicit decisions and outcome review implemented. |
+| 032–033 | Pins/recents persist; full preference persistence **partial**. Complete Korean/English catalogs, locale formatting and missing-translation checks remain. |
+| 034–037 | Directory/scanner pagination, starter recipes and atomic alert-group review implemented. Virtualization, guided authoring, since-last-review diff and broad batch actions **partial or pending**. |
+| 038–039 | Clean/sample separation implemented. Eight browser journeys and screenshots completed; formal usability/native/language QA **partial**. |
+| 040–042 | Auth and owner-scoped atomic sync contract implemented; full normalized APIs, account recovery/deletion/device controls and hosted isolation/advisor checks **partial**. |
+| 043–044 | Local SQLite worker and atomic client stores implemented. Scheduler installation, managed jobs and normalized local repositories **partial**; workspace payloads are still growing JSON documents. |
+| 045–046 | Full backup and simple watchlist CSV preview; optimistic three-way personal sync pilot implemented. Saved mappings, checksum manifests, durable mutation outbox/cursors and broader cross-device drills **partial**. |
+| 047–049 | Transactional local notification intent exists. Channel delivery, digest/quiet hours, cancellation and archive retention/compression remain. |
+| 050–051 | Quoted CSV parsing/content hashes implemented. Frozen-rule import validator/generator and complete independent parity certification remain. |
+| 052–054 | Worker status, tested snapshots, bounded cloud RPC and a benchmark exist. Operator dashboards, measured RPO/RTO, hosted restore and per-plan budgets **partial**. |
+| 055–057 | Release/rollback/deployment/incident runbooks and CI exist. Actual staging promotion, account deletion lifecycle and incident tabletop evidence remain. |
+| 058–063 | Fundamentals/events feeds, managed concurrency envelope, licensed commercial rights, external pilot, billing and pricing validation remain. |
+| 064–065 | First weekly report and watchlist CSV preview implemented. Measured time savings, saved column mappings and richer conflict handling **partial**. |
+| 066–075 | Event reminders, AI drafts, store distribution, teams, portfolios, acquisition experiments, point-in-time backtesting, marketplace, educational onboarding and unit-economics program remain phase-gated. No monetization claim is made. |
+| 080–083 | Small root App, separate styles/features/domain/platform/worker, shared engine and safer primitives implemented. Large screen composition/model, duplicated registries and remaining loose style props still need extraction. |
+| 084–085 | Dormant code inventory/cleanup remains. One package and lockfile with separate client/worker entry points is retained deliberately; npm workspace packaging is deferred until independently versioned/deployed packages justify it. |
+| 086–090 | README/current-status authority, historical document labels, Git hygiene, templates, pinned CI and dependency updates implemented. GitHub synchronization and account-plan branch-protection state are recorded below. |
+| 091–092 | This evidence manifest and operational docs added. Original design/backlog iCloud copies remain canonical delivery artifacts; an implementation-status copy accompanies them. Release artifact hashes and final Git ref follow verification. |
+
+## Remaining gates, separated by cause
+
+**Further code/QA work:** full localization/accessibility/device coverage; entity navigation; screen/model/metric-registry extraction; normalized storage and bounded archive retention; full account recovery/deletion/session lifecycle; cursor sync; managed ingestion/scheduling; notification transport/preferences; subscription checkout/entitlements/webhooks; operational projections; broader load/restore tests. These cannot be described as merely missing credentials.
+
+**External inputs/operations:** a dedicated StockLedger cloud project and hosting target; owned domain and email service; contractual market-data rights; payment-provider/business configuration if billing is chosen; native signing/store accounts and physical-device QA; real pilot users and measured willingness to pay. Existing unrelated Supabase projects and private local environment values were not changed.
+
+**Operator action for the no-subscription path:** provide the actual workspace backup and authorized CSV directory, then install a schedule from the local-worker runbook. Existing hardware must remain awake. No real user's scheduler or data import was fabricated during this implementation.
+
+## Architecture decisions
+
+1. Preserve the original prototype/history and add recovery before feature growth. No destructive reseeding or silent repair.
+2. Share deterministic domain code between Expo and the Node worker. Keep server imports and secrets out of bundles.
+3. Keep whole-document local revisions for a recoverable beta migration; defer normalized repositories explicitly because they require another data migration and archive policy.
+4. Keep cloud optional. Ship the complete local workflow independently of paid infrastructure; restrict the first cloud contract to personal records and explicit conflicts.
+5. Retain a single root package/lockfile for now. Platform-specific persistence/session adapters are separate from portable domain code.
+6. Do not fabricate financial/event evidence or populate paid features with placeholders. Add those only with real inputs and complete lifecycle tests.
+
+## Runbooks and release identity
+
+- [Local worker and recovery](../operations/LOCAL_WORKER.md)
+- [Cloud contract and deployment gates](../operations/CLOUD_DEPLOYMENT.md)
+- [Release, rollback and incidents](../operations/RELEASE_RUNBOOK.md)
+- App: **0.2.0**; persisted workspace/export schema: **2**; evaluation engine: **2.0.0**; calendar: **2024–2028**.
+- Migration: `20260916032227_ledger_sync.sql`.
+- Source baseline: `02e54c5`; final implementation ref, CI URLs and synchronization evidence are appended after verification.

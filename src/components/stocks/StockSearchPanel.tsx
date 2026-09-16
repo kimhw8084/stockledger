@@ -70,7 +70,7 @@ export const StockSearchPanel = ({
     </View>
     <View style={styles.inlineBetween}>
       <View style={styles.searchSectionMeta}>
-        <Text style={styles.suggestionLabel}>{hasStockQuery ? t(language, "stocks.search.suggestions") : t(language, "stocks.search.recent")}</Text>
+        <Text style={styles.suggestionLabel}>{hasStockQuery ? t(language, "stocks.search.suggestions") : language === "ko" ? "관심 종목" : "Your watchlist"}</Text>
         <Text style={styles.searchResultCount}>
           {stockSuggestions.length > 0 ? t(language, "stocks.search.resultCount", { count: stockSuggestions.length }) : hasStockQuery ? t(language, "stocks.search.resultCount", { count: 0 }) : t(language, "stocks.search.resultNone")}
         </Text>
@@ -104,6 +104,7 @@ export const StockSearchPanel = ({
             return (
               <Pressable
                 key={`suggest-${item.stock.id}`}
+                accessibilityRole="button" accessibilityLabel={`Open ${item.stock.symbol} ${item.stock.name}`}
                 onPress={() => openStockContext({ stockId: item.stock.id })}
                 style={({ pressed }) => [
                   styles.stockSuggestionRow,
@@ -128,8 +129,6 @@ export const StockSearchPanel = ({
                         <Text style={styles.stockTopMatchLabel}>{t(language, "stocks.search.exact")}</Text>
                       ) : isTopMatch ? (
                         <Text style={styles.stockTopMatchLabel}>{t(language, "stocks.search.topMatch")}</Text>
-                      ) : !hasStockQuery ? (
-                        <Text style={styles.stockRecentLabel}>{t(language, "stocks.search.recentBadge")}</Text>
                       ) : null}
                     </View>
                     <Text
@@ -142,23 +141,11 @@ export const StockSearchPanel = ({
                 </View>
                 <View style={styles.stockSuggestionRight}>
                   <Text style={styles.stockSuggestionPrice}>
-                    {item.snapshot ? `$${item.snapshot.price.toFixed(2)}` : "--"}
+                    {item.snapshot && item.snapshot.freshness !== "Unavailable" ? `$${item.snapshot.price.toFixed(2)}` : "--"}
                   </Text>
                   <Text style={styles.stockSuggestionMeta} numberOfLines={1}>
                     {stockSuggestionTrustLabel(item.snapshot)}
                   </Text>
-                  {!hasStockQuery ? (
-                    <Pressable
-                      onPress={() =>
-                        setRecentStockIds((current) =>
-                          current.filter((candidate) => candidate !== item.stock.id),
-                        )
-                      }
-                      hitSlop={8}
-                    >
-                      <Text style={styles.stockSuggestionRemove}>{t(language, "common.remove")}</Text>
-                    </Pressable>
-                  ) : null}
                 </View>
               </Pressable>
             );

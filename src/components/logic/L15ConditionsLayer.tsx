@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import { FrozenScannerRule } from "../../lib/frozenScannerRules";
@@ -19,6 +19,7 @@ interface L15ConditionsLayerProps {
 }
 
 const signalSummary = (language: AppLanguage, signal: ScanSignal) => {
+  if (signal.status === "FAILED") return language === "ko" ? "현재 조건을 충족하지 않습니다." : "The conditions are not currently met.";
   if (signal.status === "MATCHED") return "Condition matched — human review required.";
   if (signal.status === "NEAR_MATCH") return "Near match — watchlist only.";
   return language === "ko"
@@ -45,6 +46,7 @@ export const L15ConditionsLayer: React.FC<L15ConditionsLayerProps> = ({
   Button,
   MetaPill,
 }) => {
+  const [visibleCount, setVisibleCount] = useState(18);
   return (
     <View style={styles.container}>
       <SectionHeader
@@ -76,7 +78,7 @@ export const L15ConditionsLayer: React.FC<L15ConditionsLayerProps> = ({
             </Text>
           </LogicLevelCard>
         ) : (
-          signals.slice(0, 18).map((signal) => {
+          signals.slice(0, visibleCount).map((signal) => {
             const review = reviewLogsBySignal.get(signal.signalId);
             const rule = rules.find((item) => item.ruleId === signal.ruleId);
             return (
@@ -125,6 +127,7 @@ export const L15ConditionsLayer: React.FC<L15ConditionsLayerProps> = ({
           })
         )}
       </View>
+      {signals.length > visibleCount ? <Button label={language === "ko" ? "더 보기" : `Show more (${signals.length - visibleCount} remaining)`} tone="secondary" onPress={() => setVisibleCount(count => count + 18)} /> : null}
     </View>
   );
 };

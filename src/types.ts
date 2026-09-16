@@ -58,6 +58,7 @@ export type ConditionOperator =
   | "within";
 
 export interface Stock {
+  archivedAt?: string;
   id: string;
   symbol: string;
   name: string;
@@ -66,6 +67,7 @@ export interface Stock {
 }
 
 export interface RecipeCondition {
+  lineageId?: string;
   id: string;
   label: string;
   kind: "required" | "supporting" | "negative" | "disqualifier";
@@ -186,7 +188,21 @@ export interface LogicSet {
   outcomeConfig?: RecipeOutcomeConfig;
 }
 
+export interface SnapshotProvenance {
+  schemaVersion: 2;
+  origin: "provider" | "import" | "demo";
+  observedDate: string;
+  retrievedAt: string;
+  currency: "USD";
+  adjustment: "adjusted" | "unadjusted" | "unknown";
+  datasetId: string;
+}
+/** Historical name retained for import compatibility; isMock/provenance identify origin. */
 export interface MockSnapshot {
+  provenance?: SnapshotProvenance;
+  historyDates?: string[];
+  benchmarkDates?: string[];
+  benchmarkSymbol?: string;
   stockId: string;
   price: number;
   drawdownPct: number;
@@ -225,6 +241,7 @@ export interface ConditionEvaluationResult {
   conditionId: string;
   role: ConditionRole;
   passed: boolean;
+  truth?: "true" | "false" | "unknown";
   metricKey?: string;
   formulaKey?: string;
   operator?: ConditionOperator;
@@ -310,6 +327,11 @@ export interface VisualEvidenceGroup {
 }
 
 export interface Evaluation {
+  id?: string;
+  inputHash?: string;
+  engineVersion?: string;
+  eligibilityMet?: boolean;
+  qualityBlocked?: boolean;
   eyeId: string;
   recipeId?: string;
   recipeVersion?: number;
@@ -335,6 +357,7 @@ export interface Evaluation {
 }
 
 export interface Eye {
+  archivedAt?: string;
   id: string;
   stockId: string;
   recipeId: string;
@@ -350,6 +373,7 @@ export interface Eye {
 }
 
 export interface Alert {
+  evaluationId?: string;
   id: string;
   eyeId: string;
   recipeId?: string;
@@ -374,6 +398,9 @@ export interface Alert {
 }
 
 export interface Decision {
+  evaluationId?: string;
+  archivedAt?: string;
+  amendments?: Array<{ amendedAt: string; action: DecisionAction; note: string; concern: string; thesisValid: "Yes" | "Partly" | "No"; timing: "Early" | "On Time" | "Late" }>;
   id: string;
   eyeId: string;
   alertId?: string;
@@ -599,6 +626,8 @@ export interface ScannerSettings {
 }
 
 export interface AppData {
+  workspaceId?: string;
+  evaluations?: Evaluation[];
   stocks: Stock[];
   recipes: Recipe[];
   customMetrics: MetricDefinition[];

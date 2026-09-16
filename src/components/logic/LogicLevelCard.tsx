@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffff",
   },
   swipeActionsLayer: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     flexDirection: "row",
     justifyContent: "flex-end",
     alignItems: "stretch",

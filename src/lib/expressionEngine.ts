@@ -1,4 +1,5 @@
 import { Eye, MockSnapshot } from "../types";
+import { evaluateArithmetic, expressionTokens, parseExpression } from "../domain/arithmetic";
 
 export type ExpressionParameter = {
   key: string;
@@ -51,36 +52,47 @@ export const expressionParameterRequiredData = (keys: string[]) =>
     ),
   );
 
-const parameterValue = (snapshot: MockSnapshot, eye: Eye, key: string): number | undefined => {
+export const parameterValue = (snapshot: MockSnapshot, eye: Eye, key: string, now = new Date(snapshot.updatedAt)): number | undefined => {
   switch (key) {
     case "PRICE_NOW":
       return latest(snapshot.priceHistorySeries) ?? snapshot.price;
     case "PRICE_20D_AGO":
-      return snapshot.priceHistorySeries?.at(-21) ?? snapshot.priceHistorySeries?.[0];
+      return snapshot.priceHistorySeries?.at(-21);
     case "PRICE_60D_AGO":
-      return snapshot.priceHistorySeries?.at(-61) ?? snapshot.priceHistorySeries?.[0];
+      return snapshot.priceHistorySeries?.at(-61);
     case "PRICE_HIGH_252D":
-      return snapshot.priceHistorySeries?.length ? Math.max(...snapshot.priceHistorySeries.slice(-252)) : undefined;
+      return (snapshot.priceHistorySeries?.length ?? 0) >= 252 ? Math.max(...snapshot.priceHistorySeries!.slice(-252)) : undefined;
     case "PRICE_LOW_20D":
-      return snapshot.priceHistorySeries?.length ? Math.min(...snapshot.priceHistorySeries.slice(-20)) : undefined;
+      return (snapshot.priceHistorySeries?.length ?? 0) >= 20 ? Math.min(...snapshot.priceHistorySeries!.slice(-20)) : undefined;
     case "PRICE_AVG_20D":
-      return average(snapshot.priceHistorySeries?.slice(-20) ?? []);
+      return (snapshot.priceHistorySeries?.length ?? 0) >= 20 ? average(snapshot.priceHistorySeries!.slice(-20)) : undefined;
     case "PRICE_AVG_50D":
-      return average(snapshot.priceHistorySeries?.slice(-50) ?? []);
+      return (snapshot.priceHistorySeries?.length ?? 0) >= 50 ? average(snapshot.priceHistorySeries!.slice(-50)) : undefined;
     case "PRICE_AVG_200D":
-      return average(snapshot.priceHistorySeries?.slice(-200) ?? []);
-    case "BENCH_NOW":
-      return latest(snapshot.benchmarkHistorySeries);
-    case "BENCH_60D_AGO":
-      return snapshot.benchmarkHistorySeries?.at(-61) ?? snapshot.benchmarkHistorySeries?.[0];
+      return (snapshot.priceHistorySeries?.length ?? 0) >= 200 ? average(snapshot.priceHistorySeries!.slice(-200)) : undefined;
+    case "BENCH_NOW": {
+      if (snapshot.historyDates && snapshot.benchmarkDates) {
+        const index = snapshot.benchmarkDates.indexOf(snapshot.historyDates.at(-1)!);
+        return index < 0 ? undefined : snapshot.benchmarkHistorySeries?.[index];
+      }
+      return snapshot.isMock ? latest(snapshot.benchmarkHistorySeries) : undefined;
+    }
+    case "BENCH_60D_AGO": {
+      const date = snapshot.historyDates?.at(-61);
+      if (date && snapshot.benchmarkDates) {
+        const index = snapshot.benchmarkDates.indexOf(date);
+        return index < 0 ? undefined : snapshot.benchmarkHistorySeries?.[index];
+      }
+      return snapshot.isMock ? snapshot.benchmarkHistorySeries?.at(-61) : undefined;
+    }
     case "VOL_NOW":
       return latest(snapshot.volumeHistorySeries);
     case "VOL_AVG_20D":
-      return average(snapshot.volumeHistorySeries?.slice(-20) ?? []);
+      return (snapshot.volumeHistorySeries?.length ?? 0) >= 20 ? average(snapshot.volumeHistorySeries!.slice(-20)) : undefined;
     case "RANGE_AVG_10D":
-      return average(snapshot.volatilityHistorySeries?.slice(-10) ?? []);
+      return (snapshot.volatilityHistorySeries?.length ?? 0) >= 10 ? average(snapshot.volatilityHistorySeries!.slice(-10)) : undefined;
     case "RANGE_AVG_30D":
-      return average(snapshot.volatilityHistorySeries?.slice(-30) ?? []);
+      return (snapshot.volatilityHistorySeries?.length ?? 0) >= 30 ? average(snapshot.volatilityHistorySeries!.slice(-30)) : undefined;
     case "REV_GROWTH":
       return snapshot.revenueGrowthYoY;
     case "MARGIN_DELTA":
@@ -94,7 +106,7 @@ const parameterValue = (snapshot: MockSnapshot, eye: Eye, key: string): number |
     case "REVIEW_DAYS": {
       const reviewAt = eye.lastReviewedAt ?? snapshot.lastThesisReviewAt;
       if (!reviewAt) return undefined;
-      return Math.floor((Date.now() - new Date(reviewAt).getTime()) / (1000 * 60 * 60 * 24));
+      return Math.floor((now.getTime() - new Date(reviewAt).getTime()) / (1000 * 60 * 60 * 24));
     }
     case "FLAG_COUNT":
       return [...snapshot.riskFlags, ...(eye.manualFlags ?? [])].length;
@@ -103,64 +115,24 @@ const parameterValue = (snapshot: MockSnapshot, eye: Eye, key: string): number |
   }
 };
 
-const sanitizeExpression = (expression: string) =>
-  expression.replace(/\s+/g, " ").trim();
-
 export const evaluateExpression = (
-  expression: string,
-  parameterKeys: string[],
-  snapshot: MockSnapshot,
-  eye: Eye,
+  expression: string, parameterKeys: string[], snapshot: MockSnapshot, eye: Eye,
+  now = new Date(snapshot.updatedAt),
 ) => {
-  const sanitized = sanitizeExpression(expression);
-  if (!sanitized) return undefined;
-
-  const parameterValues = Object.fromEntries(
-    parameterKeys.map((key) => [key, parameterValue(snapshot, eye, key)]),
-  );
-
-  if (Object.values(parameterValues).some((value) => typeof value !== "number" || Number.isNaN(value))) {
-    return undefined;
-  }
-
-  const tokenized = parameterKeys.reduce((current, key) => {
-    const safeKey = key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    return current.replace(new RegExp(`\\b${safeKey}\\b`, "g"), String(parameterValues[key]));
-  }, sanitized);
-
-  if (!/^[A-Z0-9_,+\-*/(). %]+$/i.test(tokenized)) return undefined;
-
   try {
-    const result = Function(
-      "ABS",
-      "PCT_CHANGE",
-      "AVG",
-      "MIN",
-      "MAX",
-      "CLAMP",
-      `"use strict"; return (${tokenized});`,
-    )(
-      (value: number) => Math.abs(value),
-      (current: number, base: number) => (base !== 0 ? ((current / base) - 1) * 100 : 0),
-      (left: number, right: number) => (left + right) / 2,
-      (left: number, right: number) => Math.min(left, right),
-      (left: number, right: number) => Math.max(left, right),
-      (value: number, low: number, high: number) => Math.min(Math.max(value, low), high),
-    );
-    return typeof result === "number" && Number.isFinite(result) ? Number(result.toFixed(2)) : undefined;
-  } catch {
-    return undefined;
-  }
+    const allowed = parameterKeys.filter(key => expressionParameterKeys.includes(key));
+    const tree = parseExpression(expression, allowed);
+    const result = evaluateArithmetic(tree, key => parameterValue(snapshot, eye, key, now));
+    return result === undefined ? undefined : Number(result.toFixed(2));
+  } catch { return undefined; }
 };
 
 export const buildExpressionPreview = (expression: string, parameterKeys: string[]) =>
   parameterKeys.reduce((current, key) => current.replace(new RegExp(`\\b${key}\\b`, "g"), expressionParameterLabel(key)), expression);
 
-export const tokenizeExpression = (expression: string) =>
-  expression
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean);
+export const tokenizeExpression = (expression: string) => {
+  try { return expressionTokens(expression); } catch { return []; }
+};
 
 export const appendExpressionToken = (expression: string, token: string) =>
   [...tokenizeExpression(expression), token].join(" ").trim();
@@ -180,47 +152,17 @@ export const functionTokenTemplates = [
   "CLAMP ( , , )",
 ] as const;
 
-export const validateExpressionSyntax = (expression: string, parameterKeys: string[]) => {
-  const sanitized = sanitizeExpression(expression);
-  if (!sanitized) {
-    return { valid: false, reason: "empty" as const };
-  }
-
-  const tokenized = parameterKeys.reduce((current, key) => {
-    const safeKey = key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    return current.replace(new RegExp(`\\b${safeKey}\\b`, "g"), "1");
-  }, sanitized);
-
-  if (!/^[A-Z0-9_,+\-*/(). %]+$/i.test(tokenized)) {
-    return { valid: false, reason: "characters" as const };
-  }
-
+export const validateExpressionSyntax = (expression: string, parameterKeys: string[]): { valid: boolean; reason: "empty" | "characters" | "syntax" | "ok" } => {
+  if (!expression.trim()) return { valid: false, reason: "empty" as const };
   try {
-    Function(
-      "ABS",
-      "PCT_CHANGE",
-      "AVG",
-      "MIN",
-      "MAX",
-      "CLAMP",
-      `"use strict"; return (${tokenized});`,
-    )(
-      (value: number) => Math.abs(value),
-      (current: number, base: number) => (base !== 0 ? ((current / base) - 1) * 100 : 0),
-      (left: number, right: number) => (left + right) / 2,
-      (left: number, right: number) => Math.min(left, right),
-      (left: number, right: number) => Math.max(left, right),
-      (value: number, low: number, high: number) => Math.min(Math.max(value, low), high),
-    );
+    parseExpression(expression, parameterKeys.filter(key => expressionParameterKeys.includes(key)));
     return { valid: true, reason: "ok" as const };
-  } catch {
-    return { valid: false, reason: "syntax" as const };
-  }
+  } catch { return { valid: false, reason: "syntax" as const }; }
 };
 
 export const pctChangeFromSeries = (series?: number[], lookback = 20) => {
   const current = latest(series);
-  const base = series?.at(-(lookback + 1)) ?? series?.[0];
+  const base = series?.at(-(lookback + 1));
   const value = pctChange(current, base);
   return value !== undefined ? Number(value.toFixed(2)) : undefined;
 };

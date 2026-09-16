@@ -1,3 +1,5 @@
+> Historical prototype brief. Use [current implementation status](production/IMPLEMENTATION_STATUS.md) and the [production design](production/StockLedger_Project_Design_2026-09-15.md) for the active release scope.
+
 # Visual Evidence Layer Specification
 
 ## Purpose

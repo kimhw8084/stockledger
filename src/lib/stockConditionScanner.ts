@@ -15,6 +15,7 @@ import { frozenScannerRules, FrozenScannerRule, ScannerSector, scannerSectorEtfM
 import { latestCompletedTradingDate } from "./marketCalendar";
 import { computeProcessedFeaturesForSymbol } from "./processedFeatureEngine";
 import { loadDynamicCurrentUniverse, requiredSymbolsForRules } from "./universeProvider";
+import { contentHash } from "../domain/contentHash";
 
 const PROVIDER_NAME = "Stooq Daily Provider";
 const SURVIVORSHIP_LABEL = "Current-constituent biased historical proof";
@@ -24,12 +25,12 @@ const toMap = (bars: RawBarRecord[]) =>
     if (!acc[bar.symbol]) acc[bar.symbol] = [];
     acc[bar.symbol].push(bar);
     return acc;
-  }, {});
+  }, Object.create(null) as Record<string, RawBarRecord[]>);
 
 const sortBars = (bars: RawBarRecord[]) => [...bars].sort((left, right) => left.date.localeCompare(right.date));
 
 const signalIdFor = (ticker: string, signalDate: string, ruleSignatureHash: string) =>
-  `signal-${ticker}-${signalDate}-${ruleSignatureHash.slice(0, 12)}`;
+  `signal-${contentHash({ ticker, signalDate, ruleSignatureHash })}`;
 
 const getSectorMembers = (snapshot: UniverseSnapshot, sector: ScannerSector) =>
   snapshot.sectorSnapshots.find((entry) => entry.sector === sector)?.tickers ?? [];
@@ -67,13 +68,19 @@ const computeReclaimLow = (stockBars: RawBarRecord[], window: number) => {
   return stockBars[stockBars.length - 1].close > priorLow;
 };
 
-const evaluateToken = (
+export const evaluateToken = (
   token: string,
   rule: FrozenScannerRule,
   features: ProcessedFeatureRecord,
   stockBars: RawBarRecord[],
 ) => {
   const values = features.featureValues;
+  const required: Record<string, string[]> = {
+    DEEP_DISCOUNT: ["DD_126"], MA20: ["Close", "MA20"], MA20_RECLAIM: ["Close", "MA20"],
+    MA10: ["Close", "MA10"], NO_VOL_REJECT: ["VOL_SPIKE_20"], RS_IMP: ["RS_IMPROVE_5"],
+    RS_SPY_POS: ["EXRET_20_SPY"], RS_SEC_POS: ["EXRET_20_SECTOR"], SEC_M50: ["SECTOR_ABOVE_MA50"],
+  };
+  if ((required[token] ?? []).some(key => values[key] === null || values[key] === undefined || (typeof values[key] === "number" && !Number.isFinite(values[key])))) return null;
   switch (token) {
     case "DEEP_DISCOUNT":
       return typeof values.DD_126 === "number" && values.DD_126 <= (rule.parameters.ddThresh ?? -0.3);
@@ -106,16 +113,13 @@ const nearMatchStatus = (
   tokenResults: Record<string, boolean | null>,
   featureValues: ProcessedFeatureRecord["featureValues"],
 ) => {
-  const failedCount = Object.values(tokenResults).filter((value) => value === false).length;
-  if (rule.family === "DeepDiscount") {
-    if (typeof featureValues.DD_126 === "number" && typeof rule.parameters.ddThresh === "number") {
-      if (featureValues.DD_126 <= rule.parameters.ddThresh + 0.05) return true;
-    }
-    return failedCount === 1;
+  const failed = Object.keys(tokenResults).filter(key => tokenResults[key] === false);
+  if (Object.values(tokenResults).some(value => value === null) || failed.length !== 1) return false;
+  if (failed[0] === "DEEP_DISCOUNT" && typeof featureValues.DD_126 === "number" && typeof rule.parameters.ddThresh === "number") {
+    return featureValues.DD_126 <= rule.parameters.ddThresh + 0.05;
   }
-  if (tokenResults.FAILED_BREAK === true && tokenResults.RECLAIM_LOW === false) return true;
-  if (tokenResults.RECLAIM_LOW === true && failedCount === 1) return true;
-  return failedCount === 1;
+  // Only timing proximity qualifies; failed risk/market gates never do.
+  return ["RECLAIM_LOW", "MA10", "MA20", "MA20_RECLAIM"].includes(failed[0]);
 };
 
 const buildSignal = (
@@ -128,7 +132,7 @@ const buildSignal = (
   tokenResults: Record<string, boolean | null>,
   features: ProcessedFeatureRecord,
 ) : ScanSignal => {
-  const signalDate = features.asOfDate;
+  const signalDate = scanRun.scanDate;
   const matchedConditionsJson = Object.entries(tokenResults)
     .filter(([, passed]) => passed === true)
     .map(([token]) => token);
@@ -140,7 +144,7 @@ const buildSignal = (
     .map(([token]) => token);
   const sectorMemberCount = getSectorMembers(universeSnapshot, sector).length;
   return {
-    signalId: signalIdFor(ticker, signalDate, rule.ruleSignatureHash),
+    signalId: signalIdFor(ticker, signalDate, `${rule.ruleSignatureHash}-${scanRun.id.replace(/^scan-/, "")}`),
     scanRunId: scanRun.id,
     scanDate: scanRun.scanDate,
     signalDate,
@@ -173,7 +177,7 @@ const buildSignal = (
   };
 };
 
-const buildForwardProof = (
+export const buildForwardProof = (
   signal: ScanSignal,
   stockBars: RawBarRecord[],
   spyBars: RawBarRecord[],
@@ -184,8 +188,10 @@ const buildForwardProof = (
   const spyBase = spyBars.find((bar) => bar.date === signal.signalDate)?.close;
   const sectorBase = sectorBars.find((bar) => bar.date === signal.signalDate)?.close;
   const horizonReturn = (bars: RawBarRecord[], base: number | undefined, offset: number) => {
-    if (startIndex < 0 || base === undefined || startIndex + offset >= bars.length) return undefined;
-    return bars[startIndex + offset].close / base - 1;
+    if (startIndex < 0 || base === undefined || startIndex + offset >= stockBars.length) return undefined;
+    const date = stockBars[startIndex + offset]?.date;
+    const end = bars.find(bar => bar.date === date)?.close;
+    return end !== undefined && base > 0 ? end / base - 1 : undefined;
   };
   const ret5 = horizonReturn(stockBars, baseClose, 5);
   const ret10 = horizonReturn(stockBars, baseClose, 10);
@@ -199,11 +205,11 @@ const buildForwardProof = (
   const sectorRet10 = horizonReturn(sectorBars, sectorBase, 10);
   const sectorRet20 = horizonReturn(sectorBars, sectorBase, 20);
   const sectorRet30 = horizonReturn(sectorBars, sectorBase, 30);
-  const window30 = startIndex >= 0 ? stockBars.slice(startIndex, Math.min(stockBars.length, startIndex + 31)) : [];
+  const window30 = startIndex >= 0 ? stockBars.slice(startIndex + 1, startIndex + 31) : [];
   const mfe30 =
-    baseClose && window30.length >= 2 ? Math.max(...window30.map((bar) => bar.high / baseClose - 1)) : undefined;
+    baseClose && window30.length === 30 ? Math.max(...window30.map((bar) => bar.high / baseClose - 1)) : undefined;
   const mae30 =
-    baseClose && window30.length >= 2 ? Math.min(...window30.map((bar) => bar.low / baseClose - 1)) : undefined;
+    baseClose && window30.length === 30 ? Math.min(...window30.map((bar) => bar.low / baseClose - 1)) : undefined;
   return {
     id: `forward-${signal.signalId}`,
     signalId: signal.signalId,
@@ -252,25 +258,31 @@ export const runDailyStockConditionScan = async (input: {
   existingForwardProof: ForwardProofLedger[];
   scannerSettings: ScannerSettings;
   previousUniverseSnapshot?: UniverseSnapshot;
+  now?: Date;
+  adjustment?: "adjusted" | "unadjusted" | "unknown";
+  providerName?: string;
+  histories?: { symbol: string; rows: RawBarRecord[]; error?: string }[];
+  universeSnapshot?: UniverseSnapshot;
 }) : Promise<ScannerExecutionResult> => {
+  const startedAt = (input.now ?? new Date()).toISOString();
   const latestExpectedDate = latestCompletedTradingDate(
-    new Date(),
+    input.now ?? new Date(),
     input.scannerSettings.providerDelayMinutesAfterClose,
   );
-  const universeSnapshot = await loadDynamicCurrentUniverse(
+  const universeSnapshot = input.universeSnapshot ?? await loadDynamicCurrentUniverse(
     input.scannerSettings,
     input.previousUniverseSnapshot,
   );
 
   if (
-    universeSnapshot.universeSourceStatus === "current_universe_unavailable" &&
-    !input.scannerSettings.fallbackToFrozenUniverse
+    universeSnapshot.universeSourceStatus === "current_universe_unavailable" ||
+    universeSnapshot.sectorSnapshots.every(sector => sector.tickers.length === 0)
   ) {
     const blockedRun: ScanRun = {
       id: `scan-${latestExpectedDate}-blocked`,
       scanDate: latestExpectedDate,
       latestExpectedTradingDate: latestExpectedDate,
-      startedAtUtc: new Date().toISOString(),
+      startedAtUtc: startedAt,
       completedAtUtc: new Date().toISOString(),
       universeMode: input.scannerSettings.universeMode,
       universeSource: universeSnapshot.universeSource,
@@ -286,36 +298,39 @@ export const runDailyStockConditionScan = async (input: {
       universeSnapshot,
       processedFeatures: [],
       scanRun: blockedRun,
-      scanSignals: [],
+      scanSignals: input.existingSignals,
       forwardProofLedger: input.existingForwardProof,
     };
   }
 
-  const targetSymbols = requiredSymbolsForRules(universeSnapshot);
+  const targetSymbols = [...new Set([...requiredSymbolsForRules(universeSnapshot), ...input.existingSignals.filter(signal => signal.status === "MATCHED").flatMap(signal => [signal.ticker, signal.sectorEtf])])];
   const startDate = "2024-01-01";
-  const histories = await fetch_daily_bars(targetSymbols, startDate, latestExpectedDate);
+  const histories = input.histories ?? await fetch_daily_bars(targetSymbols, startDate, latestExpectedDate);
   const { batch, validationIssues } = write_raw_archive(
-    PROVIDER_NAME,
+    input.providerName ?? PROVIDER_NAME,
     histories,
     latestExpectedDate,
     input.existingBatches,
+    input.adjustment ?? "unknown",
   );
+  batch.adjustedStatus = input.adjustment ?? "unknown";
+  if (batch.adjustedStatus !== "adjusted") validationIssues.push("adjusted_price_history_required");
   const archiveList = update_manifest(input.existingBatches, batch);
   const barsBySymbol = Object.fromEntries(
     Object.entries(toMap(batch.bars)).map(([symbol, bars]) => [symbol, sortBars(bars)]),
   );
 
   const scanRun: ScanRun = {
-    id: `scan-${latestExpectedDate}-${batch.archiveVersion}`,
+    id: `scan-${contentHash({ date: latestExpectedDate, batch: batch.id, universe: universeSnapshot.snapshotHash, rules: frozenScannerRules.map(rule => rule.ruleSignatureHash), engine: "2.0.0" })}`,
     scanDate: latestExpectedDate,
     latestExpectedTradingDate: latestExpectedDate,
-    startedAtUtc: new Date().toISOString(),
-    completedAtUtc: new Date().toISOString(),
+    startedAtUtc: startedAt,
+    completedAtUtc: undefined,
     universeMode: universeSnapshot.universeMode,
     universeSource: universeSnapshot.universeSource,
     universeSnapshotDate: universeSnapshot.snapshotDate,
     universeSnapshotHash: universeSnapshot.snapshotHash,
-    providerName: PROVIDER_NAME,
+    providerName: input.providerName ?? PROVIDER_NAME,
     sourceStatus: universeSnapshot.universeSourceStatus,
     status: validationIssues.length ? "partial" : "completed",
     warnings: validationIssues,
@@ -332,6 +347,9 @@ export const runDailyStockConditionScan = async (input: {
       const stockBars = barsBySymbol[ticker] ?? [];
       const symbolValidation = validateResponse(stockBars, latestExpectedDate);
       const missingWarmup = missingWarmupForRule(rule, stockBars, spyBars, sectorBars);
+      const benchmarkIssues = [...validateResponse(spyBars, latestExpectedDate).issues, ...validateResponse(sectorBars, latestExpectedDate).issues];
+      missingWarmup.push(...benchmarkIssues);
+      if (batch.adjustedStatus !== "adjusted") missingWarmup.push("adjusted_price_history_required");
       if (!symbolValidation.valid || missingWarmup.length > 0) {
         const blockedFeature = computeProcessedFeaturesForSymbol(ticker, rule.sector, stockBars, spyBars, sectorBars);
         if (blockedFeature) processedFeatures.push(blockedFeature);
@@ -377,7 +395,7 @@ export const runDailyStockConditionScan = async (input: {
             ? "NEAR_MATCH"
             : "FAILED";
 
-      if (status !== "FAILED") {
+      {
         scanSignals.push(
           buildSignal(scanRun, universeSnapshot, ticker, rule.sector, rule, status, tokenResults, featureRecord),
         );
@@ -391,9 +409,7 @@ export const runDailyStockConditionScan = async (input: {
       (existing) =>
         !scanSignals.some(
           (next) =>
-            next.ticker === existing.ticker &&
-            next.signalDate === existing.signalDate &&
-            next.ruleSignatureHash === existing.ruleSignatureHash,
+            next.signalId === existing.signalId,
         ),
     ),
   ];
@@ -403,13 +419,21 @@ export const runDailyStockConditionScan = async (input: {
     .map((signal) => {
       const stockBars = barsBySymbol[signal.ticker] ?? [];
       const sectorBars = barsBySymbol[signal.sectorEtf] ?? [];
-      return buildForwardProof(signal, stockBars, spyBars, sectorBars);
+      const previous = input.existingForwardProof.find(entry => entry.signalId === signal.signalId);
+      const next = buildForwardProof(signal, stockBars, spyBars, sectorBars);
+      if (!previous) return next;
+      // Completed observations are immutable. Missing later data cannot erase them.
+      const merged = { ...previous };
+      for (const [key, value] of Object.entries(next)) {
+        if ((value !== undefined && (merged as unknown as Record<string, unknown>)[key] === undefined) || (typeof value === "boolean" && value)) (merged as unknown as Record<string, unknown>)[key] = value;
+      }
+      return merged;
     });
 
   return {
     universeSnapshot,
-    processedFeatures,
-    scanRun,
+    processedFeatures: [...new Map(processedFeatures.map(feature => [feature.id, feature])).values()],
+    scanRun: { ...scanRun, completedAtUtc: new Date().toISOString(), status: scanSignals.some(signal => signal.status === "BLOCKED_OR_INCOMPLETE_DATA") ? "partial" : scanRun.status },
     rawArchiveBatch: archiveList[0],
     scanSignals: dedupedSignals,
     forwardProofLedger: [

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import { FrozenScannerRule, scannerTokenFeatureMap } from "../../lib/frozenScannerRules";
@@ -56,6 +56,7 @@ export const L1MetricsLayer: React.FC<L1MetricsLayerProps> = ({
   SectionHeader,
   Button,
 }) => {
+  const [visibleCount, setVisibleCount] = useState(18);
   const ruleMapByFeature = new Map<string, FrozenScannerRule[]>();
   rules.forEach((rule) => {
     rule.activeConditions.forEach((token) => {
@@ -100,7 +101,7 @@ export const L1MetricsLayer: React.FC<L1MetricsLayerProps> = ({
             </Text>
           </LogicLevelCard>
         ) : (
-          processedFeatures.slice(0, 18).map((feature) => {
+          processedFeatures.slice(0, visibleCount).map((feature) => {
             const coreKeys = [
               "DD_126",
               "MA10",
@@ -153,6 +154,7 @@ export const L1MetricsLayer: React.FC<L1MetricsLayerProps> = ({
           })
         )}
       </View>
+      {processedFeatures.length > visibleCount ? <Button label={language === "ko" ? "더 보기" : `Show more (${processedFeatures.length - visibleCount} remaining)`} tone="secondary" onPress={() => setVisibleCount(count => count + 18)} /> : null}
     </View>
   );
 };

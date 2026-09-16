@@ -1,4 +1,7 @@
 import { ScannerSettings, UniverseMode, UniverseSnapshot } from "../types";
+import { contentHash } from "../domain/contentHash";
+import { parseCsvRows } from "./csv";
+import { fetchText } from "./network";
 import { ScannerSector, frozenScannerRules } from "./frozenScannerRules";
 
 const SP500_CONSTITUENTS_URL =
@@ -10,28 +13,11 @@ const sectorNameToEtf: Record<string, ScannerSector | undefined> = {
   "Information Technology": "XLK",
 };
 
-const createSimpleHash = (value: string) => {
-  let hash = 0;
-  for (let index = 0; index < value.length; index += 1) {
-    hash = (hash * 31 + value.charCodeAt(index)) >>> 0;
-  }
-  return hash.toString(16).padStart(8, "0");
-};
-
 const parseConstituentsCsv = (csv: string) => {
-  const lines = csv.trim().split(/\r?\n/);
-  if (lines.length <= 1) return [];
-  return lines
-    .slice(1)
-    .map((line) => {
-      const parts = line.split(",");
-      return {
-        symbol: parts[0]?.trim(),
-        name: parts[1]?.trim(),
-        sector: parts[2]?.trim(),
-      };
-    })
-    .filter((row) => row.symbol && row.sector);
+  const [header, ...rows] = parseCsvRows(csv, 2000);
+  if (!header || header[0] !== "Symbol" || header[2] !== "Sector") throw new Error("Unexpected universe columns.");
+  if (rows.length < 400 || rows.length > 600) throw new Error("Unexpected constituent count.");
+  return rows.map(parts => ({ symbol: parts[0].trim(), name: parts[1].trim(), sector: parts[2].trim() }));
 };
 
 const buildSnapshot = (
@@ -48,7 +34,7 @@ const buildSnapshot = (
     sector,
     tickers: [...new Set(tickers)].sort(),
   }));
-  const snapshotHash = createSimpleHash(JSON.stringify(sectorSnapshots));
+  const snapshotHash = contentHash(sectorSnapshots);
   return {
     id: `universe-${snapshotDate}-${snapshotHash}`,
     universeMode,
@@ -84,12 +70,11 @@ export const loadDynamicCurrentUniverse = async (
   settings: ScannerSettings,
   previousSnapshot?: UniverseSnapshot,
 ): Promise<UniverseSnapshot> => {
+  if (settings.universeMode === "frozen_research_universe") {
+    return buildFrozenFallback(settings, "Explicit frozen research universe; no dynamic membership request.");
+  }
   try {
-    const response = await fetch(SP500_CONSTITUENTS_URL);
-    if (!response.ok) {
-      throw new Error(`Failed to load current universe from ${SP500_CONSTITUENTS_URL}`);
-    }
-    const rows = parseConstituentsCsv(await response.text());
+    const rows = parseConstituentsCsv(await fetchText(SP500_CONSTITUENTS_URL));
     const targetSectors = new Set(frozenScannerRules.map((rule) => rule.sector));
     const sectorMembers = rows.reduce<Record<ScannerSector, string[]>>(
       (acc, row) => {
@@ -102,6 +87,7 @@ export const loadDynamicCurrentUniverse = async (
       { XLY: [], XLI: [], XLK: [] },
     );
 
+    if (Object.values(sectorMembers).some(members => members.length === 0)) throw new Error("Universe is missing a required sector.");
     const previousSymbols = new Set(previousSnapshot?.sectorSnapshots.flatMap((item) => item.tickers) ?? []);
     const nextSymbols = new Set(Object.values(sectorMembers).flat());
     const addedTickers = [...nextSymbols].filter((ticker) => !previousSymbols.has(ticker)).sort();

@@ -1,4 +1,20 @@
-# CHANGELOG
+# Changelog
+
+## 0.2.0 — beta candidate, September 2026
+
+- Replaced destructive seed normalization with validated, recoverable IndexedDB/SQLite storage, atomic revisions and real file import/export.
+- Replaced runtime JavaScript expressions with a bounded arithmetic parser. Corrected risk/eligibility gates, warmups, market dates, price provenance, benchmark alignment and forward outcomes.
+- Added immutable recipe/evaluation/scan evidence, decision amendment history, reversible archives and alert cooldown/deduplication.
+- Completed watchlist editing/import, empty onboarding, dated charts, outcome editing, weekly report export, navigation/back behavior, accessible controls and reduced motion.
+- Added a standalone SQLite worker with job leases, transactional results/outbox, restart idempotency and consistent backups.
+- Added an optional Supabase Auth/sync pilot with ownership RLS, atomic optimistic writes, bounded retry receipts/quotas and explicit conflicts.
+- Upgraded Expo to SDK 57; added regression/browser/database checks, CI and operating runbooks.
+
+## Review baseline — September 15, 2026
+
+Preserved the prototype and Git history, created the private canonical repository, and delivered the comprehensive design and improvement documents.
+
+## Historical prototype log
 
 ## 2026-05-13
 

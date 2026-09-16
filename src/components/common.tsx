@@ -7,18 +7,22 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  type TextInputProps,
   View,
 } from "react-native";
 import { AppLanguage, t } from "../lib/i18n";
+import { useReducedMotion } from "../hooks/useReducedMotion";
 
 const fontFamily = "System";
 
 export const Reveal = ({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) => {
+  const reduced = useReducedMotion();
   const opacity = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(10)).current;
 
   useEffect(() => {
-    Animated.parallel([
+    if (reduced) { opacity.setValue(1); translateY.setValue(0); return; }
+    const animation = Animated.parallel([
       Animated.timing(opacity, {
         toValue: 1,
         duration: 350,
@@ -31,8 +35,9 @@ export const Reveal = ({ children, delay = 0 }: { children: React.ReactNode; del
         delay,
         useNativeDriver: true,
       }),
-    ]).start();
-  }, [delay, opacity, translateY]);
+    ]);
+    animation.start(); return () => animation.stop();
+  }, [delay, opacity, translateY, reduced]);
 
   return (
     <Animated.View style={{ opacity, transform: [{ translateY }] }}>
@@ -63,13 +68,25 @@ export const Button = ({
   style,
 }: {
   label: string;
-  onPress: () => void;
+  onPress: () => void | Promise<unknown>;
   tone?: "primary" | "secondary" | "ghost" | "risk";
   disabled?: boolean;
   style?: any;
-}) => (
-  <Pressable
-    onPress={disabled ? undefined : onPress}
+}) => {
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState("");
+  const busy = useRef(false);
+  return <><Pressable
+    accessibilityRole="button"
+    accessibilityLabel={label}
+    accessibilityState={{ disabled: disabled || pending, busy: pending }}
+    disabled={disabled || pending}
+    onPress={async () => {
+      if (disabled || busy.current) return;
+      busy.current = true; setPending(true); setError("");
+      try { await onPress(); } catch (cause) { setError(cause instanceof Error ? cause.message : "Could not complete action. Please try again."); }
+      finally { busy.current = false; setPending(false); }
+    }}
     style={({ pressed }) => [
       styles.button,
       tone === "primary"
@@ -96,12 +113,11 @@ export const Button = ({
             : styles.buttonGhostText,
         disabled ? styles.buttonDisabledText : null,
       ]}
-      numberOfLines={1}
     >
-      {label}
+      {pending ? "…" : label}
     </Text>
-  </Pressable>
-);
+  </Pressable>{error ? <Text accessibilityRole="alert" style={{ color: "#a12935", fontSize: 14, lineHeight: 20 }}>{error}</Text> : null}</>;
+};
 
 export const Input = ({
   value,
@@ -114,12 +130,16 @@ export const Input = ({
   returnKeyType,
   invalid,
   autoFocus,
+  secureTextEntry,
+  autoComplete,
 }: {
   value: string;
   onChangeText: (value: string) => void;
   placeholder: string;
   multiline?: boolean;
-  keyboardType?: "default" | "numeric";
+  keyboardType?: TextInputProps["keyboardType"];
+  secureTextEntry?: boolean;
+  autoComplete?: TextInputProps["autoComplete"];
   autoCapitalize?: "none" | "sentences" | "characters";
   onSubmitEditing?: () => void;
   returnKeyType?: "done" | "go" | "next" | "search";
@@ -127,6 +147,7 @@ export const Input = ({
   autoFocus?: boolean;
 }) => (
   <TextInput
+    accessibilityLabel={placeholder}
     value={value}
     onChangeText={onChangeText}
     placeholder={placeholder}
@@ -137,6 +158,8 @@ export const Input = ({
     onSubmitEditing={onSubmitEditing}
     returnKeyType={returnKeyType}
     autoFocus={autoFocus}
+    secureTextEntry={secureTextEntry}
+    autoComplete={autoComplete}
     style={[styles.input, invalid ? styles.inputInvalid : null, multiline ? styles.textArea : null]}
   />
 );
@@ -161,7 +184,7 @@ export const NumberStepper = ({
   <View style={styles.stepper}>
     <Text style={styles.stepperLabel}>{label}</Text>
     <View style={styles.stepperTrack}>
-      <Pressable onPress={() => onChange(Math.max(min, Number((value - step).toFixed(2))))} style={styles.stepperButton}>
+      <Pressable accessibilityRole="button" accessibilityLabel={`Decrease ${label}`} onPress={() => onChange(Math.max(min, Number((value - step).toFixed(2))))} style={styles.stepperButton}>
         <Text style={styles.stepperButtonText}>-</Text>
       </Pressable>
       <View style={styles.stepperValueWrap}>
@@ -170,7 +193,7 @@ export const NumberStepper = ({
           {unit ? ` ${unit}` : ""}
         </Text>
       </View>
-      <Pressable onPress={() => onChange(Math.min(max, Number((value + step).toFixed(2))))} style={styles.stepperButton}>
+      <Pressable accessibilityRole="button" accessibilityLabel={`Increase ${label}`} onPress={() => onChange(Math.min(max, Number((value + step).toFixed(2))))} style={styles.stepperButton}>
         <Text style={styles.stepperButtonText}>+</Text>
       </Pressable>
     </View>
@@ -230,6 +253,7 @@ export const HorizontalChoice = <T extends string>({
         {options.map((option, index) => (
           <Pressable
             key={option}
+            accessibilityRole="button" accessibilityLabel={labelForOption ? labelForOption(option) : option} accessibilityState={{ selected: option === value }} aria-pressed={option === value}
             onPress={() => onSelect(option)}
             style={({ pressed }) => [
               styles.segmentedChoiceItem,
@@ -258,6 +282,7 @@ export const HorizontalChoice = <T extends string>({
       {options.map((option) => (
         <Pressable
           key={option}
+          accessibilityRole="button" accessibilityLabel={labelForOption ? labelForOption(option) : option} accessibilityState={{ selected: option === value }} aria-pressed={option === value}
           onPress={() => onSelect(option)}
           style={({ pressed }) => [
             styles.choiceChip,
@@ -345,6 +370,7 @@ export const SearchableSelect = <T extends string | { id: string; label: string;
   placeholder = "Select an option...",
   label,
   renderOption,
+  disabled = false,
 }: {
   options: readonly T[];
   value: string;
@@ -352,8 +378,10 @@ export const SearchableSelect = <T extends string | { id: string; label: string;
   placeholder?: string;
   label?: string;
   renderOption?: (option: T) => React.ReactNode;
+  disabled?: boolean;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const reduced = useReducedMotion();
   const [search, setSearch] = useState("");
 
   const getLabel = (opt: T) => (typeof opt === "string" ? opt : opt.label);
@@ -370,7 +398,7 @@ export const SearchableSelect = <T extends string | { id: string; label: string;
   return (
     <View style={styles.selectContainer}>
       {label && <Text style={styles.selectLabel}>{label}</Text>}
-      <Pressable onPress={() => setIsOpen(true)} style={styles.selectTrigger}>
+      <Pressable disabled={disabled} accessibilityState={{ disabled }} accessibilityRole="button" accessibilityLabel={label ?? placeholder} aria-expanded={isOpen} onPress={() => setIsOpen(true)} style={styles.selectTrigger}>
         <Text style={[styles.selectValue, !selectedOption ? styles.selectPlaceholder : null]}>
           {selectedOption ? getLabel(selectedOption) : placeholder}
         </Text>
@@ -380,14 +408,14 @@ export const SearchableSelect = <T extends string | { id: string; label: string;
       <Modal
         visible={isOpen}
         transparent
-        animationType="slide"
+        animationType={reduced ? "none" : "slide"}
         onRequestClose={() => { setIsOpen(false); setSearch(""); }}
       >
         <View style={styles.dropdownOverlay}>
           <View style={styles.dropdownContent}>
              <View style={styles.dropdownHeader}>
                 <Text style={styles.dropdownTitle}>{label || "SELECT"}</Text>
-                <Pressable onPress={() => { setIsOpen(false); setSearch(""); }} style={styles.dropdownClose}>
+                <Pressable accessibilityRole="button" accessibilityLabel="Close options" onPress={() => { setIsOpen(false); setSearch(""); }} style={styles.dropdownClose}>
                    <Text style={styles.dropdownCloseText}>✕</Text>
                 </Pressable>
              </View>
@@ -404,6 +432,7 @@ export const SearchableSelect = <T extends string | { id: string; label: string;
                   filteredOptions.map((opt) => (
                     <Pressable
                       key={getId(opt)}
+                      accessibilityRole="button" accessibilityLabel={getLabel(opt)}
                       onPress={() => {
                         onSelect(opt);
                         setIsOpen(false);

@@ -1,3 +1,5 @@
+> Historical prototype record. Current delivery scope, verification and remaining gates: [implementation status](docs/production/IMPLEMENTATION_STATUS.md). The [production backlog](docs/production/StockLedger_Improvement_Backlog_2026-09-15.md) defines stable SL work items.
+
 # KNOWN LIMITATIONS
 
 - All market snapshots currently come from a clearly labeled mock adapter.

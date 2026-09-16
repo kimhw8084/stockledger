@@ -1,0 +1,65 @@
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { afterEach, expect, it } from "vitest";
+import { WorkerStore } from "../server/worker/store";
+import { seedData } from "../src/lib/seed";
+import { runWorker } from "../server/worker/run";
+import { previousUsTradingDate } from "../src/lib/marketCalendar";
+const folders: string[] = [];
+const databasePath = () => { const dir = mkdtempSync(join(tmpdir(), "stockledger-test-")); folders.push(dir); return join(dir, "ledger.sqlite"); };
+afterEach(() => { for (const dir of folders.splice(0)) rmSync(dir, { recursive: true, force: true }); });
+it("persists revisions and rejects stale writes without losing records", () => {
+  const path = databasePath(); const first = new WorkerStore(path);
+  first.import(seedData, 0); first.close();
+  const reopened = new WorkerStore(path);
+  expect(reopened.load()?.revision).toBe(1);
+  expect(() => reopened.import(seedData, 0)).toThrow(/conflict/);
+  expect(reopened.load()?.data.stocks.length).toBe(seedData.stocks.length);
+  expect(reopened.integrityCheck()).toBe(true); reopened.close();
+});
+it("reclaims expired work and prevents the former worker from committing", () => {
+  const store = new WorkerStore(databasePath()); store.import(seedData, 0);
+  const oldToken = store.claim("job", 1000, 100)!;
+  expect(store.claim("job", 1050, 100)).toBeNull();
+  const token = store.claim("job", 1200, 100)!;
+  expect(() => store.complete("job", oldToken, seedData, 1, 1250)).toThrow(/lease/);
+  store.complete("job", token, seedData, 1, 1250);
+  expect(store.load()?.revision).toBe(2);
+  expect(store.claim("job", 2000)).toBeNull();
+  expect(store.pendingOutbox()).toHaveLength(1);
+  store.acknowledge(String(store.pendingOutbox()[0].id));
+  expect(store.pendingOutbox()).toHaveLength(0); store.close();
+});
+it("commits results and notification intent atomically", () => {
+  const store = new WorkerStore(databasePath()); store.import(seedData, 0);
+  const token = store.claim("job", 1000)!;
+  expect(() => store.complete("job", token, seedData, 99, 1100)).toThrow(/conflict/);
+  expect(store.load()?.revision).toBe(1);
+  expect(store.pendingOutbox()).toHaveLength(0); store.close();
+});
+it("restores a consistent SQLite snapshot", async () => {
+  const path = databasePath(); const store = new WorkerStore(path); store.import(seedData, 0);
+  await store.backup(path + ".backup"); store.close();
+  const restored = new WorkerStore(path + ".backup");
+  expect(restored.integrityCheck()).toBe(true);
+  expect(restored.load()?.data.recipes).toEqual(seedData.recipes);
+  restored.close();
+});
+it("runs the shared engine from local CSV observations and survives restart without repeating a job", async () => {
+  const path = databasePath(); const store = new WorkerStore(path);
+  const data = structuredClone(seedData);
+  data.scannerSettings = { ...data.scannerSettings, universeMode: "frozen_research_universe", frozenUniverseBySector: { XLK: [data.stocks[0].symbol] } };
+  store.import(data, 0);
+  const dates = ["2026-09-14"];
+  while (dates.length < 260) dates.unshift(previousUsTradingDate(dates[0]));
+  const histories = [...new Set([data.stocks[0].symbol, "SPY", "XLK"])].map(symbol => ({ symbol, rows: dates.map((date, index) => ({ symbol, date, open: 100 + index, close: 100 + index, high: 101 + index, low: 99 + index, volume: 1000 })) }));
+  const options = { source: "Regression fixture", adjustment: "adjusted" as const, now: new Date("2026-09-14T22:00:00Z") };
+  await runWorker(store, histories, options);
+  expect(store.load()?.data.scanRuns[0].providerName).toBe("Regression fixture");
+  expect(store.load()?.data.snapshots[0].provenance?.observedDate).toBe("2026-09-14");
+  expect(store.pendingOutbox()).toHaveLength(1); store.close();
+  const restarted = new WorkerStore(path);
+  expect((await runWorker(restarted, histories, options)).status).toBe("already_claimed_or_completed");
+  expect(restarted.load()?.revision).toBe(2); expect(restarted.pendingOutbox()).toHaveLength(1); restarted.close();
+});
