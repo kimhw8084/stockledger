@@ -1,0 +1,13 @@
+{
+  "sourceCommit": "dcac4da59fe5d11ee005caf3bc3c6fac3f44041e",
+  "runtime": "Node 22.23.2 / Expo 57.0.23",
+  "command": "EXPO_NO_DOTENV=1 npm run export:all",
+  "note": "Local verification artifacts only; native bundles are not signed installable applications.",
+  "sha256": {
+    "_expo/static/js/android/AppEntry-8ac664940f110218a0e7db22242238f2.hbc": "573c3ddecccda463cf98c887be56135cc4b33272d03c5d0ce74012c871d83fc3",
+    "_expo/static/js/ios/AppEntry-1d9d6b7f118b236a7d9e596e2908bd25.hbc": "3d9b9ed3183e61262151c5ef9a1989d418b77d73b90747caef4efc9f1bf8975b",
+    "_expo/static/js/web/AppEntry-c5fa71edd5008b662f06e974c8ce5807.js": "a93ffff50873cc8341f2c5f203e79e03ec4242e20a4b4438aa87de79ef8499eb",
+    "index.html": "2dae772dfc073532a90d7a7247e2a634c29900e02b819a33704b73b0b4c0a1e3",
+    "metadata.json": "3f4b347d83c7410186ddf789d1085a32c34b1878228c4e3b0301a05a93352aab"
+  }
+}

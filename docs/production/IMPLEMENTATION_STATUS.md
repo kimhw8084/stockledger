@@ -61,8 +61,8 @@ Implementation began September 15, 2026, from `02e54c5`. Verification continued 
 | Dependency audit | **0 findings** at verification. The scoped xcode/uuid override also passed a CommonJS UUID generation smoke check. |
 | Client boundaries | Public environment allowlist, no runtime eval/Function and no server/Node client imports passed. |
 | Repository hygiene | Whitespace check passed; no generated DB/export/environment files selected; credential-pattern scan found no matches. A pattern scan is not a comprehensive security audit. |
-| Full local Supabase integration | CI job prepared; result pending the first synchronized implementation commit. Local Docker startup/listing was unresponsive, so the Mac result is not claimed. |
-| GitHub clean-environment checks | Pending the implementation push; results will be appended after the workflow completes. |
+| Full local Supabase integration | **Passed on GitHub Linux** using the actual isolated local Supabase stack: Auth sessions, PostgREST ownership, denied anonymous/direct writes, atomic RPC, retry and revision checks. Local Docker was unresponsive; no Mac full-stack result is claimed. |
+| GitHub clean-environment checks | The first clean Linux run passed builds/cloud integration and caught mobile header overflow in one browser journey. The layout is fixed and the journey now asserts viewport bounds; **the corrected run passed both jobs**. A separate fresh Mac clone of `bb6d3b1` passed locked install, TypeScript and all 61 tests; all 139 tracked files matched byte-for-byte. It was then fast-forwarded to the corrected source. |
 
 Browser screenshots were inspected locally. Desktop/browser-emulated phone coverage does not establish screen-reader, real-device, tablet, landscape, Korean or large-text acceptance.
 
@@ -121,9 +121,21 @@ The synthetic worker fixture processed **100 stocks × 260 sessions in 2,036 ms*
 
 ## Runbooks and release identity
 
-- [Local worker and recovery](../operations/LOCAL_WORKER.md)
-- [Cloud contract and deployment gates](../operations/CLOUD_DEPLOYMENT.md)
-- [Release, rollback and incidents](../operations/RELEASE_RUNBOOK.md)
+- [Local worker and recovery](https://github.com/kimhw8084/stockledger/blob/main/docs/operations/LOCAL_WORKER.md)
+- [Cloud contract and deployment gates](https://github.com/kimhw8084/stockledger/blob/main/docs/operations/CLOUD_DEPLOYMENT.md)
+- [Release, rollback and incidents](https://github.com/kimhw8084/stockledger/blob/main/docs/operations/RELEASE_RUNBOOK.md)
 - App: **0.2.0**; persisted workspace/export schema: **2**; evaluation engine: **2.0.0**; calendar: **2024–2028**.
 - Migration: `20260916032227_ledger_sync.sql`.
-- Source baseline: `02e54c5`; final implementation ref, CI URLs and synchronization evidence are appended after verification.
+- Source baseline: `02e54c5`; implementation: `bb6d3b1`; verified corrected code: **`dcac4da59fe5d11ee005caf3bc3c6fac3f44041e`**. The following documentation commit does not alter runtime code.
+
+
+## Final release evidence
+
+- **Both jobs passed:** [Release checks for dcac4da](https://github.com/kimhw8084/stockledger/actions/runs/35056249829), September 16, 2026 UTC. The application job performs locked installation, TypeScript, 61 tests, boundary checks, dependency audit, all-platform export and eight browser journeys. The cloud job starts actual isolated Supabase, exercises Auth/PostgREST/RPC and lints application database functions with warnings treated as failures.
+- The first Linux run identified a Watchlist header that overflowed with Linux fonts. The corrected header wraps text, reserves 44-point controls, and has a viewport regression assertion. CI passed after the fix; it was not resolved by forcing clicks or hiding the test.
+- [Local build manifest](https://github.com/kimhw8084/stockledger/blob/main/docs/production/LOCAL_BUILD_MANIFEST.json) records the exact source ref and SHA-256 hashes for the web/iOS/Android verification artifacts. It does not represent signed native applications or a public deployment.
+- Main-branch protection is enabled: required `app` and `cloud-contract` checks with up-to-date branches; pull-request flow with zero required external approvals for the solo repository; linear history and resolved conversations; force pushes and branch deletion disabled. Administrator override remains available to the owner. This is configuration, not an independent code review.
+- Canonical GitHub repository remains private. Existing history is preserved. Final documentation is delivered through the same protected repository and the local/remote refs are checked at handoff.
+- The original design/backlog copies in iCloud Downloads still match their canonical repository documents byte-for-byte. `StockLedger_Implementation_Status_2026-09-15.md` adds this status report beside them; it is also byte-identical to this canonical file.
+
+This release is ready for controlled local use and further pilot verification. The unfinished code and external launch gates listed above remain open; no paid or public production readiness is asserted.
