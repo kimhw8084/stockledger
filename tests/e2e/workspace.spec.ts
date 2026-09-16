@@ -18,6 +18,11 @@ test("create a real watchlist, reload it, and restore a validated file backup", 
   await expect(page.getByRole("button", { name: "Add your first stock" })).toHaveCount(0);
   await page.getByRole("tab", { name: "Watchlist", exact: true }).click();
   await expect(page.getByRole("button", { name: "Open AAPL Apple" })).toBeVisible();
+  // Header actions must stay inside the viewport, including with Linux fonts.
+  const settingsBounds = await page.getByRole("button", { name: "Settings", exact: true }).boundingBox();
+  expect(settingsBounds).not.toBeNull();
+  expect(settingsBounds!.x + settingsBounds!.width).toBeLessThanOrEqual(page.viewportSize()!.width);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await page.getByRole("button", { name: "Settings", exact: true }).click();
   await expect(page.getByText("Your workspace", { exact: true })).toBeVisible();
   const downloadPromise = page.waitForEvent("download");

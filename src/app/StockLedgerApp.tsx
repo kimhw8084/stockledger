@@ -3658,8 +3658,8 @@ export default function App() {
         {error ? <View style={{ padding: 12, backgroundColor: "#fff0ec" }}><Text accessibilityRole="alert" selectable>{error}</Text><Button label="Dismiss" tone="ghost" onPress={actions.dismissError} /></View> : null}
         {saving || scanning ? <Text accessibilityLiveRegion="polite" style={{ padding: 8 }}>{saving ? "Saving…" : "Scanning completed market sessions…"}</Text> : null}
         <View style={styles.topBar}>
-          <View>
-            <Text style={styles.topBarTitle}>{tabLabels[tab]}</Text>
+          <View style={styles.topBarCopy}>
+            <Text accessibilityRole="header" style={styles.topBarTitle}>{tabLabels[tab]}</Text>
             <Text style={styles.topBarSubtitle}>{topBarSubtitle}</Text>
           </View>
           <View style={styles.topBarActions}>

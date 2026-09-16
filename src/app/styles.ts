@@ -11,19 +11,25 @@ export const styles = StyleSheet.create({
   },
   topBar: {
     paddingHorizontal: 18,
-    paddingTop: Platform.OS === "ios" ? 54 : 18,
+    paddingTop: 18,
     paddingBottom: 12,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    gap: 12,
     borderBottomWidth: 1,
     borderBottomColor: "#e5e7eb",
     backgroundColor: "#fbfbfd",
   },
   topBarActions: {
     flexDirection: "row",
+    flexShrink: 0,
     alignItems: "center",
     gap: 8,
+  },
+  topBarCopy: {
+    flex: 1,
+    minWidth: 0,
   },
   topBarTitle: {
     color: "#111827",
@@ -46,8 +52,8 @@ export const styles = StyleSheet.create({
     marginLeft: 12,
   },
   alertBell: {
-    width: 42,
-    height: 42,
+    width: 44,
+    height: 44,
     borderRadius: 12,
     backgroundColor: "#ffffff",
     borderWidth: 1,

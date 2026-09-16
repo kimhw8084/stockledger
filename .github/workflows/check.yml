@@ -48,5 +48,7 @@ jobs:
       - name: Start isolated local Supabase
         run: npx supabase start -x studio,edge-runtime,logflare,vector,supavisor,imgproxy,realtime,storage-api
       - run: npm run test:cloud
+      - name: Lint application database functions
+        run: npx supabase db lint --local --schema public,ledger_private --level warning --fail-on warning
       - if: always()
         run: npx supabase stop --no-backup
