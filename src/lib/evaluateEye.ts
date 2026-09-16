@@ -6,10 +6,12 @@ import {
   Eye,
   EyeState,
   MockSnapshot,
+  MetricDefinition,
   Recipe,
   RecipeCondition,
 } from "../types";
-import { getFormulaDefinition, getMetricDefinition } from "./metricCatalog";
+import { evaluateExpression } from "./expressionEngine";
+import { getFormulaDefinition, getMetricDefinition, metricCatalog } from "./metricCatalog";
 
 const DEFAULT_STATE_CONFIG = {
   attentionNeededMinScore: 5,
@@ -22,27 +24,104 @@ const DEFAULT_STATE_CONFIG = {
 const asNumber = (value: unknown) => (typeof value === "number" ? value : undefined);
 const asString = (value: unknown) => (typeof value === "string" ? value : undefined);
 const asBoolean = (value: unknown) => (typeof value === "boolean" ? value : undefined);
+const average = (values: number[]) => (values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : undefined);
+const latest = (values?: number[]) => (values && values.length ? values[values.length - 1] : undefined);
+const pctChange = (current: number | undefined, base: number | undefined) =>
+  current !== undefined && base !== undefined && base !== 0 ? ((current / base) - 1) * 100 : undefined;
 
-const resolveMetricValue = (eye: Eye, snapshot: MockSnapshot, condition: RecipeCondition) => {
-  const metricKey = condition.metricKey;
-
-  switch (metricKey) {
+const resolveFormulaValue = (
+  eye: Eye,
+  snapshot: MockSnapshot,
+  condition: RecipeCondition,
+  key?: string,
+) => {
+  switch (key) {
     case "drawdown_from_recent_high":
-      return snapshot.drawdownPct;
+    case "drawdown_pct": {
+      const current = latest(snapshot.priceHistorySeries) ?? snapshot.price;
+      const recentHigh = snapshot.priceHistorySeries?.length ? Math.max(...snapshot.priceHistorySeries) : undefined;
+      return recentHigh && current ? Number((((current / recentHigh) - 1) * 100).toFixed(1)) : snapshot.drawdownPct;
+    }
     case "near_support":
-      return snapshot.nearSupport;
-    case "stabilization_score":
-      return snapshot.stabilizationScore;
+    case "near_support_bool": {
+      const current = latest(snapshot.priceHistorySeries) ?? snapshot.price;
+      const recentSupport = snapshot.priceHistorySeries?.length
+        ? Math.min(...snapshot.priceHistorySeries.slice(-15))
+        : undefined;
+      return current !== undefined && recentSupport !== undefined
+        ? current >= recentSupport && current <= recentSupport * 1.05
+        : snapshot.nearSupport;
+    }
     case "valuation_discount":
+    case "valuation_discount_bool":
       return snapshot.valuationDiscount;
-    case "analyst_revision_trend":
-      return snapshot.analystRevisionTrend;
     case "relative_strength_vs_spy":
-      return snapshot.relativeStrengthVsSpyPct;
+    case "relative_strength_vs_spy_pct": {
+      const current = latest(snapshot.priceHistorySeries) ?? snapshot.price;
+      const stockBase = snapshot.priceHistorySeries?.at(-61) ?? snapshot.priceHistorySeries?.[0];
+      const benchmarkCurrent = latest(snapshot.benchmarkHistorySeries);
+      const benchmarkBase = snapshot.benchmarkHistorySeries?.at(-61) ?? snapshot.benchmarkHistorySeries?.[0];
+      const stockReturn = pctChange(current, stockBase);
+      const benchmarkReturn = pctChange(benchmarkCurrent, benchmarkBase);
+      return stockReturn !== undefined && benchmarkReturn !== undefined
+        ? Number((stockReturn - benchmarkReturn).toFixed(1))
+        : snapshot.relativeStrengthVsSpyPct;
+    }
     case "distance_from_ma_50":
-      return snapshot.movingAverage50DistancePct;
+    case "distance_from_ma_50_pct": {
+      const current = latest(snapshot.priceHistorySeries) ?? snapshot.price;
+      const ma50 = average(snapshot.priceHistorySeries?.slice(-50) ?? []);
+      const value = pctChange(current, ma50);
+      return value !== undefined ? Number(value.toFixed(1)) : snapshot.movingAverage50DistancePct;
+    }
+    case "distance_from_ma_20":
+    case "distance_from_ma_20_pct": {
+      const current = latest(snapshot.priceHistorySeries) ?? snapshot.price;
+      const ma20 = average(snapshot.priceHistorySeries?.slice(-20) ?? []);
+      const value = pctChange(current, ma20);
+      return value !== undefined ? Number(value.toFixed(1)) : snapshot.movingAverage20DistancePct;
+    }
+    case "distance_from_ma_200":
+    case "distance_from_ma_200_pct": {
+      const current = latest(snapshot.priceHistorySeries) ?? snapshot.price;
+      const ma200 = average(snapshot.priceHistorySeries?.slice(-200) ?? snapshot.priceHistorySeries ?? []);
+      const value = pctChange(current, ma200);
+      return value !== undefined ? Number(value.toFixed(1)) : snapshot.movingAverage200DistancePct;
+    }
+    case "price_return_20d":
+    case "price_return_20d_pct": {
+      const current = latest(snapshot.priceHistorySeries) ?? snapshot.price;
+      const base = snapshot.priceHistorySeries?.at(-21) ?? snapshot.priceHistorySeries?.[0];
+      const value = pctChange(current, base);
+      return value !== undefined ? Number(value.toFixed(1)) : snapshot.priceReturn20dPct;
+    }
+    case "price_return_60d":
+    case "price_return_60d_pct": {
+      const current = latest(snapshot.priceHistorySeries) ?? snapshot.price;
+      const base = snapshot.priceHistorySeries?.at(-61) ?? snapshot.priceHistorySeries?.[0];
+      const value = pctChange(current, base);
+      return value !== undefined ? Number(value.toFixed(1)) : snapshot.priceReturn60dPct;
+    }
     case "volume_spike":
-      return snapshot.volumeSpike;
+    case "volume_spike_bool": {
+      const recentVolume = latest(snapshot.volumeHistorySeries);
+      const baselineVolume = average(snapshot.volumeHistorySeries?.slice(-21, -1) ?? []);
+      return recentVolume !== undefined && baselineVolume !== undefined
+        ? recentVolume > baselineVolume * 1.35
+        : snapshot.volumeSpike;
+    }
+    case "volatility_compression":
+    case "volatility_compression_bool": {
+      const latestAverage = average(snapshot.volatilityHistorySeries?.slice(-10) ?? []);
+      const priorAverage = average(snapshot.volatilityHistorySeries?.slice(-30, -10) ?? []);
+      return latestAverage !== undefined && priorAverage !== undefined
+        ? latestAverage < priorAverage * 0.86
+        : snapshot.volatilityCompression;
+    }
+    case "average_range_pct": {
+      const value = average(snapshot.volatilityHistorySeries?.slice(-10) ?? []);
+      return value !== undefined ? Number(value.toFixed(1)) : snapshot.averageRangePct;
+    }
     case "revenue_growth_yoy":
       return snapshot.revenueGrowthYoY;
     case "margin_change_pct":
@@ -50,18 +129,43 @@ const resolveMetricValue = (eye: Eye, snapshot: MockSnapshot, condition: RecipeC
     case "debt_risk_level":
       return snapshot.debtRiskLevel;
     case "earnings_soon":
+    case "earnings_soon_bool":
       return snapshot.earningsSoon;
+    case "days_until_earnings":
+      return snapshot.daysUntilEarnings;
     case "price_inside_entry_zone": {
       const low = eye.plannedEntryLow ?? snapshot.plannedEntryLow;
       const high = eye.plannedEntryHigh ?? snapshot.plannedEntryHigh;
       if (low === undefined || high === undefined) return undefined;
       return snapshot.price >= low && snapshot.price <= high;
     }
+    case "price_beyond_entry_zone": {
+      const low = eye.plannedEntryLow ?? snapshot.plannedEntryLow;
+      const high = eye.plannedEntryHigh ?? snapshot.plannedEntryHigh;
+      if (low === undefined || high === undefined) return undefined;
+      return snapshot.price < low || snapshot.price > high;
+    }
     case "days_since_last_review": {
       const lastReview = eye.lastReviewedAt ?? snapshot.lastThesisReviewAt;
       if (!lastReview) return undefined;
       const ms = new Date().getTime() - new Date(lastReview).getTime();
       return Math.floor(ms / (1000 * 60 * 60 * 24));
+    }
+    case "thesis_review_stale": {
+      const lastReview = eye.lastReviewedAt ?? snapshot.lastThesisReviewAt;
+      if (!lastReview) return undefined;
+      const ms = new Date().getTime() - new Date(lastReview).getTime();
+      const days = Math.floor(ms / (1000 * 60 * 60 * 24));
+      return days >= 14;
+    }
+    case "rebound_from_recent_low":
+    case "rebound_from_recent_low_pct": {
+      const current = latest(snapshot.priceHistorySeries) ?? snapshot.price;
+      const recentLow = snapshot.priceHistorySeries?.length
+        ? Math.min(...snapshot.priceHistorySeries.slice(-20))
+        : undefined;
+      const value = pctChange(current, recentLow);
+      return value !== undefined ? Number(value.toFixed(1)) : undefined;
     }
     case "manual_flag_present": {
       const expected = asString(condition.value);
@@ -72,6 +176,22 @@ const resolveMetricValue = (eye: Eye, snapshot: MockSnapshot, condition: RecipeC
     default:
       return undefined;
   }
+};
+
+const resolveMetricValue = (eye: Eye, snapshot: MockSnapshot, condition: RecipeCondition) =>
+  resolveFormulaValue(eye, snapshot, condition, condition.metricKey) ??
+  resolveFormulaValue(eye, snapshot, condition, condition.formulaKey);
+const resolveMetricValueFromDefinition = (
+  eye: Eye,
+  snapshot: MockSnapshot,
+  metricDefinitions: MetricDefinition[],
+  condition: RecipeCondition,
+) => {
+  const metric = metricDefinitions.find((item) => item.key === condition.metricKey);
+  if (metric?.expression && metric.parameterKeys?.length) {
+    return evaluateExpression(metric.expression, metric.parameterKeys, snapshot, eye);
+  }
+  return resolveMetricValue(eye, snapshot, condition);
 };
 
 const compareMetricValue = (
@@ -159,10 +279,11 @@ const describeCondition = (
 const evaluateCondition = (
   eye: Eye,
   snapshot: MockSnapshot,
+  metricDefinitions: MetricDefinition[],
   condition: RecipeCondition,
 ): ConditionEvaluationResult => {
   const role = roleFromCondition(condition);
-  const actualValue = resolveMetricValue(eye, snapshot, condition);
+  const actualValue = resolveMetricValueFromDefinition(eye, snapshot, metricDefinitions, condition);
   const passed = compareMetricValue(actualValue, condition.operator, condition.value);
 
   return {
@@ -241,9 +362,16 @@ const stateFromResults = (
   return { currentState: "Not Relevant", score, riskCount: riskWarnings.length, hardDisqualifiers };
 };
 
-export const evaluateEye = (eye: Eye, recipe: Recipe, snapshot: MockSnapshot): Evaluation => {
+export const evaluateEye = (
+  eye: Eye,
+  recipe: Recipe,
+  snapshot: MockSnapshot,
+  metricDefinitions: MetricDefinition[] = metricCatalog,
+): Evaluation => {
   const previousState = eye.lastEvaluation?.currentState ?? "Not Relevant";
-  const conditionResults = recipe.conditions.map((condition) => evaluateCondition(eye, snapshot, condition));
+  const conditionResults = recipe.conditions.map((condition) =>
+    evaluateCondition(eye, snapshot, metricDefinitions, condition),
+  );
   const stateSummary = stateFromResults(conditionResults, recipe);
 
   const supportingEvidence = conditionResults

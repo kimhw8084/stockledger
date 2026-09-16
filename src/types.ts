@@ -86,17 +86,22 @@ export interface MetricDefinition {
   humanMeaning: string;
   formulaKey: string;
   requiredData: string[];
+  expression?: string;
+  parameterKeys?: string[];
   freshnessExpectation: FreshnessStatus | "Near Real Time" | "Daily" | "Review Cadence";
   availability: MetricAvailability;
   exampleConditions: string[];
   exampleDisplayText: string;
   missingDataBehavior: string;
+  origin?: "starter" | "custom";
+  createdAt?: string;
 }
 
 export interface FormulaDefinition {
   key: string;
   name: string;
   description: string;
+  equation?: string;
   requiredData: string[];
   outputType: "number" | "boolean" | "string";
 }
@@ -127,6 +132,7 @@ export interface RecipeOutcomeConfig {
 
 export interface Recipe {
   id: string;
+  lineageId?: string;
   version: number;
   name: string;
   purpose: string;
@@ -136,9 +142,47 @@ export interface Recipe {
   notes: string;
   conditions: RecipeCondition[];
   createdAt: string;
+  retiredAt?: string;
   stateConfig?: RecipeStateConfig;
   alertConfig?: RecipeAlertConfig;
   reviewConfig?: RecipeReviewConfig;
+  outcomeConfig?: RecipeOutcomeConfig;
+}
+
+export interface LogicRule {
+  id: string;
+  lineageId?: string;
+  setId: string;
+  setVersion: number;
+  label: string;
+  kind: "required" | "supporting" | "negative" | "disqualifier";
+  role?: ConditionRole;
+  metricKey?: string;
+  formulaKey?: string;
+  operator?: ConditionOperator;
+  value?: string | number | boolean | [number, number];
+  unit?: string;
+  humanDescription?: string;
+  notes?: string;
+  availability?: MetricAvailability;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface LogicSet {
+  id: string;
+  lineageId?: string;
+  version: number;
+  name: string;
+  purpose: string;
+  opportunityType?: string;
+  timeHorizon: string;
+  intendedUseCase: string;
+  notes: string;
+  createdAt: string;
+  retiredAt?: string;
+  reviewConfig?: RecipeReviewConfig;
+  alertConfig?: RecipeAlertConfig;
   outcomeConfig?: RecipeOutcomeConfig;
 }
 
@@ -150,8 +194,8 @@ export interface MockSnapshot {
   stabilizationScore: number;
   movingAverage20DistancePct?: number;
   valuationDiscount?: boolean;
-  analystRevisionTrend?: "improving" | "flat" | "weak";
   earningsSoon?: boolean;
+  daysUntilEarnings?: number;
   riskFlags: string[];
   movingAverage50DistancePct?: number;
   movingAverage200DistancePct?: number;
@@ -238,7 +282,6 @@ export interface VisualEvidenceCard {
     | "Earnings & Events"
     | "News & Thesis Risk"
     | "Sector & Market Context"
-    | "Macro Context"
     | "User Thesis Match"
     | "Recipe Condition Map"
     | "Data Quality"
@@ -362,14 +405,218 @@ export interface Outcome {
   createdAt: string;
 }
 
+export type UniverseMode = "dynamic_current_universe" | "frozen_research_universe";
+
+export type UniverseSourceStatus =
+  | "dynamic_current_universe"
+  | "frozen_import_fallback"
+  | "current_universe_unavailable";
+
+export type SignalStatus =
+  | "MATCHED"
+  | "NEAR_MATCH"
+  | "FAILED"
+  | "BLOCKED_OR_INCOMPLETE_DATA";
+
+export type RawDataValidationStatus = "valid" | "invalid" | "partial";
+
+export interface RawBarRecord {
+  symbol: string;
+  date: string;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
+}
+
+export interface RawBarArchiveBatch {
+  id: string;
+  provider: string;
+  downloadedAtUtc: string;
+  symbols: string[];
+  startDate: string;
+  endDate: string;
+  rowCount: number;
+  adjustedStatus?: "adjusted" | "unadjusted" | "unknown";
+  validationStatus: RawDataValidationStatus;
+  archiveVersion: number;
+  schemaVersion: string;
+  bars: RawBarRecord[];
+  supersededByBatchId?: string;
+}
+
+export interface UniverseSectorSnapshot {
+  sector: string;
+  tickers: string[];
+}
+
+export interface UniverseSnapshot {
+  id: string;
+  universeMode: UniverseMode;
+  universeSource: string;
+  universeSourceStatus: UniverseSourceStatus;
+  snapshotDate: string;
+  snapshotHash: string;
+  fetchedAtUtc: string;
+  sectorSnapshots: UniverseSectorSnapshot[];
+  addedTickers?: string[];
+  removedTickers?: string[];
+  warning?: string;
+}
+
+export interface ProcessedFeatureRecord {
+  id: string;
+  symbol: string;
+  asOfDate: string;
+  sector: string;
+  sectorEtf: string;
+  featureSemanticsVersion: string;
+  computedAtUtc: string;
+  featureValues: Record<string, number | boolean | string | null>;
+  featureMeta: Record<
+    string,
+    {
+      formula: string;
+      rawInputs: string[];
+      lookbackDays: number;
+      warmupDays: number;
+      pointInTimeSafe: boolean;
+      computedAfterCloseOnly: boolean;
+      featureVersion: string;
+    }
+  >;
+}
+
+export interface ScanRun {
+  id: string;
+  scanDate: string;
+  latestExpectedTradingDate: string;
+  startedAtUtc: string;
+  completedAtUtc?: string;
+  universeMode: UniverseMode;
+  universeSource: string;
+  universeSnapshotDate?: string;
+  universeSnapshotHash?: string;
+  providerName: string;
+  sourceStatus: UniverseSourceStatus;
+  status: "completed" | "blocked" | "partial";
+  warnings: string[];
+  blockedReason?: string;
+}
+
+export interface FrozenRuleProofSummary {
+  discoveryMedian30: number;
+  holdoutMedian30: number;
+  lockboxMedian30: number;
+  latestEraStatus: "pass" | "fail" | "unknown";
+}
+
+export interface ScanSignal {
+  signalId: string;
+  scanRunId: string;
+  scanDate: string;
+  signalDate: string;
+  ticker: string;
+  sector: string;
+  ruleId: string;
+  ruleSignatureHash: string;
+  family: string;
+  classificationAtSignal: string;
+  appPriority: string;
+  status: SignalStatus;
+  matchedConditionsJson: string[];
+  failedConditionsJson: string[];
+  missingConditionsJson: string[];
+  featureValuesJson: Record<string, number | boolean | string | null>;
+  closePriceAtSignal?: number;
+  spyClose?: number;
+  sectorEtf: string;
+  sectorEtfClose?: number;
+  proofSummarySnapshot: FrozenRuleProofSummary;
+  riskWarningsSnapshot: string[];
+  survivorshipBiasLabel: string;
+  forwardProofRequired: boolean;
+  universeMode: UniverseMode;
+  universeSource: string;
+  universeSnapshotDate?: string;
+  universeSnapshotHash?: string;
+  sectorMemberCount: number;
+  createdAtUtc: string;
+}
+
+export interface ReviewLog {
+  id: string;
+  signalId: string;
+  reviewedAt: string;
+  userDecision: "watch" | "ignore" | "bought" | "skipped" | "sold" | "other";
+  manualReason: string;
+  convictionScoreOptional?: number;
+  notes?: string;
+  entryPriceOptional?: number;
+  exitPriceOptional?: number;
+  resultNotes?: string;
+}
+
+export interface ForwardProofLedger {
+  id: string;
+  signalId: string;
+  ret5?: number;
+  ret10?: number;
+  ret20?: number;
+  ret30?: number;
+  spyRet5?: number;
+  spyRet10?: number;
+  spyRet20?: number;
+  spyRet30?: number;
+  sectorRet5?: number;
+  sectorRet10?: number;
+  sectorRet20?: number;
+  sectorRet30?: number;
+  beatSpy5?: boolean;
+  beatSpy10?: boolean;
+  beatSpy20?: boolean;
+  beatSpy30?: boolean;
+  beatSector5?: boolean;
+  beatSector10?: boolean;
+  beatSector20?: boolean;
+  beatSector30?: boolean;
+  mfe30?: number;
+  mae30?: number;
+  completed5d: boolean;
+  completed10d: boolean;
+  completed20d: boolean;
+  completed30d: boolean;
+  lastUpdatedAtUtc: string;
+}
+
+export interface ScannerSettings {
+  universeMode: UniverseMode;
+  fallbackToFrozenUniverse: boolean;
+  providerDelayMinutesAfterClose: number;
+  notifyNearMatches: boolean;
+  frozenUniverseBySector?: Record<string, string[]>;
+}
+
 export interface AppData {
   stocks: Stock[];
   recipes: Recipe[];
+  customMetrics: MetricDefinition[];
+  logicRules: LogicRule[];
+  logicSets: LogicSet[];
   eyes: Eye[];
   alerts: Alert[];
   decisions: Decision[];
   outcomes: Outcome[];
   snapshots: MockSnapshot[];
+  rawBarArchives: RawBarArchiveBatch[];
+  universeSnapshots: UniverseSnapshot[];
+  processedFeatures: ProcessedFeatureRecord[];
+  scanRuns: ScanRun[];
+  scanSignals: ScanSignal[];
+  reviewLogs: ReviewLog[];
+  forwardProofLedger: ForwardProofLedger[];
+  scannerSettings: ScannerSettings;
 }
 
 export interface ProviderHealthEntry {

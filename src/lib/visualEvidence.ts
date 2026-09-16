@@ -327,7 +327,7 @@ const groupDefinitions: Array<{
     key: "risk",
     title: "Risks and Blocks",
     note: "What downgrades or blocks the setup right now.",
-    families: ["Debt / Balance Sheet Risk", "Earnings & Events", "News & Thesis Risk", "Macro Context"],
+    families: ["Debt / Balance Sheet Risk", "Earnings & Events", "News & Thesis Risk"],
   },
   {
     key: "quality",
@@ -1184,8 +1184,8 @@ export const buildStockVisualAnalysisGroups = ({
         comparisonLabel: "Recent operating trend",
       },
       formulaName: "Business quality checklist",
-      formulaDescription: "Combines revenue direction, margin direction, and analyst revision trend into a compact health check.",
-      formulaInputs: ["revenueGrowthYoY", "marginChangePct", "analystRevisionTrend"],
+      formulaDescription: "Combines revenue direction and margin direction into a compact operating quality check.",
+      formulaInputs: ["revenueGrowthYoY", "marginChangePct"],
       visual: {
         kind: "checklist",
         items: [
@@ -1196,15 +1196,6 @@ export const buildStockVisualAnalysisGroups = ({
           {
             label: `Margin change ${(snapshot.marginChangePct ?? 0).toFixed(1)} pts`,
             tone: (snapshot.marginChangePct ?? 0) > -3 ? "good" : (snapshot.marginChangePct ?? 0) > -6 ? "warning" : "danger",
-          },
-          {
-            label: `Analyst trend ${snapshot.analystRevisionTrend}`,
-            tone:
-              snapshot.analystRevisionTrend === "improving"
-                ? "good"
-                : snapshot.analystRevisionTrend === "flat"
-                  ? "neutral"
-                  : "warning",
           },
         ],
       },

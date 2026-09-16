@@ -18,7 +18,7 @@ const parseAlphaVantageHealth = async (): Promise<ProviderHealthEntry> => {
       configured: false,
       status: "Unconfigured",
       mode: "On Demand",
-      note: "Missing API key.",
+      note: "API 키가 없습니다.",
       endpoint: "SYMBOL_SEARCH",
       lastCheckedAt: nowIso(),
     };
@@ -43,8 +43,8 @@ const parseAlphaVantageHealth = async (): Promise<ProviderHealthEntry> => {
       mode: "On Demand",
       note:
         status === "Healthy"
-          ? "Free key works. Use sparingly because the free tier is low-volume."
-          : payload.Note || payload.Information || "Unexpected Alpha Vantage response.",
+          ? "무료 키는 동작하지만 한도가 낮으므로 아껴서 사용해야 합니다."
+          : payload.Note || payload.Information || "예상하지 못한 Alpha Vantage 응답입니다.",
       endpoint: "SYMBOL_SEARCH",
       lastCheckedAt: nowIso(),
     };
@@ -54,7 +54,7 @@ const parseAlphaVantageHealth = async (): Promise<ProviderHealthEntry> => {
       configured: true,
       status: "Error",
       mode: "On Demand",
-      note: error instanceof Error ? error.message : "Unknown Alpha Vantage error.",
+      note: error instanceof Error ? error.message : "알 수 없는 Alpha Vantage 오류입니다.",
       endpoint: "SYMBOL_SEARCH",
       lastCheckedAt: nowIso(),
     };
@@ -68,7 +68,7 @@ const parseTwelveDataHealth = async (): Promise<ProviderHealthEntry> => {
       configured: false,
       status: "Unconfigured",
       mode: "On Demand",
-      note: "Missing API key.",
+      note: "API 키가 없습니다.",
       endpoint: "/time_series",
       lastCheckedAt: nowIso(),
     };
@@ -92,8 +92,8 @@ const parseTwelveDataHealth = async (): Promise<ProviderHealthEntry> => {
       mode: "On Demand",
       note:
         status === "Healthy"
-          ? "Market-data endpoint works. Higher-cost fundamental endpoints are not auto-polled on the free tier."
-          : payload.message || "Unexpected Twelve Data response.",
+          ? "시세 엔드포인트는 정상입니다. 무료 구간에서는 비용이 큰 재무 엔드포인트를 자동 조회하지 않습니다."
+          : payload.message || "예상하지 못한 Twelve Data 응답입니다.",
       endpoint: "/time_series",
       lastCheckedAt: nowIso(),
     };
@@ -103,7 +103,7 @@ const parseTwelveDataHealth = async (): Promise<ProviderHealthEntry> => {
       configured: true,
       status: "Error",
       mode: "On Demand",
-      note: error instanceof Error ? error.message : "Unknown Twelve Data error.",
+      note: error instanceof Error ? error.message : "알 수 없는 Twelve Data 오류입니다.",
       endpoint: "/time_series",
       lastCheckedAt: nowIso(),
     };
@@ -117,7 +117,7 @@ const parseMarketauxHealth = async (): Promise<ProviderHealthEntry> => {
       configured: false,
       status: "Unconfigured",
       mode: "On Demand",
-      note: "Missing API token.",
+      note: "API 토큰이 없습니다.",
       endpoint: "/v1/news/all",
       lastCheckedAt: nowIso(),
     };
@@ -137,8 +137,8 @@ const parseMarketauxHealth = async (): Promise<ProviderHealthEntry> => {
       mode: "On Demand",
       note:
         status === "Healthy"
-          ? "News endpoint works. The free tier should be used only for stock detail or alert review, not background polling."
-          : payload.error?.message || "Unexpected Marketaux response.",
+          ? "뉴스 엔드포인트는 정상입니다. 무료 구간에서는 백그라운드 폴링 대신 종목 상세나 알림 검토 때만 써야 합니다."
+          : payload.error?.message || "예상하지 못한 Marketaux 응답입니다.",
       endpoint: "/v1/news/all",
       lastCheckedAt: nowIso(),
     };
@@ -148,7 +148,7 @@ const parseMarketauxHealth = async (): Promise<ProviderHealthEntry> => {
       configured: true,
       status: "Error",
       mode: "On Demand",
-      note: error instanceof Error ? error.message : "Unknown Marketaux error.",
+      note: error instanceof Error ? error.message : "알 수 없는 Marketaux 오류입니다.",
       endpoint: "/v1/news/all",
       lastCheckedAt: nowIso(),
     };
@@ -161,7 +161,7 @@ export const getProviderHealth = async (): Promise<ProviderHealthEntry[]> => {
     configured: true,
     status: "Healthy",
     mode: "Disabled",
-    note: "Configured and available, but currently parked while the app stays dummy-backed.",
+    note: "연결은 가능하지만 앱이 더미 데이터 모드인 동안은 대기 상태로 둡니다.",
     endpoint: "q/d/l",
     lastCheckedAt: nowIso(),
   };

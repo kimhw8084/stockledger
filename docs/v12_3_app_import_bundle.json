@@ -1,0 +1,1712 @@
+{
+  "export_name": "V12.3 App Import Bundle",
+  "source_version": "V12.3 frozen",
+  "generated_at_utc": "2026-05-22T01:10:06.480198+00:00",
+  "research_status": "frozen_app_export",
+  "universe_policy": {
+    "scanner_universe": "current S&P 500 constituents filtered by each rule's sector scope",
+    "constituent_source": "data/sp500_current_constituents.csv",
+    "current_constituents_survivorship_biased": true,
+    "point_in_time_membership_available": false
+  },
+  "daily_scan_policy": {
+    "frequency": "daily",
+    "evaluation_time": "after market close using completed daily bar",
+    "pending_live_intraday_signals_allowed": false,
+    "entry_semantics_note": "This export is for research-condition scanning only. It does not prescribe execution."
+  },
+  "feature_engine_requirements": {
+    "global_required_columns": [
+      "Date",
+      "Open",
+      "High",
+      "Low",
+      "Close",
+      "Volume",
+      "MA10",
+      "MA20",
+      "MA50",
+      "EXRET_20_SPY",
+      "EXRET_20_SECTOR",
+      "RS_IMPROVE_5",
+      "VOL_SPIKE_20",
+      "SECTOR_ABOVE_MA50"
+    ],
+    "column_semantics": {
+      "DD_126": "Drawdown from rolling 126D high as a raw decimal.",
+      "MA10": "10-day moving average of Close.",
+      "MA20": "20-day moving average of Close.",
+      "MA50": "50-day moving average of Close.",
+      "EXRET_20_SPY": "20D stock return minus 20D SPY return.",
+      "EXRET_20_SECTOR": "20D stock return minus 20D sector ETF return.",
+      "RS_IMPROVE_5": "5D change in relative-strength series used by the research engine.",
+      "VOL_SPIKE_20": "Current volume divided by 20D average volume or equivalent engine-consistent spike metric.",
+      "SECTOR_ABOVE_MA50": "Boolean: sector ETF close > sector ETF MA50 on the same completed bar."
+    }
+  },
+  "rules": [
+    {
+      "rule_id": "DeepDiscount_dd_tn03-wind126_NO_VOL_REJECT-RS_IMP-RS_SPY_POS_SectorXLI_V1",
+      "rule_signature_hash": "0e5c9be1b206b470f6de95d9991a60273cbbea160301f49373f245fe0d92fea3",
+      "family": "DeepDiscount",
+      "classification": "Production Candidate, Needs Forward Proof",
+      "scope_label": "SectorXLI",
+      "sector": "XLI",
+      "active_conditions": [
+        "DEEP_DISCOUNT",
+        "MA20",
+        "NO_VOL_REJECT",
+        "RS_IMP",
+        "RS_SPY_POS"
+      ],
+      "blockers": [
+        "NO_VOL_REJECT",
+        "RS_IMP",
+        "RS_SPY_POS"
+      ],
+      "parameters": {
+        "dd_thresh": -0.3,
+        "window": 126
+      },
+      "required_raw_data_layers": [
+        "db/raw/prices",
+        "db/raw/benchmarks",
+        "db/raw/macro",
+        "data/sp500_current_constituents.csv"
+      ],
+      "survivorship_bias_label": "current_constituents_survivorship_biased",
+      "risk_warnings": [
+        "point_in_time_membership_unavailable",
+        "forward_proof_required"
+      ],
+      "forward_proof_required": true,
+      "proof_summary": {
+        "discovery_median30": 0.0759792761089479,
+        "holdout_median30": 0.0343483342605148,
+        "lockbox_median30": 0.05452493726082826,
+        "latest_era_status": "pass",
+        "current_constituents_survivorship_biased": true
+      },
+      "baseline_summary": [
+        {
+          "baseline_name": "SPY same-window baseline",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "Sector ETF same-window baseline",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "Random same-ticker entries",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "Random same-frequency entries",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "10% drawdown-only baseline",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "20% drawdown-only baseline",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "MA20 reclaim-only baseline",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "RS_SPY_POS-only baseline",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "Best previous same-family rule",
+          "passed": false,
+          "unavailable": true,
+          "failure_reason": "",
+          "unavailable_reason": "invalid_comparator_tiny_sample"
+        },
+        {
+          "baseline_name": "Best previous same-sector rule",
+          "passed": false,
+          "unavailable": false,
+          "failure_reason": "candidate_value=0.0759792761089479 baseline_value=0.1348278638783481",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "Simplest interpretable subset of candidate rule",
+          "passed": false,
+          "unavailable": true,
+          "failure_reason": "",
+          "unavailable_reason": "baseline_value_missing"
+        },
+        {
+          "baseline_name": "Nearest V11 champion overlap comparison",
+          "passed": false,
+          "unavailable": true,
+          "failure_reason": "",
+          "unavailable_reason": "baseline_value_missing"
+        },
+        {
+          "baseline_name": "Simplest interpretable subset",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "Nearest V11 champion overlap",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        }
+      ],
+      "scan_universe": {
+        "universe_type": "current_sp500_sector_members",
+        "constituent_source": "data/sp500_current_constituents.csv",
+        "sector_ticker_count": 79,
+        "tickers": [
+          "ADP",
+          "ALLE",
+          "AME",
+          "AOS",
+          "AXON",
+          "BA",
+          "BLDR",
+          "BR",
+          "CARR",
+          "CAT",
+          "CHRW",
+          "CMI",
+          "CPRT",
+          "CSX",
+          "CTAS",
+          "DAL",
+          "DE",
+          "DOV",
+          "EFX",
+          "EME",
+          "EMR",
+          "ETN",
+          "EXPD",
+          "FAST",
+          "FDX",
+          "FIX",
+          "FTV",
+          "GD",
+          "GE",
+          "GEV",
+          "GNRC",
+          "GWW",
+          "HII",
+          "HON",
+          "HUBB",
+          "HWM",
+          "IEX",
+          "IR",
+          "ITW",
+          "J",
+          "JBHT",
+          "JCI",
+          "LDOS",
+          "LHX",
+          "LII",
+          "LMT",
+          "LUV",
+          "MAS",
+          "MMM",
+          "NDSN",
+          "NOC",
+          "NSC",
+          "ODFL",
+          "OTIS",
+          "PAYX",
+          "PCAR",
+          "PH",
+          "PNR",
+          "PWR",
+          "ROK",
+          "ROL",
+          "RSG",
+          "RTX",
+          "SNA",
+          "SWK",
+          "TDG",
+          "TT",
+          "TXT",
+          "UAL",
+          "UBER",
+          "UNP",
+          "UPS",
+          "URI",
+          "VLTO",
+          "VRSK",
+          "VRT",
+          "WAB",
+          "WM",
+          "XYL"
+        ]
+      },
+      "app_logic": {
+        "signal_definition": "Signal is true on a completed daily bar only when every active condition and blocker formula evaluates true on that bar.",
+        "active_condition_logic": [
+          {
+            "token": "DEEP_DISCOUNT",
+            "description": "Stock is at a deep drawdown versus its rolling high window.",
+            "formula": "DD_126 <= -0.3"
+          },
+          {
+            "token": "MA20",
+            "description": "Close is above MA20.",
+            "formula": "Close > MA20"
+          },
+          {
+            "token": "NO_VOL_REJECT",
+            "description": "Recent volume spike rejection is not extreme.",
+            "formula": "VOL_SPIKE_20 <= 2.5"
+          },
+          {
+            "token": "RS_IMP",
+            "description": "Relative strength improvement over 5D is positive.",
+            "formula": "RS_IMPROVE_5 > 0.0"
+          },
+          {
+            "token": "RS_SPY_POS",
+            "description": "20D excess return versus SPY is positive.",
+            "formula": "EXRET_20_SPY > 0"
+          }
+        ],
+        "required_feature_columns": [
+          "Close",
+          "DD_126",
+          "Date",
+          "EXRET_20_SECTOR",
+          "EXRET_20_SPY",
+          "High",
+          "Low",
+          "MA10",
+          "MA20",
+          "MA50",
+          "Open",
+          "RS_IMPROVE_5",
+          "SECTOR_ABOVE_MA50",
+          "VOL_SPIKE_20",
+          "Volume"
+        ],
+        "bar_timing": {
+          "evaluation_point": "after_daily_close",
+          "uses_completed_bar_only": true,
+          "intraday_not_supported": true
+        }
+      }
+    },
+    {
+      "rule_id": "FailedBreakdown_recl3-wind45_NO_VOL_REJECT-RS_SEC_POS-RS_SPY_POS_SectorXLK_V1",
+      "rule_signature_hash": "d16097902148cc652f545473bd007eef925dc8213efbb4ef15f117b19799dc12",
+      "family": "FailedBreakdown",
+      "classification": "Production Candidate, Needs Forward Proof",
+      "scope_label": "SectorXLK",
+      "sector": "XLK",
+      "active_conditions": [
+        "FAILED_BREAK",
+        "RECLAIM_LOW",
+        "MA10",
+        "NO_VOL_REJECT",
+        "RS_SEC_POS",
+        "RS_SPY_POS"
+      ],
+      "blockers": [
+        "NO_VOL_REJECT",
+        "RS_SEC_POS",
+        "RS_SPY_POS"
+      ],
+      "parameters": {
+        "reclaim_days": 3,
+        "window": 45
+      },
+      "required_raw_data_layers": [
+        "db/raw/prices",
+        "db/raw/benchmarks",
+        "db/raw/macro",
+        "data/sp500_current_constituents.csv"
+      ],
+      "survivorship_bias_label": "current_constituents_survivorship_biased",
+      "risk_warnings": [
+        "point_in_time_membership_unavailable",
+        "forward_proof_required"
+      ],
+      "forward_proof_required": true,
+      "proof_summary": {
+        "discovery_median30": 0.06229804374358655,
+        "holdout_median30": 0.0089645743979691,
+        "lockbox_median30": 0.0681637910633976,
+        "latest_era_status": "pass",
+        "current_constituents_survivorship_biased": true
+      },
+      "baseline_summary": [
+        {
+          "baseline_name": "SPY same-window baseline",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "Sector ETF same-window baseline",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "Random same-ticker entries",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "Random same-frequency entries",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "10% drawdown-only baseline",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "20% drawdown-only baseline",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "MA20 reclaim-only baseline",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "RS_SPY_POS-only baseline",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "Best previous same-family rule",
+          "passed": false,
+          "unavailable": true,
+          "failure_reason": "",
+          "unavailable_reason": "invalid_comparator_tiny_sample"
+        },
+        {
+          "baseline_name": "Best previous same-sector rule",
+          "passed": false,
+          "unavailable": true,
+          "failure_reason": "",
+          "unavailable_reason": "invalid_comparator_tiny_sample"
+        },
+        {
+          "baseline_name": "Simplest interpretable subset of candidate rule",
+          "passed": false,
+          "unavailable": true,
+          "failure_reason": "",
+          "unavailable_reason": "baseline_value_missing"
+        },
+        {
+          "baseline_name": "Nearest V11 champion overlap comparison",
+          "passed": false,
+          "unavailable": true,
+          "failure_reason": "",
+          "unavailable_reason": "baseline_value_missing"
+        },
+        {
+          "baseline_name": "Simplest interpretable subset",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "Nearest V11 champion overlap",
+          "passed": false,
+          "unavailable": false,
+          "failure_reason": "candidate_value=0.06229804374358655 baseline_value=0.0645388416941656",
+          "unavailable_reason": ""
+        }
+      ],
+      "scan_universe": {
+        "universe_type": "current_sp500_sector_members",
+        "constituent_source": "data/sp500_current_constituents.csv",
+        "sector_ticker_count": 73,
+        "tickers": [
+          "AAPL",
+          "ACN",
+          "ADBE",
+          "ADI",
+          "ADSK",
+          "AKAM",
+          "AMAT",
+          "AMD",
+          "ANET",
+          "APH",
+          "APP",
+          "AVGO",
+          "CDNS",
+          "CDW",
+          "CIEN",
+          "COHR",
+          "CRM",
+          "CRWD",
+          "CSCO",
+          "CTSH",
+          "DDOG",
+          "DELL",
+          "EPAM",
+          "FFIV",
+          "FICO",
+          "FSLR",
+          "FTNT",
+          "GDDY",
+          "GEN",
+          "GLW",
+          "HPE",
+          "HPQ",
+          "IBM",
+          "INTC",
+          "INTU",
+          "IT",
+          "JBL",
+          "KEYS",
+          "KLAC",
+          "LITE",
+          "LRCX",
+          "MCHP",
+          "MPWR",
+          "MSFT",
+          "MSI",
+          "MU",
+          "NOW",
+          "NTAP",
+          "NVDA",
+          "NXPI",
+          "ON",
+          "ORCL",
+          "PANW",
+          "PLTR",
+          "PTC",
+          "Q",
+          "QCOM",
+          "ROP",
+          "SMCI",
+          "SNDK",
+          "SNPS",
+          "STX",
+          "SWKS",
+          "TDY",
+          "TEL",
+          "TER",
+          "TRMB",
+          "TXN",
+          "TYL",
+          "VRSN",
+          "WDAY",
+          "WDC",
+          "ZBRA"
+        ]
+      },
+      "app_logic": {
+        "signal_definition": "Signal is true on a completed daily bar only when every active condition and blocker formula evaluates true on that bar.",
+        "active_condition_logic": [
+          {
+            "token": "FAILED_BREAK",
+            "description": "A recent low-break occurred within the reclaim window.",
+            "formula": "rolling_max(Low < rolling_min(Low.shift(1), 45), 3) == true"
+          },
+          {
+            "token": "RECLAIM_LOW",
+            "description": "Close reclaimed the prior rolling low reference level.",
+            "formula": "Close > rolling_min(Low.shift(1), 45)"
+          },
+          {
+            "token": "MA10",
+            "description": "Close is above MA10.",
+            "formula": "Close > MA10"
+          },
+          {
+            "token": "NO_VOL_REJECT",
+            "description": "Recent volume spike rejection is not extreme.",
+            "formula": "VOL_SPIKE_20 <= 2.5"
+          },
+          {
+            "token": "RS_SEC_POS",
+            "description": "20D excess return versus sector ETF is positive.",
+            "formula": "EXRET_20_SECTOR > 0"
+          },
+          {
+            "token": "RS_SPY_POS",
+            "description": "20D excess return versus SPY is positive.",
+            "formula": "EXRET_20_SPY > 0"
+          }
+        ],
+        "required_feature_columns": [
+          "Close",
+          "Date",
+          "EXRET_20_SECTOR",
+          "EXRET_20_SPY",
+          "High",
+          "Low",
+          "MA10",
+          "MA20",
+          "MA50",
+          "Open",
+          "RS_IMPROVE_5",
+          "SECTOR_ABOVE_MA50",
+          "VOL_SPIKE_20",
+          "Volume"
+        ],
+        "bar_timing": {
+          "evaluation_point": "after_daily_close",
+          "uses_completed_bar_only": true,
+          "intraday_not_supported": true
+        }
+      }
+    },
+    {
+      "rule_id": "FailedBreakdown_recl3-wind63_MA20_RECLAIM-NO_VOL_REJECT-RS_SPY_POS_SectorXLK_V1",
+      "rule_signature_hash": "f7450d1cab899b10721468b168f76217aa0af3ed3ae0cdf7e556165c802d8528",
+      "family": "FailedBreakdown",
+      "classification": "Production Candidate, Needs Forward Proof",
+      "scope_label": "SectorXLK",
+      "sector": "XLK",
+      "active_conditions": [
+        "FAILED_BREAK",
+        "RECLAIM_LOW",
+        "MA10",
+        "MA20_RECLAIM",
+        "NO_VOL_REJECT",
+        "RS_SPY_POS"
+      ],
+      "blockers": [
+        "MA20_RECLAIM",
+        "NO_VOL_REJECT",
+        "RS_SPY_POS"
+      ],
+      "parameters": {
+        "reclaim_days": 3,
+        "window": 63
+      },
+      "required_raw_data_layers": [
+        "db/raw/prices",
+        "db/raw/benchmarks",
+        "db/raw/macro",
+        "data/sp500_current_constituents.csv"
+      ],
+      "survivorship_bias_label": "current_constituents_survivorship_biased",
+      "risk_warnings": [
+        "point_in_time_membership_unavailable",
+        "forward_proof_required"
+      ],
+      "forward_proof_required": true,
+      "proof_summary": {
+        "discovery_median30": 0.0566547149552335,
+        "holdout_median30": 0.0027457732990239995,
+        "lockbox_median30": 0.0684355336513994,
+        "latest_era_status": "pass",
+        "current_constituents_survivorship_biased": true
+      },
+      "baseline_summary": [
+        {
+          "baseline_name": "SPY same-window baseline",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "Sector ETF same-window baseline",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "Random same-ticker entries",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "Random same-frequency entries",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "10% drawdown-only baseline",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "20% drawdown-only baseline",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "MA20 reclaim-only baseline",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "RS_SPY_POS-only baseline",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "Best previous same-family rule",
+          "passed": false,
+          "unavailable": true,
+          "failure_reason": "",
+          "unavailable_reason": "invalid_comparator_tiny_sample"
+        },
+        {
+          "baseline_name": "Best previous same-sector rule",
+          "passed": false,
+          "unavailable": true,
+          "failure_reason": "",
+          "unavailable_reason": "invalid_comparator_tiny_sample"
+        },
+        {
+          "baseline_name": "Simplest interpretable subset of candidate rule",
+          "passed": false,
+          "unavailable": true,
+          "failure_reason": "",
+          "unavailable_reason": "baseline_value_missing"
+        },
+        {
+          "baseline_name": "Nearest V11 champion overlap comparison",
+          "passed": false,
+          "unavailable": true,
+          "failure_reason": "",
+          "unavailable_reason": "baseline_value_missing"
+        },
+        {
+          "baseline_name": "Simplest interpretable subset",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "Nearest V11 champion overlap",
+          "passed": false,
+          "unavailable": false,
+          "failure_reason": "candidate_value=0.0566547149552335 baseline_value=0.0645388416941656",
+          "unavailable_reason": ""
+        }
+      ],
+      "scan_universe": {
+        "universe_type": "current_sp500_sector_members",
+        "constituent_source": "data/sp500_current_constituents.csv",
+        "sector_ticker_count": 73,
+        "tickers": [
+          "AAPL",
+          "ACN",
+          "ADBE",
+          "ADI",
+          "ADSK",
+          "AKAM",
+          "AMAT",
+          "AMD",
+          "ANET",
+          "APH",
+          "APP",
+          "AVGO",
+          "CDNS",
+          "CDW",
+          "CIEN",
+          "COHR",
+          "CRM",
+          "CRWD",
+          "CSCO",
+          "CTSH",
+          "DDOG",
+          "DELL",
+          "EPAM",
+          "FFIV",
+          "FICO",
+          "FSLR",
+          "FTNT",
+          "GDDY",
+          "GEN",
+          "GLW",
+          "HPE",
+          "HPQ",
+          "IBM",
+          "INTC",
+          "INTU",
+          "IT",
+          "JBL",
+          "KEYS",
+          "KLAC",
+          "LITE",
+          "LRCX",
+          "MCHP",
+          "MPWR",
+          "MSFT",
+          "MSI",
+          "MU",
+          "NOW",
+          "NTAP",
+          "NVDA",
+          "NXPI",
+          "ON",
+          "ORCL",
+          "PANW",
+          "PLTR",
+          "PTC",
+          "Q",
+          "QCOM",
+          "ROP",
+          "SMCI",
+          "SNDK",
+          "SNPS",
+          "STX",
+          "SWKS",
+          "TDY",
+          "TEL",
+          "TER",
+          "TRMB",
+          "TXN",
+          "TYL",
+          "VRSN",
+          "WDAY",
+          "WDC",
+          "ZBRA"
+        ]
+      },
+      "app_logic": {
+        "signal_definition": "Signal is true on a completed daily bar only when every active condition and blocker formula evaluates true on that bar.",
+        "active_condition_logic": [
+          {
+            "token": "FAILED_BREAK",
+            "description": "A recent low-break occurred within the reclaim window.",
+            "formula": "rolling_max(Low < rolling_min(Low.shift(1), 63), 3) == true"
+          },
+          {
+            "token": "RECLAIM_LOW",
+            "description": "Close reclaimed the prior rolling low reference level.",
+            "formula": "Close > rolling_min(Low.shift(1), 63)"
+          },
+          {
+            "token": "MA10",
+            "description": "Close is above MA10.",
+            "formula": "Close > MA10"
+          },
+          {
+            "token": "MA20_RECLAIM",
+            "description": "Close is above MA20 reclaim filter.",
+            "formula": "Close > MA20"
+          },
+          {
+            "token": "NO_VOL_REJECT",
+            "description": "Recent volume spike rejection is not extreme.",
+            "formula": "VOL_SPIKE_20 <= 2.5"
+          },
+          {
+            "token": "RS_SPY_POS",
+            "description": "20D excess return versus SPY is positive.",
+            "formula": "EXRET_20_SPY > 0"
+          }
+        ],
+        "required_feature_columns": [
+          "Close",
+          "Date",
+          "EXRET_20_SECTOR",
+          "EXRET_20_SPY",
+          "High",
+          "Low",
+          "MA10",
+          "MA20",
+          "MA50",
+          "Open",
+          "RS_IMPROVE_5",
+          "SECTOR_ABOVE_MA50",
+          "VOL_SPIKE_20",
+          "Volume"
+        ],
+        "bar_timing": {
+          "evaluation_point": "after_daily_close",
+          "uses_completed_bar_only": true,
+          "intraday_not_supported": true
+        }
+      }
+    },
+    {
+      "rule_id": "FailedBreakdown_recl5-wind90_NO_VOL_REJECT-RS_SPY_POS-SEC_M50_SectorXLI_V1",
+      "rule_signature_hash": "1179b2ea1dda5e4c01fbd6767e913ce8b096ad08fffb0acdd90cf9d2908b607a",
+      "family": "FailedBreakdown",
+      "classification": "Production Candidate, Needs Forward Proof",
+      "scope_label": "SectorXLI",
+      "sector": "XLI",
+      "active_conditions": [
+        "FAILED_BREAK",
+        "RECLAIM_LOW",
+        "MA10",
+        "NO_VOL_REJECT",
+        "RS_SPY_POS",
+        "SEC_M50"
+      ],
+      "blockers": [
+        "NO_VOL_REJECT",
+        "RS_SPY_POS",
+        "SEC_M50"
+      ],
+      "parameters": {
+        "reclaim_days": 5,
+        "window": 90
+      },
+      "required_raw_data_layers": [
+        "db/raw/prices",
+        "db/raw/benchmarks",
+        "db/raw/macro",
+        "data/sp500_current_constituents.csv"
+      ],
+      "survivorship_bias_label": "current_constituents_survivorship_biased",
+      "risk_warnings": [
+        "point_in_time_membership_unavailable",
+        "forward_proof_required"
+      ],
+      "forward_proof_required": true,
+      "proof_summary": {
+        "discovery_median30": 0.0335426034144414,
+        "holdout_median30": 0.0067286922111668,
+        "lockbox_median30": 0.0245722374705046,
+        "latest_era_status": "pass",
+        "current_constituents_survivorship_biased": true
+      },
+      "baseline_summary": [
+        {
+          "baseline_name": "SPY same-window baseline",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "Sector ETF same-window baseline",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "Random same-ticker entries",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "Random same-frequency entries",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "10% drawdown-only baseline",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "20% drawdown-only baseline",
+          "passed": false,
+          "unavailable": false,
+          "failure_reason": "candidate_value=0.0335426034144414 baseline_value=0.0363437538228124",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "MA20 reclaim-only baseline",
+          "passed": false,
+          "unavailable": false,
+          "failure_reason": "candidate_value=0.0335426034144414 baseline_value=0.0366788516674354",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "RS_SPY_POS-only baseline",
+          "passed": false,
+          "unavailable": false,
+          "failure_reason": "candidate_value=0.0335426034144414 baseline_value=0.0347629337652194",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "Best previous same-family rule",
+          "passed": false,
+          "unavailable": true,
+          "failure_reason": "",
+          "unavailable_reason": "invalid_comparator_tiny_sample"
+        },
+        {
+          "baseline_name": "Best previous same-sector rule",
+          "passed": false,
+          "unavailable": false,
+          "failure_reason": "candidate_value=0.0335426034144414 baseline_value=0.1348278638783481",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "Simplest interpretable subset of candidate rule",
+          "passed": false,
+          "unavailable": true,
+          "failure_reason": "",
+          "unavailable_reason": "baseline_value_missing"
+        },
+        {
+          "baseline_name": "Nearest V11 champion overlap comparison",
+          "passed": false,
+          "unavailable": true,
+          "failure_reason": "",
+          "unavailable_reason": "baseline_value_missing"
+        },
+        {
+          "baseline_name": "Simplest interpretable subset",
+          "passed": false,
+          "unavailable": false,
+          "failure_reason": "candidate_value=0.0335426034144414 baseline_value=0.0405268499851741",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "Nearest V11 champion overlap",
+          "passed": false,
+          "unavailable": false,
+          "failure_reason": "candidate_value=0.0335426034144414 baseline_value=0.0714091980818913",
+          "unavailable_reason": ""
+        }
+      ],
+      "scan_universe": {
+        "universe_type": "current_sp500_sector_members",
+        "constituent_source": "data/sp500_current_constituents.csv",
+        "sector_ticker_count": 79,
+        "tickers": [
+          "ADP",
+          "ALLE",
+          "AME",
+          "AOS",
+          "AXON",
+          "BA",
+          "BLDR",
+          "BR",
+          "CARR",
+          "CAT",
+          "CHRW",
+          "CMI",
+          "CPRT",
+          "CSX",
+          "CTAS",
+          "DAL",
+          "DE",
+          "DOV",
+          "EFX",
+          "EME",
+          "EMR",
+          "ETN",
+          "EXPD",
+          "FAST",
+          "FDX",
+          "FIX",
+          "FTV",
+          "GD",
+          "GE",
+          "GEV",
+          "GNRC",
+          "GWW",
+          "HII",
+          "HON",
+          "HUBB",
+          "HWM",
+          "IEX",
+          "IR",
+          "ITW",
+          "J",
+          "JBHT",
+          "JCI",
+          "LDOS",
+          "LHX",
+          "LII",
+          "LMT",
+          "LUV",
+          "MAS",
+          "MMM",
+          "NDSN",
+          "NOC",
+          "NSC",
+          "ODFL",
+          "OTIS",
+          "PAYX",
+          "PCAR",
+          "PH",
+          "PNR",
+          "PWR",
+          "ROK",
+          "ROL",
+          "RSG",
+          "RTX",
+          "SNA",
+          "SWK",
+          "TDG",
+          "TT",
+          "TXT",
+          "UAL",
+          "UBER",
+          "UNP",
+          "UPS",
+          "URI",
+          "VLTO",
+          "VRSK",
+          "VRT",
+          "WAB",
+          "WM",
+          "XYL"
+        ]
+      },
+      "app_logic": {
+        "signal_definition": "Signal is true on a completed daily bar only when every active condition and blocker formula evaluates true on that bar.",
+        "active_condition_logic": [
+          {
+            "token": "FAILED_BREAK",
+            "description": "A recent low-break occurred within the reclaim window.",
+            "formula": "rolling_max(Low < rolling_min(Low.shift(1), 90), 5) == true"
+          },
+          {
+            "token": "RECLAIM_LOW",
+            "description": "Close reclaimed the prior rolling low reference level.",
+            "formula": "Close > rolling_min(Low.shift(1), 90)"
+          },
+          {
+            "token": "MA10",
+            "description": "Close is above MA10.",
+            "formula": "Close > MA10"
+          },
+          {
+            "token": "NO_VOL_REJECT",
+            "description": "Recent volume spike rejection is not extreme.",
+            "formula": "VOL_SPIKE_20 <= 2.5"
+          },
+          {
+            "token": "RS_SPY_POS",
+            "description": "20D excess return versus SPY is positive.",
+            "formula": "EXRET_20_SPY > 0"
+          },
+          {
+            "token": "SEC_M50",
+            "description": "Sector ETF is above its MA50 trend filter.",
+            "formula": "SECTOR_ABOVE_MA50 == true"
+          }
+        ],
+        "required_feature_columns": [
+          "Close",
+          "Date",
+          "EXRET_20_SECTOR",
+          "EXRET_20_SPY",
+          "High",
+          "Low",
+          "MA10",
+          "MA20",
+          "MA50",
+          "Open",
+          "RS_IMPROVE_5",
+          "SECTOR_ABOVE_MA50",
+          "VOL_SPIKE_20",
+          "Volume"
+        ],
+        "bar_timing": {
+          "evaluation_point": "after_daily_close",
+          "uses_completed_bar_only": true,
+          "intraday_not_supported": true
+        }
+      }
+    },
+    {
+      "rule_id": "FailedBreakdown_recl7-wind126_NO_VOL_REJECT-RS_SPY_POS-SEC_M50_SectorXLI_V1",
+      "rule_signature_hash": "4ec535be515f5343396b3541e1993931e82016895ac267e81f953dfb5a6f04ac",
+      "family": "FailedBreakdown",
+      "classification": "Production Candidate, Needs Forward Proof",
+      "scope_label": "SectorXLI",
+      "sector": "XLI",
+      "active_conditions": [
+        "FAILED_BREAK",
+        "RECLAIM_LOW",
+        "MA10",
+        "NO_VOL_REJECT",
+        "RS_SPY_POS",
+        "SEC_M50"
+      ],
+      "blockers": [
+        "NO_VOL_REJECT",
+        "RS_SPY_POS",
+        "SEC_M50"
+      ],
+      "parameters": {
+        "reclaim_days": 7,
+        "window": 126
+      },
+      "required_raw_data_layers": [
+        "db/raw/prices",
+        "db/raw/benchmarks",
+        "db/raw/macro",
+        "data/sp500_current_constituents.csv"
+      ],
+      "survivorship_bias_label": "current_constituents_survivorship_biased",
+      "risk_warnings": [
+        "point_in_time_membership_unavailable",
+        "forward_proof_required"
+      ],
+      "forward_proof_required": true,
+      "proof_summary": {
+        "discovery_median30": 0.05375942234063075,
+        "holdout_median30": 0.01447866248196345,
+        "lockbox_median30": 0.0302097220343513,
+        "latest_era_status": "pass",
+        "current_constituents_survivorship_biased": true
+      },
+      "baseline_summary": [
+        {
+          "baseline_name": "SPY same-window baseline",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "Sector ETF same-window baseline",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "Random same-ticker entries",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "Random same-frequency entries",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "10% drawdown-only baseline",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "20% drawdown-only baseline",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "MA20 reclaim-only baseline",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "RS_SPY_POS-only baseline",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "Best previous same-family rule",
+          "passed": false,
+          "unavailable": true,
+          "failure_reason": "",
+          "unavailable_reason": "invalid_comparator_tiny_sample"
+        },
+        {
+          "baseline_name": "Best previous same-sector rule",
+          "passed": false,
+          "unavailable": false,
+          "failure_reason": "candidate_value=0.05375942234063075 baseline_value=0.1348278638783481",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "Simplest interpretable subset of candidate rule",
+          "passed": false,
+          "unavailable": true,
+          "failure_reason": "",
+          "unavailable_reason": "baseline_value_missing"
+        },
+        {
+          "baseline_name": "Nearest V11 champion overlap comparison",
+          "passed": false,
+          "unavailable": true,
+          "failure_reason": "",
+          "unavailable_reason": "baseline_value_missing"
+        },
+        {
+          "baseline_name": "Simplest interpretable subset",
+          "passed": false,
+          "unavailable": false,
+          "failure_reason": "candidate_value=0.05375942234063075 baseline_value=0.0560024812919751",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "Nearest V11 champion overlap",
+          "passed": false,
+          "unavailable": false,
+          "failure_reason": "candidate_value=0.05375942234063075 baseline_value=0.0714091980818913",
+          "unavailable_reason": ""
+        }
+      ],
+      "scan_universe": {
+        "universe_type": "current_sp500_sector_members",
+        "constituent_source": "data/sp500_current_constituents.csv",
+        "sector_ticker_count": 79,
+        "tickers": [
+          "ADP",
+          "ALLE",
+          "AME",
+          "AOS",
+          "AXON",
+          "BA",
+          "BLDR",
+          "BR",
+          "CARR",
+          "CAT",
+          "CHRW",
+          "CMI",
+          "CPRT",
+          "CSX",
+          "CTAS",
+          "DAL",
+          "DE",
+          "DOV",
+          "EFX",
+          "EME",
+          "EMR",
+          "ETN",
+          "EXPD",
+          "FAST",
+          "FDX",
+          "FIX",
+          "FTV",
+          "GD",
+          "GE",
+          "GEV",
+          "GNRC",
+          "GWW",
+          "HII",
+          "HON",
+          "HUBB",
+          "HWM",
+          "IEX",
+          "IR",
+          "ITW",
+          "J",
+          "JBHT",
+          "JCI",
+          "LDOS",
+          "LHX",
+          "LII",
+          "LMT",
+          "LUV",
+          "MAS",
+          "MMM",
+          "NDSN",
+          "NOC",
+          "NSC",
+          "ODFL",
+          "OTIS",
+          "PAYX",
+          "PCAR",
+          "PH",
+          "PNR",
+          "PWR",
+          "ROK",
+          "ROL",
+          "RSG",
+          "RTX",
+          "SNA",
+          "SWK",
+          "TDG",
+          "TT",
+          "TXT",
+          "UAL",
+          "UBER",
+          "UNP",
+          "UPS",
+          "URI",
+          "VLTO",
+          "VRSK",
+          "VRT",
+          "WAB",
+          "WM",
+          "XYL"
+        ]
+      },
+      "app_logic": {
+        "signal_definition": "Signal is true on a completed daily bar only when every active condition and blocker formula evaluates true on that bar.",
+        "active_condition_logic": [
+          {
+            "token": "FAILED_BREAK",
+            "description": "A recent low-break occurred within the reclaim window.",
+            "formula": "rolling_max(Low < rolling_min(Low.shift(1), 126), 7) == true"
+          },
+          {
+            "token": "RECLAIM_LOW",
+            "description": "Close reclaimed the prior rolling low reference level.",
+            "formula": "Close > rolling_min(Low.shift(1), 126)"
+          },
+          {
+            "token": "MA10",
+            "description": "Close is above MA10.",
+            "formula": "Close > MA10"
+          },
+          {
+            "token": "NO_VOL_REJECT",
+            "description": "Recent volume spike rejection is not extreme.",
+            "formula": "VOL_SPIKE_20 <= 2.5"
+          },
+          {
+            "token": "RS_SPY_POS",
+            "description": "20D excess return versus SPY is positive.",
+            "formula": "EXRET_20_SPY > 0"
+          },
+          {
+            "token": "SEC_M50",
+            "description": "Sector ETF is above its MA50 trend filter.",
+            "formula": "SECTOR_ABOVE_MA50 == true"
+          }
+        ],
+        "required_feature_columns": [
+          "Close",
+          "Date",
+          "EXRET_20_SECTOR",
+          "EXRET_20_SPY",
+          "High",
+          "Low",
+          "MA10",
+          "MA20",
+          "MA50",
+          "Open",
+          "RS_IMPROVE_5",
+          "SECTOR_ABOVE_MA50",
+          "VOL_SPIKE_20",
+          "Volume"
+        ],
+        "bar_timing": {
+          "evaluation_point": "after_daily_close",
+          "uses_completed_bar_only": true,
+          "intraday_not_supported": true
+        }
+      }
+    },
+    {
+      "rule_id": "DeepDiscount_dd_tn03-wind126_NO_VOL_REJECT-RS_IMP-RS_SPY_POS_SectorXLY_V1",
+      "rule_signature_hash": "b940f218276673a48c17578722d72130cc0555ba8895b481c80ef0da4d4b105a",
+      "family": "DeepDiscount",
+      "classification": "Champion Candidate, Current-Constituent Biased",
+      "scope_label": "SectorXLY",
+      "sector": "XLY",
+      "active_conditions": [
+        "DEEP_DISCOUNT",
+        "MA20",
+        "NO_VOL_REJECT",
+        "RS_IMP",
+        "RS_SPY_POS"
+      ],
+      "blockers": [
+        "NO_VOL_REJECT",
+        "RS_IMP",
+        "RS_SPY_POS"
+      ],
+      "parameters": {
+        "dd_thresh": -0.3,
+        "window": 126
+      },
+      "required_raw_data_layers": [
+        "db/raw/prices",
+        "db/raw/benchmarks",
+        "db/raw/macro",
+        "data/sp500_current_constituents.csv"
+      ],
+      "survivorship_bias_label": "current_constituents_survivorship_biased",
+      "risk_warnings": [
+        "point_in_time_membership_unavailable",
+        "forward_proof_required"
+      ],
+      "forward_proof_required": true,
+      "proof_summary": {
+        "discovery_median30": 0.0938884212216308,
+        "holdout_median30": 0.0119749926544994,
+        "lockbox_median30": 0.0759097350564368,
+        "latest_era_status": "pass",
+        "current_constituents_survivorship_biased": true
+      },
+      "baseline_summary": [
+        {
+          "baseline_name": "SPY same-window baseline",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "Sector ETF same-window baseline",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "Random same-ticker entries",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "Random same-frequency entries",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "10% drawdown-only baseline",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "20% drawdown-only baseline",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "MA20 reclaim-only baseline",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "RS_SPY_POS-only baseline",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "Best previous same-family rule",
+          "passed": false,
+          "unavailable": true,
+          "failure_reason": "",
+          "unavailable_reason": "invalid_comparator_tiny_sample"
+        },
+        {
+          "baseline_name": "Best previous same-sector rule",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "Simplest interpretable subset of candidate rule",
+          "passed": false,
+          "unavailable": true,
+          "failure_reason": "",
+          "unavailable_reason": "baseline_value_missing"
+        },
+        {
+          "baseline_name": "Nearest V11 champion overlap comparison",
+          "passed": false,
+          "unavailable": true,
+          "failure_reason": "",
+          "unavailable_reason": "baseline_value_missing"
+        },
+        {
+          "baseline_name": "Simplest interpretable subset",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        },
+        {
+          "baseline_name": "Nearest V11 champion overlap",
+          "passed": true,
+          "unavailable": false,
+          "failure_reason": "",
+          "unavailable_reason": ""
+        }
+      ],
+      "scan_universe": {
+        "universe_type": "current_sp500_sector_members",
+        "constituent_source": "data/sp500_current_constituents.csv",
+        "sector_ticker_count": 48,
+        "tickers": [
+          "ABNB",
+          "AMZN",
+          "APTV",
+          "AZO",
+          "BBY",
+          "BKNG",
+          "CCL",
+          "CMG",
+          "CVNA",
+          "DASH",
+          "DECK",
+          "DHI",
+          "DPZ",
+          "DRI",
+          "EBAY",
+          "EXPE",
+          "F",
+          "GM",
+          "GPC",
+          "GRMN",
+          "HAS",
+          "HD",
+          "HLT",
+          "LEN",
+          "LOW",
+          "LULU",
+          "LVS",
+          "MAR",
+          "MCD",
+          "MGM",
+          "NCLH",
+          "NKE",
+          "NVR",
+          "ORLY",
+          "PHM",
+          "POOL",
+          "RCL",
+          "RL",
+          "ROST",
+          "SBUX",
+          "TJX",
+          "TPR",
+          "TSCO",
+          "TSLA",
+          "ULTA",
+          "WSM",
+          "WYNN",
+          "YUM"
+        ]
+      },
+      "app_logic": {
+        "signal_definition": "Signal is true on a completed daily bar only when every active condition and blocker formula evaluates true on that bar.",
+        "active_condition_logic": [
+          {
+            "token": "DEEP_DISCOUNT",
+            "description": "Stock is at a deep drawdown versus its rolling high window.",
+            "formula": "DD_126 <= -0.3"
+          },
+          {
+            "token": "MA20",
+            "description": "Close is above MA20.",
+            "formula": "Close > MA20"
+          },
+          {
+            "token": "NO_VOL_REJECT",
+            "description": "Recent volume spike rejection is not extreme.",
+            "formula": "VOL_SPIKE_20 <= 2.5"
+          },
+          {
+            "token": "RS_IMP",
+            "description": "Relative strength improvement over 5D is positive.",
+            "formula": "RS_IMPROVE_5 > 0.0"
+          },
+          {
+            "token": "RS_SPY_POS",
+            "description": "20D excess return versus SPY is positive.",
+            "formula": "EXRET_20_SPY > 0"
+          }
+        ],
+        "required_feature_columns": [
+          "Close",
+          "DD_126",
+          "Date",
+          "EXRET_20_SECTOR",
+          "EXRET_20_SPY",
+          "High",
+          "Low",
+          "MA10",
+          "MA20",
+          "MA50",
+          "Open",
+          "RS_IMPROVE_5",
+          "SECTOR_ABOVE_MA50",
+          "VOL_SPIKE_20",
+          "Volume"
+        ],
+        "bar_timing": {
+          "evaluation_point": "after_daily_close",
+          "uses_completed_bar_only": true,
+          "intraday_not_supported": true
+        }
+      }
+    }
+  ]
+}

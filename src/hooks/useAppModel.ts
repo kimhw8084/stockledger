@@ -5,6 +5,8 @@ import { buildMockSnapshot } from "../lib/mockSnapshot";
 import { getProviderHealth } from "../lib/providerHealth";
 import { seedData } from "../lib/seed";
 import { loadAppData, saveAppData } from "../lib/storage";
+import { latestCompletedTradingDate, shouldRunAfterClose } from "../lib/marketCalendar";
+import { createReviewLogEntry, runDailyStockConditionScan } from "../lib/stockConditionScanner";
 import {
   Alert,
   AppData,
@@ -12,12 +14,16 @@ import {
   DecisionAction,
   Eye,
   Evaluation,
+  LogicRule,
+  LogicSet,
+  MetricDefinition,
   Outcome,
   ProviderHealthEntry,
   Recipe,
   RecipeCondition,
   Stock,
 } from "../types";
+import { metricCatalog } from "../lib/metricCatalog";
 
 const createId = (prefix: string) => `${prefix}-${Math.random().toString(36).slice(2, 10)}`;
 
@@ -56,6 +62,7 @@ const buildAlertFromEvaluation = (
 
 const evaluateAllEyes = (data: AppData): AppData => {
   const alerts = [...data.alerts];
+  const allMetrics = [...metricCatalog, ...(data.customMetrics ?? [])];
   const eyes = data.eyes.map((eye) => {
     const recipe = data.recipes.find((item) => item.id === eye.recipeId);
     const snapshot = data.snapshots.find((item) => item.stockId === eye.stockId);
@@ -65,7 +72,7 @@ const evaluateAllEyes = (data: AppData): AppData => {
       return eye;
     }
 
-    const evaluation = evaluateEye(eye, recipe, snapshot);
+    const evaluation = evaluateEye(eye, recipe, snapshot, allMetrics);
     if (evaluation.alertSuggested) {
       const hasDuplicate = alerts.some(
         (alert) =>
@@ -101,12 +108,95 @@ const buildSnapshotForStock = (stock: Stock, existing?: AppData["snapshots"][num
   };
 };
 
+const materializeRecipeFromLogicSet = (
+  logicSet: LogicSet,
+  logicRules: LogicRule[],
+): Recipe => ({
+  id: logicSet.id,
+  lineageId: logicSet.lineageId ?? logicSet.id,
+  version: logicSet.version,
+  name: logicSet.name,
+  purpose: logicSet.purpose,
+  opportunityType: logicSet.opportunityType,
+  timeHorizon: logicSet.timeHorizon,
+  intendedUseCase: logicSet.intendedUseCase,
+  notes: logicSet.notes,
+  createdAt: logicSet.createdAt,
+  retiredAt: logicSet.retiredAt,
+  reviewConfig: logicSet.reviewConfig,
+  alertConfig: logicSet.alertConfig,
+  outcomeConfig: logicSet.outcomeConfig,
+  conditions: logicRules
+    .filter((rule) => rule.setId === logicSet.id)
+    .map((rule) => ({
+      id: rule.id,
+      label: rule.label,
+      kind: rule.kind,
+      role: rule.role,
+      metricKey: rule.metricKey,
+      formulaKey: rule.formulaKey,
+      operator: rule.operator,
+      value: rule.value,
+      unit: rule.unit,
+      humanDescription: rule.humanDescription,
+      notes: rule.notes,
+      availability: rule.availability,
+    })),
+});
+
+const syncLogicModel = (prev: AppData, nextRecipes: Recipe[]) => {
+  const nextLogicSets: LogicSet[] = nextRecipes.map((recipe) => ({
+    id: recipe.id,
+    lineageId: recipe.lineageId ?? recipe.id,
+    version: recipe.version,
+    name: recipe.name,
+    purpose: recipe.purpose,
+    opportunityType: recipe.opportunityType,
+    timeHorizon: recipe.timeHorizon,
+    intendedUseCase: recipe.intendedUseCase,
+    notes: recipe.notes,
+    createdAt: recipe.createdAt,
+    retiredAt: recipe.retiredAt,
+    reviewConfig: recipe.reviewConfig,
+    alertConfig: recipe.alertConfig,
+    outcomeConfig: recipe.outcomeConfig,
+  }));
+  const nextLogicRules: LogicRule[] = nextRecipes.flatMap((recipe) =>
+    recipe.conditions.map((condition) => ({
+      id: condition.id,
+      lineageId: prev.logicRules.find((rule) => rule.id === condition.id)?.lineageId ?? condition.id,
+      setId: recipe.id,
+      setVersion: recipe.version,
+      label: condition.label,
+      kind: condition.kind,
+      role: condition.role,
+      metricKey: condition.metricKey,
+      formulaKey: condition.formulaKey,
+      operator: condition.operator,
+      value: condition.value,
+      unit: condition.unit,
+      humanDescription: condition.humanDescription,
+      notes: condition.notes,
+      availability: condition.availability,
+      createdAt: prev.logicRules.find((rule) => rule.id === condition.id)?.createdAt ?? recipe.createdAt,
+      updatedAt: new Date().toISOString(),
+    })),
+  );
+  return {
+    ...prev,
+    recipes: nextRecipes,
+    logicSets: nextLogicSets,
+    logicRules: nextLogicRules,
+  };
+};
+
 export const useAppModel = () => {
   const [data, setData] = useState<AppData | null>(null);
   const [loading, setLoading] = useState(true);
   const [providerHealth, setProviderHealth] = useState<ProviderHealthEntry[]>([]);
   const [providerHealthLoading, setProviderHealthLoading] = useState(true);
   const dataRef = useRef<AppData | null>(null);
+  const autoScanStartedRef = useRef(false);
 
   useEffect(() => {
     loadAppData()
@@ -126,6 +216,50 @@ export const useAppModel = () => {
       .finally(() => setProviderHealthLoading(false));
   }, []);
 
+  useEffect(() => {
+    const current = dataRef.current;
+    if (!current || autoScanStartedRef.current) return;
+    if (!shouldRunAfterClose(new Date(), current.scannerSettings.providerDelayMinutesAfterClose)) return;
+    const latestCompleted = latestCompletedTradingDate(
+      new Date(),
+      current.scannerSettings.providerDelayMinutesAfterClose,
+    );
+    const lastRun = current.scanRuns[0]?.scanDate;
+    if (lastRun === latestCompleted) return;
+    autoScanStartedRef.current = true;
+    runDailyStockConditionScan({
+      existingBatches: current.rawBarArchives,
+      existingSignals: current.scanSignals,
+      existingForwardProof: current.forwardProofLedger,
+      scannerSettings: current.scannerSettings,
+      previousUniverseSnapshot: current.universeSnapshots[0],
+    })
+      .then(async (result) => {
+        await commit((prev) => ({
+          ...prev,
+          rawBarArchives: result.rawArchiveBatch
+            ? [result.rawArchiveBatch, ...prev.rawBarArchives.filter((entry) => entry.id !== result.rawArchiveBatch!.id)]
+            : prev.rawBarArchives,
+          universeSnapshots: [
+            result.universeSnapshot,
+            ...prev.universeSnapshots.filter((entry) => entry.id !== result.universeSnapshot.id),
+          ],
+          processedFeatures: [
+            ...result.processedFeatures,
+            ...prev.processedFeatures.filter(
+              (entry) => !result.processedFeatures.some((next) => next.id === entry.id),
+            ),
+          ],
+          scanRuns: [result.scanRun, ...prev.scanRuns.filter((entry) => entry.id !== result.scanRun.id)],
+          scanSignals: result.scanSignals,
+          forwardProofLedger: result.forwardProofLedger,
+        }));
+      })
+      .finally(() => {
+        autoScanStartedRef.current = false;
+      });
+  }, [loading]);
+
   const commit = async (next: AppData | ((current: AppData) => AppData)) => {
     const current = dataRef.current;
     if (!current && typeof next === "function") return;
@@ -138,41 +272,200 @@ export const useAppModel = () => {
 
   const actions = useMemo(
     () => ({
-      async addStock(input: { symbol: string; name: string; thesis: string }) {
+      async addEye(input: {
+        symbol: string;
+        name: string;
+        thesis: string;
+        recipeId: string;
+        plannedEntryLow?: number;
+        plannedEntryHigh?: number;
+        invalidationRule?: string;
+        lastReviewedAt?: string;
+      }) {
         const current = dataRef.current;
         if (!current) return;
         const normalizedSymbol = input.symbol.trim().toUpperCase();
-        const existing = current.stocks.find((stock) => stock.symbol.toUpperCase() === normalizedSymbol);
-        if (existing) {
-          await commit((prev) => {
-            const updatedStock: Stock = {
-              ...existing,
-              name: input.name.trim() || existing.name,
-              thesis: input.thesis.trim() || existing.thesis,
-            };
-            const existingSnapshot = prev.snapshots.find((snapshot) => snapshot.stockId === existing.id);
-            const nextSnapshot = existingSnapshot ?? buildSnapshotForStock(updatedStock);
-            return {
-              ...prev,
-              stocks: [updatedStock, ...prev.stocks.filter((stock) => stock.id !== existing.id)],
-              snapshots: [nextSnapshot, ...prev.snapshots.filter((snapshot) => snapshot.stockId !== existing.id)],
-            };
-          });
-          return;
+        
+        let stock = current.stocks.find(s => s.symbol === normalizedSymbol);
+        if (!stock) {
+          stock = {
+            id: createId("stock"),
+            symbol: normalizedSymbol,
+            name: input.name.trim() || normalizedSymbol,
+            thesis: input.thesis.trim(),
+            createdAt: new Date().toISOString(),
+          };
         }
 
-        const stock: Stock = {
-          id: createId("stock"),
-          symbol: normalizedSymbol,
-          name: input.name.trim(),
-          thesis: input.thesis.trim(),
-          createdAt: new Date().toISOString(),
-        };
-        const snapshot = buildSnapshotForStock(stock);
+        const recipe = current.recipes.find((item) => item.id === input.recipeId);
+        const existing = current.eyes.find(
+          (eye) => eye.stockId === stock!.id && eye.recipeId === input.recipeId,
+        );
+        const reviewAt = input.lastReviewedAt ?? new Date().toISOString();
+
+        await commit((prev) => {
+          const nextEye: Eye = existing
+            ? {
+                ...existing,
+                thesisSnapshot: input.thesis.trim() || existing.thesisSnapshot,
+                recipeVersionAtCreation: recipe?.version ?? existing.recipeVersionAtCreation,
+                plannedEntryLow: input.plannedEntryLow ?? existing.plannedEntryLow,
+                plannedEntryHigh: input.plannedEntryHigh ?? existing.plannedEntryHigh,
+                invalidationRule: input.invalidationRule?.trim() || existing.invalidationRule,
+                lastReviewedAt: reviewAt,
+              }
+            : {
+                id: createId("eye"),
+                stockId: stock!.id,
+                recipeId: input.recipeId,
+                thesisSnapshot: input.thesis.trim(),
+                recipeVersionAtCreation: recipe?.version,
+                plannedEntryLow: input.plannedEntryLow,
+                plannedEntryHigh: input.plannedEntryHigh,
+                invalidationRule: input.invalidationRule?.trim(),
+                lastReviewedAt: reviewAt,
+                createdAt: new Date().toISOString(),
+              };
+
+          const existingSnapshot = prev.snapshots.find(s => s.stockId === stock!.id);
+          const nextSnapshot = existingSnapshot 
+            ? {
+                ...existingSnapshot,
+                plannedEntryLow: nextEye.plannedEntryLow ?? existingSnapshot.plannedEntryLow,
+                plannedEntryHigh: nextEye.plannedEntryHigh ?? existingSnapshot.plannedEntryHigh,
+                lastThesisReviewAt: reviewAt,
+              }
+            : buildSnapshotForStock(stock!, { 
+                plannedEntryLow: nextEye.plannedEntryLow, 
+                plannedEntryHigh: nextEye.plannedEntryHigh, 
+                lastThesisReviewAt: reviewAt 
+              } as any);
+
+          return {
+            ...prev,
+            stocks: stock!.id.startsWith("stock-") && !prev.stocks.some(s => s.id === stock!.id) 
+              ? [stock!, ...prev.stocks] 
+              : prev.stocks,
+            eyes: [nextEye, ...prev.eyes.filter((eye) => eye.id !== nextEye.id)],
+            snapshots: [nextSnapshot, ...prev.snapshots.filter(s => s.stockId !== stock!.id)],
+          };
+        });
+      },
+      async updateEye(
+        eyeId: string,
+        input: {
+          recipeId: string;
+          thesisSnapshot: string;
+          plannedEntryLow?: number;
+          plannedEntryHigh?: number;
+          invalidationRule?: string;
+          lastReviewedAt?: string;
+        },
+      ) {
+        const current = dataRef.current;
+        if (!current) return;
+        const eye = current.eyes.find((item) => item.id === eyeId);
+        if (!eye) return;
+        const recipe = current.recipes.find((item) => item.id === input.recipeId);
+        const reviewAt = input.lastReviewedAt ?? eye.lastReviewedAt ?? new Date().toISOString();
         await commit((prev) => ({
           ...prev,
-          stocks: [stock, ...prev.stocks],
-          snapshots: [snapshot, ...prev.snapshots],
+          eyes: prev.eyes.map((item) =>
+            item.id === eyeId
+              ? {
+                  ...item,
+                  recipeId: input.recipeId,
+                  thesisSnapshot: input.thesisSnapshot.trim(),
+                  recipeVersionAtCreation: recipe?.version ?? item.recipeVersionAtCreation,
+                  plannedEntryLow: input.plannedEntryLow,
+                  plannedEntryHigh: input.plannedEntryHigh,
+                  invalidationRule: input.invalidationRule?.trim(),
+                  lastReviewedAt: reviewAt,
+                }
+              : item,
+          ),
+          snapshots: prev.snapshots.map((snapshot) =>
+            snapshot.stockId === eye.stockId
+              ? {
+                  ...snapshot,
+                  plannedEntryLow: input.plannedEntryLow ?? snapshot.plannedEntryLow,
+                  plannedEntryHigh: input.plannedEntryHigh ?? snapshot.plannedEntryHigh,
+                  lastThesisReviewAt: reviewAt,
+                }
+              : snapshot,
+          ),
+        }));
+      },
+      async runDailyScanner() {
+        const current = dataRef.current;
+        if (!current) return;
+        const result = await runDailyStockConditionScan({
+          existingBatches: current.rawBarArchives,
+          existingSignals: current.scanSignals,
+          existingForwardProof: current.forwardProofLedger,
+          scannerSettings: current.scannerSettings,
+          previousUniverseSnapshot: current.universeSnapshots[0],
+        });
+        await commit((prev) => ({
+          ...prev,
+          rawBarArchives: result.rawArchiveBatch
+            ? [result.rawArchiveBatch, ...prev.rawBarArchives.filter((entry) => entry.id !== result.rawArchiveBatch!.id)]
+            : prev.rawBarArchives,
+          universeSnapshots: [
+            result.universeSnapshot,
+            ...prev.universeSnapshots.filter((entry) => entry.id !== result.universeSnapshot.id),
+          ],
+          processedFeatures: [
+            ...result.processedFeatures,
+            ...prev.processedFeatures.filter(
+              (entry) => !result.processedFeatures.some((next) => next.id === entry.id),
+            ),
+          ],
+          scanRuns: [result.scanRun, ...prev.scanRuns.filter((entry) => entry.id !== result.scanRun.id)],
+          scanSignals: result.scanSignals,
+          forwardProofLedger: result.forwardProofLedger,
+        }));
+      },
+      async addSignalReviewLog(input: {
+        signalId: string;
+        userDecision: "watch" | "ignore" | "bought" | "skipped" | "sold" | "other";
+        manualReason: string;
+        convictionScoreOptional?: number;
+        notes?: string;
+        entryPriceOptional?: number;
+        exitPriceOptional?: number;
+        resultNotes?: string;
+      }) {
+        const current = dataRef.current;
+        if (!current) return;
+        const reviewLog = createReviewLogEntry({
+          signalId: input.signalId,
+          reviewedAt: new Date().toISOString(),
+          userDecision: input.userDecision,
+          manualReason: input.manualReason,
+          convictionScoreOptional: input.convictionScoreOptional,
+          notes: input.notes,
+          entryPriceOptional: input.entryPriceOptional,
+          exitPriceOptional: input.exitPriceOptional,
+          resultNotes: input.resultNotes,
+        });
+        await commit((prev) => ({
+          ...prev,
+          reviewLogs: [reviewLog, ...prev.reviewLogs.filter((entry) => entry.id !== reviewLog.id)],
+        }));
+      },
+      async deleteEye(eyeId: string) {
+        const current = dataRef.current;
+        if (!current) return;
+        const removedDecisionIds = current.decisions
+          .filter((decision) => decision.eyeId === eyeId)
+          .map((decision) => decision.id);
+        await commit((prev) => ({
+          ...prev,
+          eyes: prev.eyes.filter((eye) => eye.id !== eyeId),
+          alerts: prev.alerts.filter((alert) => alert.eyeId !== eyeId),
+          decisions: prev.decisions.filter((decision) => decision.eyeId !== eyeId),
+          outcomes: prev.outcomes.filter((outcome) => !removedDecisionIds.includes(outcome.decisionId)),
         }));
       },
       async addRecipe(input: {
@@ -188,8 +481,10 @@ export const useAppModel = () => {
       }) {
         const current = dataRef.current;
         if (!current) return;
+        const recipeId = createId("recipe");
         const recipe: Recipe = {
-          id: createId("recipe"),
+          id: recipeId,
+          lineageId: recipeId,
           version: 1,
           name: input.name.trim(),
           purpose: input.purpose.trim(),
@@ -217,88 +512,206 @@ export const useAppModel = () => {
               : [
                   {
                     id: createId("condition"),
-                    label: "User-defined rule set. Expand this recipe in future iterations.",
+                    label: "User-defined rule.",
                     kind: "required",
                   },
                 ],
         };
-        await commit((prev) => ({
-          ...prev,
-          recipes: [recipe, ...prev.recipes],
-        }));
+        await commit((prev) => syncLogicModel(prev, [recipe, ...prev.recipes]));
       },
-      async addEye(input: {
-        stockId: string;
-        recipeId: string;
-        thesisSnapshot: string;
-        plannedEntryLow?: number;
-        plannedEntryHigh?: number;
-        invalidationRule?: string;
-        lastReviewedAt?: string;
-      }) {
+      async updateRecipe(
+        recipeId: string,
+        input: {
+          name: string;
+          purpose: string;
+          opportunityType: string;
+          timeHorizon: string;
+          intendedUseCase: string;
+          notes: string;
+          reviewCadenceDays: number;
+          alertCooldownHours: number;
+          conditions?: RecipeCondition[];
+        },
+      ) {
         const current = dataRef.current;
         if (!current) return;
-        const recipe = current.recipes.find((item) => item.id === input.recipeId);
-        const existing = current.eyes.find(
-          (eye) => eye.stockId === input.stockId && eye.recipeId === input.recipeId,
+        await commit((prev) =>
+          syncLogicModel(
+            prev,
+            prev.recipes.map((recipe) =>
+              recipe.id === recipeId
+                ? {
+                    ...recipe,
+                    name: input.name.trim(),
+                    purpose: input.purpose.trim(),
+                    opportunityType: input.opportunityType.trim(),
+                    timeHorizon: input.timeHorizon.trim(),
+                    intendedUseCase: input.intendedUseCase.trim(),
+                    notes: input.notes.trim(),
+                    reviewConfig: {
+                      cadenceDays: input.reviewCadenceDays,
+                      reviewTriggers: recipe.reviewConfig?.reviewTriggers ?? ["state_change", "manual_review_due"],
+                    },
+                    alertConfig: {
+                      cooldownHours: input.alertCooldownHours,
+                      dedupeKey: recipe.alertConfig?.dedupeKey ?? "state_change",
+                      priorityOnAttention: recipe.alertConfig?.priorityOnAttention ?? "High",
+                      priorityOnRisk: recipe.alertConfig?.priorityOnRisk ?? "High",
+                    },
+                    conditions:
+                      input.conditions && input.conditions.length > 0
+                        ? input.conditions.map((condition) => ({
+                            ...condition,
+                            id: condition.id || createId("condition"),
+                          }))
+                        : recipe.conditions,
+                  }
+                : recipe,
+            ),
+          ),
         );
-        const reviewAt = input.lastReviewedAt ?? new Date().toISOString();
-
+      },
+      async addMetric(metric: MetricDefinition) {
+        const current = dataRef.current;
+        if (!current) return;
         await commit((prev) => {
-          const nextEye: Eye = existing
-            ? {
-                ...existing,
-                thesisSnapshot: input.thesisSnapshot.trim() || existing.thesisSnapshot,
-                recipeVersionAtCreation: recipe?.version ?? existing.recipeVersionAtCreation,
-                plannedEntryLow: input.plannedEntryLow ?? existing.plannedEntryLow,
-                plannedEntryHigh: input.plannedEntryHigh ?? existing.plannedEntryHigh,
-                invalidationRule: input.invalidationRule?.trim() || existing.invalidationRule,
-                lastReviewedAt: reviewAt,
-              }
-            : {
-                id: createId("eye"),
-                stockId: input.stockId,
-                recipeId: input.recipeId,
-                thesisSnapshot: input.thesisSnapshot.trim(),
-                recipeVersionAtCreation: recipe?.version,
-                plannedEntryLow: input.plannedEntryLow,
-                plannedEntryHigh: input.plannedEntryHigh,
-                invalidationRule: input.invalidationRule?.trim(),
-                lastReviewedAt: reviewAt,
-                createdAt: new Date().toISOString(),
-              };
-
-          const nextSnapshots = prev.snapshots.map((snapshot) =>
-            snapshot.stockId === input.stockId
-              ? {
-                  ...snapshot,
-                  plannedEntryLow: nextEye.plannedEntryLow ?? snapshot.plannedEntryLow,
-                  plannedEntryHigh: nextEye.plannedEntryHigh ?? snapshot.plannedEntryHigh,
-                  lastThesisReviewAt: reviewAt,
-                }
-              : snapshot,
-          );
-
+          const existing = prev.customMetrics.find((item) => item.key === metric.key);
+          const nextMetric: MetricDefinition = {
+            ...metric,
+            origin: "custom",
+            createdAt: metric.createdAt ?? existing?.createdAt ?? new Date().toISOString(),
+          };
           return {
             ...prev,
-            eyes: [nextEye, ...prev.eyes.filter((eye) => eye.id !== nextEye.id)],
-            snapshots: nextSnapshots,
+            customMetrics: existing
+              ? [nextMetric, ...prev.customMetrics.filter((item) => item.key !== metric.key)]
+              : [nextMetric, ...prev.customMetrics],
           };
         });
       },
-      async deleteEye(eyeId: string) {
+      async deleteMetric(metricKey: string) {
         const current = dataRef.current;
-        if (!current) return;
-        const removedDecisionIds = current.decisions
-          .filter((decision) => decision.eyeId === eyeId)
-          .map((decision) => decision.id);
+        if (!current) return false;
+        const inUse = current.recipes.some((recipe) =>
+          recipe.conditions.some((condition) => condition.metricKey === metricKey),
+        );
+        if (inUse) return false;
         await commit((prev) => ({
           ...prev,
-          eyes: prev.eyes.filter((eye) => eye.id !== eyeId),
-          alerts: prev.alerts.filter((alert) => alert.eyeId !== eyeId),
-          decisions: prev.decisions.filter((decision) => decision.eyeId !== eyeId),
-          outcomes: prev.outcomes.filter((outcome) => !removedDecisionIds.includes(outcome.decisionId)),
+          customMetrics: prev.customMetrics.filter((metric) => metric.key !== metricKey),
         }));
+        return true;
+      },
+      async duplicateRecipe(recipeId: string, nextName?: string) {
+        const current = dataRef.current;
+        if (!current) return;
+        const source = current.recipes.find((recipe) => recipe.id === recipeId);
+        if (!source) return;
+        const nextId = createId("recipe");
+        const duplicated: Recipe = {
+          ...source,
+          id: nextId,
+          lineageId: nextId,
+          version: 1,
+          name: nextName?.trim() || `${source.name} Copy`,
+          retiredAt: undefined,
+          createdAt: new Date().toISOString(),
+          conditions: source.conditions.map((condition) => ({
+            ...condition,
+            id: createId("condition"),
+          })),
+        };
+        await commit((prev) => syncLogicModel(prev, [duplicated, ...prev.recipes]));
+        return duplicated.id;
+      },
+      async createRecipeVersion(recipeId: string) {
+        const current = dataRef.current;
+        if (!current) return;
+        const source = current.recipes.find((recipe) => recipe.id === recipeId);
+        if (!source) return;
+        const lineageId = source.lineageId ?? source.id;
+        const nextVersion =
+          Math.max(
+            ...current.recipes
+              .filter((recipe) => (recipe.lineageId ?? recipe.id) === lineageId)
+              .map((recipe) => recipe.version),
+          ) + 1;
+        const nextId = createId("recipe");
+        const versioned: Recipe = {
+          ...source,
+          id: nextId,
+          lineageId,
+          version: nextVersion,
+          retiredAt: undefined,
+          createdAt: new Date().toISOString(),
+          conditions: source.conditions.map((condition) => ({
+            ...condition,
+            id: createId("condition"),
+          })),
+        };
+        await commit((prev) => syncLogicModel(prev, [versioned, ...prev.recipes]));
+        return versioned.id;
+      },
+      async restoreRecipeVersion(recipeId: string) {
+        const current = dataRef.current;
+        if (!current) return;
+        const source = current.recipes.find((recipe) => recipe.id === recipeId);
+        if (!source) return;
+        const lineageId = source.lineageId ?? source.id;
+        const nextVersion =
+          Math.max(
+            ...current.recipes
+              .filter((recipe) => (recipe.lineageId ?? recipe.id) === lineageId)
+              .map((recipe) => recipe.version),
+          ) + 1;
+        const nextId = createId("recipe");
+        const restored: Recipe = {
+          ...source,
+          id: nextId,
+          lineageId,
+          version: nextVersion,
+          retiredAt: undefined,
+          createdAt: new Date().toISOString(),
+          conditions: source.conditions.map((condition) => ({
+            ...condition,
+            id: createId("condition"),
+          })),
+        };
+        await commit((prev) => syncLogicModel(prev, [restored, ...prev.recipes]));
+        return restored.id;
+      },
+      async deleteRecipe(recipeId: string) {
+        const current = dataRef.current;
+        if (!current) return false;
+        const linkedEyeIds = current.eyes.filter((eye) => eye.recipeId === recipeId).map((eye) => eye.id);
+        const hasLinkedHistory =
+          linkedEyeIds.length > 0 ||
+          current.decisions.some((decision) => decision.recipeId === recipeId || linkedEyeIds.includes(decision.eyeId));
+        if (hasLinkedHistory) return false;
+        await commit((prev) =>
+          syncLogicModel(
+            prev,
+            prev.recipes.filter((recipe) => recipe.id !== recipeId),
+          ),
+        );
+        return true;
+      },
+      async retireRecipe(recipeId: string) {
+        const current = dataRef.current;
+        if (!current) return;
+        await commit((prev) =>
+          syncLogicModel(
+            prev,
+            prev.recipes.map((recipe) =>
+              recipe.id === recipeId
+                ? {
+                    ...recipe,
+                    retiredAt: recipe.retiredAt ?? new Date().toISOString(),
+                  }
+                : recipe,
+            ),
+          ),
+        );
       },
       async logDecision(input: {
         eyeId: string;
@@ -328,13 +741,13 @@ export const useAppModel = () => {
           decisionId: decision.id,
           recipeId: decision.recipeId,
           recipeVersion: decision.recipeVersion,
-          reviewWindow: "30 days",
+          reviewWindow: "30일",
           status: "Pending",
-          priceChangeNote: "Follow up with the next price review.",
-          maxRunupNote: "Review run-up after the follow-up window.",
-          maxDrawdownNote: "Review drawdown after the follow-up window.",
-          lesson: "Review whether the thesis held and whether timing discipline improved.",
-          recipeSuggestion: "Adjust the recipe only after enough reviewed outcomes accumulate.",
+          priceChangeNote: "TBD",
+          maxRunupNote: "TBD",
+          maxDrawdownNote: "TBD",
+          lesson: "Review thesis maintainability.",
+          recipeSuggestion: "Accumulate more outcomes before evolving logic.",
           createdAt: new Date().toISOString(),
         };
         await commit((prev) => ({
@@ -346,6 +759,48 @@ export const useAppModel = () => {
           ),
         }));
         return decision.id;
+      },
+      async updateDecision(
+        decisionId: string,
+        input: {
+          eyeId: string;
+          alertId?: string;
+          action: DecisionAction;
+          note: string;
+          concern: string;
+          thesisValid: "Yes" | "Partly" | "No";
+          timing: "Early" | "On Time" | "Late";
+        },
+      ) {
+        const current = dataRef.current;
+        if (!current) return;
+        const eye = current.eyes.find((item) => item.id === input.eyeId);
+        if (!eye) return;
+        await commit((prev) => ({
+          ...prev,
+          decisions: prev.decisions.map((decision) =>
+            decision.id === decisionId
+              ? {
+                  ...decision,
+                  ...input,
+                  recipeId: eye.recipeId,
+                  recipeVersion: eye.lastEvaluation?.recipeVersion ?? eye.recipeVersionAtCreation,
+                  stateAtDecision: eye.lastEvaluation?.currentState,
+                  conditionResults: eye.lastEvaluation?.conditionResults,
+                  dataQuality: eye.lastEvaluation?.dataQuality,
+                }
+              : decision,
+          ),
+        }));
+      },
+      async deleteDecision(decisionId: string) {
+        const current = dataRef.current;
+        if (!current) return;
+        await commit((prev) => ({
+          ...prev,
+          decisions: prev.decisions.filter((decision) => decision.id !== decisionId),
+          outcomes: prev.outcomes.filter((outcome) => outcome.decisionId !== decisionId),
+        }));
       },
       async markAlertReviewed(alertId: string) {
         const current = dataRef.current;

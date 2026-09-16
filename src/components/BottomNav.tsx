@@ -1,5 +1,5 @@
-import React from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { Animated, Pressable, StyleSheet, Text, View } from "react-native";
 
 const fontFamily = "System";
 
@@ -8,30 +8,113 @@ interface BottomNavProps<T extends string> {
   currentTab: T;
   onSelect: (tab: T) => void;
   labels?: Partial<Record<T, string>>;
+  icons?: Partial<Record<T, string>>;
 }
 
-export const BottomNav = <T extends string>({ tabs, currentTab, onSelect, labels }: BottomNavProps<T>) => (
-  <View style={styles.bottomNav}>
-    <View style={styles.bottomNavRow}>
-      {tabs.map((item) => (
-        <Pressable
-          key={item}
-          onPress={() => onSelect(item)}
-          style={({ pressed }) => [
-            styles.navItem,
-            currentTab === item ? styles.navItemActive : null,
-            pressed ? styles.navItemPressed : null,
-          ]}
-        >
-          <View style={[styles.navIndicator, currentTab === item ? styles.navIndicatorActive : null]} />
-          <Text style={[styles.navLabel, currentTab === item ? styles.navLabelActive : null]} numberOfLines={1}>
-            {labels?.[item] ?? item}
-          </Text>
-        </Pressable>
-      ))}
+export const BottomNav = <T extends string>({ tabs, currentTab, onSelect, labels, icons }: BottomNavProps<T>) => {
+  const [itemFrames, setItemFrames] = useState<Record<string, { x: number; y: number; width: number; height: number }>>({});
+  const pillX = useRef(new Animated.Value(0)).current;
+  const pillY = useRef(new Animated.Value(0)).current;
+  const pillWidth = useRef(new Animated.Value(0)).current;
+  const pillHeight = useRef(new Animated.Value(0)).current;
+  const activeFrame = itemFrames[String(currentTab)];
+
+  useEffect(() => {
+    if (!activeFrame) return;
+    Animated.parallel([
+      Animated.spring(pillX, {
+        toValue: activeFrame.x + 6,
+        useNativeDriver: false,
+        stiffness: 260,
+        damping: 26,
+        mass: 0.9,
+      }),
+      Animated.spring(pillY, {
+        toValue: activeFrame.y + 6,
+        useNativeDriver: false,
+        stiffness: 260,
+        damping: 26,
+        mass: 0.9,
+      }),
+      Animated.spring(pillWidth, {
+        toValue: Math.max(0, activeFrame.width - 12),
+        useNativeDriver: false,
+        stiffness: 260,
+        damping: 26,
+        mass: 0.9,
+      }),
+      Animated.spring(pillHeight, {
+        toValue: Math.max(0, activeFrame.height - 12),
+        useNativeDriver: false,
+        stiffness: 260,
+        damping: 26,
+        mass: 0.9,
+      }),
+    ]).start();
+  }, [activeFrame, pillHeight, pillWidth, pillX, pillY]);
+
+  return (
+    <View style={styles.bottomNav}>
+      <View style={styles.bottomNavRail}>
+        {activeFrame ? (
+          <Animated.View
+            pointerEvents="none"
+            style={[
+              styles.activePill,
+              {
+                left: pillX,
+                top: pillY,
+                width: pillWidth,
+                height: pillHeight,
+              },
+            ]}
+          />
+        ) : null}
+        <View style={styles.bottomNavRow}>
+          {tabs.map((item) => {
+            const active = currentTab === item;
+            return (
+              <Pressable
+                key={item}
+                onPress={() => onSelect(item)}
+                onLayout={(event) => {
+                  const { x, y, width, height } = event.nativeEvent.layout;
+                  setItemFrames((current) => {
+                    const previous = current[String(item)];
+                    if (
+                      previous &&
+                      previous.x === x &&
+                      previous.y === y &&
+                      previous.width === width &&
+                      previous.height === height
+                    ) {
+                      return current;
+                    }
+                    return {
+                      ...current,
+                      [String(item)]: { x, y, width, height },
+                    };
+                  });
+                }}
+                style={({ pressed }) => [
+                  styles.navItem,
+                  pressed ? styles.navItemPressed : null,
+                ]}
+              >
+                <Text style={[styles.navIcon, active ? styles.navIconActive : null]}>
+                  {icons?.[item] ?? "•"}
+                </Text>
+                <Text style={[styles.navLabel, active ? styles.navLabelActive : null]} numberOfLines={1}>
+                  {labels?.[item] ?? item}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+      </View>
     </View>
-  </View>
-);
+  );
+};
 
 const styles = StyleSheet.create({
   bottomNav: {
@@ -39,61 +122,70 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: "#fbfbfd",
+    backgroundColor: "transparent",
+    paddingTop: 0,
+    paddingBottom: 0,
+    paddingHorizontal: 0,
+  },
+  bottomNavRail: {
+    overflow: "hidden",
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 0,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
     borderTopWidth: 1,
-    borderTopColor: "#e5e7eb",
-    paddingTop: 8,
-    paddingBottom: 28,
-    paddingHorizontal: 10,
+    borderTopColor: "rgba(15,23,42,0.08)",
+    backgroundColor: "rgba(251,251,253,0.98)",
+    shadowColor: "#0f172a",
+    shadowOpacity: 0.08,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: -4 },
+    elevation: 12,
+    minHeight: 86,
+  },
+  activePill: {
+    position: "absolute",
+    borderRadius: 18,
+    backgroundColor: "#111827",
   },
   bottomNavRow: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
-    minHeight: 68,
+    minHeight: 86,
     paddingHorizontal: 8,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: "#ffffff",
-    borderWidth: 1,
-    borderColor: "#eceef2",
-    shadowColor: "#111827",
-    shadowOpacity: 0.05,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 8,
+    paddingTop: 10,
+    paddingBottom: 12,
   },
   navItem: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
     gap: 5,
-    minHeight: 52,
-    borderRadius: 14,
-    marginHorizontal: 2,
-    overflow: "hidden",
-  },
-  navItemActive: {
-    backgroundColor: "#111827",
+    minHeight: 64,
+    borderRadius: 16,
+    marginHorizontal: 0,
+    zIndex: 1,
   },
   navItemPressed: {
-    transform: [{ scale: 0.985 }],
-    opacity: 0.92,
+    transform: [{ scale: 0.975 }],
+    opacity: 0.94,
   },
-  navIndicator: {
-    width: 18,
-    height: 3,
-    borderRadius: 2,
-    backgroundColor: "#d1d5db",
+  navIcon: {
+    color: "#94a3b8",
+    fontSize: 17,
+    fontWeight: "900",
+    fontFamily,
   },
-  navIndicatorActive: {
-    backgroundColor: "#ffffff",
+  navIconActive: {
+    color: "#ffffff",
+    fontSize: 18,
   },
   navLabel: {
-    color: "#6b7280",
-    fontSize: 10,
+    color: "#64748b",
+    fontSize: 11,
     fontWeight: "800",
     fontFamily,
+    lineHeight: 14,
   },
   navLabelActive: {
     color: "#ffffff",

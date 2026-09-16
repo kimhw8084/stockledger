@@ -1,10 +1,10 @@
 import { StatusBar } from "expo-status-bar";
 import React, { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import {
+  Alert as RNAlert,
   Animated,
   Platform,
   Pressable,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -21,12 +21,32 @@ import { StockSearchPanel } from "./src/components/stocks/StockSearchPanel";
 import { StockTrendHero } from "./src/components/stocks/StockTrendHero";
 import { StockMetricDetailSheet } from "./src/components/stocks/StockMetricDetailSheet";
 import {
+  localizedAlertPriority,
+  localizedAlertUsefulness,
+  localizedActionUrgency,
+  localizedConditionCategory,
+  localizedConditionKind,
+  localizedDecisionAction,
+  localizedEyeState,
+  localizedEyesShelfFilter,
   localizedFreshness,
+  localizedJournalFilter,
+  localizedOutcomeStatus,
+  localizedOpportunityType,
+  localizedRecipeOptionValue,
   localizedProviderStatus,
+  localizedRecipeBuilderPrompt,
+  localizedRecipeBuilderStep,
+  localizedRecipeShelfFilter,
+  localizedReviewDateOption,
   localizedSnapshotMode,
   localizedSourceType,
   localizedStatus,
   localizedSuggestionTrust,
+  localizedThesisValidity,
+  localizedTimeHorizon,
+  localizedTiming,
+  localizedUseCase,
   subtitleLabel,
   t,
   tabLabel,
@@ -39,10 +59,13 @@ import {
   DecisionAction,
   Eye,
   EyeState,
+  Evaluation,
   FreshnessStatus,
+  MetricDefinition,
   ProviderHealthEntry,
   Recipe,
   RecipeCondition,
+  ScanSignal,
   Stock,
   VisualEvidenceCard,
   VisualEvidenceGroup,
@@ -52,8 +75,41 @@ import {
   buildEvidenceGroups,
   buildStockVisualAnalysisGroups,
 } from "./src/lib/visualEvidence";
+import { getFormulaDefinition, getMetricDefinition, metricCatalog, formulaRegistry } from "./src/lib/metricCatalog";
+import {
+  appendExpressionToken,
+  buildExpressionPreview,
+  expressionParameterRegistry,
+  expressionParameterKeys,
+  expressionParameterRequiredData,
+  functionTokenTemplates,
+  referencedExpressionParameters,
+  removeLastExpressionToken,
+  tokenizeExpression,
+  validateExpressionSyntax,
+} from "./src/lib/expressionEngine";
+import {
+  Card,
+  Button,
+  Input,
+  NumberStepper,
+  DenseStat,
+  MetaPill,
+  HorizontalChoice,
+  SectionHeader,
+  LogicBlock,
+  SearchableSelect,
+  Reveal,
+} from "./src/components/common";
+import { logicRoleStateEffect, logicRoleWeight } from "./src/lib/logicHelpers";
+import { frozenScannerRules, scannerFeatureRegistry } from "./src/lib/frozenScannerRules";
+import { L0DataLayer } from "./src/components/logic/L0DataLayer";
+import { L1MetricsLayer } from "./src/components/logic/L1MetricsLayer";
+import { L15ConditionsLayer } from "./src/components/logic/L15ConditionsLayer";
+import { L2RecipesLayer } from "./src/components/logic/L2RecipesLayer";
+import { HomeVisualDashboard } from "./src/components/HomeVisualDashboard";
 
-type TabKey = "Home" | "Stocks" | "Recipes" | "Eyes" | "Alerts" | "Journal" | "Settings";
+type TabKey = "Home" | "Stocks" | "Logic Lab" | "Eyes" | "Alerts" | "Journal" | "Settings";
 type AlertWorkspaceTab = "Current" | "History" | "Detail";
 type ConditionKind = RecipeCondition["kind"];
 type AnalysisBenchmark = "SPY" | "QQQ" | "Sector ETF";
@@ -70,9 +126,23 @@ type HomeBucket = "All" | "Review Now" | "Forming" | "Review Soon";
 type RecipeShelfFilter = "All" | "Starter" | "Custom" | "Recent";
 type EyesShelfFilter = "All" | "Needs Review" | "Quiet";
 type JournalFilter = "All" | "Entered" | "Skipped" | "Risky";
+type LogicLabLayer = "Processed Features" | "Frozen Rules" | "Signals";
+type LogicInfoTarget = "Raw Data" | "Processed Features" | "Frozen Rules" | "Signals";
 
 type StockRouteTarget = "Stocks" | "Alerts" | "Eyes" | "Journal";
 type RecipeBuilderStep = "Purpose" | "Logic" | "Risk & Alerts" | "Review & Outcome";
+type MetricDraftForm = {
+  name: string;
+  humanMeaning: string;
+  builderMode: "raw" | "equation";
+  selectedRawFields: string[];
+  rawParameterKey: string;
+  expression: string;
+  availability: MetricDefinition["availability"];
+  freshnessExpectation: MetricDefinition["freshnessExpectation"];
+  exampleDisplayText: string;
+  missingDataBehavior: string;
+};
 
 interface ConditionTemplate {
   id: string;
@@ -100,7 +170,15 @@ interface ConditionTemplate {
       };
 }
 
-const tabs: TabKey[] = ["Home", "Stocks", "Recipes", "Eyes", "Alerts", "Journal", "Settings"];
+type ConditionBuilderState = {
+  metricKey: string;
+  role: NonNullable<RecipeCondition["role"]>;
+  operator: ConditionOperator;
+  threshold: string;
+  note: string;
+};
+
+const tabs: TabKey[] = ["Home", "Stocks", "Logic Lab", "Eyes"];
 const recipeBuilderSteps: RecipeBuilderStep[] = ["Purpose", "Logic", "Risk & Alerts", "Review & Outcome"];
 const analysisBenchmarks: AnalysisBenchmark[] = ["SPY", "QQQ", "Sector ETF"];
 const analysisLookbacks: AnalysisLookback[] = ["20D", "3M", "6M"];
@@ -121,35 +199,34 @@ const homeBuckets: HomeBucket[] = ["All", "Review Now", "Forming", "Review Soon"
 const recipeShelfFilters: RecipeShelfFilter[] = ["All", "Starter", "Custom", "Recent"];
 const eyesShelfFilters: EyesShelfFilter[] = ["All", "Needs Review", "Quiet"];
 const journalFilters: JournalFilter[] = ["All", "Entered", "Skipped", "Risky"];
+const logicLabLayers: LogicLabLayer[] = ["Processed Features", "Frozen Rules", "Signals"];
 const languageOptions: AppLanguage[] = ["en", "ko"];
 const starterRecipeNames = [
   "Temporary Bargain Sale",
-  "Sector Leader Pullback",
-  "Bad News Overreaction",
-  "Earnings Reset Recovery",
+  "Leader Pullback",
+  "Reset Recovery",
+  "Thesis Risk Monitor",
 ];
 const opportunityTypes = [
   "Temporary Mispricing",
   "Leader Pullback",
   "Recovery Setup",
-  "Event Reset",
   "Risk Monitoring",
 ] as const;
 const timeHorizons = ["1 to 2 weeks", "1 to 3 months", "3 to 12 months", "Multi-year"] as const;
 const useCaseOptions = [
   "Watchlist Triage",
   "Position Building",
-  "Post-Earnings Review",
   "Thesis Protection",
 ] as const;
 const reviewCadenceOptions = [3, 7, 14, 30, 60] as const;
 const alertCooldownOptions = [6, 12, 24, 48, 72] as const;
 const manualFlagOptions = [
-  "accounting issue",
-  "regulatory risk",
-  "guidance cut",
-  "management credibility damage",
-  "severe dilution risk",
+  "회계 이슈",
+  "규제 리스크",
+  "가이던스 압박",
+  "경영진 신뢰 훼손",
+  "심한 희석 위험",
 ] as const;
 const reviewDateOptions = [
   { label: "Today", daysAgo: 0 },
@@ -169,15 +246,15 @@ const decisionActions: DecisionAction[] = [
 const thesisValidityOptions = ["Yes", "Partly", "No"] as const;
 const timingOptions = ["Early", "On Time", "Late"] as const;
 const conditionKinds: ConditionKind[] = ["required", "supporting", "negative", "disqualifier"];
-const conditionCategories = [
-  "Technical",
-  "Valuation",
-  "Business Quality",
-  "News",
-  "Macro",
-  "Risk",
-  "Sentiment",
-] as const;
+const conditionRoleOptions: NonNullable<RecipeCondition["role"]>[] = [
+  "Eligibility Filter",
+  "Supporting Evidence",
+  "Timing Trigger",
+  "Risk Warning",
+  "Hard Disqualifier",
+  "Review Trigger",
+  "Outcome Learning Tag",
+];
 
 const fontFamily = Platform.select({
   ios: "System",
@@ -309,20 +386,6 @@ const conditionLibrary: ConditionTemplate[] = [
     control: { type: "enum", options: ["true", "false"] },
   },
   {
-    id: "market-stress",
-    category: "Macro",
-    title: "Broad market stress",
-    description: "Adapt recipe behavior when the wider market is under pressure.",
-    metricKey: "relative_strength_vs_spy",
-    formulaKey: "relative_strength_vs_spy_pct",
-    defaultKind: "negative",
-    complexity: "Layered",
-    metricLabel: "market regime",
-    defaultOperator: "<=",
-    defaultValue: "-5",
-    control: { type: "number", step: 1, min: -25, max: 25, unit: "%" },
-  },
-  {
     id: "debt-risk",
     category: "Risk",
     title: "Debt stress",
@@ -350,20 +413,6 @@ const conditionLibrary: ConditionTemplate[] = [
     defaultValue: "guidance cut",
     control: { type: "enum", options: manualFlagOptions },
   },
-  {
-    id: "analyst-revisions",
-    category: "Sentiment",
-    title: "Analyst revision trend",
-    description: "Track whether revisions are improving, flat, or weakening.",
-    metricKey: "analyst_revision_trend",
-    formulaKey: "analyst_revision_trend",
-    defaultKind: "negative",
-    complexity: "Simple",
-    metricLabel: "revision trend",
-    defaultOperator: "is",
-    defaultValue: "weak",
-    control: { type: "enum", options: ["improving", "flat", "weak"] },
-  },
 ];
 
 const createLocalId = (prefix: string) => `${prefix}-${Math.random().toString(36).slice(2, 10)}`;
@@ -373,25 +422,6 @@ const isoDateDaysAgo = (daysAgo: number) => {
   date.setHours(12, 0, 0, 0);
   date.setDate(date.getDate() - daysAgo);
   return date.toISOString();
-};
-
-const parseThresholdValue = (rawValue: string, template: ConditionTemplate) => {
-  if (template.control.type === "number") {
-    return Number(rawValue);
-  }
-  if (rawValue === "true") return true;
-  if (rawValue === "false") return false;
-  return rawValue;
-};
-
-const operatorOptionsForTemplate = (template: ConditionTemplate): readonly ConditionOperator[] =>
-  template.control.type === "number" ? [">=", "<=", ">", "<"] : template.defaultOperator === "contains" ? ["contains", "is"] : ["is"];
-
-const formatMetricThreshold = (template: ConditionTemplate, threshold: string) => {
-  if (template.control.type === "number") {
-    return `${threshold}${template.control.unit ? ` ${template.control.unit}` : ""}`;
-  }
-  return threshold === "true" ? "Yes" : threshold === "false" ? "No" : threshold;
 };
 
 const roleFromBuilderKind = (kind: ConditionKind): RecipeCondition["role"] => {
@@ -406,6 +436,122 @@ const roleFromBuilderKind = (kind: ConditionKind): RecipeCondition["role"] => {
       return "Hard Disqualifier";
   }
 };
+
+const kindFromConditionRole = (role: RecipeCondition["role"]): ConditionKind => {
+  switch (role) {
+    case "Eligibility Filter":
+      return "required";
+    case "Supporting Evidence":
+    case "Timing Trigger":
+    case "Review Trigger":
+    case "Outcome Learning Tag":
+      return "supporting";
+    case "Risk Warning":
+      return "negative";
+    case "Hard Disqualifier":
+      return "disqualifier";
+    default:
+      return "supporting";
+  }
+};
+
+const metricControlConfig = (metric?: MetricDefinition, formula?: { outputType: "number" | "boolean" | "string" }) => {
+  if (!metric || !formula) {
+    return { type: "number" as const, step: 1, min: -100, max: 100, unit: "" };
+  }
+  if (formula.outputType === "boolean") {
+    return { type: "enum" as const, options: ["true", "false"] };
+  }
+  if (metric.key === "debt_risk_level") {
+    return { type: "enum" as const, options: ["low", "medium", "high"] };
+  }
+  if (metric.key === "manual_flag_present") {
+    return { type: "enum" as const, options: [...manualFlagOptions] };
+  }
+  const numberConfigMap: Record<string, { step: number; min: number; max: number; unit?: string }> = {
+    drawdown_from_recent_high: { step: 5, min: -80, max: -5, unit: "%" },
+    relative_strength_vs_spy: { step: 1, min: -25, max: 25, unit: "%" },
+    distance_from_ma_20: { step: 1, min: -25, max: 25, unit: "%" },
+    distance_from_ma_50: { step: 1, min: -25, max: 25, unit: "%" },
+    distance_from_ma_200: { step: 1, min: -40, max: 40, unit: "%" },
+    rebound_from_recent_low: { step: 1, min: 0, max: 80, unit: "%" },
+    revenue_growth_yoy: { step: 5, min: -50, max: 80, unit: "%" },
+    margin_change_pct: { step: 1, min: -25, max: 15, unit: "pts" },
+    days_until_earnings: { step: 1, min: 0, max: 90, unit: "d" },
+    days_since_last_review: { step: 1, min: 0, max: 180, unit: "d" },
+  };
+  const config = numberConfigMap[metric.key] ?? { step: 1, min: -100, max: 100, unit: "" };
+  return { type: "number" as const, ...config };
+};
+
+const operatorOptionsForMetric = (
+  metric?: MetricDefinition,
+  formula?: { outputType: "number" | "boolean" | "string" },
+): readonly ConditionOperator[] => {
+  if (!metric || !formula) return [">=", "<=", ">", "<"];
+  if (formula.outputType === "number") return [">=", "<=", ">", "<"];
+  if (metric.key === "manual_flag_present") return ["contains", "is"];
+  return ["is"];
+};
+
+const formatMetricThreshold = (
+  metric: MetricDefinition | undefined,
+  threshold: string,
+  language: AppLanguage,
+  formula?: { outputType: "number" | "boolean" | "string" },
+) => {
+  const control = metricControlConfig(metric, formula);
+  if (control.type === "number") {
+    return `${threshold}${control.unit ? ` ${control.unit}` : ""}`;
+  }
+  if (threshold === "true") return language === "ko" ? "예" : "Yes";
+  if (threshold === "false") return language === "ko" ? "아니오" : "No";
+  return threshold;
+};
+
+const parseThresholdValue = (
+  rawValue: string,
+  metric: MetricDefinition | undefined,
+  formula?: { outputType: "number" | "boolean" | "string" },
+) => {
+  const control = metricControlConfig(metric, formula);
+  if (control.type === "number") return Number(rawValue);
+  if (rawValue === "true") return true;
+  if (rawValue === "false") return false;
+  return rawValue;
+};
+
+const defaultRecipeDraftForm = (): RecipeDraftForm => ({
+  name: "",
+  purpose: "",
+  opportunityType: opportunityTypes[0],
+  timeHorizon: timeHorizons[1],
+  intendedUseCase: useCaseOptions[0],
+  notes: "",
+  reviewCadenceDays: reviewCadenceOptions[2],
+  alertCooldownHours: alertCooldownOptions[2],
+});
+
+const defaultMetricDraftForm = (): MetricDraftForm => ({
+  name: "",
+  humanMeaning: "",
+  builderMode: "raw",
+  selectedRawFields: [],
+  rawParameterKey: expressionParameterRegistry[0].key,
+  expression: expressionParameterRegistry[0].key,
+  availability: "automated",
+  freshnessExpectation: "Daily",
+  exampleDisplayText: "",
+  missingDataBehavior: "",
+});
+
+const slugMetricKey = (value: string) =>
+  value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9가-힣]+/g, "_")
+    .replace(/^_+|_+$/g, "")
+    .slice(0, 48);
 
 const stockSearchScore = (query: string, item: { stock: Stock }) => {
   const normalizedQuery = query.trim().toLowerCase();
@@ -437,7 +583,6 @@ const stockMetricFamilyOrder = [
   "Earnings & Events",
   "News & Thesis Risk",
   "Sector & Market Context",
-  "Macro Context",
   "User Thesis Match",
   "Recipe Condition Map",
 ] as const;
@@ -494,6 +639,121 @@ const analysisStatusFilterLabel = (filter: AnalysisStatusFilter) => {
   }
 };
 
+const localizedMetricAvailability = (language: AppLanguage, value?: string | null) => {
+  if (!value || language === "en") return value ?? "";
+  switch (value) {
+    case "automated":
+      return "자동";
+    case "manual":
+      return "수동";
+    case "future":
+      return "보류";
+    default:
+      return value;
+  }
+};
+
+const localizedConditionRole = (language: AppLanguage, value?: string | null) => {
+  if (!value || language === "en") return value ?? "";
+  switch (value) {
+    case "Eligibility Filter":
+      return "적격 필터";
+    case "Supporting Evidence":
+      return "보강 근거";
+    case "Timing Trigger":
+      return "타이밍 트리거";
+    case "Risk Warning":
+      return "위험 경고";
+    case "Hard Disqualifier":
+      return "강한 제외 조건";
+    case "Review Trigger":
+      return "검토 트리거";
+    case "Outcome Learning Tag":
+      return "성과 학습 태그";
+    default:
+      return value;
+  }
+};
+
+const rawLogicFieldLabel = (language: AppLanguage, field: string) => {
+  const labels: Record<string, { ko: string; en: string }> = {
+    priceHistorySeries: { ko: "가격 시계열", en: "Price history series" },
+    volumeHistorySeries: { ko: "거래량 시계열", en: "Volume history series" },
+    volatilityHistorySeries: { ko: "변동폭 시계열", en: "Volatility range series" },
+    benchmarkHistorySeries: { ko: "벤치마크 시계열", en: "Benchmark history series" },
+    financialStatementSnapshot: { ko: "재무 스냅샷", en: "Financial statement snapshot" },
+    valuationSnapshot: { ko: "밸류에이션 스냅샷", en: "Valuation snapshot" },
+    eventCalendar: { ko: "이벤트 캘린더", en: "Event calendar" },
+    newsRiskFlags: { ko: "뉴스·위험 플래그", en: "News risk flags" },
+    thesisText: { ko: "투자 논리 원문", en: "Thesis text" },
+    plannedEntryRange: { ko: "계획 진입 구간", en: "Planned entry range" },
+    invalidationRule: { ko: "무효화 기준", en: "Invalidation rule" },
+    lastThesisReviewAt: { ko: "마지막 논리 검토 시점", en: "Last thesis review time" },
+    manualRiskFlags: { ko: "수동 위험 플래그", en: "Manual risk flags" },
+  };
+  return labels[field]?.[language] ?? field;
+};
+
+const recipeLineageKey = (recipe: Recipe) => recipe.lineageId ?? recipe.id;
+const logicRuleRefKey = (recipeId: string, conditionId: string) => `${recipeId}:${conditionId}`;
+
+const logicInfoContent = (language: AppLanguage, target: LogicInfoTarget) => {
+  const content = {
+    "Raw Data": {
+      title: language === "ko" ? "원천 데이터" : "Raw Data",
+      body:
+        language === "ko"
+          ? "원천 데이터는 스캐너의 출발점입니다. 완성된 일봉 OHLCV, SPY, 섹터 ETF, 구성종목/섹터 맵, 그리고 필요한 수동 입력만 둡니다. 이 팝업에서는 데이터 정의, 프로바이더/API, 갱신 빈도, 어떤 처리 피처가 여기에 의존하는지만 확인합니다."
+          : "Raw Data is the scanner starting layer. It holds only completed daily OHLCV bars, SPY, sector ETFs, universe membership data, and required manual inputs. Use this view to inspect definitions, providers/APIs, freshness, and which processed features depend on each source.",
+    },
+    "Processed Features": {
+      title: language === "ko" ? "처리 피처" : "Processed Features",
+      body:
+        language === "ko"
+          ? "처리 피처는 원천 일봉 데이터에서 계산된 중간 결과입니다. 이동평균, 126일 하락폭, SPY 대비 초과수익, 거래량 배수처럼 규칙 평가 전에 필요한 파생값만 보여줍니다. 여기서는 직접 식을 만드는 것이 아니라, 스캐너가 실제로 계산한 값을 점검합니다."
+          : "Processed Features are the derived columns computed from archived daily data. They include moving averages, 126-day drawdown, excess return versus SPY, volume spike, and other explicit intermediate values required before rule evaluation. This view is for inspection, not custom formula editing.",
+    },
+    "Frozen Rules": {
+      title: language === "ko" ? "고정 규칙" : "Frozen Rules",
+      body:
+        language === "ko"
+          ? "고정 규칙은 이번 앱의 핵심 연구 규칙 여섯 개입니다. 규칙 ID, 서명 해시, 섹터 범위, 조건 토큰, 파라미터, 과거 증거 요약이 모두 중앙 레지스트리에 고정되어 있습니다. 여기서는 바꾸는 것이 아니라 읽고 검증합니다."
+          : "Frozen Rules are the six central research rules. Their ids, signature hashes, sector scope, condition tokens, parameters, and proof snapshots are fixed in a central registry. This view is for inspection and verification, not mutation.",
+    },
+    Signals: {
+      title: language === "ko" ? "신호" : "Signals",
+      body:
+        language === "ko"
+          ? "신호는 하루 스캔 결과입니다. MATCHED, NEAR_MATCH, BLOCKED만 노출하고, 어떤 조건이 통과/실패/누락됐는지와 함께 사람 검토 기록을 남깁니다. 매수·매도 명령이 아니라 검토 대상을 압축하는 출력 레이어입니다."
+          : "Signals are the daily scan outputs. Only MATCHED, NEAR_MATCH, and BLOCKED results are surfaced, along with the passed, failed, and missing conditions and the manual review log. This is an inspection layer, not a trading instruction layer.",
+    },
+  } as const;
+  return content[target];
+};
+
+const buildLogicSetVersionDiff = (recipe: Recipe, previous?: Recipe) => {
+  if (!previous) {
+    return { added: recipe.conditions.length, removed: 0, changed: 0, metaChanged: 0 };
+  }
+  const previousMap = new Map(previous.conditions.map((condition) => [condition.id, condition]));
+  const nextMap = new Map(recipe.conditions.map((condition) => [condition.id, condition]));
+  const added = recipe.conditions.filter((condition) => !previousMap.has(condition.id)).length;
+  const removed = previous.conditions.filter((condition) => !nextMap.has(condition.id)).length;
+  const changed = recipe.conditions.filter((condition) => {
+    const old = previousMap.get(condition.id);
+    if (!old) return false;
+    return (
+      old.metricKey !== condition.metricKey ||
+      old.formulaKey !== condition.formulaKey ||
+      old.operator !== condition.operator ||
+      JSON.stringify(old.value) !== JSON.stringify(condition.value) ||
+      old.role !== condition.role
+    );
+  }).length;
+  const metaChanged = Number(previous.name !== recipe.name) + Number(previous.purpose !== recipe.purpose);
+  return { added, removed, changed, metaChanged };
+};
+
 const stockBoardModeLabel = (mode: StockBoardMode) => {
   switch (mode) {
     case "Pinned First":
@@ -502,6 +762,33 @@ const stockBoardModeLabel = (mode: StockBoardMode) => {
       return mode;
   }
 };
+
+const homeBucketLabel = (language: AppLanguage, bucket: HomeBucket) => {
+  switch (bucket) {
+    case "All":
+      return t(language, "common.all");
+    case "Review Now":
+      return t(language, "home.bucket.reviewNow");
+    case "Forming":
+      return t(language, "home.bucket.forming");
+    case "Review Soon":
+      return t(language, "home.bucket.reviewSoon");
+    default:
+      return bucket;
+  }
+};
+
+const recipeShelfFilterLabel = (language: AppLanguage, filter: RecipeShelfFilter) =>
+  localizedRecipeShelfFilter(language, filter);
+
+const recipeBuilderStepLabel = (language: AppLanguage, step: RecipeBuilderStep) =>
+  localizedRecipeBuilderStep(language, step);
+
+const eyesShelfFilterLabel = (language: AppLanguage, filter: EyesShelfFilter) =>
+  localizedEyesShelfFilter(language, filter);
+
+const journalFilterLabel = (language: AppLanguage, filter: JournalFilter) =>
+  localizedJournalFilter(language, filter);
 
 const compactMetricContextLabel = (card: VisualEvidenceCard) => {
   const label = card.metric.thresholdLabel ?? card.metric.comparisonLabel ?? card.role;
@@ -659,250 +946,16 @@ const normalizeSeries = (series: number[], bounds?: { min: number; max: number }
   return series.map((value) => ((value - min) / range) * 100);
 };
 
-const Reveal = ({
-  children,
-  delay = 0,
-}: {
-  children: React.ReactNode;
-  delay?: number;
-}) => {
-  const opacity = useRef(new Animated.Value(0)).current;
-  const translateY = useRef(new Animated.Value(16)).current;
-
-  useEffect(() => {
-    Animated.parallel([
-      Animated.timing(opacity, {
-        toValue: 1,
-        duration: 220,
-        delay,
-        useNativeDriver: true,
-      }),
-      Animated.timing(translateY, {
-        toValue: 0,
-        duration: 240,
-        delay,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, [delay, opacity, translateY]);
-
-  return (
-    <Animated.View style={{ opacity, transform: [{ translateY }] }}>
-      {children}
-    </Animated.View>
-  );
-};
-
-const Card = ({
-  children,
-  highlighted,
-}: {
-  children: React.ReactNode;
-  highlighted?: boolean;
-}) => <View style={[styles.card, highlighted ? styles.cardHighlighted : null]}>{children}</View>;
-
-const Button = ({
-  label,
-  onPress,
-  tone = "primary",
-  disabled = false,
-}: {
-  label: string;
-  onPress: () => void;
-  tone?: "primary" | "secondary" | "ghost";
-  disabled?: boolean;
-}) => (
-  <Pressable
-    onPress={disabled ? undefined : onPress}
-    style={({ pressed }) => [
-      styles.button,
-      tone === "primary"
-        ? styles.buttonPrimary
-        : tone === "secondary"
-          ? styles.buttonSecondary
-          : styles.buttonGhost,
-      pressed && !disabled ? styles.buttonPressed : null,
-      disabled ? styles.buttonDisabled : null,
-    ]}
-  >
-    <Text
-      style={[
-        styles.buttonText,
-        tone === "primary"
-          ? styles.buttonPrimaryText
-          : tone === "secondary"
-          ? styles.buttonSecondaryText
-          : styles.buttonGhostText,
-        disabled ? styles.buttonDisabledText : null,
-      ]}
-      numberOfLines={1}
-    >
-      {label}
-    </Text>
-  </Pressable>
-);
-
-const Input = ({
-  value,
-  onChangeText,
-  placeholder,
-  multiline,
-  keyboardType,
-  autoCapitalize,
-  onSubmitEditing,
-  returnKeyType,
-  invalid,
-}: {
-  value: string;
-  onChangeText: (value: string) => void;
-  placeholder: string;
-  multiline?: boolean;
-  keyboardType?: "default" | "numeric";
-  autoCapitalize?: "none" | "sentences" | "characters";
-  onSubmitEditing?: () => void;
-  returnKeyType?: "done" | "go" | "next" | "search";
-  invalid?: boolean;
-}) => (
-  <TextInput
-    value={value}
-    onChangeText={onChangeText}
-    placeholder={placeholder}
-    placeholderTextColor="#8da0b7"
-    multiline={multiline}
-    keyboardType={keyboardType}
-    autoCapitalize={autoCapitalize}
-    onSubmitEditing={onSubmitEditing}
-    returnKeyType={returnKeyType}
-    style={[styles.input, invalid ? styles.inputInvalid : null, multiline ? styles.textArea : null]}
-  />
-);
-
-const NumberStepper = ({
-  label,
-  value,
-  onChange,
-  step,
-  min,
-  max,
-  unit,
-}: {
-  label: string;
-  value: number;
-  onChange: (next: number) => void;
-  step: number;
-  min: number;
-  max: number;
-  unit?: string;
-}) => (
-  <View style={styles.stepper}>
-    <Text style={styles.stepperLabel}>{label}</Text>
-    <View style={styles.stepperTrack}>
-      <Pressable onPress={() => onChange(Math.max(min, Number((value - step).toFixed(2))))} style={styles.stepperButton}>
-        <Text style={styles.stepperButtonText}>-</Text>
-      </Pressable>
-      <View style={styles.stepperValueWrap}>
-        <Text style={styles.stepperValue}>
-          {value}
-          {unit ? ` ${unit}` : ""}
-        </Text>
-      </View>
-      <Pressable onPress={() => onChange(Math.min(max, Number((value + step).toFixed(2))))} style={styles.stepperButton}>
-        <Text style={styles.stepperButtonText}>+</Text>
-      </Pressable>
-    </View>
-  </View>
-);
-
-const DenseStat = ({ label, value, tone = "neutral" }: { label: string; value: string; tone?: "neutral" | "strong" | "risk" }) => (
-  <View style={[styles.denseStat, tone === "strong" ? styles.denseStatStrong : tone === "risk" ? styles.denseStatRisk : null]}>
-    <Text style={styles.denseStatLabel} numberOfLines={1}>
-      {label}
-    </Text>
-    <Text style={styles.denseStatValue} numberOfLines={1}>
-      {value}
-    </Text>
-  </View>
-);
-
-const MetaPill = ({ label }: { label: string }) => (
-  <View style={styles.metaPill}>
-    <Text style={styles.metaPillText} numberOfLines={1}>
-      {label}
-    </Text>
-  </View>
-);
-
-const HorizontalChoice = <T extends string>({
-  options,
-  value,
-  onSelect,
-  variant = "chip",
-  labelForOption,
-}: {
-  options: readonly T[];
-  value: T;
-  onSelect: (next: T) => void;
-  variant?: "chip" | "segmented";
-  labelForOption?: (option: T) => string;
-}) => {
-  if (variant === "segmented") {
-    return (
-      <View style={styles.segmentedChoice}>
-        {options.map((option, index) => (
-          <Pressable
-            key={option}
-            onPress={() => onSelect(option)}
-            style={({ pressed }) => [
-              styles.segmentedChoiceItem,
-              option === value ? styles.segmentedChoiceItemActive : null,
-              index > 0 ? styles.segmentedChoiceItemDivider : null,
-              pressed ? styles.choiceChipPressed : null,
-            ]}
-          >
-            <Text
-              style={[
-                styles.segmentedChoiceText,
-                option === value ? styles.segmentedChoiceTextActive : null,
-              ]}
-              numberOfLines={1}
-            >
-              {labelForOption ? labelForOption(option) : option}
-            </Text>
-          </Pressable>
-        ))}
-      </View>
-    );
-  }
-
-  return (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.choiceRow}>
-      {options.map((option) => (
-        <Pressable
-          key={option}
-          onPress={() => onSelect(option)}
-          style={({ pressed }) => [
-            styles.choiceChip,
-            option === value ? styles.choiceChipActive : null,
-            pressed ? styles.choiceChipPressed : null,
-          ]}
-        >
-          <Text style={[styles.choiceChipText, option === value ? styles.choiceChipTextActive : null]} numberOfLines={1}>
-            {labelForOption ? labelForOption(option) : option}
-          </Text>
-        </Pressable>
-      ))}
-    </ScrollView>
-  );
-};
-
 const StepFlow = ({
   steps,
   current,
   onSelect,
+  labelForStep,
 }: {
   steps: readonly RecipeBuilderStep[];
   current: RecipeBuilderStep;
   onSelect: (step: RecipeBuilderStep) => void;
+  labelForStep?: (step: RecipeBuilderStep) => string;
 }) => {
   const currentIndex = steps.indexOf(current);
 
@@ -935,7 +988,7 @@ const StepFlow = ({
                 </Text>
               </View>
               <Text style={[styles.stepLabel, active ? styles.stepLabelActive : null]} numberOfLines={1}>
-                {step}
+                {labelForStep ? labelForStep(step) : step}
               </Text>
             </Pressable>
           </React.Fragment>
@@ -1294,6 +1347,7 @@ const EvidenceCardView = ({
   onOpen,
   pinned = false,
   dense = false,
+  hideFreshness = false,
   language = "en",
 }: {
   card: VisualEvidenceCard;
@@ -1301,6 +1355,7 @@ const EvidenceCardView = ({
   onOpen?: () => void;
   pinned?: boolean;
   dense?: boolean;
+  hideFreshness?: boolean;
   language?: AppLanguage;
 }) => {
   const [expanded, setExpanded] = useState(false);
@@ -1409,16 +1464,18 @@ const EvidenceCardView = ({
             <Text style={[styles.compactEvidenceEffect, dense ? styles.compactEvidenceEffectDense : null]} numberOfLines={1}>
               {card.effect}
             </Text>
-            <View style={styles.compactFreshnessWrap}>
-              <View style={freshnessTone(card.freshness)}>
-                <View style={styles.freshnessDot} />
+            {!hideFreshness ? (
+              <View style={styles.compactFreshnessWrap}>
+                <View style={freshnessTone(card.freshness)}>
+                  <View style={styles.freshnessDot} />
+                </View>
+                <Text style={[styles.compactFreshnessText, dense ? styles.compactFreshnessTextDense : null]} numberOfLines={1}>
+                  {card.freshness === "Unavailable"
+                    ? t(language, "stocks.data.noData")
+                    : localizedFreshness(language, card.freshness)}
+                </Text>
               </View>
-              <Text style={[styles.compactFreshnessText, dense ? styles.compactFreshnessTextDense : null]} numberOfLines={1}>
-                {card.freshness === "Unavailable"
-                  ? t(language, "stocks.data.noData")
-                  : localizedFreshness(language, card.freshness)}
-              </Text>
-            </View>
+            ) : null}
           </View>
         </>
       ) : (
@@ -1438,10 +1495,12 @@ const EvidenceCardView = ({
           <Text style={styles.evidenceEffect}>{t(language, "stocks.evidence.effect", { label: card.effect })}</Text>
           <Text style={styles.evidenceWhy}>{t(language, "stocks.evidence.why", { label: card.whyItMatters })}</Text>
 
-          <View style={styles.metaRow}>
-            <MetaPill label={sourceTypeLabel(language, card.sourceType)} />
-            {card.metric.comparisonLabel ? <MetaPill label={card.metric.comparisonLabel} /> : null}
-          </View>
+          {!hideFreshness ? (
+            <View style={styles.metaRow}>
+              <MetaPill label={sourceTypeLabel(language, card.sourceType)} />
+              {card.metric.comparisonLabel ? <MetaPill label={card.metric.comparisonLabel} /> : null}
+            </View>
+          ) : null}
         </>
       )}
 
@@ -1458,11 +1517,13 @@ const EvidenceCardView = ({
           {card.relatedConditionLabel ? <Text style={styles.evidenceRelated}>{t(language, "stocks.evidence.recipeLink", { label: card.relatedConditionLabel })}</Text> : null}
           <Text style={styles.evidenceEffect}>{t(language, "stocks.evidence.effect", { label: card.effect })}</Text>
           <Text style={styles.evidenceWhy}>{t(language, "stocks.evidence.why", { label: card.whyItMatters })}</Text>
-          <View style={styles.metaRow}>
-            <MetaPill label={sourceTypeLabel(language, card.sourceType)} />
-            <MetaPill label={localizedFreshness(language, card.freshness)} />
-            {card.metric.comparisonLabel ? <MetaPill label={card.metric.comparisonLabel} /> : null}
-          </View>
+          {!hideFreshness ? (
+            <View style={styles.metaRow}>
+              <MetaPill label={sourceTypeLabel(language, card.sourceType)} />
+              <MetaPill label={localizedFreshness(language, card.freshness)} />
+              {card.metric.comparisonLabel ? <MetaPill label={card.metric.comparisonLabel} /> : null}
+            </View>
+          ) : null}
           <Text style={styles.formulaTitle}>{card.formulaName ?? t(language, "stocks.evidence.formulaDetail")}</Text>
           <Text style={styles.formulaBody}>{card.formulaDescription ?? t(language, "stocks.evidence.formulaMissing")}</Text>
           <Text style={styles.formulaMeta}>
@@ -1668,7 +1729,7 @@ const StockTriageCard = ({
               <Text style={styles.stockTriageToggle}>{expanded ? t(language, "common.hide") : t(language, "common.open")}</Text>
             </View>
           </View>
-          <Text style={stateTone(evaluation?.currentState)}>{evaluation?.currentState ?? (language === "ko" ? "미추적" : "Unwatched")}</Text>
+          <Text style={stateTone(evaluation?.currentState)}>{localizedEyeState(language, evaluation?.currentState)}</Text>
         </View>
 
         <View style={styles.stockTriageSummaryRow}>
@@ -1709,7 +1770,7 @@ const StockTriageCard = ({
             <View style={styles.detailCallout}>
               <Text style={styles.detailCalloutLabel}>{language === "ko" ? "최근 결정" : "Latest decision"}</Text>
               <Text style={styles.detailCalloutBody}>
-                {item.decisions[0].action} · {formatShortDate(item.decisions[0].createdAt)}
+                {localizedDecisionAction(language, item.decisions[0].action)} · {formatShortDate(item.decisions[0].createdAt)}
               </Text>
             </View>
           ) : null}
@@ -1764,7 +1825,7 @@ const AlertClusterCard = ({
   const [expanded, setExpanded] = useState(false);
   const leadAlert = group.openAlerts[0];
   const nextAlert = group.openAlerts[1];
-  const supportLine = group.dominantEye?.lastEvaluation?.whyNow ?? leadAlert?.whyNow ?? (language === "ko" ? "이 종목에 묶인 신호를 함께 검토하세요." : "Review grouped signals on this stock.");
+  const supportLine = group.dominantEye?.lastEvaluation?.whyNow ?? leadAlert?.whyNow ?? t(language, "alerts.cluster.groupHint");
 
   return (
     <Card highlighted={selectedStockId === group.stock.id}>
@@ -1779,7 +1840,7 @@ const AlertClusterCard = ({
           </View>
           <View style={styles.priorityStack}>
             <View style={priorityTone(group.highestPriority)}>
-              <Text style={styles.priorityBadgeText}>{group.highestPriority}</Text>
+              <Text style={styles.priorityBadgeText}>{localizedAlertPriority(language, group.highestPriority)}</Text>
             </View>
             <Text style={styles.timestampText}>{group.openAlerts.length} {t(language, "common.alerts")}</Text>
           </View>
@@ -1799,7 +1860,7 @@ const AlertClusterCard = ({
 
         {!expanded && nextAlert ? (
           <Text style={styles.alertClusterPreview} numberOfLines={1}>
-            {language === "ko" ? "다음" : "Next"}: {nextAlert.title}
+            {t(language, "alerts.cluster.next")}: {nextAlert.title}
           </Text>
         ) : null}
       </Pressable>
@@ -1815,15 +1876,15 @@ const AlertClusterCard = ({
                 </View>
                 <View style={styles.priorityStack}>
                   <View style={priorityTone(alert.priority)}>
-                    <Text style={styles.priorityBadgeText}>{alert.priority}</Text>
+                    <Text style={styles.priorityBadgeText}>{localizedAlertPriority(language, alert.priority)}</Text>
                   </View>
                   <Text style={styles.timestampText}>{formatDate(alert.createdAt)}</Text>
                 </View>
               </View>
               <View style={styles.alertClusterActions}>
-                <Button label="Entered" onPress={() => onQuickDecision(alert, "Entered")} />
-                <Button label="Skip" tone="secondary" onPress={() => onQuickDecision(alert, "Skipped")} />
-                <Button label="Snooze" tone="secondary" onPress={() => onSnooze(alert.id)} />
+                <Button label={t(language, "alerts.action.entered")} onPress={() => onQuickDecision(alert, "Entered")} />
+                <Button label={t(language, "alerts.action.skip")} tone="secondary" onPress={() => onQuickDecision(alert, "Skipped")} />
+                <Button label={t(language, "alerts.action.snooze")} tone="secondary" onPress={() => onSnooze(alert.id)} />
                 <Button label={t(language, "common.done")} tone="ghost" onPress={() => onReviewed(alert.id)} />
               </View>
             </Pressable>
@@ -1832,15 +1893,30 @@ const AlertClusterCard = ({
       ) : null}
 
       <View style={styles.analysisActionRow}>
-        <Button label={language === "ko" ? "종목 열기" : "Open Stock"} onPress={onOpenStock} />
-        <Button label={language === "ko" ? "모두 확인" : "Acknowledge All"} tone="ghost" onPress={onAcknowledgeAll} />
+        <Button label={t(language, "common.stock")} onPress={onOpenStock} />
+        <Button label={t(language, "alerts.action.acknowledgeAll")} tone="ghost" onPress={onAcknowledgeAll} />
         {leadAlert ? (
-          <Button label={expanded ? (language === "ko" ? "대표 알림 상세" : "Lead Detail") : (language === "ko" ? "상세 열기" : "Open Detail")} tone="secondary" onPress={() => onOpenDetail(leadAlert.id)} />
+          <Button label={t(language, "common.detail")} tone="secondary" onPress={() => onOpenDetail(leadAlert.id)} />
         ) : null}
       </View>
     </Card>
   );
 };
+
+const logicLabLayerLabel = (language: AppLanguage, layer: LogicLabLayer) => {
+  switch (layer) {
+    case "Processed Features":
+      return language === "ko" ? "처리 피처" : "Features";
+    case "Frozen Rules":
+      return language === "ko" ? "고정 규칙" : "Rules";
+    case "Signals":
+      return language === "ko" ? "신호" : "Signals";
+    default:
+      return layer;
+  }
+};
+
+
 
 interface RecipeDraftForm {
   name: string;
@@ -1877,18 +1953,10 @@ export default function App() {
   const [recipeShelfFilter, setRecipeShelfFilter] = useState<RecipeShelfFilter>("All");
   const [eyesShelfFilter, setEyesShelfFilter] = useState<EyesShelfFilter>("All");
   const [journalFilter, setJournalFilter] = useState<JournalFilter>("All");
+  const [logicLabLayer, setLogicLabLayer] = useState<LogicLabLayer>("Processed Features");
 
-  const [stockForm, setStockForm] = useState({ symbol: "", name: "", thesis: "" });
-  const [recipeForm, setRecipeForm] = useState<RecipeDraftForm>({
-    name: "",
-    purpose: "",
-    opportunityType: opportunityTypes[0],
-    timeHorizon: timeHorizons[1],
-    intendedUseCase: useCaseOptions[0],
-    notes: "",
-    reviewCadenceDays: reviewCadenceOptions[2],
-    alertCooldownHours: alertCooldownOptions[2],
-  });
+  const [recipeForm, setRecipeForm] = useState<RecipeDraftForm>(defaultRecipeDraftForm());
+  const [metricForm, setMetricForm] = useState<MetricDraftForm>(defaultMetricDraftForm());
   const [eyeForm, setEyeForm] = useState<EyeDraftForm>({
     stockId: "",
     recipeId: "",
@@ -1907,12 +1975,11 @@ export default function App() {
     thesisValid: "Yes" as (typeof thesisValidityOptions)[number],
     timing: "On Time" as (typeof timingOptions)[number],
   });
-  const [conditionBuilder, setConditionBuilder] = useState({
-    category: "Technical",
-    templateId: conditionLibrary[0].id,
-    kind: conditionLibrary[0].defaultKind,
-    operator: conditionLibrary[0].defaultOperator as ConditionOperator,
-    threshold: conditionLibrary[0].defaultValue,
+  const [conditionBuilder, setConditionBuilder] = useState<ConditionBuilderState>({
+    metricKey: metricCatalog[0].key,
+    role: "Eligibility Filter",
+    operator: "<=",
+    threshold: "-25",
     note: "",
   });
   const [draftConditions, setDraftConditions] = useState<RecipeCondition[]>([]);
@@ -1923,24 +1990,82 @@ export default function App() {
   const [stockSearch, setStockSearch] = useState("");
   const [recentStockIds, setRecentStockIds] = useState<string[]>([]);
   const [pinnedMetricKeys, setPinnedMetricKeys] = useState<string[]>([]);
-  const [stockComposerOpen, setStockComposerOpen] = useState(false);
   const [selectedEvidenceCard, setSelectedEvidenceCard] = useState<VisualEvidenceCard | null>(null);
   const [selectedHeroPointIndex, setSelectedHeroPointIndex] = useState(0);
   const [recipeBuilderOpen, setRecipeBuilderOpen] = useState(false);
+  const [recipeBuilderEditingId, setRecipeBuilderEditingId] = useState("");
+  const [logicSetBuilderOpen, setLogicSetBuilderOpen] = useState(false);
+  const [logicSetBuilderEditingId, setLogicSetBuilderEditingId] = useState("");
+  const [logicSetForm, setLogicSetForm] = useState<RecipeDraftForm>(defaultRecipeDraftForm());
+  const [logicSetSelectedRuleRefs, setLogicSetSelectedRuleRefs] = useState<string[]>([]);
+  const [logicSetFormAttempted, setLogicSetFormAttempted] = useState(false);
+  const [metricBuilderOpen, setMetricBuilderOpen] = useState(false);
+  const [conditionBuilderOpen, setConditionBuilderOpen] = useState(false);
+  const [logicL0RegistryOpen, setLogicL0RegistryOpen] = useState(false);
+  const [logicInfoTarget, setLogicInfoTarget] = useState<LogicInfoTarget | "">("");
+  const [logicVersionsRecipeId, setLogicVersionsRecipeId] = useState("");
+  const [metricNumberToken, setMetricNumberToken] = useState("");
+  const [metricInsertRawField, setMetricInsertRawField] = useState(expressionParameterRegistry[0].key);
+  const [metricFunctionKey, setMetricFunctionKey] = useState("ABS");
+  const [metricFunctionArgMode1, setMetricFunctionArgMode1] = useState<"parameter" | "number">("parameter");
+  const [metricFunctionArgMode2, setMetricFunctionArgMode2] = useState<"parameter" | "number">("parameter");
+  const [metricFunctionArgMode3, setMetricFunctionArgMode3] = useState<"parameter" | "number">("parameter");
+  const [metricFunctionArgParameter1, setMetricFunctionArgParameter1] = useState(expressionParameterRegistry[0].key);
+  const [metricFunctionArgParameter2, setMetricFunctionArgParameter2] = useState(expressionParameterRegistry[1]?.key ?? expressionParameterRegistry[0].key);
+  const [metricFunctionArgParameter3, setMetricFunctionArgParameter3] = useState(expressionParameterRegistry[2]?.key ?? expressionParameterRegistry[0].key);
+  const [metricFunctionArgNumber1, setMetricFunctionArgNumber1] = useState("");
+  const [metricFunctionArgNumber2, setMetricFunctionArgNumber2] = useState("");
+  const [metricFunctionArgNumber3, setMetricFunctionArgNumber3] = useState("");
+  const [metricBuilderEditingKey, setMetricBuilderEditingKey] = useState("");
   const [recipeDetailId, setRecipeDetailId] = useState("");
+  const [conditionBuilderRecipeId, setConditionBuilderRecipeId] = useState("");
+  const [logicRuleEditingContext, setLogicRuleEditingContext] = useState<{ recipeId: string; conditionId?: string } | null>(null);
   const [selectedDecisionId, setSelectedDecisionId] = useState("");
   const [eyeDetailOpen, setEyeDetailOpen] = useState(false);
   const [eyeComposerOpen, setEyeComposerOpen] = useState(false);
+  const [eyeComposerEditingId, setEyeComposerEditingId] = useState("");
   const [journalComposerOpen, setJournalComposerOpen] = useState(false);
+  const [journalComposerEditingId, setJournalComposerEditingId] = useState("");
   const [alertDetailOpen, setAlertDetailOpen] = useState(false);
+  const [scannerSignalReviewId, setScannerSignalReviewId] = useState("");
+  const [scannerReviewForm, setScannerReviewForm] = useState({
+    userDecision: "watch" as "watch" | "ignore" | "bought" | "skipped" | "sold" | "other",
+    manualReason: "",
+    convictionScoreOptional: "",
+    notes: "",
+    entryPriceOptional: "",
+    exitPriceOptional: "",
+    resultNotes: "",
+  });
   const [recipeFormAttempted, setRecipeFormAttempted] = useState(false);
+  const [metricFormAttempted, setMetricFormAttempted] = useState(false);
   const [eyeFormAttempted, setEyeFormAttempted] = useState(false);
   const [journalFormAttempted, setJournalFormAttempted] = useState(false);
-  const [stockFormAttempted, setStockFormAttempted] = useState(false);
   const deferredStockSearch = useDeferredValue(stockSearch);
   const { width: viewportWidth } = useWindowDimensions();
   const isCompactPhone = viewportWidth < 390;
   const isVeryCompactPhone = viewportWidth < 360;
+  const logicLabMetricCatalog = useMemo(
+    () =>
+      ((data?.customMetrics ?? []).map((metric) => ({
+        ...metric,
+        origin: "custom" as const,
+      })) as MetricDefinition[]),
+    [data?.customMetrics],
+  );
+  const logicMetricKeySet = useMemo(
+    () => new Set(logicLabMetricCatalog.map((metric) => metric.key)),
+    [logicLabMetricCatalog],
+  );
+  const logicLabCompatibleRecipes = useMemo(
+    () =>
+      (data?.recipes ?? []).filter((recipe) =>
+        recipe.conditions.every(
+          (condition) => !condition.metricKey || logicMetricKeySet.has(condition.metricKey),
+        ),
+      ),
+    [data?.recipes, logicMetricKeySet],
+  );
 
   useEffect(() => {
     loadAppLanguage().then(setLanguage);
@@ -1980,6 +2105,42 @@ export default function App() {
           alert.reviewed || (Boolean(alert.snoozedUntil) && new Date(alert.snoozedUntil!).getTime() > Date.now()),
       ),
     [alertQueue],
+  );
+  const latestScanRun = data?.scanRuns?.[0];
+  const latestScanSignals = useMemo(
+    () =>
+      data?.scanSignals.filter((signal) => signal.scanRunId === latestScanRun?.id) ?? [],
+    [data?.scanSignals, latestScanRun?.id],
+  );
+  const latestProcessedFeatureDate =
+    latestScanRun?.latestExpectedTradingDate ??
+    (data?.processedFeatures ?? []).reduce<string>(
+      (latest, feature) => (feature.asOfDate > latest ? feature.asOfDate : latest),
+      "",
+    );
+  const latestProcessedFeatures = useMemo(
+    () =>
+      latestProcessedFeatureDate
+        ? (data?.processedFeatures ?? []).filter((feature) => feature.asOfDate === latestProcessedFeatureDate)
+        : [],
+    [data?.processedFeatures, latestProcessedFeatureDate],
+  );
+  const matchedScannerSignals = useMemo(
+    () => latestScanSignals.filter((signal) => signal.status === "MATCHED"),
+    [latestScanSignals],
+  );
+  const nearScannerSignals = useMemo(
+    () => latestScanSignals.filter((signal) => signal.status === "NEAR_MATCH"),
+    [latestScanSignals],
+  );
+  const blockedScannerSignals = useMemo(
+    () => latestScanSignals.filter((signal) => signal.status === "BLOCKED_OR_INCOMPLETE_DATA"),
+    [latestScanSignals],
+  );
+  const scannerReviewLogsBySignal = useMemo(
+    () =>
+      new Map((data?.reviewLogs ?? []).map((entry) => [entry.signalId, entry] as const)),
+    [data?.reviewLogs],
   );
 
   const stockDirectory = useMemo(() => {
@@ -2087,15 +2248,14 @@ export default function App() {
   }, [data?.stocks, previewStockId]);
 
   useEffect(() => {
-    const template =
-      conditionLibrary.find((item) => item.id === conditionBuilder.templateId) ?? conditionLibrary[0];
-    setConditionBuilder((current) => ({
-      ...current,
-      kind: template.defaultKind,
-      operator: template.defaultOperator,
-      threshold: template.defaultValue,
-    }));
-  }, [conditionBuilder.templateId]);
+    if (!conditionBuilderRecipeId && logicLabCompatibleRecipes[0]) {
+      setConditionBuilderRecipeId(logicLabCompatibleRecipes[0].id);
+      return;
+    }
+    if (conditionBuilderRecipeId && !logicLabCompatibleRecipes.some((recipe) => recipe.id === conditionBuilderRecipeId)) {
+      setConditionBuilderRecipeId(logicLabCompatibleRecipes[0]?.id ?? "");
+    }
+  }, [conditionBuilderRecipeId, logicLabCompatibleRecipes]);
 
   useEffect(() => {
     if (!eyeForm.stockId || !data) return;
@@ -2114,6 +2274,58 @@ export default function App() {
       };
     });
   }, [data, eyeForm.stockId]);
+
+  useEffect(() => {
+    const nextMetric =
+      logicLabMetricCatalog.find((metric) => metric.key === conditionBuilder.metricKey) ?? logicLabMetricCatalog[0];
+    const nextFormula = getFormulaDefinition(nextMetric?.formulaKey ?? "");
+    if (!nextMetric || !nextFormula) return;
+    const allowedOperators = operatorOptionsForMetric(nextMetric, nextFormula);
+    const control = metricControlConfig(nextMetric, nextFormula);
+    setConditionBuilder((current) => {
+      let threshold = current.threshold;
+      if (control.type === "enum" && !control.options.includes(current.threshold)) {
+        threshold = control.options[0];
+      }
+      if (control.type === "number" && Number.isNaN(Number(current.threshold))) {
+        threshold = String(control.min);
+      }
+      return {
+        ...current,
+        operator: allowedOperators.includes(current.operator) ? current.operator : allowedOperators[0],
+        threshold,
+      };
+    });
+  }, [conditionBuilder.metricKey, logicLabMetricCatalog]);
+
+  useEffect(() => {
+    if (metricForm.builderMode !== "raw") return;
+    if (!metricForm.rawParameterKey) return;
+    setMetricForm((current) =>
+      current.expression === current.rawParameterKey
+        ? current
+        : {
+            ...current,
+            expression: current.rawParameterKey,
+          },
+    );
+  }, [metricForm.builderMode, metricForm.rawParameterKey]);
+
+  useEffect(() => {
+    if (metricForm.builderMode !== "equation") return;
+    const referenced = referencedExpressionParameters(metricForm.expression);
+    setMetricForm((current) => {
+      const same =
+        referenced.length === current.selectedRawFields.length &&
+        referenced.every((key, index) => key === current.selectedRawFields[index]);
+      return same
+        ? current
+        : {
+            ...current,
+            selectedRawFields: referenced,
+          };
+    });
+  }, [metricForm.builderMode, metricForm.expression]);
 
   const preSelectedStockSummary =
     filteredStockDirectory.find((item) => item.stock.id === selectedStockId) ??
@@ -2203,10 +2415,10 @@ export default function App() {
 
   if (loading || !data) {
     return (
-      <SafeAreaView style={styles.loadingScreen}>
+      <View style={styles.loadingScreen}>
         <StatusBar style="dark" />
         <Text style={styles.loadingText}>{t(language, "common.loading")}</Text>
-      </SafeAreaView>
+      </View>
     );
   }
 
@@ -2220,9 +2432,11 @@ export default function App() {
   const selectedStockSummary =
     filteredStockDirectory.find((item) => item.stock.id === selectedStockId) ??
     stockDirectory.find((item) => item.stock.id === selectedStockId);
-  const selectedTemplate =
-    conditionLibrary.find((item) => item.id === conditionBuilder.templateId) ?? conditionLibrary[0];
-  const selectedOperatorOptions = operatorOptionsForTemplate(selectedTemplate);
+  const selectedConditionMetric =
+    logicLabMetricCatalog.find((metric) => metric.key === conditionBuilder.metricKey) ?? logicLabMetricCatalog[0];
+  const selectedConditionFormula = getFormulaDefinition(selectedConditionMetric?.formulaKey ?? "");
+  const selectedOperatorOptions = operatorOptionsForMetric(selectedConditionMetric, selectedConditionFormula);
+  const selectedConditionControl = metricControlConfig(selectedConditionMetric, selectedConditionFormula);
   const selectedAlert = alertQueue.find((alert) => alert.id === selectedAlertId) ?? alertQueue[0];
   const openAlerts = data.alerts.filter(
     (alert) => !alert.reviewed && (!alert.snoozedUntil || new Date(alert.snoozedUntil).getTime() <= Date.now()),
@@ -2411,6 +2625,20 @@ export default function App() {
     if (recipeShelfFilter === "Custom") return !starterRecipeNames.includes(recipe.name);
     return new Date(recipe.createdAt).getTime() >= Date.now() - 1000 * 60 * 60 * 24 * 14;
   });
+  const logicLabRecipes = [...logicLabCompatibleRecipes]
+    .sort((left, right) => {
+    const lineageDelta = recipeLineageKey(left).localeCompare(recipeLineageKey(right));
+    if (lineageDelta !== 0) return lineageDelta;
+    return right.version - left.version;
+  });
+  const selectedLogicVersionRecipe = logicVersionsRecipeId
+    ? data.recipes.find((recipe) => recipe.id === logicVersionsRecipeId)
+    : undefined;
+  const selectedLogicVersionLineage = selectedLogicVersionRecipe
+    ? [...data.recipes]
+        .filter((recipe) => recipeLineageKey(recipe) === recipeLineageKey(selectedLogicVersionRecipe))
+        .sort((left, right) => right.version - left.version)
+    : [];
   const journalHistory = [...data.decisions].sort((left, right) => right.createdAt.localeCompare(left.createdAt));
   const filteredJournalHistory = journalHistory.filter((decision) => {
     if (journalFilter === "All") return true;
@@ -2451,7 +2679,6 @@ export default function App() {
         Number(right.highestPriority === "High") - Number(left.highestPriority === "High") ||
         right.openAlerts.length - left.openAlerts.length,
     );
-
   const homeUrgentStocks = stockDirectory.filter((item) =>
     ["Attention Needed", "Thesis Risk Rising", "Thesis Broken"].includes(
       item.dominantEye?.lastEvaluation?.currentState ?? "",
@@ -2473,23 +2700,151 @@ export default function App() {
   const selectedEyeLinkedDecisions = selectedEye
     ? data.decisions.filter((decision) => decision.eyeId === selectedEye.id)
     : [];
-  const snapshotDiagnostics = {
-    provider: data.snapshots.filter((snapshot) => !snapshot.isMock).length,
-    mock: data.snapshots.filter((snapshot) => snapshot.isMock).length,
-    partial: data.snapshots.filter((snapshot) => snapshot.freshness === "Partial").length,
-    delayed: data.snapshots.filter((snapshot) => snapshot.freshness === "Delayed").length,
-    stale: data.snapshots.filter((snapshot) => snapshot.freshness === "Stale").length,
-    unavailable: data.snapshots.filter((snapshot) => snapshot.freshness === "Unavailable").length,
-  };
-
+  const logicLabConditionCount = data.logicRules.length;
+  const logicLabRuleLibrary = data.logicRules
+    .map((rule) => {
+      const set = logicLabRecipes.find((recipe) => recipe.id === rule.setId);
+      if (!set) return null;
+      return {
+        recipeId: set.id,
+        recipeName: set.name,
+        recipeVersion: set.version,
+        condition: {
+          id: rule.id,
+          label: rule.label,
+          kind: rule.kind,
+          role: rule.role,
+          metricKey: rule.metricKey,
+          formulaKey: rule.formulaKey,
+          operator: rule.operator,
+          value: rule.value,
+          unit: rule.unit,
+          humanDescription: rule.humanDescription,
+          notes: rule.notes,
+          availability: rule.availability,
+        },
+      };
+    })
+    .filter(Boolean) as Array<{
+      recipeId: string;
+      recipeName: string;
+      recipeVersion: number;
+      condition: RecipeCondition;
+    }>;
+  const selectedLogicSetRuleTemplates = logicLabRuleLibrary.filter((row) =>
+    logicSetSelectedRuleRefs.includes(logicRuleRefKey(row.recipeId, row.condition.id)),
+  );
+  const logicSetRulesByRole = selectedLogicSetRuleTemplates.reduce<Record<string, typeof selectedLogicSetRuleTemplates>>(
+    (groups, row) => {
+      const role = row.condition.role ?? "Supporting Evidence";
+      groups[role] = groups[role] ? [...groups[role], row] : [row];
+      return groups;
+    },
+    {},
+  );
+  const scannerFeatureRefs = (names: readonly string[]) =>
+    scannerFeatureRegistry
+      .filter((name) => names.includes(name))
+      .map((name) => ({ name }));
+  const logicLabDataSources = [
+    {
+      key: "market",
+      title: language === "ko" ? "시세·추세 원천 데이터" : "Price / trend source data",
+      status: language === "ko" ? "사용 가능" : "Available",
+      freshnessLabel: language === "ko" ? "일간" : "Daily",
+      reliability: language === "ko" ? "가장 핵심이 되는 시세 원천 계층" : "Primary market source layer",
+      mode: language === "ko" ? "자동" : "Automated",
+      provider: "Stooq daily history",
+      api: language === "ko" ? "무키 시세 CSV 원천" : "Keyless CSV price source",
+      fields: ["priceHistorySeries", "ohlcBarSeries", "dividendSplitEvents"],
+      metrics: scannerFeatureRefs(["MA10", "MA20", "MA50", "DD_126", "RET_20_STOCK"]),
+    },
+    {
+      key: "volume-volatility",
+      title: language === "ko" ? "거래량·변동성 원천 데이터" : "Volume / volatility source data",
+      status: language === "ko" ? "사용 가능" : "Available",
+      freshnessLabel: language === "ko" ? "일간" : "Daily",
+      reliability: language === "ko" ? "거래량·변동폭 원천 시계열" : "Volume and volatility source series",
+      mode: language === "ko" ? "자동" : "Automated",
+      provider: "Stooq volume history",
+      api: language === "ko" ? "시세 파생 원천" : "Derived from price history source",
+      fields: ["volumeHistorySeries", "volatilityHistorySeries"],
+      metrics: scannerFeatureRefs(["VOL_SPIKE_20"]),
+    },
+    {
+      key: "benchmark-sector",
+      title: language === "ko" ? "지수·벤치마크 원천 데이터" : "Benchmark / index source data",
+      status: language === "ko" ? "사용 가능" : "Available",
+      freshnessLabel: language === "ko" ? "일간" : "Daily",
+      reliability: language === "ko" ? "지수·벤치마크 비교 원천 계층" : "Benchmark comparison source layer",
+      mode: language === "ko" ? "자동" : "Automated",
+      provider: "SPY / sector ETF history",
+      api: language === "ko" ? "벤치마크 시계열 원천" : "Benchmark series source",
+      fields: ["benchmarkHistorySeries", "sectorBenchmarkSeries"],
+      metrics: scannerFeatureRefs(["RET_20_SPY", "RET_20_SECTOR", "EXRET_20_SPY", "EXRET_20_SECTOR", "RS_SERIES_SPY", "RS_IMPROVE_5", "SECTOR_ABOVE_MA50"]),
+    },
+    {
+      key: "fundamental",
+      title: language === "ko" ? "사업·재무 데이터" : "Business / financial data",
+      status: language === "ko" ? "부분 사용 가능" : "Partial",
+      freshnessLabel: language === "ko" ? "분기" : "Quarterly",
+      reliability: language === "ko" ? "재무제표 원천 스냅샷" : "Financial statement source snapshot",
+      mode: language === "ko" ? "혼합" : "Mixed",
+      provider: "Twelve Data fundamentals",
+      api: language === "ko" ? "재무 API 원천" : "Fundamentals API source",
+      fields: ["financialStatementSnapshot", "incomeStatementSnapshot", "balanceSheetSnapshot", "cashFlowSnapshot"],
+      metrics: [],
+    },
+    {
+      key: "valuation",
+      title: language === "ko" ? "밸류에이션 스냅샷 데이터" : "Valuation snapshot data",
+      status: language === "ko" ? "부분 사용 가능" : "Partial",
+      freshnessLabel: language === "ko" ? "주기적 스냅샷" : "Periodic snapshot",
+      reliability: language === "ko" ? "밸류에이션 비교 원천값" : "Valuation comparison inputs",
+      mode: language === "ko" ? "반자동" : "Semi-automated",
+      provider: "Alpha Vantage / manual baseline",
+      api: language === "ko" ? "멀티플 비교 원천" : "Valuation baseline source",
+      fields: ["valuationSnapshot", "valuationHistorySeries"],
+      metrics: [],
+    },
+    {
+      key: "events-news",
+      title: language === "ko" ? "이벤트·뉴스 데이터" : "Events / news data",
+      status: language === "ko" ? "부분 사용 가능" : "Partial",
+      freshnessLabel: language === "ko" ? "이벤트 기준" : "Event-driven",
+      reliability:
+        language === "ko" ? "이벤트 일정과 위험 태그 원천값" : "Event schedule and risk-tag inputs",
+      mode: language === "ko" ? "혼합" : "Mixed",
+      provider: "Twelve Data + Marketaux",
+      api: language === "ko" ? "이벤트/뉴스 API 원천" : "Events / news API source",
+      fields: ["eventCalendar", "guidanceEvents", "newsRiskFlags", "shortInterestSnapshot", "ownershipSnapshot"],
+      metrics: [],
+    },
+    {
+      key: "thesis",
+      title: language === "ko" ? "사용자 논리·검토 데이터" : "User thesis data",
+      status: language === "ko" ? "수동 입력" : "Manual",
+      freshnessLabel: language === "ko" ? "검토 시 갱신" : "Updated on review",
+      reliability: language === "ko" ? "사용자 입력 원문" : "Manual source inputs",
+      mode: language === "ko" ? "수동" : "Manual",
+      provider: language === "ko" ? "사용자 입력 레지스트리" : "User input registry",
+      api: language === "ko" ? "앱 내부 저장값" : "In-app stored fields",
+      fields: ["thesisText", "plannedEntryRange", "invalidationRule", "lastThesisReviewAt", "manualRiskFlags"],
+      metrics: [],
+    },
+  ] as const;
   const previewRecipe =
     draftConditions.length === 0
       ? undefined
       : {
           id: "preview-recipe",
           version: 1,
-          name: recipeForm.name.trim() || "Draft Recipe",
-          purpose: recipeForm.purpose.trim() || "Preview how this draft logic behaves before saving it.",
+          name: recipeForm.name.trim() || (language === "ko" ? "미리보기 레시피" : "Draft Recipe"),
+          purpose:
+            recipeForm.purpose.trim() ||
+            (language === "ko"
+              ? "저장 전에 이 초안 논리가 어떻게 작동하는지 미리 확인합니다."
+              : "Preview how this draft logic behaves before saving it."),
           opportunityType: recipeForm.opportunityType,
           timeHorizon: recipeForm.timeHorizon,
           intendedUseCase: recipeForm.intendedUseCase,
@@ -2507,6 +2862,24 @@ export default function App() {
             priorityOnRisk: "High" as const,
           },
         };
+  const availableRawFieldOptions = expressionParameterRegistry.map((parameter) => ({
+    key: parameter.key,
+    label: parameter.label,
+    description: parameter.description,
+  }));
+  const selectedMetricRequiredData = expressionParameterRequiredData(
+    metricForm.builderMode === "raw"
+      ? [metricForm.rawParameterKey]
+      : metricForm.selectedRawFields,
+  );
+  const selectedMetricExpressionPreview = buildExpressionPreview(
+    metricForm.builderMode === "raw" ? metricForm.rawParameterKey : metricForm.expression,
+    metricForm.builderMode === "raw" ? [metricForm.rawParameterKey] : metricForm.selectedRawFields,
+  );
+  const metricExpressionValidity =
+    metricForm.builderMode === "raw"
+      ? { valid: true as const, reason: "ok" as const }
+      : validateExpressionSyntax(metricForm.expression, referencedExpressionParameters(metricForm.expression));
 
   const previewStock = data.stocks.find((stock) => stock.id === previewStockId) ?? data.stocks[0];
   const previewSnapshot = previewStock
@@ -2520,23 +2893,16 @@ export default function App() {
         thesisSnapshot: eyeForm.thesisSnapshot.trim() || previewStock.thesis,
         plannedEntryLow: Number(eyeForm.plannedEntryLow) || previewSnapshot?.plannedEntryLow,
         plannedEntryHigh: Number(eyeForm.plannedEntryHigh) || previewSnapshot?.plannedEntryHigh,
-        invalidationRule: eyeForm.invalidationRule.trim() || "Preview only.",
+        invalidationRule: eyeForm.invalidationRule.trim() || (language === "ko" ? "미리보기 전용" : "Preview only."),
         lastReviewedAt: isoDateDaysAgo(eyeForm.lastReviewedDaysAgo),
         createdAt: new Date().toISOString(),
       }
     : undefined;
   const previewEvaluation =
     previewRecipe && previewEye && previewSnapshot
-      ? evaluateEye(previewEye, previewRecipe, previewSnapshot)
+      ? evaluateEye(previewEye, previewRecipe, previewSnapshot, logicLabMetricCatalog)
       : undefined;
-  const recipeStepPrompt =
-    recipeBuilderStep === "Purpose"
-      ? "Define what opportunity this recipe is trying to surface."
-      : recipeBuilderStep === "Logic"
-        ? "Translate the investment logic into concrete conditions."
-        : recipeBuilderStep === "Risk & Alerts"
-          ? "Set downgrade logic and alert behavior."
-          : "Choose cadence and preview the recipe on a stock.";
+  const recipeStepPrompt = localizedRecipeBuilderPrompt(language, recipeBuilderStep);
   const canAdvanceRecipeStep =
     recipeBuilderStep === "Purpose"
       ? recipeForm.name.trim().length > 0 && recipeForm.purpose.trim().length > 0
@@ -2566,12 +2932,13 @@ export default function App() {
   const tabLabels: Record<TabKey, string> = {
     Home: tabLabel(language, "Home"),
     Stocks: tabLabel(language, "Stocks"),
-    Recipes: tabLabel(language, "Recipes"),
+    "Logic Lab": tabLabel(language, "Logic Lab"),
     Eyes: tabLabel(language, "Eyes"),
     Alerts: tabLabel(language, "Alerts"),
     Journal: tabLabel(language, "Journal"),
     Settings: tabLabel(language, "Settings"),
   };
+  const pendingOutcomesCount = data.outcomes.filter((outcome) => outcome.status !== "Reviewed").length;
   const topBarSubtitle =
     tab === "Home"
       ? language === "ko"
@@ -2585,10 +2952,10 @@ export default function App() {
           : language === "ko"
             ? "종목을 검색해 전체 분석 보드를 확인하세요"
             : "Search any stock and inspect the full board"
-        : tab === "Recipes"
+        : tab === "Logic Lab"
           ? language === "ko"
-            ? `현재 레시피 ${filteredRecipes.length}개`
-            : `${filteredRecipes.length} recipes in view`
+            ? "수식, 규칙, 세트를 한 흐름으로 구성합니다"
+            : "Build formulas, rules, and sets in one flow"
           : tab === "Eyes"
             ? language === "ko"
               ? `활성 모니터 ${filteredActiveEyesInventory.length}개`
@@ -2673,9 +3040,13 @@ export default function App() {
       eyeId: eye.id,
       alertId: alert.id,
       action,
-      note: `${action} after reviewing ${eyeLine(eye, data.stocks, data.recipes)}.`,
+      note:
+        language === "ko"
+          ? `${localizedDecisionAction(language, action)} 결정. ${eyeLine(eye, data.stocks, data.recipes)} 검토 후 기록했습니다.`
+          : `${action} after reviewing ${eyeLine(eye, data.stocks, data.recipes)}.`,
       concern:
-        eye.lastEvaluation?.contradictingEvidence[0] ?? "No additional concern captured during quick review.",
+        eye.lastEvaluation?.contradictingEvidence[0] ??
+        (language === "ko" ? "빠른 검토 중 추가 우려는 기록되지 않았습니다." : "No additional concern captured during quick review."),
       thesisValid: action === "Marked Thesis Broken" ? "No" : action === "Rejected" ? "Partly" : "Yes",
       timing: "On Time",
     });
@@ -2697,23 +3068,30 @@ export default function App() {
   };
 
   const addDraftCondition = () => {
-    const noteSuffix = conditionBuilder.note.trim() ? ` Notes: ${conditionBuilder.note.trim()}.` : "";
-    const label = `${selectedTemplate.title}: ${selectedTemplate.metricLabel} ${conditionBuilder.operator} ${formatMetricThreshold(
-      selectedTemplate,
+    if (!selectedConditionMetric || !selectedConditionFormula) return;
+    const noteSuffix = conditionBuilder.note.trim()
+      ? language === "ko"
+        ? ` 메모: ${conditionBuilder.note.trim()}.`
+        : ` Notes: ${conditionBuilder.note.trim()}.`
+      : "";
+    const label = `${selectedConditionMetric.name}: ${conditionBuilder.operator} ${formatMetricThreshold(
+      selectedConditionMetric,
       conditionBuilder.threshold,
+      language,
+      selectedConditionFormula,
     )}.${noteSuffix}`;
     setDraftConditions((current) => [
       {
         id: createLocalId("condition"),
-        kind: conditionBuilder.kind,
-        role: roleFromBuilderKind(conditionBuilder.kind),
-        metricKey: selectedTemplate.metricKey,
-        formulaKey: selectedTemplate.formulaKey,
+        kind: kindFromConditionRole(conditionBuilder.role),
+        role: conditionBuilder.role,
+        metricKey: selectedConditionMetric.key,
+        formulaKey: selectedConditionFormula.key,
         operator: conditionBuilder.operator,
-        value: parseThresholdValue(conditionBuilder.threshold, selectedTemplate),
+        value: parseThresholdValue(conditionBuilder.threshold, selectedConditionMetric, selectedConditionFormula),
         humanDescription: label,
         notes: conditionBuilder.note.trim(),
-        availability: selectedTemplate.metricKey === "manual_flag_present" ? "manual" : "automated",
+        availability: selectedConditionMetric.availability,
         label,
       },
       ...current,
@@ -2724,41 +3102,47 @@ export default function App() {
     }));
   };
 
-  const saveRecipe = async () => {
-    setRecipeFormAttempted(true);
-    if (!recipeForm.name.trim() || !recipeForm.purpose.trim() || draftConditions.length === 0) return;
-    await actions.addRecipe({
-      ...recipeForm,
-      conditions: draftConditions,
-    });
-    setRecipeForm({
-      name: "",
-      purpose: "",
-      opportunityType: opportunityTypes[0],
-      timeHorizon: timeHorizons[1],
-      intendedUseCase: useCaseOptions[0],
-      notes: "",
-      reviewCadenceDays: reviewCadenceOptions[2],
-      alertCooldownHours: alertCooldownOptions[2],
-    });
+  const resetRecipeBuilderDraft = () => {
+    setRecipeForm(defaultRecipeDraftForm());
     setDraftConditions([]);
     setRecipeBuilderStep("Purpose");
-    setRecipeBuilderOpen(false);
+    setRecipeBuilderEditingId("");
     setRecipeFormAttempted(false);
+    setConditionBuilder({
+      metricKey: metricCatalog[0].key,
+      role: "Eligibility Filter",
+      operator: "<=",
+      threshold: "-25",
+      note: "",
+    });
   };
 
-  const saveEye = async () => {
-    setEyeFormAttempted(true);
-    if (!eyeForm.stockId || !eyeForm.recipeId || !eyeForm.thesisSnapshot.trim()) return;
-    await actions.addEye({
-      stockId: eyeForm.stockId,
-      recipeId: eyeForm.recipeId,
-      thesisSnapshot: eyeForm.thesisSnapshot,
-      plannedEntryLow: Number(eyeForm.plannedEntryLow),
-      plannedEntryHigh: Number(eyeForm.plannedEntryHigh),
-      invalidationRule: eyeForm.invalidationRule,
-      lastReviewedAt: isoDateDaysAgo(eyeForm.lastReviewedDaysAgo),
-    });
+  const resetMetricBuilderDraft = () => {
+    setMetricForm(defaultMetricDraftForm());
+    setMetricBuilderEditingKey("");
+    setMetricFormAttempted(false);
+    setMetricNumberToken("");
+    setMetricInsertRawField(expressionParameterRegistry[0].key);
+    setMetricFunctionKey("ABS");
+    setMetricFunctionArgMode1("parameter");
+    setMetricFunctionArgMode2("parameter");
+    setMetricFunctionArgMode3("parameter");
+    setMetricFunctionArgParameter1(expressionParameterRegistry[0].key);
+    setMetricFunctionArgParameter2(expressionParameterRegistry[1]?.key ?? expressionParameterRegistry[0].key);
+    setMetricFunctionArgParameter3(expressionParameterRegistry[2]?.key ?? expressionParameterRegistry[0].key);
+    setMetricFunctionArgNumber1("");
+    setMetricFunctionArgNumber2("");
+    setMetricFunctionArgNumber3("");
+  };
+
+  const resetLogicSetBuilderDraft = () => {
+    setLogicSetForm(defaultRecipeDraftForm());
+    setLogicSetSelectedRuleRefs([]);
+    setLogicSetBuilderEditingId("");
+    setLogicSetFormAttempted(false);
+  };
+
+  const resetEyeComposerDraft = () => {
     setEyeForm({
       stockId: "",
       recipeId: "",
@@ -2768,17 +3152,11 @@ export default function App() {
       invalidationRule: "",
       lastReviewedDaysAgo: reviewDateOptions[2].daysAgo,
     });
-    setEyeComposerOpen(false);
+    setEyeComposerEditingId("");
     setEyeFormAttempted(false);
   };
 
-  const saveDecision = async () => {
-    setJournalFormAttempted(true);
-    if (!decisionForm.eyeId || !decisionForm.note.trim()) return;
-    const decisionId = await actions.logDecision(decisionForm);
-    if (decisionId) {
-      setSelectedDecisionId(decisionId);
-    }
+  const resetJournalComposerDraft = () => {
     setDecisionForm({
       eyeId: "",
       alertId: "",
@@ -2788,12 +3166,556 @@ export default function App() {
       thesisValid: "Yes",
       timing: "On Time",
     });
-    setJournalComposerOpen(false);
+    setJournalComposerEditingId("");
     setJournalFormAttempted(false);
   };
 
+  const resetLogicRuleBuilderDraft = () => {
+    setConditionBuilder({
+      metricKey: logicLabMetricCatalog[0]?.key ?? metricCatalog[0].key,
+      role: "Eligibility Filter",
+      operator: "<=",
+      threshold: "-25",
+      note: "",
+    });
+    setLogicRuleEditingContext(null);
+    setConditionBuilderRecipeId(logicLabCompatibleRecipes[0]?.id ?? "");
+  };
+
+  const openLogicSetBuilder = (recipe?: Recipe) => {
+    if (!recipe) {
+      resetLogicSetBuilderDraft();
+      setLogicSetBuilderOpen(true);
+      return;
+    }
+    setLogicSetForm({
+      name: recipe.name,
+      purpose: recipe.purpose,
+      opportunityType: opportunityTypes.includes(recipe.opportunityType as (typeof opportunityTypes)[number])
+        ? (recipe.opportunityType as (typeof opportunityTypes)[number])
+        : opportunityTypes[0],
+      timeHorizon: timeHorizons.includes(recipe.timeHorizon as (typeof timeHorizons)[number])
+        ? (recipe.timeHorizon as (typeof timeHorizons)[number])
+        : timeHorizons[1],
+      intendedUseCase: useCaseOptions.includes(recipe.intendedUseCase as (typeof useCaseOptions)[number])
+        ? (recipe.intendedUseCase as (typeof useCaseOptions)[number])
+        : useCaseOptions[0],
+      notes: recipe.notes ?? "",
+      reviewCadenceDays: recipe.reviewConfig?.cadenceDays ?? reviewCadenceOptions[2],
+      alertCooldownHours: recipe.alertConfig?.cooldownHours ?? alertCooldownOptions[2],
+    });
+    setLogicSetSelectedRuleRefs(recipe.conditions.map((condition) => logicRuleRefKey(recipe.id, condition.id)));
+    setLogicSetBuilderEditingId(recipe.id);
+    setLogicSetFormAttempted(false);
+    setLogicSetBuilderOpen(true);
+  };
+
+  const buildRuleFromConditionBuilder = () => {
+    if (!selectedConditionMetric || !selectedConditionFormula) return null;
+    const noteSuffix = conditionBuilder.note.trim()
+      ? language === "ko"
+        ? ` 메모: ${conditionBuilder.note.trim()}.`
+        : ` Notes: ${conditionBuilder.note.trim()}.`
+      : "";
+    const label = `${selectedConditionMetric.name}: ${conditionBuilder.operator} ${formatMetricThreshold(
+      selectedConditionMetric,
+      conditionBuilder.threshold,
+      language,
+      selectedConditionFormula,
+    )}.${noteSuffix}`;
+
+    return {
+      id: logicRuleEditingContext?.conditionId ?? createLocalId("condition"),
+      kind: kindFromConditionRole(conditionBuilder.role),
+      role: conditionBuilder.role,
+      metricKey: selectedConditionMetric.key,
+      formulaKey: selectedConditionFormula.key,
+      operator: conditionBuilder.operator,
+      value: parseThresholdValue(conditionBuilder.threshold, selectedConditionMetric, selectedConditionFormula),
+      humanDescription: label,
+      notes: conditionBuilder.note.trim(),
+      availability: selectedConditionMetric.availability,
+      label,
+    } satisfies RecipeCondition;
+  };
+
+  const openConditionBuilder = (row?: { recipeId?: string; condition?: RecipeCondition }) => {
+    if (row?.condition) {
+      const metric = logicLabMetricCatalog.find((item) => item.key === row.condition?.metricKey);
+      const formula = getFormulaDefinition(row.condition.formulaKey ?? metric?.formulaKey ?? "");
+      setConditionBuilder({
+        metricKey: row.condition.metricKey ?? logicLabMetricCatalog[0]?.key ?? metricCatalog[0].key,
+        role: row.condition.role ?? "Supporting Evidence",
+        operator: row.condition.operator ?? operatorOptionsForMetric(metric, formula)[0],
+        threshold: Array.isArray(row.condition.value)
+          ? String(row.condition.value[0] ?? "")
+          : String(row.condition.value ?? ""),
+        note: row.condition.notes ?? "",
+      });
+      setConditionBuilderRecipeId(row.recipeId ?? "");
+      setLogicRuleEditingContext({ recipeId: row.recipeId ?? "", conditionId: row.condition.id });
+    } else {
+      resetLogicRuleBuilderDraft();
+    }
+    setConditionBuilderOpen(true);
+  };
+
+  const deleteLogicRule = async (recipeId: string, conditionId: string) => {
+    const recipe = data.recipes.find((item) => item.id === recipeId);
+    if (!recipe) return;
+    RNAlert.alert(
+      language === "ko" ? "L1.5 규칙 삭제" : "Delete L1.5 Rule",
+      language === "ko"
+        ? "이 규칙을 삭제하면 연결된 L2 세트에서 바로 빠집니다."
+        : "Deleting this rule removes it from its linked L2 set immediately.",
+      [
+        { text: language === "ko" ? "취소" : "Cancel", style: "cancel" },
+        {
+          text: language === "ko" ? "삭제" : "Delete",
+          style: "destructive",
+          onPress: async () => {
+            await actions.updateRecipe(recipeId, {
+              name: recipe.name,
+              purpose: recipe.purpose,
+              opportunityType: recipe.opportunityType ?? opportunityTypes[0],
+              timeHorizon: recipe.timeHorizon,
+              intendedUseCase: recipe.intendedUseCase,
+              notes: recipe.notes,
+              reviewCadenceDays: recipe.reviewConfig?.cadenceDays ?? reviewCadenceOptions[2],
+              alertCooldownHours: recipe.alertConfig?.cooldownHours ?? alertCooldownOptions[2],
+              conditions: recipe.conditions.filter((condition) => condition.id !== conditionId),
+            });
+            if (logicRuleEditingContext?.recipeId === recipeId && logicRuleEditingContext.conditionId === conditionId) {
+              resetLogicRuleBuilderDraft();
+            }
+          },
+        },
+      ],
+    );
+  };
+
+  const duplicateLogicRule = (recipeId: string, condition: RecipeCondition) => {
+    const metric = logicLabMetricCatalog.find((item) => item.key === condition.metricKey);
+    const formula = getFormulaDefinition(condition.formulaKey ?? metric?.formulaKey ?? "");
+    setConditionBuilder({
+      metricKey: condition.metricKey ?? logicLabMetricCatalog[0]?.key ?? metricCatalog[0].key,
+      role: condition.role ?? "Supporting Evidence",
+      operator: condition.operator ?? operatorOptionsForMetric(metric, formula)[0],
+      threshold: Array.isArray(condition.value)
+        ? String(condition.value[0] ?? "")
+        : String(condition.value ?? ""),
+      note: condition.notes ?? "",
+    });
+    setConditionBuilderRecipeId(recipeId);
+    setLogicRuleEditingContext(null);
+    setConditionBuilderOpen(true);
+  };
+
+  const deleteLogicSet = async (recipeId: string) => {
+    const recipe = data.recipes.find((item) => item.id === recipeId);
+    if (!recipe) return;
+    const linkedEyes = data.eyes.filter((eye) => eye.recipeId === recipeId).length;
+    RNAlert.alert(
+      language === "ko" ? "L2 세트 삭제" : "Delete L2 Set",
+      linkedEyes > 0
+        ? language === "ko"
+          ? `"${recipe.name}" 세트는 ${linkedEyes}개의 Eye와 연결되어 있어 삭제할 수 없습니다. 먼저 연결을 해제하세요.`
+          : `"${recipe.name}" is linked to ${linkedEyes} Eyes, so it cannot be deleted. Remove those links first.`
+        : language === "ko"
+          ? `"${recipe.name}" 세트를 삭제하면 이 세트의 규칙과 버전 기록도 함께 제거됩니다.`
+          : `Deleting "${recipe.name}" removes this set along with its rule and version record.`,
+      linkedEyes > 0
+        ? [{ text: language === "ko" ? "확인" : "OK", style: "default" }]
+        : [
+            { text: language === "ko" ? "취소" : "Cancel", style: "cancel" },
+            {
+              text: language === "ko" ? "삭제" : "Delete",
+              style: "destructive",
+              onPress: async () => {
+                const removed = await actions.deleteRecipe(recipeId);
+                if (!removed) {
+                  RNAlert.alert(
+                    language === "ko" ? "삭제 불가" : "Cannot Delete",
+                    language === "ko"
+                      ? "이미 연결된 기록이나 의사결정이 있어 삭제할 수 없습니다."
+                      : "This set still has linked history or decisions, so it cannot be deleted.",
+                  );
+                  return;
+                }
+                if (logicVersionsRecipeId === recipeId) {
+                  setLogicVersionsRecipeId("");
+                }
+              },
+            },
+          ],
+    );
+  };
+
+  const openHomeJournalComposer = (eyeId: string, alertId?: string) => {
+    setDecisionForm({
+      eyeId,
+      alertId: alertId ?? "",
+      action: "Entered",
+      note: "",
+      concern: "",
+      thesisValid: "Yes",
+      timing: "On Time",
+    });
+    setJournalComposerEditingId("");
+    setJournalFormAttempted(false);
+    setJournalComposerOpen(true);
+  };
+
+  const selectedScannerSignal = scannerSignalReviewId
+    ? data?.scanSignals.find((signal) => signal.signalId === scannerSignalReviewId)
+    : undefined;
+
+  const openScannerReview = (signal: ScanSignal) => {
+    setScannerSignalReviewId(signal.signalId);
+    setScannerReviewForm({
+      userDecision: "watch",
+      manualReason: "",
+      convictionScoreOptional: "",
+      notes: "",
+      entryPriceOptional: "",
+      exitPriceOptional: "",
+      resultNotes: "",
+    });
+  };
+
+  const submitScannerReview = async () => {
+    if (!selectedScannerSignal || !scannerReviewForm.manualReason.trim()) return;
+    await actions.addSignalReviewLog({
+      signalId: selectedScannerSignal.signalId,
+      userDecision: scannerReviewForm.userDecision,
+      manualReason: scannerReviewForm.manualReason.trim(),
+      convictionScoreOptional:
+        scannerReviewForm.convictionScoreOptional.trim() !== ""
+          ? Number(scannerReviewForm.convictionScoreOptional)
+          : undefined,
+      notes: scannerReviewForm.notes.trim() || undefined,
+      entryPriceOptional:
+        scannerReviewForm.entryPriceOptional.trim() !== ""
+          ? Number(scannerReviewForm.entryPriceOptional)
+          : undefined,
+      exitPriceOptional:
+        scannerReviewForm.exitPriceOptional.trim() !== ""
+          ? Number(scannerReviewForm.exitPriceOptional)
+          : undefined,
+      resultNotes: scannerReviewForm.resultNotes.trim() || undefined,
+    });
+    setScannerSignalReviewId("");
+  };
+
+  const saveLogicRule = async () => {
+    const recipe = data.recipes.find((item) => item.id === conditionBuilderRecipeId);
+    const nextRule = buildRuleFromConditionBuilder();
+    if (!recipe || !nextRule) return;
+
+    const nextConditions = logicRuleEditingContext?.conditionId
+      ? recipe.conditions.map((condition) =>
+          condition.id === logicRuleEditingContext.conditionId ? nextRule : condition,
+        )
+      : [nextRule, ...recipe.conditions];
+
+    await actions.updateRecipe(recipe.id, {
+      name: recipe.name,
+      purpose: recipe.purpose,
+      opportunityType: recipe.opportunityType ?? opportunityTypes[0],
+      timeHorizon: recipe.timeHorizon,
+      intendedUseCase: recipe.intendedUseCase,
+      notes: recipe.notes,
+      reviewCadenceDays: recipe.reviewConfig?.cadenceDays ?? reviewCadenceOptions[2],
+      alertCooldownHours: recipe.alertConfig?.cooldownHours ?? alertCooldownOptions[2],
+      conditions: nextConditions,
+    });
+    setConditionBuilderOpen(false);
+    resetLogicRuleBuilderDraft();
+  };
+
+  const openMetricBuilder = (metric?: MetricDefinition) => {
+    if (!metric) {
+      resetMetricBuilderDraft();
+      setMetricBuilderOpen(true);
+      return;
+    }
+
+    setMetricForm({
+      name:
+        metric.origin === "custom"
+          ? metric.name
+          : language === "ko"
+            ? `${metric.name} 사용자 버전`
+            : `${metric.name} Custom`,
+      humanMeaning: metric.humanMeaning,
+      builderMode: metric.formulaKey === "custom_expression" ? "equation" : "raw",
+      selectedRawFields: [...(metric.parameterKeys ?? metric.requiredData)],
+      rawParameterKey: metric.parameterKeys?.[0] ?? metric.requiredData[0] ?? expressionParameterRegistry[0].key,
+      expression: metric.expression ?? metric.parameterKeys?.[0] ?? metric.requiredData[0] ?? expressionParameterRegistry[0].key,
+      availability: metric.availability,
+      freshnessExpectation: metric.freshnessExpectation,
+      exampleDisplayText: metric.exampleDisplayText,
+      missingDataBehavior: metric.missingDataBehavior,
+    });
+    setMetricBuilderEditingKey(metric.origin === "custom" ? metric.key : "");
+    setMetricFormAttempted(false);
+    setMetricInsertRawField(metric.parameterKeys?.[0] ?? metric.requiredData[0] ?? expressionParameterRegistry[0].key);
+    setMetricNumberToken("");
+    setMetricFunctionKey("ABS");
+    setMetricFunctionArgMode1("parameter");
+    setMetricFunctionArgMode2("parameter");
+    setMetricFunctionArgMode3("parameter");
+    setMetricFunctionArgParameter1(metric.parameterKeys?.[0] ?? expressionParameterRegistry[0].key);
+    setMetricFunctionArgParameter2(metric.parameterKeys?.[1] ?? expressionParameterRegistry[1]?.key ?? expressionParameterRegistry[0].key);
+    setMetricFunctionArgParameter3(metric.parameterKeys?.[2] ?? expressionParameterRegistry[2]?.key ?? expressionParameterRegistry[0].key);
+    setMetricFunctionArgNumber1("");
+    setMetricFunctionArgNumber2("");
+    setMetricFunctionArgNumber3("");
+    setMetricBuilderOpen(true);
+  };
+
+  const duplicateMetric = (metric: MetricDefinition) => {
+    setMetricForm({
+      name: language === "ko" ? `${metric.name} 사본` : `${metric.name} Copy`,
+      humanMeaning: metric.humanMeaning,
+      builderMode: metric.formulaKey === "custom_expression" ? "equation" : "raw",
+      selectedRawFields: [...(metric.parameterKeys ?? metric.requiredData)],
+      rawParameterKey: metric.parameterKeys?.[0] ?? metric.requiredData[0] ?? expressionParameterRegistry[0].key,
+      expression: metric.expression ?? metric.parameterKeys?.[0] ?? metric.requiredData[0] ?? expressionParameterRegistry[0].key,
+      availability: metric.availability,
+      freshnessExpectation: metric.freshnessExpectation,
+      exampleDisplayText: metric.exampleDisplayText,
+      missingDataBehavior: metric.missingDataBehavior,
+    });
+    setMetricBuilderEditingKey("");
+    setMetricFormAttempted(false);
+    setMetricInsertRawField(metric.parameterKeys?.[0] ?? metric.requiredData[0] ?? expressionParameterRegistry[0].key);
+    setMetricNumberToken("");
+    setMetricBuilderOpen(true);
+  };
+
+  const deleteMetric = async (metric: MetricDefinition) => {
+    RNAlert.alert(
+      language === "ko" ? "L1 수식 삭제" : "Delete L1 Formula",
+      language === "ko"
+        ? `"${metric.name}" 수식을 삭제하면 연결된 Logic Lab 규칙과 세트에서 제외됩니다.`
+        : `Deleting "${metric.name}" removes it from linked Logic Lab rules and sets.`,
+      [
+        { text: language === "ko" ? "취소" : "Cancel", style: "cancel" },
+        {
+          text: language === "ko" ? "삭제" : "Delete",
+          style: "destructive",
+          onPress: async () => {
+            const removed = await actions.deleteMetric(metric.key);
+            if (removed && metricBuilderEditingKey === metric.key) {
+              resetMetricBuilderDraft();
+            }
+          },
+        },
+      ],
+    );
+  };
+
+  const appendMetricExpressionToken = (token: string) => {
+    setMetricForm((current) => ({
+      ...current,
+      expression: appendExpressionToken(current.expression, token),
+    }));
+  };
+
+  const removeMetricExpressionToken = () => {
+    setMetricForm((current) => ({
+      ...current,
+      expression: removeLastExpressionToken(current.expression),
+    }));
+  };
+
+  const buildMetricFunctionToken = () => {
+    const takeArg = (
+      mode: "parameter" | "number",
+      parameterKey: string,
+      numberValue: string,
+    ) => (mode === "parameter" ? parameterKey : numberValue.trim());
+
+    const arg1 = takeArg(metricFunctionArgMode1, metricFunctionArgParameter1, metricFunctionArgNumber1);
+    const arg2 = takeArg(metricFunctionArgMode2, metricFunctionArgParameter2, metricFunctionArgNumber2);
+    const arg3 = takeArg(metricFunctionArgMode3, metricFunctionArgParameter3, metricFunctionArgNumber3);
+
+    if (!arg1) return null;
+
+    switch (metricFunctionKey) {
+      case "ABS":
+        return `ABS ( ${arg1} )`;
+      case "PCT_CHANGE":
+      case "AVG":
+      case "MIN":
+      case "MAX":
+        return arg2 ? `${metricFunctionKey} ( ${arg1} , ${arg2} )` : null;
+      case "CLAMP":
+        return arg2 && arg3 ? `CLAMP ( ${arg1} , ${arg2} , ${arg3} )` : null;
+      default:
+        return null;
+    }
+  };
+
+  const saveMetric = async () => {
+    setMetricFormAttempted(true);
+    const activeParameterKeys =
+      metricForm.builderMode === "raw" ? [metricForm.rawParameterKey] : metricForm.selectedRawFields;
+    const expression =
+      metricForm.builderMode === "raw" ? metricForm.rawParameterKey : metricForm.expression.trim();
+    if (
+      !metricForm.name.trim() ||
+      !metricForm.humanMeaning.trim() ||
+      activeParameterKeys.length === 0 ||
+      !expression ||
+      (metricForm.builderMode === "equation" && !metricExpressionValidity.valid)
+    )
+      return;
+
+    const candidateKey = metricBuilderEditingKey || `metric_${slugMetricKey(metricForm.name)}`;
+    let resolvedKey = candidateKey;
+    let suffix = 2;
+    while (
+      logicMetricKeySet.has(resolvedKey) &&
+      (!metricBuilderEditingKey || resolvedKey !== metricBuilderEditingKey)
+    ) {
+      resolvedKey = `${candidateKey}_${suffix}`;
+      suffix += 1;
+    }
+
+    const nextMetric: MetricDefinition = {
+      key: resolvedKey,
+      name: metricForm.name.trim(),
+      humanMeaning: metricForm.humanMeaning.trim(),
+      formulaKey: metricForm.builderMode === "raw" ? "raw_passthrough" : "custom_expression",
+      requiredData: expressionParameterRequiredData(activeParameterKeys),
+      expression,
+      parameterKeys: activeParameterKeys,
+      freshnessExpectation: metricForm.freshnessExpectation,
+      availability: metricForm.availability,
+      exampleConditions: [],
+      exampleDisplayText:
+        metricForm.exampleDisplayText.trim() ||
+        (language === "ko"
+          ? "이 지표는 선택한 수식이 산출하는 대표 예시를 보여줍니다."
+          : "This metric exposes the representative output produced by the selected formula."),
+      missingDataBehavior:
+        metricForm.missingDataBehavior.trim() ||
+        (language === "ko"
+          ? "필요한 L0 원천값이 비어 있으면 지표를 확정하지 않고 검토 필요 상태로 남깁니다."
+          : "If required L0 inputs are missing, the metric remains unresolved and marked for review."),
+      origin: "custom",
+    };
+
+    await actions.addMetric(nextMetric);
+    setMetricBuilderOpen(false);
+    resetMetricBuilderDraft();
+  };
+
+  const saveLogicSet = async () => {
+    setLogicSetFormAttempted(true);
+    if (!logicSetForm.name.trim() || !logicSetForm.purpose.trim() || selectedLogicSetRuleTemplates.length === 0) {
+      return;
+    }
+
+    const editingRecipe = logicSetBuilderEditingId
+      ? data.recipes.find((recipe) => recipe.id === logicSetBuilderEditingId)
+      : undefined;
+
+    const nextConditions = selectedLogicSetRuleTemplates.map((row) => {
+      if (row.recipeId === logicSetBuilderEditingId) {
+        return row.condition;
+      }
+      return {
+        ...row.condition,
+        id: createLocalId("condition"),
+      };
+    });
+
+    const nextPayload = {
+      ...logicSetForm,
+      conditions: nextConditions,
+    };
+
+    if (editingRecipe) {
+      await actions.updateRecipe(editingRecipe.id, nextPayload);
+    } else {
+      await actions.addRecipe(nextPayload);
+    }
+
+    setLogicSetBuilderOpen(false);
+    resetLogicSetBuilderDraft();
+  };
+
+  const saveRecipe = async () => {
+    setRecipeFormAttempted(true);
+    if (!recipeForm.name.trim() || !recipeForm.purpose.trim() || draftConditions.length === 0) return;
+    if (recipeBuilderEditingId) {
+      await actions.updateRecipe(recipeBuilderEditingId, {
+        ...recipeForm,
+        conditions: draftConditions,
+      });
+    } else {
+      await actions.addRecipe({
+        ...recipeForm,
+        conditions: draftConditions,
+      });
+    }
+    resetRecipeBuilderDraft();
+    setRecipeBuilderOpen(false);
+  };
+
+  const saveEye = async () => {
+    setEyeFormAttempted(true);
+    if (!eyeForm.stockId || !eyeForm.recipeId || !eyeForm.thesisSnapshot.trim()) return;
+    
+    const stock = data?.stocks.find(s => s.id === eyeForm.stockId);
+    if (!stock) return;
+
+    if (eyeComposerEditingId) {
+      await actions.updateEye(eyeComposerEditingId, {
+        recipeId: eyeForm.recipeId,
+        thesisSnapshot: eyeForm.thesisSnapshot,
+        plannedEntryLow: Number(eyeForm.plannedEntryLow),
+        plannedEntryHigh: Number(eyeForm.plannedEntryHigh),
+        invalidationRule: eyeForm.invalidationRule,
+        lastReviewedAt: isoDateDaysAgo(eyeForm.lastReviewedDaysAgo),
+      });
+    } else {
+      await actions.addEye({
+        symbol: stock.symbol,
+        name: stock.name,
+        thesis: eyeForm.thesisSnapshot,
+        recipeId: eyeForm.recipeId,
+        plannedEntryLow: Number(eyeForm.plannedEntryLow),
+        plannedEntryHigh: Number(eyeForm.plannedEntryHigh),
+        invalidationRule: eyeForm.invalidationRule,
+        lastReviewedAt: isoDateDaysAgo(eyeForm.lastReviewedDaysAgo),
+      });
+    }
+    resetEyeComposerDraft();
+    setEyeComposerOpen(false);
+  };
+
+  const saveDecision = async () => {
+    setJournalFormAttempted(true);
+    if (!decisionForm.eyeId || !decisionForm.note.trim()) return;
+    if (journalComposerEditingId) {
+      await actions.updateDecision(journalComposerEditingId, decisionForm);
+      setSelectedDecisionId(journalComposerEditingId);
+    } else {
+      const decisionId = await actions.logDecision(decisionForm);
+      if (decisionId) {
+        setSelectedDecisionId(decisionId);
+      }
+    }
+    resetJournalComposerDraft();
+    setJournalComposerOpen(false);
+  };
+
   return (
-    <SafeAreaView style={styles.screen}>
+    <View style={styles.screen}>
       <StatusBar style="dark" />
       <View style={styles.frame}>
         <View style={styles.topBar}>
@@ -2801,20 +3723,39 @@ export default function App() {
             <Text style={styles.topBarTitle}>{tabLabels[tab]}</Text>
             <Text style={styles.topBarSubtitle}>{topBarSubtitle}</Text>
           </View>
-          <Pressable
-            onPress={() => {
-              setAlertWorkspaceTab("Current");
-              setTab("Alerts");
-            }}
-            style={styles.alertBell}
-          >
-            <Text style={styles.alertBellIcon}>!</Text>
-            {openAlerts > 0 ? (
-              <View style={styles.alertBellBadge}>
-                <Text style={styles.alertBellBadgeText}>{openAlerts}</Text>
-              </View>
-            ) : null}
-          </Pressable>
+          <View style={styles.topBarActions}>
+            <Pressable
+              onPress={() => {
+                setAlertWorkspaceTab("Current");
+                setTab("Alerts");
+              }}
+              style={[styles.alertBell, tab === "Alerts" ? styles.topHeaderActionActive : null]}
+            >
+              <Text style={[styles.alertBellIcon, tab === "Alerts" ? styles.topHeaderActionIconActive : null]}>!</Text>
+              {openAlerts > 0 ? (
+                <View style={styles.alertBellBadge}>
+                  <Text style={styles.alertBellBadgeText}>{openAlerts}</Text>
+                </View>
+              ) : null}
+            </Pressable>
+            <Pressable
+              onPress={() => setTab("Journal")}
+              style={[styles.alertBell, tab === "Journal" ? styles.topHeaderActionActive : null]}
+            >
+              <Text style={[styles.alertBellIcon, tab === "Journal" ? styles.topHeaderActionIconActive : null]}>H</Text>
+              {pendingOutcomesCount > 0 ? (
+                <View style={styles.alertBellBadge}>
+                  <Text style={styles.alertBellBadgeText}>{pendingOutcomesCount}</Text>
+                </View>
+              ) : null}
+            </Pressable>
+            <Pressable
+              onPress={() => setTab("Settings")}
+              style={[styles.alertBell, tab === "Settings" ? styles.topHeaderActionActive : null]}
+            >
+              <Text style={[styles.alertBellIcon, tab === "Settings" ? styles.topHeaderActionIconActive : null]}>S</Text>
+            </Pressable>
+          </View>
         </View>
         <ScrollView
           contentContainerStyle={styles.page}
@@ -2823,116 +3764,24 @@ export default function App() {
           nestedScrollEnabled
         >
           {tab === "Home" ? (
-            <>
-              <Reveal>
-                <SectionHeader note={subtitleLabel(language, "Home")} />
-                <View style={styles.homeSummaryStrip}>
-                  <DenseStat label={language === "ko" ? "열린 알림" : "Open alerts"} value={`${openAlerts}`} tone={openAlerts > 0 ? "risk" : "strong"} />
-                  <DenseStat label={language === "ko" ? "긴급 종목" : "Urgent stocks"} value={`${homeUrgentStocks.length}`} tone={homeUrgentStocks.length > 0 ? "risk" : "neutral"} />
-                  <DenseStat label={language === "ko" ? "기회 형성" : "Opportunity"} value={`${homeOpportunityStocks.length}`} />
-                  <DenseStat label={language === "ko" ? "검토 지연" : "Stale review"} value={`${homeStaleReviewStocks.length}`} />
-                </View>
-                <HorizontalChoice options={homeBuckets} value={homeBucket} onSelect={setHomeBucket} />
-              </Reveal>
-
-              {(homeBucket === "All" || homeBucket === "Review Now") ? (
-              <Reveal delay={40}>
-                <SectionHeader title={`${language === "ko" ? "지금 검토" : "Review Now"} · ${homeUrgentStocks.length}`} note={language === "ko" ? "가장 긴급한 종목부터 보여줍니다." : "Highest-urgency stocks first."} />
-                <View style={styles.stack}>
-                  {homeUrgentStocks.length === 0 ? (
-                    <Card>
-                      <Text style={styles.cardBody}>{language === "ko" ? "지금 바로 검토할 종목은 없습니다." : "No stocks need immediate review right now."}</Text>
-                    </Card>
-                  ) : (
-                    homeUrgentStocks.slice(0, 4).map((item) => (
-                      <StockTriageCard
-                        key={`urgent-${item.stock.id}`}
-                        item={item}
-                        recipes={data.recipes}
-                        language={language}
-                        onOpenStock={() => openStockContext({ stockId: item.stock.id })}
-                        onReview={() => void actions.markEyesReviewed({ stockId: item.stock.id })}
-                        onOpenJournal={() => {
-                          if (!item.decisions[0]) return;
-                          setSelectedDecisionId(item.decisions[0].id);
-                          setTab("Journal");
-                        }}
-                        onOpenAlerts={() => {
-                          setSelectedStockId(item.stock.id);
-                          setAlertWorkspaceTab("Current");
-                          setTab("Alerts");
-                        }}
-                      />
-                    ))
-                  )}
-                </View>
-              </Reveal>
-              ) : null}
-
-              {(homeBucket === "All" || homeBucket === "Forming") ? (
-              <Reveal delay={80}>
-                <SectionHeader title={`${language === "ko" ? "형성 중" : "Forming"} · ${homeOpportunityStocks.length}`} note={language === "ko" ? "관심이 커지고 있지만 아직 긴급하지는 않은 종목입니다." : "Stocks becoming more interesting but not yet urgent."} />
-                <View style={styles.stack}>
-                  {homeOpportunityStocks.length === 0 ? (
-                    <Card>
-                      <Text style={styles.cardBody}>{language === "ko" ? "지금 더 강한 구도를 만들고 있는 종목은 없습니다." : "No stocks are forming a stronger setup right now."}</Text>
-                    </Card>
-                  ) : (
-                    homeOpportunityStocks.slice(0, 3).map((item) => (
-                      <StockTriageCard
-                        key={`forming-${item.stock.id}`}
-                        item={item}
-                        recipes={data.recipes}
-                        language={language}
-                        onOpenStock={() => openStockContext({ stockId: item.stock.id })}
-                        onReview={() => void actions.markEyesReviewed({ stockId: item.stock.id })}
-                        onOpenJournal={() => {
-                          if (!item.decisions[0]) return;
-                          setSelectedDecisionId(item.decisions[0].id);
-                          setTab("Journal");
-                        }}
-                      />
-                    ))
-                  )}
-                </View>
-              </Reveal>
-              ) : null}
-
-              {(homeBucket === "All" || homeBucket === "Review Soon") ? (
-              <Reveal delay={120}>
-                <SectionHeader title={`${language === "ko" ? "곧 검토" : "Review Soon"} · ${homeStaleReviewStocks.length}`} note={language === "ko" ? "새 알림이 없어도 논리를 다시 확인해야 하는 모니터입니다." : "Eyes that need a fresh thesis check even without a new alert."} />
-                <View style={styles.stack}>
-                  {homeStaleReviewStocks.length === 0 ? (
-                    <Card>
-                      <Text style={styles.cardBody}>{language === "ko" ? "지금 오래된 논리 검토 항목은 없습니다." : "No stale thesis reviews are flagged right now."}</Text>
-                    </Card>
-                  ) : (
-                    homeStaleReviewStocks.slice(0, 3).map((item) => (
-                      <StockTriageCard
-                        key={`stale-${item.stock.id}`}
-                        item={item}
-                        recipes={data.recipes}
-                        language={language}
-                        onOpenStock={() => openStockContext({ stockId: item.stock.id })}
-                        onReview={() => void actions.markEyesReviewed({ stockId: item.stock.id })}
-                        onOpenJournal={() => {
-                          if (!item.decisions[0]) return;
-                          setSelectedDecisionId(item.decisions[0].id);
-                          setTab("Journal");
-                        }}
-                      />
-                    ))
-                  )}
-                </View>
-              </Reveal>
-              ) : null}
-            </>
+            <HomeVisualDashboard
+              language={language}
+              stockDirectory={stockDirectory}
+              urgentStocks={homeUrgentStocks}
+              opportunityStocks={homeOpportunityStocks}
+              staleReviewStocks={homeStaleReviewStocks}
+              openAlertsCount={openAlerts}
+              outcomes={data.outcomes}
+              onSelectStock={(stockId, eyeId) => openStockContext({ stockId, eyeId })}
+              onOpenAlerts={() => setTab("Alerts")}
+              onOpenLogicLab={() => setTab("Logic Lab")}
+              onOpenJournal={(eyeId, alertId) => openHomeJournalComposer(eyeId, alertId)}
+            />
           ) : null}
 
           {tab === "Stocks" ? (
             <>
               <Reveal>
-                <SectionHeader note={subtitleLabel(language, "Stocks")} />
                 <StockSearchPanel
                   styles={styles}
                   stockSearch={stockSearch}
@@ -2945,7 +3794,7 @@ export default function App() {
                   deferredStockSearch={deferredStockSearch}
                   recentStocksCount={recentStocks.length}
                   setRecentStockIds={setRecentStockIds}
-                  onAddStock={() => setStockComposerOpen(true)}
+                  onAddStock={() => {}}
                   isCompactPhone={isCompactPhone}
                   isVeryCompactPhone={isVeryCompactPhone}
                   Input={Input}
@@ -2956,8 +3805,22 @@ export default function App() {
               </Reveal>
 
               {selectedStockSummary ? (
-                <Reveal delay={40}>
-                  <Card highlighted>
+                <Reveal delay={40} key={`stock-hero-${selectedStockSummary.stock.id}`}>
+                   <View style={styles.stockBoardHeaderPolished}>
+                      <View style={styles.flexOne}>
+                        <Text style={styles.stockSymbolBig}>{selectedStockSummary.stock.symbol}</Text>
+                        <Text style={styles.stockNameBig}>{selectedStockSummary.stock.name}</Text>
+                      </View>
+                      <Button 
+                        label={language === "ko" ? "EYE 등록" : "REGISTER EYE"} 
+                        onPress={() => {
+                          setEyeForm((current) => ({ ...current, stockId: selectedStockSummary.stock.id }));
+                          setEyeComposerOpen(true);
+                        }}
+                      />
+                   </View>
+                   
+                   <Card highlighted style={styles.heroCardPolished}>
                     <StockTrendHero
                       styles={styles}
                       stock={selectedStockSummary.stock}
@@ -2984,6 +3847,8 @@ export default function App() {
                         setSelectedStockId("");
                         setStockSearch("");
                       }}
+                      onEditStock={() => {}}
+                      onDeleteStock={() => {}}
                       lookbackControl={
                         <HorizontalChoice
                           options={analysisLookbacks}
@@ -3107,70 +3972,227 @@ export default function App() {
             </>
           ) : null}
 
-          {tab === "Recipes" ? (
+          {tab === "Logic Lab" ? (
             <>
               <Reveal>
-                <SectionHeader note={subtitleLabel(language, "Recipes")} />
-                <View style={styles.homeSummaryStrip}>
-                  <DenseStat label="Recipes" value={`${data.recipes.length}`} tone="strong" />
-                  <DenseStat label="Starter" value={`${data.recipes.filter((recipe) => starterRecipeNames.includes(recipe.name)).length}`} />
-                  <DenseStat label="Custom" value={`${data.recipes.filter((recipe) => !starterRecipeNames.includes(recipe.name)).length}`} />
-                  <DenseStat label="Active Eyes" value={`${data.eyes.length}`} />
-                </View>
-                <HorizontalChoice options={recipeShelfFilters} value={recipeShelfFilter} onSelect={setRecipeShelfFilter} />
-                <View style={styles.actionRow}>
-                  <Button
-                    label="New"
-                    onPress={() => {
-                      setRecipeBuilderStep("Purpose");
-                      setRecipeBuilderOpen(true);
-                    }}
-                  />
+                <View style={styles.logicLayerRailWrap}>
+                  <View style={styles.logicLayerTopRow}>
+                    <View style={styles.logicLayerRail}>
+                      {logicLabLayers.map((layer, index) => {
+                        const active = logicLabLayer === layer;
+                        const completed = logicLabLayers.indexOf(logicLabLayer) > index;
+                        return (
+                          <React.Fragment key={`logic-layer-tab-${layer}`}>
+                            <Pressable
+                              onPress={() => setLogicLabLayer(layer)}
+                              style={({ pressed }) => [
+                                styles.logicLayerStep,
+                                pressed ? styles.logicLayerChipPressed : null,
+                              ]}
+                            >
+                              <View
+                                style={[
+                                  styles.logicLayerStepDot,
+                                  completed ? styles.logicLayerStepDotCompleted : null,
+                                  active ? styles.logicLayerStepDotActive : null,
+                                ]}
+                              >
+                                <Text
+                                  style={[
+                                    styles.logicLayerStepDotText,
+                                    completed || active ? styles.logicLayerStepDotTextActive : null,
+                                  ]}
+                                >
+                                  {index + 1}
+                                </Text>
+                              </View>
+                              <Text
+                                style={[
+                                  styles.logicLayerStepLabel,
+                                  active ? styles.logicLayerStepLabelActive : null,
+                                ]}
+                                numberOfLines={1}
+                              >
+                                {logicLabLayerLabel(language, layer)}
+                              </Text>
+                            </Pressable>
+                            {index < logicLabLayers.length - 1 ? (
+                              <View
+                                style={[
+                                  styles.logicLayerStepConnector,
+                                  logicLabLayers.indexOf(logicLabLayer) > index
+                                    ? styles.logicLayerStepConnectorActive
+                                    : null,
+                                ]}
+                              />
+                            ) : null}
+                          </React.Fragment>
+                        );
+                      })}
+                    </View>
+                    <Pressable
+                      onPress={() => setLogicL0RegistryOpen(true)}
+                      style={({ pressed }) => [
+                        styles.logicL0Button,
+                        pressed ? styles.logicLayerChipPressed : null,
+                      ]}
+                    >
+                      <Text style={styles.logicL0ButtonText}>{language === "ko" ? "원천" : "Raw"}</Text>
+                    </Pressable>
+                  </View>
                 </View>
               </Reveal>
 
-              <Reveal delay={40}>
-                <View style={styles.stack}>
-                  {filteredRecipes.map((recipe) => (
-                    <Pressable
-                      key={recipe.id}
-                      onPress={() => setRecipeDetailId(recipe.id)}
-                      style={({ pressed }) => [styles.pressableCardWrap, pressed ? styles.pressableCardWrapPressed : null]}
-                    >
-                      <Card>
-                        <View style={styles.inlineBetween}>
-                          <View style={styles.flexOne}>
-                            <Text style={styles.cardEyebrow}>Version {recipe.version}</Text>
-                            <Text style={styles.cardTitle}>{recipe.name}</Text>
-                          </View>
-                          <Text style={styles.inventoryRowMeta}>
-                            {data.eyes.filter((eye) => eye.recipeId === recipe.id).length} Eyes
-                          </Text>
-                        </View>
-                        <Text style={styles.cardBody} numberOfLines={2}>{recipe.purpose}</Text>
-                        <View style={styles.dualDenseGrid}>
-                          <DenseStat label="Type" value={recipe.opportunityType ?? "General"} tone="strong" />
-                          <DenseStat label="Horizon" value={recipe.timeHorizon || "Unset"} />
-                          <DenseStat label="Cadence" value={`${recipe.reviewConfig?.cadenceDays ?? 14}d`} />
-                          <DenseStat label="Conditions" value={String(recipe.conditions.length)} />
-                        </View>
-                        <View style={styles.metaRow}>
-                          <MetaPill label={starterRecipeNames.includes(recipe.name) ? "Starter" : "Custom"} />
-                          <MetaPill label={recipe.intendedUseCase || "Use case pending"} />
-                        </View>
-                        <View style={styles.analysisActionRow}>
-                          <Button label="Open" tone="secondary" onPress={() => setRecipeDetailId(recipe.id)} />
-                          <Button
-                            label="Use for Eye"
-                            onPress={() => {
-                              setEyeForm((current) => ({ ...current, recipeId: recipe.id }));
-                              setEyeComposerOpen(true);
-                            }}
-                          />
-                        </View>
-                      </Card>
-                    </Pressable>
-                  ))}
+              <Reveal delay={40} key={`logic-layer-${logicLabLayer}`}>
+                <View style={styles.layerContentContainer}>
+                  <Card style={styles.scannerSummaryCard}>
+                    <View style={styles.scannerSummaryTopRow}>
+                      <View style={styles.scannerSummaryTitleWrap}>
+                        <Text style={styles.cardTitle}>
+                          {language === "ko" ? "일일 조건 스캐너" : "Daily Condition Scanner"}
+                        </Text>
+                        <Text style={styles.scannerMetaText}>
+                          {latestScanRun
+                            ? language === "ko"
+                              ? `${latestScanRun.scanDate} 기준 · ${latestScanRun.status}`
+                              : `${latestScanRun.scanDate} · ${latestScanRun.status}`
+                            : language === "ko"
+                              ? "아직 스캔 기록이 없습니다."
+                              : "No scan run yet."}
+                        </Text>
+                      </View>
+                      <Button
+                        label={language === "ko" ? "스캔 실행" : "Run Scan"}
+                        onPress={() => void actions.runDailyScanner()}
+                      />
+                    </View>
+                    <View style={styles.homeSummaryStrip}>
+                      <DenseStat
+                        label={language === "ko" ? "Matched" : "Matched"}
+                        value={`${matchedScannerSignals.length}`}
+                        tone="strong"
+                      />
+                      <DenseStat
+                        label={language === "ko" ? "Near" : "Near"}
+                        value={`${nearScannerSignals.length}`}
+                      />
+                      <DenseStat
+                        label={language === "ko" ? "Blocked" : "Blocked"}
+                        value={`${blockedScannerSignals.length}`}
+                        tone="risk"
+                      />
+                      <DenseStat
+                        label={language === "ko" ? "규칙" : "Rules"}
+                        value={`${frozenScannerRules.length}`}
+                      />
+                    </View>
+                    <Text style={styles.cardBody}>
+                      {language === "ko"
+                        ? "Condition matched — human review required. Near match — watchlist only."
+                        : "Condition matched — human review required. Near match — watchlist only."}
+                    </Text>
+                    {(matchedScannerSignals.length > 0 ||
+                      nearScannerSignals.length > 0 ||
+                      blockedScannerSignals.length > 0) ? (
+                      <View style={styles.stack}>
+                        {[...matchedScannerSignals, ...nearScannerSignals, ...blockedScannerSignals]
+                          .slice(0, 8)
+                          .map((signal) => {
+                            const review = scannerReviewLogsBySignal.get(signal.signalId);
+                            return (
+                              <Card key={signal.signalId} style={styles.scannerSignalCard}>
+                                <View style={styles.scannerSignalTopRow}>
+                                  <View style={styles.scannerSignalTitleWrap}>
+                                    <Text style={styles.cardTitle}>
+                                      {signal.ticker} · {signal.status}
+                                    </Text>
+                                    <Text style={styles.scannerMetaText}>
+                                      {signal.ruleId}
+                                    </Text>
+                                  </View>
+                                  <MetaPill label={signal.sector} tone="neutral" />
+                                </View>
+                                <Text style={styles.cardBody}>
+                                  {signal.status === "MATCHED"
+                                    ? "Condition matched — human review required."
+                                    : signal.status === "NEAR_MATCH"
+                                      ? "Near match — watchlist only."
+                                      : language === "ko"
+                                        ? "데이터 부족 또는 검증 실패로 스캔이 차단됐습니다."
+                                        : "Scan blocked because data is incomplete or invalid."}
+                                </Text>
+                                <View style={styles.metaRow}>
+                                  <MetaPill
+                                    label={`${signal.matchedConditionsJson.length} ${language === "ko" ? "통과" : "passed"}`}
+                                    tone="success"
+                                  />
+                                  {signal.failedConditionsJson.length > 0 ? (
+                                    <MetaPill
+                                      label={`${signal.failedConditionsJson.length} ${language === "ko" ? "실패" : "failed"}`}
+                                      tone="info"
+                                    />
+                                  ) : null}
+                                  {signal.missingConditionsJson.length > 0 ? (
+                                    <MetaPill
+                                      label={`${signal.missingConditionsJson.length} ${language === "ko" ? "누락" : "missing"}`}
+                                      tone="risk"
+                                    />
+                                  ) : null}
+                                  {review ? (
+                                    <MetaPill
+                                      label={language === "ko" ? "검토 기록 있음" : "Review logged"}
+                                      tone="info"
+                                    />
+                                  ) : null}
+                                </View>
+                                <View style={styles.actionRow}>
+                                  <Button
+                                    label={language === "ko" ? "검토 기록" : "Log Review"}
+                                    tone="secondary"
+                                    onPress={() => openScannerReview(signal)}
+                                  />
+                                </View>
+                              </Card>
+                            );
+                          })}
+                      </View>
+                    ) : null}
+                  </Card>
+                  {logicLabLayer === "Processed Features" && (
+                    <L1MetricsLayer
+                      language={language}
+                      processedFeatures={latestProcessedFeatures}
+                      latestScanDate={latestProcessedFeatureDate || undefined}
+                      rules={frozenScannerRules}
+                      MetaPill={MetaPill}
+                      SectionHeader={SectionHeader}
+                      Button={Button}
+                      onOpenHelp={() => setLogicInfoTarget("Processed Features")}
+                    />
+                  )}
+                  {logicLabLayer === "Frozen Rules" && (
+                    <L2RecipesLayer
+                      language={language}
+                      rules={frozenScannerRules}
+                      SectionHeader={SectionHeader}
+                      Button={Button}
+                      MetaPill={MetaPill}
+                      onOpenHelp={() => setLogicInfoTarget("Frozen Rules")}
+                    />
+                  )}
+                  {logicLabLayer === "Signals" && (
+                    <L15ConditionsLayer
+                      language={language}
+                      signals={[...matchedScannerSignals, ...nearScannerSignals, ...blockedScannerSignals]}
+                      rules={frozenScannerRules}
+                      reviewLogsBySignal={scannerReviewLogsBySignal}
+                      MetaPill={MetaPill}
+                      SectionHeader={SectionHeader}
+                      Button={Button}
+                      onOpenHelp={() => setLogicInfoTarget("Signals")}
+                      onOpenReview={openScannerReview}
+                    />
+                  )}
                 </View>
               </Reveal>
             </>
@@ -3181,23 +4203,29 @@ export default function App() {
               <Reveal>
                 <SectionHeader note={subtitleLabel(language, "Eyes")} />
                 <View style={styles.homeSummaryStrip}>
-                  <DenseStat label="Active" value={`${activeEyesInventory.length}`} tone="strong" />
-                  <DenseStat label="Inactive" value={`${inactiveEyesInventory.length}`} />
-                  <DenseStat label="Attention" value={`${data.eyes.filter((eye) => eye.lastEvaluation?.currentState === "Attention Needed").length}`} tone="risk" />
-                  <DenseStat label="Broken" value={`${data.eyes.filter((eye) => eye.lastEvaluation?.currentState === "Thesis Broken").length}`} />
+                  <DenseStat label={t(language, "eyes.summary.active")} value={`${activeEyesInventory.length}`} tone="strong" />
+                  <DenseStat label={t(language, "eyes.summary.inactive")} value={`${inactiveEyesInventory.length}`} />
+                  <DenseStat label={t(language, "eyes.summary.attention")} value={`${data.eyes.filter((eye) => eye.lastEvaluation?.currentState === "Attention Needed").length}`} tone="risk" />
+                  <DenseStat label={t(language, "eyes.summary.broken")} value={`${data.eyes.filter((eye) => eye.lastEvaluation?.currentState === "Thesis Broken").length}`} />
                 </View>
-                <HorizontalChoice options={eyesShelfFilters} value={eyesShelfFilter} onSelect={setEyesShelfFilter} />
+                <HorizontalChoice options={eyesShelfFilters} value={eyesShelfFilter} onSelect={(filter: EyesShelfFilter) => setEyesShelfFilter(filter)} labelForOption={(filter: EyesShelfFilter) => eyesShelfFilterLabel(language, filter)} />
                 <View style={styles.actionRow}>
-                  <Button label="New" onPress={() => setEyeComposerOpen(true)} />
+                  <Button
+                    label={t(language, "common.new")}
+                    onPress={() => {
+                      resetEyeComposerDraft();
+                      setEyeComposerOpen(true);
+                    }}
+                  />
                 </View>
               </Reveal>
 
               <Reveal delay={40}>
-                <SectionHeader title={`Active Eyes · ${filteredActiveEyesInventory.length}`} note="These are the recipe subscriptions currently worth monitoring." />
+                <SectionHeader title={t(language, "eyes.active.title", { count: filteredActiveEyesInventory.length })} note={t(language, "eyes.active.note")} />
                 <View style={styles.stack}>
                   {filteredActiveEyesInventory.length === 0 ? (
                     <Card>
-                      <Text style={styles.cardBody}>No active Eyes yet.</Text>
+                      <Text style={styles.cardBody}>{t(language, "eyes.active.empty")}</Text>
                     </Card>
                   ) : (
                     filteredActiveEyesInventory.map((eye) => (
@@ -3217,26 +4245,28 @@ export default function App() {
                             <Text style={styles.cardBody} numberOfLines={2}>{eye.thesisSnapshot}</Text>
                           </View>
                           <Text style={stateTone(eye.lastEvaluation?.currentState)}>
-                            {eye.lastEvaluation?.currentState ?? "Not Evaluated"}
+                            {eye.lastEvaluation?.currentState
+                              ? localizedEyeState(language, eye.lastEvaluation.currentState)
+                              : t(language, "eyes.notEvaluated")}
                           </Text>
                         </View>
                         <View style={styles.compactMetricRow}>
-                          <Text style={styles.compactMetricText}>{eye.lastEvaluation?.whyNow ?? "Waiting for the next meaningful change."}</Text>
+                          <Text style={styles.compactMetricText}>{eye.lastEvaluation?.whyNow ?? t(language, "eyes.waiting")}</Text>
                         </View>
                         <View style={styles.metaRow}>
-                          <MetaPill label={eye.lastEvaluation?.actionUrgency ?? "Wait"} />
+                          <MetaPill label={localizedActionUrgency(language, eye.lastEvaluation?.actionUrgency ?? t(language, "eyes.meta.wait"))} />
                           <MetaPill label={`v${eye.recipeVersionAtCreation ?? eye.lastEvaluation?.recipeVersion ?? 1}`} />
-                          <MetaPill label={eye.lastReviewedAt ? formatShortDate(eye.lastReviewedAt) : "Review due"} />
+                          <MetaPill label={eye.lastReviewedAt ? formatShortDate(eye.lastReviewedAt) : t(language, "eyes.meta.reviewDue")} />
                         </View>
                         <View style={styles.analysisActionRow}>
-                          <Button label="Stock" onPress={() => openStockContext({ stockId: eye.stockId, eyeId: eye.id })} />
+                          <Button label={t(language, "eyes.action.stock")} onPress={() => openStockContext({ stockId: eye.stockId, eyeId: eye.id })} />
                           <Button
-                            label="Review"
+                            label={t(language, "eyes.action.review")}
                             tone="secondary"
                             onPress={() => void actions.markEyesReviewed({ stockId: eye.stockId, recipeId: eye.recipeId })}
                           />
                           <Button
-                            label="Detail"
+                            label={t(language, "eyes.action.detail")}
                             tone="ghost"
                             onPress={() => {
                               setSelectedEyeId(eye.id);
@@ -3252,11 +4282,11 @@ export default function App() {
               </Reveal>
 
               <Reveal delay={60}>
-                <SectionHeader title={`Inactive Eyes · ${filteredInactiveEyesInventory.length}`} note="Subscriptions that are quiet or thesis-broken remain here for reference." />
+                <SectionHeader title={t(language, "eyes.inactive.title", { count: filteredInactiveEyesInventory.length })} note={t(language, "eyes.inactive.note")} />
                 <View style={styles.stack}>
                   {filteredInactiveEyesInventory.length === 0 ? (
                     <Card>
-                      <Text style={styles.cardBody}>No inactive Eyes yet.</Text>
+                      <Text style={styles.cardBody}>{t(language, "eyes.inactive.empty")}</Text>
                     </Card>
                   ) : (
                     filteredInactiveEyesInventory.map((eye) => (
@@ -3276,17 +4306,19 @@ export default function App() {
                             <Text style={styles.cardBody} numberOfLines={2}>{eye.thesisSnapshot}</Text>
                           </View>
                           <Text style={stateTone(eye.lastEvaluation?.currentState)}>
-                            {eye.lastEvaluation?.currentState ?? "Not Evaluated"}
+                            {eye.lastEvaluation?.currentState
+                              ? localizedEyeState(language, eye.lastEvaluation.currentState)
+                              : t(language, "eyes.notEvaluated")}
                           </Text>
                         </View>
                         <View style={styles.metaRow}>
-                          <MetaPill label={eye.lastEvaluation?.actionUrgency ?? "Wait"} />
-                          <MetaPill label={eye.lastReviewedAt ? formatShortDate(eye.lastReviewedAt) : "Review due"} />
+                          <MetaPill label={localizedActionUrgency(language, eye.lastEvaluation?.actionUrgency ?? t(language, "eyes.meta.wait"))} />
+                          <MetaPill label={eye.lastReviewedAt ? formatShortDate(eye.lastReviewedAt) : t(language, "eyes.meta.reviewDue")} />
                         </View>
                         <View style={styles.analysisActionRow}>
-                          <Button label="Stock" onPress={() => openStockContext({ stockId: eye.stockId, eyeId: eye.id })} />
+                          <Button label={t(language, "eyes.action.stock")} onPress={() => openStockContext({ stockId: eye.stockId, eyeId: eye.id })} />
                           <Button
-                            label="Detail"
+                            label={t(language, "eyes.action.detail")}
                             tone="secondary"
                             onPress={() => {
                               setSelectedEyeId(eye.id);
@@ -3308,21 +4340,26 @@ export default function App() {
               <Reveal>
                 <SectionHeader note={subtitleLabel(language, "Alerts")} />
                 <View style={styles.homeSummaryStrip}>
-                  <DenseStat label="Open" value={`${groupedAlertQueue.reduce((sum, item) => sum + item.openAlerts.length, 0)}`} tone="risk" />
-                  <DenseStat label="Grouped Stocks" value={`${groupedAlertQueue.length}`} />
-                  <DenseStat label="Snoozed" value={`${snoozedAlerts.length}`} />
-                  <DenseStat label="Reviewed" value={`${reviewedAlerts.length}`} />
+                  <DenseStat label={t(language, "alerts.summary.open")} value={`${groupedAlertQueue.reduce((sum, item) => sum + item.openAlerts.length, 0)}`} tone="risk" />
+                  <DenseStat label={t(language, "alerts.summary.groupedStocks")} value={`${groupedAlertQueue.length}`} />
+                  <DenseStat label={t(language, "alerts.summary.snoozed")} value={`${snoozedAlerts.length}`} />
+                  <DenseStat label={t(language, "alerts.summary.reviewed")} value={`${reviewedAlerts.length}`} />
                 </View>
-                <HorizontalChoice options={["Current", "History"]} value={alertWorkspaceTab} onSelect={(value) => setAlertWorkspaceTab(value as "Current" | "History")} />
+                <HorizontalChoice
+                  options={["Current", "History"] as const}
+                  value={alertWorkspaceTab}
+                  onSelect={(value: "Current" | "History") => setAlertWorkspaceTab(value)}
+                  labelForOption={(value: "Current" | "History") => t(language, value === "Current" ? "alerts.tab.current" : "alerts.tab.history")}
+                />
               </Reveal>
 
               {alertWorkspaceTab === "Current" ? (
                 <Reveal delay={40}>
-                  <SectionHeader title={`Current Alerts · ${groupedAlertQueue.length}`} note="Alerts are grouped by stock first so related signals stay together." />
+                  <SectionHeader title={t(language, "alerts.current.title", { count: groupedAlertQueue.length })} note={t(language, "alerts.current.note")} />
                   <View style={styles.stack}>
                     {groupedAlertQueue.length === 0 ? (
                       <Card>
-                        <Text style={styles.cardBody}>No open alerts right now.</Text>
+                        <Text style={styles.cardBody}>{t(language, "alerts.current.empty")}</Text>
                       </Card>
                   ) : (
                       groupedAlertQueue.map((group) => (
@@ -3349,11 +4386,11 @@ export default function App() {
 
               {alertWorkspaceTab === "History" ? (
                 <Reveal delay={40}>
-                  <SectionHeader title={`Alert History · ${alertHistory.length}`} note="Review acknowledged and snoozed alerts, and jump into linked journals when they exist." />
+                  <SectionHeader title={t(language, "alerts.history.title", { count: alertHistory.length })} note={t(language, "alerts.history.note")} />
                   <View style={styles.stack}>
                     {alertHistory.length === 0 ? (
                       <Card>
-                        <Text style={styles.cardBody}>No alert history yet.</Text>
+                        <Text style={styles.cardBody}>{t(language, "alerts.history.empty")}</Text>
                       </Card>
                     ) : (
                       alertHistory.map((alert) => {
@@ -3368,21 +4405,21 @@ export default function App() {
                             <Text style={styles.alertTitle}>{alert.title}</Text>
                             <Text style={styles.cardBody} numberOfLines={2}>{alert.whyNow}</Text>
                             <View style={styles.metaRow}>
-                              <MetaPill label={alert.reviewed ? "Acknowledged" : `Snoozed until ${alert.snoozedUntil ? formatDate(alert.snoozedUntil) : "unknown"}`} />
-                              <MetaPill label={alert.priority} />
-                              {alert.usefulness ? <MetaPill label={alert.usefulness} /> : null}
-                              {linkedDecision ? <MetaPill label={`Journal · ${linkedDecision.action}`} /> : null}
+                              <MetaPill label={alert.reviewed ? t(language, "alerts.history.acknowledged") : t(language, "alerts.history.snoozedUntil", { date: alert.snoozedUntil ? formatDate(alert.snoozedUntil) : t(language, "alerts.history.snoozedUnknown") })} />
+                              <MetaPill label={localizedAlertPriority(language, alert.priority)} />
+                              {alert.usefulness ? <MetaPill label={localizedAlertUsefulness(language, alert.usefulness)} /> : null}
+                              {linkedDecision ? <MetaPill label={t(language, "alerts.history.journalAction", { action: localizedDecisionAction(language, linkedDecision.action) })} /> : null}
                             </View>
                             <View style={styles.analysisActionRow}>
-                              <Button label="Detail" onPress={() => {
+                              <Button label={t(language, "common.detail")} onPress={() => {
                                 setSelectedAlertId(alert.id);
                                 setAlertDetailOpen(true);
                               }} />
-                              {!alert.reviewed ? <Button label="Unsnooze" tone="secondary" onPress={() => void actions.snoozeAlert(alert.id, -1)} /> : null}
-                              {eye ? <Button label="Stock" tone="secondary" onPress={() => openStockContext({ stockId: eye.stockId, eyeId: eye.id, alertId: alert.id, target: "Alerts" })} /> : null}
+                              {!alert.reviewed ? <Button label={t(language, "alerts.action.unsnooze")} tone="secondary" onPress={() => void actions.snoozeAlert(alert.id, -1)} /> : null}
+                              {eye ? <Button label={t(language, "common.stock")} tone="secondary" onPress={() => openStockContext({ stockId: eye.stockId, eyeId: eye.id, alertId: alert.id, target: "Alerts" })} /> : null}
                               {linkedDecision ? (
                                 <Button
-                                  label="Journal"
+                                  label={t(language, "common.journal")}
                                   tone="ghost"
                                   onPress={() => {
                                     if (linkedDecision) {
@@ -3408,14 +4445,14 @@ export default function App() {
               <Reveal>
                 <SectionHeader note={subtitleLabel(language, "Journal")} />
                 <View style={styles.homeSummaryStrip}>
-                  <DenseStat label="Entries" value={`${data.decisions.length}`} tone="strong" />
-                  <DenseStat label="Entered" value={`${data.decisions.filter((decision) => decision.action === "Entered").length}`} />
-                  <DenseStat label="Skipped" value={`${data.decisions.filter((decision) => decision.action === "Skipped").length}`} />
-                  <DenseStat label="Pending Outcomes" value={`${data.outcomes.filter((outcome) => outcome.status === "Pending").length}`} />
+                  <DenseStat label={t(language, "journal.summary.entries")} value={`${data.decisions.length}`} tone="strong" />
+                  <DenseStat label={t(language, "journal.summary.entered")} value={`${data.decisions.filter((decision) => decision.action === "Entered").length}`} />
+                  <DenseStat label={t(language, "journal.summary.skipped")} value={`${data.decisions.filter((decision) => decision.action === "Skipped").length}`} />
+                  <DenseStat label={t(language, "journal.summary.pendingOutcomes")} value={`${data.outcomes.filter((outcome) => outcome.status === "Pending").length}`} />
                 </View>
-                <HorizontalChoice options={journalFilters} value={journalFilter} onSelect={setJournalFilter} />
+                <HorizontalChoice options={journalFilters} value={journalFilter} onSelect={(filter: JournalFilter) => setJournalFilter(filter)} labelForOption={(filter: JournalFilter) => journalFilterLabel(language, filter)} />
                 <View style={styles.actionRow}>
-                  <Button label="New" onPress={() => setJournalComposerOpen(true)} />
+                  <Button label={t(language, "common.new")} onPress={() => setJournalComposerOpen(true)} />
                 </View>
               </Reveal>
 
@@ -3423,7 +4460,7 @@ export default function App() {
                 <View style={styles.stack}>
                   {filteredJournalHistory.length === 0 ? (
                     <Card>
-                      <Text style={styles.cardBody}>No journal entries in this filter yet.</Text>
+                      <Text style={styles.cardBody}>{t(language, "journal.empty")}</Text>
                     </Card>
                   ) : filteredJournalHistory.map((decision) => {
                     const linkedEye = data.eyes.find((eye) => eye.id === decision.eyeId);
@@ -3436,26 +4473,26 @@ export default function App() {
                       >
                       <Card>
                         <Text style={styles.cardEyebrow}>{formatDate(decision.createdAt)}</Text>
-                        <Text style={styles.alertTitle}>{decision.action} · {decisionTitle(decision.eyeId, data.eyes, data.stocks, data.recipes)}</Text>
+                        <Text style={styles.alertTitle}>{localizedDecisionAction(language, decision.action)} · {decisionTitle(decision.eyeId, data.eyes, data.stocks, data.recipes)}</Text>
                         <Text style={styles.cardBody} numberOfLines={2}>{decision.note}</Text>
                         <View style={styles.metaRow}>
-                          <MetaPill label={decision.stateAtDecision ?? "No state snapshot"} />
-                          <MetaPill label={decision.dataQuality ?? "No data note"} />
-                          <MetaPill label={`Thesis ${decision.thesisValid}`} />
-                          <MetaPill label={decision.timing} />
+                          <MetaPill label={decision.stateAtDecision ?? t(language, "journal.meta.noState")} />
+                          <MetaPill label={decision.dataQuality ?? t(language, "journal.meta.noData")} />
+                          <MetaPill label={t(language, "journal.meta.thesis", { value: localizedThesisValidity(language, decision.thesisValid) })} />
+                          <MetaPill label={localizedTiming(language, decision.timing)} />
                         </View>
-                        <Text style={styles.metaLine}>Concern: {decision.concern || "Not captured"}</Text>
+                        <Text style={styles.metaLine}>{t(language, "journal.meta.concern", { value: decision.concern || t(language, "journal.meta.notCaptured") })}</Text>
                         <View style={styles.analysisActionRow}>
-                          <Button label="Open" tone="secondary" onPress={() => setSelectedDecisionId(decision.id)} />
+                          <Button label={t(language, "journal.action.open")} tone="secondary" onPress={() => setSelectedDecisionId(decision.id)} />
                           {linkedEye ? (
                             <Button
-                              label="Stock"
+                              label={t(language, "common.stock")}
                               onPress={() => openStockContext({ stockId: linkedEye.stockId, eyeId: linkedEye.id })}
                             />
                           ) : null}
                           {decision.alertId ? (
                             <Button
-                              label="Alert"
+                              label={t(language, "journal.action.alert")}
                               tone="ghost"
                               onPress={() => {
                                 setSelectedAlertId(decision.alertId ?? "");
@@ -3468,7 +4505,7 @@ export default function App() {
                         </View>
                         {linkedOutcome ? (
                           <View style={styles.formulaPanel}>
-                            <Text style={styles.formulaTitle}>Outcome · {linkedOutcome.status}</Text>
+                            <Text style={styles.formulaTitle}>{t(language, "journal.detail.outcome", { status: localizedOutcomeStatus(language, linkedOutcome.status) })}</Text>
                             <Text style={styles.formulaBody}>{linkedOutcome.lesson}</Text>
                             <Text style={styles.formulaMeta}>{linkedOutcome.recipeSuggestion}</Text>
                           </View>
@@ -3528,6 +4565,11 @@ export default function App() {
                     disabled={providerHealthLoading}
                   />
                   <Button label={t(language, "settings.providers.refresh")} tone="secondary" onPress={() => void actions.refreshMockData()} />
+                  <Button
+                    label={language === "ko" ? "일일 스캔" : "Daily Scan"}
+                    tone="secondary"
+                    onPress={() => void actions.runDailyScanner()}
+                  />
                 </View>
               </Reveal>
 
@@ -3568,34 +4610,930 @@ export default function App() {
             </>
           ) : null}
         </ScrollView>
+        {conditionBuilderOpen ? (
+          <WindowPanel
+            title={
+              logicRuleEditingContext?.conditionId
+                ? language === "ko"
+                  ? "L1.5 규칙 수정"
+                  : "Edit L1.5 Rule"
+                : language === "ko"
+                  ? "L1.5 규칙 빌더"
+                  : "L1.5 Rule Builder"
+            }
+            subtitle={
+              language === "ko"
+                ? "L1 수식 하나를 선택하고, 수학 조건과 역할을 붙여 L1.5 규칙을 만듭니다."
+                : "Pick one L1 formula, attach a mathematical condition and role, and save it as an L1.5 rule."
+            }
+            onClose={() => {
+              setConditionBuilderOpen(false);
+              resetLogicRuleBuilderDraft();
+            }}
+            closeLabel={t(language, "common.done")}
+          >
+            <Card style={styles.logicBuilderCompactCard}>
+              <View style={styles.metricBuilderSectionHeader}>
+                <Text style={styles.metricBuilderSectionTitle}>{language === "ko" ? "규칙 구성" : "Rule Composition"}</Text>
+                <MetaPill label={language === "ko" ? "L1 → L1.5" : "L1 → L1.5"} tone="info" />
+              </View>
+              <View style={styles.metricBuilderCompactRow}>
+                <View style={styles.metricBuilderSelectorField}>
+                  <Text style={styles.metricBuilderMiniLabel}>{language === "ko" ? "L1 수식" : "L1 Formula"}</Text>
+                  <SearchableSelect
+                    label=""
+                    options={logicLabMetricCatalog.map((metric) => ({
+                      id: metric.key,
+                      label: metric.name,
+                      sublabel: metric.humanMeaning,
+                    }))}
+                    value={conditionBuilder.metricKey}
+                    onSelect={(option: any) =>
+                      setConditionBuilder((current) => ({ ...current, metricKey: option.id }))
+                    }
+                    placeholder={language === "ko" ? "수식 선택" : "Select formula"}
+                  />
+                </View>
+                <View style={styles.metricBuilderSelectorField}>
+                  <Text style={styles.metricBuilderMiniLabel}>{language === "ko" ? "대상 L2" : "Target L2"}</Text>
+                  <SearchableSelect
+                    label=""
+                    options={logicLabRecipes.map((recipe) => ({
+                      id: recipe.id,
+                      label: recipe.name,
+                      sublabel: `v${recipe.version} · ${localizedTimeHorizon(language, recipe.timeHorizon)}`,
+                    }))}
+                    value={conditionBuilderRecipeId}
+                    onSelect={(option: any) => setConditionBuilderRecipeId(option.id)}
+                    placeholder={language === "ko" ? "세트 선택" : "Choose set"}
+                  />
+                </View>
+              </View>
+            </Card>
+            {selectedConditionMetric ? (
+              <Card style={styles.logicBuilderCompactCard}>
+                <View style={styles.navigatorHeader}>
+                  <Text style={styles.navigatorEyebrow}>L1 FORMULA</Text>
+                  <Text style={styles.navigatorBody}>{selectedConditionMetric.name}</Text>
+                  <Text style={styles.previewDisclosure}>{selectedConditionMetric.humanMeaning}</Text>
+                </View>
+                <View style={styles.metaRow}>
+                  {selectedConditionMetric.requiredData.map((field) => (
+                    <MetaPill key={`condition-builder-field-${field}`} label={`L0 · ${rawLogicFieldLabel(language, field)}`} />
+                  ))}
+                </View>
+              </Card>
+            ) : null}
+            <Card style={styles.logicBuilderCompactCard}>
+              <Text style={styles.metricBuilderMiniLabel}>{language === "ko" ? "연산자" : "Operator"}</Text>
+              <HorizontalChoice
+                options={selectedOperatorOptions}
+                value={conditionBuilder.operator}
+                onSelect={(operator) => setConditionBuilder((current) => ({ ...current, operator }))}
+              />
+              <Text style={styles.metricBuilderMiniLabel}>{language === "ko" ? "기준값" : "Threshold"}</Text>
+              {selectedConditionControl.type === "number" ? (
+                <NumberStepper
+                  label={language === "ko" ? "기준값 조정" : "Adjust threshold"}
+                  value={Number(conditionBuilder.threshold)}
+                  onChange={(next) => setConditionBuilder((current) => ({ ...current, threshold: String(next) }))}
+                  step={selectedConditionControl.step}
+                  min={selectedConditionControl.min}
+                  max={selectedConditionControl.max}
+                  unit={selectedConditionControl.unit}
+                />
+              ) : (
+                <HorizontalChoice
+                  options={selectedConditionControl.options}
+                  value={conditionBuilder.threshold}
+                  onSelect={(value) => setConditionBuilder((current) => ({ ...current, threshold: value }))}
+                  labelForOption={(value) => localizedRecipeOptionValue(language, value)}
+                />
+              )}
+              <Text style={styles.metricBuilderMiniLabel}>{language === "ko" ? "역할" : "Role"}</Text>
+              <HorizontalChoice
+                options={conditionRoleOptions as readonly string[]}
+                value={conditionBuilder.role}
+                onSelect={(role) =>
+                  setConditionBuilder((current) => ({ ...current, role: role as NonNullable<RecipeCondition["role"]> }))
+                }
+                labelForOption={(role) => localizedConditionRole(language, role)}
+              />
+            </Card>
+            <View style={styles.formulaPanel}>
+              <Text style={styles.previewLabel}>{language === "ko" ? "실시간 규칙 미리보기" : "Live Rule Preview"}</Text>
+              <Text style={styles.formulaTitle}>
+                {selectedConditionMetric?.name ?? "--"} {conditionBuilder.operator}{" "}
+                {formatMetricThreshold(selectedConditionMetric, conditionBuilder.threshold, language, selectedConditionFormula)}
+              </Text>
+              <Text style={styles.formulaBody}>
+                {localizedConditionRole(language, conditionBuilder.role)} · {logicRoleStateEffect(language, conditionBuilder.role)}
+              </Text>
+            </View>
+            <Input
+              value={conditionBuilder.note}
+              onChangeText={(note) => setConditionBuilder((current) => ({ ...current, note }))}
+              placeholder={language === "ko" ? "선택 이유나 주의 메모를 짧게 적으세요." : "Add a short rationale or warning note."}
+              multiline
+            />
+            <View style={styles.actionRow}>
+              <Button
+                label={logicRuleEditingContext?.conditionId ? (language === "ko" ? "규칙 저장" : "Save Rule") : language === "ko" ? "L1.5 규칙 추가" : "Add L1.5 Rule"}
+                onPress={() => void saveLogicRule()}
+              />
+              <Button
+                label={language === "ko" ? "초기화" : "Reset"}
+                tone="ghost"
+                onPress={resetLogicRuleBuilderDraft}
+              />
+            </View>
+          </WindowPanel>
+        ) : null}
+
+        {logicL0RegistryOpen ? (
+          <WindowPanel
+            title={language === "ko" ? "원천 데이터 레지스트리" : "Raw Data Registry"}
+            subtitle={
+              language === "ko"
+                ? "여기서는 원천 데이터만 봅니다. 정의, 중요도, 연결된 처리 피처, 소스, API 원천을 확인하세요."
+                : "This is the raw-data registry only. Review the definitions, importance, linked processed features, sources, and API origins here."
+            }
+            onClose={() => setLogicL0RegistryOpen(false)}
+            closeLabel={t(language, "common.done")}
+          >
+            <L0DataLayer
+              language={language}
+              dataSources={logicLabDataSources}
+              rules={frozenScannerRules}
+              MetaPill={MetaPill}
+              SectionHeader={SectionHeader}
+              Button={Button}
+              onOpenHelp={() => setLogicInfoTarget("Raw Data")}
+            />
+          </WindowPanel>
+        ) : null}
+
+        {selectedLogicVersionRecipe ? (
+          <WindowPanel
+            title={language === "ko" ? "L2 버전 이력" : "L2 Version History"}
+            subtitle={
+              language === "ko"
+                ? `"${selectedLogicVersionRecipe.name}" 세트가 언제 어떻게 바뀌었는지 비교합니다.`
+                : `Review when and how "${selectedLogicVersionRecipe.name}" changed over time.`
+            }
+            onClose={() => setLogicVersionsRecipeId("")}
+            closeLabel={t(language, "common.done")}
+          >
+            <View style={styles.versionHistoryStack}>
+              {selectedLogicVersionLineage.map((recipe, index) => {
+                const previous = selectedLogicVersionLineage[index + 1];
+                const diff = buildLogicSetVersionDiff(recipe, previous);
+                return (
+                  <Card key={`logic-version-${recipe.id}`} style={styles.versionHistoryCard}>
+                    <View style={styles.versionHistoryHeader}>
+                      <View style={styles.versionHistoryTitleWrap}>
+                        <Text style={styles.versionHistoryTitle}>
+                          {recipe.name} · v{recipe.version}
+                        </Text>
+                        <Text style={styles.versionHistorySubtitle}>
+                          {recipe.createdAt.slice(0, 16).replace("T", " ")}
+                        </Text>
+                      </View>
+                      <MetaPill label={recipe.retiredAt ? (language === "ko" ? "은퇴" : "Retired") : language === "ko" ? "활성" : "Active"} tone={recipe.retiredAt ? "risk" : "success"} />
+                    </View>
+                    <View style={styles.versionHistoryMetaRow}>
+                      <MetaPill label={language === "ko" ? `추가 ${diff.added}` : `Added ${diff.added}`} tone="info" />
+                      <MetaPill label={language === "ko" ? `변경 ${diff.changed}` : `Changed ${diff.changed}`} tone="info" />
+                      <MetaPill label={language === "ko" ? `삭제 ${diff.removed}` : `Removed ${diff.removed}`} tone="info" />
+                      <MetaPill label={language === "ko" ? `메타 ${diff.metaChanged}` : `Meta ${diff.metaChanged}`} />
+                    </View>
+                    <Text style={styles.versionHistoryBody}>
+                      {language === "ko"
+                        ? `${recipe.conditions.length}개의 L1.5 규칙으로 구성된 세트입니다.`
+                        : `This set version contains ${recipe.conditions.length} L1.5 rules.`}
+                    </Text>
+                    <View style={styles.versionHistoryActionRow}>
+                      <Button
+                        label={language === "ko" ? "이 버전으로 복원" : "Restore This Version"}
+                        tone="secondary"
+                        onPress={async () => {
+                          const nextId = await actions.restoreRecipeVersion(recipe.id);
+                          setLogicVersionsRecipeId(nextId ?? recipe.id);
+                        }}
+                        style={styles.versionHistoryActionButton}
+                      />
+                      <Button
+                        label={language === "ko" ? "새 버전 생성" : "New Version"}
+                        onPress={async () => {
+                          const nextId = await actions.createRecipeVersion(recipe.id);
+                          setLogicVersionsRecipeId(nextId ?? recipe.id);
+                        }}
+                        style={styles.versionHistoryActionButton}
+                      />
+                    </View>
+                  </Card>
+                );
+              })}
+            </View>
+          </WindowPanel>
+        ) : null}
+
+        {logicInfoTarget ? (
+          <WindowPanel
+            title={logicInfoContent(language, logicInfoTarget).title}
+            subtitle={language === "ko" ? "이 레벨이 맡는 역할과 입력, 출력, 연결 구조를 설명합니다." : "This explains the role, input, output, and connection model of the selected level."}
+            onClose={() => setLogicInfoTarget("")}
+            closeLabel={t(language, "common.done")}
+          >
+            <Card style={styles.logicInfoCard}>
+              <Text style={styles.logicInfoBody}>{logicInfoContent(language, logicInfoTarget).body}</Text>
+            </Card>
+          </WindowPanel>
+        ) : null}
+
+        {metricBuilderOpen ? (
+          <WindowPanel
+            title={metricBuilderEditingKey ? (language === "ko" ? "L1 지표 수정" : "Edit L1 Metric") : language === "ko" ? "L1 지표 빌더" : "L1 Metric Builder"}
+            subtitle={
+              metricBuilderEditingKey
+                ? language === "ko"
+                  ? "기존 사용자 정의 지표를 같은 수식 체계 안에서 수정합니다."
+                  : "Update the existing custom metric inside the same formula pipeline."
+                : language === "ko"
+                ? "L0 원천값과 수식을 명시적으로 연결해 새 지표를 정의합니다."
+                : "Define a new metric by explicitly connecting raw L0 inputs to a formula."
+            }
+            onClose={() => {
+              setMetricBuilderOpen(false);
+              resetMetricBuilderDraft();
+            }}
+            closeLabel={t(language, "common.done")}
+          >
+            <Card style={styles.metricBuilderSectionCard}>
+              <View style={styles.metricBuilderMetaGrid}>
+                <View style={styles.metricBuilderMetaField}>
+                  <Text style={styles.metricBuilderMiniLabel}>{language === "ko" ? "이름" : "Name"}</Text>
+                  <Input
+                    value={metricForm.name}
+                    onChangeText={(name) => setMetricForm((current) => ({ ...current, name }))}
+                    placeholder={language === "ko" ? "예: 조정 후 안정화 강도" : "Example: Post-pullback stabilization strength"}
+                    invalid={metricFormAttempted && !metricForm.name.trim()}
+                  />
+                </View>
+                <View style={styles.metricBuilderMetaField}>
+                  <Text style={styles.metricBuilderMiniLabel}>{language === "ko" ? "의미" : "Meaning"}</Text>
+                  <Input
+                    value={metricForm.humanMeaning}
+                    onChangeText={(humanMeaning) => setMetricForm((current) => ({ ...current, humanMeaning }))}
+                    placeholder={
+                      language === "ko"
+                        ? "무엇을 측정하는지 한 줄로"
+                        : "What the metric measures"
+                    }
+                    multiline
+                    invalid={metricFormAttempted && !metricForm.humanMeaning.trim()}
+                  />
+                </View>
+              </View>
+              {metricFormAttempted && (!metricForm.name.trim() || !metricForm.humanMeaning.trim()) ? (
+                <Text style={styles.validationText}>
+                  {language === "ko"
+                    ? "이름과 의미를 모두 채워야 합니다."
+                    : "Name and meaning are both required."}
+                </Text>
+              ) : null}
+            </Card>
+
+            <Card style={styles.metricBuilderSectionCard}>
+              <View style={styles.metricBuilderSectionHeader}>
+                <Text style={styles.metricBuilderSectionTitle}>{language === "ko" ? "L1 계산기" : "L1 Calculator"}</Text>
+                <MetaPill
+                  label={
+                    metricForm.builderMode === "raw"
+                      ? language === "ko"
+                        ? "L0 그대로"
+                        : "Direct L0"
+                      : language === "ko"
+                        ? "수학식"
+                        : "Equation"
+                  }
+                  tone={metricExpressionValidity.valid || metricForm.builderMode === "raw" ? "info" : "risk"}
+                />
+              </View>
+
+              <HorizontalChoice
+                options={["raw", "equation"]}
+                value={metricForm.builderMode}
+                onSelect={(builderMode) =>
+                  setMetricForm((current) => ({
+                    ...current,
+                    builderMode: builderMode as "raw" | "equation",
+                    selectedRawFields:
+                      builderMode === "equation"
+                        ? current.selectedRawFields.length > 0
+                          ? current.selectedRawFields
+                          : [current.rawParameterKey]
+                        : current.selectedRawFields,
+                  }))
+                }
+                labelForOption={(value) =>
+                  language === "ko"
+                    ? value === "raw"
+                      ? "L0 그대로"
+                      : "수학식 조합"
+                    : value === "raw"
+                      ? "Direct L0"
+                      : "Equation"
+                }
+              />
+
+              <View style={styles.metricBuilderCompactRow}>
+                <View style={styles.metricBuilderSelectorField}>
+                  <Text style={styles.metricBuilderMiniLabel}>{language === "ko" ? "L0 입력" : "L0 Input"}</Text>
+                  <SearchableSelect
+                    label=""
+                    options={availableRawFieldOptions.map((field) => ({
+                      id: field.key,
+                      label: field.label,
+                      sublabel: field.description,
+                    }))}
+                    value={metricInsertRawField}
+                    onSelect={(option: any) => setMetricInsertRawField(option.id)}
+                    placeholder={language === "ko" ? "원천값 선택" : "Choose raw input"}
+                  />
+                </View>
+                <Button
+                  label={language === "ko" ? "추가" : "Add"}
+                  tone="secondary"
+                  onPress={() => {
+                    if (metricForm.builderMode === "raw") {
+                      setMetricForm((current) => ({
+                        ...current,
+                        rawParameterKey: metricInsertRawField,
+                        expression: metricInsertRawField,
+                      }));
+                      return;
+                    }
+                    appendMetricExpressionToken(metricInsertRawField);
+                  }}
+                  style={styles.metricCalculatorAction}
+                />
+              </View>
+
+              <View
+                style={[
+                  styles.formulaCanvas,
+                  metricForm.builderMode === "equation" && metricFormAttempted && !metricExpressionValidity.valid
+                    ? styles.formulaCanvasInvalid
+                    : null,
+                ]}
+              >
+                {tokenizeExpression(metricForm.expression).length > 0 ? (
+                  tokenizeExpression(metricForm.expression).map((token, index) => (
+                    <Pressable
+                      key={`expression-token-${token}-${index}`}
+                      onPress={() =>
+                        setMetricForm((current) => ({
+                          ...current,
+                          expression: tokenizeExpression(current.expression)
+                            .filter((_, tokenIndex) => tokenIndex !== index)
+                            .join(" "),
+                        }))
+                      }
+                      style={[
+                        styles.formulaToken,
+                        /^[+\-*/()%,]+$/.test(token)
+                          ? styles.formulaTokenOperator
+                          : /^\d+(\.\d+)?$/.test(token)
+                            ? styles.formulaTokenNumber
+                            : styles.formulaTokenVariable,
+                      ]}
+                    >
+                      <Text style={styles.formulaTokenText}>
+                        {/^[A-Z_]+$/.test(token) ? buildExpressionPreview(token, [token]) : token}
+                      </Text>
+                    </Pressable>
+                  ))
+                ) : (
+                  <Text style={styles.previewDisclosure}>
+                    {language === "ko" ? "L0와 연산자를 눌러 L1 수식을 조립하세요." : "Tap L0 inputs and operators to compose the L1 formula."}
+                  </Text>
+                )}
+              </View>
+              <View style={styles.metricBuilderStatusRow}>
+                <View style={styles.metaRow}>
+                  {(metricForm.builderMode === "raw" ? [metricForm.rawParameterKey] : metricForm.selectedRawFields).map((fieldKey) => (
+                    <MetaPill
+                      key={`metric-selected-field-${fieldKey}`}
+                      label={availableRawFieldOptions.find((field) => field.key === fieldKey)?.label ?? fieldKey}
+                      tone="info"
+                    />
+                  ))}
+                </View>
+                {metricForm.builderMode === "equation" ? (
+                  <Text
+                    style={[
+                      styles.metricBuilderStatusText,
+                      metricExpressionValidity.valid ? styles.metricBuilderStatusTextValid : styles.metricBuilderStatusTextInvalid,
+                    ]}
+                  >
+                    {metricExpressionValidity.valid
+                      ? language === "ko"
+                        ? "수식 유효"
+                        : "Valid"
+                      : metricExpressionValidity.reason === "empty"
+                        ? language === "ko"
+                          ? "수식 비어 있음"
+                          : "Empty formula"
+                        : metricExpressionValidity.reason === "characters"
+                          ? language === "ko"
+                            ? "지원되지 않는 토큰"
+                            : "Unsupported token"
+                          : language === "ko"
+                            ? "괄호/함수 오류"
+                            : "Function / bracket error"}
+                  </Text>
+                ) : null}
+              </View>
+              {metricFormAttempted &&
+              ((metricForm.builderMode === "raw" && !metricForm.rawParameterKey) ||
+                (metricForm.builderMode === "equation" && metricForm.selectedRawFields.length === 0)) ? (
+                <Text style={styles.validationText}>
+                  {language === "ko" ? "최소 한 개의 L0 원천값이 필요합니다." : "At least one L0 input is required."}
+                </Text>
+              ) : null}
+
+              {metricForm.builderMode === "equation" ? (
+                <View style={styles.metricCalculatorGrid}>
+                  <View style={styles.metricCalculatorColumn}>
+                    <Text style={styles.metricBuilderMiniLabel}>{language === "ko" ? "연산자" : "Operators"}</Text>
+                    <View style={styles.metricCalculatorPad}>
+                      {["+", "-", "*", "/", "(", ")"].map((token) => (
+                        <Pressable
+                          key={`metric-op-${token}`}
+                          onPress={() => appendMetricExpressionToken(token)}
+                          style={styles.operatorChip}
+                        >
+                          <Text style={styles.operatorChipText}>{token}</Text>
+                        </Pressable>
+                      ))}
+                    </View>
+                    <Text style={styles.metricBuilderMiniLabel}>{language === "ko" ? "숫자" : "Number"}</Text>
+                    <View style={styles.metricBuilderCompactRow}>
+                      <View style={styles.metricBuilderSelectorField}>
+                        <Input
+                          value={metricNumberToken}
+                          onChangeText={setMetricNumberToken}
+                          placeholder={language === "ko" ? "예: 14, -25, 0.85" : "Example: 14, -25, 0.85"}
+                          keyboardType="numeric"
+                        />
+                      </View>
+                      <Button
+                        label={language === "ko" ? "숫자" : "Number"}
+                        tone="secondary"
+                        onPress={() => {
+                          if (!metricNumberToken.trim()) return;
+                          appendMetricExpressionToken(metricNumberToken.trim());
+                          setMetricNumberToken("");
+                        }}
+                        style={styles.metricCalculatorAction}
+                      />
+                    </View>
+                  </View>
+
+                  <View style={styles.metricCalculatorColumn}>
+                    <Text style={styles.metricBuilderMiniLabel}>{language === "ko" ? "함수" : "Function"}</Text>
+                    <SearchableSelect
+                      label=""
+                      options={functionTokenTemplates.map((template) => ({
+                        id: template.split(" ")[0],
+                        label: template.split(" ")[0],
+                        sublabel: template,
+                      }))}
+                      value={metricFunctionKey}
+                      onSelect={(option: any) => setMetricFunctionKey(option.id)}
+                      placeholder={language === "ko" ? "함수 선택" : "Choose function"}
+                    />
+                    <View style={styles.metricFunctionArgsCard}>
+                      <View style={styles.metricFunctionArgBlock}>
+                        <HorizontalChoice
+                          options={["parameter", "number"]}
+                          value={metricFunctionArgMode1}
+                          onSelect={(value) => setMetricFunctionArgMode1(value as "parameter" | "number")}
+                          labelForOption={(value) =>
+                            language === "ko"
+                              ? value === "parameter"
+                                ? "L0"
+                                : "숫자"
+                              : value === "parameter"
+                                ? "L0"
+                                : "Number"
+                          }
+                        />
+                        {metricFunctionArgMode1 === "parameter" ? (
+                          <SearchableSelect
+                            label=""
+                            options={availableRawFieldOptions.map((field) => ({
+                              id: field.key,
+                              label: field.label,
+                              sublabel: field.description,
+                            }))}
+                            value={metricFunctionArgParameter1}
+                            onSelect={(option: any) => setMetricFunctionArgParameter1(option.id)}
+                            placeholder={language === "ko" ? "인자 1" : "Arg 1"}
+                          />
+                        ) : (
+                          <Input
+                            value={metricFunctionArgNumber1}
+                            onChangeText={setMetricFunctionArgNumber1}
+                            placeholder={language === "ko" ? "인자 1 숫자" : "Arg 1 number"}
+                            keyboardType="numeric"
+                          />
+                        )}
+                      </View>
+
+                      {["PCT_CHANGE", "AVG", "MIN", "MAX", "CLAMP"].includes(metricFunctionKey) ? (
+                        <View style={styles.metricFunctionArgBlock}>
+                          <HorizontalChoice
+                            options={["parameter", "number"]}
+                            value={metricFunctionArgMode2}
+                            onSelect={(value) => setMetricFunctionArgMode2(value as "parameter" | "number")}
+                            labelForOption={(value) =>
+                              language === "ko"
+                                ? value === "parameter"
+                                  ? "L0"
+                                  : "숫자"
+                                : value === "parameter"
+                                  ? "L0"
+                                  : "Number"
+                            }
+                          />
+                          {metricFunctionArgMode2 === "parameter" ? (
+                            <SearchableSelect
+                              label=""
+                              options={availableRawFieldOptions.map((field) => ({
+                                id: field.key,
+                                label: field.label,
+                                sublabel: field.description,
+                              }))}
+                              value={metricFunctionArgParameter2}
+                              onSelect={(option: any) => setMetricFunctionArgParameter2(option.id)}
+                              placeholder={language === "ko" ? "인자 2" : "Arg 2"}
+                            />
+                          ) : (
+                            <Input
+                              value={metricFunctionArgNumber2}
+                              onChangeText={setMetricFunctionArgNumber2}
+                              placeholder={language === "ko" ? "인자 2 숫자" : "Arg 2 number"}
+                              keyboardType="numeric"
+                            />
+                          )}
+                        </View>
+                      ) : null}
+
+                      {metricFunctionKey === "CLAMP" ? (
+                        <View style={styles.metricFunctionArgBlock}>
+                          <HorizontalChoice
+                            options={["parameter", "number"]}
+                            value={metricFunctionArgMode3}
+                            onSelect={(value) => setMetricFunctionArgMode3(value as "parameter" | "number")}
+                            labelForOption={(value) =>
+                              language === "ko"
+                                ? value === "parameter"
+                                  ? "L0"
+                                  : "숫자"
+                                : value === "parameter"
+                                  ? "L0"
+                                  : "Number"
+                            }
+                          />
+                          {metricFunctionArgMode3 === "parameter" ? (
+                            <SearchableSelect
+                              label=""
+                              options={availableRawFieldOptions.map((field) => ({
+                                id: field.key,
+                                label: field.label,
+                                sublabel: field.description,
+                              }))}
+                              value={metricFunctionArgParameter3}
+                              onSelect={(option: any) => setMetricFunctionArgParameter3(option.id)}
+                              placeholder={language === "ko" ? "인자 3" : "Arg 3"}
+                            />
+                          ) : (
+                            <Input
+                              value={metricFunctionArgNumber3}
+                              onChangeText={setMetricFunctionArgNumber3}
+                              placeholder={language === "ko" ? "인자 3 숫자" : "Arg 3 number"}
+                              keyboardType="numeric"
+                            />
+                          )}
+                        </View>
+                      ) : null}
+                      <Button
+                        label={language === "ko" ? "함수 추가" : "Add function"}
+                        tone="secondary"
+                        onPress={() => {
+                          const token = buildMetricFunctionToken();
+                          if (!token) return;
+                          appendMetricExpressionToken(token);
+                        }}
+                      />
+                    </View>
+                  </View>
+                </View>
+              ) : null}
+
+              <View style={styles.actionRow}>
+                <Button
+                  label={language === "ko" ? "마지막 토큰" : "Undo Token"}
+                  tone="secondary"
+                  onPress={removeMetricExpressionToken}
+                />
+                <Button
+                  label={language === "ko" ? "전체 지우기" : "Clear"}
+                  tone="ghost"
+                  onPress={() => setMetricForm((current) => ({ ...current, expression: "" }))}
+                />
+              </View>
+            </Card>
+
+            {selectedMetricRequiredData.length > 0 ? (
+              <Card style={styles.logicNavigatorCard}>
+                <View style={styles.navigatorHeader}>
+                  <Text style={styles.navigatorEyebrow}>{language === "ko" ? "L0 DEPENDENCY" : "L0 DEPENDENCY"}</Text>
+                  <Text style={styles.navigatorBody}>
+                    {language === "ko"
+                      ? `${selectedMetricRequiredData.length}개 원천값 연결`
+                      : `${selectedMetricRequiredData.length} raw inputs linked`}
+                  </Text>
+                </View>
+                <View style={styles.metaRow}>
+                  {selectedMetricRequiredData.map((field) => (
+                    <MetaPill key={`metric-formula-field-${field}`} label={`L0 · ${rawLogicFieldLabel(language, field)}`} />
+                  ))}
+                </View>
+              </Card>
+            ) : null}
+
+            <Text style={styles.inputLabel}>{language === "ko" ? "가용성" : "Availability"}</Text>
+            <HorizontalChoice
+              options={["automated", "manual", "future"]}
+              value={metricForm.availability}
+              onSelect={(availability) =>
+                setMetricForm((current) => ({
+                  ...current,
+                  availability: availability as MetricDefinition["availability"],
+                }))
+              }
+              labelForOption={(value) => localizedMetricAvailability(language, value)}
+            />
+
+            <Text style={styles.inputLabel}>{language === "ko" ? "신선도 기대치" : "Freshness expectation"}</Text>
+            <HorizontalChoice
+              options={["Daily", "Near Real Time", "Review Cadence"]}
+              value={metricForm.freshnessExpectation}
+              onSelect={(freshnessExpectation) =>
+                setMetricForm((current) => ({
+                  ...current,
+                  freshnessExpectation: freshnessExpectation as MetricDefinition["freshnessExpectation"],
+                }))
+              }
+              labelForOption={(value) =>
+                language === "ko"
+                  ? value === "Daily"
+                    ? "일간"
+                    : value === "Near Real Time"
+                      ? "준실시간"
+                      : "검토 주기"
+                  : value
+              }
+            />
+
+            <Text style={styles.inputLabel}>{language === "ko" ? "예시 출력 설명" : "Example output description"}</Text>
+            <Input
+              value={metricForm.exampleDisplayText}
+              onChangeText={(exampleDisplayText) => setMetricForm((current) => ({ ...current, exampleDisplayText }))}
+              placeholder={
+                language === "ko"
+                  ? "이 수식이 어떤 출력값을 보여주는지 설명하세요."
+                  : "Describe the representative output this formula produces."
+              }
+              multiline
+            />
+
+            <Text style={styles.inputLabel}>{language === "ko" ? "결측 처리 방식" : "Missing-data behavior"}</Text>
+            <Input
+              value={metricForm.missingDataBehavior}
+              onChangeText={(missingDataBehavior) => setMetricForm((current) => ({ ...current, missingDataBehavior }))}
+              placeholder={
+                language === "ko"
+                  ? "필요한 L0 값이 비면 어떻게 처리할지 적으세요."
+                  : "Explain what happens if one or more L0 inputs are unavailable."
+              }
+              multiline
+            />
+
+            <View style={styles.actionRow}>
+              <Button label={metricBuilderEditingKey ? (language === "ko" ? "수정 저장" : "Save Changes") : language === "ko" ? "저장" : "Save Metric"} onPress={saveMetric} />
+              <Button
+                label={language === "ko" ? "초기화" : "Reset"}
+                tone="ghost"
+                onPress={resetMetricBuilderDraft}
+              />
+            </View>
+          </WindowPanel>
+        ) : null}
+
+        {logicSetBuilderOpen ? (
+          <WindowPanel
+            title={
+              logicSetBuilderEditingId
+                ? language === "ko"
+                  ? "L2 세트 수정"
+                  : "Edit L2 Set"
+                : language === "ko"
+                  ? "L2 세트 빌더"
+                  : "L2 Set Builder"
+            }
+            subtitle={
+              language === "ko"
+                ? "L2는 L1.5 규칙의 집합입니다. 세트 이름을 정하고 재사용할 규칙을 고른 뒤 버전 세트로 저장합니다."
+                : "L2 is a set of L1.5 rules. Name the set, choose the reusable rules, and save the versioned set."
+            }
+            onClose={() => {
+              setLogicSetBuilderOpen(false);
+              resetLogicSetBuilderDraft();
+            }}
+            closeLabel={t(language, "common.done")}
+          >
+            <Card style={styles.logicBuilderCompactCard}>
+              <View style={styles.metricBuilderSectionHeader}>
+                <Text style={styles.metricBuilderSectionTitle}>{language === "ko" ? "L2 세트 정의" : "L2 Set Definition"}</Text>
+                <MetaPill label={language === "ko" ? "L1.5 → L2" : "L1.5 → L2"} tone="info" />
+              </View>
+              <View style={styles.metricBuilderMetaGrid}>
+                <View style={styles.metricBuilderMetaField}>
+                  <Text style={styles.metricBuilderMiniLabel}>{language === "ko" ? "세트 이름" : "Set name"}</Text>
+                  <Input
+                    value={logicSetForm.name}
+                    onChangeText={(name) => setLogicSetForm((current) => ({ ...current, name }))}
+                    placeholder={language === "ko" ? "예: 리셋 회복 세트" : "Example: Reset recovery set"}
+                    invalid={logicSetFormAttempted && !logicSetForm.name.trim()}
+                  />
+                </View>
+                <View style={styles.metricBuilderMetaField}>
+                  <Text style={styles.metricBuilderMiniLabel}>{language === "ko" ? "세트 목적" : "Set purpose"}</Text>
+                  <Input
+                    value={logicSetForm.purpose}
+                    onChangeText={(purpose) => setLogicSetForm((current) => ({ ...current, purpose }))}
+                    placeholder={
+                      language === "ko"
+                        ? "이 세트가 포착하려는 상황"
+                        : "What this set is meant to capture"
+                    }
+                    multiline
+                    invalid={logicSetFormAttempted && !logicSetForm.purpose.trim()}
+                  />
+                </View>
+              </View>
+              {(logicSetFormAttempted && (!logicSetForm.name.trim() || !logicSetForm.purpose.trim())) ? (
+                <Text style={styles.validationText}>
+                  {language === "ko" ? "세트 이름과 목적을 모두 채워야 합니다." : "Name and purpose are both required."}
+                </Text>
+              ) : null}
+              <View style={styles.dualDenseGrid}>
+                <DenseStat label={language === "ko" ? "선택 규칙" : "Selected rules"} value={`${selectedLogicSetRuleTemplates.length}`} tone={selectedLogicSetRuleTemplates.length > 0 ? "strong" : "neutral"} />
+                <DenseStat label={language === "ko" ? "검토 주기" : "Review cadence"} value={`${logicSetForm.reviewCadenceDays}d`} />
+              </View>
+              <Text style={styles.metricBuilderMiniLabel}>{language === "ko" ? "세트 시간축" : "Time horizon"}</Text>
+              <HorizontalChoice
+                options={timeHorizons}
+                value={logicSetForm.timeHorizon}
+                onSelect={(timeHorizon) => setLogicSetForm((current) => ({ ...current, timeHorizon }))}
+                labelForOption={(value) => localizedTimeHorizon(language, value)}
+              />
+              <Text style={styles.metricBuilderMiniLabel}>{language === "ko" ? "주 사용 용도" : "Primary use case"}</Text>
+              <HorizontalChoice
+                options={useCaseOptions}
+                value={logicSetForm.intendedUseCase}
+                onSelect={(intendedUseCase) => setLogicSetForm((current) => ({ ...current, intendedUseCase }))}
+                labelForOption={(value) => localizedUseCase(language, value)}
+              />
+            </Card>
+
+            <Text style={styles.metricBuilderMiniLabel}>{language === "ko" ? "재사용할 L1.5 규칙" : "Reusable L1.5 Rules"}</Text>
+            <View style={styles.stack}>
+              {logicLabRuleLibrary.map((row) => {
+                const metric = logicLabMetricCatalog.find((item) => item.key === row.condition.metricKey);
+                const formula = row.condition.formulaKey
+                  ? getFormulaDefinition(row.condition.formulaKey)
+                  : undefined;
+                const threshold = formatMetricThreshold(
+                  metric,
+                  String(row.condition.value ?? ""),
+                  language,
+                  formula,
+                );
+                const ruleRef = logicRuleRefKey(row.recipeId, row.condition.id);
+                const selected = logicSetSelectedRuleRefs.includes(ruleRef);
+                return (
+                  <Pressable
+                    key={`logic-set-rule-${ruleRef}`}
+                    onPress={() =>
+                      setLogicSetSelectedRuleRefs((current) =>
+                        current.includes(ruleRef)
+                          ? current.filter((item) => item !== ruleRef)
+                          : [...current, ruleRef],
+                      )
+                    }
+                    style={[
+                      styles.logicRuleSelectCard,
+                      selected ? styles.logicRuleSelectCardActive : null,
+                    ]}
+                  >
+                    <View style={styles.inlineBetween}>
+                      <View style={styles.flexOne}>
+                        <Text style={styles.logicRuleSelectTitle} numberOfLines={2}>
+                          {(metric?.name ?? row.condition.label)} {row.condition.operator ?? ""} {threshold}
+                        </Text>
+                        <Text style={styles.logicRuleSelectMeta} numberOfLines={2}>
+                          {localizedConditionRole(language, row.condition.role ?? "Supporting Evidence")} · {row.recipeName} · v{row.recipeVersion}
+                        </Text>
+                      </View>
+                      <View style={[styles.logicRuleSelectToggle, selected ? styles.logicRuleSelectToggleActive : null]}>
+                        <Text style={[styles.logicRuleSelectToggleText, selected ? styles.logicRuleSelectToggleTextActive : null]}>
+                          {selected ? (language === "ko" ? "선택됨" : "Added") : language === "ko" ? "추가" : "Add"}
+                        </Text>
+                      </View>
+                    </View>
+                  </Pressable>
+                );
+              })}
+            </View>
+            {logicSetFormAttempted && selectedLogicSetRuleTemplates.length === 0 ? (
+              <Text style={styles.validationText}>
+                {language === "ko" ? "최소 한 개의 L1.5 규칙을 선택해야 합니다." : "Select at least one L1.5 rule."}
+              </Text>
+            ) : null}
+
+            <View style={styles.previewCard}>
+              <Text style={styles.previewLabel}>{language === "ko" ? "현재 L2 구성" : "Current L2 composition"}</Text>
+              <Text style={styles.previewText}>
+                {logicSetForm.name.trim() || (language === "ko" ? "이름 없는 세트" : "Untitled set")} · {selectedLogicSetRuleTemplates.length}
+                {language === "ko" ? "개 규칙" : " rules"}
+              </Text>
+              {Object.entries(logicSetRulesByRole).map(([role, rows]) => (
+                <Text key={`logic-set-role-${role}`} style={styles.previewDisclosure}>
+                  {localizedConditionRole(language, role)} · {rows.length}
+                </Text>
+              ))}
+            </View>
+
+            <View style={styles.actionRow}>
+              <Button
+                label={logicSetBuilderEditingId ? (language === "ko" ? "세트 저장" : "Save Set") : language === "ko" ? "L2 세트 저장" : "Save L2 Set"}
+                onPress={() => void saveLogicSet()}
+              />
+              <Button
+                label={language === "ko" ? "초기화" : "Reset"}
+                tone="ghost"
+                onPress={resetLogicSetBuilderDraft}
+              />
+            </View>
+          </WindowPanel>
+        ) : null}
 
         {recipeBuilderOpen ? (
           <WindowPanel
-            title={language === "ko" ? "레시피 만들기" : "Recipe Builder"}
-            subtitle={
-              language === "ko"
-                ? "필수 항목을 채우고 단계별로 이동한 뒤 저장 전에 미리 확인하세요."
-                : "Guided pages. Fill the required fields, move step by step, and preview before saving."
-            }
-            onClose={() => setRecipeBuilderOpen(false)}
+            title={recipeBuilderEditingId ? (language === "ko" ? "레시피 수정" : "Edit Recipe") : t(language, "recipes.builder.title")}
+            subtitle={recipeBuilderEditingId ? (language === "ko" ? "기존 레시피 버전 안에서 조건과 검토 규칙을 바로 수정합니다." : "Update conditions and review rules inside the current recipe version.") : t(language, "recipes.builder.subtitle")}
+            onClose={() => {
+              setRecipeBuilderOpen(false);
+              resetRecipeBuilderDraft();
+            }}
             closeLabel={t(language, "common.done")}
           >
-            <StepFlow steps={recipeBuilderSteps} current={recipeBuilderStep} onSelect={setRecipeBuilderStep} />
+            <StepFlow
+              steps={recipeBuilderSteps}
+              current={recipeBuilderStep}
+              onSelect={setRecipeBuilderStep}
+              labelForStep={(step) => recipeBuilderStepLabel(language, step)}
+            />
             <View style={styles.previewCard}>
-              <Text style={styles.previewLabel}>{recipeBuilderStep}</Text>
+              <Text style={styles.previewLabel}>{recipeBuilderStepLabel(language, recipeBuilderStep)}</Text>
               <Text style={styles.previewText}>{recipeStepPrompt}</Text>
             </View>
             <View style={styles.homeSummaryStrip}>
-              <DenseStat label="Conditions" value={`${draftConditions.length}`} tone={draftConditions.length > 0 ? "strong" : "neutral"} />
-              <DenseStat label="Risk Rules" value={`${draftConditions.filter((condition) => condition.kind === "negative" || condition.kind === "disqualifier").length}`} />
-              <DenseStat label="Cadence" value={`${recipeForm.reviewCadenceDays}d`} />
-              <DenseStat label="Cooldown" value={`${recipeForm.alertCooldownHours}h`} />
+              <DenseStat label={t(language, "recipes.builder.stat.conditions")} value={`${draftConditions.length}`} tone={draftConditions.length > 0 ? "strong" : "neutral"} />
+              <DenseStat label={t(language, "recipes.builder.stat.riskRules")} value={`${draftConditions.filter((condition) => condition.kind === "negative" || condition.kind === "disqualifier").length}`} />
+              <DenseStat label={t(language, "recipes.builder.stat.cadence")} value={`${recipeForm.reviewCadenceDays}d`} />
+              <DenseStat label={t(language, "recipes.builder.stat.cooldown")} value={`${recipeForm.alertCooldownHours}h`} />
             </View>
             <View style={styles.metaRow}>
               {recipeStepReadiness.map((item) => (
                 <MetaPill
                   key={`recipe-step-${item.step}`}
-                  label={`${item.step} · ${item.ready ? "Ready" : "Needs input"}`}
+                  label={`${recipeBuilderStepLabel(language, item.step)} · ${item.ready ? t(language, "recipes.builder.ready") : t(language, "recipes.builder.needsInput")}`}
                 />
               ))}
             </View>
@@ -3603,87 +5541,78 @@ export default function App() {
             <Reveal key={`builder-step-${recipeBuilderStep}`}>
               {recipeBuilderStep === "Purpose" ? (
                 <>
-                <Text style={styles.inputLabel}>Recipe name</Text>
-                <Input value={recipeForm.name} onChangeText={(name) => setRecipeForm((current) => ({ ...current, name }))} placeholder="Temporary Bargain Sale" invalid={recipeFormAttempted && !recipeForm.name.trim()} />
-                {recipeFormAttempted && !recipeForm.name.trim() ? <Text style={styles.validationText}>Recipe name is required.</Text> : null}
-                <Text style={styles.inputLabel}>Opportunity type</Text>
-                <HorizontalChoice options={opportunityTypes} value={recipeForm.opportunityType} onSelect={(opportunityType) => setRecipeForm((current) => ({ ...current, opportunityType }))} />
-                <Text style={styles.inputLabel}>Time horizon</Text>
-                <HorizontalChoice options={timeHorizons} value={recipeForm.timeHorizon} onSelect={(timeHorizon) => setRecipeForm((current) => ({ ...current, timeHorizon }))} />
-                <Text style={styles.inputLabel}>Primary use case</Text>
-                <HorizontalChoice options={useCaseOptions} value={recipeForm.intendedUseCase} onSelect={(intendedUseCase) => setRecipeForm((current) => ({ ...current, intendedUseCase }))} />
-                <Text style={styles.inputLabel}>Purpose</Text>
-                <Input value={recipeForm.purpose} onChangeText={(purpose) => setRecipeForm((current) => ({ ...current, purpose }))} placeholder="What opportunity should this logic surface?" multiline invalid={recipeFormAttempted && !recipeForm.purpose.trim()} />
-                {recipeFormAttempted && !recipeForm.purpose.trim() ? <Text style={styles.validationText}>Purpose is required.</Text> : null}
+                <Text style={styles.inputLabel}>{t(language, "recipes.builder.field.recipeName")}</Text>
+                <Input value={recipeForm.name} onChangeText={(name) => setRecipeForm((current) => ({ ...current, name }))} placeholder={t(language, "recipes.builder.placeholder.recipeName")} invalid={recipeFormAttempted && !recipeForm.name.trim()} />
+                {recipeFormAttempted && !recipeForm.name.trim() ? <Text style={styles.validationText}>{t(language, "recipes.builder.validation.recipeNameRequired")}</Text> : null}
+                <Text style={styles.inputLabel}>{t(language, "recipes.builder.field.opportunityType")}</Text>
+                <HorizontalChoice options={opportunityTypes} value={recipeForm.opportunityType} onSelect={(opportunityType) => setRecipeForm((current) => ({ ...current, opportunityType }))} labelForOption={(value) => localizedOpportunityType(language, value)} />
+                <Text style={styles.inputLabel}>{t(language, "recipes.builder.field.timeHorizon")}</Text>
+                <HorizontalChoice options={timeHorizons} value={recipeForm.timeHorizon} onSelect={(timeHorizon) => setRecipeForm((current) => ({ ...current, timeHorizon }))} labelForOption={(value) => localizedTimeHorizon(language, value)} />
+                <Text style={styles.inputLabel}>{t(language, "recipes.builder.field.primaryUseCase")}</Text>
+                <HorizontalChoice options={useCaseOptions} value={recipeForm.intendedUseCase} onSelect={(intendedUseCase) => setRecipeForm((current) => ({ ...current, intendedUseCase }))} labelForOption={(value) => localizedUseCase(language, value)} />
+                <Text style={styles.inputLabel}>{t(language, "recipes.builder.field.purpose")}</Text>
+                <Input value={recipeForm.purpose} onChangeText={(purpose) => setRecipeForm((current) => ({ ...current, purpose }))} placeholder={t(language, "recipes.builder.placeholder.purpose")} multiline invalid={recipeFormAttempted && !recipeForm.purpose.trim()} />
+                {recipeFormAttempted && !recipeForm.purpose.trim() ? <Text style={styles.validationText}>{t(language, "recipes.builder.validation.purposeRequired")}</Text> : null}
                 </>
               ) : null}
 
               {recipeBuilderStep === "Logic" ? (
                 <>
-                <Text style={styles.inputLabel}>Category</Text>
+                <Text style={styles.inputLabel}>{language === "ko" ? "L1 지표" : "L1 Metric"}</Text>
                 <HorizontalChoice
-                  options={conditionCategories}
-                  value={conditionBuilder.category as (typeof conditionCategories)[number]}
-                  onSelect={(category) => {
-                    const firstTemplate = conditionLibrary.find((item) => item.category === category) ?? conditionLibrary[0];
-                    setConditionBuilder({
-                      category,
-                      templateId: firstTemplate.id,
-                      kind: firstTemplate.defaultKind,
-                      operator: firstTemplate.defaultOperator,
-                      threshold: firstTemplate.defaultValue,
-                      note: "",
-                    });
-                  }}
+                  options={logicLabMetricCatalog.map((metric) => metric.key)}
+                  value={conditionBuilder.metricKey}
+                  onSelect={(metricKey) => setConditionBuilder((current) => ({ ...current, metricKey }))}
+                  labelForOption={(metricKey) => logicLabMetricCatalog.find((metric) => metric.key === metricKey)?.name ?? metricKey}
                 />
-                <Text style={styles.inputLabel}>Template</Text>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.choiceRow}>
-                  {conditionLibrary
-                    .filter((item) => item.category === conditionBuilder.category)
-                    .map((template) => (
-                      <Pressable
-                        key={template.id}
-                        onPress={() => setConditionBuilder((current) => ({ ...current, templateId: template.id }))}
-                        style={[styles.templateCard, conditionBuilder.templateId === template.id ? styles.templateCardActive : null]}
-                      >
-                        <Text style={[styles.templateTitle, conditionBuilder.templateId === template.id ? styles.templateTitleActive : null]}>
-                          {template.title}
-                        </Text>
-                        <Text style={[styles.templateSubtitle, conditionBuilder.templateId === template.id ? styles.templateSubtitleActive : null]}>
-                          {template.complexity} · {template.description}
-                        </Text>
-                      </Pressable>
-                    ))}
-                </ScrollView>
-                <Text style={styles.inputLabel}>Condition role</Text>
-                <HorizontalChoice options={conditionKinds} value={conditionBuilder.kind} onSelect={(kind) => setConditionBuilder((current) => ({ ...current, kind }))} />
-                <Text style={styles.inputLabel}>Operator</Text>
+                {selectedConditionMetric ? (
+                  <View style={styles.previewCard}>
+                    <Text style={styles.previewLabel}>{language === "ko" ? "선택된 L1 지표" : "Selected L1 metric"}</Text>
+                    <Text style={styles.previewText}>{selectedConditionMetric.name}</Text>
+                    <Text style={styles.previewDisclosure}>
+                      {selectedConditionMetric.humanMeaning}
+                    </Text>
+                  </View>
+                ) : null}
+                <Text style={styles.inputLabel}>{language === "ko" ? "조건 역할" : "Condition role"}</Text>
+                <HorizontalChoice
+                  options={conditionRoleOptions as readonly string[]}
+                  value={conditionBuilder.role}
+                  onSelect={(role: string) => setConditionBuilder((current) => ({ ...current, role: role as NonNullable<RecipeCondition["role"]> }))}
+                  labelForOption={(role: string) => localizedConditionRole(language, role)}
+                />
+                <Text style={styles.inputLabel}>{t(language, "recipes.builder.field.operator")}</Text>
                 <HorizontalChoice options={selectedOperatorOptions} value={conditionBuilder.operator} onSelect={(operator) => setConditionBuilder((current) => ({ ...current, operator }))} />
-                <Text style={styles.inputLabel}>Threshold / parameter</Text>
-                {selectedTemplate.control.type === "number" ? (
+                <Text style={styles.inputLabel}>{t(language, "recipes.builder.field.threshold")}</Text>
+                {selectedConditionControl.type === "number" ? (
                   <NumberStepper
-                    label={selectedTemplate.metricLabel}
+                    label={language === "ko" ? "기준값 설정" : "Threshold"}
                     value={Number(conditionBuilder.threshold)}
                     onChange={(next) => setConditionBuilder((current) => ({ ...current, threshold: String(next) }))}
-                    step={selectedTemplate.control.step}
-                    min={selectedTemplate.control.min}
-                    max={selectedTemplate.control.max}
-                    unit={selectedTemplate.control.unit}
+                    step={selectedConditionControl.step}
+                    min={selectedConditionControl.min}
+                    max={selectedConditionControl.max}
+                    unit={selectedConditionControl.unit}
                   />
                 ) : (
-                  <HorizontalChoice options={selectedTemplate.control.options} value={conditionBuilder.threshold} onSelect={(threshold) => setConditionBuilder((current) => ({ ...current, threshold }))} />
+                  <HorizontalChoice
+                    options={selectedConditionControl.options}
+                    value={conditionBuilder.threshold}
+                    onSelect={(threshold) => setConditionBuilder((current) => ({ ...current, threshold }))}
+                    labelForOption={(value) => localizedRecipeOptionValue(language, value)}
+                  />
                 )}
-                <Text style={styles.inputLabel}>Why this matters</Text>
-                <Input value={conditionBuilder.note} onChangeText={(note) => setConditionBuilder((current) => ({ ...current, note }))} placeholder="Optional context for future you" multiline />
+                <Text style={styles.inputLabel}>{t(language, "recipes.builder.field.whyMatters")}</Text>
+                <Input value={conditionBuilder.note} onChangeText={(note) => setConditionBuilder((current) => ({ ...current, note }))} placeholder={t(language, "recipes.builder.placeholder.whyMatters")} multiline />
                 <View style={styles.previewCard}>
-                  <Text style={styles.previewLabel}>Condition preview</Text>
+                  <Text style={styles.previewLabel}>{t(language, "recipes.builder.preview.condition")}</Text>
                   <Text style={styles.previewText}>
-                    {selectedTemplate.title}: {selectedTemplate.metricLabel} {conditionBuilder.operator} {formatMetricThreshold(selectedTemplate, conditionBuilder.threshold || selectedTemplate.defaultValue)}
+                    {selectedConditionMetric?.name ?? "--"} {conditionBuilder.operator} {formatMetricThreshold(selectedConditionMetric, conditionBuilder.threshold, language, selectedConditionFormula)}
                   </Text>
                 </View>
                 <View style={styles.actionRow}>
-                  <Button label="Add Condition" onPress={addDraftCondition} />
-                  <Button label="Clear Draft" tone="ghost" onPress={() => setDraftConditions([])} />
+                  <Button label={t(language, "recipes.builder.action.addCondition")} onPress={addDraftCondition} />
+                  <Button label={t(language, "recipes.builder.action.clearDraft")} tone="ghost" onPress={() => setDraftConditions([])} />
                 </View>
                 {draftConditions.length > 0 ? (
                   <View style={styles.stack}>
@@ -3691,43 +5620,43 @@ export default function App() {
                       <Card key={condition.id}>
                         <View style={styles.inlineBetween}>
                           <View style={styles.flexOne}>
-                            <Text style={[styles.kindPill, conditionKindTone(condition.kind)]}>{condition.kind}</Text>
+                            <Text style={[styles.kindPill, conditionKindTone(condition.kind)]}>{localizedConditionKind(language, condition.kind)}</Text>
                             <Text style={styles.cardBody}>{condition.label}</Text>
                           </View>
-                          <Button label="Remove" tone="ghost" onPress={() => setDraftConditions((current) => current.filter((item) => item.id !== condition.id))} />
+                          <Button label={t(language, "recipes.builder.action.remove")} tone="ghost" onPress={() => setDraftConditions((current) => current.filter((item) => item.id !== condition.id))} />
                         </View>
                       </Card>
                     ))}
                   </View>
                 ) : null}
-                {recipeFormAttempted && draftConditions.length === 0 ? <Text style={styles.validationText}>Add at least one condition.</Text> : null}
+                {recipeFormAttempted && draftConditions.length === 0 ? <Text style={styles.validationText}>{t(language, "recipes.builder.validation.conditionRequired")}</Text> : null}
                 </>
               ) : null}
 
               {recipeBuilderStep === "Risk & Alerts" ? (
                 <>
                 <View style={styles.dualDenseGrid}>
-                  <DenseStat label="Alert cooldown" value={`${recipeForm.alertCooldownHours}h`} tone="strong" />
-                  <DenseStat label="Risk rules" value={`${draftConditions.filter((condition) => condition.kind === "negative" || condition.kind === "disqualifier").length}`} />
+                  <DenseStat label={t(language, "recipes.builder.field.alertCooldown")} value={`${recipeForm.alertCooldownHours}h`} tone="strong" />
+                  <DenseStat label={t(language, "recipes.builder.stat.riskRules")} value={`${draftConditions.filter((condition) => condition.kind === "negative" || condition.kind === "disqualifier").length}`} />
                 </View>
-                <Text style={styles.inputLabel}>Alert cooldown</Text>
+                <Text style={styles.inputLabel}>{t(language, "recipes.builder.field.alertCooldown")}</Text>
                 <HorizontalChoice options={alertCooldownOptions.map(String)} value={String(recipeForm.alertCooldownHours)} onSelect={(value) => setRecipeForm((current) => ({ ...current, alertCooldownHours: Number(value) }))} />
-                <Text style={styles.inputLabel}>Notes</Text>
-                <Input value={recipeForm.notes} onChangeText={(notes) => setRecipeForm((current) => ({ ...current, notes }))} placeholder="Downgrade rules, blockers, and alert expectations" multiline />
+                <Text style={styles.inputLabel}>{t(language, "recipes.builder.field.notes")}</Text>
+                <Input value={recipeForm.notes} onChangeText={(notes) => setRecipeForm((current) => ({ ...current, notes }))} placeholder={t(language, "recipes.builder.placeholder.notes")} multiline />
                 </>
               ) : null}
 
               {recipeBuilderStep === "Review & Outcome" ? (
                 <>
                 <View style={styles.dualDenseGrid}>
-                  <DenseStat label="Review cadence" value={`${recipeForm.reviewCadenceDays}d`} tone="strong" />
-                  <DenseStat label="Draft conditions" value={`${draftConditions.length}`} />
+                  <DenseStat label={t(language, "recipes.builder.field.reviewCadence")} value={`${recipeForm.reviewCadenceDays}d`} tone="strong" />
+                  <DenseStat label={t(language, "recipes.builder.stat.conditions")} value={`${draftConditions.length}`} />
                 </View>
-                <Text style={styles.inputLabel}>Review cadence</Text>
+                <Text style={styles.inputLabel}>{t(language, "recipes.builder.field.reviewCadence")}</Text>
                 <HorizontalChoice options={reviewCadenceOptions.map(String)} value={String(recipeForm.reviewCadenceDays)} onSelect={(value) => setRecipeForm((current) => ({ ...current, reviewCadenceDays: Number(value) }))} />
                 {previewRecipe && previewEvaluation && previewStock ? (
                   <>
-                    <Text style={styles.inputLabel}>Preview stock</Text>
+                    <Text style={styles.inputLabel}>{t(language, "recipes.builder.field.previewStock")}</Text>
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.choiceRow}>
                       {data.stocks.map((stock) => (
                         <Pressable key={stock.id} onPress={() => setPreviewStockId(stock.id)} style={[styles.selectChip, previewStockId === stock.id ? styles.selectChipActive : null]}>
@@ -3736,20 +5665,24 @@ export default function App() {
                         </Pressable>
                       ))}
                     </ScrollView>
-                    <WhyNowPanel title="Draft result" body={previewEvaluation.whyNow} state={previewEvaluation.currentState} recipeVersion={`${previewRecipe.name} v${previewRecipe.version}`} />
-                    <Text style={styles.previewDisclosure}>Preview uses adapter-style sample data and stays clearly labeled.</Text>
+                    <WhyNowPanel title={t(language, "recipes.builder.preview.result")} body={previewEvaluation.whyNow} state={previewEvaluation.currentState} recipeVersion={`${previewRecipe.name} v${previewRecipe.version}`} />
+                    <Text style={styles.previewDisclosure}>{t(language, "recipes.builder.preview.disclosure")}</Text>
                   </>
                 ) : (
-                  <Text style={styles.cardBody}>Add draft conditions first to unlock preview.</Text>
+                  <Text style={styles.cardBody}>{t(language, "recipes.builder.preview.locked")}</Text>
                 )}
                 <View style={styles.formulaPanel}>
-                  <Text style={styles.formulaTitle}>Ready to save</Text>
+                  <Text style={styles.formulaTitle}>{t(language, "recipes.builder.summary.title")}</Text>
                   <Text style={styles.formulaBody}>
-                    {recipeForm.name.trim() || "Untitled Recipe"} is set up for {recipeForm.opportunityType} with {draftConditions.length} conditions, a {recipeForm.reviewCadenceDays}-day review cadence, and a {recipeForm.alertCooldownHours}-hour alert cooldown.
+                    {t(language, "recipes.builder.summary.body", {
+                      name: recipeForm.name.trim() || (language === "ko" ? "이름 없는 레시피" : "Untitled Recipe"),
+                      opportunityType: localizedOpportunityType(language, recipeForm.opportunityType),
+                      count: draftConditions.length,
+                      cadence: recipeForm.reviewCadenceDays,
+                      cooldown: recipeForm.alertCooldownHours,
+                    })}
                   </Text>
-                  <Text style={styles.formulaMeta}>
-                    Save only when the draft logic reads like a clear investing rule, not a checklist of indicators.
-                  </Text>
+                  <Text style={styles.formulaMeta}>{t(language, "recipes.builder.summary.meta")}</Text>
                 </View>
                 </>
               ) : null}
@@ -3758,7 +5691,7 @@ export default function App() {
             <View style={styles.actionRow}>
               {recipeBuilderStep !== "Purpose" ? (
                 <Button
-                  label="Back"
+                  label={t(language, "recipes.builder.action.back")}
                   tone="secondary"
                   onPress={() =>
                     setRecipeBuilderStep(recipeBuilderSteps[Math.max(recipeBuilderSteps.indexOf(recipeBuilderStep) - 1, 0)])
@@ -3767,14 +5700,14 @@ export default function App() {
               ) : null}
               {recipeBuilderStep !== "Review & Outcome" ? (
                 <Button
-                  label="Next"
+                  label={t(language, "recipes.builder.action.next")}
                   disabled={!canAdvanceRecipeStep}
                   onPress={() =>
                     setRecipeBuilderStep(recipeBuilderSteps[Math.min(recipeBuilderSteps.indexOf(recipeBuilderStep) + 1, recipeBuilderSteps.length - 1)])
                   }
                 />
               ) : (
-                <Button label="Save Recipe" disabled={!canAdvanceRecipeStep} onPress={() => void saveRecipe()} />
+                <Button label={t(language, "recipes.builder.action.save")} disabled={!canAdvanceRecipeStep} onPress={() => void saveRecipe()} />
               )}
             </View>
           </WindowPanel>
@@ -3783,27 +5716,27 @@ export default function App() {
         {selectedRecipe ? (
           <WindowPanel
             title={selectedRecipe.name}
-            subtitle={`Version ${selectedRecipe.version} · ${selectedRecipe.timeHorizon}`}
+            subtitle={`${t(language, "recipes.card.version", { version: selectedRecipe.version })} · ${localizedTimeHorizon(language, selectedRecipe.timeHorizon)}`}
             onClose={() => setRecipeDetailId("")}
             closeLabel={t(language, "common.done")}
           >
             <Text style={styles.cardBody}>{selectedRecipe.purpose}</Text>
             <View style={styles.dualDenseGrid}>
-              <DenseStat label="Type" value={selectedRecipe.opportunityType ?? "General"} tone="strong" />
-              <DenseStat label="Use case" value={selectedRecipe.intendedUseCase || "Unset"} />
-              <DenseStat label="Cadence" value={`${selectedRecipe.reviewConfig?.cadenceDays ?? 14}d`} />
-              <DenseStat label="Cooldown" value={`${selectedRecipe.alertConfig?.cooldownHours ?? 24}h`} />
-              <DenseStat label="Eyes" value={`${selectedRecipeLinkedEyes.length}`} />
-              <DenseStat label="Stocks" value={`${selectedRecipeWatchedStocks}`} />
+              <DenseStat label={t(language, "recipes.detail.type")} value={localizedOpportunityType(language, selectedRecipe.opportunityType ?? t(language, "recipes.detail.general"))} tone="strong" />
+              <DenseStat label={t(language, "recipes.detail.useCase")} value={localizedUseCase(language, selectedRecipe.intendedUseCase || t(language, "recipes.detail.unset"))} />
+              <DenseStat label={t(language, "recipes.detail.cadence")} value={`${selectedRecipe.reviewConfig?.cadenceDays ?? 14}d`} />
+              <DenseStat label={t(language, "recipes.detail.cooldown")} value={`${selectedRecipe.alertConfig?.cooldownHours ?? 24}h`} />
+              <DenseStat label={t(language, "recipes.detail.eyes")} value={`${selectedRecipeLinkedEyes.length}`} />
+              <DenseStat label={t(language, "recipes.detail.stocks")} value={`${selectedRecipeWatchedStocks}`} />
             </View>
             <View style={styles.metaRow}>
-              <MetaPill label={starterRecipeNames.includes(selectedRecipe.name) ? "Starter" : "Custom"} />
-              <MetaPill label={`${selectedRecipe.conditions.length} conditions`} />
-              {selectedRecipe.notes ? <MetaPill label="Has notes" /> : null}
+              <MetaPill label={starterRecipeNames.includes(selectedRecipe.name) ? t(language, "recipes.detail.starter") : t(language, "recipes.detail.custom")} />
+              <MetaPill label={t(language, "recipes.detail.conditions", { count: selectedRecipe.conditions.length })} />
+              {selectedRecipe.notes ? <MetaPill label={t(language, "recipes.detail.hasNotes")} /> : null}
             </View>
             {selectedRecipeLinkedEyes.length > 0 ? (
               <View style={styles.detailCallout}>
-                <Text style={styles.detailCalloutLabel}>Tracked stocks</Text>
+                <Text style={styles.detailCalloutLabel}>{t(language, "recipes.detail.trackedStocks")}</Text>
                 <View style={styles.metaRow}>
                   {selectedRecipeLinkedEyes.slice(0, 6).map((eye) => (
                     <MetaPill key={`recipe-stock-${eye.id}`} label={stockLabel(data.stocks, eye.stockId)} />
@@ -3813,7 +5746,7 @@ export default function App() {
             ) : null}
             <View style={styles.actionRow}>
               <Button
-                label="Use for Eye"
+                label={t(language, "recipes.detail.useForEye")}
                 onPress={() => {
                   setEyeForm((current) => ({ ...current, recipeId: selectedRecipe.id }));
                   setRecipeDetailId("");
@@ -3821,9 +5754,10 @@ export default function App() {
                 }}
               />
               <Button
-                label="Open Builder"
+                label={t(language, "recipes.detail.openBuilder")}
                 tone="secondary"
                 onPress={() => {
+                  setRecipeBuilderEditingId(selectedRecipe.id);
                   setRecipeForm({
                     name: selectedRecipe.name,
                     purpose: selectedRecipe.purpose,
@@ -3855,14 +5789,14 @@ export default function App() {
             </View>
             {selectedRecipe.notes ? (
               <View style={styles.detailCallout}>
-                <Text style={styles.detailCalloutLabel}>Builder notes</Text>
+                <Text style={styles.detailCalloutLabel}>{t(language, "recipes.detail.builderNotes")}</Text>
                 <Text style={styles.detailCalloutBody}>{selectedRecipe.notes}</Text>
               </View>
             ) : null}
             <View style={styles.stack}>
               {selectedRecipe.conditions.map((condition) => (
                 <Card key={`recipe-condition-${condition.id}`}>
-                  <Text style={[styles.kindPill, conditionKindTone(condition.kind)]}>{condition.kind}</Text>
+                  <Text style={[styles.kindPill, conditionKindTone(condition.kind)]}>{localizedConditionKind(language, condition.kind)}</Text>
                   <Text style={styles.cardBody}>{condition.label}</Text>
                 </Card>
               ))}
@@ -3873,68 +5807,89 @@ export default function App() {
         {eyeDetailOpen && selectedEye ? (
           <WindowPanel
             title={stockLabel(data.stocks, selectedEye.stockId)}
-            subtitle={`${recipeLabel(data.recipes, selectedEye.recipeId)} · ${selectedEye.lastEvaluation?.currentState ?? (language === "ko" ? "평가 전" : "Not Evaluated")}`}
+            subtitle={`${recipeLabel(data.recipes, selectedEye.recipeId)} · ${selectedEye.lastEvaluation?.currentState ? localizedEyeState(language, selectedEye.lastEvaluation.currentState) : t(language, "eyes.notEvaluated")}`}
             onClose={() => setEyeDetailOpen(false)}
             closeLabel={t(language, "common.done")}
           >
             <WhyNowPanel
-              title={language === "ko" ? "현재 모니터 상태" : "Current Eye state"}
+              title={t(language, "eyes.detail.currentState")}
               body={
                 selectedEye.lastEvaluation?.whyNow ??
-                (language === "ko" ? "이 모니터에는 아직 의미 있는 검토 요약이 없습니다." : "This Eye has not produced a meaningful review summary yet.")
+                t(language, "eyes.detail.noSummary")
               }
               state={selectedEye.lastEvaluation?.currentState ?? "Not Relevant"}
-              recipeVersion={`${selectedEyeRecipe?.name ?? (language === "ko" ? "알 수 없는 레시피" : "Unknown Recipe")} v${selectedEye.recipeVersionAtCreation ?? selectedEye.lastEvaluation?.recipeVersion ?? 1}`}
+              recipeVersion={`${selectedEyeRecipe?.name ?? t(language, "eyes.detail.unknownRecipe")} v${selectedEye.recipeVersionAtCreation ?? selectedEye.lastEvaluation?.recipeVersion ?? 1}`}
             />
             <View style={styles.dualDenseGrid}>
-              <DenseStat label="Urgency" value={selectedEye.lastEvaluation?.actionUrgency ?? "Wait"} tone="strong" />
-              <DenseStat label="Review" value={selectedEye.lastReviewedAt ? formatShortDate(selectedEye.lastReviewedAt) : "Due"} />
-              <DenseStat label="Entry Low" value={selectedEye.plannedEntryLow ? `$${selectedEye.plannedEntryLow.toFixed(2)}` : "Unset"} />
-              <DenseStat label="Entry High" value={selectedEye.plannedEntryHigh ? `$${selectedEye.plannedEntryHigh.toFixed(2)}` : "Unset"} />
-              <DenseStat label="Alerts" value={`${selectedEyeLinkedAlerts.length}`} />
-              <DenseStat label="Journal" value={`${selectedEyeLinkedDecisions.length}`} />
+              <DenseStat label={t(language, "eyes.detail.urgency")} value={localizedActionUrgency(language, selectedEye.lastEvaluation?.actionUrgency ?? t(language, "eyes.meta.wait"))} tone="strong" />
+              <DenseStat label={t(language, "eyes.detail.review")} value={selectedEye.lastReviewedAt ? formatShortDate(selectedEye.lastReviewedAt) : t(language, "eyes.detail.due")} />
+              <DenseStat label={t(language, "eyes.detail.entryLow")} value={selectedEye.plannedEntryLow ? `$${selectedEye.plannedEntryLow.toFixed(2)}` : t(language, "eyes.detail.unset")} />
+              <DenseStat label={t(language, "eyes.detail.entryHigh")} value={selectedEye.plannedEntryHigh ? `$${selectedEye.plannedEntryHigh.toFixed(2)}` : t(language, "eyes.detail.unset")} />
+              <DenseStat label={t(language, "eyes.detail.alerts")} value={`${selectedEyeLinkedAlerts.length}`} />
+              <DenseStat label={t(language, "eyes.detail.journal")} value={`${selectedEyeLinkedDecisions.length}`} />
             </View>
             <View style={styles.detailCallout}>
-              <Text style={styles.detailCalloutLabel}>Thesis snapshot</Text>
+              <Text style={styles.detailCalloutLabel}>{t(language, "eyes.detail.thesisSnapshot")}</Text>
               <Text style={styles.detailCalloutBody}>{selectedEye.thesisSnapshot}</Text>
             </View>
             <View style={styles.detailCallout}>
-              <Text style={styles.detailCalloutLabel}>Invalidation rule</Text>
-              <Text style={styles.detailCalloutBody}>{selectedEye.invalidationRule || "No invalidation rule recorded yet."}</Text>
+              <Text style={styles.detailCalloutLabel}>{t(language, "eyes.detail.invalidationRule")}</Text>
+              <Text style={styles.detailCalloutBody}>{selectedEye.invalidationRule || t(language, "eyes.detail.noInvalidation")}</Text>
             </View>
             {selectedEyeLinkedDecisions[0] ? (
               <View style={styles.detailCallout}>
-                <Text style={styles.detailCalloutLabel}>Last logged decision</Text>
+                <Text style={styles.detailCalloutLabel}>{t(language, "eyes.detail.lastDecision")}</Text>
                 <Text style={styles.detailCalloutBody}>
-                  {selectedEyeLinkedDecisions[0].action} · {formatShortDate(selectedEyeLinkedDecisions[0].createdAt)}
+                  {localizedDecisionAction(language, selectedEyeLinkedDecisions[0].action)} · {formatShortDate(selectedEyeLinkedDecisions[0].createdAt)}
                 </Text>
               </View>
             ) : null}
             <View style={styles.actionRow}>
               <Button
-                label="Stock"
+                label={t(language, "eyes.action.stock")}
                 onPress={() => {
                   setEyeDetailOpen(false);
                   openStockContext({ stockId: selectedEye.stockId, eyeId: selectedEye.id });
                 }}
               />
               <Button
-                label="Mark Reviewed"
+                label={t(language, "eyes.action.markReviewed")}
                 tone="secondary"
                 onPress={() => void actions.markEyesReviewed({ stockId: selectedEye.stockId, recipeId: selectedEye.recipeId })}
               />
               <Button
-                label="Add Journal"
+                label={t(language, "eyes.action.addJournal")}
                 tone="secondary"
                 onPress={() => {
+                  resetJournalComposerDraft();
                   setDecisionForm((current) => ({ ...current, eyeId: selectedEye.id }));
                   setEyeDetailOpen(false);
                   setJournalComposerOpen(true);
                 }}
               />
+              <Button
+                label={language === "ko" ? "수정" : "Edit"}
+                tone="ghost"
+                onPress={() => {
+                  setEyeComposerEditingId(selectedEye.id);
+                  setEyeForm({
+                    stockId: selectedEye.stockId,
+                    recipeId: selectedEye.recipeId,
+                    thesisSnapshot: selectedEye.thesisSnapshot,
+                    plannedEntryLow: selectedEye.plannedEntryLow ? selectedEye.plannedEntryLow.toFixed(2) : "",
+                    plannedEntryHigh: selectedEye.plannedEntryHigh ? selectedEye.plannedEntryHigh.toFixed(2) : "",
+                    invalidationRule: selectedEye.invalidationRule ?? "",
+                    lastReviewedDaysAgo: selectedEye.lastReviewedAt
+                      ? Math.max(0, Math.round((Date.now() - new Date(selectedEye.lastReviewedAt).getTime()) / (1000 * 60 * 60 * 24)))
+                      : reviewDateOptions[2].daysAgo,
+                  });
+                  setEyeDetailOpen(false);
+                  setEyeComposerOpen(true);
+                }}
+              />
               {selectedEyeLinkedDecisions[0] ? (
                 <Button
-                  label="Journal"
+                  label={t(language, "common.journal")}
                   tone="ghost"
                   onPress={() => {
                     setSelectedDecisionId(selectedEyeLinkedDecisions[0].id);
@@ -3944,7 +5899,7 @@ export default function App() {
                 />
               ) : null}
               <Button
-                label="Delete"
+                label={t(language, "eyes.action.delete")}
                 tone="ghost"
                 onPress={() => {
                   setEyeDetailOpen(false);
@@ -3954,7 +5909,7 @@ export default function App() {
             </View>
             <View style={styles.metaRow}>
               {selectedEyeStock ? <MetaPill label={selectedEyeStock.symbol} /> : null}
-              {selectedEyeRecipe ? <MetaPill label={selectedEyeRecipe.timeHorizon || "Unset horizon"} /> : null}
+              {selectedEyeRecipe ? <MetaPill label={localizedTimeHorizon(language, selectedEyeRecipe.timeHorizon || t(language, "eyes.detail.unsetHorizon"))} /> : null}
               {selectedEye.lastEvaluation?.dataQuality ? <MetaPill label={selectedEye.lastEvaluation.dataQuality} /> : null}
             </View>
           </WindowPanel>
@@ -3962,42 +5917,43 @@ export default function App() {
 
         {eyeComposerOpen ? (
           <WindowPanel
-            title={language === "ko" ? "모니터 만들기" : "Create Eye"}
-            subtitle={language === "ko" ? "선택한 종목과 레시피를 연결하고 현재 투자 논리를 남기세요." : "Subscribe a selected stock to a selected recipe with your thesis snapshot."}
-            onClose={() => setEyeComposerOpen(false)}
+            title={eyeComposerEditingId ? (language === "ko" ? "Eye 수정" : "Edit Eye") : t(language, "eyes.create.title")}
+            subtitle={eyeComposerEditingId ? (language === "ko" ? "기존 Eye의 종목, 레시피, 논리 스냅샷을 수정합니다." : "Update the stock, recipe, and thesis snapshot for this Eye.") : t(language, "eyes.create.subtitle")}
+            onClose={() => {
+              setEyeComposerOpen(false);
+              resetEyeComposerDraft();
+            }}
             closeLabel={t(language, "common.done")}
           >
-            <Text style={styles.inputLabel}>Stock</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.choiceRow}>
-              {data.stocks.map((stock) => (
-                <Pressable key={stock.id} onPress={() => setEyeForm((current) => ({ ...current, stockId: stock.id }))} style={[styles.selectChip, eyeForm.stockId === stock.id ? styles.selectChipActive : null]}>
-                  <Text style={[styles.selectChipTitle, eyeForm.stockId === stock.id ? styles.selectChipTitleActive : null]} numberOfLines={1}>{stock.symbol}</Text>
-                  <Text style={[styles.selectChipSubtitle, eyeForm.stockId === stock.id ? styles.selectChipSubtitleActive : null]} numberOfLines={1}>{stock.name}</Text>
-                </Pressable>
-              ))}
-            </ScrollView>
-            {eyeFormAttempted && !eyeForm.stockId ? <Text style={styles.validationText}>Select a stock.</Text> : null}
-            <Text style={styles.inputLabel}>Recipe</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.choiceRow}>
-              {data.recipes.map((recipe) => (
-                <Pressable key={recipe.id} onPress={() => setEyeForm((current) => ({ ...current, recipeId: recipe.id }))} style={[styles.selectChip, eyeForm.recipeId === recipe.id ? styles.selectChipActive : null]}>
-                  <Text style={[styles.selectChipTitle, eyeForm.recipeId === recipe.id ? styles.selectChipTitleActive : null]} numberOfLines={1}>{recipe.name}</Text>
-                  <Text style={[styles.selectChipSubtitle, eyeForm.recipeId === recipe.id ? styles.selectChipSubtitleActive : null]} numberOfLines={1}>{recipe.timeHorizon}</Text>
-                </Pressable>
-              ))}
-            </ScrollView>
-            {eyeFormAttempted && !eyeForm.recipeId ? <Text style={styles.validationText}>Select a recipe.</Text> : null}
-            <Text style={styles.inputLabel}>Specific thesis snapshot</Text>
-            <Input value={eyeForm.thesisSnapshot} onChangeText={(thesisSnapshot) => setEyeForm((current) => ({ ...current, thesisSnapshot }))} placeholder="Why does this stock under this recipe deserve repeated attention?" multiline invalid={eyeFormAttempted && !eyeForm.thesisSnapshot.trim()} />
-            {eyeFormAttempted && !eyeForm.thesisSnapshot.trim() ? <Text style={styles.validationText}>Thesis snapshot is required.</Text> : null}
+            <SearchableSelect
+              label={t(language, "eyes.create.stock")}
+              options={data.stocks.map(s => ({ id: s.id, label: s.symbol, sublabel: s.name }))}
+              value={eyeForm.stockId}
+              onSelect={(opt: any) => setEyeForm((current) => ({ ...current, stockId: opt.id }))}
+              placeholder="Search by symbol..."
+            />
+            {eyeFormAttempted && !eyeForm.stockId ? <Text style={styles.validationText}>{t(language, "eyes.create.selectStock")}</Text> : null}
+
+            <SearchableSelect
+              label={t(language, "eyes.create.recipe")}
+              options={data.recipes.map(r => ({ id: r.id, label: r.name, sublabel: localizedTimeHorizon(language, r.timeHorizon) }))}
+              value={eyeForm.recipeId}
+              onSelect={(opt: any) => setEyeForm((current) => ({ ...current, recipeId: opt.id }))}
+              placeholder="Select a recipe..."
+            />
+            {eyeFormAttempted && !eyeForm.recipeId ? <Text style={styles.validationText}>{t(language, "eyes.create.selectRecipe")}</Text> : null}
+            <Text style={styles.inputLabel}>{t(language, "eyes.create.thesis")}</Text>
+            <Input value={eyeForm.thesisSnapshot} onChangeText={(thesisSnapshot) => setEyeForm((current) => ({ ...current, thesisSnapshot }))} placeholder={t(language, "eyes.create.thesisPlaceholder")} multiline invalid={eyeFormAttempted && !eyeForm.thesisSnapshot.trim()} />
+            {eyeFormAttempted && !eyeForm.thesisSnapshot.trim() ? <Text style={styles.validationText}>{t(language, "eyes.create.thesisRequired")}</Text> : null}
             <View style={styles.dualDenseGrid}>
-              <NumberStepper label="Planned entry low" value={Number(eyeForm.plannedEntryLow || 0)} onChange={(next) => setEyeForm((current) => ({ ...current, plannedEntryLow: next.toFixed(2) }))} step={0.5} min={0} max={10000} />
-              <NumberStepper label="Planned entry high" value={Number(eyeForm.plannedEntryHigh || 0)} onChange={(next) => setEyeForm((current) => ({ ...current, plannedEntryHigh: next.toFixed(2) }))} step={0.5} min={0} max={10000} />
+              <NumberStepper label={t(language, "eyes.create.entryLow")} value={Number(eyeForm.plannedEntryLow || 0)} onChange={(next) => setEyeForm((current) => ({ ...current, plannedEntryLow: next.toFixed(2) }))} step={0.5} min={0} max={10000} />
+              <NumberStepper label={t(language, "eyes.create.entryHigh")} value={Number(eyeForm.plannedEntryHigh || 0)} onChange={(next) => setEyeForm((current) => ({ ...current, plannedEntryHigh: next.toFixed(2) }))} step={0.5} min={0} max={10000} />
             </View>
-            <Text style={styles.inputLabel}>Last thesis review</Text>
+            <Text style={styles.inputLabel}>{t(language, "eyes.create.lastReview")}</Text>
             <HorizontalChoice
               options={reviewDateOptions.map((item) => item.label)}
               value={reviewDateOptions.find((item) => item.daysAgo === eyeForm.lastReviewedDaysAgo)?.label ?? reviewDateOptions[2].label}
+              labelForOption={(label) => localizedReviewDateOption(language, label)}
               onSelect={(label) =>
                 setEyeForm((current) => ({
                   ...current,
@@ -4005,66 +5961,68 @@ export default function App() {
                 }))
               }
             />
-            <Text style={styles.inputLabel}>Invalidation rule</Text>
-            <Input value={eyeForm.invalidationRule} onChangeText={(invalidationRule) => setEyeForm((current) => ({ ...current, invalidationRule }))} placeholder="What would break the thesis fast?" multiline />
-            <Button label="Create Eye" onPress={() => void saveEye()} />
+            <Text style={styles.inputLabel}>{t(language, "eyes.create.invalidation")}</Text>
+            <Input value={eyeForm.invalidationRule} onChangeText={(invalidationRule) => setEyeForm((current) => ({ ...current, invalidationRule }))} placeholder={t(language, "eyes.create.invalidationPlaceholder")} multiline />
+            <Button label={eyeComposerEditingId ? (language === "ko" ? "수정 저장" : "Save Changes") : t(language, "eyes.create.submit")} onPress={() => void saveEye()} />
           </WindowPanel>
         ) : null}
 
         {alertDetailOpen && selectedAlert && selectedAlertEye && selectedAlertRecipe && selectedAlertEvaluation ? (
           <WindowPanel
             title={selectedAlert.title}
-            subtitle={`${stockLabel(data.stocks, selectedAlertEye.stockId)} · ${selectedAlert.priority}`}
+            subtitle={`${stockLabel(data.stocks, selectedAlertEye.stockId)} · ${localizedAlertPriority(language, selectedAlert.priority)}`}
             onClose={() => setAlertDetailOpen(false)}
             closeLabel={t(language, "common.done")}
           >
-            <WhyNowPanel title={language === "ko" ? "무슨 일이 있었나" : "What happened"} body={selectedAlert.whyNow} state={selectedAlertEvaluation.currentState} recipeVersion={`${selectedAlertRecipe.name} v${selectedAlertRecipe.version}`} />
+            <WhyNowPanel title={t(language, "alerts.detail.whatHappened")} body={selectedAlert.whyNow} state={selectedAlertEvaluation.currentState} recipeVersion={`${selectedAlertRecipe.name} v${selectedAlertRecipe.version}`} />
             <View style={styles.detailMetricStrip}>
-              <DenseStat label="Priority" value={selectedAlert.priority} tone={selectedAlert.priority === "High" ? "risk" : "strong"} />
-              <DenseStat label="State" value={selectedAlertEvaluation.currentState} />
-              <DenseStat label="Urgency" value={selectedAlertEvaluation.actionUrgency} />
-              <DenseStat label="Data" value={selectedAlert.dataQuality} tone={selectedAlert.dataQuality.includes("Mock") ? "risk" : "neutral"} />
+              <DenseStat label={t(language, "alerts.detail.priority")} value={localizedAlertPriority(language, selectedAlert.priority)} tone={selectedAlert.priority === "High" ? "risk" : "strong"} />
+              <DenseStat label={t(language, "alerts.detail.state")} value={localizedEyeState(language, selectedAlertEvaluation.currentState)} />
+              <DenseStat label={t(language, "alerts.detail.urgency")} value={selectedAlertEvaluation.actionUrgency} />
+              <DenseStat label={t(language, "alerts.detail.data")} value={selectedAlert.dataQuality} tone={selectedAlert.dataQuality.includes("Mock") ? "risk" : "neutral"} />
             </View>
             <View style={styles.dualColumn}>
               <View style={styles.evidenceColumn}>
-                <Text style={styles.columnTitle}>{language === "ko" ? "가장 큰 근거" : "Biggest support"}</Text>
-                <Text style={styles.listLine}>+ {selectedAlert.supportingEvidence[0] ?? (language === "ko" ? "강한 근거는 아직 기록되지 않았습니다." : "No strong support recorded.")}</Text>
+                <Text style={styles.columnTitle}>{t(language, "alerts.detail.biggestSupport")}</Text>
+                <Text style={styles.listLine}>+ {selectedAlert.supportingEvidence[0] ?? t(language, "alerts.detail.noStrongSupport")}</Text>
               </View>
               <View style={styles.evidenceColumn}>
-                <Text style={styles.columnTitle}>{language === "ko" ? "가장 큰 위험" : "Biggest risk"}</Text>
-                <Text style={styles.listLine}>- {selectedAlert.risks[0] ?? (language === "ko" ? "큰 위험은 아직 기록되지 않았습니다." : "No major risk recorded.")}</Text>
+                <Text style={styles.columnTitle}>{t(language, "alerts.detail.biggestRisk")}</Text>
+                <Text style={styles.listLine}>- {selectedAlert.risks[0] ?? t(language, "alerts.detail.noMajorRisk")}</Text>
               </View>
             </View>
             <WhatChangedPanel
-              title={language === "ko" ? "5초 요약" : "Review in 5 seconds"}
+              title={t(language, "alerts.detail.reviewFast")}
               items={
-                language === "ko"
-                  ? [`우선순위: ${selectedAlert.priority}`, `상태 변화: ${selectedAlert.stateChange}`, selectedAlert.dataQuality]
-                  : [`Priority is ${selectedAlert.priority}.`, `State change: ${selectedAlert.stateChange}.`, selectedAlert.dataQuality]
+                [
+                  t(language, "alerts.detail.item.priority", { value: localizedAlertPriority(language, selectedAlert.priority) }),
+                  t(language, "alerts.detail.item.stateChange", { value: selectedAlert.stateChange }),
+                  selectedAlert.dataQuality,
+                ]
               }
             />
             <View style={styles.metaRow}>
-              <MetaPill label={selectedAlert.reviewed ? (language === "ko" ? "확인됨" : "Acknowledged") : (language === "ko" ? "열림" : "Open")} />
+              <MetaPill label={selectedAlert.reviewed ? t(language, "alerts.history.acknowledged") : t(language, "alerts.detail.open")} />
               <MetaPill label={selectedAlertSnapshot?.isMock ? t(language, "stocks.data.dummyBacked") : t(language, "stocks.data.providerBacked")} />
               <MetaPill label={localizedFreshness(language, selectedAlertSnapshot?.freshness ?? "Unavailable")} />
-              {selectedAlert.usefulness ? <MetaPill label={selectedAlert.usefulness} /> : null}
+              {selectedAlert.usefulness ? <MetaPill label={localizedAlertUsefulness(language, selectedAlert.usefulness)} /> : null}
             </View>
             <View style={styles.analysisActionRow}>
               <Button
-                label="Stock"
+                label={t(language, "common.stock")}
                 tone="secondary"
                 onPress={() => {
                   setAlertDetailOpen(false);
                   openStockContext({ stockId: selectedAlertEye.stockId, eyeId: selectedAlertEye.id, alertId: selectedAlert.id, target: "Alerts" });
                 }}
               />
-              <Button label="Acknowledge" onPress={() => void actions.markAlertReviewed(selectedAlert.id)} />
-              <Button label="Snooze 24H" tone="secondary" onPress={() => void actions.snoozeAlert(selectedAlert.id, 24)} />
-              <Button label="Useful" tone="ghost" onPress={() => void actions.setAlertFeedback(selectedAlert.id, "Useful")} />
-              <Button label="Not Useful" tone="ghost" onPress={() => void actions.setAlertFeedback(selectedAlert.id, "Not Useful")} />
+              <Button label={t(language, "alerts.action.acknowledge")} onPress={() => void actions.markAlertReviewed(selectedAlert.id)} />
+              <Button label={t(language, "alerts.action.snooze24h")} tone="secondary" onPress={() => void actions.snoozeAlert(selectedAlert.id, 24)} />
+              <Button label={t(language, "alerts.action.useful")} tone="ghost" onPress={() => void actions.setAlertFeedback(selectedAlert.id, "Useful")} />
+              <Button label={t(language, "alerts.action.notUseful")} tone="ghost" onPress={() => void actions.setAlertFeedback(selectedAlert.id, "Not Useful")} />
               {selectedAlertDecision ? (
                 <Button
-                  label="Journal"
+                  label={t(language, "common.journal")}
                   tone="ghost"
                   onPress={() => {
                     setSelectedDecisionId(selectedAlertDecision.id);
@@ -4084,64 +6042,69 @@ export default function App() {
 
         {journalComposerOpen ? (
           <WindowPanel
-            title={language === "ko" ? "새 기록 추가" : "New Journal Entry"}
-            subtitle={language === "ko" ? "원할 때만 직접 결정 기록을 남기세요." : "Capture the decision only when you choose to add one."}
-            onClose={() => setJournalComposerOpen(false)}
+            title={t(language, "journal.composer.title")}
+            subtitle={t(language, "journal.composer.subtitle")}
+            onClose={() => {
+              setJournalComposerOpen(false);
+              resetJournalComposerDraft();
+            }}
             closeLabel={t(language, "common.done")}
           >
-            <Text style={styles.inputLabel}>Eye</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.choiceRow}>
-              {data.eyes.map((eye) => (
-                <Pressable key={eye.id} onPress={() => setDecisionForm((current) => ({ ...current, eyeId: eye.id }))} style={[styles.selectChip, decisionForm.eyeId === eye.id ? styles.selectChipActive : null]}>
-                  <Text style={[styles.selectChipTitle, decisionForm.eyeId === eye.id ? styles.selectChipTitleActive : null]} numberOfLines={1}>{stockLabel(data.stocks, eye.stockId)}</Text>
-                  <Text style={[styles.selectChipSubtitle, decisionForm.eyeId === eye.id ? styles.selectChipSubtitleActive : null]} numberOfLines={1}>{recipeLabel(data.recipes, eye.recipeId)}</Text>
-                </Pressable>
-              ))}
-            </ScrollView>
-            {journalFormAttempted && !decisionForm.eyeId ? <Text style={styles.validationText}>Select an Eye.</Text> : null}
-            <Text style={styles.inputLabel}>Action</Text>
-            <HorizontalChoice options={decisionActions} value={decisionForm.action} onSelect={(action) => setDecisionForm((current) => ({ ...current, action }))} />
-            <Text style={styles.inputLabel}>Why did you act this way?</Text>
-            <Input value={decisionForm.note} onChangeText={(note) => setDecisionForm((current) => ({ ...current, note }))} placeholder="Why did you enter, skip, or revise?" multiline invalid={journalFormAttempted && !decisionForm.note.trim()} />
-            {journalFormAttempted && !decisionForm.note.trim() ? <Text style={styles.validationText}>A decision note is required.</Text> : null}
-            <Text style={styles.inputLabel}>Main concern</Text>
-            <Input value={decisionForm.concern} onChangeText={(concern) => setDecisionForm((current) => ({ ...current, concern }))} placeholder="What risk mattered most?" multiline />
-            <Text style={styles.inputLabel}>Thesis validity</Text>
-            <HorizontalChoice options={thesisValidityOptions} value={decisionForm.thesisValid} onSelect={(thesisValid) => setDecisionForm((current) => ({ ...current, thesisValid }))} />
-            <Text style={styles.inputLabel}>Timing</Text>
-            <HorizontalChoice options={timingOptions} value={decisionForm.timing} onSelect={(timing) => setDecisionForm((current) => ({ ...current, timing }))} />
-            <Button label="Save Decision" onPress={() => void saveDecision()} />
+            <SearchableSelect
+              label={t(language, "journal.composer.eye")}
+              options={data.eyes.map(e => ({ id: e.id, label: stockLabel(data.stocks, e.stockId), sublabel: recipeLabel(data.recipes, e.recipeId) }))}
+              value={decisionForm.eyeId}
+              onSelect={(opt: any) => setDecisionForm((current) => ({ ...current, eyeId: opt.id }))}
+              placeholder="Search monitored stock..."
+            />
+            {journalFormAttempted && !decisionForm.eyeId ? <Text style={styles.validationText}>{t(language, "journal.composer.selectEye")}</Text> : null}
+            <Text style={styles.inputLabel}>{t(language, "journal.composer.action")}</Text>
+            <HorizontalChoice options={decisionActions} value={decisionForm.action} onSelect={(action) => setDecisionForm((current) => ({ ...current, action }))} labelForOption={(value) => localizedDecisionAction(language, value)} />
+            <Text style={styles.inputLabel}>{t(language, "journal.composer.why")}</Text>
+            <Input value={decisionForm.note} onChangeText={(note) => setDecisionForm((current) => ({ ...current, note }))} placeholder={t(language, "journal.composer.notePlaceholder")} multiline invalid={journalFormAttempted && !decisionForm.note.trim()} />
+            {journalFormAttempted && !decisionForm.note.trim() ? <Text style={styles.validationText}>{t(language, "journal.composer.noteRequired")}</Text> : null}
+            <Text style={styles.inputLabel}>{t(language, "journal.composer.concern")}</Text>
+            <Input value={decisionForm.concern} onChangeText={(concern) => setDecisionForm((current) => ({ ...current, concern }))} placeholder={t(language, "journal.composer.concernPlaceholder")} multiline />
+            <Text style={styles.inputLabel}>{t(language, "journal.composer.thesisValidity")}</Text>
+            <HorizontalChoice options={thesisValidityOptions} value={decisionForm.thesisValid} onSelect={(thesisValid) => setDecisionForm((current) => ({ ...current, thesisValid }))} labelForOption={(value) => localizedThesisValidity(language, value)} />
+            <Text style={styles.inputLabel}>{t(language, "journal.composer.timing")}</Text>
+            <HorizontalChoice options={timingOptions} value={decisionForm.timing} onSelect={(timing) => setDecisionForm((current) => ({ ...current, timing }))} labelForOption={(value) => localizedTiming(language, value)} />
+            <Button
+              label={journalComposerEditingId ? (language === "ko" ? "수정 저장" : "Save Changes") : t(language, "journal.action.save")}
+              onPress={() => void saveDecision()}
+            />
           </WindowPanel>
         ) : null}
 
         {selectedDecision ? (
           <WindowPanel
-            title={selectedDecision.action}
+            title={localizedDecisionAction(language, selectedDecision.action)}
             subtitle={decisionTitle(selectedDecision.eyeId, data.eyes, data.stocks, data.recipes)}
             onClose={() => setSelectedDecisionId("")}
             closeLabel={t(language, "common.done")}
           >
             <WhatChangedPanel
-              title={language === "ko" ? "결정 맥락" : "Decision context"}
+              title={t(language, "journal.detail.context")}
               items={[
-                selectedDecision.stateAtDecision ?? (language === "ko" ? "상태 스냅샷 없음" : "State snapshot unavailable"),
-                selectedDecision.dataQuality ?? (language === "ko" ? "데이터 품질 메모 없음" : "Data-quality note unavailable"),
-                language === "ko"
-                  ? `논리 ${selectedDecision.thesisValid} · 타이밍 ${selectedDecision.timing}`
-                  : `Thesis ${selectedDecision.thesisValid} · Timing ${selectedDecision.timing}`,
+                selectedDecision.stateAtDecision ?? t(language, "journal.detail.noState"),
+                selectedDecision.dataQuality ?? t(language, "journal.detail.noData"),
+                t(language, "journal.detail.thesisTiming", {
+                  thesis: localizedThesisValidity(language, selectedDecision.thesisValid),
+                  timing: localizedTiming(language, selectedDecision.timing),
+                }),
               ]}
             />
             <View style={styles.detailCallout}>
-              <Text style={styles.detailCalloutLabel}>Decision note</Text>
-              <Text style={styles.detailCalloutBody}>{selectedDecision.note || "No decision note recorded."}</Text>
+              <Text style={styles.detailCalloutLabel}>{t(language, "journal.detail.note")}</Text>
+              <Text style={styles.detailCalloutBody}>{selectedDecision.note || t(language, "journal.detail.noNote")}</Text>
             </View>
             <View style={styles.detailCallout}>
-              <Text style={styles.detailCalloutLabel}>Concern</Text>
-              <Text style={styles.detailCalloutBody}>{selectedDecision.concern || "No primary concern recorded."}</Text>
+              <Text style={styles.detailCalloutLabel}>{t(language, "journal.detail.concern")}</Text>
+              <Text style={styles.detailCalloutBody}>{selectedDecision.concern || t(language, "journal.detail.noConcern")}</Text>
             </View>
             <View style={styles.actionRow}>
               <Button
-                label="Stock"
+                label={t(language, "common.stock")}
                 onPress={() => {
                   const linkedEye = data.eyes.find((eye) => eye.id === selectedDecision.eyeId);
                   if (!linkedEye) return;
@@ -4151,7 +6114,7 @@ export default function App() {
               />
               {selectedDecision.alertId ? (
                 <Button
-                  label="Alert"
+                  label={t(language, "journal.action.alert")}
                   tone="secondary"
                   onPress={() => {
                     setSelectedAlertId(selectedDecision.alertId ?? "");
@@ -4162,9 +6125,35 @@ export default function App() {
                   }}
                 />
               ) : null}
+              <Button
+                label={language === "ko" ? "수정" : "Edit"}
+                tone="ghost"
+                onPress={() => {
+                  setJournalComposerEditingId(selectedDecision.id);
+                  setDecisionForm({
+                    eyeId: selectedDecision.eyeId,
+                    alertId: selectedDecision.alertId ?? "",
+                    action: selectedDecision.action,
+                    note: selectedDecision.note,
+                    concern: selectedDecision.concern,
+                    thesisValid: selectedDecision.thesisValid,
+                    timing: selectedDecision.timing,
+                  });
+                  setSelectedDecisionId("");
+                  setJournalComposerOpen(true);
+                }}
+              />
+              <Button
+                label={language === "ko" ? "삭제" : "Delete"}
+                tone="ghost"
+                onPress={() => {
+                  void actions.deleteDecision(selectedDecision.id);
+                  setSelectedDecisionId("");
+                }}
+              />
               {selectedDecisionOutcome ? (
                 <Button
-                  label={selectedDecisionOutcome.status === "Reviewed" ? "Outcome Done" : "Mark Outcome"}
+                  label={selectedDecisionOutcome.status === "Reviewed" ? t(language, "journal.action.outcomeDone") : t(language, "journal.action.markOutcome")}
                   tone="secondary"
                   onPress={() =>
                     void actions.setOutcomeStatus(
@@ -4178,7 +6167,7 @@ export default function App() {
             {selectedDecisionOutcome ? (
               <View style={styles.formulaPanel}>
                 <Text style={styles.formulaTitle}>
-                  Outcome · {selectedDecisionOutcome.status ?? "Pending"}
+                  {t(language, "journal.detail.outcome", { status: localizedOutcomeStatus(language, selectedDecisionOutcome.status ?? "Pending") })}
                 </Text>
                 <Text style={styles.formulaBody}>{selectedDecisionOutcome.lesson}</Text>
                 <Text style={styles.formulaMeta}>{selectedDecisionOutcome.recipeSuggestion}</Text>
@@ -4191,51 +6180,129 @@ export default function App() {
           </WindowPanel>
         ) : null}
 
-        {stockComposerOpen ? (
+        {selectedScannerSignal ? (
           <WindowPanel
-            title={language === "ko" ? "종목 추가" : "Add Stock"}
-            subtitle={language === "ko" ? "사실 기반 종목 작업공간에 새 종목을 추가합니다." : "Add a stock into the factual stock workspace."}
-            onClose={() => {
-              setStockComposerOpen(false);
-              setStockFormAttempted(false);
-            }}
-            closeLabel={t(language, "common.done")}
+            title={language === "ko" ? "신호 검토 기록" : "Signal Review Log"}
+            subtitle={`${selectedScannerSignal.ticker} · ${selectedScannerSignal.ruleId}`}
+            onClose={() => setScannerSignalReviewId("")}
           >
-            <Text style={styles.inputLabel}>Ticker</Text>
-            <Input
-              value={stockForm.symbol}
-              onChangeText={(symbol) => setStockForm((current) => ({ ...current, symbol }))}
-              placeholder="Ticker symbol"
-              autoCapitalize="characters"
-              invalid={stockFormAttempted && !stockForm.symbol.trim()}
-            />
-            {stockFormAttempted && !stockForm.symbol.trim() ? <Text style={styles.validationText}>Ticker is required.</Text> : null}
-            <Text style={styles.inputLabel}>Company</Text>
-            <Input
-              value={stockForm.name}
-              onChangeText={(name) => setStockForm((current) => ({ ...current, name }))}
-              placeholder="Company name"
-              invalid={stockFormAttempted && !stockForm.name.trim()}
-            />
-            {stockFormAttempted && !stockForm.name.trim() ? <Text style={styles.validationText}>Company name is required.</Text> : null}
-            <Text style={styles.inputLabel}>Why track it</Text>
-            <Input
-              value={stockForm.thesis}
-              onChangeText={(thesis) => setStockForm((current) => ({ ...current, thesis }))}
-              placeholder="What makes this worth monitoring?"
-              multiline
-            />
-            <Button
-              label="Add Stock"
-              onPress={() => {
-                setStockFormAttempted(true);
-                if (!stockForm.symbol.trim() || !stockForm.name.trim()) return;
-                void actions.addStock(stockForm);
-                setStockForm({ symbol: "", name: "", thesis: "" });
-                setStockComposerOpen(false);
-                setStockFormAttempted(false);
-              }}
-            />
+            <Card>
+              <Text style={styles.cardBody}>
+                {selectedScannerSignal.status === "MATCHED"
+                  ? "Condition matched — human review required."
+                  : selectedScannerSignal.status === "NEAR_MATCH"
+                    ? "Near match — watchlist only."
+                    : language === "ko"
+                      ? "데이터 부족 또는 검증 실패가 있습니다."
+                      : "Data is incomplete or failed validation."}
+              </Text>
+              <View style={styles.stack}>
+                <View style={styles.stockControlGroup}>
+                  <Text style={styles.stockControlGroupLabel}>
+                    {language === "ko" ? "검토 결정" : "Review decision"}
+                  </Text>
+                  <HorizontalChoice
+                    options={["watch", "ignore", "bought", "skipped", "sold", "other"] as const}
+                    value={scannerReviewForm.userDecision}
+                    onSelect={(value) =>
+                      setScannerReviewForm((current) => ({
+                        ...current,
+                        userDecision: value,
+                      }))
+                    }
+                    variant="segmented"
+                    labelForOption={(option) => option}
+                  />
+                </View>
+                <View style={styles.stockControlGroup}>
+                  <Text style={styles.stockControlGroupLabel}>
+                    {language === "ko" ? "수동 사유" : "Manual reason"}
+                  </Text>
+                  <Input
+                    value={scannerReviewForm.manualReason}
+                    onChangeText={(value) =>
+                      setScannerReviewForm((current) => ({ ...current, manualReason: value }))
+                    }
+                    placeholder={language === "ko" ? "왜 이 결정을 남기는지 적으세요" : "Why are you logging this review?"}
+                  />
+                </View>
+                <View style={styles.stockControlGroup}>
+                  <Text style={styles.stockControlGroupLabel}>
+                    {language === "ko" ? "메모" : "Notes"}
+                  </Text>
+                  <Input
+                    value={scannerReviewForm.notes}
+                    onChangeText={(value) =>
+                      setScannerReviewForm((current) => ({ ...current, notes: value }))
+                    }
+                    placeholder={language === "ko" ? "추가 관찰 메모" : "Additional review notes"}
+                    multiline
+                  />
+                </View>
+                <View style={styles.twoColumnGrid}>
+                  <View style={styles.flexOne}>
+                    <Text style={styles.stockControlGroupLabel}>
+                      {language === "ko" ? "확신도(선택)" : "Conviction (optional)"}
+                    </Text>
+                    <Input
+                      value={scannerReviewForm.convictionScoreOptional}
+                      onChangeText={(value) =>
+                        setScannerReviewForm((current) => ({ ...current, convictionScoreOptional: value }))
+                      }
+                      keyboardType="numeric"
+                      placeholder="0-100"
+                    />
+                  </View>
+                  <View style={styles.flexOne}>
+                    <Text style={styles.stockControlGroupLabel}>
+                      {language === "ko" ? "진입가(선택)" : "Entry price (optional)"}
+                    </Text>
+                    <Input
+                      value={scannerReviewForm.entryPriceOptional}
+                      onChangeText={(value) =>
+                        setScannerReviewForm((current) => ({ ...current, entryPriceOptional: value }))
+                      }
+                      keyboardType="numeric"
+                      placeholder="0.00"
+                    />
+                  </View>
+                </View>
+                <View style={styles.twoColumnGrid}>
+                  <View style={styles.flexOne}>
+                    <Text style={styles.stockControlGroupLabel}>
+                      {language === "ko" ? "청산가(선택)" : "Exit price (optional)"}
+                    </Text>
+                    <Input
+                      value={scannerReviewForm.exitPriceOptional}
+                      onChangeText={(value) =>
+                        setScannerReviewForm((current) => ({ ...current, exitPriceOptional: value }))
+                      }
+                      keyboardType="numeric"
+                      placeholder="0.00"
+                    />
+                  </View>
+                  <View style={styles.flexOne}>
+                    <Text style={styles.stockControlGroupLabel}>
+                      {language === "ko" ? "결과 메모" : "Result notes"}
+                    </Text>
+                    <Input
+                      value={scannerReviewForm.resultNotes}
+                      onChangeText={(value) =>
+                        setScannerReviewForm((current) => ({ ...current, resultNotes: value }))
+                      }
+                      placeholder={language === "ko" ? "후속 관찰" : "Follow-up result note"}
+                    />
+                  </View>
+                </View>
+                <View style={styles.actionRow}>
+                  <Button
+                    label={language === "ko" ? "저장" : "Save Log"}
+                    onPress={() => void submitScannerReview()}
+                    disabled={!scannerReviewForm.manualReason.trim()}
+                  />
+                </View>
+              </View>
+            </Card>
           </WindowPanel>
         ) : null}
 
@@ -4282,19 +6349,24 @@ export default function App() {
             </MotionSwap>
           </WindowPanel>
         ) : null}
-
-        <BottomNav tabs={tabs} currentTab={tab} onSelect={setTab} labels={tabLabels} />
+        <BottomNav
+          tabs={tabs}
+          currentTab={tab}
+          onSelect={setTab}
+          labels={tabLabels}
+          icons={{
+            Home: "◦",
+            Stocks: "≈",
+            "Logic Lab": "ƒ",
+            Eyes: "◎",
+          }}
+        />
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
-const SectionHeader = ({ title, note }: { title?: string; note?: string }) => (
-  <View style={styles.sectionHeader}>
-    {title ? <Text style={styles.sectionTitle}>{title}</Text> : null}
-    {note ? <Text style={styles.sectionNote}>{note}</Text> : null}
-  </View>
-);
+
 
 const styles = StyleSheet.create({
   screen: {
@@ -4307,7 +6379,7 @@ const styles = StyleSheet.create({
   },
   topBar: {
     paddingHorizontal: 18,
-    paddingTop: 12,
+    paddingTop: Platform.OS === "ios" ? 54 : 18,
     paddingBottom: 12,
     flexDirection: "row",
     alignItems: "center",
@@ -4315,6 +6387,11 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#e5e7eb",
     backgroundColor: "#fbfbfd",
+  },
+  topBarActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
   },
   topBarTitle: {
     color: "#111827",
@@ -4346,11 +6423,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  topHeaderActionActive: {
+    backgroundColor: "#111827",
+    borderColor: "#111827",
+  },
   alertBellIcon: {
     color: "#111827",
     fontSize: 16,
     fontWeight: "800",
     fontFamily,
+  },
+  topHeaderActionIconActive: {
+    color: "#ffffff",
   },
   alertBellBadge: {
     position: "absolute",
@@ -4386,7 +6470,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingHorizontal: 16,
     paddingTop: 16,
-    paddingBottom: 136,
+    paddingBottom: 104,
     gap: 14,
   },
   // Search Hero Styles
@@ -4709,6 +6793,311 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     fontFamily,
   },
+  logicSummaryStrip: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 20,
+    gap: 8,
+  },
+  logicHeaderCard: {
+    marginBottom: 10,
+    backgroundColor: "#f8fafc",
+    padding: 14,
+  },
+  logicTopStatsGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 6,
+    marginTop: 8,
+  },
+  logicTopStatCell: {
+    width: "48.8%",
+  },
+  logicPrimaryActions: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    marginTop: 10,
+  },
+  logicPrimaryActionButton: {
+    minWidth: "48.6%",
+    flexGrow: 1,
+  },
+  logicNavigatorCard: {
+    marginBottom: 24,
+    backgroundColor: "#f8fafc",
+    padding: 18,
+  },
+  navigatorHeader: {
+    marginBottom: 8,
+  },
+  navigatorEyebrow: {
+    fontSize: 10,
+    fontWeight: "900",
+    color: "#64748b",
+    textTransform: "uppercase",
+    letterSpacing: 1.2,
+    fontStyle: "italic",
+    marginBottom: 4,
+  },
+  navigatorBody: {
+    fontSize: 14,
+    color: "#475569",
+    lineHeight: 20,
+    fontWeight: "600",
+  },
+  layerContentContainer: {
+    marginTop: 8,
+    gap: 12,
+  },
+  scannerSummaryCard: {
+    gap: 10,
+  },
+  scannerSummaryTopRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    gap: 12,
+  },
+  scannerSummaryTitleWrap: {
+    flex: 1,
+    gap: 4,
+  },
+  scannerSignalCard: {
+    gap: 8,
+  },
+  scannerSignalTopRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    gap: 10,
+  },
+  scannerSignalTitleWrap: {
+    flex: 1,
+    gap: 4,
+  },
+  scannerMetaText: {
+    fontSize: 11,
+    lineHeight: 16,
+    fontWeight: "700",
+    color: "#64748b",
+    fontFamily,
+  },
+  twoColumnGrid: {
+    flexDirection: "row",
+    gap: 10,
+  },
+  logicLayerRailWrap: {
+    marginBottom: 8,
+  },
+  logicLayerTopRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  logicLayerRail: {
+    flexDirection: "row",
+    flex: 1,
+    alignItems: "center",
+  },
+  logicL0Button: {
+    minWidth: 52,
+    height: 40,
+    paddingHorizontal: 12,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "#dbe5f0",
+    backgroundColor: "#ffffff",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  logicL0ButtonText: {
+    color: "#0f172a",
+    fontSize: 12,
+    fontWeight: "900",
+    fontFamily,
+  },
+  logicLayerStep: {
+    width: 72,
+    alignItems: "center",
+    gap: 6,
+  },
+  logicLayerStepDot: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: "#d1d5db",
+    backgroundColor: "#ffffff",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  logicLayerStepDotCompleted: {
+    backgroundColor: "#e2e8f0",
+    borderColor: "#cbd5e1",
+  },
+  logicLayerStepDotActive: {
+    backgroundColor: "#0f172a",
+    borderColor: "#0f172a",
+  },
+  logicLayerChipPressed: {
+    transform: [{ scale: 0.985 }],
+    opacity: 0.96,
+  },
+  logicLayerStepDotText: {
+    color: "#64748b",
+    fontSize: 12,
+    fontWeight: "900",
+    fontFamily,
+  },
+  logicLayerStepDotTextActive: {
+    color: "#ffffff",
+  },
+  logicLayerStepLabel: {
+    color: "#64748b",
+    fontSize: 10,
+    lineHeight: 13,
+    fontWeight: "800",
+    textAlign: "center",
+    fontFamily,
+  },
+  logicLayerStepLabelActive: {
+    color: "#111827",
+  },
+  logicLayerStepConnector: {
+    flex: 1,
+    height: 2,
+    marginHorizontal: 6,
+    backgroundColor: "#e2e8f0",
+  },
+  logicLayerStepConnectorActive: {
+    backgroundColor: "#0f172a",
+  },
+  logicRuleSelectCard: {
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: "#e2e8f0",
+    backgroundColor: "#ffffff",
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  logicRuleSelectCardActive: {
+    borderColor: "#0f172a",
+    backgroundColor: "#eff6ff",
+  },
+  logicBuilderCompactCard: {
+    padding: 12,
+    borderRadius: 18,
+    backgroundColor: "#f8fafc",
+    borderWidth: 1,
+    borderColor: "#e2e8f0",
+    gap: 10,
+  },
+  logicRuleSelectTitle: {
+    fontSize: 13,
+    lineHeight: 18,
+    fontWeight: "800",
+    color: "#0f172a",
+    fontFamily,
+  },
+  logicRuleSelectMeta: {
+    marginTop: 4,
+    fontSize: 11,
+    lineHeight: 16,
+    fontWeight: "700",
+    color: "#64748b",
+    fontFamily,
+  },
+  logicRuleSelectToggle: {
+    marginLeft: 10,
+    alignSelf: "center",
+    minHeight: 32,
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "#cbd5e1",
+    backgroundColor: "#ffffff",
+  },
+  logicRuleSelectToggleActive: {
+    borderColor: "#0f172a",
+    backgroundColor: "#0f172a",
+  },
+  logicRuleSelectToggleText: {
+    fontSize: 11,
+    fontWeight: "800",
+    color: "#334155",
+    fontFamily,
+  },
+  logicRuleSelectToggleTextActive: {
+    color: "#ffffff",
+  },
+  logicActionRow: {
+    marginBottom: 4,
+  },
+  selectionPromptCard: {
+    marginTop: 20,
+    padding: 32,
+    alignItems: "center",
+    backgroundColor: "#f9fafb",
+    borderStyle: "dashed",
+    borderColor: "#cbd5e1",
+    borderWidth: 2,
+  },
+  selectionPromptText: {
+    fontSize: 12,
+    fontWeight: "900",
+    color: "#64748b",
+    textAlign: "center",
+    letterSpacing: 1,
+    lineHeight: 18,
+  },
+  selectionPromptBtn: {
+    marginTop: 20,
+    width: "100%",
+  },
+  stockBoardHeaderPolished: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 20,
+    paddingHorizontal: 4,
+  },
+  heroCardPolished: {
+    marginBottom: 20,
+  },
+  stockSymbolBig: {
+    fontSize: 28,
+    fontWeight: "900",
+    color: "#0f172a",
+    letterSpacing: -0.5,
+  },
+  stockNameBig: {
+    fontSize: 14,
+    fontWeight: "800",
+    color: "#64748b",
+    textTransform: "uppercase",
+    letterSpacing: 1,
+    marginTop: 2,
+  },
+  emptyBoardContainer: {
+    height: 200,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f8fafc",
+    borderRadius: 30,
+    borderWidth: 2,
+    borderColor: "#e2e8f0",
+    borderStyle: "dashed",
+    marginTop: 20,
+  },
+  emptyBoardText: {
+    fontSize: 12,
+    fontWeight: "900",
+    color: "#94a3b8",
+    letterSpacing: 1.5,
+  },
   homeSummaryStrip: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -4741,6 +7130,21 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 19,
     fontWeight: "600",
+    fontFamily,
+  },
+  logicBlockHeader: {
+    gap: 6,
+  },
+  logicBlockTitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 10,
+  },
+  logicBlockToggle: {
+    color: "#6b7280",
+    fontSize: 18,
+    fontWeight: "700",
     fontFamily,
   },
   stockControlsPanel: {
@@ -5772,8 +8176,169 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     fontFamily,
   },
+  choiceChipSubtext: {
+    marginTop: 4,
+    color: "#94a3b8",
+    fontSize: 10,
+    lineHeight: 14,
+    fontWeight: "700",
+    fontFamily,
+  },
   choiceChipTextActive: {
     color: "#ffffff",
+  },
+  choiceChipSubtextActive: {
+    color: "rgba(255,255,255,0.82)",
+  },
+  operatorChip: {
+    minHeight: 36,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    backgroundColor: "#ffffff",
+    borderWidth: 1,
+    borderColor: "#dbe5f0",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  operatorChipText: {
+    color: "#0f172a",
+    fontSize: 12,
+    fontWeight: "800",
+    fontFamily,
+  },
+  metricBuilderSectionCard: {
+    padding: 12,
+    borderRadius: 18,
+    gap: 10,
+    backgroundColor: "#f8fafc",
+    borderWidth: 1,
+    borderColor: "#edf0f5",
+  },
+  metricBuilderSectionHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 8,
+  },
+  metricBuilderSectionTitle: {
+    color: "#111827",
+    fontSize: 14,
+    fontWeight: "900",
+    fontFamily,
+  },
+  metricBuilderMetaGrid: {
+    gap: 10,
+  },
+  metricBuilderMetaField: {
+    gap: 4,
+  },
+  metricBuilderMiniLabel: {
+    color: "#64748b",
+    fontSize: 10,
+    fontWeight: "800",
+    textTransform: "uppercase",
+    letterSpacing: 0.35,
+    fontFamily,
+  },
+  metricBuilderCompactRow: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    gap: 8,
+  },
+  metricBuilderSelectorField: {
+    flex: 1,
+    minWidth: 0,
+    gap: 4,
+  },
+  metricCalculatorAction: {
+    minWidth: 82,
+    marginLeft: 0,
+  },
+  formulaCanvas: {
+    minHeight: 92,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "#dbe5f0",
+    backgroundColor: "#ffffff",
+    padding: 10,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    alignItems: "flex-start",
+  },
+  formulaCanvasInvalid: {
+    borderColor: "#dc2626",
+    backgroundColor: "#fef2f2",
+    shadowColor: "#dc2626",
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+  },
+  formulaToken: {
+    minHeight: 34,
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  formulaTokenVariable: {
+    backgroundColor: "#eff6ff",
+    borderColor: "#bfdbfe",
+  },
+  formulaTokenOperator: {
+    backgroundColor: "#f8fafc",
+    borderColor: "#dbe5f0",
+  },
+  formulaTokenNumber: {
+    backgroundColor: "#fef3c7",
+    borderColor: "#fcd34d",
+  },
+  formulaTokenText: {
+    color: "#0f172a",
+    fontSize: 12,
+    fontWeight: "800",
+    fontFamily,
+  },
+  metricBuilderStatusRow: {
+    gap: 8,
+  },
+  metricBuilderStatusText: {
+    fontSize: 11,
+    fontWeight: "800",
+    fontFamily,
+  },
+  metricBuilderStatusTextValid: {
+    color: "#047857",
+  },
+  metricBuilderStatusTextInvalid: {
+    color: "#b91c1c",
+  },
+  metricCalculatorGrid: {
+    gap: 10,
+  },
+  metricCalculatorColumn: {
+    gap: 8,
+  },
+  metricCalculatorPad: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 6,
+  },
+  metricFunctionArgsCard: {
+    gap: 8,
+    padding: 10,
+    borderRadius: 14,
+    backgroundColor: "#ffffff",
+    borderWidth: 1,
+    borderColor: "#e2e8f0",
+  },
+  metricFunctionArgBlock: {
+    gap: 6,
+  },
+  metricMiniButton: {
+    minWidth: 110,
+    marginLeft: 10,
   },
   templateCard: {
     width: 200,
@@ -6746,5 +9311,64 @@ const styles = StyleSheet.create({
     backgroundColor: "#1e293b",
     borderWidth: 1,
     borderColor: "#ef4444",
+  },
+  versionHistoryStack: {
+    gap: 10,
+  },
+  versionHistoryCard: {
+    gap: 10,
+  },
+  versionHistoryHeader: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    gap: 10,
+  },
+  versionHistoryTitleWrap: {
+    flex: 1,
+    gap: 3,
+  },
+  versionHistoryTitle: {
+    color: "#0f172a",
+    fontSize: 15,
+    lineHeight: 20,
+    fontWeight: "900",
+    fontFamily,
+  },
+  versionHistorySubtitle: {
+    color: "#64748b",
+    fontSize: 12,
+    lineHeight: 17,
+    fontWeight: "700",
+    fontFamily,
+  },
+  versionHistoryMetaRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 6,
+  },
+  versionHistoryBody: {
+    color: "#334155",
+    fontSize: 13,
+    lineHeight: 19,
+    fontWeight: "600",
+    fontFamily,
+  },
+  versionHistoryActionRow: {
+    flexDirection: "row",
+    gap: 8,
+  },
+  versionHistoryActionButton: {
+    flex: 1,
+  },
+  logicInfoCard: {
+    gap: 10,
+  },
+  logicInfoBody: {
+    color: "#334155",
+    fontSize: 14,
+    lineHeight: 22,
+    fontWeight: "600",
+    fontFamily,
   },
 });

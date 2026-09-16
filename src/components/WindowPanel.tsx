@@ -158,7 +158,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   windowPanel: {
-    maxHeight: "84%",
+    height: "88%",
+    minHeight: 420,
+    flexShrink: 1,
     borderTopLeftRadius: 26,
     borderTopRightRadius: 26,
     backgroundColor: "#ffffff",
@@ -231,7 +233,7 @@ const styles = StyleSheet.create({
   },
   windowScrollContent: {
     gap: 10,
-    paddingBottom: 12,
+    paddingBottom: 28,
     flexGrow: 1,
   },
 });

@@ -28,6 +28,8 @@ export const StockTrendHero = ({
   stockSnapshotModeLabel,
   Button,
   onClearStock,
+  onEditStock,
+  onDeleteStock,
   lookbackControl,
   benchmarkControl,
   language,
@@ -53,6 +55,8 @@ export const StockTrendHero = ({
   stockSnapshotModeLabel: (snapshot?: { isMock: boolean } | null) => string;
   Button: React.ComponentType<any>;
   onClearStock: () => void;
+  onEditStock: () => void;
+  onDeleteStock: () => void;
   lookbackControl: React.ReactNode;
   benchmarkControl: React.ReactNode;
   language: AppLanguage;
@@ -83,6 +87,8 @@ export const StockTrendHero = ({
               {localizedFreshness(language, snapshot?.freshness ?? "Unavailable")}
             </Text>
           </View>
+          <Button label={language === "ko" ? "수정" : "Edit"} tone="ghost" onPress={onEditStock} />
+          <Button label={language === "ko" ? "삭제" : "Delete"} tone="ghost" onPress={onDeleteStock} />
           <Button label={t(language, "stocks.hero.clear")} tone="ghost" onPress={onClearStock} />
         </View>
       </View>
