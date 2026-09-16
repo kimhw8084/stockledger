@@ -669,6 +669,8 @@ For personal mode, provide versioned exports to an existing local/iCloud backup 
 
 Managed initial recovery target: RPO up to 24 hours and RTO up to four hours, validated with a restore drill. Paid basic backups do not imply minute-level recovery. If product promises require lower RPO, procure PITR or a tested incremental replication strategy and budget it explicitly.
 
+Database backups do not include the underlying Supabase Storage objects. Back up permitted raw archives and attachments separately, retain their manifest references, and include them in restore validation. [Supabase backup scope](https://supabase.com/docs/guides/platform/backups)
+
 A quarterly restore drill uses a fresh isolated database and verifies login, data ownership, recipe/evaluation references, decisions, and exports. Before launch, perform at least one end-to-end drill. Record date, duration, restored record counts, and unresolved gaps.
 
 ## 12. Security, privacy, and operational controls
@@ -685,7 +687,7 @@ Enable RLS on every exposed user-data table and write policies for actual owners
 
 Server handlers derive owner identity from the verified session. User-editable metadata cannot grant paid plans, admin status, or access to other users' data. Service-role workers run explicit scoped operations; public endpoints do not forward arbitrary privileged queries.
 
-Use security-invoker views where supported, private schemas for internal jobs/licensed data, minimal grants, and controlled function execution. Validate policies with two separate accounts and unauthenticated access. This is defensive access testing, not a substitute for a full independent security review.
+Use security-invoker views where supported, private schemas for internal jobs/licensed data, minimal grants, and controlled function execution. Validate policies with two separate accounts and unauthenticated access. This is defensive access testing, not a substitute for a full independent security review. [Supabase RLS guidance](https://supabase.com/docs/guides/database/postgres/row-level-security)
 
 ### 12.3 Input and operational safeguards
 
@@ -1179,6 +1181,7 @@ These are bounded decision gates. They do not block the correctness, data-model,
 | In-memory persistence fixture | Saved 220 → reloaded 195.12 with provider/non-mock labels retained | Confirms provenance corruption path |
 | Credential hygiene check | No exact local-env-value/common-pattern matches in intended files or history | Limited check before private synchronization |
 | UI automation | No browser/app surface available; native service startup failed | No screenshots, tap testing, or device QA claimed |
+| Fresh GitHub clone | Clean npm ci, typecheck, and web export passed; all 62 baseline file hashes matched | Source/history synchronization independently verified |
 | Existing automated tests/CI | No test script, test suite, or workflow found at baseline | Test architecture is proposed work |
 | Commercial/live backend | No deployed service or database was validated | Production readiness is not claimed |
 

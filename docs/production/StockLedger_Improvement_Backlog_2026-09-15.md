@@ -443,7 +443,7 @@ The following table is generated from the pre-documentation working tree. “Exi
 
 ## 12. Delivery note
 
-The design and backlog are canonical under docs/production. The requested iCloud copies use the same filenames. The intended final Git target is private kimhw8084/stockledger with the existing history and reviewed local prototype preserved.
+The design and backlog are canonical under docs/production. The requested iCloud copies use the same filenames. Delivery actions: SL-087 completed by creating private kimhw8084/stockledger and uploading main with the 61 existing commits and reviewed prototype baseline 81c26f9 preserved. SL-090 completed with a root README. A fresh GitHub clone passed npm ci, typecheck, and web export; all 62 original project file hashes matched the reviewed working tree. SL-092 is delivered through byte-verified iCloud copies of these two canonical documents. App source has not been changed by the review.
 
 A synchronized documentation/source snapshot is not a production-ready application. The remaining work above is deliberately explicit so future implementation can proceed in small, verified steps.
 
