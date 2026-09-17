@@ -70,6 +70,112 @@ const dict: Record<AppLanguage, Record<string, DictValue>> = {
     "common.closeOptions": "Close options",
     "common.searchOptions": "Search options...",
     "common.noResultsFor": ({ search }: Record<string, string | number> = {}) => `No results matching "${search ?? ""}"`,
+    "common.yes": "Yes",
+    "common.no": "No",
+
+    "review.passed": "Passed",
+    "review.failed": "Failed",
+    "review.warnings": "Warnings",
+    "review.blockers": "Blockers",
+    "review.support": "Support",
+    "review.risks": "Risks",
+    "review.state": ({ value }: Record<string, string | number> = {}) => `State: ${value ?? ""}`,
+    "review.changed": "Changed",
+    "review.stable": "Stable",
+    "review.urgency": ({ value }: Record<string, string | number> = {}) => `Urgency: ${value ?? ""}`,
+    "review.nextTrigger": ({ value }: Record<string, string | number> = {}) => `Next trigger: ${value ?? ""}`,
+    "review.dataIssues": ({ value }: Record<string, string | number> = {}) => `Data issues: ${value ?? ""}`,
+    "review.showMatrix": "Show matrix",
+    "review.hideMatrix": "Hide matrix",
+    "review.condition": "Condition",
+    "review.topSupport": "Top support",
+    "review.topRisk": "Top risk",
+    "review.latestDecision": "Latest decision",
+    "review.noStrongChange": "No strong change recorded.",
+    "review.noImmediateRisk": "No immediate risk surfaced.",
+    "review.setupHigh": "High",
+    "review.setupMedium": "Medium",
+    "review.setupLow": "Low",
+
+    "logic.scanner.title": "Daily Condition Scanner",
+    "logic.scanner.run": "Run Scan",
+    "logic.scanner.matched": "Matched",
+    "logic.scanner.near": "Near",
+    "logic.scanner.blocked": "Blocked",
+    "logic.scanner.rules": "Rules",
+    "logic.scanner.noRun": "No scan run yet.",
+    "logic.scanner.matchedBody": "Condition matched — human review required.",
+    "logic.scanner.nearBody": "Near match — watchlist only.",
+    "logic.scanner.blockedBody": "Scan blocked because data is incomplete or invalid.",
+    "logic.scanner.countPassed": ({ count }: Record<string, string | number> = {}) => `${count ?? 0} passed`,
+    "logic.scanner.countFailed": ({ count }: Record<string, string | number> = {}) => `${count ?? 0} failed`,
+    "logic.scanner.countMissing": ({ count }: Record<string, string | number> = {}) => `${count ?? 0} missing`,
+    "logic.scanner.reviewLogged": "Review logged",
+    "logic.scanner.logReview": "Log Review",
+    "logic.scanner.reviewTitle": "Signal Review Log",
+    "logic.scanner.reviewDecision": "Review decision",
+    "logic.scanner.manualReason": "Manual reason",
+    "logic.scanner.manualReasonPlaceholder": "Why are you logging this review?",
+    "logic.scanner.notes": "Notes",
+    "logic.scanner.notesPlaceholder": "Additional review notes",
+    "logic.scanner.conviction": "Conviction (optional)",
+    "logic.scanner.entryPrice": "Entry price (optional)",
+    "logic.scanner.exitPrice": "Exit price (optional)",
+    "logic.scanner.resultNotes": "Result notes",
+    "logic.scanner.resultNotesPlaceholder": "Follow-up result note",
+    "logic.scanner.saveLog": "Save Log",
+    "logic.scanner.incompleteBody": "Data is incomplete or failed validation.",
+    "logic.scanner.runStatus.completed": "Completed",
+    "logic.scanner.runStatus.blocked": "Blocked",
+    "logic.scanner.runStatus.partial": "Partial",
+
+    "workspace.recovery.title": "Your saved data needs attention",
+    "workspace.recovery.body": "The original data has been kept. Export a recovery copy before restoring a backup.",
+    "workspace.recovery.export": "Export recovery copy",
+    "workspace.recovery.restore": "Restore previous saved copy",
+    "workspace.recovery.retry": "Retry loading",
+    "workspace.title": "Your workspace",
+    "workspace.body": "Stored on this device. Export regular backups to keep your investment notes safe.",
+    "workspace.export": "Export complete backup",
+    "workspace.exportReport": "Export weekly review report",
+    "workspace.reEvaluate": "Re-evaluate saved data",
+    "workspace.exportSample": "Export sample notes and start a clean personal workspace",
+    "workspace.restore.title": "Restore a backup",
+    "workspace.chooseBackup": "Choose backup file",
+    "workspace.backupPlaceholder": "Paste StockLedger backup JSON",
+    "workspace.validate": "Validate backup",
+    "workspace.validateSuccess": "Backup validated. Review the contents below before restoring.",
+    "workspace.restoreSummary": ({ stocks, recipes, decisions }: Record<string, string | number> = {}) => `${stocks ?? 0} stocks · ${recipes ?? 0} recipes · ${decisions ?? 0} decisions. Restore replaces the active workspace. A copy of the current workspace will be exported first.`,
+    "workspace.restoreCurrent": "Export current data and restore this backup",
+    "workspace.restoreSuccess": "Backup restored.",
+    "workspace.prices.title": "Import daily prices",
+    "workspace.prices.body": "CSV columns: Date,Open,High,Low,Close,Volume. Supply provider OHLCV observations, not normalized chart values. History must contain consecutive NYSE sessions. Automated alerts require provider-declared adjusted history; unadjusted or unknown data stays marked partial. Long-window metrics need at least 252 sessions.",
+    "workspace.prices.addStock": "Add a stock to your watchlist first.",
+    "workspace.prices.placeholder": "Paste daily price CSV",
+    "workspace.prices.choose": "Choose daily price CSV",
+    "workspace.prices.benchmarkPlaceholder": "Optional SPY CSV for matching dates",
+    "workspace.prices.chooseBenchmark": "Choose SPY CSV",
+    "workspace.prices.adjustment": "Provider-declared adjustment",
+    "workspace.prices.adjustment.unknown": "Unknown",
+    "workspace.prices.adjustment.adjusted": "Adjusted",
+    "workspace.prices.adjustment.unadjusted": "Unadjusted",
+    "workspace.prices.validate": "Validate and import prices",
+    "workspace.prices.importSuccess": "Prices imported with source and session dates.",
+    "workspace.addRecipes": "Add starter recipes",
+    "workspace.addRecipesSuccess": "Starter recipes added without changing existing recipes.",
+    "workspace.restoreStock": ({ symbol }: Record<string, string | number> = {}) => `Restore ${symbol ?? "stock"}`,
+    "workspace.restoreEye": ({ symbol }: Record<string, string | number> = {}) => `Restore monitoring: ${symbol ?? "stock"}`,
+    "workspace.restoreDecision": ({ date, action }: Record<string, string | number> = {}) => `Restore decision: ${date ?? ""} ${action ?? ""}`,
+    "workspace.operationFailed": "Operation failed.",
+    "workspace.saveFailed": "Save failed.",
+    "workspace.watchlist.title": "Import a watchlist",
+    "workspace.watchlist.body": "CSV needs Symbol or Ticker; Name and Thesis are optional. Existing stocks and their notes are preserved.",
+    "workspace.watchlist.choose": "Choose watchlist CSV",
+    "workspace.watchlist.placeholder": "Symbol,Name,Thesis",
+    "workspace.watchlist.preview": "Preview watchlist import",
+    "workspace.watchlist.summary": ({ added, existing }: Record<string, string | number> = {}) => `${added ?? 0} new stocks; ${existing ?? 0} existing stocks will be kept as they are.`,
+    "workspace.watchlist.import": "Import new stocks",
+    "workspace.watchlist.success": "Watchlist imported. Add recipes and price history when ready.",
 
     "route.unavailableTitle": "This link is no longer available",
     "route.entityUnavailable": "The requested item is missing, archived, stale, or unavailable. Nothing was changed.",
@@ -437,6 +543,15 @@ const dict: Record<AppLanguage, Record<string, DictValue>> = {
     "stocks.evidence.formulaDetail": "Formula detail",
     "stocks.evidence.formulaMissing": "No extra formula detail available.",
     "stocks.evidence.inputs": ({ inputs }: Record<string, string | number> = {}) => `Inputs: ${inputs ?? "No explicit inputs recorded"}`,
+    "stocks.visual.active": "Active now",
+    "stocks.visual.inactive": "Inactive now",
+    "stocks.visual.eventTiming": "Event timing",
+    "stocks.visual.eventRiskClose": "Event risk is close enough to demand a fresh review.",
+    "stocks.visual.noEventPressure": "No major event pressure inside the near window.",
+    "stocks.visual.trend": "Trend",
+    "stocks.visual.need": "Need",
+    "stocks.visual.context": "context",
+    "stocks.evidence.noInputs": "No explicit inputs recorded",
     "alerts.detail.evidenceRecorded": "Evidence recorded with this alert",
     "alerts.detail.olderEvidence": "Detailed evidence was not captured by the older app version. The original alert summary is preserved above.",
   },
@@ -504,6 +619,112 @@ const dict: Record<AppLanguage, Record<string, DictValue>> = {
     "common.closeOptions": "선택지 닫기",
     "common.searchOptions": "선택지 검색...",
     "common.noResultsFor": ({ search }: Record<string, string | number> = {}) => `"${search ?? ""}" 검색 결과가 없습니다.`,
+    "common.yes": "예",
+    "common.no": "아니오",
+
+    "review.passed": "충족",
+    "review.failed": "미충족",
+    "review.warnings": "경고",
+    "review.blockers": "차단",
+    "review.support": "근거",
+    "review.risks": "위험",
+    "review.state": ({ value }: Record<string, string | number> = {}) => `상태: ${value ?? ""}`,
+    "review.changed": "변경됨",
+    "review.stable": "안정",
+    "review.urgency": ({ value }: Record<string, string | number> = {}) => `긴급도: ${value ?? ""}`,
+    "review.nextTrigger": ({ value }: Record<string, string | number> = {}) => `다음 트리거: ${value ?? ""}`,
+    "review.dataIssues": ({ value }: Record<string, string | number> = {}) => `데이터 이슈: ${value ?? ""}`,
+    "review.showMatrix": "매트릭스 보기",
+    "review.hideMatrix": "매트릭스 숨기기",
+    "review.condition": "조건",
+    "review.topSupport": "가장 큰 근거",
+    "review.topRisk": "가장 큰 위험",
+    "review.latestDecision": "최근 결정",
+    "review.noStrongChange": "뚜렷한 변화는 아직 없습니다.",
+    "review.noImmediateRisk": "즉시 확인할 큰 위험은 아직 없습니다.",
+    "review.setupHigh": "높음",
+    "review.setupMedium": "보통",
+    "review.setupLow": "낮음",
+
+    "logic.scanner.title": "일일 조건 스캐너",
+    "logic.scanner.run": "스캔 실행",
+    "logic.scanner.matched": "일치",
+    "logic.scanner.near": "근접",
+    "logic.scanner.blocked": "차단",
+    "logic.scanner.rules": "규칙",
+    "logic.scanner.noRun": "아직 스캔 기록이 없습니다.",
+    "logic.scanner.matchedBody": "조건이 일치했습니다 — 사람의 검토가 필요합니다.",
+    "logic.scanner.nearBody": "근접 일치입니다 — 관심 목록에서만 확인하세요.",
+    "logic.scanner.blockedBody": "데이터가 부족하거나 유효하지 않아 스캔이 차단되었습니다.",
+    "logic.scanner.countPassed": ({ count }: Record<string, string | number> = {}) => `${count ?? 0}개 통과`,
+    "logic.scanner.countFailed": ({ count }: Record<string, string | number> = {}) => `${count ?? 0}개 실패`,
+    "logic.scanner.countMissing": ({ count }: Record<string, string | number> = {}) => `${count ?? 0}개 누락`,
+    "logic.scanner.reviewLogged": "검토 기록 있음",
+    "logic.scanner.logReview": "검토 기록",
+    "logic.scanner.reviewTitle": "신호 검토 기록",
+    "logic.scanner.reviewDecision": "검토 결정",
+    "logic.scanner.manualReason": "수동 사유",
+    "logic.scanner.manualReasonPlaceholder": "왜 이 결정을 남기는지 적으세요",
+    "logic.scanner.notes": "메모",
+    "logic.scanner.notesPlaceholder": "추가 관찰 메모",
+    "logic.scanner.conviction": "확신도(선택)",
+    "logic.scanner.entryPrice": "진입가(선택)",
+    "logic.scanner.exitPrice": "청산가(선택)",
+    "logic.scanner.resultNotes": "결과 메모",
+    "logic.scanner.resultNotesPlaceholder": "후속 관찰",
+    "logic.scanner.saveLog": "저장",
+    "logic.scanner.incompleteBody": "데이터가 부족하거나 검증에 실패했습니다.",
+    "logic.scanner.runStatus.completed": "완료",
+    "logic.scanner.runStatus.blocked": "차단",
+    "logic.scanner.runStatus.partial": "일부만",
+
+    "workspace.recovery.title": "저장된 데이터 확인이 필요합니다",
+    "workspace.recovery.body": "원본 데이터는 보존되어 있습니다. 백업을 복원하기 전에 복구 사본을 내보내세요.",
+    "workspace.recovery.export": "복구 사본 내보내기",
+    "workspace.recovery.restore": "이전 저장 사본 복원",
+    "workspace.recovery.retry": "다시 불러오기",
+    "workspace.title": "내 워크스페이스",
+    "workspace.body": "이 기기에 저장됩니다. 투자 메모를 안전하게 보관하려면 정기적으로 백업하세요.",
+    "workspace.export": "전체 백업 내보내기",
+    "workspace.exportReport": "주간 검토 보고서 내보내기",
+    "workspace.reEvaluate": "저장 데이터 다시 평가",
+    "workspace.exportSample": "샘플 메모를 내보내고 깨끗한 개인 워크스페이스 시작",
+    "workspace.restore.title": "백업 복원",
+    "workspace.chooseBackup": "백업 파일 선택",
+    "workspace.backupPlaceholder": "StockLedger 백업 JSON 붙여넣기",
+    "workspace.validate": "백업 검증",
+    "workspace.validateSuccess": "백업을 검증했습니다. 복원 전에 아래 내용을 확인하세요.",
+    "workspace.restoreSummary": ({ stocks, recipes, decisions }: Record<string, string | number> = {}) => `종목 ${stocks ?? 0}개 · 레시피 ${recipes ?? 0}개 · 결정 ${decisions ?? 0}개입니다. 복원하면 현재 워크스페이스가 교체됩니다. 먼저 현재 워크스페이스 사본을 내보냅니다.`,
+    "workspace.restoreCurrent": "현재 데이터를 내보내고 이 백업 복원",
+    "workspace.restoreSuccess": "백업을 복원했습니다.",
+    "workspace.prices.title": "일별 가격 가져오기",
+    "workspace.prices.body": "CSV 열: Date,Open,High,Low,Close,Volume. 정규화된 차트 값이 아니라 제공자 OHLCV 관측값을 넣으세요. 이력에는 연속된 NYSE 세션이 있어야 합니다. 자동 알림에는 제공자가 조정 여부를 선언한 조정 이력이 필요하며, 미조정 또는 알 수 없는 데이터는 일부 데이터로 표시됩니다. 긴 기간 지표에는 최소 252개 세션이 필요합니다.",
+    "workspace.prices.addStock": "관심 종목을 먼저 추가하세요.",
+    "workspace.prices.placeholder": "일별 가격 CSV 붙여넣기",
+    "workspace.prices.choose": "일별 가격 CSV 선택",
+    "workspace.prices.benchmarkPlaceholder": "날짜 매칭용 SPY CSV (선택)",
+    "workspace.prices.chooseBenchmark": "SPY CSV 선택",
+    "workspace.prices.adjustment": "제공자 조정 여부",
+    "workspace.prices.validate": "가격 검증 및 가져오기",
+    "workspace.prices.importSuccess": "소스와 세션 날짜를 포함해 가격을 가져왔습니다.",
+    "workspace.addRecipes": "스타터 레시피 추가",
+    "workspace.addRecipesSuccess": "기존 레시피를 변경하지 않고 스타터 레시피를 추가했습니다.",
+    "workspace.restoreStock": ({ symbol }: Record<string, string | number> = {}) => `${symbol ?? "종목"} 복원`,
+    "workspace.restoreEye": ({ symbol }: Record<string, string | number> = {}) => `모니터링 복원: ${symbol ?? "종목"}`,
+    "workspace.restoreDecision": ({ date, action }: Record<string, string | number> = {}) => `결정 복원: ${date ?? ""} ${action ?? ""}`,
+    "workspace.prices.adjustment.unknown": "알 수 없음",
+    "workspace.prices.adjustment.adjusted": "조정됨",
+    "workspace.prices.adjustment.unadjusted": "미조정",
+    "workspace.operationFailed": "작업에 실패했습니다.",
+    "workspace.saveFailed": "저장에 실패했습니다.",
+    "workspace.watchlist.title": "관심 종목 가져오기",
+    "workspace.watchlist.body": "CSV에는 Symbol 또는 Ticker가 필요합니다. Name과 Thesis는 선택 사항입니다. 기존 종목과 메모는 보존됩니다.",
+    "workspace.watchlist.choose": "관심 종목 CSV 선택",
+    "workspace.watchlist.placeholder": "Symbol,Name,Thesis",
+    "workspace.watchlist.preview": "관심 종목 가져오기 미리보기",
+    "workspace.watchlist.summary": ({ added, existing }: Record<string, string | number> = {}) => `새 종목 ${added ?? 0}개, 기존 종목 ${existing ?? 0}개는 현재 상태로 유지됩니다.`,
+    "workspace.watchlist.import": "새 종목 가져오기",
+    "workspace.watchlist.success": "관심 종목을 가져왔습니다. 준비되면 레시피와 가격 이력을 추가하세요.",
 
     "route.unavailableTitle": "이 링크는 더 이상 사용할 수 없습니다",
     "route.entityUnavailable": "요청한 항목이 없거나, 보관되었거나, 오래되었거나, 현재 사용할 수 없습니다. 아무것도 변경하지 않았습니다.",
@@ -871,6 +1092,15 @@ const dict: Record<AppLanguage, Record<string, DictValue>> = {
     "stocks.evidence.formulaDetail": "계산 방식",
     "stocks.evidence.formulaMissing": "추가 계산 설명이 아직 없습니다.",
     "stocks.evidence.inputs": ({ inputs }: Record<string, string | number> = {}) => `입력값: ${inputs ?? "기록된 입력값 없음"}`,
+    "stocks.visual.active": "현재 활성",
+    "stocks.visual.inactive": "현재 비활성",
+    "stocks.visual.eventTiming": "이벤트 시점",
+    "stocks.visual.eventRiskClose": "이벤트 위험이 가까워 새 검토가 필요합니다.",
+    "stocks.visual.noEventPressure": "가까운 기간에는 큰 이벤트 압박이 없습니다.",
+    "stocks.visual.trend": "추세",
+    "stocks.visual.need": "기준",
+    "stocks.visual.context": "참고값",
+    "stocks.evidence.noInputs": "기록된 입력값 없음",
     "alerts.detail.evidenceRecorded": "이 알림에 기록된 근거",
     "alerts.detail.olderEvidence": "이전 앱 버전에서는 상세 근거가 기록되지 않았습니다. 원래 알림 요약은 위에 보존되어 있습니다.",
   },
@@ -1433,3 +1663,79 @@ export const localizedOutcomeStatus = (language: AppLanguage, value?: string | n
       return value;
   }
 };
+
+export const localizedSetupStrength = (language: AppLanguage, value?: string | null) => {
+  if (!value) return "";
+  if (language === "en") return value;
+  switch (value) {
+    case "High":
+      return t(language, "review.setupHigh");
+    case "Medium":
+      return t(language, "review.setupMedium");
+    case "Low":
+      return t(language, "review.setupLow");
+    default:
+      return value;
+  }
+};
+
+export const localizedScannerStatus = (language: AppLanguage, status?: string | null) => {
+  switch (status) {
+    case "MATCHED":
+      return t(language, "logic.scanner.matched");
+    case "NEAR_MATCH":
+      return t(language, "logic.scanner.near");
+    case "BLOCKED":
+    case "BLOCKED_OR_INCOMPLETE_DATA":
+      return t(language, "logic.scanner.blocked");
+    case "FAILED":
+      return t(language, "review.failed");
+    default:
+      return status ?? "";
+  }
+};
+
+export const localizedScanRunStatus = (language: AppLanguage, status?: string | null) => {
+  switch (status) {
+    case "completed":
+      return t(language, "logic.scanner.runStatus.completed");
+    case "blocked":
+      return t(language, "logic.scanner.runStatus.blocked");
+    case "partial":
+      return t(language, "logic.scanner.runStatus.partial");
+    default:
+      return status ?? "";
+  }
+};
+
+export const localizedScannerDescription = (language: AppLanguage, status?: string | null) => {
+  switch (status) {
+    case "MATCHED":
+      return t(language, "logic.scanner.matchedBody");
+    case "NEAR_MATCH":
+      return t(language, "logic.scanner.nearBody");
+    case "BLOCKED":
+    case "BLOCKED_OR_INCOMPLETE_DATA":
+      return t(language, "logic.scanner.blockedBody");
+    default:
+      return "";
+  }
+};
+
+export const recipeConditionMapCopy = (language: AppLanguage) => ({
+  passed: t(language, "review.passed"),
+  failed: t(language, "review.failed"),
+  warnings: t(language, "review.warnings"),
+  blockers: t(language, "review.blockers"),
+  support: t(language, "review.support"),
+  risks: t(language, "review.risks"),
+  state: (value: string) => t(language, "review.state", { value }),
+  stateChanged: t(language, "review.changed"),
+  stateStable: t(language, "review.stable"),
+  urgency: (value: string) => t(language, "review.urgency", { value: localizedActionUrgency(language, value) }),
+  nextTrigger: (value: string) => t(language, "review.nextTrigger", { value }),
+  dataIssues: (value: string) => t(language, "review.dataIssues", { value }),
+  showMatrix: t(language, "review.showMatrix"),
+  hideMatrix: t(language, "review.hideMatrix"),
+  condition: t(language, "review.condition"),
+});

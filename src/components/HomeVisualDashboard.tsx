@@ -15,6 +15,7 @@ import {
   localizedDecisionAction,
   localizedEyeState,
   localizedFreshness,
+  t,
 } from "../lib/i18n";
 import { buildLogicLabScorecard, logicThesisRiskLabel } from "../lib/logicHelpers";
 import { Alert, Decision, Eye, Evaluation, MockSnapshot, Outcome, Stock } from "../types";
@@ -889,6 +890,7 @@ const HomeVisualDashboard: React.FC<HomeVisualDashboardProps> = ({
               : "This explains what the section shows and how to read it."
           }
           onClose={() => setHelpTarget("")}
+          closeLabel={t(language, "common.done")}
         >
           <Card style={styles.helpCard}>
             <Text style={styles.helpBody}>{homeHelpContent(language, helpTarget).body}</Text>

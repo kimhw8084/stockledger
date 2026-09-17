@@ -34,11 +34,13 @@ import {
   localizedActionUrgency,
   localizedConditionCategory,
   localizedConditionKind,
+  localizedConditionRole,
   localizedDecisionAction,
   localizedEyeState,
   localizedEyesShelfFilter,
   localizedFreshness,
   localizedJournalFilter,
+  localizedMetricAvailability,
   localizedOutcomeStatus,
   localizedOpportunityType,
   localizedRecipeOptionValue,
@@ -47,6 +49,10 @@ import {
   localizedRecipeBuilderStep,
   localizedRecipeShelfFilter,
   localizedReviewDateOption,
+  localizedScanRunStatus,
+  localizedScannerDescription,
+  localizedScannerStatus,
+  localizedSetupStrength,
   localizedSnapshotMode,
   localizedSourceType,
   localizedStatus,
@@ -55,6 +61,7 @@ import {
   localizedTimeHorizon,
   localizedTiming,
   localizedUseCase,
+  recipeConditionMapCopy,
   formatLocaleDate,
   formatLocaleDateTime,
   formatLocaleNumber,
@@ -514,8 +521,8 @@ const formatMetricThreshold = (
   if (control.type === "number") {
     return `${threshold}${control.unit ? ` ${control.unit}` : ""}`;
   }
-  if (threshold === "true") return language === "ko" ? "예" : "Yes";
-  if (threshold === "false") return language === "ko" ? "아니오" : "No";
+  if (threshold === "true") return t(language, "common.yes");
+  if (threshold === "false") return t(language, "common.no");
   return threshold;
 };
 
@@ -646,42 +653,6 @@ const analysisStatusFilterLabel = (filter: AnalysisStatusFilter) => {
       return "Near";
     default:
       return filter;
-  }
-};
-
-const localizedMetricAvailability = (language: AppLanguage, value?: string | null) => {
-  if (!value || language === "en") return value ?? "";
-  switch (value) {
-    case "automated":
-      return "자동";
-    case "manual":
-      return "수동";
-    case "future":
-      return "보류";
-    default:
-      return value;
-  }
-};
-
-const localizedConditionRole = (language: AppLanguage, value?: string | null) => {
-  if (!value || language === "en") return value ?? "";
-  switch (value) {
-    case "Eligibility Filter":
-      return "적격 필터";
-    case "Supporting Evidence":
-      return "보강 근거";
-    case "Timing Trigger":
-      return "타이밍 트리거";
-    case "Risk Warning":
-      return "위험 경고";
-    case "Hard Disqualifier":
-      return "강한 제외 조건";
-    case "Review Trigger":
-      return "검토 트리거";
-    case "Outcome Learning Tag":
-      return "성과 학습 태그";
-    default:
-      return value;
   }
 };
 
@@ -1080,7 +1051,7 @@ const ThresholdBar = ({ card, language = "en" }: { card: VisualEvidenceCard; lan
     return (
       <View style={styles.binaryVisual}>
         <View style={[styles.binaryDot, active ? styles.binaryDotActive : styles.binaryDotMuted]} />
-        <Text style={styles.binaryVisualText}>{active ? "Active now" : "Inactive now"}</Text>
+        <Text style={styles.binaryVisualText}>{active ? t(language, "stocks.visual.active") : t(language, "stocks.visual.inactive")}</Text>
       </View>
     );
   }
@@ -1117,9 +1088,9 @@ const ThresholdBar = ({ card, language = "en" }: { card: VisualEvidenceCard; lan
           <Text style={styles.eventCountdownValue}>{days}D</Text>
         </View>
         <View style={styles.flexOne}>
-          <Text style={styles.eventCountdownLabel}>{visual.countdownLabel ?? "Event timing"}</Text>
+          <Text style={styles.eventCountdownLabel}>{visual.countdownLabel ?? t(language, "stocks.visual.eventTiming")}</Text>
           <Text style={styles.eventCountdownMeta}>
-            {days <= 7 ? "Event risk is close enough to demand a fresh review." : "No major event pressure inside the near window."}
+            {days <= 7 ? t(language, "stocks.visual.eventRiskClose") : t(language, "stocks.visual.noEventPressure")}
           </Text>
         </View>
       </View>
@@ -1168,9 +1139,9 @@ const ThresholdBar = ({ card, language = "en" }: { card: VisualEvidenceCard; lan
           ))}
         </View>
         <View style={styles.thresholdLegend}>
-          <Text style={styles.thresholdLegendText}>{visual.markerLabel ?? (language === "ko" ? "추세" : "Trend")}</Text>
+          <Text style={styles.thresholdLegendText}>{visual.markerLabel ?? t(language, "stocks.visual.trend")}</Text>
           <Text style={styles.thresholdLegendText}>
-            {language === "ko" ? "기준" : "Need"} {card.metric.thresholdLabel ?? (language === "ko" ? "참고값" : "context")}
+            {t(language, "stocks.visual.need")} {card.metric.thresholdLabel ?? t(language, "stocks.visual.context")}
           </Text>
         </View>
       </View>
@@ -1255,7 +1226,7 @@ const ThresholdBar = ({ card, language = "en" }: { card: VisualEvidenceCard; lan
       ) : null}
       <View style={styles.thresholdLegend}>
         <Text style={styles.thresholdLegendText}>{min}</Text>
-        <Text style={styles.thresholdLegendText}>{language === "ko" ? "기준" : "Need"} {card.metric.thresholdLabel ?? "-"}</Text>
+        <Text style={styles.thresholdLegendText}>{t(language, "stocks.visual.need")} {card.metric.thresholdLabel ?? "-"}</Text>
         <Text style={styles.thresholdLegendText}>{max}</Text>
       </View>
     </View>
@@ -1267,11 +1238,13 @@ const WhyNowPanel = ({
   body,
   state,
   recipeVersion,
+  language = "en",
 }: {
   title: string;
   body: string;
   state: string;
   recipeVersion: string;
+  language?: AppLanguage;
 }) => (
   <View style={styles.card}>
     <View style={styles.inlineBetween}>
@@ -1280,7 +1253,7 @@ const WhyNowPanel = ({
         <Text style={[styles.cardBody, { fontWeight: "700" }]}>{body}</Text>
       </View>
       <View style={styles.panelBadges}>
-        <Text style={stateTone(state)}>{state}</Text>
+        <Text style={stateTone(state)}>{localizedEyeState(language, state)}</Text>
         <MetaPill label={recipeVersion} />
       </View>
     </View>
@@ -1534,7 +1507,7 @@ const EvidenceCardView = ({
           <Text style={styles.formulaBody}>{card.formulaDescription ?? t(language, "stocks.evidence.formulaMissing")}</Text>
           <Text style={styles.formulaMeta}>
             {t(language, "stocks.evidence.inputs", {
-              inputs: card.formulaInputs?.join(", ") ?? (language === "ko" ? "기록된 입력값 없음" : "No explicit inputs recorded"),
+              inputs: card.formulaInputs?.join(", ") ?? t(language, "stocks.evidence.noInputs"),
             })}
           </Text>
         </View>
@@ -1607,6 +1580,7 @@ const RecipeConditionMapCard = ({
     failed.find((item) => item.role === "Timing Trigger") ??
     failed.find((item) => item.role === "Eligibility Filter") ??
     failed[0];
+  const copy = recipeConditionMapCopy(language);
 
   return (
     <View style={styles.card}>
@@ -1618,22 +1592,22 @@ const RecipeConditionMapCard = ({
           </Text>
         </View>
         <View style={styles.panelBadges}>
-          <Text style={stateTone(evaluation.currentState)}>{evaluation.currentState}</Text>
+          <Text style={stateTone(evaluation.currentState)}>{localizedEyeState(language, evaluation.currentState)}</Text>
         </View>
       </View>
 
       <Text style={[styles.cardBody, { fontWeight: "700" }]}>{evaluation.whyNow}</Text>
 
       <View style={styles.homeStatsGrid}>
-        <DenseStat label="Passed" value={`${passed.length}`} tone="strong" />
-        <DenseStat label="Failed" value={`${failed.length}`} />
-        <DenseStat label="Warnings" value={`${warnings.length}`} tone={warnings.length > 0 ? "risk" : "neutral"} />
-        <DenseStat label="Blockers" value={`${blockers.length}`} tone={blockers.length > 0 ? "risk" : "neutral"} />
+        <DenseStat label={copy.passed} value={`${passed.length}`} tone="strong" />
+        <DenseStat label={copy.failed} value={`${failed.length}`} />
+        <DenseStat label={copy.warnings} value={`${warnings.length}`} tone={warnings.length > 0 ? "risk" : "neutral"} />
+        <DenseStat label={copy.blockers} value={`${blockers.length}`} tone={blockers.length > 0 ? "risk" : "neutral"} />
       </View>
 
       <View style={styles.analysisGrid}>
         <View style={[styles.analysisGridItem, styles.evidenceCard]}>
-          <Text style={styles.inputLabel}>Support</Text>
+          <Text style={styles.inputLabel}>{copy.support}</Text>
           {(evaluation.supportingEvidence ?? []).slice(0, 3).map((item) => (
             <Text key={item} style={[styles.cardBody, { color: "#047857", fontSize: 11, marginTop: 4 }]}>
               + {item}
@@ -1641,7 +1615,7 @@ const RecipeConditionMapCard = ({
           ))}
         </View>
         <View style={[styles.analysisGridItem, styles.evidenceCard]}>
-          <Text style={styles.inputLabel}>Risks</Text>
+          <Text style={styles.inputLabel}>{copy.risks}</Text>
           {[
             ...(evaluation.contradictingEvidence ?? []),
             ...(evaluation.riskWarnings ?? []),
@@ -1657,18 +1631,18 @@ const RecipeConditionMapCard = ({
       </View>
 
       <View style={styles.metaRow}>
-        <MetaPill label={`State: ${evaluation.stateChanged ? "Changed" : "Stable"}`} />
-        <MetaPill label={`Urgency: ${evaluation.actionUrgency}`} />
-        <MetaPill label={evaluation.setupStrength} />
+        <MetaPill label={copy.state(evaluation.stateChanged ? copy.stateChanged : copy.stateStable)} />
+        <MetaPill label={copy.urgency(evaluation.actionUrgency)} />
+        <MetaPill label={localizedSetupStrength(language, evaluation.setupStrength)} />
       </View>
 
       {nextTrigger ? (
-        <Text style={[styles.cardBody, { color: "#111827", fontSize: 12 }]}>Next trigger: {nextTrigger.explanation}</Text>
+        <Text style={[styles.cardBody, { color: "#111827", fontSize: 12 }]}>{copy.nextTrigger(nextTrigger.explanation)}</Text>
       ) : null}
 
       {evaluation.missingData.length > 0 || evaluation.staleData.length > 0 ? (
         <Text style={[styles.cardBody, { color: "#92400e", fontSize: 11 }]}>
-          Data issues: {[...evaluation.missingData, ...evaluation.staleData].slice(0, 2).join(" | ")}
+          {copy.dataIssues([...evaluation.missingData, ...evaluation.staleData].slice(0, 2).join(" | "))}
         </Text>
       ) : null}
 
@@ -1679,7 +1653,7 @@ const RecipeConditionMapCard = ({
         onPress={() => setExpanded((current) => !current)}
         style={styles.actionRow}
       >
-        <Text style={styles.buttonPrimaryText}>{expanded ? "Hide matrix" : "Show matrix"}</Text>
+        <Text style={styles.buttonPrimaryText}>{expanded ? copy.hideMatrix : copy.showMatrix}</Text>
       </Pressable>
 
       {expanded ? (
@@ -1688,7 +1662,7 @@ const RecipeConditionMapCard = ({
             <View key={item.conditionId} style={styles.inlineBetween}>
               <StatusShape status={item.missingData ? "Partial" : item.passed ? "Passed" : item.role === "Hard Disqualifier" ? "Blocked" : item.role === "Risk Warning" ? "Warning" : "Failed"} size={8} />
               <View style={[styles.flexOne, { marginLeft: 10 }]}>
-                <Text style={[styles.evidenceCardTitle, { fontSize: 13 }]}>{item.metricKey ?? "Condition"}</Text>
+                <Text style={[styles.evidenceCardTitle, { fontSize: 13 }]}>{item.metricKey ?? copy.condition}</Text>
                 <Text style={[styles.cardBody, { fontSize: 12, marginTop: 2 }]}>{item.explanation}</Text>
               </View>
             </View>
@@ -1731,12 +1705,12 @@ const StockTriageCard = ({
 }) => {
   const [expanded, setExpanded] = useState(false);
   const evaluation = item.dominantEye?.lastEvaluation;
-  const topSupport = evaluation?.supportingEvidence?.[0] ?? evaluation?.whyNow ?? (language === "ko" ? "뚜렷한 변화는 아직 없습니다." : "No strong change recorded.");
+  const topSupport = evaluation?.supportingEvidence?.[0] ?? evaluation?.whyNow ?? t(language, "review.noStrongChange");
   const topRisk =
     evaluation?.hardDisqualifiers?.[0] ??
     evaluation?.riskWarnings?.[0] ??
     evaluation?.contradictingEvidence?.[0] ??
-    (language === "ko" ? "즉시 확인할 큰 위험은 아직 없습니다." : "No immediate risk surfaced.");
+    t(language, "review.noImmediateRisk");
 
   return (
     <Card highlighted={Boolean(item.openAlerts.length)}>
@@ -1784,17 +1758,17 @@ const StockTriageCard = ({
           </View>
 
           <View style={styles.detailCallout}>
-            <Text style={styles.detailCalloutLabel}>{language === "ko" ? "가장 큰 근거" : "Top support"}</Text>
+            <Text style={styles.detailCalloutLabel}>{t(language, "review.topSupport")}</Text>
             <Text style={styles.detailCalloutBody}>{topSupport}</Text>
           </View>
           <View style={styles.detailCallout}>
-            <Text style={styles.detailCalloutLabel}>{language === "ko" ? "가장 큰 위험" : "Top risk"}</Text>
+            <Text style={styles.detailCalloutLabel}>{t(language, "review.topRisk")}</Text>
             <Text style={styles.detailCalloutBody}>{topRisk}</Text>
           </View>
 
           {item.decisions.length > 0 ? (
             <View style={styles.detailCallout}>
-              <Text style={styles.detailCalloutLabel}>{language === "ko" ? "최근 결정" : "Latest decision"}</Text>
+              <Text style={styles.detailCalloutLabel}>{t(language, "review.latestDecision")}</Text>
               <Text style={styles.detailCalloutBody}>
                 {localizedDecisionAction(language, item.decisions[0].action)} · {formatShortDate(language, item.decisions[0].createdAt)}
               </Text>
@@ -2554,7 +2528,7 @@ export default function App() {
     setSelectedHeroPointIndex(preSelectedStockTrendSeries.length - 1);
   }, [selectedStockId, analysisLookback, analysisBenchmark, preSelectedStockTrendSeries.length]);
 
-  if (!loading && !data && error) return <RecoveryPanel error={error} retry={actions.retryLoad} />;
+  if (!loading && !data && error) return <RecoveryPanel error={error} retry={actions.retryLoad} language={language} />;
 
   if (loading || !data) {
     return (
@@ -4218,47 +4192,41 @@ export default function App() {
                     <View style={styles.scannerSummaryTopRow}>
                       <View style={styles.scannerSummaryTitleWrap}>
                         <Text style={styles.cardTitle}>
-                          {language === "ko" ? "일일 조건 스캐너" : "Daily Condition Scanner"}
+                          {t(language, "logic.scanner.title")}
                         </Text>
                         <Text style={styles.scannerMetaText}>
                           {latestScanRun
-                            ? language === "ko"
-                              ? `${latestScanRun.scanDate} 기준 · ${latestScanRun.status}`
-                              : `${latestScanRun.scanDate} · ${latestScanRun.status}`
-                            : language === "ko"
-                              ? "아직 스캔 기록이 없습니다."
-                              : "No scan run yet."}
+                            ? `${latestScanRun.scanDate}${language === "ko" ? " 기준" : ""} · ${localizedScanRunStatus(language, latestScanRun.status)}`
+                            : t(language, "logic.scanner.noRun")}
                         </Text>
                       </View>
                       <Button
-                        label={language === "ko" ? "스캔 실행" : "Run Scan"}
+                        label={t(language, "logic.scanner.run")}
                         onPress={() => actions.runDailyScanner()}
                       />
                     </View>
                     <View style={styles.homeSummaryStrip}>
                       <DenseStat
-                        label={language === "ko" ? "Matched" : "Matched"}
+                        label={t(language, "logic.scanner.matched")}
                         value={`${matchedScannerSignals.length}`}
                         tone="strong"
                       />
                       <DenseStat
-                        label={language === "ko" ? "Near" : "Near"}
+                        label={t(language, "logic.scanner.near")}
                         value={`${nearScannerSignals.length}`}
                       />
                       <DenseStat
-                        label={language === "ko" ? "Blocked" : "Blocked"}
+                        label={t(language, "logic.scanner.blocked")}
                         value={`${blockedScannerSignals.length}`}
                         tone="risk"
                       />
                       <DenseStat
-                        label={language === "ko" ? "규칙" : "Rules"}
+                        label={t(language, "logic.scanner.rules")}
                         value={`${frozenScannerRules.length}`}
                       />
                     </View>
                     <Text style={styles.cardBody}>
-                      {language === "ko"
-                        ? "Condition matched — human review required. Near match — watchlist only."
-                        : "Condition matched — human review required. Near match — watchlist only."}
+                      {`${t(language, "logic.scanner.matchedBody")} ${t(language, "logic.scanner.nearBody")}`}
                     </Text>
                     {(matchedScannerSignals.length > 0 ||
                       nearScannerSignals.length > 0 ||
@@ -4273,7 +4241,7 @@ export default function App() {
                                 <View style={styles.scannerSignalTopRow}>
                                   <View style={styles.scannerSignalTitleWrap}>
                                     <Text style={styles.cardTitle}>
-                                      {signal.ticker} · {signal.status}
+                                      {signal.ticker} · {localizedScannerStatus(language, signal.status)}
                                     </Text>
                                     <Text style={styles.scannerMetaText}>
                                       {signal.ruleId}
@@ -4282,41 +4250,35 @@ export default function App() {
                                   <MetaPill label={signal.sector} tone="neutral" />
                                 </View>
                                 <Text style={styles.cardBody}>
-                                  {signal.status === "MATCHED"
-                                    ? "Condition matched — human review required."
-                                    : signal.status === "NEAR_MATCH"
-                                      ? "Near match — watchlist only."
-                                      : language === "ko"
-                                        ? "데이터 부족 또는 검증 실패로 스캔이 차단됐습니다."
-                                        : "Scan blocked because data is incomplete or invalid."}
+                                  {localizedScannerDescription(language, signal.status)}
                                 </Text>
                                 <View style={styles.metaRow}>
                                   <MetaPill
-                                    label={`${signal.matchedConditionsJson.length} ${language === "ko" ? "통과" : "passed"}`}
+                                    label={t(language, "logic.scanner.countPassed", { count: signal.matchedConditionsJson.length })}
                                     tone="success"
                                   />
                                   {signal.failedConditionsJson.length > 0 ? (
                                     <MetaPill
-                                      label={`${signal.failedConditionsJson.length} ${language === "ko" ? "실패" : "failed"}`}
+                                      label={t(language, "logic.scanner.countFailed", { count: signal.failedConditionsJson.length })}
                                       tone="info"
                                     />
                                   ) : null}
                                   {signal.missingConditionsJson.length > 0 ? (
                                     <MetaPill
-                                      label={`${signal.missingConditionsJson.length} ${language === "ko" ? "누락" : "missing"}`}
+                                      label={t(language, "logic.scanner.countMissing", { count: signal.missingConditionsJson.length })}
                                       tone="risk"
                                     />
                                   ) : null}
                                   {review ? (
                                     <MetaPill
-                                      label={language === "ko" ? "검토 기록 있음" : "Review logged"}
+                                      label={t(language, "logic.scanner.reviewLogged")}
                                       tone="info"
                                     />
                                   ) : null}
                                 </View>
                                 <View style={styles.actionRow}>
                                   <Button
-                                    label={language === "ko" ? "검토 기록" : "Log Review"}
+                                    label={t(language, "logic.scanner.logReview")}
                                     tone="secondary"
                                     onPress={() => openScannerReview(signal)}
                                   />
@@ -4683,7 +4645,7 @@ export default function App() {
 
           {tab === "Settings" ? (
             <>
-              <WorkspacePanel data={data} actions={actions} />
+              <WorkspacePanel data={data} actions={actions} language={language} />
               <CloudSyncPanel data={data} actions={actions} />
               <Reveal>
                 <SectionHeader note={subtitleLabel(language, "Settings")} />
@@ -5830,7 +5792,7 @@ export default function App() {
                         </Pressable>
                       ))}
                     </ScrollView>
-                    <WhyNowPanel title={t(language, "recipes.builder.preview.result")} body={previewEvaluation.whyNow} state={previewEvaluation.currentState} recipeVersion={`${previewRecipe.name} v${previewRecipe.version}`} />
+                    <WhyNowPanel language={language} title={t(language, "recipes.builder.preview.result")} body={previewEvaluation.whyNow} state={previewEvaluation.currentState} recipeVersion={`${previewRecipe.name} v${previewRecipe.version}`} />
                     <Text style={styles.previewDisclosure}>{t(language, "recipes.builder.preview.disclosure")}</Text>
                   </>
                 ) : (
@@ -5984,6 +5946,7 @@ export default function App() {
               }
               state={selectedEye.lastEvaluation?.currentState ?? "Not Relevant"}
               recipeVersion={`${selectedEyeRecipe?.name ?? t(language, "eyes.detail.unknownRecipe")} v${selectedEye.recipeVersionAtCreation ?? selectedEye.lastEvaluation?.recipeVersion ?? 1}`}
+              language={language}
             />
             <View style={styles.dualDenseGrid}>
               <DenseStat label={t(language, "eyes.detail.urgency")} value={localizedActionUrgency(language, selectedEye.lastEvaluation?.actionUrgency ?? t(language, "eyes.meta.wait"))} tone="strong" />
@@ -6140,11 +6103,11 @@ export default function App() {
             onClose={() => closeEntityRoute("Alerts")}
             closeLabel={t(language, "common.done")}
           >
-            <WhyNowPanel title={t(language, "alerts.detail.whatHappened")} body={selectedAlert.whyNow} state={selectedAlertEvaluation?.currentState ?? selectedAlert.evaluationContext?.currentState ?? t(language, "common.notCaptured")} recipeVersion={`${selectedAlertRecipe.name} v${selectedAlertRecipe.version}`} />
+            <WhyNowPanel language={language} title={t(language, "alerts.detail.whatHappened")} body={selectedAlert.whyNow} state={selectedAlertEvaluation?.currentState ?? selectedAlert.evaluationContext?.currentState ?? t(language, "common.notCaptured")} recipeVersion={`${selectedAlertRecipe.name} v${selectedAlertRecipe.version}`} />
             <View style={styles.detailMetricStrip}>
               <DenseStat label={t(language, "alerts.detail.priority")} value={localizedAlertPriority(language, selectedAlert.priority)} tone={selectedAlert.priority === "High" ? "risk" : "strong"} />
               <DenseStat label={t(language, "alerts.detail.state")} value={selectedAlertEvaluation?.currentState ? localizedEyeState(language, selectedAlertEvaluation.currentState) : selectedAlert.evaluationContext?.currentState ?? t(language, "common.notCaptured")} />
-              <DenseStat label={t(language, "alerts.detail.urgency")} value={selectedAlertEvaluation?.actionUrgency ?? t(language, "common.notCaptured")} />
+              <DenseStat label={t(language, "alerts.detail.urgency")} value={selectedAlertEvaluation?.actionUrgency ? localizedActionUrgency(language, selectedAlertEvaluation.actionUrgency) : t(language, "common.notCaptured")} />
               <DenseStat label={t(language, "alerts.detail.data")} value={selectedAlert.dataQuality} tone={selectedAlert.dataQuality.includes("Mock") ? "risk" : "neutral"} />
             </View>
             <View style={styles.dualColumn}>
@@ -6344,24 +6307,19 @@ export default function App() {
 
         {selectedScannerSignal ? (
           <WindowPanel
-            title={language === "ko" ? "신호 검토 기록" : "Signal Review Log"}
+            title={t(language, "logic.scanner.reviewTitle")}
             subtitle={`${selectedScannerSignal.ticker} · ${selectedScannerSignal.ruleId}`}
             onClose={() => setScannerSignalReviewId("")}
+            closeLabel={t(language, "common.done")}
           >
             <Card>
               <Text style={styles.cardBody}>
-                {selectedScannerSignal.status === "MATCHED"
-                  ? "Condition matched — human review required."
-                  : selectedScannerSignal.status === "NEAR_MATCH"
-                    ? "Near match — watchlist only."
-                    : language === "ko"
-                      ? "데이터 부족 또는 검증 실패가 있습니다."
-                      : "Data is incomplete or failed validation."}
+                {localizedScannerDescription(language, selectedScannerSignal.status) || t(language, "logic.scanner.incompleteBody")}
               </Text>
               <View style={styles.stack}>
                 <View style={styles.stockControlGroup}>
                   <Text style={styles.stockControlGroupLabel}>
-                    {language === "ko" ? "검토 결정" : "Review decision"}
+                    {t(language, "logic.scanner.reviewDecision")}
                   </Text>
                   <HorizontalChoice
                     options={["watch", "ignore", "bought", "skipped", "sold", "other"] as const}
@@ -6378,33 +6336,33 @@ export default function App() {
                 </View>
                 <View style={styles.stockControlGroup}>
                   <Text style={styles.stockControlGroupLabel}>
-                    {language === "ko" ? "수동 사유" : "Manual reason"}
+                    {t(language, "logic.scanner.manualReason")}
                   </Text>
                   <Input
                     value={scannerReviewForm.manualReason}
                     onChangeText={(value) =>
                       setScannerReviewForm((current) => ({ ...current, manualReason: value }))
                     }
-                    placeholder={language === "ko" ? "왜 이 결정을 남기는지 적으세요" : "Why are you logging this review?"}
+                    placeholder={t(language, "logic.scanner.manualReasonPlaceholder")}
                   />
                 </View>
                 <View style={styles.stockControlGroup}>
                   <Text style={styles.stockControlGroupLabel}>
-                    {language === "ko" ? "메모" : "Notes"}
+                    {t(language, "logic.scanner.notes")}
                   </Text>
                   <Input
                     value={scannerReviewForm.notes}
                     onChangeText={(value) =>
                       setScannerReviewForm((current) => ({ ...current, notes: value }))
                     }
-                    placeholder={language === "ko" ? "추가 관찰 메모" : "Additional review notes"}
+                    placeholder={t(language, "logic.scanner.notesPlaceholder")}
                     multiline
                   />
                 </View>
                 <View style={styles.twoColumnGrid}>
                   <View style={styles.flexOne}>
                     <Text style={styles.stockControlGroupLabel}>
-                      {language === "ko" ? "확신도(선택)" : "Conviction (optional)"}
+                      {t(language, "logic.scanner.conviction")}
                     </Text>
                     <Input
                       value={scannerReviewForm.convictionScoreOptional}
@@ -6417,7 +6375,7 @@ export default function App() {
                   </View>
                   <View style={styles.flexOne}>
                     <Text style={styles.stockControlGroupLabel}>
-                      {language === "ko" ? "진입가(선택)" : "Entry price (optional)"}
+                      {t(language, "logic.scanner.entryPrice")}
                     </Text>
                     <Input
                       value={scannerReviewForm.entryPriceOptional}
@@ -6432,7 +6390,7 @@ export default function App() {
                 <View style={styles.twoColumnGrid}>
                   <View style={styles.flexOne}>
                     <Text style={styles.stockControlGroupLabel}>
-                      {language === "ko" ? "청산가(선택)" : "Exit price (optional)"}
+                      {t(language, "logic.scanner.exitPrice")}
                     </Text>
                     <Input
                       value={scannerReviewForm.exitPriceOptional}
@@ -6445,20 +6403,20 @@ export default function App() {
                   </View>
                   <View style={styles.flexOne}>
                     <Text style={styles.stockControlGroupLabel}>
-                      {language === "ko" ? "결과 메모" : "Result notes"}
+                      {t(language, "logic.scanner.resultNotes")}
                     </Text>
                     <Input
                       value={scannerReviewForm.resultNotes}
                       onChangeText={(value) =>
                         setScannerReviewForm((current) => ({ ...current, resultNotes: value }))
                       }
-                      placeholder={language === "ko" ? "후속 관찰" : "Follow-up result note"}
+                      placeholder={t(language, "logic.scanner.resultNotesPlaceholder")}
                     />
                   </View>
                 </View>
                 <View style={styles.actionRow}>
                   <Button
-                    label={language === "ko" ? "저장" : "Save Log"}
+                    label={t(language, "logic.scanner.saveLog")}
                     onPress={() => submitScannerReview()}
                     disabled={!scannerReviewForm.manualReason.trim()}
                   />

@@ -15,6 +15,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useReducedMotion } from "../hooks/useReducedMotion";
+import { t, type AppLanguage } from "../lib/i18n";
 
 const fontFamily = "System";
 
@@ -23,10 +24,11 @@ interface WindowPanelProps {
   subtitle?: string;
   onClose: () => void;
   children: React.ReactNode;
+  language?: AppLanguage;
   closeLabel?: string;
 }
 
-export const WindowPanel = ({ title, subtitle, onClose, children, closeLabel = "Done" }: WindowPanelProps) => {
+export const WindowPanel = ({ title, subtitle, onClose, children, language = "en", closeLabel = t(language, "common.done") }: WindowPanelProps) => {
   const insets = useSafeAreaInsets();
   const reduced = useReducedMotion();
   const overlayOpacity = useRef(new Animated.Value(0)).current;
