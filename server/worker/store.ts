@@ -192,7 +192,7 @@ export class WorkerStore {
       UPDATE jobs SET semantic_key=id WHERE semantic_key IS NULL;
       UPDATE jobs SET input_hash=id WHERE input_hash IS NULL;
       UPDATE jobs SET last_safe_error=error WHERE last_safe_error IS NULL AND error IS NOT NULL;
-      UPDATE jobs SET status='retry-wait', next_retry_at=0 WHERE status='failed';
+      UPDATE jobs SET status='retry-wait', next_retry_at=lease_until WHERE status='failed';
     `);
     this.db.exec("CREATE UNIQUE INDEX IF NOT EXISTS jobs_semantic_key_idx ON jobs(semantic_key);");
   }
