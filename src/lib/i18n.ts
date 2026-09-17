@@ -57,6 +57,137 @@ const dict: Record<AppLanguage, Record<string, DictValue>> = {
     "common.detail": "Detail",
     "common.loading": "Loading StockLedger...",
     "common.all": "All",
+    "common.dismiss": "Dismiss",
+    "common.edit": "Edit",
+    "common.archive": "Archive",
+    "common.save": "Save",
+    "common.saveChanges": "Save Changes",
+    "common.registerEye": "Register Eye",
+    "common.saving": "Saving…",
+    "common.scanning": "Scanning completed market sessions…",
+    "common.notCaptured": "Not captured",
+    "common.select": "Select",
+    "common.closeOptions": "Close options",
+    "common.searchOptions": "Search options...",
+    "common.noResultsFor": ({ search }: Record<string, string | number> = {}) => `No results matching "${search ?? ""}"`,
+    "common.yes": "Yes",
+    "common.no": "No",
+
+    "review.passed": "Passed",
+    "review.failed": "Failed",
+    "review.warnings": "Warnings",
+    "review.blockers": "Blockers",
+    "review.support": "Support",
+    "review.risks": "Risks",
+    "review.state": ({ value }: Record<string, string | number> = {}) => `State: ${value ?? ""}`,
+    "review.changed": "Changed",
+    "review.stable": "Stable",
+    "review.urgency": ({ value }: Record<string, string | number> = {}) => `Urgency: ${value ?? ""}`,
+    "review.nextTrigger": ({ value }: Record<string, string | number> = {}) => `Next trigger: ${value ?? ""}`,
+    "review.dataIssues": ({ value }: Record<string, string | number> = {}) => `Data issues: ${value ?? ""}`,
+    "review.showMatrix": "Show matrix",
+    "review.hideMatrix": "Hide matrix",
+    "review.condition": "Condition",
+    "review.topSupport": "Top support",
+    "review.topRisk": "Top risk",
+    "review.latestDecision": "Latest decision",
+    "review.noStrongChange": "No strong change recorded.",
+    "review.noImmediateRisk": "No immediate risk surfaced.",
+    "review.setupHigh": "High",
+    "review.setupMedium": "Medium",
+    "review.setupLow": "Low",
+
+    "logic.scanner.title": "Daily Condition Scanner",
+    "logic.scanner.run": "Run Scan",
+    "logic.scanner.matched": "Matched",
+    "logic.scanner.near": "Near",
+    "logic.scanner.blocked": "Blocked",
+    "logic.scanner.rules": "Rules",
+    "logic.scanner.noRun": "No scan run yet.",
+    "logic.scanner.matchedBody": "Condition matched — human review required.",
+    "logic.scanner.nearBody": "Near match — watchlist only.",
+    "logic.scanner.blockedBody": "Scan blocked because data is incomplete or invalid.",
+    "logic.scanner.countPassed": ({ count }: Record<string, string | number> = {}) => `${count ?? 0} passed`,
+    "logic.scanner.countFailed": ({ count }: Record<string, string | number> = {}) => `${count ?? 0} failed`,
+    "logic.scanner.countMissing": ({ count }: Record<string, string | number> = {}) => `${count ?? 0} missing`,
+    "logic.scanner.reviewLogged": "Review logged",
+    "logic.scanner.logReview": "Log Review",
+    "logic.scanner.reviewTitle": "Signal Review Log",
+    "logic.scanner.reviewDecision": "Review decision",
+    "logic.scanner.manualReason": "Manual reason",
+    "logic.scanner.manualReasonPlaceholder": "Why are you logging this review?",
+    "logic.scanner.notes": "Notes",
+    "logic.scanner.notesPlaceholder": "Additional review notes",
+    "logic.scanner.conviction": "Conviction (optional)",
+    "logic.scanner.entryPrice": "Entry price (optional)",
+    "logic.scanner.exitPrice": "Exit price (optional)",
+    "logic.scanner.resultNotes": "Result notes",
+    "logic.scanner.resultNotesPlaceholder": "Follow-up result note",
+    "logic.scanner.saveLog": "Save Log",
+    "logic.scanner.incompleteBody": "Data is incomplete or failed validation.",
+    "logic.scanner.runStatus.completed": "Completed",
+    "logic.scanner.runStatus.blocked": "Blocked",
+    "logic.scanner.runStatus.partial": "Partial",
+
+    "workspace.recovery.title": "Your saved data needs attention",
+    "workspace.recovery.body": "The original data has been kept. Export a recovery copy before restoring a backup.",
+    "workspace.recovery.export": "Export recovery copy",
+    "workspace.recovery.restore": "Restore previous saved copy",
+    "workspace.recovery.retry": "Retry loading",
+    "workspace.title": "Your workspace",
+    "workspace.body": "Stored on this device. Export regular backups to keep your investment notes safe.",
+    "workspace.export": "Export complete backup",
+    "workspace.exportReport": "Export weekly review report",
+    "workspace.reEvaluate": "Re-evaluate saved data",
+    "workspace.exportSample": "Export sample notes and start a clean personal workspace",
+    "workspace.restore.title": "Restore a backup",
+    "workspace.chooseBackup": "Choose backup file",
+    "workspace.backupPlaceholder": "Paste StockLedger backup JSON",
+    "workspace.validate": "Validate backup",
+    "workspace.validateSuccess": "Backup validated. Review the contents below before restoring.",
+    "workspace.restoreSummary": ({ stocks, recipes, decisions }: Record<string, string | number> = {}) => `${stocks ?? 0} stocks · ${recipes ?? 0} recipes · ${decisions ?? 0} decisions. Restore replaces the active workspace. A copy of the current workspace will be exported first.`,
+    "workspace.restoreCurrent": "Export current data and restore this backup",
+    "workspace.restoreSuccess": "Backup restored.",
+    "workspace.prices.title": "Import daily prices",
+    "workspace.prices.body": "CSV columns: Date,Open,High,Low,Close,Volume. Supply provider OHLCV observations, not normalized chart values. History must contain consecutive NYSE sessions. Automated alerts require provider-declared adjusted history; unadjusted or unknown data stays marked partial. Long-window metrics need at least 252 sessions.",
+    "workspace.prices.addStock": "Add a stock to your watchlist first.",
+    "workspace.prices.placeholder": "Paste daily price CSV",
+    "workspace.prices.choose": "Choose daily price CSV",
+    "workspace.prices.benchmarkPlaceholder": "Optional SPY CSV for matching dates",
+    "workspace.prices.chooseBenchmark": "Choose SPY CSV",
+    "workspace.prices.adjustment": "Provider-declared adjustment",
+    "workspace.prices.adjustment.unknown": "Unknown",
+    "workspace.prices.adjustment.adjusted": "Adjusted",
+    "workspace.prices.adjustment.unadjusted": "Unadjusted",
+    "workspace.prices.validate": "Validate and import prices",
+    "workspace.prices.importSuccess": "Prices imported with source and session dates.",
+    "workspace.addRecipes": "Add starter recipes",
+    "workspace.addRecipesSuccess": "Starter recipes added without changing existing recipes.",
+    "workspace.restoreStock": ({ symbol }: Record<string, string | number> = {}) => `Restore ${symbol ?? "stock"}`,
+    "workspace.restoreEye": ({ symbol }: Record<string, string | number> = {}) => `Restore monitoring: ${symbol ?? "stock"}`,
+    "workspace.restoreDecision": ({ date, action }: Record<string, string | number> = {}) => `Restore decision: ${date ?? ""} ${action ?? ""}`,
+    "workspace.operationFailed": "Operation failed.",
+    "workspace.saveFailed": "Save failed.",
+    "workspace.watchlist.title": "Import a watchlist",
+    "workspace.watchlist.body": "CSV needs Symbol or Ticker; Name and Thesis are optional. Existing stocks and their notes are preserved.",
+    "workspace.watchlist.choose": "Choose watchlist CSV",
+    "workspace.watchlist.placeholder": "Symbol,Name,Thesis",
+    "workspace.watchlist.preview": "Preview watchlist import",
+    "workspace.watchlist.summary": ({ added, existing }: Record<string, string | number> = {}) => `${added ?? 0} new stocks; ${existing ?? 0} existing stocks will be kept as they are.`,
+    "workspace.watchlist.import": "Import new stocks",
+    "workspace.watchlist.success": "Watchlist imported. Add recipes and price history when ready.",
+
+    "route.unavailableTitle": "This link is no longer available",
+    "route.entityUnavailable": "The requested item is missing, archived, stale, or unavailable. Nothing was changed.",
+    "route.metricUnavailable": "That metric is not available for this stock. The stock view is still safe to use.",
+    "route.returnToDestination": "Return to this section",
+
+    "home.onboarding.title": "Build your investment memory",
+    "home.onboarding.body": "Add a stock, capture why you are watching it, then attach a recipe. Import daily prices in Settings to evaluate your evidence.",
+    "home.onboarding.addStock": "Add your first stock",
+    "home.onboarding.addRecipes": "Add starter recipes",
+    "home.onboarding.exploreSample": "Explore sample workspace",
+    "home.sampleNotice": "Sample data is present. Mock prices and outcomes are for exploring the app.",
 
     "settings.language.title": "Language",
     "settings.language.note": "Choose the app language.",
@@ -163,6 +294,8 @@ const dict: Record<AppLanguage, Record<string, DictValue>> = {
     "eyes.action.delete": "Delete",
     "eyes.detail.unsetHorizon": "Unset horizon",
     "eyes.create.title": "Create Eye",
+    "eyes.create.editTitle": "Edit Eye",
+    "eyes.create.editSubtitle": "Update the stock, recipe, and thesis snapshot for this Eye.",
     "eyes.create.subtitle": "Subscribe a selected stock to a selected recipe with your thesis snapshot.",
     "eyes.create.stock": "Stock",
     "eyes.create.recipe": "Recipe",
@@ -173,6 +306,8 @@ const dict: Record<AppLanguage, Record<string, DictValue>> = {
     "eyes.create.thesisRequired": "Thesis snapshot is required.",
     "eyes.create.entryLow": "Planned entry low",
     "eyes.create.entryHigh": "Planned entry high",
+    "eyes.create.entryLowPlaceholder": "Entry low (optional)",
+    "eyes.create.entryHighPlaceholder": "Entry high (optional)",
     "eyes.create.lastReview": "Last thesis review",
     "eyes.create.invalidation": "Invalidation rule",
     "eyes.create.invalidationPlaceholder": "What would break the thesis fast?",
@@ -193,6 +328,8 @@ const dict: Record<AppLanguage, Record<string, DictValue>> = {
     "journal.meta.concern": ({ value }: Record<string, string | number> = {}) => `Concern: ${value ?? "Not captured"}`,
     "journal.meta.notCaptured": "Not captured",
     "journal.action.save": "Save Decision",
+    "journal.action.edit": "Edit",
+    "journal.action.archive": "Archive decision",
     "journal.action.open": "Open",
     "journal.action.alert": "Alert",
     "journal.action.markOutcome": "Mark Outcome",
@@ -209,6 +346,19 @@ const dict: Record<AppLanguage, Record<string, DictValue>> = {
     "journal.composer.concernPlaceholder": "What risk mattered most?",
     "journal.composer.thesisValidity": "Thesis validity",
     "journal.composer.timing": "Timing",
+    "journal.composer.searchPlaceholder": "Search monitored stock...",
+    "journal.validation.thesisRequired": "Choose your thesis assessment.",
+    "journal.validation.timingRequired": "Choose your timing assessment.",
+    "journal.outcome.title": "Review this outcome",
+    "journal.outcome.body": "Record your observations and their sources. These notes are separate from the original decision evidence.",
+    "journal.outcome.reviewWindow": "Review window",
+    "journal.outcome.priceChange": "Price change and source",
+    "journal.outcome.maxRunup": "Maximum run-up and source",
+    "journal.outcome.maxDrawdown": "Maximum drawdown and source",
+    "journal.outcome.lesson": "What did you learn?",
+    "journal.outcome.recipeSuggestion": "What should change next time?",
+    "journal.outcome.save": "Save outcome review",
+    "journal.outcome.saved": "Outcome review saved.",
     "journal.detail.context": "Decision context",
     "journal.detail.noState": "State snapshot unavailable",
     "journal.detail.noData": "Data-quality note unavailable",
@@ -218,6 +368,7 @@ const dict: Record<AppLanguage, Record<string, DictValue>> = {
     "journal.detail.concern": "Concern",
     "journal.detail.noConcern": "No primary concern recorded.",
     "journal.detail.outcome": ({ status }: Record<string, string | number> = {}) => `Outcome · ${status ?? "Pending"}`,
+    "journal.detail.previousVersions": "Previous authored versions",
 
     "recipes.summary.recipes": "Recipes",
     "recipes.summary.starter": "Starter",
@@ -322,6 +473,19 @@ const dict: Record<AppLanguage, Record<string, DictValue>> = {
     "stocks.search.clearSearch": "Clear Search",
     "stocks.search.resultCount": ({ count }: Record<string, string | number> = {}) => `${count ?? 0} shown`,
     "stocks.search.resultNone": "None",
+    "stocks.search.openStock": ({ symbol, name }: Record<string, string | number> = {}) => `Open ${symbol ?? "stock"} ${name ?? ""}`,
+    "stocks.search.showMore": ({ count }: Record<string, string | number> = {}) => `Show more stocks (${count ?? 0} remaining)`,
+    "stocks.action.add": "Add stock",
+    "stocks.action.manageEyes": "Manage monitoring Eyes",
+    "stocks.editor.addTitle": "Add to watchlist",
+    "stocks.editor.editTitle": "Edit stock",
+    "stocks.editor.ticker": "Ticker",
+    "stocks.editor.tickerPlaceholder": "Ticker, e.g. AAPL",
+    "stocks.editor.companyName": "Company name",
+    "stocks.editor.companyNamePlaceholder": "Company name",
+    "stocks.editor.thesis": "Why you are watching",
+    "stocks.editor.thesisPlaceholder": "Your thesis and what would change your mind",
+    "stocks.editor.save": "Save stock",
 
     "stocks.data.dummyBacked": "Dummy-backed",
     "stocks.data.providerBacked": "Provider-backed",
@@ -332,6 +496,8 @@ const dict: Record<AppLanguage, Record<string, DictValue>> = {
 
     "stocks.hero.vs": ({ benchmark }: Record<string, string | number> = {}) => `Vs ${benchmark ?? "benchmark"}`,
     "stocks.hero.drawdown": ({ value }: Record<string, string | number> = {}) => `Drawdown ${value ?? "N/A"}`,
+    "stocks.hero.selectObservation": ({ index }: Record<string, string | number> = {}) => `Select chart observation ${index ?? ""}`,
+    "stocks.hero.noCompletedHistory": "No completed price history",
     "stocks.hero.boardControls": "Board controls",
     "stocks.hero.showing": ({ shown, total }: Record<string, string | number> = {}) =>
       `Showing ${shown ?? 0} of ${total ?? 0} metrics`,
@@ -364,6 +530,7 @@ const dict: Record<AppLanguage, Record<string, DictValue>> = {
     "stocks.detail.series": "Series",
     "stocks.detail.days": "days",
     "stocks.detail.tapChart": "Tap the chart bars to inspect earlier points without leaving the stock metric sheet.",
+    "stocks.detail.selectPoint": ({ index }: Record<string, string | number> = {}) => `Select chart point ${index ?? ""}`,
     "stocks.evidence.pinned": "Pinned",
     "stocks.evidence.current": "Current",
     "stocks.evidence.threshold": "Threshold",
@@ -376,6 +543,17 @@ const dict: Record<AppLanguage, Record<string, DictValue>> = {
     "stocks.evidence.formulaDetail": "Formula detail",
     "stocks.evidence.formulaMissing": "No extra formula detail available.",
     "stocks.evidence.inputs": ({ inputs }: Record<string, string | number> = {}) => `Inputs: ${inputs ?? "No explicit inputs recorded"}`,
+    "stocks.visual.active": "Active now",
+    "stocks.visual.inactive": "Inactive now",
+    "stocks.visual.eventTiming": "Event timing",
+    "stocks.visual.eventRiskClose": "Event risk is close enough to demand a fresh review.",
+    "stocks.visual.noEventPressure": "No major event pressure inside the near window.",
+    "stocks.visual.trend": "Trend",
+    "stocks.visual.need": "Need",
+    "stocks.visual.context": "context",
+    "stocks.evidence.noInputs": "No explicit inputs recorded",
+    "alerts.detail.evidenceRecorded": "Evidence recorded with this alert",
+    "alerts.detail.olderEvidence": "Detailed evidence was not captured by the older app version. The original alert summary is preserved above.",
   },
   ko: {
     "nav.Home": "홈",
@@ -428,6 +606,137 @@ const dict: Record<AppLanguage, Record<string, DictValue>> = {
     "common.detail": "상세",
     "common.loading": "StockLedger 불러오는 중...",
     "common.all": "전체",
+    "common.dismiss": "닫기",
+    "common.edit": "수정",
+    "common.archive": "보관",
+    "common.save": "저장",
+    "common.saveChanges": "수정 저장",
+    "common.registerEye": "모니터 등록",
+    "common.saving": "저장 중…",
+    "common.scanning": "완료된 시장 세션을 스캔하는 중…",
+    "common.notCaptured": "기록 없음",
+    "common.select": "선택",
+    "common.closeOptions": "선택지 닫기",
+    "common.searchOptions": "선택지 검색...",
+    "common.noResultsFor": ({ search }: Record<string, string | number> = {}) => `"${search ?? ""}" 검색 결과가 없습니다.`,
+    "common.yes": "예",
+    "common.no": "아니오",
+
+    "review.passed": "충족",
+    "review.failed": "미충족",
+    "review.warnings": "경고",
+    "review.blockers": "차단",
+    "review.support": "근거",
+    "review.risks": "위험",
+    "review.state": ({ value }: Record<string, string | number> = {}) => `상태: ${value ?? ""}`,
+    "review.changed": "변경됨",
+    "review.stable": "안정",
+    "review.urgency": ({ value }: Record<string, string | number> = {}) => `긴급도: ${value ?? ""}`,
+    "review.nextTrigger": ({ value }: Record<string, string | number> = {}) => `다음 트리거: ${value ?? ""}`,
+    "review.dataIssues": ({ value }: Record<string, string | number> = {}) => `데이터 이슈: ${value ?? ""}`,
+    "review.showMatrix": "매트릭스 보기",
+    "review.hideMatrix": "매트릭스 숨기기",
+    "review.condition": "조건",
+    "review.topSupport": "가장 큰 근거",
+    "review.topRisk": "가장 큰 위험",
+    "review.latestDecision": "최근 결정",
+    "review.noStrongChange": "뚜렷한 변화는 아직 없습니다.",
+    "review.noImmediateRisk": "즉시 확인할 큰 위험은 아직 없습니다.",
+    "review.setupHigh": "높음",
+    "review.setupMedium": "보통",
+    "review.setupLow": "낮음",
+
+    "logic.scanner.title": "일일 조건 스캐너",
+    "logic.scanner.run": "스캔 실행",
+    "logic.scanner.matched": "일치",
+    "logic.scanner.near": "근접",
+    "logic.scanner.blocked": "차단",
+    "logic.scanner.rules": "규칙",
+    "logic.scanner.noRun": "아직 스캔 기록이 없습니다.",
+    "logic.scanner.matchedBody": "조건이 일치했습니다 — 사람의 검토가 필요합니다.",
+    "logic.scanner.nearBody": "근접 일치입니다 — 관심 목록에서만 확인하세요.",
+    "logic.scanner.blockedBody": "데이터가 부족하거나 유효하지 않아 스캔이 차단되었습니다.",
+    "logic.scanner.countPassed": ({ count }: Record<string, string | number> = {}) => `${count ?? 0}개 통과`,
+    "logic.scanner.countFailed": ({ count }: Record<string, string | number> = {}) => `${count ?? 0}개 실패`,
+    "logic.scanner.countMissing": ({ count }: Record<string, string | number> = {}) => `${count ?? 0}개 누락`,
+    "logic.scanner.reviewLogged": "검토 기록 있음",
+    "logic.scanner.logReview": "검토 기록",
+    "logic.scanner.reviewTitle": "신호 검토 기록",
+    "logic.scanner.reviewDecision": "검토 결정",
+    "logic.scanner.manualReason": "수동 사유",
+    "logic.scanner.manualReasonPlaceholder": "왜 이 결정을 남기는지 적으세요",
+    "logic.scanner.notes": "메모",
+    "logic.scanner.notesPlaceholder": "추가 관찰 메모",
+    "logic.scanner.conviction": "확신도(선택)",
+    "logic.scanner.entryPrice": "진입가(선택)",
+    "logic.scanner.exitPrice": "청산가(선택)",
+    "logic.scanner.resultNotes": "결과 메모",
+    "logic.scanner.resultNotesPlaceholder": "후속 관찰",
+    "logic.scanner.saveLog": "저장",
+    "logic.scanner.incompleteBody": "데이터가 부족하거나 검증에 실패했습니다.",
+    "logic.scanner.runStatus.completed": "완료",
+    "logic.scanner.runStatus.blocked": "차단",
+    "logic.scanner.runStatus.partial": "일부만",
+
+    "workspace.recovery.title": "저장된 데이터 확인이 필요합니다",
+    "workspace.recovery.body": "원본 데이터는 보존되어 있습니다. 백업을 복원하기 전에 복구 사본을 내보내세요.",
+    "workspace.recovery.export": "복구 사본 내보내기",
+    "workspace.recovery.restore": "이전 저장 사본 복원",
+    "workspace.recovery.retry": "다시 불러오기",
+    "workspace.title": "내 워크스페이스",
+    "workspace.body": "이 기기에 저장됩니다. 투자 메모를 안전하게 보관하려면 정기적으로 백업하세요.",
+    "workspace.export": "전체 백업 내보내기",
+    "workspace.exportReport": "주간 검토 보고서 내보내기",
+    "workspace.reEvaluate": "저장 데이터 다시 평가",
+    "workspace.exportSample": "샘플 메모를 내보내고 깨끗한 개인 워크스페이스 시작",
+    "workspace.restore.title": "백업 복원",
+    "workspace.chooseBackup": "백업 파일 선택",
+    "workspace.backupPlaceholder": "StockLedger 백업 JSON 붙여넣기",
+    "workspace.validate": "백업 검증",
+    "workspace.validateSuccess": "백업을 검증했습니다. 복원 전에 아래 내용을 확인하세요.",
+    "workspace.restoreSummary": ({ stocks, recipes, decisions }: Record<string, string | number> = {}) => `종목 ${stocks ?? 0}개 · 레시피 ${recipes ?? 0}개 · 결정 ${decisions ?? 0}개입니다. 복원하면 현재 워크스페이스가 교체됩니다. 먼저 현재 워크스페이스 사본을 내보냅니다.`,
+    "workspace.restoreCurrent": "현재 데이터를 내보내고 이 백업 복원",
+    "workspace.restoreSuccess": "백업을 복원했습니다.",
+    "workspace.prices.title": "일별 가격 가져오기",
+    "workspace.prices.body": "CSV 열: Date,Open,High,Low,Close,Volume. 정규화된 차트 값이 아니라 제공자 OHLCV 관측값을 넣으세요. 이력에는 연속된 NYSE 세션이 있어야 합니다. 자동 알림에는 제공자가 조정 여부를 선언한 조정 이력이 필요하며, 미조정 또는 알 수 없는 데이터는 일부 데이터로 표시됩니다. 긴 기간 지표에는 최소 252개 세션이 필요합니다.",
+    "workspace.prices.addStock": "관심 종목을 먼저 추가하세요.",
+    "workspace.prices.placeholder": "일별 가격 CSV 붙여넣기",
+    "workspace.prices.choose": "일별 가격 CSV 선택",
+    "workspace.prices.benchmarkPlaceholder": "날짜 매칭용 SPY CSV (선택)",
+    "workspace.prices.chooseBenchmark": "SPY CSV 선택",
+    "workspace.prices.adjustment": "제공자 조정 여부",
+    "workspace.prices.validate": "가격 검증 및 가져오기",
+    "workspace.prices.importSuccess": "소스와 세션 날짜를 포함해 가격을 가져왔습니다.",
+    "workspace.addRecipes": "스타터 레시피 추가",
+    "workspace.addRecipesSuccess": "기존 레시피를 변경하지 않고 스타터 레시피를 추가했습니다.",
+    "workspace.restoreStock": ({ symbol }: Record<string, string | number> = {}) => `${symbol ?? "종목"} 복원`,
+    "workspace.restoreEye": ({ symbol }: Record<string, string | number> = {}) => `모니터링 복원: ${symbol ?? "종목"}`,
+    "workspace.restoreDecision": ({ date, action }: Record<string, string | number> = {}) => `결정 복원: ${date ?? ""} ${action ?? ""}`,
+    "workspace.prices.adjustment.unknown": "알 수 없음",
+    "workspace.prices.adjustment.adjusted": "조정됨",
+    "workspace.prices.adjustment.unadjusted": "미조정",
+    "workspace.operationFailed": "작업에 실패했습니다.",
+    "workspace.saveFailed": "저장에 실패했습니다.",
+    "workspace.watchlist.title": "관심 종목 가져오기",
+    "workspace.watchlist.body": "CSV에는 Symbol 또는 Ticker가 필요합니다. Name과 Thesis는 선택 사항입니다. 기존 종목과 메모는 보존됩니다.",
+    "workspace.watchlist.choose": "관심 종목 CSV 선택",
+    "workspace.watchlist.placeholder": "Symbol,Name,Thesis",
+    "workspace.watchlist.preview": "관심 종목 가져오기 미리보기",
+    "workspace.watchlist.summary": ({ added, existing }: Record<string, string | number> = {}) => `새 종목 ${added ?? 0}개, 기존 종목 ${existing ?? 0}개는 현재 상태로 유지됩니다.`,
+    "workspace.watchlist.import": "새 종목 가져오기",
+    "workspace.watchlist.success": "관심 종목을 가져왔습니다. 준비되면 레시피와 가격 이력을 추가하세요.",
+
+    "route.unavailableTitle": "이 링크는 더 이상 사용할 수 없습니다",
+    "route.entityUnavailable": "요청한 항목이 없거나, 보관되었거나, 오래되었거나, 현재 사용할 수 없습니다. 아무것도 변경하지 않았습니다.",
+    "route.metricUnavailable": "이 종목에서는 해당 지표를 사용할 수 없습니다. 종목 화면은 안전하게 유지됩니다.",
+    "route.returnToDestination": "이 섹션으로 돌아가기",
+
+    "home.onboarding.title": "투자 기억 만들기",
+    "home.onboarding.body": "종목을 추가하고, 지켜보는 이유를 적은 뒤 레시피를 연결하세요. 근거를 평가하려면 설정에서 일별 가격을 가져오세요.",
+    "home.onboarding.addStock": "첫 종목 추가",
+    "home.onboarding.addRecipes": "스타터 레시피 추가",
+    "home.onboarding.exploreSample": "샘플 워크스페이스 보기",
+    "home.sampleNotice": "샘플 데이터가 있습니다. 더미 가격과 결과는 앱을 둘러보기 위한 것입니다.",
 
     "settings.language.title": "언어",
     "settings.language.note": "앱에서 사용할 언어를 선택하세요.",
@@ -534,6 +843,8 @@ const dict: Record<AppLanguage, Record<string, DictValue>> = {
     "eyes.action.delete": "삭제",
     "eyes.detail.unsetHorizon": "기간 미설정",
     "eyes.create.title": "모니터 만들기",
+    "eyes.create.editTitle": "모니터 수정",
+    "eyes.create.editSubtitle": "이 모니터의 종목, 레시피, 논리 스냅샷을 수정합니다.",
     "eyes.create.subtitle": "선택한 종목과 레시피를 연결하고 현재 투자 논리를 남기세요.",
     "eyes.create.stock": "종목",
     "eyes.create.recipe": "레시피",
@@ -544,6 +855,8 @@ const dict: Record<AppLanguage, Record<string, DictValue>> = {
     "eyes.create.thesisRequired": "투자 논리 스냅샷은 반드시 입력해야 합니다.",
     "eyes.create.entryLow": "계획 진입 하단",
     "eyes.create.entryHigh": "계획 진입 상단",
+    "eyes.create.entryLowPlaceholder": "진입 하단 (선택)",
+    "eyes.create.entryHighPlaceholder": "진입 상단 (선택)",
     "eyes.create.lastReview": "최근 논리 검토 시점",
     "eyes.create.invalidation": "무효화 규칙",
     "eyes.create.invalidationPlaceholder": "무엇이 이 논리를 빠르게 깨뜨릴까요?",
@@ -564,6 +877,8 @@ const dict: Record<AppLanguage, Record<string, DictValue>> = {
     "journal.meta.concern": ({ value }: Record<string, string | number> = {}) => `우려: ${value ?? "기록 없음"}`,
     "journal.meta.notCaptured": "기록 없음",
     "journal.action.save": "결정 저장",
+    "journal.action.edit": "수정",
+    "journal.action.archive": "결정 보관",
     "journal.action.open": "열기",
     "journal.action.alert": "알림",
     "journal.action.markOutcome": "결과 표시",
@@ -580,6 +895,19 @@ const dict: Record<AppLanguage, Record<string, DictValue>> = {
     "journal.composer.concernPlaceholder": "가장 크게 본 위험은 무엇이었나요?",
     "journal.composer.thesisValidity": "논리 유효성",
     "journal.composer.timing": "타이밍",
+    "journal.composer.searchPlaceholder": "모니터 중인 종목 검색...",
+    "journal.validation.thesisRequired": "투자 논리 평가를 선택하세요.",
+    "journal.validation.timingRequired": "타이밍 평가를 선택하세요.",
+    "journal.outcome.title": "결과 검토",
+    "journal.outcome.body": "관찰한 내용과 출처를 기록하세요. 이 메모는 원래 결정 근거와 별도로 보존됩니다.",
+    "journal.outcome.reviewWindow": "검토 기간",
+    "journal.outcome.priceChange": "가격 변화와 출처",
+    "journal.outcome.maxRunup": "최대 상승폭과 출처",
+    "journal.outcome.maxDrawdown": "최대 하락폭과 출처",
+    "journal.outcome.lesson": "무엇을 배웠나요?",
+    "journal.outcome.recipeSuggestion": "다음에는 무엇을 바꿀까요?",
+    "journal.outcome.save": "결과 검토 저장",
+    "journal.outcome.saved": "결과 검토가 저장되었습니다.",
     "journal.detail.context": "결정 맥락",
     "journal.detail.noState": "상태 스냅샷이 없습니다",
     "journal.detail.noData": "데이터 품질 메모가 없습니다",
@@ -589,6 +917,7 @@ const dict: Record<AppLanguage, Record<string, DictValue>> = {
     "journal.detail.concern": "우려 사항",
     "journal.detail.noConcern": "기록된 핵심 우려가 없습니다.",
     "journal.detail.outcome": ({ status }: Record<string, string | number> = {}) => `결과 · ${status ?? "Pending"}`,
+    "journal.detail.previousVersions": "이전에 작성한 버전",
 
     "recipes.summary.recipes": "레시피",
     "recipes.summary.starter": "스타터",
@@ -693,6 +1022,19 @@ const dict: Record<AppLanguage, Record<string, DictValue>> = {
     "stocks.search.clearSearch": "검색 지우기",
     "stocks.search.resultCount": ({ count }: Record<string, string | number> = {}) => `${count ?? 0}개 표시`,
     "stocks.search.resultNone": "없음",
+    "stocks.search.openStock": ({ symbol, name }: Record<string, string | number> = {}) => `${symbol ?? "종목"} ${name ?? ""} 열기`,
+    "stocks.search.showMore": ({ count }: Record<string, string | number> = {}) => `종목 더 보기 (${count ?? 0}개 남음)`,
+    "stocks.action.add": "종목 추가",
+    "stocks.action.manageEyes": "모니터 관리",
+    "stocks.editor.addTitle": "관심 종목에 추가",
+    "stocks.editor.editTitle": "종목 수정",
+    "stocks.editor.ticker": "티커",
+    "stocks.editor.tickerPlaceholder": "티커, 예: AAPL",
+    "stocks.editor.companyName": "회사명",
+    "stocks.editor.companyNamePlaceholder": "회사명",
+    "stocks.editor.thesis": "지켜보는 이유",
+    "stocks.editor.thesisPlaceholder": "투자 논리와 생각이 바뀌는 조건",
+    "stocks.editor.save": "종목 저장",
 
     "stocks.data.dummyBacked": "더미 데이터",
     "stocks.data.providerBacked": "실데이터 연동",
@@ -703,6 +1045,8 @@ const dict: Record<AppLanguage, Record<string, DictValue>> = {
 
     "stocks.hero.vs": ({ benchmark }: Record<string, string | number> = {}) => `${benchmark ?? "벤치마크"} 대비`,
     "stocks.hero.drawdown": ({ value }: Record<string, string | number> = {}) => `고점 대비 ${value ?? "N/A"}`,
+    "stocks.hero.selectObservation": ({ index }: Record<string, string | number> = {}) => `${index ?? ""}번째 차트 관찰값 선택`,
+    "stocks.hero.noCompletedHistory": "완료된 가격 이력이 없습니다",
     "stocks.hero.boardControls": "보드 설정",
     "stocks.hero.showing": ({ shown, total }: Record<string, string | number> = {}) =>
       `${total ?? 0}개 중 ${shown ?? 0}개 표시`,
@@ -735,6 +1079,7 @@ const dict: Record<AppLanguage, Record<string, DictValue>> = {
     "stocks.detail.series": "흐름",
     "stocks.detail.days": "일",
     "stocks.detail.tapChart": "막대를 눌러 과거 시점을 바로 확인할 수 있습니다.",
+    "stocks.detail.selectPoint": ({ index }: Record<string, string | number> = {}) => `${index ?? ""}번째 차트 지점 선택`,
     "stocks.evidence.pinned": "고정",
     "stocks.evidence.current": "현재값",
     "stocks.evidence.threshold": "기준값",
@@ -747,16 +1092,61 @@ const dict: Record<AppLanguage, Record<string, DictValue>> = {
     "stocks.evidence.formulaDetail": "계산 방식",
     "stocks.evidence.formulaMissing": "추가 계산 설명이 아직 없습니다.",
     "stocks.evidence.inputs": ({ inputs }: Record<string, string | number> = {}) => `입력값: ${inputs ?? "기록된 입력값 없음"}`,
+    "stocks.visual.active": "현재 활성",
+    "stocks.visual.inactive": "현재 비활성",
+    "stocks.visual.eventTiming": "이벤트 시점",
+    "stocks.visual.eventRiskClose": "이벤트 위험이 가까워 새 검토가 필요합니다.",
+    "stocks.visual.noEventPressure": "가까운 기간에는 큰 이벤트 압박이 없습니다.",
+    "stocks.visual.trend": "추세",
+    "stocks.visual.need": "기준",
+    "stocks.visual.context": "참고값",
+    "stocks.evidence.noInputs": "기록된 입력값 없음",
+    "alerts.detail.evidenceRecorded": "이 알림에 기록된 근거",
+    "alerts.detail.olderEvidence": "이전 앱 버전에서는 상세 근거가 기록되지 않았습니다. 원래 알림 요약은 위에 보존되어 있습니다.",
   },
 };
+
+export const getMissingTranslationKeys = () => ({
+  en: Object.keys(dict.ko).filter((key) => !(key in dict.en)),
+  ko: Object.keys(dict.en).filter((key) => !(key in dict.ko)),
+});
+
+export const hasTranslation = (language: AppLanguage, key: string) => key in dict[language] || key in dict.en;
 
 export const t = (
   language: AppLanguage,
   key: string,
   vars?: Record<string, string | number>,
 ) => {
-  const entry = dict[language][key] ?? dict.en[key] ?? key;
+  const entry = dict[language]?.[key] ?? dict.en[key] ?? key;
   return typeof entry === "function" ? entry(vars) : entry;
+};
+
+export const formatLocaleNumber = (
+  language: AppLanguage,
+  value: number,
+  options: Intl.NumberFormatOptions = {},
+) => new Intl.NumberFormat(language === "ko" ? "ko-KR" : "en-US", options).format(value);
+
+export const formatLocaleDate = (language: AppLanguage, value: string) => {
+  const date = new Date(/^\d{4}-\d{2}-\d{2}$/.test(value) ? `${value}T12:00:00` : value);
+  if (Number.isNaN(date.getTime())) return value;
+  return new Intl.DateTimeFormat(language === "ko" ? "ko-KR" : "en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(date);
+};
+
+export const formatLocaleDateTime = (language: AppLanguage, value: string) => {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return new Intl.DateTimeFormat(language === "ko" ? "ko-KR" : "en-US", {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(date);
 };
 
 export const tabLabel = (language: AppLanguage, tab: string) => t(language, `nav.${tab}`);
@@ -1273,3 +1663,79 @@ export const localizedOutcomeStatus = (language: AppLanguage, value?: string | n
       return value;
   }
 };
+
+export const localizedSetupStrength = (language: AppLanguage, value?: string | null) => {
+  if (!value) return "";
+  if (language === "en") return value;
+  switch (value) {
+    case "High":
+      return t(language, "review.setupHigh");
+    case "Medium":
+      return t(language, "review.setupMedium");
+    case "Low":
+      return t(language, "review.setupLow");
+    default:
+      return value;
+  }
+};
+
+export const localizedScannerStatus = (language: AppLanguage, status?: string | null) => {
+  switch (status) {
+    case "MATCHED":
+      return t(language, "logic.scanner.matched");
+    case "NEAR_MATCH":
+      return t(language, "logic.scanner.near");
+    case "BLOCKED":
+    case "BLOCKED_OR_INCOMPLETE_DATA":
+      return t(language, "logic.scanner.blocked");
+    case "FAILED":
+      return t(language, "review.failed");
+    default:
+      return status ?? "";
+  }
+};
+
+export const localizedScanRunStatus = (language: AppLanguage, status?: string | null) => {
+  switch (status) {
+    case "completed":
+      return t(language, "logic.scanner.runStatus.completed");
+    case "blocked":
+      return t(language, "logic.scanner.runStatus.blocked");
+    case "partial":
+      return t(language, "logic.scanner.runStatus.partial");
+    default:
+      return status ?? "";
+  }
+};
+
+export const localizedScannerDescription = (language: AppLanguage, status?: string | null) => {
+  switch (status) {
+    case "MATCHED":
+      return t(language, "logic.scanner.matchedBody");
+    case "NEAR_MATCH":
+      return t(language, "logic.scanner.nearBody");
+    case "BLOCKED":
+    case "BLOCKED_OR_INCOMPLETE_DATA":
+      return t(language, "logic.scanner.blockedBody");
+    default:
+      return "";
+  }
+};
+
+export const recipeConditionMapCopy = (language: AppLanguage) => ({
+  passed: t(language, "review.passed"),
+  failed: t(language, "review.failed"),
+  warnings: t(language, "review.warnings"),
+  blockers: t(language, "review.blockers"),
+  support: t(language, "review.support"),
+  risks: t(language, "review.risks"),
+  state: (value: string) => t(language, "review.state", { value }),
+  stateChanged: t(language, "review.changed"),
+  stateStable: t(language, "review.stable"),
+  urgency: (value: string) => t(language, "review.urgency", { value: localizedActionUrgency(language, value) }),
+  nextTrigger: (value: string) => t(language, "review.nextTrigger", { value }),
+  dataIssues: (value: string) => t(language, "review.dataIssues", { value }),
+  showMatrix: t(language, "review.showMatrix"),
+  hideMatrix: t(language, "review.hideMatrix"),
+  condition: t(language, "review.condition"),
+});

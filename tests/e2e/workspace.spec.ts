@@ -82,8 +82,8 @@ test("records a deliberate decision, reviews its outcome, and preserves an amend
   await page.getByRole("button", { name: "Explore sample workspace" }).click();
   await page.getByRole("tab", { name: "Journal", exact: true }).click();
   await page.getByRole("button", { name: "New", exact: true }).click();
-  await page.getByRole("button", { name: "Eye", exact: true }).click();
-  await page.getByRole("button", { name: /AMD/ }).first().click();
+  await page.getByRole("combobox", { name: "Eye", exact: true }).click();
+  await page.getByRole("dialog").last().getByRole("button", { name: "AMD", exact: true }).click();
   await page.getByRole("textbox", { name: "Why did you enter, skip, or revise?" }).fill("Regression review: wait for confirmed evidence.");
   await page.getByRole("button", { name: "Save Decision", exact: true }).click();
   await expect(page.getByText("Choose your thesis assessment.")).toBeVisible();
@@ -99,4 +99,53 @@ test("records a deliberate decision, reviews its outcome, and preserves an amend
   await page.getByRole("button", { name: "Save Changes", exact: true }).click();
   await expect(page.getByText("Previous authored versions", { exact: true })).toBeVisible();
   await expect(page.getByText(/Regression review: wait for confirmed evidence/)).toBeVisible();
+});
+
+test("resolves entity links, fails safely, and preserves language preference", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "Explore sample workspace" }).click();
+  await expect(page.getByText(/Sample data is present/)).toBeVisible();
+
+  await page.goto("/#/watchlist?stockId=stock-amd");
+  await expect(page.getByText("Advanced Micro Devices", { exact: true }).first()).toBeVisible();
+  await page.reload();
+  await expect(page.getByText("Advanced Micro Devices", { exact: true }).first()).toBeVisible();
+
+  await page.goto("/#/monitoring?stockId=stock-amd&eyeId=eye-amd");
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await expect(page.getByRole("dialog").getByText("AMD", { exact: true }).first()).toBeVisible();
+  await page.getByRole("button", { name: "Done", exact: true }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+
+  await page.getByRole("tab", { name: "Journal", exact: true }).click();
+  const newEntry = page.getByRole("button", { name: "New", exact: true });
+  await newEntry.click();
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Done", exact: true })).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(newEntry).toBeFocused();
+
+  await page.goto("/#/watchlist?stockId=missing-entity");
+  await expect(page.getByRole("alert").getByText("This link is no longer available", { exact: true })).toBeVisible();
+  await expect(page.getByText("Search any stock and inspect the full board", { exact: true })).toBeVisible();
+
+  await page.getByRole("button", { name: "Settings", exact: true }).click();
+  await page.getByRole("button", { name: "한국어", exact: true }).click();
+  await expect(page.getByRole("tab", { name: "관심 종목", exact: true })).toBeVisible();
+  await page.getByRole("tab", { name: "오늘", exact: true }).click();
+  await expect(page.getByText("시각 트리아지", { exact: true })).toBeVisible();
+  await expect(page.getByText("결정 루프", { exact: true })).toBeVisible();
+  await expect(page.getByText("모니터링 보드", { exact: true })).toBeVisible();
+  await expect(page.getByText("AMD", { exact: true }).first()).toBeVisible();
+  await page.reload();
+  await expect(page.getByRole("button", { name: "설정", exact: true })).toBeVisible();
+  await expect(page.getByRole("tab", { name: "오늘", exact: true })).toBeVisible();
+  await page.getByRole("tab", { name: "오늘", exact: true }).click();
+  await expect(page.getByText("결정 루프", { exact: true })).toBeVisible();
+  await page.getByRole("tab", { name: "관심 종목", exact: true }).click();
+  await expect(page.getByText("AMD", { exact: true }).first()).toBeVisible();
+  await expect(page.getByText("Advanced Micro Devices", { exact: true }).first()).toBeVisible();
+  await page.goto("/#/monitoring?stockId=stock-amd&eyeId=eye-amd");
+  await expect(page.getByText("Deep discount logic.", { exact: true }).first()).toBeVisible();
 });

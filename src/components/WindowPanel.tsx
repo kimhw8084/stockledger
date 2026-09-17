@@ -1,6 +1,8 @@
 import React, { useEffect, useRef } from "react";
 import {
+  AccessibilityInfo,
   Animated,
+  findNodeHandle,
   Modal,
   KeyboardAvoidingView,
   Platform,
@@ -13,6 +15,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useReducedMotion } from "../hooks/useReducedMotion";
+import { t, type AppLanguage } from "../lib/i18n";
 
 const fontFamily = "System";
 
@@ -21,21 +24,66 @@ interface WindowPanelProps {
   subtitle?: string;
   onClose: () => void;
   children: React.ReactNode;
+  language?: AppLanguage;
   closeLabel?: string;
 }
 
-export const WindowPanel = ({ title, subtitle, onClose, children, closeLabel = "Done" }: WindowPanelProps) => {
+export const WindowPanel = ({ title, subtitle, onClose, children, language = "en", closeLabel = t(language, "common.done") }: WindowPanelProps) => {
   const insets = useSafeAreaInsets();
   const reduced = useReducedMotion();
   const overlayOpacity = useRef(new Animated.Value(0)).current;
   const sheetOffset = useRef(new Animated.Value(28)).current;
   const sheetScale = useRef(new Animated.Value(0.985)).current;
   const closingRef = useRef(false);
+  const closeButtonRef = useRef<any>(null);
+  const returnFocusRef = useRef<any>(null);
+
+  if (Platform.OS === "web" && typeof document !== "undefined" && returnFocusRef.current === null) {
+    const activeElement = document.activeElement;
+    if (activeElement && activeElement !== document.body) returnFocusRef.current = activeElement;
+  }
+
+  useEffect(() => {
+    if (Platform.OS === "web" && typeof document !== "undefined" && returnFocusRef.current === null) {
+      returnFocusRef.current = document.activeElement;
+    }
+    const focusInitialControl = () => {
+      if (Platform.OS === "web") {
+        closeButtonRef.current?.focus?.();
+        return;
+      }
+      const node = findNodeHandle(closeButtonRef.current);
+      if (node) AccessibilityInfo.setAccessibilityFocus(node);
+    };
+    const timer = setTimeout(focusInitialControl, 0);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const finishClose = () => {
+    onClose();
+    setTimeout(() => {
+      const target = returnFocusRef.current;
+      if (target?.isConnected !== false) target?.focus?.();
+    }, 0);
+  };
+
+  const panelKeyboardProps =
+    Platform.OS === "web"
+      ? ({
+          onKeyDown: (event: any) => {
+            const key = event?.nativeEvent?.key ?? event?.key;
+            if (key === "Escape") {
+              event.preventDefault();
+              animateClose();
+            }
+          },
+        } as any)
+      : {};
 
   const animateClose = () => {
     if (closingRef.current) return;
     closingRef.current = true;
-    if (reduced) { onClose(); return; }
+    if (reduced) { finishClose(); return; }
     Animated.parallel([
       Animated.timing(overlayOpacity, {
         toValue: 0,
@@ -52,7 +100,7 @@ export const WindowPanel = ({ title, subtitle, onClose, children, closeLabel = "
         duration: 180,
         useNativeDriver: true,
       }),
-    ]).start(() => onClose());
+    ]).start(finishClose);
   };
 
   const dragResponder = useRef(
@@ -117,11 +165,25 @@ export const WindowPanel = ({ title, subtitle, onClose, children, closeLabel = "
   }, [overlayOpacity, sheetOffset, sheetScale, reduced]);
 
   return (
-    <Modal transparent animationType="none" visible onRequestClose={animateClose} statusBarTranslucent>
+    <Modal
+      transparent
+      animationType="none"
+      visible
+      onRequestClose={animateClose}
+      statusBarTranslucent
+      {...({ accessibilityLabel: title } as any)}
+    >
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : "height"}>
       <Animated.View style={[styles.windowBackdrop, { opacity: overlayOpacity, paddingTop: insets.top }]}>
-        <Pressable accessibilityRole="button" accessibilityLabel="Close dialog" style={styles.windowDismissLayer} onPress={animateClose} />
-        <Animated.View accessibilityViewIsModal style={[styles.windowPanel, { paddingBottom: Math.max(16, insets.bottom), transform: [{ translateY: sheetOffset }, { scale: sheetScale }] }]}>
+        <Pressable accessible={false} accessibilityRole="none" style={styles.windowDismissLayer} onPress={animateClose} />
+        <Animated.View
+          accessible
+          accessibilityRole="none"
+          accessibilityLabel={title}
+          accessibilityViewIsModal
+          {...panelKeyboardProps}
+          style={[styles.windowPanel, { paddingBottom: Math.max(16, insets.bottom), transform: [{ translateY: sheetOffset }, { scale: sheetScale }] }]}
+        >
           <View style={styles.windowHandleTouch} {...dragResponder.panHandlers}>
             <View style={styles.windowGrabber} />
           </View>
@@ -136,7 +198,7 @@ export const WindowPanel = ({ title, subtitle, onClose, children, closeLabel = "
                 </Text>
               ) : null}
             </View>
-            <Pressable accessibilityRole="button" accessibilityLabel={closeLabel} onPress={animateClose} style={({ pressed }) => [styles.doneButton, pressed ? styles.doneButtonPressed : null]}>
+            <Pressable ref={closeButtonRef} accessibilityRole="button" accessibilityLabel={closeLabel} onPress={animateClose} style={({ pressed, focused }: any) => [styles.doneButton, pressed ? styles.doneButtonPressed : null, focused ? styles.focusRing : null]}>
               <Text style={styles.doneButtonText}>{closeLabel}</Text>
             </Pressable>
           </View>
@@ -231,6 +293,10 @@ const styles = StyleSheet.create({
   doneButtonPressed: {
     transform: [{ scale: 0.985 }],
     opacity: 0.92,
+  },
+  focusRing: {
+    borderColor: "#2563eb",
+    borderWidth: 3,
   },
   doneButtonText: {
     color: "#6b7280",
