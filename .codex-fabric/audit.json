@@ -1,0 +1,487 @@
+{
+  "accepted_at": "2026-09-17T13:55:00Z",
+  "changed_files": [
+    {
+      "additions": 16,
+      "deletions": 5,
+      "path": "docs/production/IMPLEMENTATION_STATUS.md",
+      "status": "M"
+    },
+    {
+      "additions": 419,
+      "deletions": 259,
+      "path": "src/app/StockLedgerApp.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 28,
+      "deletions": 1,
+      "path": "src/app/styles.ts",
+      "status": "M"
+    },
+    {
+      "additions": 3,
+      "deletions": 2,
+      "path": "src/components/BottomNav.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 43,
+      "deletions": 9,
+      "path": "src/components/HomeVisualDashboard.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 73,
+      "deletions": 7,
+      "path": "src/components/WindowPanel.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 52,
+      "deletions": 19,
+      "path": "src/components/common.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 11,
+      "deletions": 5,
+      "path": "src/components/stocks/StockMetricDetailSheet.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 4,
+      "deletions": 4,
+      "path": "src/components/stocks/StockSearchPanel.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 9,
+      "deletions": 9,
+      "path": "src/components/stocks/StockTrendHero.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 14,
+      "deletions": 6,
+      "path": "src/features/journal/OutcomeEditor.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 8,
+      "deletions": 7,
+      "path": "src/features/workspace/WatchlistImportPanel.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 42,
+      "deletions": 41,
+      "path": "src/features/workspace/WorkspacePanel.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 54,
+      "deletions": 14,
+      "path": "src/hooks/useWorkspaceNavigation.ts",
+      "status": "M"
+    },
+    {
+      "additions": 467,
+      "deletions": 1,
+      "path": "src/lib/i18n.ts",
+      "status": "M"
+    },
+    {
+      "additions": 1,
+      "deletions": 1,
+      "path": "src/lib/preferences.ts",
+      "status": "M"
+    },
+    {
+      "additions": 51,
+      "deletions": 2,
+      "path": "tests/e2e/workspace.spec.ts",
+      "status": "M"
+    },
+    {
+      "additions": 66,
+      "deletions": 0,
+      "path": "tests/i18n.test.ts",
+      "status": "A"
+    },
+    {
+      "additions": 18,
+      "deletions": 0,
+      "path": "tests/navigation.test.ts",
+      "status": "A"
+    }
+  ],
+  "checks": [
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '4212,4335p' src/app/StockLedgerApp.tsx && rtk sed -n '6340,6475p' src/app/StockLedgerApp.tsx\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n \\\"latestScanRun|scanDate|status:.*scan|interface Scan|type Scan\\\" src/app/StockLedgerApp.tsx src/types.ts src/domain src/lib | head -80 && rtk rg -n '\\\"logic\\\\.' src/lib/i18n.ts | head -50\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk rg -n \"onClose=\" src/app/StockLedgerApp.tsx src/features/workspace/WorkspacePanel.tsx src/components/HomeVisualDashboard.tsx | head -100'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '4778,5045p' src/app/StockLedgerApp.tsx && rtk sed -n '5515,5690p' src/app/StockLedgerApp.tsx && rtk sed -n '5878,6500p' src/app/StockLedgerApp.tsx | sed -n '1,640p'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n -C 3 'RecipeConditionMapCard' src/app/StockLedgerApp.tsx && rtk rg -n -P 'label=\\\"[A-Za-z]|>\\\\s*[A-Za-z][\"'^<{]*[A-Za-z]'\"\\\\s*</Text>|\\\\? \\\"[A-Za-z]|: \\\"[A-Za-z]' src/app/StockLedgerApp.tsx | head -220\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n 'stock-amd|Advanced Micro Devices|Temporary Bargain Sale|seed' src tests | head -120 && rtk sed -n '1,180p' tests/i18n.test.ts\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '1,180p' tests/app.test.tsx && rtk sed -n '1,180p' vitest.config.* 2>/dev/null || true && rtk rg -n 'react-test|@testing-library|render\\\\(' tests | head -80\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'NODE22_BIN=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin; PATH=$NODE22_BIN:$PATH; npm run typecheck'",
+      "exit_code": 2,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk nl -ba src/app/StockLedgerApp.tsx | sed -n '4190,4212p'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'NODE22_BIN=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin; PATH=$NODE22_BIN:$PATH; npm run typecheck'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '448,480p' src/lib/i18n.ts && rtk sed -n '3020,3120p' src/app/StockLedgerApp.tsx && rtk sed -n '6500,6565p' src/app/StockLedgerApp.tsx\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n '\\\"nav\\\\.' src/lib/i18n.ts | head -30 && rtk sed -n '6480,6545p' src/app/StockLedgerApp.tsx\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'NODE22_BIN=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin; PATH=$NODE22_BIN:$PATH; npm test -- --run tests/i18n.test.ts tests/app.test.tsx'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n -A35 'export interface Evaluation' src/types.ts && rtk rg -n 'setupStrength' src | head -50 && rtk rg -n 'const RecipeConditionMapCard|RecipeConditionMapCard' src/app/StockLedgerApp.tsx\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git diff --check && rtk git diff --stat dc1e63f HEAD && printf '%s\\\\n' '--- current changed files ---' && rtk git status --short && printf '%s\\\\n' '--- changed code highlights ---' && rtk git diff --unified=2 dc1e63f HEAD -- src/lib/i18n.ts src/app/StockLedgerApp.tsx src/features/workspace/WorkspacePanel.tsx src/features/workspace/WatchlistImportPanel.tsx tests/i18n.test.ts tests/e2e/workspace.spec.ts | sed -n '1,2600p'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'NODE22_BIN=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin; PATH=$NODE22_BIN:$PATH; npm run typecheck && npm test -- --run'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'NODE22_BIN=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin; PATH=$NODE22_BIN:$PATH; npm run test:e2e'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '1,240p' playwright.config.* && printf '%s\\\\n' '--- start command probe ---' && NODE22_BIN=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin; PATH=\"'$NODE22_BIN:$PATH; timeout 45 npm run web -- --non-interactive'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '1,260p' scripts/serve-preview.mjs && printf '%s\\\\n' '--- export / server probe ---' && NODE22_BIN=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin; PATH=\"'$NODE22_BIN:$PATH; npm run export:web'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'NODE22_BIN=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin; PATH=$NODE22_BIN:$PATH; npm run test:e2e'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '360,378p' src/lib/seed.ts\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'NODE22_BIN=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin; PATH=$NODE22_BIN:$PATH; npm run test:e2e'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'NODE22_BIN=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin; PATH=$NODE22_BIN:$PATH; npm run test:e2e'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'NODE22_BIN=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin; PATH=$NODE22_BIN:$PATH; npm test -- --run tests/worker.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'NODE22_BIN=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin; PATH=$NODE22_BIN:$PATH; npm run check:frozen'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'NODE22_BIN=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin; PATH=$NODE22_BIN:$PATH; npm run check:boundaries'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'NODE22_BIN=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin; PATH=$NODE22_BIN:$PATH; npm run export:all'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git diff --check && rtk git status --short --branch && printf '%s\\\\n' '--- own diff stat ---' && rtk git diff --stat && printf '%s\\\\n' '--- own diff ---' && rtk git diff -- src/app/StockLedgerApp.tsx src/components/HomeVisualDashboard.tsx src/components/WindowPanel.tsx src/features/workspace/WatchlistImportPanel.tsx src/features/workspace/WorkspacePanel.tsx src/lib/i18n.ts tests/e2e/workspace.spec.ts tests/i18n.test.ts\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk nl -ba src/app/StockLedgerApp.tsx | sed -n '6478,6494p' && rtk git show HEAD:src/app/StockLedgerApp.tsx | nl -ba | sed -n '6478,6494p'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git show HEAD:src/app/StockLedgerApp.tsx | tail -25 && tail -25 src/app/StockLedgerApp.tsx'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk tail -12 src/app/StockLedgerApp.tsx && rtk git diff -- src/app/StockLedgerApp.tsx | tail -35'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git diff --check && rtk git status --short --branch && rtk git diff --stat'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk node --version && PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm --version'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run typecheck'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm test -- --run'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm test -- --run tests/worker.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run check:frozen'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run check:boundaries'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run test:e2e'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run export:all'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git diff --check && rtk git status --short --branch'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git log --oneline --decorate --graph --all -6 && rtk git diff --quiet 67217b68ea2ea6d5f030781adf50100185b3d46c 18e3307; rtk git diff --quiet 67217b68ea2ea6d5f030781adf50100185b3d46c HEAD'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git show --stat --oneline 5151ae9 && rtk git show --format=fuller --no-patch 67217b68ea2ea6d5f030781adf50100185b3d46c && rtk git show --format=fuller --no-patch 18e3307'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git show 5151ae9:.codex-fabric/audit.json | head -60'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git show 5151ae9:.codex-fabric/audit.json | tail -80'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git ls-files .codex-fabric && rtk git check-ignore -v .codex-fabric/audit.json'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git add src/app/StockLedgerApp.tsx src/components/HomeVisualDashboard.tsx src/components/WindowPanel.tsx src/features/workspace/WatchlistImportPanel.tsx src/features/workspace/WorkspacePanel.tsx src/lib/i18n.ts tests/e2e/workspace.spec.ts tests/i18n.test.ts && rtk git commit -m \"fix: localize review-loop system copy\"'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git rev-parse HEAD && rtk git show -s --format='%H%n%P%n%s' HEAD && rtk git status --short --branch && rtk git diff --check HEAD\"'^ HEAD && rtk git diff --stat dc1e63fba672dd6bce75596d9c48a2155a16e2af HEAD && rtk git log --oneline --decorate -4'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git show --format= --name-status HEAD && rtk git merge-base --is-ancestor dc1e63fba672dd6bce75596d9c48a2155a16e2af HEAD && rtk git diff --quiet 67217b68ea2ea6d5f030781adf50100185b3d46c 18e33073431a2dd3c4bc036dea8fd9fd7c3c3bd2'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git rev-parse 67217b68ea2ea6d5f030781adf50100185b3d46c''^{tree} && rtk git rev-parse 18e33073431a2dd3c4bc036dea8fd9fd7c3c3bd2''^{tree} && rtk git rev-parse dc1e63fba672dd6bce75596d9c48a2155a16e2af''^{tree}'",
+      "exit_code": 0,
+      "type": "command_execution"
+    }
+  ],
+  "codex": {
+    "cli_version": "codex-cli 0.154.0",
+    "configured_model": "gpt-5.6-luna",
+    "event_count": 235,
+    "provider_reported_model": null,
+    "reasoning_effort": "xhigh",
+    "terminal_type": "turn.completed",
+    "usage": {
+      "cache_hit_percent": 98.17,
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 20500736,
+      "fresh_input_tokens": 381570,
+      "input_tokens": 20882306,
+      "non_reasoning_output_tokens": 33419,
+      "output_tokens": 50597,
+      "reasoning_output_tokens": 17178,
+      "total_processed_tokens": 20932903
+    },
+    "warnings": []
+  },
+  "commits": [
+    {
+      "sha": "c3474af3e227e668e8eff336491c5a66e9caaeb8",
+      "subject": "fix: localize review-loop system copy"
+    },
+    {
+      "sha": "18e33073431a2dd3c4bc036dea8fd9fd7c3c3bd2",
+      "subject": "fabric: capture completed model changes [CF-d84b82b189aca17cac879e4a]"
+    }
+  ],
+  "diff": {
+    "additions": 1379,
+    "changed_files": 19,
+    "commit_count": 2,
+    "deletions": 392
+  },
+  "error_code": null,
+  "evidence_manifest": {
+    "count": 1,
+    "items": [
+      {
+        "bytes": 22046,
+        "path": "docs/production/IMPLEMENTATION_STATUS.md",
+        "sha256": "58e187fd1f202a22a0b5150cdc8fe7ff927995813300f163a96bf5c268c4015e"
+      }
+    ],
+    "version": 1
+  },
+  "evidence_publisher_release": "1.2.3-resume-candidate",
+  "fabric_capture": {
+    "applied": false,
+    "paths_before": 0,
+    "transient_untracked_removed": {
+      "count": 0,
+      "items": []
+    }
+  },
+  "fabric_release": "1.2.3-resume-candidate",
+  "failure_class": null,
+  "finished_at": "2026-09-17T14:17:25Z",
+  "git": {
+    "base_is_ancestor": true,
+    "base_sha": "dc1e63fba672dd6bce75596d9c48a2155a16e2af",
+    "branch": "codex/stockledger-prod-c03-ux-accessibility-localization-fix-v1",
+    "head_sha": "c3474af3e227e668e8eff336491c5a66e9caaeb8",
+    "remote_exact_head": true,
+    "remote_head_sha": "c3474af3e227e668e8eff336491c5a66e9caaeb8",
+    "target_branch": "main",
+    "target_drifted_since_acceptance": false,
+    "target_head_observed_after_execution": "dc1e63fba672dd6bce75596d9c48a2155a16e2af",
+    "work_branch": "codex/stockledger-prod-c03-ux-accessibility-localization-fix-v1",
+    "worktree_clean": true
+  },
+  "instructions": {
+    "files": [],
+    "total_bytes": 0,
+    "warning": null
+  },
+  "job_id": "CF-64aa9bc345f04411a58dae34",
+  "kind": "codex-fabric-audit-evidence",
+  "locator": {
+    "branch": "codex-fabric/evidence/stockledger/prod-c03-ux-accessibility-localization-fix-v1",
+    "path": ".codex-fabric/audit.json",
+    "ref": "refs/heads/codex-fabric/evidence/stockledger/prod-c03-ux-accessibility-localization-fix-v1"
+  },
+  "operation": "FIX",
+  "policy": {
+    "environment_policy_sha256": "e077daca74297b3c30bee8989f00f8ca5338f7610b4d016a6c48db524205d064",
+    "fabric_release": "1.2.3-resume-candidate",
+    "policy_sha256": "44756118cd7fda0c45cd23ba1d31a48a3f4f2422d687df15264ba4406f40e1f2",
+    "registry_sha256": "cfc765f3211c37c7967a138f3b2d89a99341939b15b2623f92744d007f625d6f"
+  },
+  "project_id": "stockledger",
+  "recovery": {
+    "model_rerun_safe": false,
+    "recovery_required": false,
+    "retry_safe": false,
+    "retry_scope": null,
+    "worktree_retained": true
+  },
+  "request": "prod-c03-ux-accessibility-localization-fix-v1",
+  "schema_version": 1,
+  "started_at": "2026-09-17T13:55:00Z",
+  "status": "EXECUTED_CHANGE",
+  "timing": {
+    "execution_seconds": 1345,
+    "queue_seconds": 0,
+    "total_seconds": 1345
+  },
+  "transport": {
+    "bytes": 3250,
+    "envelope": "FABRIC/2",
+    "prompt_bytes": 2891,
+    "prompt_sha256": "fb7ba7d42dbb2912d04280b6a84262bc0b8a613bea90bcdf22d0b2bc7d84c970",
+    "sha256": "64aa9bc345f04411a58dae34cc7040db691a38831f3967fec51adbb873469a0e"
+  }
+}
