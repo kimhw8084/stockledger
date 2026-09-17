@@ -34,6 +34,10 @@ const makeStore = () => {
 
 const savedData = (workspaceId: string): AppData => ({ ...createEmptyAppData(), workspaceId });
 const repositoryFor = (store: KeyValueStore): WorkspaceRepository => createWorkspaceRepository(store);
+const withoutWorkspaceId = (data: AppData) => {
+  const { workspaceId: _workspaceId, ...rest } = data;
+  return rest;
+};
 
 const workspaceAtBulkHistoryBytes = (target: number): AppData => {
   const source = createRepresentativeWorkspaceFixture();
@@ -184,6 +188,144 @@ it("loads, exports, recovers, and permits unrelated edits for an existing oversi
   await repository.save(unrelatedEdit);
   expect(parseExport(values.get(STORAGE_KEYS.current)!)).toEqual(unrelatedEdit);
   expect((JSON.parse(values.get(STORAGE_KEYS.current)!) as { revision: number }).revision).toBe(6);
+});
+
+it("imports a complete oversized backup into a fresh store without losing authored history", async () => {
+  const { store, values } = makeStore();
+  const repository = repositoryFor(store);
+  const state: { current: AppData | null } = { current: null };
+  const service = createWorkspaceApplicationService({
+    repository,
+    getCurrent: () => state.current,
+    publish: next => { state.current = next; },
+  });
+  await service.load().then(loaded => { state.current = loaded; });
+
+  await service.importBackup(serializeExport(oversizedWorkspace, 42));
+
+  expect(state.current).not.toBeNull();
+  expect(withoutWorkspaceId(state.current!)).toEqual(withoutWorkspaceId(oversizedWorkspace));
+  expect(state.current!.workspaceId).toMatch(/^restored-/);
+  expect(profileWorkspace(state.current!).budget.currentBytes).toBeGreaterThan(WORKSPACE_STORAGE_BUDGET_CONTRACT.hardBudgetBytes);
+  expect((JSON.parse(values.get(STORAGE_KEYS.current)!) as { revision: number }).revision).toBe(1);
+  expect(values.get(STORAGE_KEYS.previous)).toBeUndefined();
+});
+
+it("restores an oversized backup over valid state while preserving the prior current copy", async () => {
+  const { store, values } = makeStore();
+  const repository = repositoryFor(store);
+  const prior = savedData("prior-current");
+  await repository.load();
+  await repository.save(prior);
+  const state = { current: prior };
+  const service = createWorkspaceApplicationService({
+    repository,
+    getCurrent: () => state.current,
+    publish: next => { state.current = next; },
+  });
+
+  await service.importBackup(serializeExport(oversizedWorkspace, 42));
+
+  expect(withoutWorkspaceId(state.current)).toEqual(withoutWorkspaceId(oversizedWorkspace));
+  expect(state.current.workspaceId).toMatch(/^restored-/);
+  expect(parseExport(values.get(STORAGE_KEYS.previous)!)).toEqual(prior);
+  expect((JSON.parse(values.get(STORAGE_KEYS.current)!) as { revision: number }).revision).toBe(2);
+  await repository.restorePreviousBackup();
+  expect(parseExport(values.get(STORAGE_KEYS.current)!)).toEqual(prior);
+});
+
+it("rejects invalid or corrupt oversized input without replacing valid current state", async () => {
+  const { store, values } = makeStore();
+  const repository = repositoryFor(store);
+  const current = savedData("valid-current");
+  await repository.load();
+  await repository.save(current);
+  const before = values.get(STORAGE_KEYS.current);
+  const state = { current };
+  const service = createWorkspaceApplicationService({
+    repository,
+    getCurrent: () => state.current,
+    publish: next => { state.current = next; },
+  });
+  const validEnvelope = JSON.parse(serializeExport(oversizedWorkspace, 42)) as Record<string, unknown>;
+  const invalidSchema = JSON.stringify({ ...validEnvelope, data: { ...oversizedWorkspace, stocks: "not-an-array" } });
+  const corruptJson = serializeExport(oversizedWorkspace, 42).slice(0, -1);
+
+  await expect(service.importBackup(invalidSchema)).rejects.toThrow();
+  await expect(service.importBackup(corruptJson)).rejects.toThrow();
+  expect(values.get(STORAGE_KEYS.current)).toBe(before);
+  expect(state.current).toEqual(current);
+  expect(values.get(STORAGE_KEYS.previous)).toBeUndefined();
+});
+
+it("resumes ordinary budget enforcement after oversized restore", async () => {
+  const { store, values } = makeStore();
+  const repository = repositoryFor(store);
+  await repository.load();
+  const state: { current: AppData | null } = { current: await repository.load() };
+  const service = createWorkspaceApplicationService({
+    repository,
+    getCurrent: () => state.current,
+    publish: next => { state.current = next; },
+  });
+  await service.importBackup(serializeExport(oversizedWorkspace, 42));
+
+  await service.commit(prev => ({ ...prev, workspaceId: "restored-non-growing-edit" }));
+  const revisionAfterNonGrowingEdit = (JSON.parse(values.get(STORAGE_KEYS.current)!) as { revision: number }).revision;
+  const restoredBeforeGrowth = values.get(STORAGE_KEYS.current);
+  const growth = service.commit(prev => ({
+    ...prev,
+    reviewLogs: prev.reviewLogs.map((entry, index) => index === 0 ? { ...entry, manualReason: `${entry.manualReason}x` } : entry),
+  }));
+  await expect(growth).rejects.toBeInstanceOf(WorkspaceStorageBudgetError);
+  expect(values.get(STORAGE_KEYS.current)).toBe(restoredBeforeGrowth);
+  expect((JSON.parse(values.get(STORAGE_KEYS.current)!) as { revision: number }).revision).toBe(revisionAfterNonGrowingEdit);
+  await expect(repository.save({
+    ...state.current!,
+    reviewLogs: state.current!.reviewLogs.map((entry, index) => index === 0 ? { ...entry, manualReason: `${entry.manualReason}x` } : entry),
+  })).rejects.toBeInstanceOf(WorkspaceStorageBudgetError);
+
+  const reduced = await service.commit(prev => ({ ...prev, rawBarArchives: prev.rawBarArchives.slice(0, 3) }));
+  expect(profileWorkspace(reduced).budget.currentBytes).toBeLessThan(WORKSPACE_STORAGE_BUDGET_CONTRACT.hardBudgetBytes);
+  expect((JSON.parse(values.get(STORAGE_KEYS.current)!) as { revision: number }).revision).toBe(revisionAfterNonGrowingEdit + 1);
+});
+
+it("serializes full restores and rejects a stale full-backup revision", async () => {
+  const { store, values } = makeStore();
+  const repository = repositoryFor(store);
+  await repository.load();
+  await Promise.all([repository.restoreFullBackup(savedData("first-restore")), repository.restoreFullBackup(savedData("second-restore"))]);
+  expect(parseExport(values.get(STORAGE_KEYS.current)!)).toEqual(savedData("second-restore"));
+  expect(parseExport(values.get(STORAGE_KEYS.previous)!)).toEqual(savedData("first-restore"));
+  expect((JSON.parse(values.get(STORAGE_KEYS.current)!) as { revision: number }).revision).toBe(2);
+
+  const concurrentA = repositoryFor(store);
+  const concurrentB = repositoryFor(store);
+  await concurrentA.load();
+  await concurrentB.load();
+  await concurrentA.restoreFullBackup(savedData("third-restore"));
+  await expect(concurrentB.restoreFullBackup(savedData("stale-restore"))).rejects.toThrow(/Another session saved changes/);
+  expect(parseExport(values.get(STORAGE_KEYS.current)!)).toEqual(savedData("third-restore"));
+});
+
+it("serializes a full-backup import with an ordinary application commit", async () => {
+  const { store, values } = makeStore();
+  const repository = repositoryFor(store);
+  const state: { current: AppData | null } = { current: await repository.load() };
+  const service = createWorkspaceApplicationService({
+    repository,
+    getCurrent: () => state.current,
+    publish: next => { state.current = next; },
+  });
+  const importCommand = service.importBackup(serializeExport(savedData("imported"), 42));
+  const editCommand = service.commit(prev => ({ ...prev, workspaceId: "edited-after-import" }));
+  await Promise.all([importCommand, editCommand]);
+
+  expect(state.current).toMatchObject({ ...savedData("imported"), workspaceId: "edited-after-import" });
+  const imported = parseExport(values.get(STORAGE_KEYS.previous)!);
+  expect(withoutWorkspaceId(imported)).toEqual(withoutWorkspaceId(savedData("imported")));
+  expect(imported.workspaceId).toMatch(/^restored-/);
+  expect((JSON.parse(values.get(STORAGE_KEYS.current)!) as { revision: number }).revision).toBe(2);
 });
 
 it("allows an explicit reduction of an oversized guarded history", async () => {

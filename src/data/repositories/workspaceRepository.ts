@@ -38,6 +38,7 @@ export type RecoveryData = {
 export interface WorkspaceRepository {
   load(): Promise<AppData>;
   save(data: AppData): Promise<void>;
+  restoreFullBackup(data: AppData): Promise<void>;
   readRecoveryData(): Promise<RecoveryData>;
   restorePreviousBackup(): Promise<void>;
 }
@@ -112,6 +113,37 @@ export const createWorkspaceRepository = (keyValueStore: KeyValueStore = store):
     return write;
   };
 
+  /** Explicit full-backup restore only: preserve the complete validated payload, including an oversized history. */
+  const restoreFullBackup = (data: AppData): Promise<void> => {
+    const snapshot = JSON.parse(JSON.stringify(validateAppData(data))) as AppData;
+    const write = writes.then(async () => {
+      const current = await keyValueStore.getItem(STORAGE_KEYS.current);
+      const currentRevision = current === null ? 0 : (() => {
+        try {
+          const revision = (JSON.parse(current) as Partial<StorageEnvelope>).revision;
+          return typeof revision === "number" && Number.isSafeInteger(revision) && revision >= 0 ? revision : (loadedRevision ?? 0);
+        } catch {
+          return loadedRevision ?? 0;
+        }
+      })();
+      if (loadedRevision !== null && currentRevision !== loadedRevision) throw new Error("Another session saved changes. Reload to protect those changes.");
+      const previous = await keyValueStore.getItem(STORAGE_KEYS.previous);
+      const previousRevision = previous === null ? 0 : (() => {
+        try {
+          const revision = (JSON.parse(previous) as Partial<StorageEnvelope>).revision;
+          return typeof revision === "number" && Number.isSafeInteger(revision) && revision >= 0 ? revision : 0;
+        } catch {
+          return 0;
+        }
+      })();
+      const revision = Math.max(currentRevision, previousRevision) + 1;
+      await keyValueStore.compareAndSetItem(STORAGE_KEYS.current, current, serializeExport(snapshot, revision), STORAGE_KEYS.previous);
+      loadedRevision = revision;
+    });
+    writes = write.catch(() => {});
+    return write;
+  };
+
   const readRecoveryData = async (): Promise<RecoveryData> => ({
     current: await keyValueStore.getItem(STORAGE_KEYS.current),
     previous: await keyValueStore.getItem(STORAGE_KEYS.previous),
@@ -132,7 +164,7 @@ export const createWorkspaceRepository = (keyValueStore: KeyValueStore = store):
     loadedRevision = revision;
   };
 
-  return { load, save, readRecoveryData, restorePreviousBackup };
+  return { load, save, restoreFullBackup, readRecoveryData, restorePreviousBackup };
 };
 
 export const workspaceRepository = createWorkspaceRepository();

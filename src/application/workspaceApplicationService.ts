@@ -1,6 +1,5 @@
 import { evaluateWorkspace } from "../domain/evaluateWorkspace";
 import { parseExport, serializeExport } from "../domain/backupFormat";
-import { createCommandQueue } from "../domain/commandQueue";
 import { runDailyStockConditionScan } from "../lib/stockConditionScanner";
 import { createId } from "../platform/identity";
 import type { AppData } from "../types";
@@ -25,13 +24,21 @@ export const createWorkspaceApplicationService = (dependencies: {
   publish: (next: AppData) => void;
 }): WorkspaceApplicationService => {
   const repository = dependencies.repository ?? workspaceRepository;
-  const commandQueue = createCommandQueue<AppData>(
-    dependencies.getCurrent,
-    next => repository.save(next),
-    dependencies.publish,
-  );
+  let commandTail: Promise<unknown> = Promise.resolve();
+  const enqueue = <T>(operation: () => Promise<T>): Promise<T> => {
+    const command = commandTail.then(operation);
+    commandTail = command.catch(() => {});
+    return command;
+  };
 
-  const commit = (change: AppDataChange) => commandQueue(current => evaluateWorkspace(typeof change === "function" ? change(current) : change));
+  const commit = (change: AppDataChange) => enqueue(async () => {
+    const current = dependencies.getCurrent();
+    if (current === null && typeof change === "function") throw new Error("Workspace is not loaded.");
+    const next = evaluateWorkspace(typeof change === "function" ? change(current as AppData) : change);
+    await repository.save(next);
+    dependencies.publish(next);
+    return next;
+  });
 
   return {
     load: () => repository.load(),
@@ -67,7 +74,11 @@ export const createWorkspaceApplicationService = (dependencies: {
     },
     async importBackup(raw: string) {
       const imported = parseExport(raw);
-      await commit({ ...imported, workspaceId: createId("restored") });
+      const restored = { ...imported, workspaceId: createId("restored") };
+      await enqueue(async () => {
+        await repository.restoreFullBackup(restored);
+        dependencies.publish(restored);
+      });
     },
     exportBackup() {
       const current = dependencies.getCurrent();
