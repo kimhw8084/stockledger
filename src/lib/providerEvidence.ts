@@ -1,9 +1,12 @@
 import type { MockSnapshot, Stock, VisualEvidenceCard, VisualEvidenceGroup } from "../types";
 import type { AppLanguage } from "./preferences";
+import { getMetricContract } from "./metricCatalog";
 /** Real-data cards never infer unavailable fundamentals, events or sector prices. */
 export function providerEvidence(stock: Stock, snapshot: MockSnapshot, language: AppLanguage): VisualEvidenceGroup[] {
   const ko = language === "ko";
   const valid = Boolean(snapshot.provenance) && snapshot.freshness !== "Unavailable";
+  const sessions = (key: string) => getMetricContract(key)?.windowSessions ?? 0;
+  const threshold = (key: string, name: string) => getMetricContract(key)?.thresholds?.[name];
   const metric = (key: string, name: string, family: VisualEvidenceCard["family"], value: number | boolean | undefined, unit = "%", series?: number[]): VisualEvidenceCard => ({
     id: `${stock.id}-${key}`, family, title: name, role: "Supporting Evidence",
     status: value === undefined || !valid ? "Unavailable" : snapshot.freshness === "Stale" ? "Stale" : snapshot.freshness === "Partial" ? "Partial" : "Passed",
@@ -16,13 +19,13 @@ export function providerEvidence(stock: Stock, snapshot: MockSnapshot, language:
   });
   const cards: VisualEvidenceCard[] = [
     metric("price", ko ? "종가" : "Closing price", "Price Damage", valid ? snapshot.price : undefined, " USD", snapshot.priceHistorySeries),
-    metric("drawdown", ko ? "252일 고점 대비" : "Drawdown from 252-session closing high", "Price Damage", (snapshot.priceHistorySeries?.length ?? 0) >= 252 ? snapshot.drawdownPct : undefined),
-    metric("ma20", "20-session moving-average distance", "Trend & Stabilization", snapshot.movingAverage20DistancePct),
-    metric("ma50", "50-session moving-average distance", "Trend & Stabilization", snapshot.movingAverage50DistancePct),
-    metric("ma200", "200-session moving-average distance", "Trend & Stabilization", snapshot.movingAverage200DistancePct),
-    metric("relative-strength", "60-session excess return vs SPY", "Relative Strength", snapshot.relativeStrengthVsSpyPct, " pp"),
-    metric("volume", "Volume > 1.4 × prior 20-session mean", "Volume & Volatility", snapshot.volumeSpike, "", snapshot.volumeHistorySeries),
-    metric("range", "10-session mean high/low range", "Volume & Volatility", snapshot.averageRangePct, "%", snapshot.volatilityHistorySeries),
+    metric("drawdown", ko ? `${sessions("drawdown_from_recent_high")}일 고점 대비` : `Drawdown from ${sessions("drawdown_from_recent_high")}-session closing high`, "Price Damage", (snapshot.priceHistorySeries?.length ?? 0) >= (getMetricContract("drawdown_from_recent_high")?.warmupSessions ?? Number.MAX_SAFE_INTEGER) ? snapshot.drawdownPct : undefined),
+    metric("ma20", `${sessions("distance_from_ma_20")}-session moving-average distance`, "Trend & Stabilization", snapshot.movingAverage20DistancePct),
+    metric("ma50", `${sessions("distance_from_ma_50")}-session moving-average distance`, "Trend & Stabilization", snapshot.movingAverage50DistancePct),
+    metric("ma200", `${sessions("distance_from_ma_200")}-session moving-average distance`, "Trend & Stabilization", snapshot.movingAverage200DistancePct),
+    metric("relative-strength", `${sessions("relative_strength_vs_spy")}-session excess return vs SPY`, "Relative Strength", snapshot.relativeStrengthVsSpyPct, " pp"),
+    metric("volume", `Volume > ${threshold("volume_spike", "spikeMultiple")} × prior ${getMetricContract("volume_spike")?.warmupSessions! - 1}-session mean`, "Volume & Volatility", snapshot.volumeSpike, "", snapshot.volumeHistorySeries),
+    metric("range", `${sessions("average_range_pct")}-session mean high/low range`, "Volume & Volatility", snapshot.averageRangePct, "%", snapshot.volatilityHistorySeries),
     metric("valuation", "Valuation discount", "Valuation", snapshot.valuationDiscount),
     metric("revenue", "Revenue growth", "Financial Quality", snapshot.revenueGrowthYoY),
     metric("earnings", "Days until earnings", "Earnings & Events", snapshot.daysUntilEarnings, " days"),

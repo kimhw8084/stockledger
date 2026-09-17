@@ -11,11 +11,12 @@ import {
   UniverseSnapshot,
 } from "../types";
 import { fetch_daily_bars, update_manifest, validateResponse, write_raw_archive } from "./eodDataProvider";
-import { frozenScannerRules, FrozenScannerRule, ScannerSector, scannerSectorEtfMap } from "./frozenScannerRules";
+import { frozenScannerRules, FrozenScannerRule, ScannerSector, scannerSectorEtfMap, scannerTokenFeatureMap } from "./frozenScannerRules";
 import { latestCompletedTradingDate } from "./marketCalendar";
 import { computeProcessedFeaturesForSymbol } from "./processedFeatureEngine";
 import { loadDynamicCurrentUniverse, requiredSymbolsForRules } from "./universeProvider";
 import { contentHash } from "../domain/contentHash";
+import { FINANCIAL_TRUTH_ENGINE_VERSION, getMetricContract } from "./metricCatalog";
 
 const PROVIDER_NAME = "Stooq Daily Provider";
 const SURVIVORSHIP_LABEL = "Current-constituent biased historical proof";
@@ -36,12 +37,22 @@ const getSectorMembers = (snapshot: UniverseSnapshot, sector: ScannerSector) =>
   snapshot.sectorSnapshots.find((entry) => entry.sector === sector)?.tickers ?? [];
 
 const missingWarmupForRule = (rule: FrozenScannerRule, stockBars: RawBarRecord[], spyBars: RawBarRecord[], sectorBars: RawBarRecord[]) => {
-  const maxLookback = Math.max(rule.parameters.window, 50, 20);
-  const required = maxLookback + Math.max(rule.parameters.reclaimDays ?? 0, 20);
+  const featureWarmups = rule.activeConditions.flatMap((token) =>
+    (scannerTokenFeatureMap[token] ?? []).map((feature) => getMetricContract(feature)?.warmupSessions ?? 0),
+  );
+  const failedBreakWarmup = rule.activeConditions.includes("FAILED_BREAK")
+    ? rule.parameters.window + (rule.parameters.reclaimDays ?? 0) + 1
+    : 0;
+  const reclaimWarmup = rule.activeConditions.includes("RECLAIM_LOW") ? rule.parameters.window + 1 : 0;
+  const required = Math.max(...featureWarmups, failedBreakWarmup, reclaimWarmup, 1);
   const missing: string[] = [];
   if (stockBars.length < required) missing.push(`stock_history_lt_${required}`);
-  if (spyBars.length < 50) missing.push("spy_history_lt_50");
-  if (sectorBars.length < 50) missing.push("sector_history_lt_50");
+  const spyRequired = Math.max(...rule.activeConditions.flatMap((token) =>
+    (scannerTokenFeatureMap[token] ?? []).filter((feature) => getMetricContract(feature)?.benchmark === "SPY").map((feature) => getMetricContract(feature)?.warmupSessions ?? 0), 0), 1);
+  const sectorRequired = Math.max(...rule.activeConditions.flatMap((token) =>
+    (scannerTokenFeatureMap[token] ?? []).filter((feature) => getMetricContract(feature)?.benchmark === "sector_etf").map((feature) => getMetricContract(feature)?.warmupSessions ?? 0), 0), 1);
+  if (spyBars.length < spyRequired) missing.push(`spy_history_lt_${spyRequired}`);
+  if (sectorBars.length < sectorRequired) missing.push(`sector_history_lt_${sectorRequired}`);
   return missing;
 };
 
@@ -75,11 +86,9 @@ export const evaluateToken = (
   stockBars: RawBarRecord[],
 ) => {
   const values = features.featureValues;
-  const required: Record<string, string[]> = {
-    DEEP_DISCOUNT: ["DD_126"], MA20: ["Close", "MA20"], MA20_RECLAIM: ["Close", "MA20"],
-    MA10: ["Close", "MA10"], NO_VOL_REJECT: ["VOL_SPIKE_20"], RS_IMP: ["RS_IMPROVE_5"],
-    RS_SPY_POS: ["EXRET_20_SPY"], RS_SEC_POS: ["EXRET_20_SECTOR"], SEC_M50: ["SECTOR_ABOVE_MA50"],
-  };
+  const required = Object.fromEntries(
+    Object.entries(scannerTokenFeatureMap).map(([key, featureKeys]) => [key, featureKeys.filter((featureKey) => featureKey in values)]),
+  ) as Record<string, string[]>;
   if ((required[token] ?? []).some(key => values[key] === null || values[key] === undefined || (typeof values[key] === "number" && !Number.isFinite(values[key])))) return null;
   switch (token) {
     case "DEEP_DISCOUNT":
@@ -90,13 +99,13 @@ export const evaluateToken = (
     case "MA10":
       return typeof values.Close === "number" && typeof values.MA10 === "number" && values.Close > values.MA10;
     case "NO_VOL_REJECT":
-      return typeof values.VOL_SPIKE_20 === "number" && values.VOL_SPIKE_20 <= 2.5;
+      return typeof values.VOL_SPIKE_20 === "number" && values.VOL_SPIKE_20 <= Number(getMetricContract("VOL_SPIKE_20")?.thresholds?.noRejectMax ?? Number.NaN);
     case "RS_IMP":
-      return typeof values.RS_IMPROVE_5 === "number" && values.RS_IMPROVE_5 > 0;
+      return typeof values.RS_IMPROVE_5 === "number" && values.RS_IMPROVE_5 > Number(getMetricContract("RS_IMPROVE_5")?.thresholds?.positive ?? Number.NaN);
     case "RS_SPY_POS":
-      return typeof values.EXRET_20_SPY === "number" && values.EXRET_20_SPY > 0;
+      return typeof values.EXRET_20_SPY === "number" && values.EXRET_20_SPY > Number(getMetricContract("EXRET_20_SPY")?.thresholds?.positive ?? Number.NaN);
     case "RS_SEC_POS":
-      return typeof values.EXRET_20_SECTOR === "number" && values.EXRET_20_SECTOR > 0;
+      return typeof values.EXRET_20_SECTOR === "number" && values.EXRET_20_SECTOR > Number(getMetricContract("EXRET_20_SECTOR")?.thresholds?.positive ?? Number.NaN);
     case "SEC_M50":
       return values.SECTOR_ABOVE_MA50 === true;
     case "FAILED_BREAK":
@@ -321,7 +330,7 @@ export const runDailyStockConditionScan = async (input: {
   );
 
   const scanRun: ScanRun = {
-    id: `scan-${contentHash({ date: latestExpectedDate, batch: batch.id, universe: universeSnapshot.snapshotHash, rules: frozenScannerRules.map(rule => rule.ruleSignatureHash), engine: "2.0.0" })}`,
+    id: `scan-${contentHash({ date: latestExpectedDate, batch: batch.id, universe: universeSnapshot.snapshotHash, rules: frozenScannerRules.map(rule => rule.ruleSignatureHash), engine: FINANCIAL_TRUTH_ENGINE_VERSION })}`,
     scanDate: latestExpectedDate,
     latestExpectedTradingDate: latestExpectedDate,
     startedAtUtc: startedAt,
@@ -351,7 +360,7 @@ export const runDailyStockConditionScan = async (input: {
       missingWarmup.push(...benchmarkIssues);
       if (batch.adjustedStatus !== "adjusted") missingWarmup.push("adjusted_price_history_required");
       if (!symbolValidation.valid || missingWarmup.length > 0) {
-        const blockedFeature = computeProcessedFeaturesForSymbol(ticker, rule.sector, stockBars, spyBars, sectorBars);
+        const blockedFeature = computeProcessedFeaturesForSymbol(ticker, rule.sector, stockBars, spyBars, sectorBars, input.now?.toISOString() ?? scanRun.startedAtUtc);
         if (blockedFeature) processedFeatures.push(blockedFeature);
         scanSignals.push(
           buildSignal(
@@ -368,7 +377,7 @@ export const runDailyStockConditionScan = async (input: {
               asOfDate: latestExpectedDate,
               sector: rule.sector,
               sectorEtf: scannerSectorEtfMap[rule.sector],
-              featureSemanticsVersion: "app_v1",
+              featureSemanticsVersion: getMetricContract("MA10")?.version ?? "unknown",
               computedAtUtc: new Date().toISOString(),
               featureValues: {},
               featureMeta: {},
@@ -378,7 +387,7 @@ export const runDailyStockConditionScan = async (input: {
         return;
       }
 
-      const featureRecord = computeProcessedFeaturesForSymbol(ticker, rule.sector, stockBars, spyBars, sectorBars);
+      const featureRecord = computeProcessedFeaturesForSymbol(ticker, rule.sector, stockBars, spyBars, sectorBars, input.now?.toISOString() ?? scanRun.startedAtUtc);
       if (!featureRecord) return;
       processedFeatures.push(featureRecord);
       const tokenResults = Object.fromEntries(

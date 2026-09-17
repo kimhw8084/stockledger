@@ -2,6 +2,8 @@
 
 The worker uses the same validation/evaluation engine as the app. It can run while the app is closed, but needs an awake computer and an operator-configured schedule. It reads local CSV files and sends no network requests or emails. It does not place orders.
 
+Before adopting a worker export, run `npm run check:frozen`. This verifies the checked-in V12.3 rule identity/definition contract. Research numerical parity is deliberately release-blocked until the missing source golden outputs are independently supplied.
+
 ## Bootstrap
 
 1. Prepare a personal workspace in the app and export its complete backup.

@@ -36,6 +36,31 @@ export type ConditionVisualStatus =
 
 export type MetricAvailability = "automated" | "manual" | "future";
 
+export type MetricAlignment = "dated_sessions" | "point_in_time" | "calendar_days";
+
+/**
+ * The reproducible semantic contract for a production metric or derived
+ * scanner feature. A missing or invalid observation is never a false value.
+ */
+export interface MetricContract {
+  version: string;
+  formulaKey: string;
+  formula: string;
+  requiredData: string[];
+  rawInputFields: string[];
+  windowSessions: number | null;
+  warmupSessions: number;
+  inputUnit: string;
+  outputUnit: string;
+  missingData: "unknown";
+  benchmark: "none" | "SPY" | "sector_etf";
+  alignment: MetricAlignment;
+  adjustmentBasis: "adjusted" | "declared" | "not_applicable";
+  includesCurrentObservation: boolean;
+  thresholds?: Record<string, number | string | boolean>;
+  displayPrecision?: number;
+}
+
 export type ConditionRole =
   | "Eligibility Filter"
   | "Supporting Evidence"
@@ -97,6 +122,7 @@ export interface MetricDefinition {
   missingDataBehavior: string;
   origin?: "starter" | "custom";
   createdAt?: string;
+  semanticContract?: MetricContract;
 }
 
 export interface FormulaDefinition {
@@ -106,6 +132,7 @@ export interface FormulaDefinition {
   equation?: string;
   requiredData: string[];
   outputType: "number" | "boolean" | "string";
+  semanticContract?: MetricContract;
 }
 
 export interface RecipeStateConfig {
@@ -330,6 +357,7 @@ export interface Evaluation {
   id?: string;
   inputHash?: string;
   engineVersion?: string;
+  metricContractVersion?: string;
   eligibilityMet?: boolean;
   qualityBlocked?: boolean;
   eyeId: string;

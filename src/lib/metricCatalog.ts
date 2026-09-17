@@ -1,6 +1,112 @@
-import { FormulaDefinition, MetricDefinition } from "../types";
+import type { Eye, FormulaDefinition, MetricContract, MetricDefinition, MockSnapshot, RecipeCondition } from "../types";
 
-export const formulaRegistry: FormulaDefinition[] = [
+export const PRODUCTION_METRIC_CONTRACT_VERSION = "financial_truth_v1";
+export const FINANCIAL_TRUTH_ENGINE_VERSION = "2.1.0";
+
+const makeContract = (
+  formulaKey: string,
+  formula: string,
+  requiredData: string[],
+  rawInputFields: string[],
+  windowSessions: number | null,
+  warmupSessions: number,
+  inputUnit: string,
+  outputUnit: string,
+  benchmark: MetricContract["benchmark"],
+  alignment: MetricContract["alignment"],
+  adjustmentBasis: MetricContract["adjustmentBasis"],
+  includesCurrentObservation: boolean,
+  extra: Pick<MetricContract, "thresholds" | "displayPrecision"> = {},
+): MetricContract => ({
+  version: PRODUCTION_METRIC_CONTRACT_VERSION,
+  formulaKey,
+  formula,
+  requiredData,
+  rawInputFields,
+  windowSessions,
+  warmupSessions,
+  inputUnit,
+  outputUnit,
+  missingData: "unknown",
+  benchmark,
+  alignment,
+  adjustmentBasis,
+  includesCurrentObservation,
+  ...extra,
+});
+
+/**
+ * The only authoritative definition of supported metric semantics. Generic
+ * recipe metrics and frozen-scanner features intentionally use distinct keys
+ * when their units or windows differ (for example percentage vs decimal
+ * returns, or current-inclusive vs prior-window volume ratios).
+ */
+export const metricContractRegistry: Readonly<Record<string, MetricContract>> = {
+  raw_passthrough: makeContract("raw_passthrough", "L1 = L0", [], [], null, 0, "declared", "declared", "none", "point_in_time", "not_applicable", true),
+  custom_expression: makeContract("custom_expression", "L1 = f(L0, L0, ...)", [], [], null, 0, "declared", "declared", "none", "point_in_time", "not_applicable", true),
+  drawdown_from_recent_high: makeContract("drawdown_pct", "Close[t] / max(Close[t-251:t]) - 1", ["priceHistorySeries"], ["Close"], 252, 252, "USD/share", "percent", "none", "dated_sessions", "adjusted", true, { displayPrecision: 1 }),
+  near_support: makeContract("near_support_bool", "Close[t] in [min(Close[t-19:t]), min(Close[t-19:t]) * 1.05]", ["priceHistorySeries"], ["Close"], 20, 20, "USD/share", "boolean", "none", "dated_sessions", "adjusted", true, { thresholds: { supportBandPct: 0.05 } }),
+  valuation_discount: makeContract("valuation_discount_bool", "valuationDiscount == true", ["valuationSnapshot"], ["valuationDiscount"], null, 0, "declared valuation", "boolean", "none", "point_in_time", "declared", true),
+  relative_strength_vs_spy: makeContract("relative_strength_vs_spy_pct", "(Close[t] / Close[t-60] - 1) - (SPY[t] / SPY[t-60] - 1)", ["priceHistorySeries", "benchmarkHistorySeries"], ["Close", "SPY_Close"], 60, 61, "USD/share", "percent", "SPY", "dated_sessions", "adjusted", true, { displayPrecision: 1 }),
+  distance_from_ma_50: makeContract("distance_from_ma_50_pct", "Close[t] / mean(Close[t-49:t]) - 1", ["priceHistorySeries"], ["Close"], 50, 50, "USD/share", "percent", "none", "dated_sessions", "adjusted", true, { displayPrecision: 1 }),
+  distance_from_ma_20: makeContract("distance_from_ma_20_pct", "Close[t] / mean(Close[t-19:t]) - 1", ["priceHistorySeries"], ["Close"], 20, 20, "USD/share", "percent", "none", "dated_sessions", "adjusted", true, { displayPrecision: 1 }),
+  distance_from_ma_200: makeContract("distance_from_ma_200_pct", "Close[t] / mean(Close[t-199:t]) - 1", ["priceHistorySeries"], ["Close"], 200, 200, "USD/share", "percent", "none", "dated_sessions", "adjusted", true, { displayPrecision: 1 }),
+  volume_spike: makeContract("volume_spike_bool", "Volume[t] > 1.4 * mean(Volume[t-20:t-1])", ["volumeHistorySeries"], ["Volume"], 20, 21, "shares", "boolean", "none", "dated_sessions", "declared", true, { thresholds: { spikeMultiple: 1.4 } }),
+  volume_average_20d: makeContract("volume_average_20d", "mean(Volume[t-19:t])", ["volumeHistorySeries"], ["Volume"], 20, 20, "shares", "shares", "none", "dated_sessions", "declared", true),
+  volatility_compression: makeContract("volatility_compression_bool", "mean(Range[t-9:t]) < 0.85 * mean(Range[t-29:t])", ["volatilityHistorySeries"], ["Range"], 30, 30, "percent", "boolean", "none", "dated_sessions", "declared", true, { thresholds: { compressionMultiple: 0.85 } }),
+  average_range_pct: makeContract("average_range_pct", "mean(Range[t-9:t])", ["volatilityHistorySeries"], ["Range"], 10, 10, "percent", "percent", "none", "dated_sessions", "declared", true, { displayPrecision: 1 }),
+  price_return_20d: makeContract("price_return_20d_pct", "Close[t] / Close[t-20] - 1", ["priceHistorySeries"], ["Close"], 20, 21, "USD/share", "percent", "none", "dated_sessions", "adjusted", true, { displayPrecision: 1 }),
+  price_return_60d: makeContract("price_return_60d_pct", "Close[t] / Close[t-60] - 1", ["priceHistorySeries"], ["Close"], 60, 61, "USD/share", "percent", "none", "dated_sessions", "adjusted", true, { displayPrecision: 1 }),
+  rebound_from_recent_low: makeContract("rebound_from_recent_low_pct", "Close[t] / min(Close[t-19:t]) - 1", ["priceHistorySeries"], ["Close"], 20, 20, "USD/share", "percent", "none", "dated_sessions", "adjusted", true, { displayPrecision: 1 }),
+  revenue_growth_yoy: makeContract("revenue_growth_yoy", "reported revenue[t] / reported revenue[t-4] - 1", ["financialStatementSnapshot"], ["Revenue"], null, 0, "reported currency", "percent", "none", "point_in_time", "declared", true, { displayPrecision: 1 }),
+  margin_change_pct: makeContract("margin_change_pct", "margin[t] - margin[prior reference]", ["financialStatementSnapshot"], ["Margin"], null, 0, "percent", "percentage points", "none", "point_in_time", "declared", true, { displayPrecision: 1 }),
+  debt_risk_level: makeContract("debt_risk_level", "declared debt-risk classification", ["financialStatementSnapshot"], ["Cash", "Debt", "CashFlow"], null, 0, "reported currency", "classification", "none", "point_in_time", "declared", true),
+  earnings_soon: makeContract("earnings_soon_bool", "next earnings event is within the configured risk window", ["eventCalendar"], ["NextEarningsDate"], null, 0, "calendar date", "boolean", "none", "calendar_days", "declared", true),
+  days_until_earnings: makeContract("days_until_earnings", "next earnings date - evaluation date", ["eventCalendar"], ["NextEarningsDate"], null, 0, "calendar date", "calendar days", "none", "calendar_days", "declared", true),
+  price_inside_entry_zone: makeContract("price_inside_entry_zone", "EntryLow <= Close[t] <= EntryHigh", ["priceHistorySeries", "plannedEntryRange"], ["Close", "EntryLow", "EntryHigh"], 1, 1, "USD/share", "boolean", "none", "dated_sessions", "adjusted", true),
+  price_beyond_entry_zone: makeContract("price_beyond_entry_zone", "Close[t] < EntryLow or Close[t] > EntryHigh", ["priceHistorySeries", "plannedEntryRange"], ["Close", "EntryLow", "EntryHigh"], 1, 1, "USD/share", "boolean", "none", "dated_sessions", "adjusted", true),
+  days_since_last_review: makeContract("days_since_last_review", "evaluation instant - last review instant", ["lastThesisReviewAt"], ["LastReviewedAt"], null, 0, "UTC instant", "calendar days", "none", "calendar_days", "not_applicable", true),
+  thesis_review_stale: makeContract("thesis_review_stale", "days_since_last_review >= 14", ["lastThesisReviewAt"], ["LastReviewedAt"], null, 0, "UTC instant", "boolean", "none", "calendar_days", "not_applicable", true, { thresholds: { staleAfterDays: 14 } }),
+  manual_flag_present: makeContract("manual_flag_present", "riskFlags.length > 0 or expected flag is present", ["manualRiskFlags"], ["RiskFlags"], null, 0, "declared tags", "boolean", "none", "point_in_time", "not_applicable", true),
+
+  // Frozen V12.3 research features. These are separate contracts because the
+  // research export uses decimal returns and a current-inclusive volume ratio.
+  MA10: makeContract("scanner_ma10", "mean(Close[t-9:t])", ["ohlcvBarSeries"], ["Close"], 10, 10, "USD/share", "USD/share", "none", "dated_sessions", "adjusted", true),
+  MA20: makeContract("scanner_ma20", "mean(Close[t-19:t])", ["ohlcvBarSeries"], ["Close"], 20, 20, "USD/share", "USD/share", "none", "dated_sessions", "adjusted", true),
+  MA50: makeContract("scanner_ma50", "mean(Close[t-49:t])", ["ohlcvBarSeries"], ["Close"], 50, 50, "USD/share", "USD/share", "none", "dated_sessions", "adjusted", true),
+  DD_126: makeContract("scanner_dd_126", "Close[t] / max(Close[t-125:t]) - 1", ["ohlcvBarSeries"], ["Close"], 126, 126, "USD/share", "decimal", "none", "dated_sessions", "adjusted", true),
+  RET_20_STOCK: makeContract("scanner_ret_20_stock", "Close[t] / Close[t-20] - 1", ["ohlcvBarSeries"], ["Close"], 20, 21, "USD/share", "decimal", "none", "dated_sessions", "adjusted", true),
+  RET_20_SPY: makeContract("scanner_ret_20_spy", "SPY_Close[t] / SPY_Close[t-20] - 1", ["benchmarkHistorySeries"], ["SPY_Close"], 20, 21, "USD/share", "decimal", "SPY", "dated_sessions", "adjusted", true),
+  RET_20_SECTOR: makeContract("scanner_ret_20_sector", "SectorETF_Close[t] / SectorETF_Close[t-20] - 1", ["sectorBenchmarkSeries"], ["SectorETF_Close"], 20, 21, "USD/share", "decimal", "sector_etf", "dated_sessions", "adjusted", true),
+  EXRET_20_SPY: makeContract("scanner_exret_20_spy", "RET_20_STOCK - RET_20_SPY", ["ohlcvBarSeries", "benchmarkHistorySeries"], ["Close", "SPY_Close"], 20, 21, "decimal return", "decimal", "SPY", "dated_sessions", "adjusted", true, { thresholds: { positive: 0 } }),
+  EXRET_20_SECTOR: makeContract("scanner_exret_20_sector", "RET_20_STOCK - RET_20_SECTOR", ["ohlcvBarSeries", "sectorBenchmarkSeries"], ["Close", "SectorETF_Close"], 20, 21, "decimal return", "decimal", "sector_etf", "dated_sessions", "adjusted", true, { thresholds: { positive: 0 } }),
+  VOL_SPIKE_20: makeContract("scanner_vol_spike_20", "Volume[t] / mean(Volume[t-19:t])", ["ohlcvBarSeries"], ["Volume"], 20, 20, "shares", "ratio", "none", "dated_sessions", "adjusted", true, { thresholds: { noRejectMax: 2.5 } }),
+  SECTOR_ABOVE_MA50: makeContract("scanner_sector_above_ma50", "SectorETF_Close[t] > mean(SectorETF_Close[t-49:t])", ["sectorBenchmarkSeries"], ["SectorETF_Close"], 50, 50, "USD/share", "boolean", "sector_etf", "dated_sessions", "adjusted", true),
+  RS_SERIES_SPY: makeContract("scanner_rs_series_spy", "Close[t] / SPY_Close[t]", ["ohlcvBarSeries", "benchmarkHistorySeries"], ["Close", "SPY_Close"], 1, 1, "USD/share", "ratio", "SPY", "dated_sessions", "adjusted", true),
+  RS_IMPROVE_5: makeContract("scanner_rs_improve_5", "RS_SERIES_SPY[t] / RS_SERIES_SPY[t-5] - 1", ["ohlcvBarSeries", "benchmarkHistorySeries"], ["Close", "SPY_Close"], 5, 6, "ratio", "decimal", "SPY", "dated_sessions", "adjusted", true, { thresholds: { positive: 0 } }),
+  prior_low_45: makeContract("scanner_prior_low_45", "min(Low[t-45:t-1])", ["ohlcvBarSeries"], ["Low"], 45, 46, "USD/share", "USD/share", "none", "dated_sessions", "adjusted", false),
+  prior_low_63: makeContract("scanner_prior_low_63", "min(Low[t-63:t-1])", ["ohlcvBarSeries"], ["Low"], 63, 64, "USD/share", "USD/share", "none", "dated_sessions", "adjusted", false),
+  prior_low_90: makeContract("scanner_prior_low_90", "min(Low[t-90:t-1])", ["ohlcvBarSeries"], ["Low"], 90, 91, "USD/share", "USD/share", "none", "dated_sessions", "adjusted", false),
+  prior_low_126: makeContract("scanner_prior_low_126", "min(Low[t-126:t-1])", ["ohlcvBarSeries"], ["Low"], 126, 127, "USD/share", "USD/share", "none", "dated_sessions", "adjusted", false),
+  broke_prior_low_N: makeContract("scanner_broke_prior_low_N", "Low[t] < min(Low[t-N:t-1])", ["ohlcvBarSeries"], ["Low"], null, 0, "USD/share", "boolean", "none", "dated_sessions", "adjusted", true),
+  broke_prior_low_45: makeContract("scanner_broke_prior_low_45", "Low[t] < min(Low[t-45:t-1])", ["ohlcvBarSeries"], ["Low"], 45, 46, "USD/share", "boolean", "none", "dated_sessions", "adjusted", true),
+  broke_prior_low_63: makeContract("scanner_broke_prior_low_63", "Low[t] < min(Low[t-63:t-1])", ["ohlcvBarSeries"], ["Low"], 63, 64, "USD/share", "boolean", "none", "dated_sessions", "adjusted", true),
+  broke_prior_low_90: makeContract("scanner_broke_prior_low_90", "Low[t] < min(Low[t-90:t-1])", ["ohlcvBarSeries"], ["Low"], 90, 91, "USD/share", "boolean", "none", "dated_sessions", "adjusted", true),
+  broke_prior_low_126: makeContract("scanner_broke_prior_low_126", "Low[t] < min(Low[t-126:t-1])", ["ohlcvBarSeries"], ["Low"], 126, 127, "USD/share", "boolean", "none", "dated_sessions", "adjusted", true),
+  failed_break_N_R: makeContract("scanner_failed_break_N_R", "any(Low[t-i] < min(Low[t-i-N:t-i-1]) for i=0..R-1)", ["ohlcvBarSeries"], ["Low"], null, 0, "USD/share", "boolean", "none", "dated_sessions", "adjusted", true),
+  reclaim_low_N: makeContract("scanner_reclaim_low_N", "Close[t] > min(Low[t-N:t-1])", ["ohlcvBarSeries"], ["Close", "Low"], null, 0, "USD/share", "boolean", "none", "dated_sessions", "adjusted", true),
+  RECLAIM_LOW_45: makeContract("scanner_reclaim_low_45", "Close[t] > min(Low[t-45:t-1])", ["ohlcvBarSeries"], ["Close", "Low"], 45, 46, "USD/share", "boolean", "none", "dated_sessions", "adjusted", true),
+  RECLAIM_LOW_63: makeContract("scanner_reclaim_low_63", "Close[t] > min(Low[t-63:t-1])", ["ohlcvBarSeries"], ["Close", "Low"], 63, 64, "USD/share", "boolean", "none", "dated_sessions", "adjusted", true),
+  RECLAIM_LOW_90: makeContract("scanner_reclaim_low_90", "Close[t] > min(Low[t-90:t-1])", ["ohlcvBarSeries"], ["Close", "Low"], 90, 91, "USD/share", "boolean", "none", "dated_sessions", "adjusted", true),
+  RECLAIM_LOW_126: makeContract("scanner_reclaim_low_126", "Close[t] > min(Low[t-126:t-1])", ["ohlcvBarSeries"], ["Close", "Low"], 126, 127, "USD/share", "boolean", "none", "dated_sessions", "adjusted", true),
+};
+
+export const metricContracts = metricContractRegistry;
+
+export const getMetricContract = (metricKey?: string) =>
+  metricKey ? metricContractRegistry[metricKey] : undefined;
+
+const formulaRegistryMetadata: FormulaDefinition[] = [
   {
     key: "raw_passthrough",
     name: "원천값 직접 사용",
@@ -199,7 +305,7 @@ export const formulaRegistry: FormulaDefinition[] = [
   },
 ];
 
-export const metricCatalog: MetricDefinition[] = [
+const metricCatalogMetadata: MetricDefinition[] = [
   {
     key: "drawdown_from_recent_high",
     name: "최근 고점 대비 하락폭",
@@ -477,6 +583,279 @@ export const metricCatalog: MetricDefinition[] = [
     missingDataBehavior: "위험이 없다고 가정하지 않습니다. 명시적으로 없을 때만 통과로 봅니다.",
   },
 ];
+
+const finite = (value: unknown): value is number => typeof value === "number" && Number.isFinite(value);
+export const latestFinite = (values?: number[]) => {
+  const value = values?.at(-1);
+  return finite(value) ? value : undefined;
+};
+const exactWindow = (values: number[] | undefined, length: number) => {
+  if (!values || values.length < length) return undefined;
+  const window = values.slice(-length);
+  return window.every(finite) ? window : undefined;
+};
+const contractWarmup = (key: string) => {
+  const warmup = getMetricContract(key)?.warmupSessions;
+  if (typeof warmup !== "number") throw new Error(`Metric contract ${key} has no warmup.`);
+  return warmup;
+};
+const average = (values: number[]) => values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : undefined;
+export const pctChange = (current: number | undefined, base: number | undefined) =>
+  current !== undefined && base !== undefined && base !== 0 ? (current / base - 1) * 100 : undefined;
+const daysBetween = (now: Date, value?: string) => {
+  if (!value) return undefined;
+  const time = Date.parse(value);
+  return Number.isFinite(time) ? Math.floor((now.getTime() - time) / 86400000) : undefined;
+};
+
+const benchmarkValueAtDate = (snapshot: MockSnapshot, date: string | undefined) => {
+  if (!date || !snapshot.benchmarkDates || !snapshot.benchmarkHistorySeries) return undefined;
+  const index = snapshot.benchmarkDates.indexOf(date);
+  const value = index < 0 ? undefined : snapshot.benchmarkHistorySeries[index];
+  return finite(value) ? value : undefined;
+};
+
+const datedBenchmarkWindow = (snapshot: MockSnapshot, length: number) => {
+  const stockDates = snapshot.historyDates;
+  if (!stockDates || stockDates.length < length) return undefined;
+  const dates = stockDates.slice(-length);
+  const values = dates.map((date) => benchmarkValueAtDate(snapshot, date));
+  return values.every(finite) ? values : undefined;
+};
+
+const expressionParameterValue = (
+  snapshot: MockSnapshot,
+  eye: Eye,
+  key: string,
+  now = new Date(snapshot.updatedAt),
+): number | undefined => {
+  switch (key) {
+    case "PRICE_NOW":
+      return latestFinite(snapshot.priceHistorySeries) ?? (finite(snapshot.price) ? snapshot.price : undefined);
+    case "PRICE_20D_AGO":
+      return exactWindow(snapshot.priceHistorySeries, contractWarmup("price_return_20d"))?.at(-contractWarmup("price_return_20d"));
+    case "PRICE_60D_AGO":
+      return exactWindow(snapshot.priceHistorySeries, contractWarmup("price_return_60d"))?.at(-contractWarmup("price_return_60d"));
+    case "PRICE_HIGH_252D": {
+      const values = exactWindow(snapshot.priceHistorySeries, contractWarmup("drawdown_from_recent_high"));
+      return values ? Math.max(...values) : undefined;
+    }
+    case "PRICE_LOW_20D": {
+      const values = exactWindow(snapshot.priceHistorySeries, contractWarmup("near_support"));
+      return values ? Math.min(...values) : undefined;
+    }
+    case "PRICE_AVG_20D": {
+      const values = exactWindow(snapshot.priceHistorySeries, contractWarmup("distance_from_ma_20"));
+      return values ? average(values) : undefined;
+    }
+    case "PRICE_AVG_50D": {
+      const values = exactWindow(snapshot.priceHistorySeries, contractWarmup("distance_from_ma_50"));
+      return values ? average(values) : undefined;
+    }
+    case "PRICE_AVG_200D": {
+      const values = exactWindow(snapshot.priceHistorySeries, contractWarmup("distance_from_ma_200"));
+      return values ? average(values) : undefined;
+    }
+    case "BENCH_NOW": {
+      if (!snapshot.isMock && snapshot.benchmarkSymbol !== getMetricContract("relative_strength_vs_spy")?.benchmark) return undefined;
+      const dated = benchmarkValueAtDate(snapshot, snapshot.historyDates?.at(-1));
+      return dated ?? (snapshot.isMock ? latestFinite(snapshot.benchmarkHistorySeries) : undefined);
+    }
+    case "BENCH_60D_AGO": {
+      if (!snapshot.isMock && snapshot.benchmarkSymbol !== getMetricContract("relative_strength_vs_spy")?.benchmark) return undefined;
+      const warmup = contractWarmup("relative_strength_vs_spy");
+      const dated = benchmarkValueAtDate(snapshot, snapshot.historyDates?.at(-warmup));
+      return dated ?? (snapshot.isMock ? exactWindow(snapshot.benchmarkHistorySeries, warmup)?.at(-warmup) : undefined);
+    }
+    case "VOL_NOW":
+      return latestFinite(snapshot.volumeHistorySeries);
+    case "VOL_AVG_20D": {
+      const values = exactWindow(snapshot.volumeHistorySeries, contractWarmup("volume_average_20d"));
+      return values ? average(values) : undefined;
+    }
+    case "RANGE_AVG_10D": {
+      const values = exactWindow(snapshot.volatilityHistorySeries, contractWarmup("average_range_pct"));
+      return values ? average(values) : undefined;
+    }
+    case "RANGE_AVG_30D": {
+      const values = exactWindow(snapshot.volatilityHistorySeries, contractWarmup("volatility_compression"));
+      return values ? average(values) : undefined;
+    }
+    case "REV_GROWTH": return finite(snapshot.revenueGrowthYoY) ? snapshot.revenueGrowthYoY : undefined;
+    case "MARGIN_DELTA": return finite(snapshot.marginChangePct) ? snapshot.marginChangePct : undefined;
+    case "EARN_DAYS": return finite(snapshot.daysUntilEarnings) ? snapshot.daysUntilEarnings : undefined;
+    case "ENTRY_LOW": return finite(eye.plannedEntryLow ?? snapshot.plannedEntryLow) ? eye.plannedEntryLow ?? snapshot.plannedEntryLow : undefined;
+    case "ENTRY_HIGH": return finite(eye.plannedEntryHigh ?? snapshot.plannedEntryHigh) ? eye.plannedEntryHigh ?? snapshot.plannedEntryHigh : undefined;
+    case "REVIEW_DAYS": return daysBetween(now, eye.lastReviewedAt ?? snapshot.lastThesisReviewAt);
+    case "FLAG_COUNT": return [...(snapshot.riskFlags ?? []), ...(eye.manualFlags ?? [])].length;
+    default: return undefined;
+  }
+};
+
+/** Shared raw-parameter resolver used by the bounded expression engine. */
+export const resolveExpressionParameter = expressionParameterValue;
+
+const evaluateBuiltInMetric = (
+  eye: Eye,
+  snapshot: MockSnapshot,
+  condition: RecipeCondition,
+  key: string,
+  now: Date,
+): string | number | boolean | undefined => {
+  const round = (value: number, precision = 1) => Number(value.toFixed(precision));
+  switch (key) {
+    case "drawdown_from_recent_high":
+    case "drawdown_pct": {
+      const values = exactWindow(snapshot.priceHistorySeries, getMetricContract("drawdown_from_recent_high")!.warmupSessions);
+      const value = values ? pctChange(values.at(-1), Math.max(...values)) : undefined;
+      return value === undefined ? undefined : round(value);
+    }
+    case "near_support":
+    case "near_support_bool": {
+      const values = exactWindow(snapshot.priceHistorySeries, getMetricContract("near_support")!.warmupSessions);
+      if (!values) return undefined;
+      const low = Math.min(...values);
+      const band = Number(getMetricContract("near_support")?.thresholds?.supportBandPct ?? Number.NaN);
+      return values.at(-1)! >= low && values.at(-1)! <= low * (1 + band);
+    }
+    case "valuation_discount":
+    case "valuation_discount_bool":
+      return typeof snapshot.valuationDiscount === "boolean" ? snapshot.valuationDiscount : undefined;
+    case "relative_strength_vs_spy":
+    case "relative_strength_vs_spy_pct": {
+      const contract = getMetricContract("relative_strength_vs_spy")!;
+      if (!snapshot.isMock && snapshot.benchmarkSymbol !== contract.benchmark) return undefined;
+      const stock = exactWindow(snapshot.priceHistorySeries, contract.warmupSessions);
+      const benchmark = snapshot.isMock && !snapshot.historyDates
+        ? exactWindow(snapshot.benchmarkHistorySeries, contract.warmupSessions)
+        : datedBenchmarkWindow(snapshot, contract.warmupSessions);
+      if (!stock || !benchmark) return undefined;
+      const stockReturn = pctChange(stock.at(-1), stock.at(-contract.warmupSessions));
+      const benchmarkReturn = pctChange(benchmark.at(-1), benchmark.at(-contract.warmupSessions));
+      if (stockReturn === undefined || benchmarkReturn === undefined) return undefined;
+      const value = stockReturn - benchmarkReturn;
+      return round(value);
+    }
+    case "distance_from_ma_50":
+    case "distance_from_ma_50_pct": {
+      const values = exactWindow(snapshot.priceHistorySeries, getMetricContract("distance_from_ma_50")!.warmupSessions);
+      const value = values ? pctChange(values.at(-1), average(values)) : undefined;
+      return value === undefined ? undefined : round(value);
+    }
+    case "distance_from_ma_20":
+    case "distance_from_ma_20_pct": {
+      const values = exactWindow(snapshot.priceHistorySeries, getMetricContract("distance_from_ma_20")!.warmupSessions);
+      const value = values ? pctChange(values.at(-1), average(values)) : undefined;
+      return value === undefined ? undefined : round(value);
+    }
+    case "distance_from_ma_200":
+    case "distance_from_ma_200_pct": {
+      const values = exactWindow(snapshot.priceHistorySeries, getMetricContract("distance_from_ma_200")!.warmupSessions);
+      const value = values ? pctChange(values.at(-1), average(values)) : undefined;
+      return value === undefined ? undefined : round(value);
+    }
+    case "price_return_20d":
+    case "price_return_20d_pct": {
+      const warmup = contractWarmup("price_return_20d");
+      const values = exactWindow(snapshot.priceHistorySeries, warmup);
+      const value = values ? pctChange(values.at(-1), values.at(-warmup)) : undefined;
+      return value === undefined ? undefined : round(value);
+    }
+    case "price_return_60d":
+    case "price_return_60d_pct": {
+      const warmup = contractWarmup("price_return_60d");
+      const values = exactWindow(snapshot.priceHistorySeries, warmup);
+      const value = values ? pctChange(values.at(-1), values.at(-warmup)) : undefined;
+      return value === undefined ? undefined : round(value);
+    }
+    case "volume_spike":
+    case "volume_spike_bool": {
+      const values = exactWindow(snapshot.volumeHistorySeries, getMetricContract("volume_spike")!.warmupSessions);
+      if (!values) return undefined;
+      const baseline = average(values.slice(0, -1));
+      const multiple = Number(getMetricContract("volume_spike")?.thresholds?.spikeMultiple ?? Number.NaN);
+      return baseline === undefined || baseline <= 0 ? undefined : values.at(-1)! > baseline * multiple;
+    }
+    case "volatility_compression":
+    case "volatility_compression_bool": {
+      const values = exactWindow(snapshot.volatilityHistorySeries, contractWarmup("volatility_compression"));
+      if (!values) return undefined;
+      const recentWarmup = contractWarmup("average_range_pct");
+      const multiple = Number(getMetricContract("volatility_compression")?.thresholds?.compressionMultiple ?? Number.NaN);
+      return average(values.slice(-recentWarmup))! < average(values)! * multiple;
+    }
+    case "average_range_pct": {
+      const values = exactWindow(snapshot.volatilityHistorySeries, getMetricContract("average_range_pct")!.warmupSessions);
+      const value = values ? average(values) : undefined;
+      return value === undefined ? undefined : round(value);
+    }
+    case "revenue_growth_yoy": return finite(snapshot.revenueGrowthYoY) ? round(snapshot.revenueGrowthYoY) : undefined;
+    case "margin_change_pct": return finite(snapshot.marginChangePct) ? round(snapshot.marginChangePct) : undefined;
+    case "debt_risk_level": return snapshot.debtRiskLevel;
+    case "earnings_soon":
+    case "earnings_soon_bool": return typeof snapshot.earningsSoon === "boolean" ? snapshot.earningsSoon : undefined;
+    case "days_until_earnings": return finite(snapshot.daysUntilEarnings) ? snapshot.daysUntilEarnings : undefined;
+    case "price_inside_entry_zone": {
+      const low = expressionParameterValue(snapshot, eye, "ENTRY_LOW", now);
+      const high = expressionParameterValue(snapshot, eye, "ENTRY_HIGH", now);
+      const current = expressionParameterValue(snapshot, eye, "PRICE_NOW", now);
+      return low !== undefined && high !== undefined && current !== undefined ? current >= low && current <= high : undefined;
+    }
+    case "price_beyond_entry_zone": {
+      const low = expressionParameterValue(snapshot, eye, "ENTRY_LOW", now);
+      const high = expressionParameterValue(snapshot, eye, "ENTRY_HIGH", now);
+      const current = expressionParameterValue(snapshot, eye, "PRICE_NOW", now);
+      return low !== undefined && high !== undefined && current !== undefined ? current < low || current > high : undefined;
+    }
+    case "days_since_last_review": return expressionParameterValue(snapshot, eye, "REVIEW_DAYS", now);
+    case "thesis_review_stale": {
+      const days = expressionParameterValue(snapshot, eye, "REVIEW_DAYS", now);
+      const staleAfterDays = Number(getMetricContract("thesis_review_stale")?.thresholds?.staleAfterDays ?? Number.NaN);
+      return days === undefined || !Number.isFinite(staleAfterDays) ? undefined : days >= staleAfterDays;
+    }
+    case "manual_flag_present": {
+      const expected = typeof condition.value === "string" ? condition.value : undefined;
+      const flags = [...(snapshot.riskFlags ?? []), ...(eye.manualFlags ?? [])];
+      return expected ? flags.includes(expected) : flags.length > 0;
+    }
+    default: return undefined;
+  }
+};
+
+/** One evaluator for built-in metric formulas used by preview and workspace/worker paths. */
+export const evaluateMetricValue = (
+  eye: Eye,
+  snapshot: MockSnapshot,
+  condition: RecipeCondition,
+  now = new Date(snapshot.updatedAt),
+) => {
+  for (const key of [condition.metricKey, condition.formulaKey]) {
+    if (!key) continue;
+    const value = evaluateBuiltInMetric(eye, snapshot, condition, key, now);
+    if (value !== undefined) return value;
+  }
+  return undefined;
+};
+
+const contractForFormula = (formulaKey: string) =>
+  Object.values(metricContractRegistry).find((contract) => contract.formulaKey === formulaKey);
+
+export const formulaRegistry: FormulaDefinition[] = formulaRegistryMetadata.map((formula) => ({
+  ...formula,
+  equation: contractForFormula(formula.key)?.formula ?? formula.equation,
+  requiredData: contractForFormula(formula.key)?.requiredData ?? formula.requiredData,
+  semanticContract: contractForFormula(formula.key),
+}));
+
+export const metricCatalog: MetricDefinition[] = metricCatalogMetadata.map((metric) => {
+  const semanticContract = getMetricContract(metric.key);
+  return {
+    ...metric,
+    formulaKey: semanticContract?.formulaKey ?? metric.formulaKey,
+    requiredData: semanticContract?.requiredData ?? metric.requiredData,
+    semanticContract,
+  };
+});
 
 export const getMetricDefinition = (metricKey?: string) =>
   metricKey ? metricCatalog.find((metric) => metric.key === metricKey) : undefined;

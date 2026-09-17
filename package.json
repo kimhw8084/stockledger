@@ -15,6 +15,7 @@
     "export:web": "EXPO_NO_DOTENV=1 expo export --platform web",
     "worker": "tsx server/worker/cli.ts",
     "check:boundaries": "node scripts/check-boundaries.mjs",
+    "check:frozen": "tsx scripts/validate-frozen-research-bundle.ts",
     "test:e2e": "playwright test",
     "test:cloud": "tsx tests/integration/cloud.integration.ts",
     "export:all": "EXPO_NO_DOTENV=1 expo export --platform all",
