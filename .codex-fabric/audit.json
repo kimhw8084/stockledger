@@ -1,0 +1,533 @@
+{
+  "accepted_at": "2026-09-17T03:47:36Z",
+  "changed_files": [
+    {
+      "additions": 2,
+      "deletions": 0,
+      "path": "docs/operations/LOCAL_WORKER.md",
+      "status": "M"
+    },
+    {
+      "additions": 13,
+      "deletions": 2,
+      "path": "docs/production/IMPLEMENTATION_STATUS.md",
+      "status": "M"
+    },
+    {
+      "additions": 15,
+      "deletions": 1,
+      "path": "docs/v12_3_app_import_bundle.json",
+      "status": "M"
+    },
+    {
+      "additions": 1,
+      "deletions": 0,
+      "path": "package.json",
+      "status": "M"
+    },
+    {
+      "additions": 18,
+      "deletions": 0,
+      "path": "scripts/validate-frozen-research-bundle.ts",
+      "status": "A"
+    },
+    {
+      "additions": 2,
+      "deletions": 1,
+      "path": "server/worker/run.ts",
+      "status": "M"
+    },
+    {
+      "additions": 10,
+      "deletions": 5,
+      "path": "src/app/StockLedgerApp.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 1,
+      "deletions": 1,
+      "path": "src/domain/appDataSchema.ts",
+      "status": "M"
+    },
+    {
+      "additions": 2,
+      "deletions": 2,
+      "path": "src/domain/evaluateWorkspace.ts",
+      "status": "M"
+    },
+    {
+      "additions": 29,
+      "deletions": 14,
+      "path": "src/domain/marketSnapshot.ts",
+      "status": "M"
+    },
+    {
+      "additions": 7,
+      "deletions": 162,
+      "path": "src/lib/evaluateEye.ts",
+      "status": "M"
+    },
+    {
+      "additions": 3,
+      "deletions": 69,
+      "path": "src/lib/expressionEngine.ts",
+      "status": "M"
+    },
+    {
+      "additions": 182,
+      "deletions": 31,
+      "path": "src/lib/frozenScannerRules.ts",
+      "status": "M"
+    },
+    {
+      "additions": 382,
+      "deletions": 3,
+      "path": "src/lib/metricCatalog.ts",
+      "status": "M"
+    },
+    {
+      "additions": 19,
+      "deletions": 15,
+      "path": "src/lib/mockSnapshot.ts",
+      "status": "M"
+    },
+    {
+      "additions": 140,
+      "deletions": 87,
+      "path": "src/lib/processedFeatureEngine.ts",
+      "status": "M"
+    },
+    {
+      "additions": 10,
+      "deletions": 7,
+      "path": "src/lib/providerEvidence.ts",
+      "status": "M"
+    },
+    {
+      "additions": 27,
+      "deletions": 18,
+      "path": "src/lib/stockConditionScanner.ts",
+      "status": "M"
+    },
+    {
+      "additions": 28,
+      "deletions": 0,
+      "path": "src/types.ts",
+      "status": "M"
+    },
+    {
+      "additions": 178,
+      "deletions": 0,
+      "path": "tests/financialTruth.test.ts",
+      "status": "A"
+    }
+  ],
+  "checks": [
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '1,38p' src/domain/appDataSchema.ts\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npm run check:frozen'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npm test -- --run tests/financialTruth.test.ts tests/correctness.test.ts tests/monitoring.test.ts tests/history.test.ts'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npm run typecheck'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npm test -- --run tests/financialTruth.test.ts tests/correctness.test.ts tests/monitoring.test.ts tests/history.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npm run typecheck'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '1,220p' /Users/haewonkim/.codex/RTK.md && rtk sed -n '1,220p' /Users/haewonkim/.codex/law.md && rtk rg -n \\\"function evaluateEye|export function evaluateEye|evaluateEye\\\\(\\\" src/lib/evaluateEye.ts src/app/StockLedgerApp.tsx | head -40\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '200,270p' src/lib/evaluateEye.ts && rtk sed -n '2840,2875p' src/app/StockLedgerApp.tsx\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npm run typecheck'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npm test -- --run tests/financialTruth.test.ts tests/correctness.test.ts tests/monitoring.test.ts tests/history.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npm run check:frozen && rtk npm run check:boundaries && rtk npm run export:web'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npm test -- --run'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git status --short\nrtk git diff --stat\nrtk git diff --check\nrtk git diff -- src/lib/evaluateEye.ts src/lib/metricCatalog.ts src/lib/processedFeatureEngine.ts | sed -n '1,260p'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git diff -- src/lib/frozenScannerRules.ts src/lib/stockConditionScanner.ts src/domain/marketSnapshot.ts src/domain/evaluateWorkspace.ts server/worker/run.ts src/lib/providerEvidence.ts src/types.ts src/app/StockLedgerApp.tsx | sed -n '1,420p'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git diff -- package.json docs/production/IMPLEMENTATION_STATUS.md docs/operations/LOCAL_WORKER.md docs/v12_3_app_import_bundle.json src/domain/appDataSchema.ts | sed -n '1,320p'\nrtk sed -n '1,260p' tests/financialTruth.test.ts\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '1,120p' docs/production/IMPLEMENTATION_STATUS.md\nrtk sed -n '1,260p' src/lib/processedFeatureEngine.ts\nrtk sed -n '560,920p' src/lib/metricCatalog.ts\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '1,620p' src/lib/metricCatalog.ts\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n \\\"export interface (FormulaDefinition|MetricDefinition|ProcessedFeatureRecord|MockSnapshot)|interface FormulaDefinition|type FormulaDefinition\\\" src/types.ts\nrtk sed -n '1,190p' src/types.ts\nrtk rg -n \\\"formulaRegistry|metricCatalog|semanticContract|featureMeta|lookbackDays|warmupDays|featureVersion\\\" src tests | head -200\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '1,220p' src/lib/evaluateEye.ts\nrtk sed -n '1,240p' src/lib/expressionEngine.ts\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '210,310p' src/types.ts\nrtk sed -n '500,565p' src/types.ts\nrtk sed -n '330,440p' src/lib/stockConditionScanner.ts\nrtk sed -n '180,420p' src/lib/frozenScannerRules.ts\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n \\\"broke_prior_low|RECLAIM_LOW|prior_low_N|failed_break_N_R|reclaim_low_N\\\" src/lib src tests docs/v12_3_app_import_bundle.json | head -160\nrtk sed -n '1,180p' src/lib/stockConditionScanner.ts\nrtk sed -n '180,340p' src/lib/stockConditionScanner.ts\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk nl -ba src/lib/stockConditionScanner.ts | sed -n '155,210p'\nrtk git diff -- src/lib/stockConditionScanner.ts | sed -n '1,240p'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '1,90p' src/lib/frozenScannerRules.ts\nrtk rg -n \\\"scannerTokenFeatureMap\\\" -n src/lib/frozenScannerRules.ts\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n \\\"scannerTokenRawDataMap|scannerFeatureRegistry\\\" src tests | head -100\nrtk sed -n '420,620p' src/lib/stockConditionScanner.ts\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '1,130p' src/domain/marketSnapshot.ts\nrtk rg -n \\\"benchmarkSymbol|unsupported|benchmark\\\" tests/correctness.test.ts tests/monitoring.test.ts tests/history.test.ts | head -100\nrtk rg -n \\\"interface RawBarArchiveBatch|adjustedStatus|sourceName\\\" src/types.ts | head -80\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n \\\"relativeStrengthVsSpyPct|benchmarkSymbol|benchmarkHistorySeries\\\" src | head -160\nrtk sed -n '1,160p' src/lib/visualEvidence.ts\nrtk sed -n '1,130p' tests/monitoring.test.ts\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '48,82p' src/lib/frozenScannerRules.ts\nrtk rg -n \\\"broke_prior_low_45|benchmarkSupported|RECLAIM_LOW_45\\\" src/lib/metricCatalog.ts src/lib/processedFeatureEngine.ts src/domain/marketSnapshot.ts tests/financialTruth.test.ts\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk rg -n -C 3 \"relative_strength_vs_spy\" src/lib/seed.ts | head -80\nrtk npm run typecheck\nrtk npm test -- --run tests/financialTruth.test.ts'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n -C 4 'relative_strength_vs_spy|SPY 대비|RS' src/lib/seed.ts | head -120\nrtk sed -n '130,178p' tests/financialTruth.test.ts\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npm run typecheck\nrtk npm test -- --run tests/financialTruth.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npm run typecheck\nrtk npm test -- --run tests/financialTruth.test.ts tests/correctness.test.ts tests/monitoring.test.ts tests/history.test.ts\nrtk npm run check:frozen\nrtk npm run check:boundaries\nrtk git diff --check'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npm test -- --run'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npm run export:all'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git status --short\nrtk git diff --stat\nrtk git diff --check\nrtk sed -n '1,180p' scripts/validate-frozen-research-bundle.ts\nrtk sed -n '1,120p' package.json\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n '\\\"2\\\\.0\\\\.0\\\"|engineVersion|featureSemanticsVersion|lookbackDays:|warmupDays:|1\\\\.4|0\\\\.85|2\\\\.5|\\\\b252\\\\b|\\\\b126\\\\b|\\\\b61\\\\b|\\\\b21\\\\b' src/lib src/domain server/worker src/app tests/financialTruth.test.ts | head -240\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '1,140p' src/lib/mockSnapshot.ts\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '280,340p' src/lib/frozenScannerRules.ts\nrtk sed -n '330,430p' docs/v12_3_app_import_bundle.json\nrtk rg -n -C 2 '\\\"token\\\": \\\"RS_IMP\\\"|\\\"token\\\": \\\"RS_SPY_POS\\\"|\\\"token\\\": \\\"NO_VOL_REJECT\\\"|\\\"token\\\": \\\"DEEP_DISCOUNT\\\"' docs/v12_3_app_import_bundle.json | head -80\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npm run typecheck\nrtk npm run check:frozen\nrtk npm test -- --run tests/financialTruth.test.ts\nrtk git diff --check'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npm test -- --run\nrtk npm run export:all'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git status --short\nrtk git diff --check\nrtk git diff --name-only\nrtk git diff --stat'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git diff -- src/lib/mockSnapshot.ts src/domain/marketSnapshot.ts src/lib/evaluateEye.ts src/lib/expressionEngine.ts src/domain/evaluateWorkspace.ts server/worker/run.ts | sed -n '1,520p'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -o 'metricKey:\\\\s*\\\"[\"'^\"]+\"|key:'\"\\\\s*\\\"[\"'^\"]+\"'\"' src/lib src/components src/app | sed -E 's/.*\\\"([\"'^\"]+)\"/'\"\\\\1/' | sort -u > /tmp/stockledger_keys.txt\nrtk rg -n 'stabilization_score|drawdown_pct|near_support_bool|relative_strength_vs_spy_pct|distance_from_ma_50_pct|distance_from_ma_20_pct|distance_from_ma_200_pct|price_return_20d_pct|price_return_60d_pct|volume_spike_bool|volatility_compression_bool|rebound_from_recent_low_pct' src | head -120\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n \\\"stabilization_score|stabilizationScore\\\" src/lib/seed.ts src/app/StockLedgerApp.tsx src/types.ts src/components | head -100\nrtk sed -n '260,340p' src/app/StockLedgerApp.tsx\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '300,360p' src/lib/evaluateEye.ts\nrtk sed -n '260,335p' src/lib/frozenScannerRules.ts\nrtk sed -n '690,825p' src/lib/metricCatalog.ts\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n \\\"computeProcessedFeaturesForSymbol\\\\(\\\" --glob '\"'!tests/financialTruth.test.ts'\"'\nrtk rg -n \\\"computeProcessedFeaturesForSymbol\\\\(\\\" src tests | wc -l\nrtk rg -n \\\"processedFeatures\\\" src/domain src/lib server | head -100\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '1,140p' server/worker/run.ts\nrtk sed -n '1,120p' src/domain/evaluateWorkspace.ts\nrtk sed -n '1,100p' src/lib/metricCatalog.ts\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '40,90p' src/components/logic/L0DataLayer.tsx\nrtk sed -n '145,180p' src/components/logic/L2RecipesLayer.tsx\nrtk rg -n 'ohlcBarSeries|ohlcvBarSeries' src docs tests | head -100\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npm run typecheck\nrtk npm test -- --run tests/financialTruth.test.ts tests/correctness.test.ts tests/monitoring.test.ts tests/history.test.ts\nrtk npm run check:frozen\nrtk npm run check:boundaries\nrtk git diff --check'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npm run export:web\nrtk git status --short\nrtk git diff --check'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npm run export:all'",
+      "exit_code": 0,
+      "type": "command_execution"
+    }
+  ],
+  "codex": {
+    "cli_version": "codex-cli 0.154.0",
+    "configured_model": "gpt-5.6-luna",
+    "event_count": 405,
+    "provider_reported_model": null,
+    "reasoning_effort": "xhigh",
+    "terminal_type": "turn.completed",
+    "usage": {
+      "cache_hit_percent": 98.04,
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 24458752,
+      "fresh_input_tokens": 489611,
+      "input_tokens": 24948363,
+      "non_reasoning_output_tokens": 69807,
+      "output_tokens": 115340,
+      "reasoning_output_tokens": 45533,
+      "total_processed_tokens": 25063703
+    },
+    "warnings": []
+  },
+  "commits": [
+    {
+      "sha": "dd343bc09ba8f73c17d4a0787893e0b266805248",
+      "subject": "fabric: capture completed model changes [CF-d669cf75dd2754422711dbb2]"
+    }
+  ],
+  "diff": {
+    "additions": 1069,
+    "changed_files": 20,
+    "commit_count": 1,
+    "deletions": 418
+  },
+  "error_code": null,
+  "evidence_manifest": {
+    "count": 5,
+    "items": [
+      {
+        "bytes": 4971,
+        "path": "docs/operations/LOCAL_WORKER.md",
+        "sha256": "aaf60ebba41b90b23a70c5bff7b1960d705803df3ed96e7d1ff9c9b90dead20e"
+      },
+      {
+        "bytes": 20174,
+        "path": "docs/production/IMPLEMENTATION_STATUS.md",
+        "sha256": "d8bffa59c7b7a22c5eb9a662132d11b12a68ff146870c8c35c61f72eb5fa978e"
+      },
+      {
+        "bytes": 49194,
+        "path": "docs/v12_3_app_import_bundle.json",
+        "sha256": "db44159afee1c59e92de6a9fd90f046393c1f08b8e0f167d76169c9632be42a0"
+      },
+      {
+        "bytes": 2065,
+        "path": "package.json",
+        "sha256": "9f5e404ddad597fd569f4d628571cdde121ec869904bd5be50b03faea2b403d4"
+      },
+      {
+        "bytes": 4255,
+        "path": "src/lib/providerEvidence.ts",
+        "sha256": "97cc975f4159b82627912ab4aecbe54c8418a780d1a807844d18404844723a95"
+      }
+    ],
+    "version": 1
+  },
+  "evidence_publisher_release": "1.2.3-resume-candidate",
+  "fabric_capture": {
+    "applied": true,
+    "commit_message": "fabric: capture completed model changes [CF-d669cf75dd2754422711dbb2]",
+    "commit_sha": "dd343bc09ba8f73c17d4a0787893e0b266805248",
+    "paths_before": 20,
+    "status_before": [
+      " M docs/operations/LOCAL_WORKER.md",
+      " M docs/production/IMPLEMENTATION_STATUS.md",
+      " M docs/v12_3_app_import_bundle.json",
+      " M package.json",
+      " M server/worker/run.ts",
+      " M src/app/StockLedgerApp.tsx",
+      " M src/domain/appDataSchema.ts",
+      " M src/domain/evaluateWorkspace.ts",
+      " M src/domain/marketSnapshot.ts",
+      " M src/lib/evaluateEye.ts",
+      " M src/lib/expressionEngine.ts",
+      " M src/lib/frozenScannerRules.ts",
+      " M src/lib/metricCatalog.ts",
+      " M src/lib/mockSnapshot.ts",
+      " M src/lib/processedFeatureEngine.ts",
+      " M src/lib/providerEvidence.ts",
+      " M src/lib/stockConditionScanner.ts",
+      " M src/types.ts",
+      "?? scripts/validate-frozen-research-bundle.ts",
+      "?? tests/financialTruth.test.ts"
+    ],
+    "transient_untracked_removed": {
+      "count": 0,
+      "items": []
+    }
+  },
+  "fabric_release": "1.2.3-resume-candidate",
+  "failure_class": null,
+  "finished_at": "2026-09-17T04:31:31Z",
+  "git": {
+    "base_is_ancestor": true,
+    "base_sha": "5164cbe8b60bbcf8baa4efb388eadf2cf2b03caa",
+    "branch": "codex/stockledger-prod-c02-financial-truth-v1",
+    "head_sha": "dd343bc09ba8f73c17d4a0787893e0b266805248",
+    "remote_exact_head": true,
+    "remote_head_sha": "dd343bc09ba8f73c17d4a0787893e0b266805248",
+    "target_branch": "main",
+    "target_drifted_since_acceptance": false,
+    "target_head_observed_after_execution": "5164cbe8b60bbcf8baa4efb388eadf2cf2b03caa",
+    "work_branch": "codex/stockledger-prod-c02-financial-truth-v1",
+    "worktree_clean": true
+  },
+  "instructions": {
+    "files": [],
+    "total_bytes": 0,
+    "warning": null
+  },
+  "job_id": "CF-d669cf75dd2754422711dbb2",
+  "kind": "codex-fabric-audit-evidence",
+  "locator": {
+    "branch": "codex-fabric/evidence/stockledger/prod-c02-financial-truth-v1",
+    "path": ".codex-fabric/audit.json",
+    "ref": "refs/heads/codex-fabric/evidence/stockledger/prod-c02-financial-truth-v1"
+  },
+  "operation": "BUILD",
+  "policy": {
+    "environment_policy_sha256": "e077daca74297b3c30bee8989f00f8ca5338f7610b4d016a6c48db524205d064",
+    "fabric_release": "1.2.3-resume-candidate",
+    "policy_sha256": "44756118cd7fda0c45cd23ba1d31a48a3f4f2422d687df15264ba4406f40e1f2",
+    "registry_sha256": "cfc765f3211c37c7967a138f3b2d89a99341939b15b2623f92744d007f625d6f"
+  },
+  "project_id": "stockledger",
+  "recovery": {
+    "model_rerun_safe": false,
+    "recovery_required": false,
+    "retry_safe": false,
+    "retry_scope": null,
+    "worktree_retained": true
+  },
+  "request": "prod-c02-financial-truth-v1",
+  "schema_version": 1,
+  "started_at": "2026-09-17T03:47:36Z",
+  "status": "EXECUTED_CHANGE",
+  "timing": {
+    "execution_seconds": 2635,
+    "queue_seconds": 0,
+    "total_seconds": 2635
+  },
+  "transport": {
+    "bytes": 3643,
+    "envelope": "FABRIC/2",
+    "prompt_bytes": 3318,
+    "prompt_sha256": "c3294d2c937300e7f033fbf7853736bda57cc2f8ae3370f429d187c4fa9cd3cb",
+    "sha256": "d669cf75dd2754422711dbb2a2c780964bd0b4fca8b7928b18b0f61cdcb48c8c"
+  }
+}
