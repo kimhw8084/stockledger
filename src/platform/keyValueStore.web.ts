@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import type { KeyValueStore } from "./keyValueStore";
 let connection: Promise<IDBDatabase> | undefined;
 const database = () => connection ??= new Promise((resolve, reject) => {
   const request = indexedDB.open("stockledger", 1);
@@ -16,7 +17,7 @@ const read = async (key: string): Promise<string | null> => {
     tx.onabort = tx.onerror = () => reject(tx.error ?? new Error("Local read failed."));
   });
 };
-const store = {
+const store: KeyValueStore = {
   async getItem(key: string): Promise<string | null> {
     // The prototype used localStorage. Read it only until this key is migrated.
     const current = await read(key);
