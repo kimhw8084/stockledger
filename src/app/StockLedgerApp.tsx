@@ -2528,7 +2528,7 @@ export default function App() {
     setSelectedHeroPointIndex(preSelectedStockTrendSeries.length - 1);
   }, [selectedStockId, analysisLookback, analysisBenchmark, preSelectedStockTrendSeries.length]);
 
-  if (!loading && !data && error) return <RecoveryPanel error={error} retry={actions.retryLoad} language={language} />;
+  if (!loading && !data && error) return <RecoveryPanel error={error} retry={actions.retryLoad} actions={actions} language={language} />;
 
   if (loading || !data) {
     return (
