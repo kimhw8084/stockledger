@@ -1,12 +1,13 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { openDatabaseAsync, type SQLiteDatabase } from "expo-sqlite";
+import type { KeyValueStore } from "./keyValueStore";
 let connection: Promise<SQLiteDatabase> | undefined;
 const database = () => connection ??= (async () => {
   const db = await openDatabaseAsync("stockledger.sqlite");
   await db.execAsync("PRAGMA journal_mode=WAL; CREATE TABLE IF NOT EXISTS documents (key TEXT PRIMARY KEY, value TEXT NOT NULL);");
   return db;
 })().catch(error => { connection = undefined; throw error; });
-const store = {
+const store: KeyValueStore = {
   async getItem(key: string): Promise<string | null> {
     const db = await database();
     const row = await db.getFirstAsync<{ value: string }>("SELECT value FROM documents WHERE key=?", key);

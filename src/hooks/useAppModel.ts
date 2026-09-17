@@ -1,18 +1,17 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { evaluateWorkspace } from "../domain/evaluateWorkspace";
 import { contentHash } from "../domain/contentHash";
 import { validateEntryRange } from "../domain/inputValidation";
 import { mergeWatchlist, parseWatchlistCsv } from "../domain/watchlistImport";
 import { publishRecipeRevision } from "../domain/recipeRevision";
 import { getProviderHealth } from "../lib/providerHealth";
 import { seedData } from "../lib/seed";
-import { createDemoAppData, createEmptyAppData, loadAppData, parseExport, saveAppData, serializeExport } from "../lib/storage";
+import { createDemoAppData, createEmptyAppData } from "../data/workspaceDefaults";
+import { createWorkspaceApplicationService } from "../application/workspaceApplicationService";
 import { unavailableSnapshot, snapshotFromBars } from "../domain/marketSnapshot";
 import { normalizeToSchema, write_raw_archive } from "../lib/eodDataProvider";
 import { buildSnapshotsFromAdapters } from "../lib/providerSnapshot";
-import { createCommandQueue } from "../domain/commandQueue";
-import { createReviewLogEntry, runDailyStockConditionScan } from "../lib/stockConditionScanner";
+import { createReviewLogEntry } from "../lib/stockConditionScanner";
 import {
   AppData,
   Decision,
@@ -98,21 +97,22 @@ export const useAppModel = () => {
   const [scanning, setScanning] = useState(false);
   const [loadAttempt, setLoadAttempt] = useState(0);
   const pendingWrites = useRef(0);
-  const queueRef = useRef<ReturnType<typeof createCommandQueue<AppData>> | null>(null);
-  if (!queueRef.current) queueRef.current = createCommandQueue(
-    () => dataRef.current, saveAppData,
-    next => { dataRef.current = next; setData(next); },
-  );
+  const applicationServiceRef = useRef<ReturnType<typeof createWorkspaceApplicationService> | null>(null);
+  if (!applicationServiceRef.current) applicationServiceRef.current = createWorkspaceApplicationService({
+    getCurrent: () => dataRef.current,
+    publish: next => { dataRef.current = next; setData(next); },
+  });
+  const applicationService = applicationServiceRef.current!;
 
   useEffect(() => {
     let active = true;
     setLoading(true);
     setError(null);
-    loadAppData().then(async loaded => {
+    applicationService.load().then(async loaded => {
       if (!active) return;
       dataRef.current = loaded;
       setData(loaded);
-      const evaluated = evaluateWorkspace(loaded);
+      const evaluated = applicationService.evaluate(loaded);
       if (contentHash(evaluated) !== contentHash(loaded)) await commit(current => current);
     }).catch(cause => {
       if (active) setError(cause instanceof Error ? cause.message : "Could not load saved data.");
@@ -132,7 +132,7 @@ export const useAppModel = () => {
     setSaving(true);
     setError(null);
     try {
-      return await queueRef.current!(current => evaluateWorkspace(typeof next === "function" ? next(current) : next));
+      return await applicationService.commit(next);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Save failed. Your last saved data is intact.");
       throw cause;
@@ -258,35 +258,8 @@ export const useAppModel = () => {
         setScanning(true);
         setError(null);
         try {
-        const current = dataRef.current;
-        if (!current) return;
-        const result = await runDailyStockConditionScan({
-          existingBatches: current.rawBarArchives,
-          existingSignals: current.scanSignals,
-          existingForwardProof: current.forwardProofLedger,
-          scannerSettings: current.scannerSettings,
-          previousUniverseSnapshot: current.universeSnapshots[0],
-        });
-        await commit((prev) => ({
-          ...prev,
-          rawBarArchives: result.rawArchiveBatch
-            ? [result.rawArchiveBatch, ...prev.rawBarArchives.filter((entry) => entry.id !== result.rawArchiveBatch!.id)]
-            : prev.rawBarArchives,
-          universeSnapshots: [
-            result.universeSnapshot,
-            ...prev.universeSnapshots.filter((entry) => entry.id !== result.universeSnapshot.id),
-          ],
-          processedFeatures: [
-            ...result.processedFeatures,
-            ...prev.processedFeatures.filter(
-              (entry) => !result.processedFeatures.some((next) => next.id === entry.id),
-            ),
-          ],
-          scanRuns: [result.scanRun, ...prev.scanRuns.filter((entry) => entry.id !== result.scanRun.id)],
-          scanSignals: result.scanSignals,
-          forwardProofLedger: result.forwardProofLedger,
-        }));
-       } catch (cause) {
+          await applicationService.runDailyScanner();
+        } catch (cause) {
           setError(cause instanceof Error ? cause.message : "Scan failed. History was preserved.");
         } finally { autoScanStartedRef.current = false; setScanning(false); }
       },
@@ -728,8 +701,7 @@ export const useAppModel = () => {
         await commit(prev => syncLogicModel(prev, [...prev.recipes, ...seedData.recipes.filter(recipe => !prev.recipes.some(existing => existing.id === recipe.id))]));
       },
       async importBackup(raw: string) {
-        const imported = parseExport(raw);
-        await commit({ ...imported, workspaceId: createId("restored") });
+        await applicationService.importBackup(raw);
       },
       async startPersonalWorkspace() {
         if (!dataRef.current?.snapshots.some(snapshot => snapshot.isMock)) throw new Error("This action is only for leaving the sample workspace.");
@@ -742,9 +714,10 @@ export const useAppModel = () => {
         });
       },
       exportBackup() {
-        if (!dataRef.current) throw new Error("Workspace is not loaded.");
-        return serializeExport(dataRef.current);
+        return applicationService.exportBackup();
       },
+      readRecoveryData() { return applicationService.readRecoveryData(); },
+      restorePreviousBackup() { return applicationService.restorePreviousBackup(); },
       retryLoad() { setLoadAttempt(value => value + 1); },
       dismissError() { setError(null); },
       async refreshProviderHealth() {
