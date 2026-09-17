@@ -55,6 +55,9 @@ import {
   localizedTimeHorizon,
   localizedTiming,
   localizedUseCase,
+  formatLocaleDate,
+  formatLocaleDateTime,
+  formatLocaleNumber,
   subtitleLabel,
   t,
   tabLabel,
@@ -829,20 +832,8 @@ const compactStatusAccentColor = (status: VisualEvidenceCard["status"]) => {
   }
 };
 
-const formatDate = (value: string) =>
-  new Date(value).toLocaleString(undefined, {
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  });
-
-const formatShortDate = (value: string) =>
-  new Date(value).toLocaleDateString(undefined, {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
+const formatDate = (language: AppLanguage, value: string) => formatLocaleDateTime(language, value);
+const formatShortDate = (language: AppLanguage, value: string) => formatLocaleDate(language, value);
 
 const urgencyWeight = (value?: string) => {
   switch (value) {
@@ -977,7 +968,13 @@ const StepFlow = ({
             {index > 0 ? (
               <View style={[styles.stepConnector, complete ? styles.stepConnectorActive : null]} />
             ) : null}
-            <Pressable onPress={() => onSelect(step)} style={styles.stepNode}>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={labelForStep ? labelForStep(step) : step}
+              accessibilityState={{ selected: active }}
+              onPress={() => onSelect(step)}
+              style={styles.stepNode}
+            >
               <View
                 style={[
                   styles.stepDot,
@@ -1197,9 +1194,9 @@ const ThresholdBar = ({ card, language = "en" }: { card: VisualEvidenceCard; lan
           <View style={[styles.thresholdMarkerCurrent, { left: `${Math.max(0, Math.min(100, marker))}%` }]} />
         </View>
         <View style={styles.thresholdLegend}>
-          <Text style={styles.thresholdLegendText}>{`${t(language, "stocks.detail.plannedZone")} $${low.toFixed(2)}`}</Text>
-          <Text style={styles.thresholdLegendText}>{`${t(language, "stocks.evidence.current")} $${current.toFixed(2)}`}</Text>
-          <Text style={styles.thresholdLegendText}>{`${t(language, "stocks.detail.plannedZone")} $${high.toFixed(2)}`}</Text>
+          <Text style={styles.thresholdLegendText}>{`${t(language, "stocks.detail.plannedZone")} $${formatLocaleNumber(language, low, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}</Text>
+          <Text style={styles.thresholdLegendText}>{`${t(language, "stocks.evidence.current")} $${formatLocaleNumber(language, current, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}</Text>
+          <Text style={styles.thresholdLegendText}>{`${t(language, "stocks.detail.plannedZone")} $${formatLocaleNumber(language, high, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}</Text>
         </View>
       </View>
     );
@@ -1394,6 +1391,8 @@ const EvidenceCardView = ({
 
   return (
     <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={card.title}
       onPress={handlePress}
       style={({ pressed }) => [
         styles.evidenceCard,
@@ -1559,7 +1558,13 @@ const EvidenceGroupView = ({
 
   return (
     <View style={styles.evidenceGroup}>
-      <Pressable onPress={() => setExpanded((current) => !current)} style={styles.groupHeaderButton}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={group.title}
+        accessibilityState={{ expanded }}
+        onPress={() => setExpanded((current) => !current)}
+        style={styles.groupHeaderButton}
+      >
         <View style={styles.flexOne}>
           <Text style={styles.sectionTitle}>{group.title}</Text>
           <Text style={styles.sectionNote}>{group.note}</Text>
@@ -1583,10 +1588,12 @@ const RecipeConditionMapCard = ({
   eye,
   recipe,
   stock,
+  language = "en",
 }: {
   eye: Eye;
   recipe: Recipe;
   stock: Stock;
+  language?: AppLanguage;
 }) => {
   const evaluation = eye.lastEvaluation;
   const [expanded, setExpanded] = useState(false);
@@ -1665,7 +1672,13 @@ const RecipeConditionMapCard = ({
         </Text>
       ) : null}
 
-      <Pressable onPress={() => setExpanded((current) => !current)} style={styles.actionRow}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={expanded ? t(language, "common.hide") : t(language, "common.show")}
+        accessibilityState={{ expanded }}
+        onPress={() => setExpanded((current) => !current)}
+        style={styles.actionRow}
+      >
         <Text style={styles.buttonPrimaryText}>{expanded ? "Hide matrix" : "Show matrix"}</Text>
       </Pressable>
 
@@ -1727,7 +1740,13 @@ const StockTriageCard = ({
 
   return (
     <Card highlighted={Boolean(item.openAlerts.length)}>
-      <Pressable onPress={() => setExpanded((current) => !current)} style={styles.stockTriageHeader}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={`${item.stock.symbol} ${item.stock.name}`}
+        accessibilityState={{ expanded }}
+        onPress={() => setExpanded((current) => !current)}
+        style={styles.stockTriageHeader}
+      >
         <View style={styles.inlineBetween}>
           <View style={styles.flexOne}>
             <Text style={styles.cardEyebrow}>{item.stock.name}</Text>
@@ -1741,10 +1760,10 @@ const StockTriageCard = ({
 
         <View style={styles.stockTriageSummaryRow}>
           <Text style={styles.stockTriagePrimaryMetric}>
-            {item.snapshot ? `$${item.snapshot.price.toFixed(2)}` : "--"}
+            {item.snapshot ? `$${formatLocaleNumber(language, item.snapshot.price, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "--"}
           </Text>
           <Text style={styles.stockTriageSecondaryMetric}>
-            {item.snapshot ? t(language, "stocks.hero.drawdown", { value: `${item.snapshot.drawdownPct}%` }) : "--"}
+            {item.snapshot ? t(language, "stocks.hero.drawdown", { value: `${formatLocaleNumber(language, item.snapshot.drawdownPct)}%` }) : "--"}
           </Text>
           <Text style={styles.stockTriageSecondaryMetric}>{item.openAlerts.length} {t(language, "common.alerts")}</Text>
           <Text style={styles.stockTriageSecondaryMetric}>{localizedFreshness(language, item.snapshot?.freshness ?? "Unavailable")}</Text>
@@ -1777,7 +1796,7 @@ const StockTriageCard = ({
             <View style={styles.detailCallout}>
               <Text style={styles.detailCalloutLabel}>{language === "ko" ? "최근 결정" : "Latest decision"}</Text>
               <Text style={styles.detailCalloutBody}>
-                {localizedDecisionAction(language, item.decisions[0].action)} · {formatShortDate(item.decisions[0].createdAt)}
+                {localizedDecisionAction(language, item.decisions[0].action)} · {formatShortDate(language, item.decisions[0].createdAt)}
               </Text>
             </View>
           ) : null}
@@ -1836,7 +1855,13 @@ const AlertClusterCard = ({
 
   return (
     <Card highlighted={selectedStockId === group.stock.id}>
-      <Pressable onPress={() => setExpanded((current) => !current)} style={styles.alertClusterHeader}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={`${group.stock.symbol} ${group.stock.name}`}
+        accessibilityState={{ expanded }}
+        onPress={() => setExpanded((current) => !current)}
+        style={styles.alertClusterHeader}
+      >
         <View style={styles.inlineBetween}>
           <View style={styles.flexOne}>
             <Text style={styles.cardEyebrow}>{group.stock.name}</Text>
@@ -1875,7 +1900,13 @@ const AlertClusterCard = ({
       {expanded ? (
         <View style={styles.stack}>
           {group.openAlerts.map((alert) => (
-            <Pressable key={alert.id} onPress={() => onOpenDetail(alert.id)} style={styles.alertClusterItem}>
+            <Pressable
+              key={alert.id}
+              accessibilityRole="button"
+              accessibilityLabel={alert.title}
+              onPress={() => onOpenDetail(alert.id)}
+              style={styles.alertClusterItem}
+            >
               <View style={styles.inlineBetween}>
                 <View style={styles.flexOne}>
                   <Text style={styles.alertMiniTitle}>{alert.title}</Text>
@@ -1885,7 +1916,7 @@ const AlertClusterCard = ({
                   <View style={priorityTone(alert.priority)}>
                     <Text style={styles.priorityBadgeText}>{localizedAlertPriority(language, alert.priority)}</Text>
                   </View>
-                  <Text style={styles.timestampText}>{formatDate(alert.createdAt)}</Text>
+                  <Text style={styles.timestampText}>{formatDate(language, alert.createdAt)}</Text>
                 </View>
               </View>
               <View style={styles.alertClusterActions}>
@@ -1950,7 +1981,8 @@ export default function App() {
   const { data, loading, error, saving, scanning, providerHealth, providerHealthLoading, actions } = useAppModel();
   const [stockEditor, setStockEditor] = useState<string | null>(null);
   const [language, setLanguage] = useState<AppLanguage>("en");
-  const [tab, setTab] = useWorkspaceNavigation();
+  const [tab, setTab, route] = useWorkspaceNavigation();
+  const [routeNotice, setRouteNotice] = useState("");
   const [recipeBuilderStep, setRecipeBuilderStep] = useState<RecipeBuilderStep>("Purpose");
   const [alertWorkspaceTab, setAlertWorkspaceTab] = useState<Exclude<AlertWorkspaceTab, "Detail">>("Current");
   const [analysisBenchmark, setAnalysisBenchmark] = useState<AnalysisBenchmark>(defaultAnalysisBenchmark);
@@ -2077,6 +2109,22 @@ export default function App() {
 
   useEffect(() => {
     loadAppLanguage().then(setLanguage);
+  }, []);
+
+  useEffect(() => {
+    if (Platform.OS !== "web" || typeof document === "undefined") return;
+    const style = document.createElement("style");
+    style.setAttribute("data-stockledger-focus", "true");
+    style.textContent = `
+      #stockledger-root [tabindex="0"]:focus-visible,
+      #stockledger-root input:focus-visible,
+      #stockledger-root textarea:focus-visible {
+        outline: 3px solid #2563eb;
+        outline-offset: 2px;
+      }
+    `;
+    document.head.appendChild(style);
+    return () => style.remove();
   }, []);
 
   const eyesSorted = useMemo(
@@ -2209,6 +2257,10 @@ export default function App() {
   }, [deferredStockSearch, stockDirectory]);
 
   useEffect(() => {
+    if (route.params.eyeId) {
+      if (selectedEyeId && !eyesSorted.some((eye) => eye.id === selectedEyeId)) setSelectedEyeId("");
+      return;
+    }
     if (!selectedEyeId && eyesSorted[0]) {
       setSelectedEyeId(eyesSorted[0].id);
       return;
@@ -2216,7 +2268,7 @@ export default function App() {
     if (selectedEyeId && !eyesSorted.some((eye) => eye.id === selectedEyeId)) {
       setSelectedEyeId(eyesSorted[0]?.id ?? "");
     }
-  }, [eyesSorted, selectedEyeId]);
+  }, [eyesSorted, route.params.eyeId, selectedEyeId]);
 
   useEffect(() => {
     if (selectedStockId && !stockDirectory.some((item) => item.stock.id === selectedStockId)) {
@@ -2237,6 +2289,12 @@ export default function App() {
   }, [selectedStockId]);
 
   useEffect(() => {
+    if (route.params.alertId) {
+      if (selectedAlertId && !data?.alerts.some((alert) => alert.id === selectedAlertId)) {
+        setSelectedAlertId("");
+      }
+      return;
+    }
     if (!selectedAlertId && alertQueue[0]) {
       setSelectedAlertId(alertQueue[0].id);
       return;
@@ -2244,7 +2302,7 @@ export default function App() {
     if (selectedAlertId && !alertQueue.some((alert) => alert.id === selectedAlertId)) {
       setSelectedAlertId(alertQueue[0]?.id ?? "");
     }
-  }, [alertQueue, selectedAlertId]);
+  }, [alertQueue, data?.alerts, route.params.alertId, selectedAlertId]);
 
   useEffect(() => {
     if (!previewStockId && data?.stocks[0]) {
@@ -2255,6 +2313,90 @@ export default function App() {
       setPreviewStockId(data?.stocks[0]?.id ?? "");
     }
   }, [data?.stocks, previewStockId]);
+
+  useEffect(() => {
+    if (!data) return;
+    const { params } = route;
+    let unavailable = false;
+    const markUnavailable = () => { unavailable = true; };
+
+    if (params.stockId) {
+      const stock = data.stocks.find((item) => item.id === params.stockId);
+      if (!stock || stock.archivedAt) markUnavailable();
+      else {
+        setSelectedStockId(stock.id);
+        setStockSearch("");
+      }
+      if (!stock || stock.archivedAt) {
+        setSelectedStockId("");
+        setStockSearch("");
+      }
+    }
+    if (params.metricId && (!params.stockId || !data.stocks.some((item) => item.id === params.stockId && !item.archivedAt))) {
+      markUnavailable();
+    }
+
+    if (route.tab === "Eyes" && params.eyeId) {
+      const eye = data.eyes.find((item) => item.id === params.eyeId);
+      const stock = eye ? data.stocks.find((item) => item.id === eye.stockId) : undefined;
+      if (!eye || eye.archivedAt || !stock || stock.archivedAt) markUnavailable();
+      else {
+        setSelectedEyeId(eye.id);
+        setEyeDetailOpen(true);
+      }
+      if (!eye || eye.archivedAt || !stock || stock.archivedAt) {
+        setSelectedEyeId("");
+        setEyeDetailOpen(false);
+      }
+    } else if (!params.eyeId) {
+      setEyeDetailOpen(false);
+    }
+
+    if (route.tab === "Alerts" && params.alertId) {
+      const alert = data.alerts.find((item) => item.id === params.alertId);
+      if (!alert) markUnavailable();
+      else {
+        setSelectedAlertId(alert.id);
+        setAlertWorkspaceTab(alert.reviewed ? "History" : "Current");
+        setAlertDetailOpen(true);
+      }
+      if (!alert) {
+        setSelectedAlertId("");
+        setAlertDetailOpen(false);
+      }
+    } else if (!params.alertId) {
+      setAlertDetailOpen(false);
+    }
+
+    const decisionId = params.decisionId ?? (params.outcomeId
+      ? data.outcomes.find((outcome) => outcome.id === params.outcomeId)?.decisionId
+      : undefined);
+    if (route.tab === "Journal" && decisionId) {
+      const decision = data.decisions.find((item) => item.id === decisionId);
+      const eye = decision ? data.eyes.find((item) => item.id === decision.eyeId) : undefined;
+      const stock = eye ? data.stocks.find((item) => item.id === eye.stockId) : undefined;
+      if (!decision || decision.archivedAt || !eye || eye.archivedAt || !stock || stock.archivedAt) markUnavailable();
+      else setSelectedDecisionId(decision.id);
+      if (!decision || decision.archivedAt || !eye || eye.archivedAt || !stock || stock.archivedAt) {
+        setSelectedDecisionId("");
+      }
+    } else if (!params.decisionId && !params.outcomeId) {
+      setSelectedDecisionId("");
+    }
+
+    if (route.tab === "Logic Lab" && params.recipeId) {
+      const recipe = data.recipes.find((item) => item.id === params.recipeId);
+      if (!recipe || recipe.retiredAt) markUnavailable();
+      else setRecipeDetailId(recipe.id);
+      if (!recipe || recipe.retiredAt) setRecipeDetailId("");
+    } else if (!params.recipeId) {
+      setRecipeDetailId("");
+    }
+
+    if (!params.metricId) setSelectedEvidenceCard(null);
+
+    setRouteNotice(unavailable ? t(language, "route.entityUnavailable") : "");
+  }, [data, language, route]);
 
   useEffect(() => {
     if (!conditionBuilderRecipeId && logicLabCompatibleRecipes[0]) {
@@ -2385,6 +2527,20 @@ export default function App() {
   const preSelectedStockTrendSeries = preSelectedStockSummary?.snapshot?.priceHistorySeries ?? [];
 
   useEffect(() => {
+    if (!route.params.metricId || !route.params.stockId || preSelectedStockSummary?.stock.id !== route.params.stockId) {
+      if (!route.params.metricId) setSelectedEvidenceCard(null);
+      return;
+    }
+    const card = preSortedSelectedStockAnalysisCards.find((item) => item.id === route.params.metricId);
+    if (card) {
+      setSelectedEvidenceCard((current) => current?.id === card.id ? current : card);
+      return;
+    }
+    setSelectedEvidenceCard(null);
+    if (preSelectedStockSummary) setRouteNotice(t(language, "route.metricUnavailable"));
+  }, [language, preSelectedStockAnalysisCards, preSelectedStockSummary, preSortedSelectedStockAnalysisCards, route.params.metricId]);
+
+  useEffect(() => {
     if (!selectedEvidenceCard) return;
     if (preSelectedEvidenceIndex >= 0) return;
     setSelectedEvidenceCard(null);
@@ -2409,7 +2565,7 @@ export default function App() {
     );
   }
 
-  const selectedEye = eyesSorted.find((eye) => eye.id === selectedEyeId) ?? eyesSorted[0];
+  const selectedEye = eyesSorted.find((eye) => eye.id === selectedEyeId) ?? (route.params.eyeId ? undefined : eyesSorted[0]);
   const selectedEyeStock = selectedEye
     ? data.stocks.find((stock) => stock.id === selectedEye.stockId)
     : undefined;
@@ -2424,7 +2580,7 @@ export default function App() {
   const selectedConditionFormula = getFormulaDefinition(selectedConditionMetric?.formulaKey ?? "");
   const selectedOperatorOptions = operatorOptionsForMetric(selectedConditionMetric, selectedConditionFormula);
   const selectedConditionControl = metricControlConfig(selectedConditionMetric, selectedConditionFormula);
-  const selectedAlert = alertQueue.find((alert) => alert.id === selectedAlertId) ?? alertQueue[0];
+  const selectedAlert = data.alerts.find((alert) => alert.id === selectedAlertId) ?? (route.params.alertId ? undefined : alertQueue[0]);
   const openAlerts = data.alerts.filter(
     (alert) => !alert.reviewed && (!alert.snoozedUntil || new Date(alert.snoozedUntil).getTime() <= Date.now()),
   ).length;
@@ -2529,7 +2685,9 @@ export default function App() {
       : 0;
   const selectedHeroPrice = selectedStockTrendSeries[safeSelectedHeroPointIndex];
   const selectedHeroBenchmark = selectedStockBenchmarkSeries[safeSelectedHeroPointIndex];
-  const selectedHeroPointLabel = chartData.dates[safeSelectedHeroPointIndex] ?? "No completed price history";
+  const selectedHeroPointLabel = chartData.dates[safeSelectedHeroPointIndex]
+    ? formatLocaleDate(language, chartData.dates[safeSelectedHeroPointIndex])
+    : t(language, "stocks.hero.noCompletedHistory");
   const selectedHeroBenchmarkDelta = chartData.returns[safeSelectedHeroPointIndex] !== undefined && chartData.benchmarkReturns[safeSelectedHeroPointIndex] !== undefined
     ? chartData.returns[safeSelectedHeroPointIndex] - chartData.benchmarkReturns[safeSelectedHeroPointIndex] : undefined;
   const recentStocks = recentStockIds
@@ -2959,22 +3117,64 @@ export default function App() {
     if (eyeId) setSelectedEyeId(eyeId);
     if (alertId) setSelectedAlertId(alertId);
     setRecentStockIds((current) => [stockId, ...current.filter((id) => id !== stockId)].slice(0, 6));
+    setEyeDetailOpen(false);
+    setAlertDetailOpen(false);
 
     if (target === "Stocks") {
-      setTab("Stocks");
+      setTab("Stocks", { stockId });
       return;
     }
     if (target === "Alerts") {
       setAlertWorkspaceTab("Current");
       setAlertDetailOpen(Boolean(alertId));
-      setTab("Alerts");
+      setTab("Alerts", { stockId, ...(alertId ? { alertId } : {}) });
       return;
     }
     if (target === "Eyes") {
-      setTab("Eyes");
+      setTab("Eyes", { stockId, ...(eyeId ? { eyeId } : {}) });
       return;
     }
-    setTab("Journal");
+    setTab("Journal", { stockId });
+  };
+
+  const openEyeDetail = (eyeId: string) => {
+    const eye = data?.eyes.find((item) => item.id === eyeId);
+    if (!eye) return;
+    setSelectedEyeId(eyeId);
+    setEyeDetailOpen(true);
+    setTab("Eyes", { stockId: eye.stockId, eyeId });
+  };
+
+  const openAlertDetail = (alertId: string) => {
+    const alert = data?.alerts.find((item) => item.id === alertId);
+    if (!alert) return;
+    setSelectedAlertId(alertId);
+    setAlertDetailOpen(true);
+    setAlertWorkspaceTab(alert.reviewed ? "History" : "Current");
+    setTab("Alerts", { alertId });
+  };
+
+  const openDecisionDetail = (decisionId: string) => {
+    const decision = data?.decisions.find((item) => item.id === decisionId);
+    if (!decision) return;
+    setSelectedDecisionId(decisionId);
+    setTab("Journal", { decisionId });
+  };
+
+  const openRecipeDetail = (recipeId: string) => {
+    if (!data?.recipes.some((recipe) => recipe.id === recipeId)) return;
+    setRecipeDetailId(recipeId);
+    setTab("Logic Lab", { recipeId });
+  };
+
+  const openMetricDetail = (card: VisualEvidenceCard) => {
+    if (!selectedStockSummary) return;
+    setSelectedEvidenceCard(card);
+    setTab("Stocks", { stockId: selectedStockSummary.stock.id, metricId: card.id });
+  };
+
+  const closeEntityRoute = (destination: "Stocks" | "Eyes" | "Alerts" | "Journal" | "Logic Lab") => {
+    setTab(destination, {}, { replace: true });
   };
 
   const cycleEvidenceCard = (direction: 1 | -1) => {
@@ -2983,7 +3183,9 @@ export default function App() {
     if (currentIndex < 0) return;
     const nextIndex = currentIndex + direction;
     if (nextIndex < 0 || nextIndex >= sortedSelectedStockAnalysisCards.length) return;
-    setSelectedEvidenceCard(sortedSelectedStockAnalysisCards[nextIndex]);
+    const nextCard = sortedSelectedStockAnalysisCards[nextIndex];
+    setSelectedEvidenceCard(nextCard);
+    if (selectedStockSummary) setTab("Stocks", { stockId: selectedStockSummary.stock.id, metricId: nextCard.id });
   };
 
   const togglePinnedMetric = (card: VisualEvidenceCard) => {
@@ -3641,27 +3843,36 @@ export default function App() {
     setJournalFormAttempted(true);
     if (!decisionForm.eyeId || !decisionForm.note.trim() || !decisionForm.thesisValid || !decisionForm.timing) return;
     const input = { ...decisionForm, thesisValid: decisionForm.thesisValid, timing: decisionForm.timing };
+    let savedDecisionId = journalComposerEditingId;
     if (journalComposerEditingId) {
       await actions.updateDecision(journalComposerEditingId, input);
-      setSelectedDecisionId(journalComposerEditingId);
     } else {
       const decisionId = await actions.logDecision(input);
-      if (decisionId) {
-        setSelectedDecisionId(decisionId);
-      }
+      savedDecisionId = decisionId ?? "";
     }
     resetJournalComposerDraft();
     setJournalComposerOpen(false);
+    if (savedDecisionId) {
+      setSelectedDecisionId(savedDecisionId);
+      setTab("Journal", { decisionId: savedDecisionId });
+    }
   };
 
   return (
-    <View style={styles.screen}>
+    <View nativeID="stockledger-root" style={styles.screen}>
       <StatusBar style="dark" />
-      {stockEditor !== null ? <StockEditor stock={data.stocks.find(stock => stock.id === stockEditor)} onClose={() => setStockEditor(null)} actions={actions} onSaved={id => { setSelectedStockId(id); setTab("Stocks"); }} /> : null}
+      {stockEditor !== null ? <StockEditor stock={data.stocks.find(stock => stock.id === stockEditor)} onClose={() => setStockEditor(null)} actions={actions} onSaved={id => { setSelectedStockId(id); setTab("Stocks", { stockId: id }); }} language={language} /> : null}
       <View style={styles.frame}>
+        {routeNotice ? (
+          <View style={styles.routeNotice} accessibilityRole="alert" accessibilityLiveRegion="assertive">
+            <Text style={styles.routeNoticeTitle}>{t(language, "route.unavailableTitle")}</Text>
+            <Text style={styles.routeNoticeBody}>{routeNotice}</Text>
+            <Button label={t(language, "route.returnToDestination")} tone="secondary" onPress={() => setTab(route.tab, {}, { replace: true })} />
+          </View>
+        ) : null}
         {recentError || pinError ? <Text accessibilityRole="alert" style={{ padding: 12 }}>{recentError || pinError}</Text> : null}
-        {error ? <View style={{ padding: 12, backgroundColor: "#fff0ec" }}><Text accessibilityRole="alert" selectable>{error}</Text><Button label="Dismiss" tone="ghost" onPress={actions.dismissError} /></View> : null}
-        {saving || scanning ? <Text accessibilityLiveRegion="polite" style={{ padding: 8 }}>{saving ? "Saving…" : "Scanning completed market sessions…"}</Text> : null}
+        {error ? <View style={{ padding: 12, backgroundColor: "#fff0ec" }}><Text accessibilityRole="alert" selectable>{error}</Text><Button label={t(language, "common.dismiss")} tone="ghost" onPress={actions.dismissError} /></View> : null}
+        {saving || scanning ? <Text accessibilityLiveRegion="polite" style={{ padding: 8 }}>{saving ? t(language, "common.saving") : t(language, "common.scanning")}</Text> : null}
         <View style={styles.topBar}>
           <View style={styles.topBarCopy}>
             <Text accessibilityRole="header" style={styles.topBarTitle}>{tabLabels[tab]}</Text>
@@ -3669,7 +3880,7 @@ export default function App() {
           </View>
           <View style={styles.topBarActions}>
             <Pressable
-              accessibilityRole="button" accessibilityLabel="Alerts"
+              accessibilityRole="button" accessibilityLabel={t(language, "common.alerts")} accessibilityState={{ selected: tab === "Alerts" }}
               onPress={() => {
                 setAlertWorkspaceTab("Current");
                 setTab("Alerts");
@@ -3684,7 +3895,7 @@ export default function App() {
               ) : null}
             </Pressable>
             <Pressable
-              accessibilityRole="button" accessibilityLabel="Journal"
+              accessibilityRole="button" accessibilityLabel={t(language, "common.journal")} accessibilityState={{ selected: tab === "Journal" }}
               onPress={() => setTab("Journal")}
               style={[styles.alertBell, tab === "Journal" ? styles.topHeaderActionActive : null]}
             >
@@ -3696,7 +3907,7 @@ export default function App() {
               ) : null}
             </Pressable>
             <Pressable
-              accessibilityRole="button" accessibilityLabel="Settings"
+              accessibilityRole="button" accessibilityLabel={t(language, "nav.Settings")} accessibilityState={{ selected: tab === "Settings" }}
               onPress={() => setTab("Settings")}
               style={[styles.alertBell, tab === "Settings" ? styles.topHeaderActionActive : null]}
             >
@@ -3711,14 +3922,14 @@ export default function App() {
           nestedScrollEnabled
         >
           {data.stocks.length === 0 ? <Card>
-            <Text style={styles.cardTitle}>Build your investment memory</Text>
-            <Text style={styles.cardBody}>Add a stock, capture why you are watching it, then attach a recipe. Import daily prices in Settings to evaluate your evidence.</Text>
-            <Button label="Add your first stock" onPress={() => setStockEditor("")} />
-            <Button label="Add starter recipes" tone="secondary" onPress={() => actions.addStarterRecipes()} />
-            <Button label="Explore sample workspace" tone="ghost" onPress={() => actions.resetToSeed()} />
+            <Text style={styles.cardTitle}>{t(language, "home.onboarding.title")}</Text>
+            <Text style={styles.cardBody}>{t(language, "home.onboarding.body")}</Text>
+            <Button label={t(language, "home.onboarding.addStock")} onPress={() => setStockEditor("")} />
+            <Button label={t(language, "home.onboarding.addRecipes")} tone="secondary" onPress={() => actions.addStarterRecipes()} />
+            <Button label={t(language, "home.onboarding.exploreSample")} tone="ghost" onPress={() => actions.resetToSeed()} />
           </Card> : null}
-          {tab === "Stocks" ? <View style={{ flexDirection: "row", gap: 12 }}><Button label="Add stock" onPress={() => setStockEditor("")} /><Button label="Manage monitoring Eyes" tone="secondary" onPress={() => setTab("Eyes")} /></View> : null}
-          {data.snapshots.some(snapshot => snapshot.isMock) ? <Text style={{ padding: 10, color: "#6d4b16", fontSize: 14 }}>Sample data is present. Mock prices and outcomes are for exploring the app.</Text> : null}
+          {tab === "Stocks" ? <View style={{ flexDirection: "row", gap: 12 }}><Button label={t(language, "stocks.action.add")} onPress={() => setStockEditor("")} /><Button label={t(language, "stocks.action.manageEyes")} tone="secondary" onPress={() => setTab("Eyes")} /></View> : null}
+          {data.snapshots.some(snapshot => snapshot.isMock) ? <Text style={{ padding: 10, color: "#6d4b16", fontSize: 14 }}>{t(language, "home.sampleNotice")}</Text> : null}
           {tab === "Home" && data.stocks.length > 0 ? (
             <HomeVisualDashboard
               language={language}
@@ -3758,7 +3969,7 @@ export default function App() {
                   stockSuggestionTrustLabel={(snapshot) => stockSuggestionTrustLabel(language, snapshot)}
                   language={language}
                 />
-                {stockCandidates.length > visibleStocks ? <Button label={`Show more stocks (${stockCandidates.length - visibleStocks} remaining)`} tone="secondary" onPress={() => setVisibleStocks(count => count + 24)} /> : null}
+                {stockCandidates.length > visibleStocks ? <Button label={t(language, "stocks.search.showMore", { count: stockCandidates.length - visibleStocks })} tone="secondary" onPress={() => setVisibleStocks(count => count + 24)} /> : null}
               </Reveal>
 
               {selectedStockSummary ? (
@@ -3769,7 +3980,7 @@ export default function App() {
                         <Text style={styles.stockNameBig}>{selectedStockSummary.stock.name}</Text>
                       </View>
                       <Button
-                        label={language === "ko" ? "EYE 등록" : "REGISTER EYE"}
+                        label={t(language, "common.registerEye")}
                         onPress={() => {
                           setEyeForm((current) => ({ ...current, stockId: selectedStockSummary.stock.id }));
                           setEyeComposerOpen(true);
@@ -3803,9 +4014,10 @@ export default function App() {
                       onClearStock={() => {
                         setSelectedStockId("");
                         setStockSearch("");
+                        closeEntityRoute("Stocks");
                       }}
                       onEditStock={() => setStockEditor(selectedStockSummary.stock.id)}
-                      onDeleteStock={async () => { await actions.archiveStock(selectedStockSummary.stock.id); setSelectedStockId(""); }}
+                      onDeleteStock={async () => { await actions.archiveStock(selectedStockSummary.stock.id); setSelectedStockId(""); closeEntityRoute("Stocks"); }}
                       lookbackControl={
                         <HorizontalChoice
                           options={analysisLookbacks}
@@ -3905,7 +4117,7 @@ export default function App() {
                                   stockMetricPreferenceKey(selectedStockSummary.stock.id, card.id),
                                 ),
                             )}
-                            onOpen={() => setSelectedEvidenceCard(card)}
+                            onOpen={() => openMetricDetail(card)}
                             language={language}
                           />
                         </View>
@@ -4188,9 +4400,11 @@ export default function App() {
                     filteredActiveEyesInventory.map((eye) => (
                       <Pressable
                         key={eye.id}
+                        accessibilityRole="button"
+                        accessibilityLabel={`${stockLabel(data.stocks, eye.stockId)} ${recipeLabel(data.recipes, eye.recipeId)}`}
+                        accessibilityState={{ selected: selectedEye?.id === eye.id }}
                         onPress={() => {
-                          setSelectedEyeId(eye.id);
-                          setEyeDetailOpen(true);
+                          openEyeDetail(eye.id);
                         }}
                         style={({ pressed }) => [styles.pressableCardWrap, pressed ? styles.pressableCardWrapPressed : null]}
                       >
@@ -4213,7 +4427,7 @@ export default function App() {
                         <View style={styles.metaRow}>
                           <MetaPill label={localizedActionUrgency(language, eye.lastEvaluation?.actionUrgency ?? t(language, "eyes.meta.wait"))} />
                           <MetaPill label={`v${eye.recipeVersionAtCreation ?? eye.lastEvaluation?.recipeVersion ?? 1}`} />
-                          <MetaPill label={eye.lastReviewedAt ? formatShortDate(eye.lastReviewedAt) : t(language, "eyes.meta.reviewDue")} />
+                          <MetaPill label={eye.lastReviewedAt ? formatShortDate(language, eye.lastReviewedAt) : t(language, "eyes.meta.reviewDue")} />
                         </View>
                         <View style={styles.analysisActionRow}>
                           <Button label={t(language, "eyes.action.stock")} onPress={() => openStockContext({ stockId: eye.stockId, eyeId: eye.id })} />
@@ -4226,8 +4440,7 @@ export default function App() {
                             label={t(language, "eyes.action.detail")}
                             tone="ghost"
                             onPress={() => {
-                              setSelectedEyeId(eye.id);
-                              setEyeDetailOpen(true);
+                              openEyeDetail(eye.id);
                             }}
                           />
                         </View>
@@ -4249,9 +4462,11 @@ export default function App() {
                     filteredInactiveEyesInventory.map((eye) => (
                       <Pressable
                         key={`inactive-${eye.id}`}
+                        accessibilityRole="button"
+                        accessibilityLabel={`${stockLabel(data.stocks, eye.stockId)} ${recipeLabel(data.recipes, eye.recipeId)}`}
+                        accessibilityState={{ selected: selectedEye?.id === eye.id }}
                         onPress={() => {
-                          setSelectedEyeId(eye.id);
-                          setEyeDetailOpen(true);
+                          openEyeDetail(eye.id);
                         }}
                         style={({ pressed }) => [styles.pressableCardWrap, pressed ? styles.pressableCardWrapPressed : null]}
                       >
@@ -4270,7 +4485,7 @@ export default function App() {
                         </View>
                         <View style={styles.metaRow}>
                           <MetaPill label={localizedActionUrgency(language, eye.lastEvaluation?.actionUrgency ?? t(language, "eyes.meta.wait"))} />
-                          <MetaPill label={eye.lastReviewedAt ? formatShortDate(eye.lastReviewedAt) : t(language, "eyes.meta.reviewDue")} />
+                          <MetaPill label={eye.lastReviewedAt ? formatShortDate(language, eye.lastReviewedAt) : t(language, "eyes.meta.reviewDue")} />
                         </View>
                         <View style={styles.analysisActionRow}>
                           <Button label={t(language, "eyes.action.stock")} onPress={() => openStockContext({ stockId: eye.stockId, eyeId: eye.id })} />
@@ -4278,8 +4493,7 @@ export default function App() {
                             label={t(language, "eyes.action.detail")}
                             tone="secondary"
                             onPress={() => {
-                              setSelectedEyeId(eye.id);
-                              setEyeDetailOpen(true);
+                              openEyeDetail(eye.id);
                             }}
                           />
                         </View>
@@ -4327,8 +4541,7 @@ export default function App() {
                           selectedStockId={selectedStockId}
                           onOpenStock={() => openStockContext({ stockId: group.stock.id })}
                           onOpenDetail={(alertId) => {
-                            setSelectedAlertId(alertId);
-                            setAlertDetailOpen(true);
+                            openAlertDetail(alertId);
                           }}
                           onQuickDecision={(alert, action) => quickDecision(alert, action)}
                           onSnooze={(alertId) => actions.snoozeAlert(alertId, 24)}
@@ -4357,20 +4570,19 @@ export default function App() {
                           <Card key={`history-${alert.id}`}>
                             <View style={styles.inlineBetween}>
                               <Text style={styles.cardEyebrow}>{stockLabel(data.stocks, eye?.stockId ?? "")}</Text>
-                              <Text style={styles.inventoryRowMeta}>{formatDate(alert.createdAt)}</Text>
+                              <Text style={styles.inventoryRowMeta}>{formatDate(language, alert.createdAt)}</Text>
                             </View>
                             <Text style={styles.alertTitle}>{alert.title}</Text>
                             <Text style={styles.cardBody} numberOfLines={2}>{alert.whyNow}</Text>
                             <View style={styles.metaRow}>
-                              <MetaPill label={alert.reviewed ? t(language, "alerts.history.acknowledged") : t(language, "alerts.history.snoozedUntil", { date: alert.snoozedUntil ? formatDate(alert.snoozedUntil) : t(language, "alerts.history.snoozedUnknown") })} />
+                              <MetaPill label={alert.reviewed ? t(language, "alerts.history.acknowledged") : t(language, "alerts.history.snoozedUntil", { date: alert.snoozedUntil ? formatDate(language, alert.snoozedUntil) : t(language, "alerts.history.snoozedUnknown") })} />
                               <MetaPill label={localizedAlertPriority(language, alert.priority)} />
                               {alert.usefulness ? <MetaPill label={localizedAlertUsefulness(language, alert.usefulness)} /> : null}
                               {linkedDecision ? <MetaPill label={t(language, "alerts.history.journalAction", { action: localizedDecisionAction(language, linkedDecision.action) })} /> : null}
                             </View>
                             <View style={styles.analysisActionRow}>
                               <Button label={t(language, "common.detail")} onPress={() => {
-                                setSelectedAlertId(alert.id);
-                                setAlertDetailOpen(true);
+                                openAlertDetail(alert.id);
                               }} />
                               {!alert.reviewed ? <Button label={t(language, "alerts.action.unsnooze")} tone="secondary" onPress={() => actions.snoozeAlert(alert.id, -1)} /> : null}
                               {eye ? <Button label={t(language, "common.stock")} tone="secondary" onPress={() => openStockContext({ stockId: eye.stockId, eyeId: eye.id, alertId: alert.id, target: "Alerts" })} /> : null}
@@ -4378,12 +4590,7 @@ export default function App() {
                                 <Button
                                   label={t(language, "common.journal")}
                                   tone="ghost"
-                                  onPress={() => {
-                                    if (linkedDecision) {
-                                      setSelectedDecisionId(linkedDecision.id);
-                                    }
-                                    setTab("Journal");
-                                  }}
+                                  onPress={() => { if (linkedDecision) openDecisionDetail(linkedDecision.id); }}
                                 />
                               ) : null}
                             </View>
@@ -4425,11 +4632,14 @@ export default function App() {
                     return (
                       <Pressable
                         key={decision.id}
-                        onPress={() => setSelectedDecisionId(decision.id)}
+                        accessibilityRole="button"
+                        accessibilityLabel={`${localizedDecisionAction(language, decision.action)} · ${decisionTitle(decision.eyeId, data.eyes, data.stocks, data.recipes)}`}
+                        accessibilityState={{ selected: selectedDecision?.id === decision.id }}
+                        onPress={() => openDecisionDetail(decision.id)}
                         style={({ pressed }) => [styles.pressableCardWrap, pressed ? styles.pressableCardWrapPressed : null]}
                       >
                       <Card>
-                        <Text style={styles.cardEyebrow}>{formatDate(decision.createdAt)}</Text>
+                        <Text style={styles.cardEyebrow}>{formatDate(language, decision.createdAt)}</Text>
                         <Text style={styles.alertTitle}>{localizedDecisionAction(language, decision.action)} · {decisionTitle(decision.eyeId, data.eyes, data.stocks, data.recipes)}</Text>
                         <Text style={styles.cardBody} numberOfLines={2}>{decision.note}</Text>
                         <View style={styles.metaRow}>
@@ -4440,7 +4650,7 @@ export default function App() {
                         </View>
                         <Text style={styles.metaLine}>{t(language, "journal.meta.concern", { value: decision.concern || t(language, "journal.meta.notCaptured") })}</Text>
                         <View style={styles.analysisActionRow}>
-                          <Button label={t(language, "journal.action.open")} tone="secondary" onPress={() => setSelectedDecisionId(decision.id)} />
+                          <Button label={t(language, "journal.action.open")} tone="secondary" onPress={() => openDecisionDetail(decision.id)} />
                           {linkedEye ? (
                             <Button
                               label={t(language, "common.stock")}
@@ -4451,12 +4661,7 @@ export default function App() {
                             <Button
                               label={t(language, "journal.action.alert")}
                               tone="ghost"
-                              onPress={() => {
-                                setSelectedAlertId(decision.alertId ?? "");
-                                setAlertWorkspaceTab("History");
-                                setAlertDetailOpen(true);
-                                setTab("Alerts");
-                              }}
+                              onPress={() => openAlertDetail(decision.alertId ?? "")}
                             />
                           ) : null}
                         </View>
@@ -4561,7 +4766,7 @@ export default function App() {
                       <View style={styles.metaRow}>
                         <MetaPill label={entry.configured ? t(language, "settings.providers.configured") : t(language, "settings.providers.missingKey")} />
                         {entry.endpoint ? <MetaPill label={entry.endpoint} /> : null}
-                        {entry.lastCheckedAt ? <MetaPill label={formatDate(entry.lastCheckedAt)} /> : null}
+                        {entry.lastCheckedAt ? <MetaPill label={formatDate(language, entry.lastCheckedAt)} /> : null}
                       </View>
                     </Card>
                   ))}
@@ -5677,7 +5882,7 @@ export default function App() {
           <WindowPanel
             title={selectedRecipe.name}
             subtitle={`${t(language, "recipes.card.version", { version: selectedRecipe.version })} · ${localizedTimeHorizon(language, selectedRecipe.timeHorizon)}`}
-            onClose={() => setRecipeDetailId("")}
+            onClose={() => closeEntityRoute("Logic Lab")}
             closeLabel={t(language, "common.done")}
           >
             <Text style={styles.cardBody}>{selectedRecipe.purpose}</Text>
@@ -5709,7 +5914,7 @@ export default function App() {
                 label={t(language, "recipes.detail.useForEye")}
                 onPress={() => {
                   setEyeForm((current) => ({ ...current, recipeId: selectedRecipe.id }));
-                  setRecipeDetailId("");
+                  closeEntityRoute("Logic Lab");
                   setEyeComposerOpen(true);
                 }}
               />
@@ -5741,7 +5946,7 @@ export default function App() {
                     alertCooldownHours: selectedRecipe.alertConfig?.cooldownHours ?? alertCooldownOptions[2],
                   });
                   setDraftConditions(selectedRecipe.conditions);
-                  setRecipeDetailId("");
+                  closeEntityRoute("Logic Lab");
                   setRecipeBuilderStep("Purpose");
                   setRecipeBuilderOpen(true);
                 }}
@@ -5768,7 +5973,7 @@ export default function App() {
           <WindowPanel
             title={stockLabel(data.stocks, selectedEye.stockId)}
             subtitle={`${recipeLabel(data.recipes, selectedEye.recipeId)} · ${selectedEye.lastEvaluation?.currentState ? localizedEyeState(language, selectedEye.lastEvaluation.currentState) : t(language, "eyes.notEvaluated")}`}
-            onClose={() => setEyeDetailOpen(false)}
+            onClose={() => closeEntityRoute("Eyes")}
             closeLabel={t(language, "common.done")}
           >
             <WhyNowPanel
@@ -5782,9 +5987,9 @@ export default function App() {
             />
             <View style={styles.dualDenseGrid}>
               <DenseStat label={t(language, "eyes.detail.urgency")} value={localizedActionUrgency(language, selectedEye.lastEvaluation?.actionUrgency ?? t(language, "eyes.meta.wait"))} tone="strong" />
-              <DenseStat label={t(language, "eyes.detail.review")} value={selectedEye.lastReviewedAt ? formatShortDate(selectedEye.lastReviewedAt) : t(language, "eyes.detail.due")} />
-              <DenseStat label={t(language, "eyes.detail.entryLow")} value={selectedEye.plannedEntryLow ? `$${selectedEye.plannedEntryLow.toFixed(2)}` : t(language, "eyes.detail.unset")} />
-              <DenseStat label={t(language, "eyes.detail.entryHigh")} value={selectedEye.plannedEntryHigh ? `$${selectedEye.plannedEntryHigh.toFixed(2)}` : t(language, "eyes.detail.unset")} />
+              <DenseStat label={t(language, "eyes.detail.review")} value={selectedEye.lastReviewedAt ? formatShortDate(language, selectedEye.lastReviewedAt) : t(language, "eyes.detail.due")} />
+              <DenseStat label={t(language, "eyes.detail.entryLow")} value={selectedEye.plannedEntryLow ? `$${formatLocaleNumber(language, selectedEye.plannedEntryLow, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : t(language, "eyes.detail.unset")} />
+              <DenseStat label={t(language, "eyes.detail.entryHigh")} value={selectedEye.plannedEntryHigh ? `$${formatLocaleNumber(language, selectedEye.plannedEntryHigh, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : t(language, "eyes.detail.unset")} />
               <DenseStat label={t(language, "eyes.detail.alerts")} value={`${selectedEyeLinkedAlerts.length}`} />
               <DenseStat label={t(language, "eyes.detail.journal")} value={`${selectedEyeLinkedDecisions.length}`} />
             </View>
@@ -5800,7 +6005,7 @@ export default function App() {
               <View style={styles.detailCallout}>
                 <Text style={styles.detailCalloutLabel}>{t(language, "eyes.detail.lastDecision")}</Text>
                 <Text style={styles.detailCalloutBody}>
-                  {localizedDecisionAction(language, selectedEyeLinkedDecisions[0].action)} · {formatShortDate(selectedEyeLinkedDecisions[0].createdAt)}
+                  {localizedDecisionAction(language, selectedEyeLinkedDecisions[0].action)} · {formatShortDate(language, selectedEyeLinkedDecisions[0].createdAt)}
                 </Text>
               </View>
             ) : null}
@@ -5808,7 +6013,7 @@ export default function App() {
               <Button
                 label={t(language, "eyes.action.stock")}
                 onPress={() => {
-                  setEyeDetailOpen(false);
+                  closeEntityRoute("Eyes");
                   openStockContext({ stockId: selectedEye.stockId, eyeId: selectedEye.id });
                 }}
               />
@@ -5823,7 +6028,7 @@ export default function App() {
                 onPress={() => {
                   resetJournalComposerDraft();
                   setDecisionForm((current) => ({ ...current, eyeId: selectedEye.id }));
-                  setEyeDetailOpen(false);
+                  closeEntityRoute("Eyes");
                   setJournalComposerOpen(true);
                 }}
               />
@@ -5843,7 +6048,7 @@ export default function App() {
                       ? Math.max(0, Math.round((Date.now() - new Date(selectedEye.lastReviewedAt).getTime()) / (1000 * 60 * 60 * 24)))
                       : reviewDateOptions[2].daysAgo,
                   });
-                  setEyeDetailOpen(false);
+                  closeEntityRoute("Eyes");
                   setEyeComposerOpen(true);
                 }}
               />
@@ -5853,8 +6058,7 @@ export default function App() {
                   tone="ghost"
                   onPress={() => {
                     setSelectedDecisionId(selectedEyeLinkedDecisions[0].id);
-                    setEyeDetailOpen(false);
-                    setTab("Journal");
+                    openDecisionDetail(selectedEyeLinkedDecisions[0].id);
                   }}
                 />
               ) : null}
@@ -5863,7 +6067,7 @@ export default function App() {
                 tone="ghost"
                 onPress={async () => {
                   await actions.deleteEye(selectedEye.id);
-                  setEyeDetailOpen(false);
+                  closeEntityRoute("Eyes");
                 }}
               />
             </View>
@@ -5877,8 +6081,8 @@ export default function App() {
 
         {eyeComposerOpen ? (
           <WindowPanel
-            title={eyeComposerEditingId ? (language === "ko" ? "Eye 수정" : "Edit Eye") : t(language, "eyes.create.title")}
-            subtitle={eyeComposerEditingId ? (language === "ko" ? "기존 Eye의 종목, 레시피, 논리 스냅샷을 수정합니다." : "Update the stock, recipe, and thesis snapshot for this Eye.") : t(language, "eyes.create.subtitle")}
+            title={eyeComposerEditingId ? t(language, "eyes.create.editTitle") : t(language, "eyes.create.title")}
+            subtitle={eyeComposerEditingId ? t(language, "eyes.create.editSubtitle") : t(language, "eyes.create.subtitle")}
             onClose={() => {
               setEyeComposerOpen(false);
               resetEyeComposerDraft();
@@ -5886,28 +6090,30 @@ export default function App() {
             closeLabel={t(language, "common.done")}
           >
             <SearchableSelect
+              language={language}
               label={t(language, "eyes.create.stock")}
               options={data.stocks.map(s => ({ id: s.id, label: s.symbol, sublabel: s.name }))}
               value={eyeForm.stockId}
               onSelect={(opt: any) => setEyeForm((current) => ({ ...current, stockId: opt.id }))}
-              placeholder="Search by symbol..."
+              placeholder={t(language, "eyes.create.selectStock")}
             />
             {eyeFormAttempted && !eyeForm.stockId ? <Text style={styles.validationText}>{t(language, "eyes.create.selectStock")}</Text> : null}
 
             <SearchableSelect
+              language={language}
               label={t(language, "eyes.create.recipe")}
               options={data.recipes.map(r => ({ id: r.id, label: r.name, sublabel: localizedTimeHorizon(language, r.timeHorizon) }))}
               value={eyeForm.recipeId}
               onSelect={(opt: any) => setEyeForm((current) => ({ ...current, recipeId: opt.id }))}
-              placeholder="Select a recipe..."
+              placeholder={t(language, "eyes.create.selectRecipe")}
             />
             {eyeFormAttempted && !eyeForm.recipeId ? <Text style={styles.validationText}>{t(language, "eyes.create.selectRecipe")}</Text> : null}
             <Text style={styles.inputLabel}>{t(language, "eyes.create.thesis")}</Text>
             <Input value={eyeForm.thesisSnapshot} onChangeText={(thesisSnapshot) => setEyeForm((current) => ({ ...current, thesisSnapshot }))} placeholder={t(language, "eyes.create.thesisPlaceholder")} multiline invalid={eyeFormAttempted && !eyeForm.thesisSnapshot.trim()} />
             {eyeFormAttempted && !eyeForm.thesisSnapshot.trim() ? <Text style={styles.validationText}>{t(language, "eyes.create.thesisRequired")}</Text> : null}
             <View style={styles.dualDenseGrid}>
-              <Input placeholder="Entry low (optional)" keyboardType="decimal-pad" value={eyeForm.plannedEntryLow} onChangeText={plannedEntryLow => setEyeForm(current => ({ ...current, plannedEntryLow }))} />
-              <Input placeholder="Entry high (optional)" keyboardType="decimal-pad" value={eyeForm.plannedEntryHigh} onChangeText={plannedEntryHigh => setEyeForm(current => ({ ...current, plannedEntryHigh }))} />
+              <Input placeholder={t(language, "eyes.create.entryLowPlaceholder")} keyboardType="decimal-pad" value={eyeForm.plannedEntryLow} onChangeText={plannedEntryLow => setEyeForm(current => ({ ...current, plannedEntryLow }))} />
+              <Input placeholder={t(language, "eyes.create.entryHighPlaceholder")} keyboardType="decimal-pad" value={eyeForm.plannedEntryHigh} onChangeText={plannedEntryHigh => setEyeForm(current => ({ ...current, plannedEntryHigh }))} />
             </View>
             <Text style={styles.inputLabel}>{t(language, "eyes.create.lastReview")}</Text>
             <HorizontalChoice
@@ -5923,7 +6129,7 @@ export default function App() {
             />
             <Text style={styles.inputLabel}>{t(language, "eyes.create.invalidation")}</Text>
             <Input value={eyeForm.invalidationRule} onChangeText={(invalidationRule) => setEyeForm((current) => ({ ...current, invalidationRule }))} placeholder={t(language, "eyes.create.invalidationPlaceholder")} multiline />
-            <Button label={eyeComposerEditingId ? (language === "ko" ? "수정 저장" : "Save Changes") : t(language, "eyes.create.submit")} onPress={() => saveEye()} />
+            <Button label={eyeComposerEditingId ? t(language, "common.saveChanges") : t(language, "eyes.create.submit")} onPress={() => saveEye()} />
           </WindowPanel>
         ) : null}
 
@@ -5931,14 +6137,14 @@ export default function App() {
           <WindowPanel
             title={selectedAlert.title}
             subtitle={`${stockLabel(data.stocks, selectedAlertEye.stockId)} · ${localizedAlertPriority(language, selectedAlert.priority)}`}
-            onClose={() => setAlertDetailOpen(false)}
+            onClose={() => closeEntityRoute("Alerts")}
             closeLabel={t(language, "common.done")}
           >
-            <WhyNowPanel title={t(language, "alerts.detail.whatHappened")} body={selectedAlert.whyNow} state={selectedAlertEvaluation?.currentState ?? selectedAlert.evaluationContext?.currentState ?? "Not captured"} recipeVersion={`${selectedAlertRecipe.name} v${selectedAlertRecipe.version}`} />
+            <WhyNowPanel title={t(language, "alerts.detail.whatHappened")} body={selectedAlert.whyNow} state={selectedAlertEvaluation?.currentState ?? selectedAlert.evaluationContext?.currentState ?? t(language, "common.notCaptured")} recipeVersion={`${selectedAlertRecipe.name} v${selectedAlertRecipe.version}`} />
             <View style={styles.detailMetricStrip}>
               <DenseStat label={t(language, "alerts.detail.priority")} value={localizedAlertPriority(language, selectedAlert.priority)} tone={selectedAlert.priority === "High" ? "risk" : "strong"} />
-              <DenseStat label={t(language, "alerts.detail.state")} value={selectedAlertEvaluation?.currentState ? localizedEyeState(language, selectedAlertEvaluation.currentState) : selectedAlert.evaluationContext?.currentState ?? "Not captured"} />
-              <DenseStat label={t(language, "alerts.detail.urgency")} value={selectedAlertEvaluation?.actionUrgency ?? "Not captured"} />
+              <DenseStat label={t(language, "alerts.detail.state")} value={selectedAlertEvaluation?.currentState ? localizedEyeState(language, selectedAlertEvaluation.currentState) : selectedAlert.evaluationContext?.currentState ?? t(language, "common.notCaptured")} />
+              <DenseStat label={t(language, "alerts.detail.urgency")} value={selectedAlertEvaluation?.actionUrgency ?? t(language, "common.notCaptured")} />
               <DenseStat label={t(language, "alerts.detail.data")} value={selectedAlert.dataQuality} tone={selectedAlert.dataQuality.includes("Mock") ? "risk" : "neutral"} />
             </View>
             <View style={styles.dualColumn}>
@@ -5971,8 +6177,7 @@ export default function App() {
                 label={t(language, "common.stock")}
                 tone="secondary"
                 onPress={() => {
-                  setAlertDetailOpen(false);
-                  openStockContext({ stockId: selectedAlertEye.stockId, eyeId: selectedAlertEye.id, alertId: selectedAlert.id, target: "Alerts" });
+                  openStockContext({ stockId: selectedAlertEye.stockId, eyeId: selectedAlertEye.id, alertId: selectedAlert.id, target: "Stocks" });
                 }}
               />
               <Button label={t(language, "alerts.action.acknowledge")} onPress={() => actions.markAlertReviewed(selectedAlert.id)} />
@@ -5983,18 +6188,14 @@ export default function App() {
                 <Button
                   label={t(language, "common.journal")}
                   tone="ghost"
-                  onPress={() => {
-                    setSelectedDecisionId(selectedAlertDecision.id);
-                    setAlertDetailOpen(false);
-                    setTab("Journal");
-                  }}
+                  onPress={() => openDecisionDetail(selectedAlertDecision.id)}
                 />
               ) : null}
             </View>
             <View style={styles.stack}>
-              <Text style={styles.cardTitle}>Evidence recorded with this alert</Text>
+              <Text style={styles.cardTitle}>{t(language, "alerts.detail.evidenceRecorded")}</Text>
               {(selectedAlertEvaluation?.conditionResults ?? selectedAlert.evaluationContext?.conditionResults ?? []).map(result => <Text selectable style={styles.cardBody} key={result.conditionId}>{result.role}: {result.explanation}</Text>)}
-              {!selectedAlertEvaluation && !selectedAlert.evaluationContext ? <Text style={styles.cardBody}>Detailed evidence was not captured by the older app version. The original alert summary is preserved above.</Text> : null}
+              {!selectedAlertEvaluation && !selectedAlert.evaluationContext ? <Text style={styles.cardBody}>{t(language, "alerts.detail.olderEvidence")}</Text> : null}
             </View>
           </WindowPanel>
         ) : null}
@@ -6010,12 +6211,13 @@ export default function App() {
             closeLabel={t(language, "common.done")}
           >
             <SearchableSelect
+              language={language}
               label={t(language, "journal.composer.eye")}
               disabled={Boolean(journalComposerEditingId)}
               options={data.eyes.map(e => ({ id: e.id, label: stockLabel(data.stocks, e.stockId), sublabel: recipeLabel(data.recipes, e.recipeId) }))}
               value={decisionForm.eyeId}
               onSelect={(opt: any) => setDecisionForm((current) => ({ ...current, eyeId: opt.id, alertId: "" }))}
-              placeholder="Search monitored stock..."
+              placeholder={t(language, "journal.composer.searchPlaceholder")}
             />
             {journalFormAttempted && !decisionForm.eyeId ? <Text style={styles.validationText}>{t(language, "journal.composer.selectEye")}</Text> : null}
             <Text style={styles.inputLabel}>{t(language, "journal.composer.action")}</Text>
@@ -6026,13 +6228,13 @@ export default function App() {
             <Text style={styles.inputLabel}>{t(language, "journal.composer.concern")}</Text>
             <Input value={decisionForm.concern} onChangeText={(concern) => setDecisionForm((current) => ({ ...current, concern }))} placeholder={t(language, "journal.composer.concernPlaceholder")} multiline />
             <Text style={styles.inputLabel}>{t(language, "journal.composer.thesisValidity")}</Text>
-            {journalFormAttempted && !decisionForm.thesisValid ? <Text accessibilityRole="alert" style={styles.validationText}>Choose your thesis assessment.</Text> : null}
+            {journalFormAttempted && !decisionForm.thesisValid ? <Text accessibilityRole="alert" style={styles.validationText}>{t(language, "journal.validation.thesisRequired")}</Text> : null}
             <HorizontalChoice options={thesisValidityOptions} value={decisionForm.thesisValid} onSelect={(thesisValid) => setDecisionForm((current) => ({ ...current, thesisValid }))} labelForOption={(value) => localizedThesisValidity(language, value)} />
             <Text style={styles.inputLabel}>{t(language, "journal.composer.timing")}</Text>
-            {journalFormAttempted && !decisionForm.timing ? <Text accessibilityRole="alert" style={styles.validationText}>Choose your timing assessment.</Text> : null}
+            {journalFormAttempted && !decisionForm.timing ? <Text accessibilityRole="alert" style={styles.validationText}>{t(language, "journal.validation.timingRequired")}</Text> : null}
             <HorizontalChoice options={timingOptions} value={decisionForm.timing} onSelect={(timing) => setDecisionForm((current) => ({ ...current, timing }))} labelForOption={(value) => localizedTiming(language, value)} />
             <Button
-              label={journalComposerEditingId ? (language === "ko" ? "수정 저장" : "Save Changes") : t(language, "journal.action.save")}
+              label={journalComposerEditingId ? t(language, "common.saveChanges") : t(language, "journal.action.save")}
               onPress={() => saveDecision()}
             />
           </WindowPanel>
@@ -6042,7 +6244,7 @@ export default function App() {
           <WindowPanel
             title={localizedDecisionAction(language, selectedDecision.action)}
             subtitle={decisionTitle(selectedDecision.eyeId, data.eyes, data.stocks, data.recipes)}
-            onClose={() => setSelectedDecisionId("")}
+            onClose={() => closeEntityRoute("Journal")}
             closeLabel={t(language, "common.done")}
           >
             <WhatChangedPanel
@@ -6070,7 +6272,6 @@ export default function App() {
                 onPress={() => {
                   const linkedEye = data.eyes.find((eye) => eye.id === selectedDecision.eyeId);
                   if (!linkedEye) return;
-                  setSelectedDecisionId("");
                   openStockContext({ stockId: linkedEye.stockId, eyeId: linkedEye.id });
                 }}
               />
@@ -6080,15 +6281,12 @@ export default function App() {
                   tone="secondary"
                   onPress={() => {
                     setSelectedAlertId(selectedDecision.alertId ?? "");
-                    setSelectedDecisionId("");
-                    setAlertWorkspaceTab("History");
-                    setAlertDetailOpen(true);
-                    setTab("Alerts");
+                    openAlertDetail(selectedDecision.alertId ?? "");
                   }}
                 />
               ) : null}
               <Button
-                label={language === "ko" ? "수정" : "Edit"}
+                label={t(language, "journal.action.edit")}
                 tone="ghost"
                 onPress={() => {
                   setJournalComposerEditingId(selectedDecision.id);
@@ -6101,16 +6299,16 @@ export default function App() {
                     thesisValid: selectedDecision.thesisValid,
                     timing: selectedDecision.timing,
                   });
-                  setSelectedDecisionId("");
+                  closeEntityRoute("Journal");
                   setJournalComposerOpen(true);
                 }}
               />
               <Button
-                label={language === "ko" ? "보관" : "Archive decision"}
+                label={t(language, "journal.action.archive")}
                 tone="ghost"
                   onPress={async () => {
                   await actions.deleteDecision(selectedDecision.id);
-                  setSelectedDecisionId("");
+                  closeEntityRoute("Journal");
                 }}
               />
               {selectedDecisionOutcome ? (
@@ -6128,7 +6326,7 @@ export default function App() {
             </View>
             {selectedDecisionOutcome ? (
               <View style={styles.formulaPanel}>
-                <OutcomeEditor key={selectedDecisionOutcome.id} outcome={selectedDecisionOutcome} actions={actions} />
+                <OutcomeEditor key={selectedDecisionOutcome.id} outcome={selectedDecisionOutcome} actions={actions} language={language} />
                 <Text style={styles.formulaTitle}>
                   {t(language, "journal.detail.outcome", { status: localizedOutcomeStatus(language, selectedDecisionOutcome.status ?? "Pending") })}
                 </Text>
@@ -6140,7 +6338,7 @@ export default function App() {
                 </View>
               </View>
             ) : null}
-            {selectedDecision.amendments?.length ? <View style={{ gap: 8 }}><Text accessibilityRole="header">Previous authored versions</Text>{selectedDecision.amendments.map((amendment, index) => <Text selectable key={`${amendment.amendedAt}-${index}`}>{amendment.amendedAt} · {amendment.action}: {amendment.note}</Text>)}</View> : null}
+            {selectedDecision.amendments?.length ? <View style={{ gap: 8 }}><Text accessibilityRole="header">{t(language, "journal.detail.previousVersions")}</Text>{selectedDecision.amendments.map((amendment, index) => <Text selectable key={`${amendment.amendedAt}-${index}`}>{amendment.amendedAt} · {amendment.action}: {amendment.note}</Text>)}</View> : null}
           </WindowPanel>
         ) : null}
 
@@ -6282,7 +6480,7 @@ export default function App() {
                   : ` · ${selectedEvidenceIndex + 1} of ${sortedSelectedStockAnalysisCards.length}`
                 : ""
             }`}
-            onClose={() => setSelectedEvidenceCard(null)}
+            onClose={() => closeEntityRoute("Stocks")}
             closeLabel={t(language, "common.done")}
           >
             <MotionSwap
@@ -6308,7 +6506,10 @@ export default function App() {
               onPrevious={() => cycleEvidenceCard(-1)}
               onNext={() => cycleEvidenceCard(1)}
               onTogglePin={() => togglePinnedMetric(selectedEvidenceCard)}
-              onSelectCard={setSelectedEvidenceCard}
+              onSelectCard={(card) => {
+                setSelectedEvidenceCard(card);
+                if (selectedStockSummary) setTab("Stocks", { stockId: selectedStockSummary.stock.id, metricId: card.id });
+              }}
             />
             </MotionSwap>
           </WindowPanel>
@@ -6318,6 +6519,7 @@ export default function App() {
           currentTab={tab}
           onSelect={setTab}
           labels={tabLabels}
+          navigationLabel={language === "ko" ? "주요 탐색" : "Primary navigation"}
           icons={{
             Home: "◦",
             Stocks: "≈",

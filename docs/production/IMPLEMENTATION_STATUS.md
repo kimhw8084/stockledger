@@ -34,9 +34,9 @@ Implementation began September 15, 2026, from `02e54c5`. Verification continued 
 - Evaluation and alert detail preserve captured evidence instead of substituting the latest live conditions.
 - Decisions require deliberate thesis/timing choices. Editing preserves authored amendments and original context; deletion becomes reversible archive.
 - Outcome review supports lessons and notes. Weekly Markdown reports join current review activity and coverage without inventing return or productivity claims.
-- Today, Watchlist, Recipes and Journal are the main tabs. Workspace hash routes survive browser refresh/back; native hardware back uses a history stack.
+- Today, Watchlist, Recipes and Journal are the main tabs. Entity-aware workspace hash routes survive browser refresh/back and fail safely for missing or archived records; native hardware back uses a history stack.
 - Charts use actual dated lookback windows and comparable returns. Unsupported benchmarks show unavailable coverage.
-- Shared controls expose accessibility state/errors and pending actions. Main decorative animations respect reduced motion; sheets use safe areas and keyboard avoidance.
+- Shared controls expose accessibility state/errors and pending actions. Main decorative animations respect reduced motion; sheets use safe areas, keyboard avoidance, initial focus, Escape/back dismissal, and opener focus return.
 
 ### Runnable independent worker
 
@@ -77,6 +77,17 @@ Implementation began September 15, 2026, from `02e54c5`. Verification continued 
 
 Browser screenshots were inspected locally. Desktop/browser-emulated phone coverage does not establish screen-reader, real-device, tablet, landscape, Korean or large-text acceptance.
 
+### CHG-90 verification (September 17, 2026 local run)
+
+- `npm run typecheck`: passed.
+- `npx vitest run --exclude tests/worker.test.ts`: **72 tests across 13 files passed**.
+- `npm test`: **72 tests passed**; the worker suite could not initialize on Node 20.19.4 because `node:sqlite` is unavailable. The package declares Node >=22.23.2, so worker execution is not claimed from this environment.
+- `npm run check:boundaries`, `npm run check:frozen`, and `git diff --check`: passed. Frozen-bundle validation remains structurally green but release-blocked for its documented independent-golden-output and point-in-time-data limitations.
+- `npm run export:web` and `npm run export:all`: passed on the available Expo 57 toolchain.
+- `npm run test:e2e`: **10 passed** across Desktop Chrome and Pixel 7 browser emulation. The suite covers the four existing journeys plus stock/Eye deep-link refresh, missing-entity fallback, dialog focus/Escape/return focus, Korean switching, domain-text preservation, reload persistence, viewport bounds, backup/recovery, and no external requests.
+- Browser evidence is limited to the configured emulation profiles. Screen-reader announcements, physical touch targets, real-device/tablet/landscape behavior, and large-text/OS zoom acceptance remain retained manual gates; no acceptance claim is made for them.
+- The changed core surfaces reuse the existing `Button`, `Input`, `HorizontalChoice`, `SearchableSelect`, `WindowPanel`, and navigation primitives. No alternate preference store or domain-data mutation was introduced.
+
 The synthetic worker fixture processed **100 stocks × 260 sessions in 2,036 ms**, producing 100 Eye evaluations and 200 scanner rows. Export: **5,656,231 bytes**; SQLite/WAL: **11,736,672 bytes**; ending RSS: **251,641,856 bytes**; integrity check passed. This is one local run, not p95, a load test or a user-count capacity guarantee. Reproduce with `npm run benchmark:worker`.
 
 ## Backlog reconciliation
@@ -93,11 +104,11 @@ The synthetic worker fixture processed **100 stocks × 260 sessions in 2,036 ms*
 | 011 | Bounded downloads, validation and retained blocked/failed results; resumable per-symbol distributed ingestion **partial**. |
 | 012–015 | Forward outcome preservation, safe expressions, client secret separation, dependency updates and regression suite implemented. More independent market fixtures still desirable. |
 | 020–024 | Stock editing/import, honest chart/evidence basis and four main destinations implemented. Only SPY comparison is supported; other benchmarks are visibly unavailable. |
-| 025–028 | Back/refresh routes, accessible primitives, reduced motion and responsive sheet behavior implemented; entity deep links, full focus management and device/accessibility matrix **partial**. |
+| 025–028 | Back/refresh routes, stable entity deep links with safe fallback, shared accessible primitives, reduced motion and browser-tested sheet focus behavior implemented; screen-reader/native-device acceptance matrix remains **partial**. |
 | 029–031 | Optional numeric validation, durable action feedback, explicit decisions and outcome review implemented. |
-| 032–033 | Pins/recents persist; full preference persistence **partial**. Complete Korean/English catalogs, locale formatting and missing-translation checks remain. |
+| 032–033 | Pins/recents and the intentional language preference persist; core English/Korean catalog parity, English fallback, locale-aware dates/numbers and missing-translation checks are implemented. Broader preference scope remains **partial**. |
 | 034–037 | Directory/scanner pagination, starter recipes and atomic alert-group review implemented. Virtualization, guided authoring, since-last-review diff and broad batch actions **partial or pending**. |
-| 038–039 | Clean/sample separation implemented. Eight browser journeys and screenshots completed; formal usability/native/language QA **partial**. |
+| 038–039 | Clean/sample separation implemented. Ten browser journeys across Desktop Chrome and Pixel 7 emulation and refreshed screenshots completed; formal usability/native/screen-reader/language QA **partial**. |
 | 040–042 | Auth and owner-scoped atomic sync contract implemented; full normalized APIs, account recovery/deletion/device controls and hosted isolation/advisor checks **partial**. |
 | 043–044 | Local SQLite worker and atomic client stores implemented. Scheduler installation, managed jobs and normalized local repositories **partial**; workspace payloads are still growing JSON documents. |
 | 045–046 | Full backup and simple watchlist CSV preview; optimistic three-way personal sync pilot implemented. Saved mappings, checksum manifests, durable mutation outbox/cursors and broader cross-device drills **partial**. |

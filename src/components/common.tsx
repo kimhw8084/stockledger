@@ -66,21 +66,29 @@ export const Button = ({
   tone = "primary",
   disabled = false,
   style,
+  accessibilityLabel,
+  accessibilityHint,
 }: {
   label: string;
   onPress: () => void | Promise<unknown>;
   tone?: "primary" | "secondary" | "ghost" | "risk";
   disabled?: boolean;
   style?: any;
+  accessibilityLabel?: string;
+  accessibilityHint?: string;
 }) => {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
+  const [focused, setFocused] = useState(false);
   const busy = useRef(false);
   return <><Pressable
     accessibilityRole="button"
-    accessibilityLabel={label}
+    accessibilityLabel={accessibilityLabel ?? label}
+    accessibilityHint={accessibilityHint}
     accessibilityState={{ disabled: disabled || pending, busy: pending }}
     disabled={disabled || pending}
+    onFocus={() => setFocused(true)}
+    onBlur={() => setFocused(false)}
     onPress={async () => {
       if (disabled || busy.current) return;
       busy.current = true; setPending(true); setError("");
@@ -97,6 +105,7 @@ export const Button = ({
             ? styles.buttonRisk
             : styles.buttonGhost,
       pressed && !disabled ? styles.buttonPressed : null,
+      focused ? styles.focusRing : null,
       disabled ? styles.buttonDisabled : null,
       style,
     ]}
@@ -132,6 +141,8 @@ export const Input = ({
   autoFocus,
   secureTextEntry,
   autoComplete,
+  accessibilityLabel,
+  accessibilityHint,
 }: {
   value: string;
   onChangeText: (value: string) => void;
@@ -140,6 +151,8 @@ export const Input = ({
   keyboardType?: TextInputProps["keyboardType"];
   secureTextEntry?: boolean;
   autoComplete?: TextInputProps["autoComplete"];
+  accessibilityLabel?: string;
+  accessibilityHint?: string;
   autoCapitalize?: "none" | "sentences" | "characters";
   onSubmitEditing?: () => void;
   returnKeyType?: "done" | "go" | "next" | "search";
@@ -147,7 +160,9 @@ export const Input = ({
   autoFocus?: boolean;
 }) => (
   <TextInput
-    accessibilityLabel={placeholder}
+    accessibilityLabel={accessibilityLabel ?? placeholder}
+    accessibilityHint={accessibilityHint}
+    {...(invalid ? ({ "aria-invalid": true } as any) : {})}
     value={value}
     onChangeText={onChangeText}
     placeholder={placeholder}
@@ -184,7 +199,7 @@ export const NumberStepper = ({
   <View style={styles.stepper}>
     <Text style={styles.stepperLabel}>{label}</Text>
     <View style={styles.stepperTrack}>
-      <Pressable accessibilityRole="button" accessibilityLabel={`Decrease ${label}`} onPress={() => onChange(Math.max(min, Number((value - step).toFixed(2))))} style={styles.stepperButton}>
+      <Pressable accessibilityRole="button" accessibilityLabel={`Decrease ${label}`} accessibilityHint={`Minimum ${min}`} onPress={() => onChange(Math.max(min, Number((value - step).toFixed(2))))} style={styles.stepperButton}>
         <Text style={styles.stepperButtonText}>-</Text>
       </Pressable>
       <View style={styles.stepperValueWrap}>
@@ -193,7 +208,7 @@ export const NumberStepper = ({
           {unit ? ` ${unit}` : ""}
         </Text>
       </View>
-      <Pressable accessibilityRole="button" accessibilityLabel={`Increase ${label}`} onPress={() => onChange(Math.min(max, Number((value + step).toFixed(2))))} style={styles.stepperButton}>
+      <Pressable accessibilityRole="button" accessibilityLabel={`Increase ${label}`} accessibilityHint={`Maximum ${max}`} onPress={() => onChange(Math.min(max, Number((value + step).toFixed(2))))} style={styles.stepperButton}>
         <Text style={styles.stepperButtonText}>+</Text>
       </Pressable>
     </View>
@@ -255,11 +270,12 @@ export const HorizontalChoice = <T extends string>({
             key={option}
             accessibilityRole="button" accessibilityLabel={labelForOption ? labelForOption(option) : option} accessibilityState={{ selected: option === value }} aria-pressed={option === value}
             onPress={() => onSelect(option)}
-            style={({ pressed }) => [
+            style={({ pressed, focused }: any) => [
               styles.segmentedChoiceItem,
               option === value ? styles.segmentedChoiceItemActive : null,
               index > 0 ? styles.segmentedChoiceItemDivider : null,
               pressed ? styles.choiceChipPressed : null,
+              focused ? styles.focusRing : null,
             ]}
           >
             <Text
@@ -284,10 +300,11 @@ export const HorizontalChoice = <T extends string>({
           key={option}
           accessibilityRole="button" accessibilityLabel={labelForOption ? labelForOption(option) : option} accessibilityState={{ selected: option === value }} aria-pressed={option === value}
           onPress={() => onSelect(option)}
-          style={({ pressed }) => [
+          style={({ pressed, focused }: any) => [
             styles.choiceChip,
             option === value ? styles.choiceChipActive : null,
             pressed ? styles.choiceChipPressed : null,
+            focused ? styles.focusRing : null,
           ]}
         >
           <Text style={[styles.choiceChipText, option === value ? styles.choiceChipTextActive : null]} numberOfLines={1}>
@@ -342,7 +359,13 @@ export const LogicBlock = ({
 
   return (
     <Card style={[styles.logicBlockCard, status === "Blocked" ? styles.borderBlocked : status === "Warning" ? styles.borderWarning : null]}>
-      <Pressable onPress={() => setExpanded((current) => !current)} style={styles.logicBlockHeader}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={title}
+        accessibilityState={{ expanded }}
+        onPress={() => setExpanded((current) => !current)}
+        style={({ focused }: any) => [styles.logicBlockHeader, focused ? styles.focusRing : null]}
+      >
         <View style={styles.flexOne}>
           <View style={styles.logicBlockTopRow}>
             {eyebrow ? <Text style={styles.cardEyebrow}>{eyebrow}</Text> : null}
@@ -371,6 +394,7 @@ export const SearchableSelect = <T extends string | { id: string; label: string;
   label,
   renderOption,
   disabled = false,
+  language = "en",
 }: {
   options: readonly T[];
   value: string;
@@ -379,6 +403,7 @@ export const SearchableSelect = <T extends string | { id: string; label: string;
   label?: string;
   renderOption?: (option: T) => React.ReactNode;
   disabled?: boolean;
+  language?: AppLanguage;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const reduced = useReducedMotion();
@@ -398,7 +423,7 @@ export const SearchableSelect = <T extends string | { id: string; label: string;
   return (
     <View style={styles.selectContainer}>
       {label && <Text style={styles.selectLabel}>{label}</Text>}
-      <Pressable disabled={disabled} accessibilityState={{ disabled }} accessibilityRole="button" accessibilityLabel={label ?? placeholder} aria-expanded={isOpen} onPress={() => setIsOpen(true)} style={styles.selectTrigger}>
+      <Pressable disabled={disabled} accessibilityState={{ disabled, expanded: isOpen }} accessibilityRole="combobox" accessibilityLabel={label ?? placeholder} aria-expanded={isOpen} onPress={() => setIsOpen(true)} style={({ focused }: any) => [styles.selectTrigger, focused ? styles.focusRing : null]}>
         <Text style={[styles.selectValue, !selectedOption ? styles.selectPlaceholder : null]}>
           {selectedOption ? getLabel(selectedOption) : placeholder}
         </Text>
@@ -414,8 +439,8 @@ export const SearchableSelect = <T extends string | { id: string; label: string;
         <View style={styles.dropdownOverlay}>
           <View style={styles.dropdownContent}>
              <View style={styles.dropdownHeader}>
-                <Text style={styles.dropdownTitle}>{label || "SELECT"}</Text>
-                <Pressable accessibilityRole="button" accessibilityLabel="Close options" onPress={() => { setIsOpen(false); setSearch(""); }} style={styles.dropdownClose}>
+                <Text style={styles.dropdownTitle}>{label || t(language, "common.select")}</Text>
+                <Pressable accessibilityRole="button" accessibilityLabel={t(language, "common.closeOptions")} onPress={() => { setIsOpen(false); setSearch(""); }} style={({ focused }: any) => [styles.dropdownClose, focused ? styles.focusRing : null]}>
                    <Text style={styles.dropdownCloseText}>✕</Text>
                 </Pressable>
              </View>
@@ -423,7 +448,7 @@ export const SearchableSelect = <T extends string | { id: string; label: string;
                 <Input
                   value={search}
                   onChangeText={setSearch}
-                  placeholder="Search options..."
+                  placeholder={t(language, "common.searchOptions")}
                   autoFocus
                 />
              </View>
@@ -438,10 +463,11 @@ export const SearchableSelect = <T extends string | { id: string; label: string;
                         setIsOpen(false);
                         setSearch("");
                       }}
-                      style={({ pressed }) => [
+                      style={({ pressed, focused }: any) => [
                         styles.dropdownItem,
                         getId(opt) === value ? styles.dropdownItemActive : null,
-                        pressed ? styles.dropdownItemPressed : null
+                        pressed ? styles.dropdownItemPressed : null,
+                        focused ? styles.focusRing : null,
                       ]}
                     >
                       {renderOption ? renderOption(opt) : (
@@ -458,7 +484,7 @@ export const SearchableSelect = <T extends string | { id: string; label: string;
                   ))
                 ) : (
                   <View style={styles.dropdownEmpty}>
-                     <Text style={styles.dropdownEmptyText}>No results matching "{search}"</Text>
+                     <Text style={styles.dropdownEmptyText}>{t(language, "common.noResultsFor", { search })}</Text>
                   </View>
                 )}
              </ScrollView>
@@ -487,7 +513,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
   },
   button: {
-    height: 44,
+    minHeight: 44,
     paddingHorizontal: 16,
     borderRadius: 12,
     alignItems: "center",
@@ -535,6 +561,10 @@ const styles = StyleSheet.create({
   buttonDisabledText: {
     color: "#9ca3af",
   },
+  focusRing: {
+    borderColor: "#2563eb",
+    borderWidth: 3,
+  },
   input: {
     height: 48,
     backgroundColor: "#f9fafb",
@@ -576,7 +606,8 @@ const styles = StyleSheet.create({
   },
   stepperButton: {
     width: 36,
-    height: 36,
+    minWidth: 44,
+    height: 44,
     backgroundColor: "#ffffff",
     borderRadius: 10,
     alignItems: "center",
@@ -670,6 +701,7 @@ const styles = StyleSheet.create({
   },
   segmentedChoiceItem: {
     flex: 1,
+    minHeight: 44,
     paddingVertical: 8,
     alignItems: "center",
     borderRadius: 9,
@@ -699,6 +731,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
   },
   choiceChip: {
+    minHeight: 44,
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderRadius: 12,
@@ -898,9 +931,9 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
   },
   dropdownClose: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    minWidth: 44,
+    minHeight: 44,
+    borderRadius: 22,
     backgroundColor: "#f1f5f9",
     alignItems: "center",
     justifyContent: "center",

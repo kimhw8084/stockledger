@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 
 import { VisualEvidenceCard } from "../../types";
-import { t } from "../../lib/i18n";
+import { formatLocaleNumber, t } from "../../lib/i18n";
 import { AppLanguage } from "../../lib/preferences";
 
 const DetailedVisualHero = ({
@@ -128,9 +128,9 @@ const DetailedVisualHero = ({
           <View style={[styles.detailZoneMarker, { left: `${Math.max(0, Math.min(100, marker))}%` }]} />
         </View>
         <View style={[styles.detailHeroLegend, compactLayout ? styles.detailHeroLegendCompact : null]}>
-          <Text style={styles.detailHeroLegendText}>${low.toFixed(2)}</Text>
-          <Text style={styles.detailHeroLegendText}>${current.toFixed(2)}</Text>
-          <Text style={styles.detailHeroLegendText}>${high.toFixed(2)}</Text>
+          <Text style={styles.detailHeroLegendText}>${formatLocaleNumber(language, low, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</Text>
+          <Text style={styles.detailHeroLegendText}>${formatLocaleNumber(language, current, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</Text>
+          <Text style={styles.detailHeroLegendText}>${formatLocaleNumber(language, high, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</Text>
         </View>
         <Text style={styles.detailHeroFootnote}>{card.metric.thresholdLabel ?? t(language, "stocks.detail.plannedZone")}</Text>
       </View>
@@ -177,6 +177,9 @@ const DetailedVisualHero = ({
             return (
               <Pressable
                 key={`${card.id}-detail-series-${index}`}
+                accessibilityRole="button"
+                accessibilityLabel={t(language, "stocks.detail.selectPoint", { index: index + 1 })}
+                accessibilityState={{ selected: seriesActive }}
                 onPress={() => setSelectedPoint(index)}
                 style={[styles.detailHeroBarHit, seriesActive ? styles.detailHeroBarHitActive : null]}
               >
@@ -332,6 +335,9 @@ export const StockMetricDetailSheet = ({
           {sortedCards.map((jumpCard) => (
             <Pressable
               key={`jump-${jumpCard.id}`}
+              accessibilityRole="button"
+              accessibilityLabel={jumpCard.title}
+              accessibilityState={{ selected: card.id === jumpCard.id }}
               onPress={() => onSelectCard(jumpCard)}
               style={[styles.metricJumpChip, card.id === jumpCard.id ? styles.metricJumpChipActive : null]}
             >
@@ -345,7 +351,7 @@ export const StockMetricDetailSheet = ({
           ))}
         </ScrollView>
       </View>
-      <Pressable onPress={() => setShowFormulaDetails((current) => !current)} style={styles.detailDisclosurePanel}>
+      <Pressable accessibilityRole="button" accessibilityLabel={showFormulaDetails ? t(language, "stocks.detail.hideFormula") : t(language, "stocks.detail.showFormula")} accessibilityState={{ expanded: showFormulaDetails }} onPress={() => setShowFormulaDetails((current) => !current)} style={styles.detailDisclosurePanel}>
         <View style={styles.flexOne}>
           <Text style={styles.formulaTitle}>{showFormulaDetails ? t(language, "stocks.detail.hideFormula") : t(language, "stocks.detail.showFormula")}</Text>
           <Text style={styles.formulaMeta} numberOfLines={showFormulaDetails ? undefined : 1}>

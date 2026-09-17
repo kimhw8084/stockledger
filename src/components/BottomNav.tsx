@@ -10,9 +10,10 @@ interface BottomNavProps<T extends string> {
   onSelect: (tab: T) => void;
   labels?: Partial<Record<T, string>>;
   icons?: Partial<Record<T, string>>;
+  navigationLabel?: string;
 }
 
-export const BottomNav = <T extends string>({ tabs, currentTab, onSelect, labels, icons }: BottomNavProps<T>) => {
+export const BottomNav = <T extends string>({ tabs, currentTab, onSelect, labels, icons, navigationLabel = "Primary navigation" }: BottomNavProps<T>) => {
   const reduced = useReducedMotion();
   const [itemFrames, setItemFrames] = useState<Record<string, { x: number; y: number; width: number; height: number }>>({});
   const pillX = useRef(new Animated.Value(0)).current;
@@ -74,7 +75,7 @@ export const BottomNav = <T extends string>({ tabs, currentTab, onSelect, labels
             ]}
           />
         ) : null}
-        <View style={styles.bottomNavRow}>
+        <View accessibilityRole="tablist" accessibilityLabel={navigationLabel} style={styles.bottomNavRow}>
           {tabs.map((item) => {
             const active = currentTab === item;
             return (

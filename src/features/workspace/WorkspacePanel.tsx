@@ -8,6 +8,7 @@ import { parseExport, readRecoveryData, restorePreviousBackup } from "../../lib/
 import { downloadText, pickTextFile } from "../../platform/fileAccess";
 import { WatchlistImportPanel } from "./WatchlistImportPanel";
 import { reviewReport } from "../../domain/reviewReport";
+import { t, type AppLanguage } from "../../lib/i18n";
 
 type Actions = ReturnType<typeof useAppModel>["actions"];
 const backupName = () => `StockLedger-${new Date().toISOString().slice(0, 10)}.json`;
@@ -20,17 +21,17 @@ export function RecoveryPanel({ error, retry }: { error: string; retry: () => vo
     <Button label="Retry loading" tone="secondary" onPress={retry} />
   </View>;
 }
-export function StockEditor({ stock, onClose, actions, onSaved }: { stock?: Stock; onClose: () => void; actions: Actions; onSaved: (id: string) => void }) {
+export function StockEditor({ stock, onClose, actions, onSaved, language }: { stock?: Stock; onClose: () => void; actions: Actions; onSaved: (id: string) => void; language: AppLanguage }) {
   const [symbol, setSymbol] = useState(stock?.symbol ?? "");
   const [name, setName] = useState(stock?.name ?? "");
   const [thesis, setThesis] = useState(stock?.thesis ?? "");
   const [error, setError] = useState("");
-  return <WindowPanel title={stock ? "Edit stock" : "Add to watchlist"} onClose={onClose}>
-    <Text style={styles.label}>Ticker</Text><Input placeholder="Ticker, e.g. AAPL" value={symbol} onChangeText={setSymbol} autoCapitalize="characters" />
-    <Text style={styles.label}>Company name</Text><Input placeholder="Company name" value={name} onChangeText={setName} />
-    <Text style={styles.label}>Why you are watching</Text><Input placeholder="Your thesis and what would change your mind" value={thesis} onChangeText={setThesis} multiline />
+  return <WindowPanel title={stock ? t(language, "stocks.editor.editTitle") : t(language, "stocks.editor.addTitle")} onClose={onClose}>
+    <Text style={styles.label}>{t(language, "stocks.editor.ticker")}</Text><Input placeholder={t(language, "stocks.editor.tickerPlaceholder")} value={symbol} onChangeText={setSymbol} autoCapitalize="characters" />
+    <Text style={styles.label}>{t(language, "stocks.editor.companyName")}</Text><Input placeholder={t(language, "stocks.editor.companyNamePlaceholder")} value={name} onChangeText={setName} />
+    <Text style={styles.label}>{t(language, "stocks.editor.thesis")}</Text><Input placeholder={t(language, "stocks.editor.thesisPlaceholder")} value={thesis} onChangeText={setThesis} multiline />
     {error ? <Text accessibilityRole="alert" style={styles.error}>{error}</Text> : null}
-    <Button label="Save stock" onPress={async () => { try { const id = await actions.saveStock({ id: stock?.id, symbol, name, thesis }); onSaved(id); onClose(); } catch (cause) { setError(cause instanceof Error ? cause.message : "Save failed."); } }} />
+    <Button label={t(language, "stocks.editor.save")} onPress={async () => { try { const id = await actions.saveStock({ id: stock?.id, symbol, name, thesis }); onSaved(id); onClose(); } catch (cause) { setError(cause instanceof Error ? cause.message : "Save failed."); } }} />
   </WindowPanel>;
 }
 export function WorkspacePanel({ data, actions }: { data: AppData; actions: Actions }) {
