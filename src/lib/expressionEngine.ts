@@ -1,5 +1,6 @@
 import { Eye, MockSnapshot } from "../types";
 import { evaluateArithmetic, expressionTokens, parseExpression } from "../domain/arithmetic";
+import { latestFinite, pctChange, resolveExpressionParameter } from "./metricCatalog";
 
 export type ExpressionParameter = {
   key: string;
@@ -7,12 +8,6 @@ export type ExpressionParameter = {
   description: string;
   requiredData: string[];
 };
-
-const average = (values: number[]) =>
-  values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : undefined;
-const latest = (values?: number[]) => (values && values.length ? values[values.length - 1] : undefined);
-const pctChange = (current: number | undefined, base: number | undefined) =>
-  current !== undefined && base !== undefined && base !== 0 ? ((current / base) - 1) * 100 : undefined;
 
 export const expressionParameterRegistry: ExpressionParameter[] = [
   { key: "PRICE_NOW", label: "현재가", description: "가격 시계열의 최신값", requiredData: ["priceHistorySeries"] },
@@ -52,68 +47,7 @@ export const expressionParameterRequiredData = (keys: string[]) =>
     ),
   );
 
-export const parameterValue = (snapshot: MockSnapshot, eye: Eye, key: string, now = new Date(snapshot.updatedAt)): number | undefined => {
-  switch (key) {
-    case "PRICE_NOW":
-      return latest(snapshot.priceHistorySeries) ?? snapshot.price;
-    case "PRICE_20D_AGO":
-      return snapshot.priceHistorySeries?.at(-21);
-    case "PRICE_60D_AGO":
-      return snapshot.priceHistorySeries?.at(-61);
-    case "PRICE_HIGH_252D":
-      return (snapshot.priceHistorySeries?.length ?? 0) >= 252 ? Math.max(...snapshot.priceHistorySeries!.slice(-252)) : undefined;
-    case "PRICE_LOW_20D":
-      return (snapshot.priceHistorySeries?.length ?? 0) >= 20 ? Math.min(...snapshot.priceHistorySeries!.slice(-20)) : undefined;
-    case "PRICE_AVG_20D":
-      return (snapshot.priceHistorySeries?.length ?? 0) >= 20 ? average(snapshot.priceHistorySeries!.slice(-20)) : undefined;
-    case "PRICE_AVG_50D":
-      return (snapshot.priceHistorySeries?.length ?? 0) >= 50 ? average(snapshot.priceHistorySeries!.slice(-50)) : undefined;
-    case "PRICE_AVG_200D":
-      return (snapshot.priceHistorySeries?.length ?? 0) >= 200 ? average(snapshot.priceHistorySeries!.slice(-200)) : undefined;
-    case "BENCH_NOW": {
-      if (snapshot.historyDates && snapshot.benchmarkDates) {
-        const index = snapshot.benchmarkDates.indexOf(snapshot.historyDates.at(-1)!);
-        return index < 0 ? undefined : snapshot.benchmarkHistorySeries?.[index];
-      }
-      return snapshot.isMock ? latest(snapshot.benchmarkHistorySeries) : undefined;
-    }
-    case "BENCH_60D_AGO": {
-      const date = snapshot.historyDates?.at(-61);
-      if (date && snapshot.benchmarkDates) {
-        const index = snapshot.benchmarkDates.indexOf(date);
-        return index < 0 ? undefined : snapshot.benchmarkHistorySeries?.[index];
-      }
-      return snapshot.isMock ? snapshot.benchmarkHistorySeries?.at(-61) : undefined;
-    }
-    case "VOL_NOW":
-      return latest(snapshot.volumeHistorySeries);
-    case "VOL_AVG_20D":
-      return (snapshot.volumeHistorySeries?.length ?? 0) >= 20 ? average(snapshot.volumeHistorySeries!.slice(-20)) : undefined;
-    case "RANGE_AVG_10D":
-      return (snapshot.volatilityHistorySeries?.length ?? 0) >= 10 ? average(snapshot.volatilityHistorySeries!.slice(-10)) : undefined;
-    case "RANGE_AVG_30D":
-      return (snapshot.volatilityHistorySeries?.length ?? 0) >= 30 ? average(snapshot.volatilityHistorySeries!.slice(-30)) : undefined;
-    case "REV_GROWTH":
-      return snapshot.revenueGrowthYoY;
-    case "MARGIN_DELTA":
-      return snapshot.marginChangePct;
-    case "EARN_DAYS":
-      return snapshot.daysUntilEarnings;
-    case "ENTRY_LOW":
-      return eye.plannedEntryLow ?? snapshot.plannedEntryLow;
-    case "ENTRY_HIGH":
-      return eye.plannedEntryHigh ?? snapshot.plannedEntryHigh;
-    case "REVIEW_DAYS": {
-      const reviewAt = eye.lastReviewedAt ?? snapshot.lastThesisReviewAt;
-      if (!reviewAt) return undefined;
-      return Math.floor((now.getTime() - new Date(reviewAt).getTime()) / (1000 * 60 * 60 * 24));
-    }
-    case "FLAG_COUNT":
-      return [...snapshot.riskFlags, ...(eye.manualFlags ?? [])].length;
-    default:
-      return undefined;
-  }
-};
+export const parameterValue = resolveExpressionParameter;
 
 export const evaluateExpression = (
   expression: string, parameterKeys: string[], snapshot: MockSnapshot, eye: Eye,
@@ -161,7 +95,7 @@ export const validateExpressionSyntax = (expression: string, parameterKeys: stri
 };
 
 export const pctChangeFromSeries = (series?: number[], lookback = 20) => {
-  const current = latest(series);
+  const current = latestFinite(series);
   const base = series?.at(-(lookback + 1));
   const value = pctChange(current, base);
   return value !== undefined ? Number(value.toFixed(2)) : undefined;

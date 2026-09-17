@@ -3,6 +3,7 @@
   "source_version": "V12.3 frozen",
   "generated_at_utc": "2026-05-22T01:10:06.480198+00:00",
   "research_status": "frozen_app_export",
+  "financial_truth_contract_version": "financial_truth_v1",
   "universe_policy": {
     "scanner_universe": "current S&P 500 constituents filtered by each rule's sector scope",
     "constituent_source": "data/sp500_current_constituents.csv",
@@ -43,6 +44,19 @@
       "VOL_SPIKE_20": "Current volume divided by 20D average volume or equivalent engine-consistent spike metric.",
       "SECTOR_ABOVE_MA50": "Boolean: sector ETF close > sector ETF MA50 on the same completed bar."
     }
+  },
+  "machine_validation": {
+    "validator": "validateFrozenResearchBundle",
+    "status": "blocked_unverified",
+    "structural_parity": "required",
+    "independent_numeric_parity": "blocked",
+    "limitations": [
+      "research_numeric_golden_outputs_not_included_in_repository",
+      "current_constituents_survivorship_biased",
+      "point_in_time_membership_unavailable",
+      "forward_proof_required"
+    ],
+    "release_note": "Rule identity, hashes, parameters, conditions, definitions, and limitations are checked in machine validation. Performance guarantees are not inferred from this artifact."
   },
   "rules": [
     {

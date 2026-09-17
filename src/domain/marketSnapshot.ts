@@ -1,6 +1,7 @@
 import type { MockSnapshot, RawBarRecord, SnapshotProvenance, Stock } from "../types";
 import { lastExpectedTradingDate } from "../lib/marketCalendar";
 import { validateResponse } from "../lib/eodDataProvider";
+import { getMetricContract } from "../lib/metricCatalog";
 
 const mean = (values: number[], count: number) => values.length >= count ? values.slice(-count).reduce((a, b) => a + b, 0) / count : undefined;
 const pct = (current: number, base?: number) => base !== undefined && base > 0 ? (current / base - 1) * 100 : undefined;
@@ -25,19 +26,33 @@ export function snapshotFromBars(stock: Stock, bars: RawBarRecord[], benchmark: 
   const volumes = completed.map(bar => bar.volume);
   const ranges = completed.map(bar => (bar.high / bar.low - 1) * 100);
   const benchmarkByDate = new Map(benchmarkRows.map(bar => [bar.date, bar.close]));
+  const benchmarkSymbol = options.benchmarkSymbol ?? "SPY";
+  const benchmarkSupported = benchmarkSymbol === "SPY";
   const price = latest.close;
-  const ma20 = mean(closes, 20), ma50 = mean(closes, 50), ma200 = mean(closes, 200);
-  const high252 = completed.length >= 252 ? Math.max(...closes.slice(-252)) : undefined;
-  const low20 = completed.length >= 20 ? Math.min(...closes.slice(-20)) : undefined;
-  const range10 = mean(ranges, 10), range30 = mean(ranges, 30);
-  const baselineVolume = mean(volumes.slice(0, -1), 20);
-  const return60 = pct(price, closes.at(-61));
-  const benchNow = benchmarkByDate.get(latest.date);
-  const benchPast = completed.at(-61) ? benchmarkByDate.get(completed.at(-61)!.date) : undefined;
-  const benchmarkReturn60 = benchNow === undefined ? undefined : pct(benchNow, benchPast);
-  const nearSupport = low20 === undefined ? undefined : price >= low20 && price <= low20 * 1.05;
-  const priceReturn20dPct = pct(price, closes.at(-21));
-  const compression = range10 !== undefined && range30 !== undefined ? range10 < range30 * .85 : undefined;
+  const ma20 = mean(closes, getMetricContract("distance_from_ma_20")!.warmupSessions);
+  const ma50 = mean(closes, getMetricContract("distance_from_ma_50")!.warmupSessions);
+  const ma200 = mean(closes, getMetricContract("distance_from_ma_200")!.warmupSessions);
+  const high252 = completed.length >= getMetricContract("drawdown_from_recent_high")!.warmupSessions
+    ? Math.max(...closes.slice(-getMetricContract("drawdown_from_recent_high")!.windowSessions!)) : undefined;
+  const low20 = completed.length >= getMetricContract("near_support")!.warmupSessions
+    ? Math.min(...closes.slice(-getMetricContract("near_support")!.windowSessions!)) : undefined;
+  const range10 = mean(ranges, getMetricContract("average_range_pct")!.warmupSessions);
+  const range30 = mean(ranges, getMetricContract("volatility_compression")!.warmupSessions);
+  const volumeWarmup = getMetricContract("volume_spike")!.warmupSessions;
+  const baselineVolume = mean(volumes.slice(0, -1), volumeWarmup - 1);
+  const return60 = pct(price, closes.at(-getMetricContract("price_return_60d")!.warmupSessions));
+  const benchmarkWarmup = getMetricContract("relative_strength_vs_spy")!.warmupSessions;
+  const benchmarkWindow = completed.length >= benchmarkWarmup
+    ? completed.slice(-benchmarkWarmup).map(bar => benchmarkByDate.get(bar.date) ?? Number.NaN)
+    : undefined;
+  const benchmarkReturn60 = !benchmarkSupported || !benchmarkWindow || !benchmarkWindow.every(Number.isFinite)
+    ? undefined
+    : pct(benchmarkWindow.at(-1)!, benchmarkWindow.at(-benchmarkWarmup));
+  const supportBand = Number(getMetricContract("near_support")!.thresholds?.supportBandPct);
+  const nearSupport = low20 === undefined ? undefined : price >= low20 && price <= low20 * (1 + supportBand);
+  const priceReturn20dPct = pct(price, closes.at(-getMetricContract("price_return_20d")!.warmupSessions));
+  const compressionMultiple = Number(getMetricContract("volatility_compression")!.thresholds?.compressionMultiple);
+  const compression = range10 !== undefined && range30 !== undefined ? range10 < range30 * compressionMultiple : undefined;
   // Keep benchmark arrays dated and raw; never independently min-max normalize.
   const aligned = completed.filter(bar => benchmarkByDate.has(bar.date));
   return {
@@ -46,11 +61,11 @@ export function snapshotFromBars(stock: Stock, bars: RawBarRecord[], benchmark: 
     nearSupport, movingAverage20DistancePct: pct(price, ma20), movingAverage50DistancePct: pct(price, ma50), movingAverage200DistancePct: pct(price, ma200),
     priceReturn20dPct, priceReturn60dPct: return60,
     relativeStrengthVsSpyPct: return60 !== undefined && benchmarkReturn60 !== undefined ? return60 - benchmarkReturn60 : undefined,
-    volumeSpike: baselineVolume !== undefined && baselineVolume > 0 ? latest.volume > baselineVolume * 1.4 : undefined,
+    volumeSpike: baselineVolume !== undefined && baselineVolume > 0 ? latest.volume > baselineVolume * Number(getMetricContract("volume_spike")!.thresholds?.spikeMultiple) : undefined,
     volatilityCompression: compression, averageRangePct: range10, riskFlags: [],
     priceHistorySeries: closes, historyDates: completed.map(bar => bar.date),
     benchmarkHistorySeries: aligned.map(bar => benchmarkByDate.get(bar.date)!), benchmarkDates: aligned.map(bar => bar.date),
-    benchmarkSymbol: options.benchmarkSymbol ?? "SPY", volumeHistorySeries: volumes, volatilityHistorySeries: ranges,
+    benchmarkSymbol, volumeHistorySeries: volumes, volatilityHistorySeries: ranges,
     updatedAt: now.toISOString(), sourceName: options.source, isMock: options.origin === "demo",
     freshness: latest.date < expected ? "Stale" : options.adjustment !== "adjusted" ? "Partial" : "Delayed",
     provenance: { schemaVersion: 2, origin: options.origin, observedDate: latest.date, retrievedAt: now.toISOString(), currency: "USD", adjustment: options.adjustment, datasetId: options.datasetId },

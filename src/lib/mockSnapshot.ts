@@ -1,4 +1,5 @@
 import { MockSnapshot, Stock } from "../types";
+import { getMetricContract } from "./metricCatalog";
 
 const symbolSeed = (symbol: string) =>
   symbol
@@ -41,31 +42,34 @@ export const buildMockSnapshot = (stock: Stock): MockSnapshot => {
   });
 
   const price = Number(priceHistorySeries.at(-1)?.toFixed(2) ?? priceBase.toFixed(2));
-  const recentHigh = Math.max(...priceHistorySeries);
+  const warmup = (key: string) => getMetricContract(key)!.warmupSessions;
+  const recentHigh = Math.max(...priceHistorySeries.slice(-warmup("drawdown_from_recent_high")));
   const drawdown = Number((((price / recentHigh) - 1) * 100).toFixed(1));
   const average = (values: number[]) => values.reduce((sum, value) => sum + value, 0) / values.length;
-  const ma20 = average(priceHistorySeries.slice(-20));
-  const ma50 = average(priceHistorySeries.slice(-50));
-  const ma200 = average(priceHistorySeries.slice(-200));
+  const ma20 = average(priceHistorySeries.slice(-warmup("distance_from_ma_20")));
+  const ma50 = average(priceHistorySeries.slice(-warmup("distance_from_ma_50")));
+  const ma200 = average(priceHistorySeries.slice(-warmup("distance_from_ma_200")));
   const movingAverage20DistancePct = Number((((price / ma20) - 1) * 100).toFixed(1));
   const movingAverage50DistancePct = Number((((price / ma50) - 1) * 100).toFixed(1));
   const movingAverage200DistancePct = Number((((price / ma200) - 1) * 100).toFixed(1));
-  const recentLow = Math.min(...priceHistorySeries.slice(-15));
-  const nearSupport = price >= recentLow && price <= recentLow * 1.05;
-  const price20Base = priceHistorySeries.at(-21) ?? priceHistorySeries[0];
-  const price60Base = priceHistorySeries.at(-61) ?? priceHistorySeries[0];
-  const benchmark20Base = benchmarkHistorySeries.at(-21) ?? benchmarkHistorySeries[0];
-  const benchmark60Base = benchmarkHistorySeries.at(-61) ?? benchmarkHistorySeries[0];
+  const recentLow = Math.min(...priceHistorySeries.slice(-warmup("near_support")));
+  const supportBand = Number(getMetricContract("near_support")!.thresholds?.supportBandPct);
+  const nearSupport = price >= recentLow && price <= recentLow * (1 + supportBand);
+  const price20Base = priceHistorySeries.at(-warmup("price_return_20d")) ?? priceHistorySeries[0];
+  const price60Base = priceHistorySeries.at(-warmup("price_return_60d")) ?? priceHistorySeries[0];
+  const benchmark20Base = benchmarkHistorySeries.at(-warmup("price_return_20d")) ?? benchmarkHistorySeries[0];
+  const benchmark60Base = benchmarkHistorySeries.at(-warmup("relative_strength_vs_spy")) ?? benchmarkHistorySeries[0];
   const priceReturn20dPct = Number((((price / price20Base) - 1) * 100).toFixed(1));
   const priceReturn60dPct = Number((((price / price60Base) - 1) * 100).toFixed(1));
   const benchmarkReturn60dPct = Number((((benchmarkHistorySeries.at(-1)! / benchmark60Base) - 1) * 100).toFixed(1));
   const relativeStrengthVsSpyPct = Number((priceReturn60dPct - benchmarkReturn60dPct).toFixed(1));
   const recentVolume = volumeHistorySeries.at(-1) ?? 0;
-  const baselineVolume = average(volumeHistorySeries.slice(-21, -1));
-  const volumeSpike = recentVolume > baselineVolume * 1.4;
-  const averageRangePct = Number(average(volatilityHistorySeries.slice(-10)).toFixed(1));
-  const earlierAverageRangePct = average(volatilityHistorySeries.slice(-30));
-  const volatilityCompression = averageRangePct < earlierAverageRangePct * 0.85;
+  const volumeWarmup = warmup("volume_spike");
+  const baselineVolume = average(volumeHistorySeries.slice(-volumeWarmup, -1));
+  const volumeSpike = recentVolume > baselineVolume * Number(getMetricContract("volume_spike")!.thresholds?.spikeMultiple);
+  const averageRangePct = Number(average(volatilityHistorySeries.slice(-warmup("average_range_pct"))).toFixed(1));
+  const earlierAverageRangePct = average(volatilityHistorySeries.slice(-warmup("volatility_compression")));
+  const volatilityCompression = average(volatilityHistorySeries.slice(-warmup("average_range_pct"))) < earlierAverageRangePct * Number(getMetricContract("volatility_compression")!.thresholds?.compressionMultiple);
   const stabilizationScore = Math.max(
     18,
     Math.min(

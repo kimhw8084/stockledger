@@ -2056,10 +2056,9 @@ export default function App() {
   const isVeryCompactPhone = viewportWidth < 360;
   const logicLabMetricCatalog = useMemo(
     () =>
-      ((data?.customMetrics ?? []).map((metric) => ({
-        ...metric,
-        origin: "custom" as const,
-      })) as MetricDefinition[]),
+      ([...metricCatalog, ...(data?.customMetrics ?? [])].map((metric) =>
+        metric.origin === "custom" ? { ...metric, origin: "custom" as const } : metric,
+      ) as MetricDefinition[]),
     [data?.customMetrics],
   );
   const logicMetricKeySet = useMemo(
@@ -2857,7 +2856,13 @@ export default function App() {
     : undefined;
   const previewEvaluation =
     previewRecipe && previewEye && previewSnapshot
-      ? evaluateEye(previewEye, previewRecipe, previewSnapshot, logicLabMetricCatalog)
+      ? evaluateEye(
+          previewEye,
+          previewRecipe,
+          previewSnapshot,
+          logicLabMetricCatalog,
+          new Date(previewSnapshot.updatedAt),
+        )
       : undefined;
   const recipeStepPrompt = localizedRecipeBuilderPrompt(language, recipeBuilderStep);
   const canAdvanceRecipeStep =

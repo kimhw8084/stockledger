@@ -1,34 +1,63 @@
 import { ProcessedFeatureRecord, RawBarRecord } from "../types";
+import { isUsTradingDate, previousUsTradingDate } from "./marketCalendar";
+import {
+  getMetricContract,
+  PRODUCTION_METRIC_CONTRACT_VERSION,
+} from "./metricCatalog";
 import { ScannerSector, scannerSectorEtfMap } from "./frozenScannerRules";
 
 const avg = (values: number[]) => values.reduce((sum, value) => sum + value, 0) / values.length;
-const rollingMean = (values: number[], length: number) =>
-  values.length >= length && values.slice(-length).every(Number.isFinite) ? avg(values.slice(-length)) : null;
-const rollingMax = (values: number[], length: number) =>
-  values.length >= length ? Math.max(...values.slice(-length)) : null;
-const rollingMin = (values: number[], length: number) =>
-  values.length >= length ? Math.min(...values.slice(-length)) : null;
+const exactWindow = (values: number[], length: number) => {
+  if (values.length < length) return null;
+  const window = values.slice(-length);
+  return window.every(Number.isFinite) ? window : null;
+};
+const rollingMean = (values: number[], length: number) => {
+  const window = exactWindow(values, length);
+  return window ? avg(window) : null;
+};
+const rollingMax = (values: number[], length: number) => {
+  const window = exactWindow(values, length);
+  return window ? Math.max(...window) : null;
+};
 const pctReturn = (current: number | null, base: number | null) =>
   current !== null && base !== null && base !== 0 ? current / base - 1 : null;
 
 const latestValue = (values: number[]) => (values.length && Number.isFinite(values[values.length - 1]) ? values[values.length - 1] : null);
-const shiftValue = (values: number[], lookback: number) =>
-  values.length > lookback && Number.isFinite(values[values.length - 1 - lookback]) ? values[values.length - 1 - lookback] : null;
+const contractWindow = (key: string) => {
+  const window = getMetricContract(key)?.windowSessions;
+  if (typeof window !== "number") throw new Error(`Metric contract ${key} has no fixed session window.`);
+  return window;
+};
 
-const featureMeta = (
-  formula: string,
-  rawInputs: string[],
-  lookbackDays: number,
-  warmupDays: number,
-) => ({
-  formula,
-  rawInputs,
-  lookbackDays,
-  warmupDays,
-  pointInTimeSafe: true,
-  computedAfterCloseOnly: true,
-  featureVersion: "scanner_v2_date_aligned",
-});
+const isContiguousSessionSeries = (bars: RawBarRecord[]) => {
+  if (!bars.length) return false;
+  try {
+    return bars.every((bar, index) =>
+      isUsTradingDate(bar.date) &&
+      [bar.open, bar.high, bar.low, bar.close, bar.volume].every(Number.isFinite) &&
+      [bar.open, bar.high, bar.low, bar.close].every((value) => value > 0) &&
+      bar.volume >= 0 &&
+      (index === 0 || previousUsTradingDate(bar.date) === bars[index - 1].date),
+    );
+  } catch {
+    return false;
+  }
+};
+
+const featureMeta = (key: string) => {
+  const contract = getMetricContract(key);
+  if (!contract) throw new Error(`Missing metric contract for processed feature ${key}.`);
+  return {
+    formula: contract.formula,
+    rawInputs: contract.rawInputFields,
+    lookbackDays: contract.windowSessions ?? 0,
+    warmupDays: contract.warmupSessions,
+    pointInTimeSafe: true,
+    computedAfterCloseOnly: true,
+    featureVersion: contract.version,
+  };
+};
 
 export const computeProcessedFeaturesForSymbol = (
   symbol: string,
@@ -36,74 +65,90 @@ export const computeProcessedFeaturesForSymbol = (
   stockBars: RawBarRecord[],
   spyBars: RawBarRecord[],
   sectorBars: RawBarRecord[],
+  computedAtUtc?: string,
 ): ProcessedFeatureRecord | null => {
   const closes = stockBars.map((bar) => bar.close);
   const lows = stockBars.map((bar) => bar.low);
   const volumes = stockBars.map((bar) => bar.volume);
-  // Join on stock sessions; missing benchmark sessions remain unknown, never
-  // shift array positions or fill from a different trading date.
-  const spyByDate = new Map(spyBars.map(bar => [bar.date, bar.close]));
-  const sectorByDate = new Map(sectorBars.map(bar => [bar.date, bar.close]));
-  const spyCloses = stockBars.map(bar => spyByDate.get(bar.date) ?? Number.NaN);
-  const sectorCloses = stockBars.map(bar => sectorByDate.get(bar.date) ?? Number.NaN);
+  const stockSessionsValid = isContiguousSessionSeries(stockBars);
 
+  // Join benchmarks by the stock's actual session dates. A missing benchmark
+  // session invalidates the complete window; positions are never substituted.
+  const spyByDate = new Map(spyBars.map((bar) => [bar.date, bar.close]));
+  const sectorByDate = new Map(sectorBars.map((bar) => [bar.date, bar.close]));
+  const alignedWindow = (byDate: Map<string, number>, length: number) => {
+    if (!stockSessionsValid || stockBars.length < length) return null;
+    const values = stockBars.slice(-length).map((bar) => byDate.get(bar.date) ?? Number.NaN);
+    return values.every(Number.isFinite) ? values : null;
+  };
+
+  const asOfDate = stockBars.at(-1)?.date;
   const close = latestValue(closes);
-  if (close === null) return null;
+  if (close === null || !asOfDate) return null;
 
-  const ma10 = rollingMean(closes, 10);
-  const ma20 = rollingMean(closes, 20);
-  const ma50 = rollingMean(closes, 50);
-  const dd126Base = rollingMax(closes, 126);
-  const dd126 = dd126Base !== null ? close / dd126Base - 1 : null;
-  const ret20Stock = pctReturn(close, shiftValue(closes, 20));
-  const spyClose = latestValue(spyCloses);
-  const ret20Spy = pctReturn(spyClose, shiftValue(spyCloses, 20));
-  const sectorClose = latestValue(sectorCloses);
-  const ret20Sector = pctReturn(sectorClose, shiftValue(sectorCloses, 20));
+  const ma10 = stockSessionsValid ? rollingMean(closes, contractWindow("MA10")) : null;
+  const ma20 = stockSessionsValid ? rollingMean(closes, contractWindow("MA20")) : null;
+  const ma50 = stockSessionsValid ? rollingMean(closes, contractWindow("MA50")) : null;
+  const dd126Base = stockSessionsValid ? rollingMax(closes, contractWindow("DD_126")) : null;
+  const dd126 = pctReturn(close, dd126Base);
+
+  const stockReturnWarmup = getMetricContract("RET_20_STOCK")!.warmupSessions;
+  const spyReturnWarmup = getMetricContract("RET_20_SPY")!.warmupSessions;
+  const sectorReturnWarmup = getMetricContract("RET_20_SECTOR")!.warmupSessions;
+  const stockReturnWindow = stockSessionsValid ? exactWindow(closes, stockReturnWarmup) : null;
+  const ret20Stock = stockReturnWindow ? pctReturn(close, stockReturnWindow.at(-stockReturnWarmup)!) : null;
+  const spyReturnWindow = alignedWindow(spyByDate, spyReturnWarmup);
+  const sectorReturnWindow = alignedWindow(sectorByDate, sectorReturnWarmup);
+  const spyClose = alignedWindow(spyByDate, 1)?.at(-1) ?? null;
+  const sectorClose = alignedWindow(sectorByDate, 1)?.at(-1) ?? null;
+  const ret20Spy = spyReturnWindow ? pctReturn(spyClose, spyReturnWindow.at(-spyReturnWarmup)!) : null;
+  const ret20Sector = sectorReturnWindow ? pctReturn(sectorClose, sectorReturnWindow.at(-sectorReturnWarmup)!) : null;
   const exret20Spy = ret20Stock !== null && ret20Spy !== null ? ret20Stock - ret20Spy : null;
-  const exret20Sector =
-    ret20Stock !== null && ret20Sector !== null ? ret20Stock - ret20Sector : null;
-  const volSpike20 =
-    latestValue(volumes) !== null && (rollingMean(volumes, 20) ?? 0) > 0
-      ? (latestValue(volumes) as number) / (rollingMean(volumes, 20) as number)
-      : null;
-  const sectorAboveMa50 =
-    sectorClose !== null && rollingMean(sectorCloses, 50) !== null
-      ? sectorClose > (rollingMean(sectorCloses, 50) as number)
-      : null;
-  const rsSeriesSpy = close !== null && spyClose !== null && spyClose !== 0 ? close / spyClose : null;
-  const priorRs = shiftValue(
-    closes.map((item, index) =>
-      spyCloses[index] && spyCloses[index] !== 0 ? item / spyCloses[index] : Number.NaN,
-    ),
-    5,
-  );
-  const rsImprove5 = rsSeriesSpy !== null && priorRs !== null && Number.isFinite(priorRs) && priorRs !== 0
-    ? rsSeriesSpy / priorRs - 1
+  const exret20Sector = ret20Stock !== null && ret20Sector !== null ? ret20Stock - ret20Sector : null;
+
+  const volumeWindow = stockSessionsValid ? exactWindow(volumes, contractWindow("VOL_SPIKE_20")) : null;
+  const latestVolume = latestValue(volumes);
+  const volumeAverage = volumeWindow ? avg(volumeWindow) : null;
+  const volSpike20 = latestVolume !== null && volumeAverage !== null && volumeAverage > 0
+    ? latestVolume / volumeAverage
+    : null;
+  const sectorMaWindow = alignedWindow(sectorByDate, contractWindow("SECTOR_ABOVE_MA50"));
+  const sectorAboveMa50 = sectorClose !== null && sectorMaWindow !== null
+    ? sectorClose > avg(sectorMaWindow)
     : null;
 
-  const asOfDate = stockBars[stockBars.length - 1]?.date;
-  const shiftedLows = lows.slice(0, -1);
-  const priorLow45 = shiftedLows.length >= 45 ? Math.min(...shiftedLows.slice(-45)) : null;
-  const priorLow63 = shiftedLows.length >= 63 ? Math.min(...shiftedLows.slice(-63)) : null;
-  const priorLow90 = shiftedLows.length >= 90 ? Math.min(...shiftedLows.slice(-90)) : null;
-  const priorLow126 = shiftedLows.length >= 126 ? Math.min(...shiftedLows.slice(-126)) : null;
-  const recentLow = latestValue(lows);
+  const rsWindow = alignedWindow(spyByDate, getMetricContract("RS_IMPROVE_5")!.warmupSessions);
+  const rsSeriesSpy = spyClose !== null && spyClose !== 0 ? close / spyClose : null;
+  const rsStockWindow = stockSessionsValid ? exactWindow(closes, getMetricContract("RS_IMPROVE_5")!.warmupSessions) : null;
+  const priorRs = rsWindow && rsStockWindow && rsWindow.every((value) => value !== 0)
+    ? rsStockWindow.map((item, index) => item / rsWindow[index])
+    : null;
+  const rsImprove5 = rsSeriesSpy !== null && priorRs?.[0] !== undefined && priorRs[0] !== 0
+    ? rsSeriesSpy / priorRs[0] - 1
+    : null;
+
+  const priorLow = (key: string) => {
+    const window = exactWindow(lows, getMetricContract(key)!.warmupSessions);
+    return stockSessionsValid && window ? Math.min(...window.slice(0, -1)) : null;
+  };
+  const priorLow45 = priorLow("prior_low_45");
+  const priorLow63 = priorLow("prior_low_63");
+  const priorLow90 = priorLow("prior_low_90");
+  const priorLow126 = priorLow("prior_low_126");
+  const recentLow = Number.isFinite(lows.at(-1)) ? lows.at(-1)! : null;
   const broke45 = recentLow !== null && priorLow45 !== null ? recentLow < priorLow45 : null;
   const broke63 = recentLow !== null && priorLow63 !== null ? recentLow < priorLow63 : null;
   const broke90 = recentLow !== null && priorLow90 !== null ? recentLow < priorLow90 : null;
   const broke126 = recentLow !== null && priorLow126 !== null ? recentLow < priorLow126 : null;
 
-  if (!asOfDate) return null;
-
   return {
-    id: `feature-${symbol}-${asOfDate}`,
+    id: `feature-${symbol}-${asOfDate}-${PRODUCTION_METRIC_CONTRACT_VERSION}`,
     symbol,
     asOfDate,
     sector,
     sectorEtf: scannerSectorEtfMap[sector],
-    featureSemanticsVersion: "app_v2_date_aligned",
-    computedAtUtc: new Date().toISOString(),
+    featureSemanticsVersion: PRODUCTION_METRIC_CONTRACT_VERSION,
+    computedAtUtc: computedAtUtc === undefined ? `${asOfDate}T23:59:59.999Z` : computedAtUtc,
     featureValues: {
       Close: close,
       SPY_Close: spyClose,
@@ -135,23 +180,31 @@ export const computeProcessedFeaturesForSymbol = (
       RECLAIM_LOW_126: close !== null && priorLow126 !== null ? close > priorLow126 : null,
     },
     featureMeta: {
-      MA10: featureMeta("rolling_mean(Close, 10)", ["Close"], 10, 10),
-      MA20: featureMeta("rolling_mean(Close, 20)", ["Close"], 20, 21),
-      MA50: featureMeta("rolling_mean(Close, 50)", ["Close"], 50, 50),
-      DD_126: featureMeta("Close / rolling_max(Close, 126) - 1", ["Close"], 126, 126),
-      RET_20_STOCK: featureMeta("Close / Close.shift(20) - 1", ["Close"], 20, 21),
-      RET_20_SPY: featureMeta("SPY_Close / SPY_Close.shift(20) - 1", ["SPY_Close"], 20, 21),
-      RET_20_SECTOR: featureMeta("SectorETF_Close / SectorETF_Close.shift(20) - 1", ["SectorETF_Close"], 20, 21),
-      EXRET_20_SPY: featureMeta("RET_20_STOCK - RET_20_SPY", ["RET_20_STOCK", "RET_20_SPY"], 20, 20),
-      EXRET_20_SECTOR: featureMeta("RET_20_STOCK - RET_20_SECTOR", ["RET_20_STOCK", "RET_20_SECTOR"], 20, 20),
-      VOL_SPIKE_20: featureMeta("Volume / rolling_mean(Volume, 20)", ["Volume"], 20, 20),
-      SECTOR_ABOVE_MA50: featureMeta("SectorETF_Close > rolling_mean(SectorETF_Close, 50)", ["SectorETF_Close"], 50, 50),
-      RS_SERIES_SPY: featureMeta("Close / SPY_Close", ["Close", "SPY_Close"], 1, 1),
-      RS_IMPROVE_5: featureMeta("RS_SERIES_SPY / RS_SERIES_SPY.shift(5) - 1", ["RS_SERIES_SPY"], 5, 6),
-      prior_low_45: featureMeta("rolling_min(Low.shift(1), 45)", ["Low"], 45, 46),
-      prior_low_63: featureMeta("rolling_min(Low.shift(1), 63)", ["Low"], 63, 64),
-      prior_low_90: featureMeta("rolling_min(Low.shift(1), 90)", ["Low"], 90, 91),
-      prior_low_126: featureMeta("rolling_min(Low.shift(1), 126)", ["Low"], 126, 127),
+      MA10: featureMeta("MA10"),
+      MA20: featureMeta("MA20"),
+      MA50: featureMeta("MA50"),
+      DD_126: featureMeta("DD_126"),
+      RET_20_STOCK: featureMeta("RET_20_STOCK"),
+      RET_20_SPY: featureMeta("RET_20_SPY"),
+      RET_20_SECTOR: featureMeta("RET_20_SECTOR"),
+      EXRET_20_SPY: featureMeta("EXRET_20_SPY"),
+      EXRET_20_SECTOR: featureMeta("EXRET_20_SECTOR"),
+      VOL_SPIKE_20: featureMeta("VOL_SPIKE_20"),
+      SECTOR_ABOVE_MA50: featureMeta("SECTOR_ABOVE_MA50"),
+      RS_SERIES_SPY: featureMeta("RS_SERIES_SPY"),
+      RS_IMPROVE_5: featureMeta("RS_IMPROVE_5"),
+      prior_low_45: featureMeta("prior_low_45"),
+      prior_low_63: featureMeta("prior_low_63"),
+      prior_low_90: featureMeta("prior_low_90"),
+      prior_low_126: featureMeta("prior_low_126"),
+      broke_prior_low_45: featureMeta("broke_prior_low_45"),
+      broke_prior_low_63: featureMeta("broke_prior_low_63"),
+      broke_prior_low_90: featureMeta("broke_prior_low_90"),
+      broke_prior_low_126: featureMeta("broke_prior_low_126"),
+      RECLAIM_LOW_45: featureMeta("RECLAIM_LOW_45"),
+      RECLAIM_LOW_63: featureMeta("RECLAIM_LOW_63"),
+      RECLAIM_LOW_90: featureMeta("RECLAIM_LOW_90"),
+      RECLAIM_LOW_126: featureMeta("RECLAIM_LOW_126"),
     },
   };
 };

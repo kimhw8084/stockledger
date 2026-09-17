@@ -1,6 +1,6 @@
 import type { Alert, AppData, Evaluation, Eye, Recipe } from "../types";
 import { evaluateEye } from "../lib/evaluateEye";
-import { metricCatalog } from "../lib/metricCatalog";
+import { FINANCIAL_TRUTH_ENGINE_VERSION, metricCatalog } from "../lib/metricCatalog";
 import { contentHash } from "./contentHash";
 import { latestCompletedTradingDate } from "../lib/marketCalendar";
 
@@ -17,7 +17,7 @@ export function evaluateWorkspace(data: AppData, now = new Date()): AppData {
     const recipe = data.recipes.find(item => item.id === eye.recipeId);
     const snapshot = snapshots.find(item => item.stockId === eye.stockId);
     if (!stock || stock.archivedAt || eye.archivedAt || !recipe || !snapshot) return eye;
-    const key = contentHash({ engine: "2.0.0", eye: { ...eye, lastEvaluation: undefined }, recipe, snapshot, definitions, completedSession, reviewDate: now.toISOString().slice(0, 10) });
+    const key = contentHash({ engine: FINANCIAL_TRUTH_ENGINE_VERSION, eye: { ...eye, lastEvaluation: undefined }, recipe, snapshot, definitions, completedSession, reviewDate: now.toISOString().slice(0, 10) });
     if (eye.lastEvaluation?.inputHash === key) return eye;
     const evaluation: Evaluation = { ...evaluateEye(eye, recipe, snapshot, definitions, now), id: `evaluation-${key}`, inputHash: key };
     if (!evaluations.some(item => item.id === evaluation.id)) evaluations.push(evaluation);

@@ -8,6 +8,9 @@ Implementation began September 15, 2026, from `02e54c5`. Verification continued 
 
 ### Trustworthy data and calculations
 
+- CHG-89 adds one versioned `financial_truth_v1` contract registry for supported recipe metrics and frozen scanner features. Formula, exact session window/warmup, units, benchmark/alignment, adjustment basis, thresholds and UNKNOWN behavior are consumed by preview, workspace/worker evaluation, snapshots and scanner feature metadata.
+- Independent N−1/N/N+1, zero-denominator, dated-gap, stale/partial, split-basis and symbol-mixed fixtures are checked in `tests/financialTruth.test.ts`. Preview and worker/workspace evaluation are compared with the same dated inputs and explicit evaluation instant.
+- `npm run check:frozen` machine-checks all six V12.3 rule IDs, hashes, parameters, blockers, conditions, definitions and limitations against `docs/v12_3_app_import_bundle.json`. Numerical research parity remains explicitly **blocked/unverified** because source golden outputs are not included; no performance guarantee is inferred.
 - Replaced runtime JavaScript expression execution with a bounded arithmetic grammar. Unsupported inputs, missing observations and insufficient warmup remain unknown.
 - Required/eligibility gates and risk conditions now control interpretation consistently. Incomplete critical data cannot become a confident opportunity signal.
 - Daily observations retain actual prices, dates, source, retrieval time and adjustment status. Personal workspaces no longer manufacture missing prices, financials, event dates or sector evidence.
@@ -64,6 +67,14 @@ Implementation began September 15, 2026, from `02e54c5`. Verification continued 
 | Full local Supabase integration | **Passed on GitHub Linux** using the actual isolated local Supabase stack: Auth sessions, PostgREST ownership, denied anonymous/direct writes, atomic RPC, retry and revision checks. Local Docker was unresponsive; no Mac full-stack result is claimed. |
 | GitHub clean-environment checks | The first clean Linux run passed builds/cloud integration and caught mobile header overflow in one browser journey. The layout is fixed and the journey now asserts viewport bounds; **the corrected run passed both jobs**. A separate fresh Mac clone of `bb6d3b1` passed locked install, TypeScript and all 61 tests; all 139 tracked files matched byte-for-byte. It was then fast-forwarded to the corrected source. |
 
+### CHG-89 verification (September 16, 2026 local run)
+
+- `npm run typecheck`: passed.
+- `npm test -- --run tests/financialTruth.test.ts tests/correctness.test.ts tests/monitoring.test.ts tests/history.test.ts`: **44 tests across 4 files passed**.
+- `npm run check:frozen`: passed structural parity for all 6 frozen rules; status remains `blocked_unverified` and release-blocked for missing independent numeric golden outputs, survivorship bias, unavailable point-in-time membership, and required forward proof.
+- `npm run check:boundaries`, `git diff --check`, and `npm run export:all`: passed.
+- Full local `npm test -- --run`: **67 tests passed across 11 files**. `tests/worker.test.ts` could not initialize on the available Node 20.19.4 runtime because `node:sqlite` is unavailable; worker coverage is not claimed from this run. The repository package requires Node >=22.23.2.
+
 Browser screenshots were inspected locally. Desktop/browser-emulated phone coverage does not establish screen-reader, real-device, tablet, landscape, Korean or large-text acceptance.
 
 The synthetic worker fixture processed **100 stocks × 260 sessions in 2,036 ms**, producing 100 Eye evaluations and 200 scanner rows. Export: **5,656,231 bytes**; SQLite/WAL: **11,736,672 bytes**; ending RSS: **251,641,856 bytes**; integrity check passed. This is one local run, not p95, a load test or a user-count capacity guarantee. Reproduce with `npm run benchmark:worker`.
@@ -75,7 +86,7 @@ The synthetic worker fixture processed **100 stocks × 260 sessions in 2,036 ms*
 | SL items | Implemented scope / remaining acceptance |
 | --- | --- |
 | 001–006 | Recovery, observation separation, gates/risk, exchange sessions and date joins implemented and tested. Broader real-provider/corporate-action fixtures remain. |
-| 007 | Warmups implemented; complete versioned registry consolidation/parity is **partial**. |
+| 007 | **CHG-89 complete for current supported scope:** versioned formula/window/warmup/unit/missing-data/benchmark contracts and independent boundary fixtures are implemented. New metrics still require a contract before production use. |
 | 008 | Recipe/evaluation/decision history and amendments implemented; full visual diff/version migration UX remains **partial**. |
 | 009 | Cooldown, semantic dedupe and existing snooze wired; quiet hours/escalation/channel lifecycle **partial**. |
 | 010 | Explicit provider configuration, truthful unavailable/partial/stale provenance implemented; licensed managed adapters remain. |
@@ -91,7 +102,7 @@ The synthetic worker fixture processed **100 stocks × 260 sessions in 2,036 ms*
 | 043–044 | Local SQLite worker and atomic client stores implemented. Scheduler installation, managed jobs and normalized local repositories **partial**; workspace payloads are still growing JSON documents. |
 | 045–046 | Full backup and simple watchlist CSV preview; optimistic three-way personal sync pilot implemented. Saved mappings, checksum manifests, durable mutation outbox/cursors and broader cross-device drills **partial**. |
 | 047–049 | Transactional local notification intent exists. Channel delivery, digest/quiet hours, cancellation and archive retention/compression remain. |
-| 050–051 | Quoted CSV parsing/content hashes implemented. Frozen-rule import validator/generator and complete independent parity certification remain. |
+| 050–051 | Quoted CSV parsing/content hashes and structural frozen-rule import validation implemented. The six-rule bundle is machine-checked; independent numerical parity is explicitly release-blocked until source golden outputs are supplied. |
 | 052–054 | Worker status, tested snapshots, bounded cloud RPC and a benchmark exist. Operator dashboards, measured RPO/RTO, hosted restore and per-plan budgets **partial**. |
 | 055–057 | Release/rollback/deployment/incident runbooks and CI exist. Actual staging promotion, account deletion lifecycle and incident tabletop evidence remain. |
 | 058–063 | Fundamentals/events feeds, managed concurrency envelope, licensed commercial rights, external pilot, billing and pricing validation remain. |

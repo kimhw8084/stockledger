@@ -4,6 +4,7 @@ import { snapshotFromBars } from "../../src/domain/marketSnapshot";
 import { runDailyStockConditionScan } from "../../src/lib/stockConditionScanner";
 import { latestCompletedTradingDate } from "../../src/lib/marketCalendar";
 import { frozenScannerRules } from "../../src/lib/frozenScannerRules";
+import { FINANCIAL_TRUTH_ENGINE_VERSION } from "../../src/lib/metricCatalog";
 import type { RawBarRecord, UniverseSnapshot } from "../../src/types";
 import { WorkerStore } from "./store";
 
@@ -14,7 +15,7 @@ export async function runWorker(store: WorkerStore, histories: { symbol: string;
   const data = saved.data;
   const date = latestCompletedTradingDate(now, data.scannerSettings.providerDelayMinutesAfterClose);
   const sourceHash = contentHash(histories);
-  const id = contentHash({ date, sourceHash, adjustment: options.adjustment, source: options.source, settings: data.scannerSettings, recipes: data.recipes, eyes: data.eyes.map(({ lastEvaluation, ...eye }) => eye), rules: frozenScannerRules.map(rule => rule.ruleSignatureHash) });
+  const id = contentHash({ engine: FINANCIAL_TRUTH_ENGINE_VERSION, date, sourceHash, adjustment: options.adjustment, source: options.source, settings: data.scannerSettings, recipes: data.recipes, eyes: data.eyes.map(({ lastEvaluation, ...eye }) => eye), rules: frozenScannerRules.map(rule => rule.ruleSignatureHash) });
   const token = store.claim(id);
   if (!token) return { status: "already_claimed_or_completed", jobId: id };
   try {
