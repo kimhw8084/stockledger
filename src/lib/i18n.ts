@@ -57,6 +57,31 @@ const dict: Record<AppLanguage, Record<string, DictValue>> = {
     "common.detail": "Detail",
     "common.loading": "Loading StockLedger...",
     "common.all": "All",
+    "common.dismiss": "Dismiss",
+    "common.edit": "Edit",
+    "common.archive": "Archive",
+    "common.save": "Save",
+    "common.saveChanges": "Save Changes",
+    "common.registerEye": "Register Eye",
+    "common.saving": "Saving…",
+    "common.scanning": "Scanning completed market sessions…",
+    "common.notCaptured": "Not captured",
+    "common.select": "Select",
+    "common.closeOptions": "Close options",
+    "common.searchOptions": "Search options...",
+    "common.noResultsFor": ({ search }: Record<string, string | number> = {}) => `No results matching "${search ?? ""}"`,
+
+    "route.unavailableTitle": "This link is no longer available",
+    "route.entityUnavailable": "The requested item is missing, archived, stale, or unavailable. Nothing was changed.",
+    "route.metricUnavailable": "That metric is not available for this stock. The stock view is still safe to use.",
+    "route.returnToDestination": "Return to this section",
+
+    "home.onboarding.title": "Build your investment memory",
+    "home.onboarding.body": "Add a stock, capture why you are watching it, then attach a recipe. Import daily prices in Settings to evaluate your evidence.",
+    "home.onboarding.addStock": "Add your first stock",
+    "home.onboarding.addRecipes": "Add starter recipes",
+    "home.onboarding.exploreSample": "Explore sample workspace",
+    "home.sampleNotice": "Sample data is present. Mock prices and outcomes are for exploring the app.",
 
     "settings.language.title": "Language",
     "settings.language.note": "Choose the app language.",
@@ -163,6 +188,8 @@ const dict: Record<AppLanguage, Record<string, DictValue>> = {
     "eyes.action.delete": "Delete",
     "eyes.detail.unsetHorizon": "Unset horizon",
     "eyes.create.title": "Create Eye",
+    "eyes.create.editTitle": "Edit Eye",
+    "eyes.create.editSubtitle": "Update the stock, recipe, and thesis snapshot for this Eye.",
     "eyes.create.subtitle": "Subscribe a selected stock to a selected recipe with your thesis snapshot.",
     "eyes.create.stock": "Stock",
     "eyes.create.recipe": "Recipe",
@@ -173,6 +200,8 @@ const dict: Record<AppLanguage, Record<string, DictValue>> = {
     "eyes.create.thesisRequired": "Thesis snapshot is required.",
     "eyes.create.entryLow": "Planned entry low",
     "eyes.create.entryHigh": "Planned entry high",
+    "eyes.create.entryLowPlaceholder": "Entry low (optional)",
+    "eyes.create.entryHighPlaceholder": "Entry high (optional)",
     "eyes.create.lastReview": "Last thesis review",
     "eyes.create.invalidation": "Invalidation rule",
     "eyes.create.invalidationPlaceholder": "What would break the thesis fast?",
@@ -193,6 +222,8 @@ const dict: Record<AppLanguage, Record<string, DictValue>> = {
     "journal.meta.concern": ({ value }: Record<string, string | number> = {}) => `Concern: ${value ?? "Not captured"}`,
     "journal.meta.notCaptured": "Not captured",
     "journal.action.save": "Save Decision",
+    "journal.action.edit": "Edit",
+    "journal.action.archive": "Archive decision",
     "journal.action.open": "Open",
     "journal.action.alert": "Alert",
     "journal.action.markOutcome": "Mark Outcome",
@@ -209,6 +240,19 @@ const dict: Record<AppLanguage, Record<string, DictValue>> = {
     "journal.composer.concernPlaceholder": "What risk mattered most?",
     "journal.composer.thesisValidity": "Thesis validity",
     "journal.composer.timing": "Timing",
+    "journal.composer.searchPlaceholder": "Search monitored stock...",
+    "journal.validation.thesisRequired": "Choose your thesis assessment.",
+    "journal.validation.timingRequired": "Choose your timing assessment.",
+    "journal.outcome.title": "Review this outcome",
+    "journal.outcome.body": "Record your observations and their sources. These notes are separate from the original decision evidence.",
+    "journal.outcome.reviewWindow": "Review window",
+    "journal.outcome.priceChange": "Price change and source",
+    "journal.outcome.maxRunup": "Maximum run-up and source",
+    "journal.outcome.maxDrawdown": "Maximum drawdown and source",
+    "journal.outcome.lesson": "What did you learn?",
+    "journal.outcome.recipeSuggestion": "What should change next time?",
+    "journal.outcome.save": "Save outcome review",
+    "journal.outcome.saved": "Outcome review saved.",
     "journal.detail.context": "Decision context",
     "journal.detail.noState": "State snapshot unavailable",
     "journal.detail.noData": "Data-quality note unavailable",
@@ -218,6 +262,7 @@ const dict: Record<AppLanguage, Record<string, DictValue>> = {
     "journal.detail.concern": "Concern",
     "journal.detail.noConcern": "No primary concern recorded.",
     "journal.detail.outcome": ({ status }: Record<string, string | number> = {}) => `Outcome · ${status ?? "Pending"}`,
+    "journal.detail.previousVersions": "Previous authored versions",
 
     "recipes.summary.recipes": "Recipes",
     "recipes.summary.starter": "Starter",
@@ -322,6 +367,19 @@ const dict: Record<AppLanguage, Record<string, DictValue>> = {
     "stocks.search.clearSearch": "Clear Search",
     "stocks.search.resultCount": ({ count }: Record<string, string | number> = {}) => `${count ?? 0} shown`,
     "stocks.search.resultNone": "None",
+    "stocks.search.openStock": ({ symbol, name }: Record<string, string | number> = {}) => `Open ${symbol ?? "stock"} ${name ?? ""}`,
+    "stocks.search.showMore": ({ count }: Record<string, string | number> = {}) => `Show more stocks (${count ?? 0} remaining)`,
+    "stocks.action.add": "Add stock",
+    "stocks.action.manageEyes": "Manage monitoring Eyes",
+    "stocks.editor.addTitle": "Add to watchlist",
+    "stocks.editor.editTitle": "Edit stock",
+    "stocks.editor.ticker": "Ticker",
+    "stocks.editor.tickerPlaceholder": "Ticker, e.g. AAPL",
+    "stocks.editor.companyName": "Company name",
+    "stocks.editor.companyNamePlaceholder": "Company name",
+    "stocks.editor.thesis": "Why you are watching",
+    "stocks.editor.thesisPlaceholder": "Your thesis and what would change your mind",
+    "stocks.editor.save": "Save stock",
 
     "stocks.data.dummyBacked": "Dummy-backed",
     "stocks.data.providerBacked": "Provider-backed",
@@ -332,6 +390,8 @@ const dict: Record<AppLanguage, Record<string, DictValue>> = {
 
     "stocks.hero.vs": ({ benchmark }: Record<string, string | number> = {}) => `Vs ${benchmark ?? "benchmark"}`,
     "stocks.hero.drawdown": ({ value }: Record<string, string | number> = {}) => `Drawdown ${value ?? "N/A"}`,
+    "stocks.hero.selectObservation": ({ index }: Record<string, string | number> = {}) => `Select chart observation ${index ?? ""}`,
+    "stocks.hero.noCompletedHistory": "No completed price history",
     "stocks.hero.boardControls": "Board controls",
     "stocks.hero.showing": ({ shown, total }: Record<string, string | number> = {}) =>
       `Showing ${shown ?? 0} of ${total ?? 0} metrics`,
@@ -364,6 +424,7 @@ const dict: Record<AppLanguage, Record<string, DictValue>> = {
     "stocks.detail.series": "Series",
     "stocks.detail.days": "days",
     "stocks.detail.tapChart": "Tap the chart bars to inspect earlier points without leaving the stock metric sheet.",
+    "stocks.detail.selectPoint": ({ index }: Record<string, string | number> = {}) => `Select chart point ${index ?? ""}`,
     "stocks.evidence.pinned": "Pinned",
     "stocks.evidence.current": "Current",
     "stocks.evidence.threshold": "Threshold",
@@ -376,6 +437,8 @@ const dict: Record<AppLanguage, Record<string, DictValue>> = {
     "stocks.evidence.formulaDetail": "Formula detail",
     "stocks.evidence.formulaMissing": "No extra formula detail available.",
     "stocks.evidence.inputs": ({ inputs }: Record<string, string | number> = {}) => `Inputs: ${inputs ?? "No explicit inputs recorded"}`,
+    "alerts.detail.evidenceRecorded": "Evidence recorded with this alert",
+    "alerts.detail.olderEvidence": "Detailed evidence was not captured by the older app version. The original alert summary is preserved above.",
   },
   ko: {
     "nav.Home": "홈",
@@ -428,6 +491,31 @@ const dict: Record<AppLanguage, Record<string, DictValue>> = {
     "common.detail": "상세",
     "common.loading": "StockLedger 불러오는 중...",
     "common.all": "전체",
+    "common.dismiss": "닫기",
+    "common.edit": "수정",
+    "common.archive": "보관",
+    "common.save": "저장",
+    "common.saveChanges": "수정 저장",
+    "common.registerEye": "모니터 등록",
+    "common.saving": "저장 중…",
+    "common.scanning": "완료된 시장 세션을 스캔하는 중…",
+    "common.notCaptured": "기록 없음",
+    "common.select": "선택",
+    "common.closeOptions": "선택지 닫기",
+    "common.searchOptions": "선택지 검색...",
+    "common.noResultsFor": ({ search }: Record<string, string | number> = {}) => `"${search ?? ""}" 검색 결과가 없습니다.`,
+
+    "route.unavailableTitle": "이 링크는 더 이상 사용할 수 없습니다",
+    "route.entityUnavailable": "요청한 항목이 없거나, 보관되었거나, 오래되었거나, 현재 사용할 수 없습니다. 아무것도 변경하지 않았습니다.",
+    "route.metricUnavailable": "이 종목에서는 해당 지표를 사용할 수 없습니다. 종목 화면은 안전하게 유지됩니다.",
+    "route.returnToDestination": "이 섹션으로 돌아가기",
+
+    "home.onboarding.title": "투자 기억 만들기",
+    "home.onboarding.body": "종목을 추가하고, 지켜보는 이유를 적은 뒤 레시피를 연결하세요. 근거를 평가하려면 설정에서 일별 가격을 가져오세요.",
+    "home.onboarding.addStock": "첫 종목 추가",
+    "home.onboarding.addRecipes": "스타터 레시피 추가",
+    "home.onboarding.exploreSample": "샘플 워크스페이스 보기",
+    "home.sampleNotice": "샘플 데이터가 있습니다. 더미 가격과 결과는 앱을 둘러보기 위한 것입니다.",
 
     "settings.language.title": "언어",
     "settings.language.note": "앱에서 사용할 언어를 선택하세요.",
@@ -534,6 +622,8 @@ const dict: Record<AppLanguage, Record<string, DictValue>> = {
     "eyes.action.delete": "삭제",
     "eyes.detail.unsetHorizon": "기간 미설정",
     "eyes.create.title": "모니터 만들기",
+    "eyes.create.editTitle": "모니터 수정",
+    "eyes.create.editSubtitle": "이 모니터의 종목, 레시피, 논리 스냅샷을 수정합니다.",
     "eyes.create.subtitle": "선택한 종목과 레시피를 연결하고 현재 투자 논리를 남기세요.",
     "eyes.create.stock": "종목",
     "eyes.create.recipe": "레시피",
@@ -544,6 +634,8 @@ const dict: Record<AppLanguage, Record<string, DictValue>> = {
     "eyes.create.thesisRequired": "투자 논리 스냅샷은 반드시 입력해야 합니다.",
     "eyes.create.entryLow": "계획 진입 하단",
     "eyes.create.entryHigh": "계획 진입 상단",
+    "eyes.create.entryLowPlaceholder": "진입 하단 (선택)",
+    "eyes.create.entryHighPlaceholder": "진입 상단 (선택)",
     "eyes.create.lastReview": "최근 논리 검토 시점",
     "eyes.create.invalidation": "무효화 규칙",
     "eyes.create.invalidationPlaceholder": "무엇이 이 논리를 빠르게 깨뜨릴까요?",
@@ -564,6 +656,8 @@ const dict: Record<AppLanguage, Record<string, DictValue>> = {
     "journal.meta.concern": ({ value }: Record<string, string | number> = {}) => `우려: ${value ?? "기록 없음"}`,
     "journal.meta.notCaptured": "기록 없음",
     "journal.action.save": "결정 저장",
+    "journal.action.edit": "수정",
+    "journal.action.archive": "결정 보관",
     "journal.action.open": "열기",
     "journal.action.alert": "알림",
     "journal.action.markOutcome": "결과 표시",
@@ -580,6 +674,19 @@ const dict: Record<AppLanguage, Record<string, DictValue>> = {
     "journal.composer.concernPlaceholder": "가장 크게 본 위험은 무엇이었나요?",
     "journal.composer.thesisValidity": "논리 유효성",
     "journal.composer.timing": "타이밍",
+    "journal.composer.searchPlaceholder": "모니터 중인 종목 검색...",
+    "journal.validation.thesisRequired": "투자 논리 평가를 선택하세요.",
+    "journal.validation.timingRequired": "타이밍 평가를 선택하세요.",
+    "journal.outcome.title": "결과 검토",
+    "journal.outcome.body": "관찰한 내용과 출처를 기록하세요. 이 메모는 원래 결정 근거와 별도로 보존됩니다.",
+    "journal.outcome.reviewWindow": "검토 기간",
+    "journal.outcome.priceChange": "가격 변화와 출처",
+    "journal.outcome.maxRunup": "최대 상승폭과 출처",
+    "journal.outcome.maxDrawdown": "최대 하락폭과 출처",
+    "journal.outcome.lesson": "무엇을 배웠나요?",
+    "journal.outcome.recipeSuggestion": "다음에는 무엇을 바꿀까요?",
+    "journal.outcome.save": "결과 검토 저장",
+    "journal.outcome.saved": "결과 검토가 저장되었습니다.",
     "journal.detail.context": "결정 맥락",
     "journal.detail.noState": "상태 스냅샷이 없습니다",
     "journal.detail.noData": "데이터 품질 메모가 없습니다",
@@ -589,6 +696,7 @@ const dict: Record<AppLanguage, Record<string, DictValue>> = {
     "journal.detail.concern": "우려 사항",
     "journal.detail.noConcern": "기록된 핵심 우려가 없습니다.",
     "journal.detail.outcome": ({ status }: Record<string, string | number> = {}) => `결과 · ${status ?? "Pending"}`,
+    "journal.detail.previousVersions": "이전에 작성한 버전",
 
     "recipes.summary.recipes": "레시피",
     "recipes.summary.starter": "스타터",
@@ -693,6 +801,19 @@ const dict: Record<AppLanguage, Record<string, DictValue>> = {
     "stocks.search.clearSearch": "검색 지우기",
     "stocks.search.resultCount": ({ count }: Record<string, string | number> = {}) => `${count ?? 0}개 표시`,
     "stocks.search.resultNone": "없음",
+    "stocks.search.openStock": ({ symbol, name }: Record<string, string | number> = {}) => `${symbol ?? "종목"} ${name ?? ""} 열기`,
+    "stocks.search.showMore": ({ count }: Record<string, string | number> = {}) => `종목 더 보기 (${count ?? 0}개 남음)`,
+    "stocks.action.add": "종목 추가",
+    "stocks.action.manageEyes": "모니터 관리",
+    "stocks.editor.addTitle": "관심 종목에 추가",
+    "stocks.editor.editTitle": "종목 수정",
+    "stocks.editor.ticker": "티커",
+    "stocks.editor.tickerPlaceholder": "티커, 예: AAPL",
+    "stocks.editor.companyName": "회사명",
+    "stocks.editor.companyNamePlaceholder": "회사명",
+    "stocks.editor.thesis": "지켜보는 이유",
+    "stocks.editor.thesisPlaceholder": "투자 논리와 생각이 바뀌는 조건",
+    "stocks.editor.save": "종목 저장",
 
     "stocks.data.dummyBacked": "더미 데이터",
     "stocks.data.providerBacked": "실데이터 연동",
@@ -703,6 +824,8 @@ const dict: Record<AppLanguage, Record<string, DictValue>> = {
 
     "stocks.hero.vs": ({ benchmark }: Record<string, string | number> = {}) => `${benchmark ?? "벤치마크"} 대비`,
     "stocks.hero.drawdown": ({ value }: Record<string, string | number> = {}) => `고점 대비 ${value ?? "N/A"}`,
+    "stocks.hero.selectObservation": ({ index }: Record<string, string | number> = {}) => `${index ?? ""}번째 차트 관찰값 선택`,
+    "stocks.hero.noCompletedHistory": "완료된 가격 이력이 없습니다",
     "stocks.hero.boardControls": "보드 설정",
     "stocks.hero.showing": ({ shown, total }: Record<string, string | number> = {}) =>
       `${total ?? 0}개 중 ${shown ?? 0}개 표시`,
@@ -735,6 +858,7 @@ const dict: Record<AppLanguage, Record<string, DictValue>> = {
     "stocks.detail.series": "흐름",
     "stocks.detail.days": "일",
     "stocks.detail.tapChart": "막대를 눌러 과거 시점을 바로 확인할 수 있습니다.",
+    "stocks.detail.selectPoint": ({ index }: Record<string, string | number> = {}) => `${index ?? ""}번째 차트 지점 선택`,
     "stocks.evidence.pinned": "고정",
     "stocks.evidence.current": "현재값",
     "stocks.evidence.threshold": "기준값",
@@ -747,16 +871,52 @@ const dict: Record<AppLanguage, Record<string, DictValue>> = {
     "stocks.evidence.formulaDetail": "계산 방식",
     "stocks.evidence.formulaMissing": "추가 계산 설명이 아직 없습니다.",
     "stocks.evidence.inputs": ({ inputs }: Record<string, string | number> = {}) => `입력값: ${inputs ?? "기록된 입력값 없음"}`,
+    "alerts.detail.evidenceRecorded": "이 알림에 기록된 근거",
+    "alerts.detail.olderEvidence": "이전 앱 버전에서는 상세 근거가 기록되지 않았습니다. 원래 알림 요약은 위에 보존되어 있습니다.",
   },
 };
+
+export const getMissingTranslationKeys = () => ({
+  en: Object.keys(dict.ko).filter((key) => !(key in dict.en)),
+  ko: Object.keys(dict.en).filter((key) => !(key in dict.ko)),
+});
+
+export const hasTranslation = (language: AppLanguage, key: string) => key in dict[language] || key in dict.en;
 
 export const t = (
   language: AppLanguage,
   key: string,
   vars?: Record<string, string | number>,
 ) => {
-  const entry = dict[language][key] ?? dict.en[key] ?? key;
+  const entry = dict[language]?.[key] ?? dict.en[key] ?? key;
   return typeof entry === "function" ? entry(vars) : entry;
+};
+
+export const formatLocaleNumber = (
+  language: AppLanguage,
+  value: number,
+  options: Intl.NumberFormatOptions = {},
+) => new Intl.NumberFormat(language === "ko" ? "ko-KR" : "en-US", options).format(value);
+
+export const formatLocaleDate = (language: AppLanguage, value: string) => {
+  const date = new Date(/^\d{4}-\d{2}-\d{2}$/.test(value) ? `${value}T12:00:00` : value);
+  if (Number.isNaN(date.getTime())) return value;
+  return new Intl.DateTimeFormat(language === "ko" ? "ko-KR" : "en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(date);
+};
+
+export const formatLocaleDateTime = (language: AppLanguage, value: string) => {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return new Intl.DateTimeFormat(language === "ko" ? "ko-KR" : "en-US", {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(date);
 };
 
 export const tabLabel = (language: AppLanguage, tab: string) => t(language, `nav.${tab}`);

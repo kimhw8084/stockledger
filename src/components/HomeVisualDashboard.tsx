@@ -454,7 +454,13 @@ const HomeVisualDashboard: React.FC<HomeVisualDashboardProps> = ({
   const renderSectionTitle = (label: string, target: HomeHelpTarget) => (
     <View style={styles.sectionTitleRow}>
       <Text style={styles.sectionEyebrow}>{label}</Text>
-      <Pressable onPress={() => setHelpTarget(target)} style={styles.sectionHelpButton}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={language === "ko" ? `${label} 설명` : `${label} help`}
+        accessibilityHint={language === "ko" ? "이 구역의 설명을 엽니다" : "Opens help for this section"}
+        onPress={() => setHelpTarget(target)}
+        style={styles.sectionHelpButton}
+      >
         <Text style={styles.sectionHelpButtonText}>?</Text>
       </Pressable>
     </View>
@@ -470,6 +476,10 @@ const HomeVisualDashboard: React.FC<HomeVisualDashboardProps> = ({
             <Pressable
               key={figure.key}
               onPress={figure.key === "alerts" ? onOpenAlerts : undefined}
+              disabled={figure.key !== "alerts"}
+              accessibilityRole="button"
+              accessibilityLabel={`${figure.label}: ${figure.value}`}
+              accessibilityState={{ disabled: figure.key !== "alerts" }}
               style={styles.summaryMiniCard}
             >
               <View style={[styles.summaryMiniDot, { backgroundColor: figure.tone }]} />
@@ -491,10 +501,10 @@ const HomeVisualDashboard: React.FC<HomeVisualDashboardProps> = ({
               <Text style={styles.heroTitle}>{language === "ko" ? "긴급도 성운" : "Urgency constellation"}</Text>
             </View>
             <View style={styles.heroActions}>
-              <Pressable style={styles.heroActionChip} onPress={onOpenAlerts}>
+              <Pressable accessibilityRole="button" accessibilityLabel={language === "ko" ? "알림 열기" : "Open alerts"} style={styles.heroActionChip} onPress={onOpenAlerts}>
                 <Text style={styles.heroActionText}>{language === "ko" ? "알림" : "Alerts"}</Text>
               </Pressable>
-              <Pressable style={styles.heroActionChip} onPress={onOpenLogicLab}>
+              <Pressable accessibilityRole="button" accessibilityLabel={language === "ko" ? "로직 열기" : "Open logic lab"} style={styles.heroActionChip} onPress={onOpenLogicLab}>
                 <Text style={styles.heroActionText}>{language === "ko" ? "로직" : "Logic"}</Text>
               </Pressable>
             </View>
@@ -544,6 +554,9 @@ const HomeVisualDashboard: React.FC<HomeVisualDashboardProps> = ({
                     />
                   ) : null}
                   <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel={`${item.stock.symbol} ${item.stock.name}`}
+                    accessibilityState={{ expanded: expandedStockIds.includes(item.stock.id) }}
                     onPress={() => toggleExpand(item.stock.id)}
                     style={[
                       styles.nodeCore,
@@ -574,6 +587,9 @@ const HomeVisualDashboard: React.FC<HomeVisualDashboardProps> = ({
               return (
                 <Pressable
                   key={`radar-${item.stock.id}`}
+                  accessibilityRole="button"
+                  accessibilityLabel={`${item.stock.symbol} ${localizedUrgency(language, evaluation?.actionUrgency)}`}
+                  accessibilityState={{ expanded: expandedStockIds.includes(item.stock.id) }}
                   onPress={() => toggleExpand(item.stock.id)}
                   style={[
                     styles.radarChip,
@@ -601,6 +617,8 @@ const HomeVisualDashboard: React.FC<HomeVisualDashboardProps> = ({
             {decisionLoopItems.map(({ item, decision, outcome }) => (
               <Pressable
                 key={`loop-${decision.id}`}
+                accessibilityRole="button"
+                accessibilityLabel={`${item.stock.symbol} ${localizedDecisionAction(language, decision.action)}`}
                 onPress={() => onOpenJournal(item.dominantEye?.id ?? decision.eyeId, decision.alertId)}
                 style={styles.loopCard}
               >
@@ -644,6 +662,9 @@ const HomeVisualDashboard: React.FC<HomeVisualDashboardProps> = ({
         {HOME_BUCKETS.map((item) => (
           <Pressable
             key={item}
+            accessibilityRole="button"
+            accessibilityLabel={`${bucketLabel(language, item)}: ${bucketCounts[item]}`}
+            accessibilityState={{ selected: bucket === item }}
             onPress={() => setBucket(item)}
             style={[styles.bucketChip, bucket === item ? styles.bucketChipActive : null]}
           >
@@ -668,7 +689,13 @@ const HomeVisualDashboard: React.FC<HomeVisualDashboardProps> = ({
 
           return (
             <Reveal key={item.stock.id} delay={260 + index * 24}>
-              <Pressable onPress={() => toggleExpand(item.stock.id)} style={styles.stockCard}>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={`${item.stock.symbol} ${item.stock.name}`}
+                accessibilityState={{ expanded }}
+                onPress={() => toggleExpand(item.stock.id)}
+                style={styles.stockCard}
+              >
                 <View style={styles.stockCardTop}>
                   <View style={styles.stockCardIdentity}>
                     <View style={[styles.stateDot, { backgroundColor: stateColor(evaluation?.currentState) }]} />
@@ -824,17 +851,19 @@ const HomeVisualDashboard: React.FC<HomeVisualDashboardProps> = ({
                     </View>
 
                     <View style={styles.quickActionRow}>
-                      <Pressable style={styles.quickAction} onPress={() => openStock(item)}>
+                      <Pressable accessibilityRole="button" accessibilityLabel={language === "ko" ? "종목 열기" : "Open stock"} style={styles.quickAction} onPress={() => openStock(item)}>
                         <Text style={styles.quickActionText}>{language === "ko" ? "종목" : "Stock"}</Text>
                       </Pressable>
-                      <Pressable style={styles.quickAction} onPress={() => openStock(item)}>
+                      <Pressable accessibilityRole="button" accessibilityLabel={language === "ko" ? "검토 열기" : "Open review"} style={styles.quickAction} onPress={() => openStock(item)}>
                         <Text style={styles.quickActionText}>{language === "ko" ? "검토" : "Review"}</Text>
                       </Pressable>
-                      <Pressable style={styles.quickAction} onPress={onOpenAlerts}>
+                      <Pressable accessibilityRole="button" accessibilityLabel={language === "ko" ? "알림 열기" : "Open alerts"} style={styles.quickAction} onPress={onOpenAlerts}>
                         <Text style={styles.quickActionText}>{language === "ko" ? "알림" : "Alerts"}</Text>
                       </Pressable>
                       {item.dominantEye ? (
                         <Pressable
+                          accessibilityRole="button"
+                          accessibilityLabel={language === "ko" ? "저널 열기" : "Open journal"}
                           style={styles.quickAction}
                           onPress={() => onOpenJournal(item.dominantEye!.id, item.openAlerts[0]?.id)}
                         >
@@ -896,8 +925,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   sectionHelpButton: {
-    width: 24,
-    height: 24,
+    minWidth: 44,
+    minHeight: 44,
+    width: 44,
+    height: 44,
     borderRadius: 12,
     backgroundColor: "#ffffff",
     borderWidth: 1,
@@ -1822,6 +1853,7 @@ const styles = StyleSheet.create({
   },
   quickAction: {
     flex: 1,
+    minHeight: 44,
     borderRadius: 16,
     backgroundColor: "#0f172a",
     paddingVertical: 10,

@@ -104,6 +104,28 @@ export const styles = StyleSheet.create({
     fontWeight: "700",
     fontFamily,
   },
+  routeNotice: {
+    marginHorizontal: 16,
+    marginTop: 12,
+    padding: 14,
+    gap: 8,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "#f59e0b",
+    backgroundColor: "#fffbeb",
+  },
+  routeNoticeTitle: {
+    color: "#92400e",
+    fontSize: 15,
+    fontWeight: "800",
+    fontFamily,
+  },
+  routeNoticeBody: {
+    color: "#78350f",
+    fontSize: 14,
+    lineHeight: 20,
+    fontFamily,
+  },
   page: {
     flexGrow: 1,
     paddingHorizontal: 16,
@@ -269,6 +291,11 @@ export const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "700",
     fontFamily,
+  },
+  inlineUtilityButton: {
+    minHeight: 44,
+    justifyContent: "center",
+    paddingHorizontal: 4,
   },
   searchAssistText: {
     color: "#6b7280",
@@ -1334,7 +1361,7 @@ export const styles = StyleSheet.create({
   },
   metricJumpChip: {
     paddingHorizontal: 11,
-    minHeight: 32,
+    minHeight: 44,
     borderRadius: 11,
     backgroundColor: "#f3f4f6",
     borderWidth: 1,

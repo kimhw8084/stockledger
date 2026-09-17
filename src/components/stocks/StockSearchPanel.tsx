@@ -2,7 +2,7 @@ import React from "react";
 import { Pressable, Text, View } from "react-native";
 
 import { FreshnessStatus, MockSnapshot, Stock } from "../../types";
-import { t } from "../../lib/i18n";
+import { formatLocaleNumber, t } from "../../lib/i18n";
 import { AppLanguage } from "../../lib/preferences";
 import { MotionSwap } from "../MotionSwap";
 
@@ -76,7 +76,7 @@ export const StockSearchPanel = ({
         </Text>
       </View>
       {!hasStockQuery && recentStocksCount > 0 ? (
-        <Pressable onPress={() => setRecentStockIds([])} hitSlop={8}>
+        <Pressable accessibilityRole="button" accessibilityLabel={t(language, "stocks.search.clearRecent")} onPress={() => setRecentStockIds([])} hitSlop={8} style={styles.inlineUtilityButton}>
           <Text style={styles.inlineUtilityText}>{t(language, "stocks.search.clearRecent")}</Text>
         </Pressable>
       ) : null}
@@ -104,7 +104,7 @@ export const StockSearchPanel = ({
             return (
               <Pressable
                 key={`suggest-${item.stock.id}`}
-                accessibilityRole="button" accessibilityLabel={`Open ${item.stock.symbol} ${item.stock.name}`}
+                accessibilityRole="button" accessibilityLabel={t(language, "stocks.search.openStock", { symbol: item.stock.symbol, name: item.stock.name })}
                 onPress={() => openStockContext({ stockId: item.stock.id })}
                 style={({ pressed }) => [
                   styles.stockSuggestionRow,
@@ -141,7 +141,7 @@ export const StockSearchPanel = ({
                 </View>
                 <View style={styles.stockSuggestionRight}>
                   <Text style={styles.stockSuggestionPrice}>
-                    {item.snapshot && item.snapshot.freshness !== "Unavailable" ? `$${item.snapshot.price.toFixed(2)}` : "--"}
+                    {item.snapshot && item.snapshot.freshness !== "Unavailable" ? `$${formatLocaleNumber(language, item.snapshot.price, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "--"}
                   </Text>
                   <Text style={styles.stockSuggestionMeta} numberOfLines={1}>
                     {stockSuggestionTrustLabel(item.snapshot)}

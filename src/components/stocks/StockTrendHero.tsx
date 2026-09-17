@@ -2,7 +2,7 @@ import React from "react";
 import { Animated, Pressable, Text, View } from "react-native";
 
 import { FreshnessStatus, MockSnapshot, Stock } from "../../types";
-import { localizedFreshness, t } from "../../lib/i18n";
+import { formatLocaleNumber, localizedFreshness, t } from "../../lib/i18n";
 import { AppLanguage } from "../../lib/preferences";
 import { MotionSwap } from "../MotionSwap";
 
@@ -87,8 +87,8 @@ export const StockTrendHero = ({
               {localizedFreshness(language, snapshot?.freshness ?? "Unavailable")}
             </Text>
           </View>
-          <Button label={language === "ko" ? "수정" : "Edit"} tone="ghost" onPress={onEditStock} />
-          <Button label={language === "ko" ? "보관" : "Archive"} tone="ghost" onPress={onDeleteStock} />
+          <Button label={t(language, "common.edit")} tone="ghost" onPress={onEditStock} />
+          <Button label={t(language, "common.archive")} tone="ghost" onPress={onDeleteStock} />
           <Button label={t(language, "stocks.hero.clear")} tone="ghost" onPress={onClearStock} />
         </View>
       </View>
@@ -102,7 +102,7 @@ export const StockTrendHero = ({
         <View style={[styles.stockTrendHeader, isCompactPhone ? styles.stockTrendHeaderCompact : null]}>
           <View style={styles.flexOne}>
             <Text style={[styles.stockTrendPrice, isCompactPhone ? styles.stockTrendPriceCompact : null]}>
-              {selectedHeroPrice !== undefined ? `$${selectedHeroPrice.toFixed(2)}` : "--"}
+              {selectedHeroPrice !== undefined ? `$${formatLocaleNumber(language, selectedHeroPrice, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "--"}
             </Text>
             <Text style={styles.stockTrendCaption}>{selectedHeroPointLabel}</Text>
           </View>
@@ -112,15 +112,15 @@ export const StockTrendHero = ({
               <Text style={styles.stockTrendSummaryMiniValue}>
                 {selectedStockHeroRange
                   ? language === "ko"
-                    ? `${Math.round(selectedStockHeroRange.high - selectedStockHeroRange.low)}포인트`
-                    : `${Math.round(selectedStockHeroRange.high - selectedStockHeroRange.low)} pts`
+                    ? `${formatLocaleNumber(language, Math.round(selectedStockHeroRange.high - selectedStockHeroRange.low))}포인트`
+                    : `${formatLocaleNumber(language, Math.round(selectedStockHeroRange.high - selectedStockHeroRange.low))} pts`
                   : "--"}
               </Text>
             </View>
             <View style={[styles.stockTrendSummaryMiniBlock, isCompactPhone ? styles.stockTrendSummaryMiniBlockCompact : null]}>
               <Text style={styles.stockTrendSummaryMiniLabel}>{t(language, "stocks.hero.vs", { benchmark: analysisBenchmark })}</Text>
               <Text style={styles.stockTrendSummaryMiniValue}>
-                {selectedHeroBenchmarkDelta !== undefined ? `${selectedHeroBenchmarkDelta >= 0 ? "+" : ""}${selectedHeroBenchmarkDelta.toFixed(2)} pp` : "--"}
+                {selectedHeroBenchmarkDelta !== undefined ? `${selectedHeroBenchmarkDelta >= 0 ? "+" : ""}${formatLocaleNumber(language, selectedHeroBenchmarkDelta, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} pp` : "--"}
               </Text>
             </View>
           </View>
@@ -145,7 +145,7 @@ export const StockTrendHero = ({
             <Pressable
               key={`trend-${stock.id}-${index}`}
               accessibilityRole="button"
-              accessibilityLabel={`Select chart observation ${index + 1}`}
+              accessibilityLabel={t(language, "stocks.hero.selectObservation", { index: index + 1 })}
               accessibilityState={{ selected: index === safeSelectedHeroPointIndex }}
               onPress={() => setSelectedHeroPointIndex(index)}
               style={[styles.stockTrendBarHit, index === safeSelectedHeroPointIndex ? styles.stockTrendBarHitActive : null]}
@@ -203,7 +203,7 @@ export const StockTrendHero = ({
         <View style={[styles.stockTrendLegend, isCompactPhone ? styles.stockTrendLegendCompact : null]}>
           <Text style={styles.stockTrendLegendText}>{selectedHeroPointLabel}</Text>
           <Text style={styles.stockTrendLegendText}>
-            {t(language, "stocks.hero.drawdown", { value: snapshot ? `${snapshot.drawdownPct}%` : "N/A" })}
+            {t(language, "stocks.hero.drawdown", { value: snapshot ? `${formatLocaleNumber(language, snapshot.drawdownPct)}%` : "N/A" })}
           </Text>
           <Text style={styles.stockTrendLegendText}>
             {language === "ko" ? `${analysisLookback} · ${analysisBenchmark} 비교` : `${analysisLookback} vs ${analysisBenchmark}`}
