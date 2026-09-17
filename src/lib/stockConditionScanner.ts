@@ -272,9 +272,10 @@ export const runDailyStockConditionScan = async (input: {
   providerName?: string;
   histories?: { symbol: string; rows: RawBarRecord[]; error?: string }[];
   universeSnapshot?: UniverseSnapshot;
+  scheduledSession?: string;
 }) : Promise<ScannerExecutionResult> => {
   const startedAt = (input.now ?? new Date()).toISOString();
-  const latestExpectedDate = latestCompletedTradingDate(
+  const latestExpectedDate = input.scheduledSession ?? latestCompletedTradingDate(
     input.now ?? new Date(),
     input.scannerSettings.providerDelayMinutesAfterClose,
   );
