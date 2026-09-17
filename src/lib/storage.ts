@@ -7,6 +7,7 @@ export { createDemoAppData, createEmptyAppData } from "../data/workspaceDefaults
 export {
   STORAGE_KEYS,
   StorageRecoveryError,
+  WorkspaceStorageBudgetError,
   workspaceRepository,
   createWorkspaceRepository,
   prepareLegacyMigration,

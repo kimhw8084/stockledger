@@ -1,6 +1,6 @@
 import { createRepresentativeWorkspaceFixture } from "../src/data/representativeWorkspaceFixture";
 import { profileWorkspace } from "../src/data/workspaceFootprint";
-import { RETENTION_CONTRACT, STORAGE_LAYOUT_CONTRACT } from "../src/data/workspaceContract";
+import { RETENTION_CONTRACT, STORAGE_LAYOUT_CONTRACT, WORKSPACE_STORAGE_BUDGET_CONTRACT } from "../src/data/workspaceContract";
 
 const profile = profileWorkspace(createRepresentativeWorkspaceFixture());
 console.log(JSON.stringify({
@@ -10,6 +10,8 @@ console.log(JSON.stringify({
     deterministic: true,
     purpose: "representative measurement only; not a real-user capacity estimate",
   },
+  storageBudgetContract: WORKSPACE_STORAGE_BUDGET_CONTRACT,
+  storageBudget: profile.budget,
   serializedWorkspaceBytes: profile.serializedWorkspaceBytes,
   bootstrapSerializedBytes: profile.bootstrapSerializedBytes,
   domains: profile.domains,

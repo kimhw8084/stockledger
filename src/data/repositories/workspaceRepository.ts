@@ -5,6 +5,7 @@ import store from "../../platform/keyValueStore";
 import type { KeyValueStore } from "../../platform/keyValueStore";
 import type { AppData } from "../../types";
 import { createEmptyAppData } from "../workspaceDefaults";
+import { profileWorkspace, type WorkspaceBudgetStatus } from "../workspaceFootprint";
 import { STORAGE_LAYOUT_CONTRACT } from "../workspaceContract";
 
 export const STORAGE_KEYS = {
@@ -14,6 +15,18 @@ export const STORAGE_KEYS = {
 
 export class StorageRecoveryError extends Error {
   constructor(message: string) { super(message); this.name = "StorageRecoveryError"; }
+}
+
+export class WorkspaceStorageBudgetError extends Error {
+  readonly code = "WORKSPACE_STORAGE_BUDGET_EXCEEDED" as const;
+
+  constructor(
+    readonly current: WorkspaceBudgetStatus,
+    readonly attempted: WorkspaceBudgetStatus,
+  ) {
+    super(`Workspace storage budget exceeded: guarded bulk history would grow from ${current.currentBytes} to ${attempted.currentBytes} UTF-8 bytes, over the ${attempted.budgetBytes}-byte hard budget. Reduce guarded history through an explicit reduction operation before adding more historical evidence.`);
+    this.name = "WorkspaceStorageBudgetError";
+  }
 }
 
 export type RecoveryData = {
@@ -80,12 +93,18 @@ export const createWorkspaceRepository = (keyValueStore: KeyValueStore = store):
     const snapshot = JSON.parse(JSON.stringify(validated)) as AppData;
     const write = writes.then(async () => {
       const previous = await keyValueStore.getItem(STORAGE_KEYS.current);
+      let currentData = createEmptyAppData();
       let revision = 1;
       if (previous !== null) {
-        parseExport(previous); // refuse to overwrite unrecovered invalid data
+        currentData = parseExport(previous); // refuse to overwrite unrecovered invalid data
         revision = (JSON.parse(previous) as StorageEnvelope).revision + 1;
       }
       if (loadedRevision !== null && loadedRevision !== revision - 1) throw new Error("Another session saved changes. Reload to protect those changes.");
+      const currentBudget = profileWorkspace(currentData).budget;
+      const attemptedBudget = profileWorkspace(snapshot).budget;
+      if (attemptedBudget.overBudget && attemptedBudget.currentBytes > currentBudget.currentBytes) {
+        throw new WorkspaceStorageBudgetError(currentBudget, attemptedBudget);
+      }
       await keyValueStore.compareAndSetItem(STORAGE_KEYS.current, previous, serializeExport(snapshot, revision), STORAGE_KEYS.previous);
       loadedRevision = revision;
     });
