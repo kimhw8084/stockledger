@@ -4,7 +4,7 @@ import { Button, Card, HorizontalChoice, Input } from "../../components/common";
 import { WindowPanel } from "../../components/WindowPanel";
 import type { useAppModel } from "../../hooks/useAppModel";
 import type { AppData, Stock } from "../../types";
-import { parseExport, readRecoveryData, restorePreviousBackup } from "../../lib/storage";
+import { parseExport } from "../../domain/backupFormat";
 import { downloadText, pickTextFile } from "../../platform/fileAccess";
 import { WatchlistImportPanel } from "./WatchlistImportPanel";
 import { reviewReport } from "../../domain/reviewReport";
@@ -12,12 +12,12 @@ import { t, type AppLanguage } from "../../lib/i18n";
 
 type Actions = ReturnType<typeof useAppModel>["actions"];
 const backupName = () => `StockLedger-${new Date().toISOString().slice(0, 10)}.json`;
-export function RecoveryPanel({ error, retry, language }: { error: string; retry: () => void; language: AppLanguage }) {
+export function RecoveryPanel({ error, retry, actions, language }: { error: string; retry: () => void; actions: Actions; language: AppLanguage }) {
   return <View style={styles.panel}><Text accessibilityRole="header" style={styles.title}>{t(language, "workspace.recovery.title")}</Text>
     <Text accessibilityRole="alert" selectable style={styles.body}>{error}</Text>
     <Text style={styles.body}>{t(language, "workspace.recovery.body")}</Text>
-    <Button label={t(language, "workspace.recovery.export")} onPress={async () => downloadText("StockLedger-recovery.json", JSON.stringify(await readRecoveryData(), null, 2))} />
-    <Button label={t(language, "workspace.recovery.restore")} tone="secondary" onPress={async () => { await restorePreviousBackup(); retry(); }} />
+    <Button label={t(language, "workspace.recovery.export")} onPress={async () => downloadText("StockLedger-recovery.json", JSON.stringify(await actions.readRecoveryData(), null, 2))} />
+    <Button label={t(language, "workspace.recovery.restore")} tone="secondary" onPress={async () => { await actions.restorePreviousBackup(); retry(); }} />
     <Button label={t(language, "workspace.recovery.retry")} tone="secondary" onPress={retry} />
   </View>;
 }
