@@ -134,10 +134,29 @@ export const previousUsTradingDate = (date: string): string => {
   while (!isUsTradingDate(cursor)) cursor = shiftSessionDate(cursor, -1);
   return cursor;
 };
+export const nextUsTradingDate = (date: string): string => {
+  let cursor = shiftSessionDate(date, 1);
+  while (!isUsTradingDate(cursor)) cursor = shiftSessionDate(cursor, 1);
+  return cursor;
+};
 export const isUsTradingDay = (instant: Date) => isUsTradingDate(formatDateInZone(instant));
 export const previousUsTradingDay = (instant: Date) =>
   new Date(`${previousUsTradingDate(formatDateInZone(instant))}T12:00:00Z`);
 export const marketCloseMinutes = (date: string) => earlyCloses.has(date) ? 13 * 60 : MARKET_CLOSE_HOUR * 60;
+export const marketSessionDueAtUtc = (date: string, providerDelayMinutesAfterClose = 45) => {
+  assertCoverage(date);
+  if (!Number.isFinite(providerDelayMinutesAfterClose) || providerDelayMinutesAfterClose < 0 || providerDelayMinutesAfterClose > 360) {
+    throw new Error("Provider delay must be between 0 and 360 minutes.");
+  }
+  const localNoon = new Date(`${date}T12:00:00Z`);
+  const zonedNoon = getZonedParts(localNoon);
+  const utcNoonForZonedDate = Date.UTC(zonedNoon.year, zonedNoon.month - 1, zonedNoon.day, zonedNoon.hour, zonedNoon.minute, zonedNoon.second);
+  const offsetMinutes = (utcNoonForZonedDate - localNoon.getTime()) / 60_000;
+  return new Date(Date.UTC(
+    Number(date.slice(0, 4)), Number(date.slice(5, 7)) - 1, Number(date.slice(8, 10)),
+    0, marketCloseMinutes(date) + providerDelayMinutesAfterClose,
+  ) - offsetMinutes * 60_000);
+};
 export const latestCompletedTradingDate = (now = new Date(), providerDelayMinutesAfterClose = 45) => {
   if (!Number.isFinite(providerDelayMinutesAfterClose) || providerDelayMinutesAfterClose < 0 || providerDelayMinutesAfterClose > 360) {
     throw new Error("Provider delay must be between 0 and 360 minutes.");

@@ -17,10 +17,10 @@ async function main() {
     const histories = [...stocks.map(stock => stock.symbol), "SPY", ...sectors].map(symbol => ({ symbol, rows: dates.map((date, i) => ({ symbol, date, open: 100 + i, close: 100 + i, high: 101 + i, low: 99 + i, volume: 1000 })) }));
     store.import(data, 0);
     const started = performance.now();
-    await runWorker(store, histories, { source: "Synthetic benchmark", adjustment: "adjusted", now });
+    const result = await runWorker(store, histories, { source: "Synthetic benchmark", adjustment: "adjusted", now });
     const elapsedMs = Math.round(performance.now() - started);
     const saved = store.load()!;
-    console.log(JSON.stringify({ synthetic: true, stocks: 100, sessions: 260, evaluations: saved.data.evaluations?.length, scannerRows: saved.data.scanSignals.length, elapsedMs, databaseBytesIncludingWal: [path, path + "-wal", path + "-shm"].reduce((sum, file) => sum + (existsSync(file) ? statSync(file).size : 0), 0), workspaceBytes: Buffer.byteLength(JSON.stringify(saved.data)), endingRssBytes: process.memoryUsage().rss, integrity: store.integrityCheck() }, null, 2));
+    console.log(JSON.stringify({ synthetic: true, stocks: 100, sessions: 260, evaluations: saved.data.evaluations?.length, scannerRows: saved.data.scanSignals.length, elapsedMs, databaseBytesIncludingWal: [path, path + "-wal", path + "-shm"].reduce((sum, file) => sum + (existsSync(file) ? statSync(file).size : 0), 0), workspaceBytes: Buffer.byteLength(JSON.stringify(saved.data)), endingRssBytes: process.memoryUsage().rss, integrity: store.integrityCheck(), deadlineEvidence: { elapsedMs: result.deadline.elapsedMs, workloadSize: { stocks: 100, sessions: 260, symbols: result.deadline.workloadSize.symbols, rows: result.deadline.workloadSize.rows, jobStages: result.deadline.workloadSize.jobStages }, deadlineBudgetMs: result.deadline.deadlineBudgetMs, remainingHeadroomMs: result.deadline.remainingHeadroomMs, withinBudget: result.deadline.withinBudget, evidenceOnly: true } }, null, 2));
   } finally { store.close(); rmSync(directory, { recursive: true, force: true }); }
 }
 main().catch(error => { console.error(error); process.exitCode = 1; });

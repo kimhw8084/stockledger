@@ -50,4 +50,6 @@ Still unimplemented: complete password recovery/device-session management, self-
 
 Also required: actual hosting/project/domain, authorized data rights, email setup, privacy/retention terms, pilot usage and unit economics, restore/load drills, and native signing/device/store QA if distributing native clients. Do not represent this candidate as paid-launch ready.
 
+CHG-92 adds a provider-independent managed execution entry point and a versioned durable job contract, but no managed hosting target, credentials, scheduler installation, or hosted execution evidence exists in this repository. Provisioning and exercising a hosted cron/job platform is an explicit external gate. The local no-subscription path is documented in `docs/operations/LOCAL_WORKER.md`; it depends on an awake operator-owned machine and does not imply hosted availability.
+
 Upstream references: [local development](https://supabase.com/docs/guides/local-development), [RLS](https://supabase.com/docs/guides/database/postgres/row-level-security), [production checklist](https://supabase.com/docs/guides/deployment/going-into-prod).
