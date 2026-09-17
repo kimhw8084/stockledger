@@ -3,9 +3,9 @@ import { parseExport, serializeExport } from "../src/domain/backupFormat";
 import { createWorkspaceApplicationService } from "../src/application/workspaceApplicationService";
 import { createRepresentativeWorkspaceFixture } from "../src/data/representativeWorkspaceFixture";
 import { profileWorkspace } from "../src/data/workspaceFootprint";
-import { RETENTION_CONTRACT, STORAGE_LAYOUT_CONTRACT } from "../src/data/workspaceContract";
+import { RETENTION_CONTRACT, STORAGE_LAYOUT_CONTRACT, WORKSPACE_STORAGE_BUDGET_CONTRACT } from "../src/data/workspaceContract";
 import { createEmptyAppData } from "../src/data/workspaceDefaults";
-import { createWorkspaceRepository, STORAGE_KEYS, type WorkspaceRepository } from "../src/data/repositories/workspaceRepository";
+import { createWorkspaceRepository, STORAGE_KEYS, WorkspaceStorageBudgetError, type WorkspaceRepository } from "../src/data/repositories/workspaceRepository";
 import type { KeyValueStore } from "../src/platform/keyValueStore";
 import type { AppData } from "../src/types";
 
@@ -34,6 +34,22 @@ const makeStore = () => {
 
 const savedData = (workspaceId: string): AppData => ({ ...createEmptyAppData(), workspaceId });
 const repositoryFor = (store: KeyValueStore): WorkspaceRepository => createWorkspaceRepository(store);
+
+const workspaceAtBulkHistoryBytes = (target: number): AppData => {
+  const source = createRepresentativeWorkspaceFixture();
+  const sourceBytes = profileWorkspace(source).budget.currentBytes;
+  const originalReasonLength = source.reviewLogs[0]?.manualReason?.length ?? 0;
+  const withReasonLength = (length: number): AppData => ({
+    ...source,
+    reviewLogs: source.reviewLogs.map((entry, index) => index === 0 ? { ...entry, manualReason: "x".repeat(length) } : entry),
+  });
+  const result = withReasonLength(originalReasonLength + target - sourceBytes);
+  if (profileWorkspace(result).budget.currentBytes !== target) throw new Error(`Could not build exact test fixture at ${target} bytes.`);
+  return result;
+};
+
+const exactBoundaryWorkspace = workspaceAtBulkHistoryBytes(WORKSPACE_STORAGE_BUDGET_CONTRACT.hardBudgetBytes);
+const oversizedWorkspace = workspaceAtBulkHistoryBytes(WORKSPACE_STORAGE_BUDGET_CONTRACT.hardBudgetBytes + 1);
 
 beforeEach(() => vi.clearAllMocks());
 
@@ -116,6 +132,71 @@ it("serializes authored writes in order and rejects a stale repository revision"
   expect(parseExport(values.get(STORAGE_KEYS.current)!)).toEqual(third);
 });
 
+it("allows below-budget growth and exact-boundary writes", async () => {
+  const { store, values } = makeStore();
+  const repository = repositoryFor(store);
+  await repository.load();
+  const fixture = createRepresentativeWorkspaceFixture();
+  const grown = { ...fixture, reviewLogs: fixture.reviewLogs.map((entry, index) => index === 0 ? { ...entry, manualReason: `${entry.manualReason}x` } : entry) };
+  expect(profileWorkspace(grown).budget.currentBytes).toBeGreaterThan(profileWorkspace(fixture).budget.currentBytes);
+  expect(profileWorkspace(grown).budget.overBudget).toBe(false);
+  await repository.save(grown);
+  expect(parseExport(values.get(STORAGE_KEYS.current)!)).toEqual(grown);
+
+  const exactRepository = repositoryFor(makeStore().store);
+  await exactRepository.load();
+  await exactRepository.save(exactBoundaryWorkspace);
+  expect(profileWorkspace(exactBoundaryWorkspace).budget.currentBytes).toBe(WORKSPACE_STORAGE_BUDGET_CONTRACT.hardBudgetBytes);
+  await expect(exactRepository.save(oversizedWorkspace)).rejects.toBeInstanceOf(WorkspaceStorageBudgetError);
+});
+
+it("rejects only attempted over-budget growth and preserves the last valid revision", async () => {
+  const { store, values } = makeStore();
+  const repository = repositoryFor(store);
+  await repository.load();
+  const fixture = createRepresentativeWorkspaceFixture();
+  await repository.save(fixture);
+  const before = values.get(STORAGE_KEYS.current);
+  const failedWrite = repository.save(oversizedWorkspace);
+  await expect(failedWrite).rejects.toBeInstanceOf(WorkspaceStorageBudgetError);
+  try { await failedWrite; } catch (error) { expect((error as WorkspaceStorageBudgetError).code).toBe("WORKSPACE_STORAGE_BUDGET_EXCEEDED"); }
+  expect(values.get(STORAGE_KEYS.current)).toBe(before);
+  expect((JSON.parse(values.get(STORAGE_KEYS.current)!) as { revision: number }).revision).toBe(1);
+  expect(values.get(STORAGE_KEYS.previous)).toBeUndefined();
+});
+
+it("loads, exports, recovers, and permits unrelated edits for an existing oversized workspace", async () => {
+  const { store, values } = makeStore();
+  const previous = workspaceAtBulkHistoryBytes(WORKSPACE_STORAGE_BUDGET_CONTRACT.hardBudgetBytes + 2);
+  values.set(STORAGE_KEYS.current, serializeExport(oversizedWorkspace, 4, new Date("2026-09-17T00:00:00.000Z")));
+  values.set(STORAGE_KEYS.previous, serializeExport(previous, 3, new Date("2026-09-17T00:00:00.000Z")));
+  const repository = repositoryFor(store);
+  const loaded = await repository.load();
+  expect(loaded.rawBarArchives).toEqual(oversizedWorkspace.rawBarArchives);
+  const service = createWorkspaceApplicationService({ repository, getCurrent: () => loaded, publish: () => undefined });
+  expect(parseExport(service.exportBackup())).toEqual(oversizedWorkspace);
+
+  await repository.restorePreviousBackup();
+  expect(parseExport(values.get(STORAGE_KEYS.current)!)).toEqual(previous);
+  expect(parseExport(values.get(STORAGE_KEYS.current)!).rawBarArchives).toEqual(previous.rawBarArchives);
+
+  const unrelatedEdit = { ...previous, workspaceId: "oversized-edited" };
+  await repository.save(unrelatedEdit);
+  expect(parseExport(values.get(STORAGE_KEYS.current)!)).toEqual(unrelatedEdit);
+  expect((JSON.parse(values.get(STORAGE_KEYS.current)!) as { revision: number }).revision).toBe(6);
+});
+
+it("allows an explicit reduction of an oversized guarded history", async () => {
+  const { store, values } = makeStore();
+  const repository = repositoryFor(store);
+  values.set(STORAGE_KEYS.current, serializeExport(oversizedWorkspace, 4));
+  const loaded = await repository.load();
+  const reduced = { ...loaded, rawBarArchives: loaded.rawBarArchives.slice(0, 3) };
+  expect(profileWorkspace(reduced).budget.currentBytes).toBeLessThan(profileWorkspace(loaded).budget.currentBytes);
+  await repository.save(reduced);
+  expect(parseExport(values.get(STORAGE_KEYS.current)!)).toEqual(reduced);
+});
+
 it("profiles a deterministic representative fixture without applying an implicit retention rule", () => {
   const fixture = createRepresentativeWorkspaceFixture();
   const first = profileWorkspace(fixture);
@@ -123,7 +204,16 @@ it("profiles a deterministic representative fixture without applying an implicit
   expect(first).toEqual(second);
   expect(first.serializedWorkspaceBytes).toBeGreaterThan(0);
   expect(first.bootstrapSerializedBytes).toBe(first.serializedWorkspaceBytes);
+  expect(first.budget.currentBytes).toBe(WORKSPACE_STORAGE_BUDGET_CONTRACT.representativeFixture.bulkHistoryBytes);
+  expect(first.budget.budgetBytes).toBe(WORKSPACE_STORAGE_BUDGET_CONTRACT.hardBudgetBytes);
+  expect(first.budget.remainingBytes).toBe(WORKSPACE_STORAGE_BUDGET_CONTRACT.hardBudgetBytes - first.budget.currentBytes);
+  expect(first.budget.utilization).toBe(0.5);
+  expect(first.budget.overBudget).toBe(false);
+  expect(first.budget.domains.map(domain => domain.domain)).toEqual([...WORKSPACE_STORAGE_BUDGET_CONTRACT.guardedCollections]);
   expect(first.dominantDomains[0].domain).toBe("rawBarArchives");
   expect(STORAGE_LAYOUT_CONTRACT.currentLayout).toBe("single-v2-envelope");
-  expect(RETENTION_CONTRACT.rawBarArchives).toEqual({ bootstrap: "included", export: "full", retention: "retain-until-explicit-follow-up" });
+  expect(STORAGE_LAYOUT_CONTRACT.storageBudget.version).toBe(WORKSPACE_STORAGE_BUDGET_CONTRACT.version);
+  expect(STORAGE_LAYOUT_CONTRACT.storageBudget.hardBudgetBytes).toBe(WORKSPACE_STORAGE_BUDGET_CONTRACT.hardBudgetBytes);
+  expect(RETENTION_CONTRACT.contractVersion).toBe(2);
+  expect(RETENTION_CONTRACT.rawBarArchives).toEqual({ bootstrap: "included", export: "full", retention: "full-until-workspace-storage-budget", storageBudgetVersion: 1 });
 });
