@@ -3,13 +3,13 @@
 ## Source identity
 
 - Protected-main base: `59cc7c672cd6b759cf0ceefb5a77acea66c7435d` (`origin/main` at task start)
-- Tested implementation head: `8895d5ab48e3eef4e9d3e80d6f84751608f8dfcd`
+- Tested implementation head: `b63b0a6923751e15744d852d407a72c3e808592d`
 - Branch: `codex/stockledger-prod-c05-scheduler-jobs-v1`
 - Job contract: `stockledger-production-job-v1`, revision `1`
 - Runtime: Node `v22.23.2`, npm `10.9.8`
 - Hosted scheduler: not provisioned or exercised; external deployment remains a gate
 
-The final evidence-publication commit is the child commit that adds this document. The tested implementation head above is the exact source commit for the runtime/test evidence below; this evidence document changes no executable code.
+The final evidence-publication update is the child commit that refreshes this document after the migration compatibility fix. The tested implementation head above is the exact source commit for the runtime/test evidence below; this evidence document changes no executable code.
 
 ## Changed files
 
@@ -60,17 +60,17 @@ All commands ran from the implementation workspace with Node `v22.23.2` on the t
 
 ```json
 {
-  "elapsedMs": 2347,
+  "elapsedMs": 2544,
   "workloadSize": { "stocks": 100, "sessions": 260, "symbols": 104, "rows": 27040, "jobStages": 4 },
   "deadlineBudgetMs": 1800000,
-  "remainingHeadroomMs": 1797653,
+  "remainingHeadroomMs": 1797456,
   "withinBudget": true,
   "evidenceOnly": true,
   "evaluations": 100,
   "scannerRows": 200,
   "workspaceBytes": 5812831,
   "databaseBytesIncludingWal": 12160024,
-  "endingRssBytes": 241041408,
+  "endingRssBytes": 241352704,
   "integrity": true
 }
 ```
