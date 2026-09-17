@@ -1,0 +1,484 @@
+{
+  "accepted_at": "2026-09-17T10:50:30Z",
+  "changed_files": [
+    {
+      "additions": 2,
+      "deletions": 0,
+      "path": "docs/operations/LOCAL_WORKER.md",
+      "status": "M"
+    },
+    {
+      "additions": 13,
+      "deletions": 2,
+      "path": "docs/production/IMPLEMENTATION_STATUS.md",
+      "status": "M"
+    },
+    {
+      "additions": 15,
+      "deletions": 1,
+      "path": "docs/v12_3_app_import_bundle.json",
+      "status": "M"
+    },
+    {
+      "additions": 1,
+      "deletions": 0,
+      "path": "package.json",
+      "status": "M"
+    },
+    {
+      "additions": 18,
+      "deletions": 0,
+      "path": "scripts/validate-frozen-research-bundle.ts",
+      "status": "A"
+    },
+    {
+      "additions": 2,
+      "deletions": 1,
+      "path": "server/worker/run.ts",
+      "status": "M"
+    },
+    {
+      "additions": 10,
+      "deletions": 5,
+      "path": "src/app/StockLedgerApp.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 1,
+      "deletions": 1,
+      "path": "src/domain/appDataSchema.ts",
+      "status": "M"
+    },
+    {
+      "additions": 2,
+      "deletions": 2,
+      "path": "src/domain/evaluateWorkspace.ts",
+      "status": "M"
+    },
+    {
+      "additions": 29,
+      "deletions": 14,
+      "path": "src/domain/marketSnapshot.ts",
+      "status": "M"
+    },
+    {
+      "additions": 7,
+      "deletions": 162,
+      "path": "src/lib/evaluateEye.ts",
+      "status": "M"
+    },
+    {
+      "additions": 3,
+      "deletions": 69,
+      "path": "src/lib/expressionEngine.ts",
+      "status": "M"
+    },
+    {
+      "additions": 182,
+      "deletions": 31,
+      "path": "src/lib/frozenScannerRules.ts",
+      "status": "M"
+    },
+    {
+      "additions": 382,
+      "deletions": 3,
+      "path": "src/lib/metricCatalog.ts",
+      "status": "M"
+    },
+    {
+      "additions": 19,
+      "deletions": 15,
+      "path": "src/lib/mockSnapshot.ts",
+      "status": "M"
+    },
+    {
+      "additions": 140,
+      "deletions": 87,
+      "path": "src/lib/processedFeatureEngine.ts",
+      "status": "M"
+    },
+    {
+      "additions": 10,
+      "deletions": 7,
+      "path": "src/lib/providerEvidence.ts",
+      "status": "M"
+    },
+    {
+      "additions": 27,
+      "deletions": 18,
+      "path": "src/lib/stockConditionScanner.ts",
+      "status": "M"
+    },
+    {
+      "additions": 28,
+      "deletions": 0,
+      "path": "src/types.ts",
+      "status": "M"
+    },
+    {
+      "additions": 178,
+      "deletions": 0,
+      "path": "tests/financialTruth.test.ts",
+      "status": "A"
+    }
+  ],
+  "checks": [
+    {
+      "command": "/bin/zsh -lc \"pwd && echo '--- AGENTS refs ---' && sed -n '1,240p' /Users/haewonkim/.codex/RTK.md && echo '--- law ---' && sed -n '1,260p' /Users/haewonkim/.codex/law.md && echo '--- repo files ---' && rg --files -g 'AGENTS.md' -g 'package.json' -g 'package-lock.json' -g 'npm-shrinkwrap.json' -g 'yarn.lock' -g 'pnpm-lock.yaml' -g '.nvmrc' -g '.node-version' -g 'README*' -g 'CONTRIBUTING*' | sed -n '1,200p'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk node --version && rtk npm --version'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sh -lc 'echo PATH=\"'$PATH; command -v node; command -v nvm || true; command -v fnm || true; command -v volta || true; command -v asdf || true; echo \"--- version files ---\"; rtk cat .nvmrc; echo \"--- common node binaries ---\"; for p in /opt/homebrew/bin/node /usr/local/bin/node /usr/bin/node \"$HOME/.volta/bin/node\" \"$HOME/.nvm/versions/node\"/*/bin/node; do if [ -x \"$p\" ]; then \"$p\" --version; fi; done'\"'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sh -lc 'for p in /opt/homebrew/bin/node /usr/local/bin/node /usr/bin/node /Users/haewonkim/.nvm/versions/node/v20.19.4/bin/node; do if [ -x \\\"\"'$p\" ]; then echo \"$p -> $($p --version)\"; fi; done; for p in /opt/homebrew/bin/npm /usr/local/bin/npm /usr/bin/npm /Users/haewonkim/.nvm/versions/node/v20.19.4/bin/npm; do if [ -x \"$p\" ]; then echo \"$p -> $($p --version)\"; fi; done'\"'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sh -lc 'export PATH=\\\"/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:\"'$PATH\"; echo \"node=$(command -v node)\"; node --version; echo \"npm=$(command -v npm)\"; npm --version; node -e \"const [major,minor,patch]=process.versions.node.split('\"\\\\\\\".\\\\\\\").map(Number); if (major < 22 || (major === 22 && (minor < 23 || (minor === 23 && patch < 2)))) process.exit(1); console.log(\"'`runtime-ok=${process.versions.node}`)\"'\"'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sh -lc 'export PATH=\\\"/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:\"'$PATH\"; echo \"node=$(command -v node)\"; node --version; echo \"npm=$(command -v npm)\"; npm --version; node -e '\"'\\\\''const [major,minor,patch]=process.versions.node.split(\\\".\\\").map(Number); if (major < 22 || (major === 22 && (minor < 23 || (minor === 23 && patch < 2)))) process.exit(1); console.log(\\\"runtime-ok=\\\" + process.versions.node)'\\\\'''\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git branch --show-current'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git show-ref --heads --tags | rtk rg 'dd343bc09ba8f73c17d4a0787893e0b266805248|main|master|CHG-89|R1'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git status --short --branch'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git rev-parse --show-toplevel && rtk git rev-parse HEAD && rtk git log -1 --format='%H%n%P%n%s'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git log --graph --decorate --oneline --all -20'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git merge-base --is-ancestor 02e54c5f8c01edab228c20fc56e910a41da0852e HEAD; echo \"main-is-ancestor-exit=$?\"; rtk git merge-base --is-ancestor dd343bc09ba8f73c17d4a0787893e0b266805248 HEAD; echo \"candidate-is-ancestor-exit=$?\"; rtk git merge-base HEAD dd343bc09ba8f73c17d4a0787893e0b266805248'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git rev-parse dd343bc09ba8f73c17d4a0787893e0b266805248''^{tree} && rtk git rev-parse HEAD''^{tree} && rtk git rev-parse 02e54c5f8c01edab228c20fc56e910a41da0852e''^{tree}'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git diff --stat dd343bc09ba8f73c17d4a0787893e0b266805248 HEAD && rtk git diff --name-status dd343bc09ba8f73c17d4a0787893e0b266805248 HEAD'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git merge --ff-only dd343bc09ba8f73c17d4a0787893e0b266805248'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '1,240p' package.json\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git diff --name-status 5164cbe8b60bbcf8baa4efb388eadf2cf2b03caa dd343bc09ba8f73c17d4a0787893e0b266805248 && rtk git diff --check dd343bc09ba8f73c17d4a0787893e0b266805248'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git status --short --branch && rtk git rev-parse HEAD && rtk git rev-parse HEAD''^{tree} && rtk git rev-parse dd343bc09ba8f73c17d4a0787893e0b266805248''^{tree} && rtk git merge-base --is-ancestor 5164cbe8b60bbcf8baa4efb388eadf2cf2b03caa HEAD; echo \"base-ancestor-exit=$?\"'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sh -lc 'export PATH=\\\"/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:\"'$PATH\"; npm ci'\"'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git log --all --format='%H %D %s' --grep='evidence\\\\|verify\\\\|audit' -i -20\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n \\\"Fabric|evidence|financial-truth|frozen-research|worker.test\\\" docs scripts tests package.json README.md | sed -n '1,260p'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git show --stat --oneline --decorate 2cdd9d0 && rtk git show --format=fuller --no-ext-diff --no-renames 2cdd9d0 -- docs/production docs/operations | sed -n '1,260p'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git show 2cdd9d0:.codex-fabric/audit.json | sed -n '1,260p'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sh -lc 'export PATH=\\\"/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:\"'$PATH\"; npm run typecheck'\"'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sh -lc 'export PATH=\\\"/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:\"'$PATH\"; npm test -- --run'\"'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n \\\"node:sqlite|DatabaseSync|worker\\\" tests/worker.test.ts server/worker/run.ts | sed -n '1,180p'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sh -lc 'export PATH=\\\"/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:\"'$PATH\"; npm test -- --run tests/worker.test.ts'\"'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n \\\"node:sqlite|DatabaseSync\\\" server tests | sed -n '1,200p'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sh -lc 'export PATH=\\\"/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:\"'$PATH\"; npm run check:frozen'\"'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sh -lc 'export PATH=\\\"/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:\"'$PATH\"; npm test -- --run tests/financialTruth.test.ts'\"'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sh -lc 'export PATH=\\\"/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:\"'$PATH\"; npm run check:boundaries'\"'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sh -lc 'export PATH=\\\"/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:\"'$PATH\"; npm run export:all'\"'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git status --short --branch'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git diff --check'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git diff --stat && rtk git diff -- package-lock.json package.json'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git show 2cdd9d0:.codex-fabric/audit.json | tail -120'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git show 2cdd9d0:.codex-fabric/audit.json | rtk rg -n 'candidate|base|target|branch|tree|node|result|status|checks|accepted|commit|sha|publish' -i | tail -120\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git branch -a --contains dd343bc09ba8f73c17d4a0787893e0b266805248 && rtk git remote -v'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git show 2cdd9d0:.codex-fabric/audit.json | sed -n '360,460p'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git show -s --format='candidate_subject=%s%nparent=%P%nauthor=%aI%ncommitter=%cI' dd343bc09ba8f73c17d4a0787893e0b266805248 && rtk git show -s --format='base_subject=%s%nparent=%P' 5164cbe8b60bbcf8baa4efb388eadf2cf2b03caa\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sh -lc 'echo \\\"status=\"'$(rtk git status --porcelain=v1 | rtk wc -l | rtk tr -d \" \")\"; rtk git diff --check; echo \"diff_check_exit=$?\"; rtk shasum -a 256 package-lock.json'\"'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sh -lc 'echo \\\"branch=\"'$(rtk git branch --show-current)\"; echo \"head=$(rtk git rev-parse HEAD)\"; echo \"tree=$(rtk git rev-parse HEAD''^{tree})\"; echo \"candidate=$(rtk git rev-parse dd343bc09ba8f73c17d4a0787893e0b266805248)\"; echo \"candidate_tree=$(rtk git rev-parse dd343bc09ba8f73c17d4a0787893e0b266805248''^{tree})\"; echo \"base=$(rtk git rev-parse 5164cbe8b60bbcf8baa4efb388eadf2cf2b03caa)\"; echo \"main=$(rtk git rev-parse main)\"; echo \"origin_main=$(rtk git rev-parse origin/main)\"; if rtk git merge-base --is-ancestor 5164cbe8b60bbcf8baa4efb388eadf2cf2b03caa HEAD; then echo \"base_is_ancestor=true\"; else echo \"base_is_ancestor=false\"; fi; if rtk git merge-base --is-ancestor dd343bc09ba8f73c17d4a0787893e0b266805248 main; then echo \"candidate_in_main=true\"; else echo \"candidate_in_main=false\"; fi; if rtk git merge-base --is-ancestor main HEAD; then echo \"main_is_ancestor_of_candidate=true\"; else echo \"main_is_ancestor_of_candidate=false\"; fi'\"'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sh -lc 'export PATH=\\\"/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:\"'$PATH\"; printf \"node=%s'\"\\\\nnpm=%s\\\\n\\\" \\\"\"'$(node --version)\" \"$(npm --version)\"; node -e '\"'\\\\''const sqlite = require(\\\"node:sqlite\\\"); console.log(\\\"node-sqlite=available:\\\" + (typeof sqlite.DatabaseSync === \\\"function\\\"))'\\\\'''\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sh -lc 'export PATH=\\\"/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:\"'$PATH\"; npm test -- --run tests/financialTruth.test.ts tests/correctness.test.ts tests/monitoring.test.ts tests/history.test.ts'\"'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git status --short --branch && rtk git rev-parse HEAD && rtk git rev-parse HEAD''^{tree}'",
+      "exit_code": 0,
+      "type": "command_execution"
+    }
+  ],
+  "codex": {
+    "cli_version": "codex-cli 0.154.0",
+    "configured_model": "gpt-5.6-luna",
+    "event_count": 103,
+    "provider_reported_model": null,
+    "reasoning_effort": "xhigh",
+    "terminal_type": "turn.completed",
+    "usage": {
+      "cache_hit_percent": 90.91,
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 864512,
+      "fresh_input_tokens": 86460,
+      "input_tokens": 950972,
+      "non_reasoning_output_tokens": 7186,
+      "output_tokens": 15906,
+      "reasoning_output_tokens": 8720,
+      "total_processed_tokens": 966878
+    },
+    "warnings": []
+  },
+  "commits": [
+    {
+      "sha": "dd343bc09ba8f73c17d4a0787893e0b266805248",
+      "subject": "fabric: capture completed model changes [CF-d669cf75dd2754422711dbb2]"
+    }
+  ],
+  "diff": {
+    "additions": 1069,
+    "changed_files": 20,
+    "commit_count": 1,
+    "deletions": 418
+  },
+  "error_code": null,
+  "evidence_manifest": {
+    "count": 5,
+    "items": [
+      {
+        "bytes": 4971,
+        "path": "docs/operations/LOCAL_WORKER.md",
+        "sha256": "aaf60ebba41b90b23a70c5bff7b1960d705803df3ed96e7d1ff9c9b90dead20e"
+      },
+      {
+        "bytes": 20174,
+        "path": "docs/production/IMPLEMENTATION_STATUS.md",
+        "sha256": "d8bffa59c7b7a22c5eb9a662132d11b12a68ff146870c8c35c61f72eb5fa978e"
+      },
+      {
+        "bytes": 49194,
+        "path": "docs/v12_3_app_import_bundle.json",
+        "sha256": "db44159afee1c59e92de6a9fd90f046393c1f08b8e0f167d76169c9632be42a0"
+      },
+      {
+        "bytes": 2065,
+        "path": "package.json",
+        "sha256": "9f5e404ddad597fd569f4d628571cdde121ec869904bd5be50b03faea2b403d4"
+      },
+      {
+        "bytes": 4255,
+        "path": "src/lib/providerEvidence.ts",
+        "sha256": "97cc975f4159b82627912ab4aecbe54c8418a780d1a807844d18404844723a95"
+      }
+    ],
+    "version": 1
+  },
+  "evidence_publisher_release": "1.2.3-resume-candidate",
+  "fabric_capture": {
+    "applied": false,
+    "paths_before": 0,
+    "transient_untracked_removed": {
+      "count": 0,
+      "items": []
+    }
+  },
+  "fabric_release": "1.2.3-resume-candidate",
+  "failure_class": null,
+  "finished_at": "2026-09-17T10:56:14Z",
+  "git": {
+    "base_is_ancestor": true,
+    "base_sha": "5164cbe8b60bbcf8baa4efb388eadf2cf2b03caa",
+    "branch": "codex/stockledger-prod-c02-financial-truth-verify-node22-v1",
+    "head_sha": "dd343bc09ba8f73c17d4a0787893e0b266805248",
+    "remote_exact_head": true,
+    "remote_head_sha": "dd343bc09ba8f73c17d4a0787893e0b266805248",
+    "target_branch": "main",
+    "target_drifted_since_acceptance": false,
+    "target_head_observed_after_execution": "5164cbe8b60bbcf8baa4efb388eadf2cf2b03caa",
+    "work_branch": "codex/stockledger-prod-c02-financial-truth-verify-node22-v1",
+    "worktree_clean": true
+  },
+  "instructions": {
+    "files": [],
+    "total_bytes": 0,
+    "warning": null
+  },
+  "job_id": "CF-f2493f2730dbe7ab476f9375",
+  "kind": "codex-fabric-audit-evidence",
+  "locator": {
+    "branch": "codex-fabric/evidence/stockledger/prod-c02-financial-truth-verify-node22-v1",
+    "path": ".codex-fabric/audit.json",
+    "ref": "refs/heads/codex-fabric/evidence/stockledger/prod-c02-financial-truth-verify-node22-v1"
+  },
+  "operation": "VERIFY",
+  "policy": {
+    "environment_policy_sha256": "e077daca74297b3c30bee8989f00f8ca5338f7610b4d016a6c48db524205d064",
+    "fabric_release": "1.2.3-resume-candidate",
+    "policy_sha256": "44756118cd7fda0c45cd23ba1d31a48a3f4f2422d687df15264ba4406f40e1f2",
+    "registry_sha256": "cfc765f3211c37c7967a138f3b2d89a99341939b15b2623f92744d007f625d6f"
+  },
+  "project_id": "stockledger",
+  "recovery": {
+    "model_rerun_safe": false,
+    "recovery_required": false,
+    "retry_safe": false,
+    "retry_scope": null,
+    "worktree_retained": true
+  },
+  "request": "prod-c02-financial-truth-verify-node22-v1",
+  "schema_version": 1,
+  "started_at": "2026-09-17T10:50:30Z",
+  "status": "EXECUTED_CHANGE",
+  "timing": {
+    "execution_seconds": 344,
+    "queue_seconds": 0,
+    "total_seconds": 344
+  },
+  "transport": {
+    "bytes": 1892,
+    "envelope": "FABRIC/2",
+    "prompt_bytes": 1538,
+    "prompt_sha256": "d26f642f13ec6ec7e2f6dc3783b125707a9004b457e2ee7ef5224d3a0af6f781",
+    "sha256": "f2493f2730dbe7ab476f93753087cabc4a118575160ac6fa19459b6b0d8a9321"
+  }
+}
