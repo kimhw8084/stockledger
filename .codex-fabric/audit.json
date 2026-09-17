@@ -1,0 +1,499 @@
+{
+  "accepted_at": "2026-09-17T12:49:39Z",
+  "changed_files": [
+    {
+      "additions": 16,
+      "deletions": 5,
+      "path": "docs/production/IMPLEMENTATION_STATUS.md",
+      "status": "M"
+    },
+    {
+      "additions": 346,
+      "deletions": 144,
+      "path": "src/app/StockLedgerApp.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 28,
+      "deletions": 1,
+      "path": "src/app/styles.ts",
+      "status": "M"
+    },
+    {
+      "additions": 3,
+      "deletions": 2,
+      "path": "src/components/BottomNav.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 41,
+      "deletions": 9,
+      "path": "src/components/HomeVisualDashboard.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 70,
+      "deletions": 6,
+      "path": "src/components/WindowPanel.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 52,
+      "deletions": 19,
+      "path": "src/components/common.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 11,
+      "deletions": 5,
+      "path": "src/components/stocks/StockMetricDetailSheet.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 4,
+      "deletions": 4,
+      "path": "src/components/stocks/StockSearchPanel.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 9,
+      "deletions": 9,
+      "path": "src/components/stocks/StockTrendHero.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 14,
+      "deletions": 6,
+      "path": "src/features/journal/OutcomeEditor.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 7,
+      "deletions": 6,
+      "path": "src/features/workspace/WorkspacePanel.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 54,
+      "deletions": 14,
+      "path": "src/hooks/useWorkspaceNavigation.ts",
+      "status": "M"
+    },
+    {
+      "additions": 161,
+      "deletions": 1,
+      "path": "src/lib/i18n.ts",
+      "status": "M"
+    },
+    {
+      "additions": 1,
+      "deletions": 1,
+      "path": "src/lib/preferences.ts",
+      "status": "M"
+    },
+    {
+      "additions": 40,
+      "deletions": 2,
+      "path": "tests/e2e/workspace.spec.ts",
+      "status": "M"
+    },
+    {
+      "additions": 36,
+      "deletions": 0,
+      "path": "tests/i18n.test.ts",
+      "status": "A"
+    },
+    {
+      "additions": 18,
+      "deletions": 0,
+      "path": "tests/navigation.test.ts",
+      "status": "A"
+    }
+  ],
+  "checks": [
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n '\\\"home\\\\.' src/lib/i18n.ts && rtk rg -n 'language === \\\"ko\\\" \\\\? \\\"[\"'^\"]+\" : \"[''^\"]+\"'\"' src/components/HomeVisualDashboard.tsx | head -80\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '65,100p' src/components/HomeVisualDashboard.tsx && rtk sed -n '150,245p' src/components/HomeVisualDashboard.tsx\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n '<NumberStepper' src -g '*.tsx' && rtk rg -n 'Input ' src/app/StockLedgerApp.tsx | head -60\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '165,220p' src/components/common.tsx && rtk sed -n '4848,4870p' src/app/StockLedgerApp.tsx && rtk sed -n '5740,5762p' src/app/StockLedgerApp.tsx\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '1,120p' src/features/workspace/WorkspacePanel.tsx && rtk sed -n '120,190p' src/components/common.tsx\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '1,120p' src/platform/keyValueStore.ts && rtk rg -n 'AsyncStorage' src | head -40 && rtk rg -n 'language' src/hooks/useAppModel.ts src/app/StockLedgerApp.tsx | head -60\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npm run check:boundaries'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npm run check:frozen'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npm test'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npx vitest run --exclude tests/worker.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npm run typecheck'",
+      "exit_code": 2,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npm run export:all'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npm run export:web'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npm run typecheck'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npm run test:e2e'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '390,480p' src/components/common.tsx && rtk rg -n 'selectChip|modal' src/app/styles.ts | head -30\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk npm run export:web && rtk npx playwright test tests/e2e/workspace.spec.ts -g 'records a deliberate' --project=desktop --project=mobile\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git diff --check && rtk git status --short --branch'",
+      "exit_code": 2,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git diff -- src/hooks/useWorkspaceNavigation.ts src/components/WindowPanel.tsx src/lib/i18n.ts tests/i18n.test.ts tests/navigation.test.ts tests/e2e/workspace.spec.ts | head -500'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git diff -- src/components/common.tsx src/components/HomeVisualDashboard.tsx src/components/BottomNav.tsx src/components/stocks/StockSearchPanel.tsx src/components/stocks/StockTrendHero.tsx src/components/stocks/StockMetricDetailSheet.tsx | head -520'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg --files docs | rg -i 'evidence|atlas|surface|visual|status|manifest' | sort | head -120 && rtk sed -n '1,220p' docs/production/IMPLEMENTATION_STATUS.md 2>/dev/null || true && rtk sed -n '1,180p' docs/production/LOCAL_BUILD_MANIFEST.json\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npm run export:all'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npm run test:e2e'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git diff --check'",
+      "exit_code": 2,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n 'journal\\\\.detail\\\\.previousVersions|common\\\\.saveChanges|common\\\\.registerEye|stocks\\\\.search\\\\.showMore' src/lib/i18n.ts && rtk node -e 'const fs=require(\\\"fs\\\"); const s=fs.readFileSync(\\\"src/lib/i18n.ts\\\",\\\"utf8\\\"); console.log(\\\"catalog literals\\\",(s.match(/\\\"[\"'^\"]+\":/g)||[]).length)'\"'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git status --short --branch && rtk git diff --stat'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git diff --check'",
+      "exit_code": 2,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npm run check:boundaries'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npm run check:frozen'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npm test'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npx vitest run --exclude tests/worker.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npm run typecheck'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git diff --check 2>&1'",
+      "exit_code": 2,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '1,220p' /Users/haewonkim/.codex/RTK.md\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy git diff --check'",
+      "exit_code": 2,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy git diff --check'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n 'setRecipeDetailId|openRecipeDetail|recipeDetailId' src/app/StockLedgerApp.tsx\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n 'recipe.*detail|details|selectedRecipe|Open' src/app/StockLedgerApp.tsx | sed -n '1,180p'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '4180,4380p' src/app/StockLedgerApp.tsx && rtk sed -n '5630,5685p' src/app/StockLedgerApp.tsx\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy git diff --check'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npm run check:boundaries'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npm run check:frozen'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npx vitest run --exclude tests/worker.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npm run typecheck'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npm run export:all'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npm run test:e2e'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npm test'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n 'stockId|eyeId|alertId|decisionId|outcomeId|recipeId|metricId' src/hooks/useWorkspaceNavigation.ts src/app/StockLedgerApp.tsx | head -100\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git status --short --branch'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git diff --stat && rtk proxy git diff --check'",
+      "exit_code": 0,
+      "type": "command_execution"
+    }
+  ],
+  "codex": {
+    "cli_version": "codex-cli 0.154.0",
+    "configured_model": "gpt-5.6-luna",
+    "event_count": 803,
+    "provider_reported_model": null,
+    "reasoning_effort": "xhigh",
+    "terminal_type": "turn.completed",
+    "usage": {
+      "cache_hit_percent": 98.63,
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 46072064,
+      "fresh_input_tokens": 640669,
+      "input_tokens": 46712733,
+      "non_reasoning_output_tokens": 67707,
+      "output_tokens": 109625,
+      "reasoning_output_tokens": 41918,
+      "total_processed_tokens": 46822358
+    },
+    "warnings": []
+  },
+  "commits": [
+    {
+      "sha": "67217b68ea2ea6d5f030781adf50100185b3d46c",
+      "subject": "fabric: capture completed model changes [CF-d84b82b189aca17cac879e4a]"
+    }
+  ],
+  "diff": {
+    "additions": 911,
+    "changed_files": 18,
+    "commit_count": 1,
+    "deletions": 234
+  },
+  "error_code": null,
+  "evidence_manifest": {
+    "count": 1,
+    "items": [
+      {
+        "bytes": 22046,
+        "path": "docs/production/IMPLEMENTATION_STATUS.md",
+        "sha256": "58e187fd1f202a22a0b5150cdc8fe7ff927995813300f163a96bf5c268c4015e"
+      }
+    ],
+    "version": 1
+  },
+  "evidence_publisher_release": "1.2.3-resume-candidate",
+  "fabric_capture": {
+    "applied": true,
+    "commit_message": "fabric: capture completed model changes [CF-d84b82b189aca17cac879e4a]",
+    "commit_sha": "67217b68ea2ea6d5f030781adf50100185b3d46c",
+    "paths_before": 18,
+    "status_before": [
+      " M docs/production/IMPLEMENTATION_STATUS.md",
+      " M src/app/StockLedgerApp.tsx",
+      " M src/app/styles.ts",
+      " M src/components/BottomNav.tsx",
+      " M src/components/HomeVisualDashboard.tsx",
+      " M src/components/WindowPanel.tsx",
+      " M src/components/common.tsx",
+      " M src/components/stocks/StockMetricDetailSheet.tsx",
+      " M src/components/stocks/StockSearchPanel.tsx",
+      " M src/components/stocks/StockTrendHero.tsx",
+      " M src/features/journal/OutcomeEditor.tsx",
+      " M src/features/workspace/WorkspacePanel.tsx",
+      " M src/hooks/useWorkspaceNavigation.ts",
+      " M src/lib/i18n.ts",
+      " M src/lib/preferences.ts",
+      " M tests/e2e/workspace.spec.ts",
+      "?? tests/i18n.test.ts",
+      "?? tests/navigation.test.ts"
+    ],
+    "transient_untracked_removed": {
+      "count": 0,
+      "items": []
+    }
+  },
+  "fabric_release": "1.2.3-resume-candidate",
+  "failure_class": null,
+  "finished_at": "2026-09-17T13:40:00Z",
+  "git": {
+    "base_is_ancestor": true,
+    "base_sha": "dc1e63fba672dd6bce75596d9c48a2155a16e2af",
+    "branch": "codex/stockledger-prod-c03-ux-accessibility-localization-v1",
+    "head_sha": "67217b68ea2ea6d5f030781adf50100185b3d46c",
+    "remote_exact_head": true,
+    "remote_head_sha": "67217b68ea2ea6d5f030781adf50100185b3d46c",
+    "target_branch": "main",
+    "target_drifted_since_acceptance": false,
+    "target_head_observed_after_execution": "dc1e63fba672dd6bce75596d9c48a2155a16e2af",
+    "work_branch": "codex/stockledger-prod-c03-ux-accessibility-localization-v1",
+    "worktree_clean": true
+  },
+  "instructions": {
+    "files": [],
+    "total_bytes": 0,
+    "warning": null
+  },
+  "job_id": "CF-d84b82b189aca17cac879e4a",
+  "kind": "codex-fabric-audit-evidence",
+  "locator": {
+    "branch": "codex-fabric/evidence/stockledger/prod-c03-ux-accessibility-localization-v1",
+    "path": ".codex-fabric/audit.json",
+    "ref": "refs/heads/codex-fabric/evidence/stockledger/prod-c03-ux-accessibility-localization-v1"
+  },
+  "operation": "BUILD",
+  "policy": {
+    "environment_policy_sha256": "e077daca74297b3c30bee8989f00f8ca5338f7610b4d016a6c48db524205d064",
+    "fabric_release": "1.2.3-resume-candidate",
+    "policy_sha256": "44756118cd7fda0c45cd23ba1d31a48a3f4f2422d687df15264ba4406f40e1f2",
+    "registry_sha256": "cfc765f3211c37c7967a138f3b2d89a99341939b15b2623f92744d007f625d6f"
+  },
+  "project_id": "stockledger",
+  "recovery": {
+    "model_rerun_safe": false,
+    "recovery_required": false,
+    "retry_safe": false,
+    "retry_scope": null,
+    "worktree_retained": true
+  },
+  "request": "prod-c03-ux-accessibility-localization-v1",
+  "schema_version": 1,
+  "started_at": "2026-09-17T12:49:39Z",
+  "status": "EXECUTED_CHANGE",
+  "timing": {
+    "execution_seconds": 3021,
+    "queue_seconds": 0,
+    "total_seconds": 3021
+  },
+  "transport": {
+    "bytes": 4382,
+    "envelope": "FABRIC/2",
+    "prompt_bytes": 4029,
+    "prompt_sha256": "c0b87e9f67de0ac615ab3b167a6cb6a2678e68688c8326aed5f6016964cef662",
+    "sha256": "d84b82b189aca17cac879e4ab54a6d769d385a81b333b0b75e06f4c97cf0f617"
+  }
+}
