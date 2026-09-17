@@ -1,0 +1,425 @@
+{
+  "accepted_at": "2026-09-17T18:49:13Z",
+  "changed_files": [
+    {
+      "additions": 2,
+      "deletions": 1,
+      "path": "package.json",
+      "status": "M"
+    },
+    {
+      "additions": 19,
+      "deletions": 0,
+      "path": "scripts/profile-workspace.ts",
+      "status": "A"
+    },
+    {
+      "additions": 1,
+      "deletions": 1,
+      "path": "src/app/StockLedgerApp.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 91,
+      "deletions": 0,
+      "path": "src/application/workspaceApplicationService.ts",
+      "status": "A"
+    },
+    {
+      "additions": 170,
+      "deletions": 0,
+      "path": "src/data/repositories/workspaceRepository.ts",
+      "status": "A"
+    },
+    {
+      "additions": 155,
+      "deletions": 0,
+      "path": "src/data/representativeWorkspaceFixture.ts",
+      "status": "A"
+    },
+    {
+      "additions": 120,
+      "deletions": 0,
+      "path": "src/data/workspaceContract.ts",
+      "status": "A"
+    },
+    {
+      "additions": 11,
+      "deletions": 0,
+      "path": "src/data/workspaceDefaults.ts",
+      "status": "A"
+    },
+    {
+      "additions": 59,
+      "deletions": 0,
+      "path": "src/data/workspaceFootprint.ts",
+      "status": "A"
+    },
+    {
+      "additions": 4,
+      "deletions": 4,
+      "path": "src/features/workspace/WorkspacePanel.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 18,
+      "deletions": 45,
+      "path": "src/hooks/useAppModel.ts",
+      "status": "M"
+    },
+    {
+      "additions": 20,
+      "deletions": 84,
+      "path": "src/lib/storage.ts",
+      "status": "M"
+    },
+    {
+      "additions": 2,
+      "deletions": 1,
+      "path": "src/platform/keyValueStore.native.ts",
+      "status": "M"
+    },
+    {
+      "additions": 8,
+      "deletions": 1,
+      "path": "src/platform/keyValueStore.ts",
+      "status": "M"
+    },
+    {
+      "additions": 2,
+      "deletions": 1,
+      "path": "src/platform/keyValueStore.web.ts",
+      "status": "M"
+    },
+    {
+      "additions": 361,
+      "deletions": 0,
+      "path": "tests/repository.test.ts",
+      "status": "A"
+    }
+  ],
+  "checks": [
+    {
+      "command": "/bin/zsh -lc \"pwd && printf '%s\\\\n' '--- AGENTS references ---' && sed -n '1,220p' /Users/haewonkim/.codex/RTK.md && printf '%s\\\\n' '--- law ---' && sed -n '1,260p' /Users/haewonkim/.codex/law.md && printf '%s\\\\n' '--- repo status ---' && git status --short --branch && printf '%s\\\\n' '--- candidate/base refs ---' && git show -s --format='%H%n%P%n%ad%n%s' --date=iso-strict 6c7c3ede008b7c0c7b3523b87e5a638f7e3a38cf && git log --oneline --decorate -8\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git log --all --graph --oneline --decorate -20 && rtk git branch -a --contains 6c7c3ede008b7c0c7b3523b87e5a638f7e3a38cf && printf '%s\\\\n' '--- candidate diff stat ---' && rtk git diff --stat 6c7c3ede008b7c0c7b3523b87e5a638f7e3a38cf\"'^ 6c7c3ede008b7c0c7b3523b87e5a638f7e3a38cf && printf '\"'%s\\\\n' '--- candidate metadata ---' && rtk git show --no-ext-diff --format=fuller --stat 6c7c3ede008b7c0c7b3523b87e5a638f7e3a38cf && printf '%s\\\\n' '--- refs ---' && rtk git show-ref | tail -30 && printf '%s\\\\n' '--- runtime ---' && node --version && npm --version && printf '%s\\\\n' '--- top files ---' && rtk rg --files -g '\"'!*node_modules*'\"' | head -100\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git show -s --format='%H %P %s' 2af1887 && rtk git diff --stat c2e1196 2af1887 && printf '%s\\\\n' '--- candidate parent ancestry ---' && rtk git merge-base --is-ancestor c2e119667c7b3e3279958542957fb02fda5e57b1 2af18875e402182e9d564ff0ab2b1816c971de2d; printf 'ancestor_exit=%s\\\\n' \\\"\"'$?\" && printf '\"'%s\\\\n' '--- package scripts/engines ---' && sed -n '1,240p' package.json && printf '%s\\\\n' '--- relevant workspace files ---' && rtk rg -n \\\"importBackup|exportBackup|WorkspaceApplicationService|class WorkspaceRepository|commit\\\\(|WorkspaceStorageBudget|backup|restore\\\" src tests scripts | head -240\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git cherry-pick 2af18875e402182e9d564ff0ab2b1816c971de2d 6c7c3ede008b7c0c7b3523b87e5a638f7e3a38cf && rtk git status --short --branch && rtk git log --oneline --decorate -5'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"printf '%s\\\\n' '--- application service ---' && sed -n '1,280p' src/application/workspaceApplicationService.ts && printf '%s\\\\n' '--- repository ---' && sed -n '1,360p' src/data/repositories/workspaceRepository.ts && printf '%s\\\\n' '--- contract ---' && sed -n '1,320p' src/data/workspaceContract.ts && printf '%s\\\\n' '--- footprint ---' && sed -n '1,260p' src/data/workspaceFootprint.ts && printf '%s\\\\n' '--- storage ---' && sed -n '1,180p' src/lib/storage.ts && printf '%s\\\\n' '--- hook relevant ---' && sed -n '80,180p' src/hooks/useAppModel.ts && sed -n '700,770p' src/hooks/useAppModel.ts\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"printf '%s\\\\n' '--- backup format ---' && sed -n '1,260p' src/domain/backupFormat.ts && printf '%s\\\\n' '--- app schema ---' && sed -n '1,320p' src/domain/appDataSchema.ts && printf '%s\\\\n' '--- key-value store interface ---' && sed -n '1,160p' src/platform/keyValueStore.ts && printf '%s\\\\n' '--- web store ---' && sed -n '1,180p' src/platform/keyValueStore.web.ts && printf '%s\\\\n' '--- native store ---' && sed -n '1,180p' src/platform/keyValueStore.native.ts && printf '%s\\\\n' '--- existing repository tests ---' && sed -n '1,420p' tests/repository.test.ts\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"sed -n '1,180p' src/domain/commandQueue.ts && printf '%s\\\\n' '--- types/defaults ---' && sed -n '1,220p' src/data/workspaceDefaults.ts && sed -n '1,120p' src/types.ts && printf '%s\\\\n' '--- current tests around application service/import ---' && rtk rg -n \\\"createWorkspaceApplicationService|importBackup|commandQueue|publish\\\" tests src/application src/hooks | head -200 && printf '%s\\\\n' '--- baseline tree after carry ---' && rtk git status --short --branch && rtk git diff c2e1196 --stat\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk command -v node && rtk command -v nvm || true && rtk ls -1 /Users/haewonkim/.nvm/versions/node 2>/dev/null || true && rtk ls -1 /opt/homebrew/opt/node@22/bin/node /usr/local/opt/node@22/bin/node 2>/dev/null || true && printf '%s\\\\n' '--- package lock node metadata ---' && rtk rg -n 'node-version|22\\\\.23\\\\.2|engines' .github package.json package-lock.json README.md docs 2>/dev/null | head -100\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"sed -n '1,320p' src/domain/evaluateWorkspace.ts && printf '%s\\\\n' '--- identity ---' && sed -n '1,100p' src/platform/identity.ts && printf '%s\\\\n' '--- scripts/profile ---' && sed -n '1,260p' scripts/profile-workspace.ts && printf '%s\\\\n' '--- app model imports ---' && sed -n '1,120p' src/hooks/useAppModel.ts\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"sed -n '1,180p' tests/monitoring.test.ts && printf '%s\\\\n' '--- all repository interfaces uses ---' && rtk rg -n \\\"WorkspaceRepository|createWorkspaceRepository\\\\(\\\" src tests | cat && printf '%s\\\\n' '--- all command queue uses ---' && rtk rg -n \\\"createCommandQueue\\\" src tests\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npm ci'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH node --version && rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm --version && rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm run typecheck && rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm test -- --run tests/repository.test.ts'",
+      "exit_code": 2,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm run typecheck && rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm test -- --run tests/repository.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg --files tests | sort && printf '%s\\\\n' '--- changed diff ---' && rtk git diff -- src/application/workspaceApplicationService.ts src/data/repositories/workspaceRepository.ts tests/repository.test.ts && printf '%s\\\\n' '--- status ---' && rtk git status --short\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm test -- --run'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm test -- --run tests/worker.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm test -- --run tests/repository.test.ts tests/storage.test.ts tests/history.test.ts tests/sync.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git show 6c7c3ede008b7c0c7b3523b87e5a638f7e3a38cf:package.json | sed -n '1,90p' && printf '%s\\\\n' '--- profile refs ---' && rtk rg -n \\\"profile:workspace|profile-workspace\\\" . --glob '\"'!node_modules/**'\"'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git diff 6c7c3ede008b7c0c7b3523b87e5a638f7e3a38cf -- package.json && sed -n '1,35p' package.json && rtk git show 2af18875e402182e9d564ff0ab2b1816c971de2d:package.json | sed -n '1,35p'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm run check:boundaries'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm run check:frozen'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm run profile:workspace'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm run test:e2e'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '1,240p' playwright.config.ts && printf '%s\\\\n' '--- e2e package/project config ---' && rtk rg -n \\\"webServer|start|preview|port|baseURL\\\" playwright.config.ts package.json scripts tests/e2e README.md && printf '%s\\\\n' '--- expo availability ---' && rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:\"'$PATH npm exec -- expo --version && printf '\"'%s\\\\n' '--- web startup probe ---' && rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:\"'$PATH timeout 20 npm run web -- --port 4173'",
+      "exit_code": 124,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '1,240p' scripts/serve-preview.mjs && printf '%s\\\\n' '--- dist ---' && rtk ls -ld dist web-build 2>/dev/null || true && rtk find . -maxdepth 2 -type f -name 'index.html' -print\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm run export:all'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm run test:e2e'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git diff --check && rtk git status --short --branch && rtk git diff --stat && printf '%s\\\\n' '--- ancestry/evidence hashes ---' && rtk git log --oneline --decorate -6 && printf '%s\\\\n' '--- candidate carry equivalence ---' && rtk git diff --stat 38366ed 61fc4a1 && rtk git diff --exit-code 2af18875e402182e9d564ff0ab2b1816c971de2d 6c7c3ede008b7c0c7b3523b87e5a638f7e3a38cf >/dev/null; printf 'candidate_internal_diff_exit=%s\\\\n' \\\"\"'$?\"'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git range-diff c2e119667c7b3e3279958542957fb02fda5e57b1..6c7c3ede008b7c0c7b3523b87e5a638f7e3a38cf c2e119667c7b3e3279958542957fb02fda5e57b1..61fc4a1 && rtk git diff --check && rtk git status --short --branch && rtk git diff --stat && printf '%s\\\\n' '--- head/base ---' && rtk git rev-parse HEAD && rtk git rev-parse c2e119667c7b3e3279958542957fb02fda5e57b1 && printf '%s\\\\n' '--- budget constants ---' && rtk rg -n \\\"version: 1|hardBudgetBytes|REPRESENTATIVE_FIXTURE_BULK_HISTORY_BYTES|restoreFullBackup\\\" src/data/workspaceContract.ts src/data/repositories/workspaceRepository.ts src/application/workspaceApplicationService.ts\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git diff --no-ext-diff -- src/application/workspaceApplicationService.ts src/data/repositories/workspaceRepository.ts tests/repository.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm run typecheck && rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm test -- --run tests/repository.test.ts tests/storage.test.ts tests/history.test.ts tests/sync.test.ts && rtk git diff --check'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm run typecheck && rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm test -- --run tests/repository.test.ts tests/storage.test.ts tests/history.test.ts tests/sync.test.ts && rtk git diff --check'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm test -- --run tests/worker.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm test -- --run'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk nl -ba src/data/repositories/workspaceRepository.ts | sed -n '30,185p' && printf '%s\\\\n' '--- service lines ---' && rtk nl -ba src/application/workspaceApplicationService.ts | sed -n '1,100p' && printf '%s\\\\n' '--- final status ---' && rtk git status --short --branch && rtk git diff --check\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git show --stat --oneline 88fb88c && rtk git show --format= --name-only 88fb88c && printf '%s\\\\n' '--- evidence commit content ---' && rtk git show --format= 88fb88c | head -180\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git show 88fb88c:.codex-fabric/audit.json | sed -n '1,520p'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk ls -la .codex-fabric 2>/dev/null || true && rtk rg --files .codex-fabric 2>/dev/null || true && printf '%s\\\\n' '--- evidence refs for c04 ---' && rtk git branch -a | rg 'c04' && printf '%s\\\\n' '--- candidate audit refs ---' && rtk git ls-tree -r --name-only 88fb88c | head -30\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git show --no-patch --format=fuller 0724d07 && rtk git show 0724d07:.codex-fabric/audit.json | sed -n '1,90p' && printf '%s\\\\n' '--- R2 evidence diff from candidate ---' && rtk git diff --stat 6c7c3ede008b7c0c7b3523b87e5a638f7e3a38cf 88fb88c && printf '%s\\\\n' '--- evidence branch ancestry ---' && rtk git log --oneline --decorate --ancestry-path 6c7c3ed..88fb88c\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    }
+  ],
+  "codex": {
+    "cli_version": "codex-cli 0.154.0",
+    "configured_model": "gpt-5.6-luna",
+    "event_count": 107,
+    "provider_reported_model": null,
+    "reasoning_effort": "xhigh",
+    "terminal_type": "turn.completed",
+    "usage": {
+      "cache_hit_percent": 94.67,
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 4018432,
+      "fresh_input_tokens": 226225,
+      "input_tokens": 4244657,
+      "non_reasoning_output_tokens": 12963,
+      "output_tokens": 34419,
+      "reasoning_output_tokens": 21456,
+      "total_processed_tokens": 4279076
+    },
+    "warnings": []
+  },
+  "commits": [
+    {
+      "sha": "051bd0a4ba55b475929d4ffbdc7a0d55137a032a",
+      "subject": "fabric: capture completed model changes [CF-3250cb1404de58a8da179231]"
+    },
+    {
+      "sha": "61fc4a1af3f4783a5b129d0528e42b4bc47c0381",
+      "subject": "fix: enforce workspace storage budget"
+    },
+    {
+      "sha": "38366edcec926e677fcb82b1fa09cb74249ba107",
+      "subject": "fabric: capture completed model changes [CF-e776793b0f1a1acf9eaba3c1]"
+    }
+  ],
+  "diff": {
+    "additions": 1043,
+    "changed_files": 16,
+    "commit_count": 3,
+    "deletions": 138
+  },
+  "error_code": null,
+  "evidence_manifest": {
+    "count": 1,
+    "items": [
+      {
+        "bytes": 2177,
+        "path": "package.json",
+        "sha256": "ee87059d4cf4437fbd9910f83be71f35b52b9e0b7cd1dbaa14b0134d0d3885a5"
+      }
+    ],
+    "version": 1
+  },
+  "evidence_publisher_release": "1.2.3-resume-candidate",
+  "fabric_capture": {
+    "applied": true,
+    "commit_message": "fabric: capture completed model changes [CF-3250cb1404de58a8da179231]",
+    "commit_sha": "051bd0a4ba55b475929d4ffbdc7a0d55137a032a",
+    "paths_before": 3,
+    "status_before": [
+      " M src/application/workspaceApplicationService.ts",
+      " M src/data/repositories/workspaceRepository.ts",
+      " M tests/repository.test.ts"
+    ],
+    "transient_untracked_removed": {
+      "count": 0,
+      "items": []
+    }
+  },
+  "fabric_release": "1.2.3-resume-candidate",
+  "failure_class": null,
+  "finished_at": "2026-09-17T19:03:36Z",
+  "git": {
+    "base_is_ancestor": true,
+    "base_sha": "c2e119667c7b3e3279958542957fb02fda5e57b1",
+    "branch": "codex/stockledger-prod-c04-architecture-persistence-import-recovery-fix-v1",
+    "head_sha": "051bd0a4ba55b475929d4ffbdc7a0d55137a032a",
+    "remote_exact_head": true,
+    "remote_head_sha": "051bd0a4ba55b475929d4ffbdc7a0d55137a032a",
+    "target_branch": "main",
+    "target_drifted_since_acceptance": false,
+    "target_head_observed_after_execution": "c2e119667c7b3e3279958542957fb02fda5e57b1",
+    "work_branch": "codex/stockledger-prod-c04-architecture-persistence-import-recovery-fix-v1",
+    "worktree_clean": true
+  },
+  "instructions": {
+    "files": [],
+    "total_bytes": 0,
+    "warning": null
+  },
+  "job_id": "CF-3250cb1404de58a8da179231",
+  "kind": "codex-fabric-audit-evidence",
+  "locator": {
+    "branch": "codex-fabric/evidence/stockledger/prod-c04-architecture-persistence-import-recovery-fix-v1",
+    "path": ".codex-fabric/audit.json",
+    "ref": "refs/heads/codex-fabric/evidence/stockledger/prod-c04-architecture-persistence-import-recovery-fix-v1"
+  },
+  "operation": "FIX",
+  "policy": {
+    "environment_policy_sha256": "e077daca74297b3c30bee8989f00f8ca5338f7610b4d016a6c48db524205d064",
+    "fabric_release": "1.2.3-resume-candidate",
+    "policy_sha256": "44756118cd7fda0c45cd23ba1d31a48a3f4f2422d687df15264ba4406f40e1f2",
+    "registry_sha256": "cfc765f3211c37c7967a138f3b2d89a99341939b15b2623f92744d007f625d6f"
+  },
+  "project_id": "stockledger",
+  "recovery": {
+    "model_rerun_safe": false,
+    "recovery_required": false,
+    "retry_safe": false,
+    "retry_scope": null,
+    "worktree_retained": true
+  },
+  "request": "prod-c04-architecture-persistence-import-recovery-fix-v1",
+  "schema_version": 1,
+  "started_at": "2026-09-17T18:49:13Z",
+  "status": "EXECUTED_CHANGE",
+  "timing": {
+    "execution_seconds": 863,
+    "queue_seconds": 0,
+    "total_seconds": 863
+  },
+  "transport": {
+    "bytes": 3801,
+    "envelope": "FABRIC/2",
+    "prompt_bytes": 3420,
+    "prompt_sha256": "03fe48349cf2a707ee35872304b1a963251da27f24ccd09e4f6056648709ca0a",
+    "sha256": "3250cb1404de58a8da179231c3ea6a5ba0492d7161173046ff7de5105b9a6770"
+  }
+}
