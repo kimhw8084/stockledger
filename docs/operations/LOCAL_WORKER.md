@@ -87,6 +87,6 @@ Outbox rows are delivery intent only. `pendingNotificationIntents` is not a sent
 
 ## Measured representative fixture
 
-`npm run benchmark:worker` runs the deterministic synthetic fixture: **100 stocks × 260 sessions**, with SPY and three sector inputs, through the four-stage contract. The benchmark output reports elapsed time, workload size, the explicit **30-minute engineering deadline budget**, remaining headroom, result counts, serialized workspace bytes, SQLite/WAL bytes, RSS and integrity. A current Node 22.23.2 run recorded **2,489 ms elapsed**, **1,797,511 ms remaining headroom**, **100 Eye evaluations**, **200 scanner rows**, **5,812,831 workspace bytes**, **12,160,024 SQLite/WAL bytes**, **240,697,344 RSS bytes**, and integrity `true`.
+`npm run benchmark:worker` runs the deterministic synthetic fixture: **100 stocks × 260 sessions**, with SPY and three sector inputs, through the four-stage contract. The benchmark output reports elapsed time, workload size, the explicit **30-minute engineering deadline budget**, remaining headroom, result counts, serialized workspace bytes, SQLite/WAL bytes, RSS and integrity. A current Node 22.23.2 run recorded **2,211 ms elapsed**, **1,797,790 ms remaining headroom**, **100 Eye evaluations**, **200 scanner rows**, **5,812,831 workspace bytes**, **12,192,912 SQLite/WAL bytes**, **239,517,696 RSS bytes**, and integrity `true`.
 
 This is one deterministic engineering measurement, not p95 capacity, a production SLA, a hosted guarantee, or a user-count forecast.
