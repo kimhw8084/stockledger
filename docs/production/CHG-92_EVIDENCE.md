@@ -3,8 +3,8 @@
 ## Source identity
 
 - Protected-main base: `59cc7c672cd6b759cf0ceefb5a77acea66c7435d` (`origin/main` at task start)
-- Tested implementation head: `TBD after CHG-92 recovery-fix verification commit`
-- Evidence publication head: `TBD after evidence-only commit`
+- Tested implementation head: `215a5fda5eb5e316bc35f0ccda5eb7ec92e370f4`
+- Evidence publication head: documentation-only child commit of the tested implementation head; exact final head is reported with this publication.
 - R1 candidate carried forward exactly: `66ba55796e58c2d37882f091854860d7998a8842`
 - Branch: `codex/stockledger-prod-c05-scheduler-recovery-fix-v1`
 - Job contract: `stockledger-production-job-v1`, revision `1`
@@ -35,9 +35,9 @@ All commands ran from the implementation workspace with Node `v22.23.2` on the t
 |---|---:|---|
 | `npm ci` | 0 | 595 packages installed; 0 audit vulnerabilities. |
 | `npm run typecheck` | 0 | Strict TypeScript passed. |
-| `npm test -- --run` | pending final run | Repository-wide result recorded after the recovery-fix commit. |
+| `npm test -- --run` | 0 | 15 files, 108 tests passed. |
 | `npm test -- --run tests/worker.test.ts` | 0 | 20 scheduler/worker tests passed, including the restart/recovery matrix below. |
-| `npm run benchmark:worker` | 0 | Deterministic representative fixture and deadline evidence below. |
+| `npm run benchmark:worker` | 0 | Deterministic representative fixture and deadline evidence below; Node v22.23.2. |
 | `npm run check:frozen` | 0 | Structural check completed; result remains `blocked_unverified` for the documented independent-golden-output, survivorship, point-in-time-membership and forward-proof limitations. |
 | `npm run check:boundaries` | 0 | Client secret/runtime-parser/server-import boundary passed. |
 | `npm run export:all` | 0 | Web, iOS and Android bundles exported. |
@@ -64,17 +64,17 @@ All commands ran from the implementation workspace with Node `v22.23.2` on the t
 
 ```json
 {
-  "elapsedMs": 2544,
+  "elapsedMs": 2197,
   "workloadSize": { "stocks": 100, "sessions": 260, "symbols": 104, "rows": 27040, "jobStages": 4 },
   "deadlineBudgetMs": 1800000,
-  "remainingHeadroomMs": 1797456,
+  "remainingHeadroomMs": 1797803,
   "withinBudget": true,
   "evidenceOnly": true,
   "evaluations": 100,
   "scannerRows": 200,
   "workspaceBytes": 5812831,
   "databaseBytesIncludingWal": 12160024,
-  "endingRssBytes": 241352704,
+  "endingRssBytes": 240320512,
   "integrity": true
 }
 ```
