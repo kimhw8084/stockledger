@@ -4,6 +4,7 @@
 
 - Protected-main base: 4b4fc73a27b1a58a47405fe8cdf18c7ecf79975f (origin/main).
 - Prior candidate carried forward exactly before correction: b5912cc9dcc5d7fe71a4e1cdbd2002a9e0b74c07.
+- Final implementation commit: 77dbde2 (the evidence publication commit is its direct child and is reported in the Fabric handoff).
 - Branch: codex/stockledger-prod-c07-notification-control-fix-v1.
 - No merge to main and no external deployment were performed. The final implementation and evidence commit hashes are supplied in the Fabric handoff because a commit cannot embed its own hash without becoming self-referential.
 - Runtime proved for this work: Node v22.23.2 from .nvmrc, npm 10.9.8.
