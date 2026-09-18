@@ -1,0 +1,483 @@
+{
+  "accepted_at": "2026-09-18T03:04:59Z",
+  "changed_files": [
+    {
+      "additions": 2,
+      "deletions": 0,
+      "path": "docs/operations/CLOUD_DEPLOYMENT.md",
+      "status": "M"
+    },
+    {
+      "additions": 57,
+      "deletions": 24,
+      "path": "docs/operations/LOCAL_WORKER.md",
+      "status": "M"
+    },
+    {
+      "additions": 82,
+      "deletions": 0,
+      "path": "docs/production/CHG-92_EVIDENCE.md",
+      "status": "A"
+    },
+    {
+      "additions": 2,
+      "deletions": 2,
+      "path": "scripts/benchmark-worker.ts",
+      "status": "M"
+    },
+    {
+      "additions": 29,
+      "deletions": 8,
+      "path": "server/worker/cli.ts",
+      "status": "M"
+    },
+    {
+      "additions": 89,
+      "deletions": 0,
+      "path": "server/worker/contract.ts",
+      "status": "A"
+    },
+    {
+      "additions": 351,
+      "deletions": 0,
+      "path": "server/worker/managed.ts",
+      "status": "A"
+    },
+    {
+      "additions": 11,
+      "deletions": 42,
+      "path": "server/worker/run.ts",
+      "status": "M"
+    },
+    {
+      "additions": 445,
+      "deletions": 20,
+      "path": "server/worker/store.ts",
+      "status": "M"
+    },
+    {
+      "additions": 19,
+      "deletions": 0,
+      "path": "src/lib/marketCalendar.ts",
+      "status": "M"
+    },
+    {
+      "additions": 2,
+      "deletions": 1,
+      "path": "src/lib/stockConditionScanner.ts",
+      "status": "M"
+    },
+    {
+      "additions": 295,
+      "deletions": 2,
+      "path": "tests/worker.test.ts",
+      "status": "M"
+    }
+  ],
+  "checks": [
+    {
+      "command": "/bin/zsh -lc \"printf '%s\\\\n' '--- managed.ts ---' && rtk sed -n '1,520p' server/worker/managed.ts && printf '%s\\\\n' '--- store.ts ---' && rtk sed -n '1,760p' server/worker/store.ts\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk nl -ba server/worker/store.ts | sed -n '1,260p'; rtk nl -ba server/worker/store.ts | sed -n '261,620p'; rtk nl -ba server/worker/managed.ts | sed -n '1,380p'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk nl -ba server/worker/store.ts | sed -n '330,480p'; printf '%s\\\\n' '--- contract ---'; rtk sed -n '1,260p' server/worker/contract.ts; printf '%s\\\\n' '--- market calendar ---'; rtk sed -n '1,300p' src/lib/marketCalendar.ts; printf '%s\\\\n' '--- worker tests symbols ---'; rtk rg -n \\\"runManaged|scheduler|retry|lease|outbox|lastSafe|missed|partial|blocked|session|enqueue|admission\\\" tests/worker.test.ts\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '1,260p' tests/worker.test.ts; printf '%s\\\\n' '--- cli ---'; rtk sed -n '1,300p' server/worker/cli.ts; printf '%s\\\\n' '--- run ---'; rtk sed -n '1,260p' server/worker/run.ts; printf '%s\\\\n' '--- current CHG-92 ---'; rtk sed -n '1,260p' docs/production/CHG-92_EVIDENCE.md; printf '%s\\\\n' '--- current LOCAL_WORKER ---'; rtk sed -n '1,340p' docs/operations/LOCAL_WORKER.md\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"printf '%s\\\\n' '--- scanner ---'; rtk sed -n '1,420p' src/lib/stockConditionScanner.ts; printf '%s\\\\n' '--- types identities ---'; rtk rg -n \\\"interface (ScanRun|ScanSignal|RawBar|Forward)|type (ScanRun|ScanSignal)|semantic|scheduledSession|inputHash|sourceHash|scanRun\\\" src server | head -240; printf '%s\\\\n' '--- app schema relevant ---'; rtk rg -n \\\"scanRuns|scanSignals|forwardProof|rawBarArchives|processedFeatures|universeSnapshots\\\" src/domain src/types.ts src | head -220\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '400,480p' src/lib/stockConditionScanner.ts; rtk sed -n '530,655p' src/types.ts; rtk sed -n '1,130p' src/domain/contentHash.ts; rtk rg -n \\\"latestExpected|lastExpectedSession|schedulerStatus|missedSessions|lastSafeError|updateSchedulerState|getSchedulerCheckpoint|WORKER_MAX_CATCH\\\" . -g '\"'!node_modules'\"' -g '\"'!dist'\"' -g '\"'!coverage'\"'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git diff -- server/worker/managed.ts server/worker/store.ts && rtk npm run typecheck'",
+      "exit_code": 127,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npm ci'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk node --version; rtk npm --version; rtk which node; rtk command -v nvm || true; rtk command -v fnm || true; rtk ls -1 /opt/homebrew/Cellar/node* 2>/dev/null || true; rtk ls -1 /usr/local/Cellar/node* 2>/dev/null || true; rtk ls -1 /Users/haewonkim/.nvm/versions/node 2>/dev/null || true'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/bin:/bin /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/node --version && rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/bin:/bin /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npm --version && rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/bin:/bin /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npm run typecheck'",
+      "exit_code": 2,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/bin:/bin /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npm run typecheck && rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/bin:/bin /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npm test -- --run tests/worker.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '70,190p' tests/worker.test.ts; rtk sed -n '190,420p' tests/worker.test.ts; rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/bin:/bin /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npm run typecheck\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/bin:/bin /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npm test -- --run tests/worker.test.ts'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/bin:/bin /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npm test -- --run tests/worker.test.ts'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/bin:/bin /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npm test -- --run tests/worker.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk nl -ba docs/production/CHG-92_EVIDENCE.md | sed -n '1,180p'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/bin:/bin /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npm ci'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/bin:/bin /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npm run typecheck && rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/bin:/bin /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npm test -- --run'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/bin:/bin /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npm run benchmark:worker'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/bin:/bin /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npm run check:boundaries'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/bin:/bin /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npm run check:frozen'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/bin:/bin /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npm run export:all'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git diff --check && rtk git status --short --branch && rtk git diff --stat && rtk git diff -- docs/operations/LOCAL_WORKER.md docs/production/CHG-92_EVIDENCE.md server/worker/managed.ts server/worker/store.ts tests/worker.test.ts | sed -n '1,360p'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git add server/worker/managed.ts server/worker/store.ts tests/worker.test.ts docs/operations/LOCAL_WORKER.md docs/production/CHG-92_EVIDENCE.md && rtk git commit -m \"fix: recover durable scheduler work after restart\" && rtk git rev-parse HEAD && rtk git status --short --branch'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/bin:/bin /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/node --version && rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/bin:/bin /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npm --version && rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/bin:/bin /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npm ci'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/bin:/bin /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npm run typecheck && rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/bin:/bin /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npm test -- --run'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/bin:/bin /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npm test -- --run tests/worker.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/bin:/bin /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npm run benchmark:worker'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/bin:/bin /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npm run check:boundaries'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/bin:/bin /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npm run check:frozen'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/bin:/bin /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npm run export:all'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git diff --check; rtk git status --short --branch; rtk git rev-parse HEAD; rtk git log -4 --oneline --decorate'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git rev-parse 59cc7c6 66ba55796e58c2d37882f091854860d7998a8842 215a5fd'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git diff --check && rtk git diff --stat && rtk git add docs/production/CHG-92_EVIDENCE.md && rtk git commit -m \"docs: publish CHG-92 recovery evidence\" && rtk git rev-parse HEAD && rtk git status --short --branch'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git diff --check && rtk git status --short --branch && rtk git rev-parse HEAD && rtk git diff --name-only 59cc7c672cd6b759cf0ceefb5a77acea66c7435d..HEAD && rtk git log --oneline --decorate -7'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/bin:/bin /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npm run typecheck && rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/bin:/bin /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npm test -- --run tests/worker.test.ts'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/bin:/bin /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npm test -- --run tests/worker.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git diff --check && rtk git add server/worker/store.ts tests/worker.test.ts && rtk git commit -m \"fix: preserve current scheduler errors\" && rtk git rev-parse HEAD && rtk git status --short --branch'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/bin:/bin /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npm run typecheck && rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/bin:/bin /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npm test -- --run'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/bin:/bin /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npm test -- --run tests/worker.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/bin:/bin /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npm run benchmark:worker'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/bin:/bin /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npm run check:boundaries'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/bin:/bin /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npm run check:frozen'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/bin:/bin /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npm run export:all'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git diff --check && rtk git status --short --branch && rtk git rev-parse HEAD'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git diff --check && rtk git add docs/production/CHG-92_EVIDENCE.md && rtk git commit -m \"docs: finalize CHG-92 recovery evidence\" && rtk git rev-parse HEAD && rtk git status --short --branch && rtk git diff --check'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '1,120p' docs/production/CHG-92_EVIDENCE.md && rtk git status --short --branch && rtk git rev-parse HEAD\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git diff --check && rtk git add docs/production/CHG-92_EVIDENCE.md && rtk git commit -m \"docs: clarify CHG-92 source evidence\" && rtk git rev-parse HEAD && rtk git status --short --branch && rtk git diff --check'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/bin:/bin /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npm ci'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git status --short --branch && rtk git rev-parse HEAD && rtk git diff --check'",
+      "exit_code": 0,
+      "type": "command_execution"
+    }
+  ],
+  "codex": {
+    "cli_version": "codex-cli 0.154.0",
+    "configured_model": "gpt-5.6-luna",
+    "event_count": 151,
+    "provider_reported_model": null,
+    "reasoning_effort": "xhigh",
+    "terminal_type": "turn.completed",
+    "usage": {
+      "cache_hit_percent": 98.05,
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 9395968,
+      "fresh_input_tokens": 186405,
+      "input_tokens": 9582373,
+      "non_reasoning_output_tokens": 22557,
+      "output_tokens": 46244,
+      "reasoning_output_tokens": 23687,
+      "total_processed_tokens": 9628617
+    },
+    "warnings": []
+  },
+  "commits": [
+    {
+      "sha": "e3241223f66e1e4d33bc11efad36bab796786d83",
+      "subject": "docs: clarify CHG-92 source evidence"
+    },
+    {
+      "sha": "8dcc20eb16adb5dad0869532534aeabe2ec77ef8",
+      "subject": "docs: finalize CHG-92 recovery evidence"
+    },
+    {
+      "sha": "5c54d5fba96d67af86d37b074d13405106c95def",
+      "subject": "fix: preserve current scheduler errors"
+    },
+    {
+      "sha": "299495ba24a265ea6f769fabcee86ecf380b1583",
+      "subject": "docs: publish CHG-92 recovery evidence"
+    },
+    {
+      "sha": "215a5fda5eb5e316bc35f0ccda5eb7ec92e370f4",
+      "subject": "fix: recover durable scheduler work after restart"
+    },
+    {
+      "sha": "58dd7a357fb15a6597eba1dc4b88c058c31f6587",
+      "subject": "docs: refresh CHG-92 evidence refs"
+    },
+    {
+      "sha": "230c3463109ffb22b4818b443975b421a531ecdf",
+      "subject": "fix: preserve migrated worker retry deadlines"
+    },
+    {
+      "sha": "ed31b570afe63bc7659c690733e363cd1afe8764",
+      "subject": "docs: publish CHG-92 scheduler evidence"
+    },
+    {
+      "sha": "4a6182d5b98c352654ce9a194e18734bd8259515",
+      "subject": "feat: productionize scheduled worker jobs"
+    }
+  ],
+  "diff": {
+    "additions": 1384,
+    "changed_files": 12,
+    "commit_count": 9,
+    "deletions": 99
+  },
+  "error_code": null,
+  "evidence_manifest": {
+    "count": 3,
+    "items": [
+      {
+        "bytes": 5762,
+        "path": "docs/operations/CLOUD_DEPLOYMENT.md",
+        "sha256": "b0c59c14fa7088e1fa478c906df25107cb077953d7f0c05812f2328b8694cd38"
+      },
+      {
+        "bytes": 10328,
+        "path": "docs/operations/LOCAL_WORKER.md",
+        "sha256": "68154b77b8ef03eeaf2c5ef4e340ac2135f535fdf04799f6c918a936f9599077"
+      },
+      {
+        "bytes": 5424,
+        "path": "docs/production/CHG-92_EVIDENCE.md",
+        "sha256": "c867686852e20f28fd8a6c58672b0c8c3cccd4b08b99956a4c34611cae7b8716"
+      }
+    ],
+    "version": 1
+  },
+  "evidence_publisher_release": "1.2.3-resume-candidate",
+  "fabric_capture": {
+    "applied": false,
+    "paths_before": 0,
+    "transient_untracked_removed": {
+      "count": 0,
+      "items": []
+    }
+  },
+  "fabric_release": "1.2.3-resume-candidate",
+  "failure_class": null,
+  "finished_at": "2026-09-18T03:25:56Z",
+  "git": {
+    "base_is_ancestor": true,
+    "base_sha": "59cc7c672cd6b759cf0ceefb5a77acea66c7435d",
+    "branch": "codex/stockledger-prod-c05-scheduler-recovery-fix-v1",
+    "head_sha": "e3241223f66e1e4d33bc11efad36bab796786d83",
+    "remote_exact_head": true,
+    "remote_head_sha": "e3241223f66e1e4d33bc11efad36bab796786d83",
+    "target_branch": "main",
+    "target_drifted_since_acceptance": false,
+    "target_head_observed_after_execution": "59cc7c672cd6b759cf0ceefb5a77acea66c7435d",
+    "work_branch": "codex/stockledger-prod-c05-scheduler-recovery-fix-v1",
+    "worktree_clean": true
+  },
+  "instructions": {
+    "files": [],
+    "total_bytes": 0,
+    "warning": null
+  },
+  "job_id": "CF-b9c2ac4c799ce5dbd908e87c",
+  "kind": "codex-fabric-audit-evidence",
+  "locator": {
+    "branch": "codex-fabric/evidence/stockledger/prod-c05-scheduler-recovery-fix-v1",
+    "path": ".codex-fabric/audit.json",
+    "ref": "refs/heads/codex-fabric/evidence/stockledger/prod-c05-scheduler-recovery-fix-v1"
+  },
+  "operation": "FIX",
+  "policy": {
+    "environment_policy_sha256": "e077daca74297b3c30bee8989f00f8ca5338f7610b4d016a6c48db524205d064",
+    "fabric_release": "1.2.3-resume-candidate",
+    "policy_sha256": "44756118cd7fda0c45cd23ba1d31a48a3f4f2422d687df15264ba4406f40e1f2",
+    "registry_sha256": "cfc765f3211c37c7967a138f3b2d89a99341939b15b2623f92744d007f625d6f"
+  },
+  "project_id": "stockledger",
+  "recovery": {
+    "model_rerun_safe": false,
+    "recovery_required": false,
+    "retry_safe": false,
+    "retry_scope": null,
+    "worktree_retained": true
+  },
+  "request": "prod-c05-scheduler-recovery-fix-v1",
+  "schema_version": 1,
+  "started_at": "2026-09-18T03:04:59Z",
+  "status": "EXECUTED_CHANGE",
+  "timing": {
+    "execution_seconds": 1257,
+    "queue_seconds": 0,
+    "total_seconds": 1257
+  },
+  "transport": {
+    "bytes": 5093,
+    "envelope": "FABRIC/2",
+    "prompt_bytes": 4756,
+    "prompt_sha256": "b5a72d57d5400b2d35071e344cb8bbc9f18b385d44607a09c21bed1a14bbbf64",
+    "sha256": "b9c2ac4c799ce5dbd908e87c3580054bec7bbc9f3665aca6b13002853fb8baaa"
+  }
+}
