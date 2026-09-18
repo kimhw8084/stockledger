@@ -1,0 +1,555 @@
+{
+  "accepted_at": "2026-09-18T22:16:42Z",
+  "changed_files": [
+    {
+      "additions": 1,
+      "deletions": 1,
+      "path": "README.md",
+      "status": "M"
+    },
+    {
+      "additions": 1,
+      "deletions": 0,
+      "path": "docs/operations/CLOUD_DEPLOYMENT.md",
+      "status": "M"
+    },
+    {
+      "additions": 32,
+      "deletions": 4,
+      "path": "docs/operations/LOCAL_WORKER.md",
+      "status": "M"
+    },
+    {
+      "additions": 67,
+      "deletions": 0,
+      "path": "docs/production/CHG-94_EVIDENCE.md",
+      "status": "A"
+    },
+    {
+      "additions": 3,
+      "deletions": 3,
+      "path": "docs/production/IMPLEMENTATION_STATUS.md",
+      "status": "M"
+    },
+    {
+      "additions": 1,
+      "deletions": 1,
+      "path": "server/worker/cli.ts",
+      "status": "M"
+    },
+    {
+      "additions": 14,
+      "deletions": 0,
+      "path": "server/worker/contract.ts",
+      "status": "M"
+    },
+    {
+      "additions": 15,
+      "deletions": 2,
+      "path": "server/worker/managed.ts",
+      "status": "M"
+    },
+    {
+      "additions": 167,
+      "deletions": 0,
+      "path": "server/worker/notificationTransport.ts",
+      "status": "A"
+    },
+    {
+      "additions": 5,
+      "deletions": 0,
+      "path": "server/worker/run.ts",
+      "status": "M"
+    },
+    {
+      "additions": 335,
+      "deletions": 4,
+      "path": "server/worker/store.ts",
+      "status": "M"
+    },
+    {
+      "additions": 2,
+      "deletions": 0,
+      "path": "src/app/StockLedgerApp.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 2,
+      "deletions": 0,
+      "path": "src/data/workspaceDefaults.ts",
+      "status": "M"
+    },
+    {
+      "additions": 13,
+      "deletions": 2,
+      "path": "src/domain/appDataSchema.ts",
+      "status": "M"
+    },
+    {
+      "additions": 155,
+      "deletions": 0,
+      "path": "src/domain/notificationDelivery.ts",
+      "status": "A"
+    },
+    {
+      "additions": 46,
+      "deletions": 0,
+      "path": "src/domain/notificationPreferences.ts",
+      "status": "A"
+    },
+    {
+      "additions": 57,
+      "deletions": 0,
+      "path": "src/features/notifications/NotificationSettingsPanel.tsx",
+      "status": "A"
+    },
+    {
+      "additions": 13,
+      "deletions": 0,
+      "path": "src/hooks/useAppModel.ts",
+      "status": "M"
+    },
+    {
+      "additions": 52,
+      "deletions": 0,
+      "path": "src/lib/i18n.ts",
+      "status": "M"
+    },
+    {
+      "additions": 2,
+      "deletions": 0,
+      "path": "src/lib/seed.ts",
+      "status": "M"
+    },
+    {
+      "additions": 25,
+      "deletions": 0,
+      "path": "src/types.ts",
+      "status": "M"
+    },
+    {
+      "additions": 19,
+      "deletions": 0,
+      "path": "tests/e2e/workspace.spec.ts",
+      "status": "M"
+    },
+    {
+      "additions": 297,
+      "deletions": 0,
+      "path": "tests/notification.test.ts",
+      "status": "A"
+    }
+  ],
+  "checks": [
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm test -- --run tests/worker.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm test -- --run tests/notification.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git diff --stat && rtk git diff -- docs/operations/LOCAL_WORKER.md docs/operations/CLOUD_DEPLOYMENT.md server/worker/cli.ts server/worker/run.ts src/domain/appDataSchema.ts src/hooks/useAppModel.ts src/app/StockLedgerApp.tsx tests/e2e/workspace.spec.ts | sed -n '1,420p'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git rev-parse HEAD && rtk git diff --name-only && rtk git status --short'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run test:e2e'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run export:all'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run export:all'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run test:e2e'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk lsof -nP -iTCP:43187 -sTCP:LISTEN || true'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run test:e2e'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run typecheck && PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm test -- --run tests/notification.test.ts tests/i18n.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk test -f docs/production/CHG-94_EVIDENCE.md && rtk wc -l docs/production/CHG-94_EVIDENCE.md || true\nPATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk git status --short\nPATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk git diff --stat'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk ls -l docs/production/CHG-94_EVIDENCE.md\nPATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk sed -n '\"'1,240p' docs/production/CHG-94_EVIDENCE.md\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm test -- --run'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk git diff --check'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run check:boundaries'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run typecheck'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run export:all'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run test:e2e'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk git diff -- server/worker/store.ts server/worker/managed.ts src/domain/notificationDelivery.ts src/domain/notificationPreferences.ts server/worker/notificationTransport.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk sed -n '\"'1,280p' src/domain/notificationDelivery.ts\nPATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:\"'$PATH rtk sed -n '\"'1,220p' src/domain/notificationPreferences.ts\nPATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:\"'$PATH rtk sed -n '\"'1,360p' server/worker/notificationTransport.ts\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk sed -n '\"'1,220p' src/features/notifications/NotificationSettingsPanel.tsx\nPATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:\"'$PATH rtk rg -n \"commitNotificationPreferences|notificationPreferences|NotificationSettings\" src server tests --glob '\"'\"'!tests/notification.test.ts'\"'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk sed -n '\"'690,742p' src/hooks/useAppModel.ts\nPATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:\"'$PATH rtk sed -n '\"'40,105p' src/domain/appDataSchema.ts\nPATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:\"'$PATH rtk sed -n '\"'110,190p' src/types.ts\nPATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:\"'$PATH rtk sed -n '\"'680,725p' src/types.ts\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk rg -n \"new WorkerStore|WorkerStore|worker\" server/worker src | head -160\nPATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk sed -n '\"'1,220p' server/worker/cli.ts\nPATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:\"'$PATH rtk sed -n '\"'1,180p' server/worker/run.ts\nPATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:\"'$PATH rtk sed -n '\"'1,180p' server/worker/managed.ts\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk sed -n '\"'1,520p' tests/notification.test.ts\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk git status --short\nPATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk git diff --check\nPATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk rg -n \"TODO|FIXME|console'\"\\\\.log\\\\(|password|token|secret|apiKey|thesis|notes|holdings\\\" server/worker/notificationTransport.ts src/domain/notificationDelivery.ts docs/operations/LOCAL_WORKER.md docs/production/CHG-94_EVIDENCE.md\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm test -- --run tests/notification.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk sed -n '\"'1,16p' docs/production/CHG-94_EVIDENCE.md\nPATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:\"'$PATH rtk rg -n \"npm test -- --run '\"\\\\||Final Git HEAD|focused delivery\\\" docs/production/CHG-94_EVIDENCE.md\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm test -- --run'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm test -- --run tests/worker.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run check:frozen'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm audit --audit-level=high'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run benchmark:worker'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run typecheck'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk sed -n '\"'1,110p' server/worker/contract.ts\nPATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:\"'$PATH rtk sed -n '\"'1,120p' docs/operations/LOCAL_WORKER.md\nPATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:\"'$PATH rtk sed -n '\"'1,90p' docs/operations/CLOUD_DEPLOYMENT.md\nPATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:\"'$PATH rtk git diff --check\nPATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run check:boundaries'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm test -- --run tests/notification.test.ts'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk sed -n '\"'770,900p' server/worker/store.ts\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm test -- --run tests/notification.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm test -- --run'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk git diff --check'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run check:boundaries'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run typecheck'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm test -- --run tests/notification.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm test -- --run'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk git diff --check'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run check:boundaries'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run typecheck'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk git status --short\nPATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk git diff --stat\nPATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk find src/features/notifications -maxdepth 2 -type f -print\nPATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk sed -n '\"'48,75p' docs/production/CHG-94_EVIDENCE.md\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk git rev-parse HEAD\nPATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk git branch --show-current\nPATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk node --version\nPATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm --version'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk git diff --check\nPATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk sed -n '\"'1,12p' docs/production/CHG-94_EVIDENCE.md\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    }
+  ],
+  "codex": {
+    "cli_version": "codex-cli 0.154.0",
+    "configured_model": "gpt-5.6-luna",
+    "event_count": 353,
+    "provider_reported_model": null,
+    "reasoning_effort": "xhigh",
+    "terminal_type": "turn.completed",
+    "usage": {
+      "cache_hit_percent": 98.28,
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 23410176,
+      "fresh_input_tokens": 410247,
+      "input_tokens": 23820423,
+      "non_reasoning_output_tokens": 61869,
+      "output_tokens": 96220,
+      "reasoning_output_tokens": 34351,
+      "total_processed_tokens": 23916643
+    },
+    "warnings": []
+  },
+  "commits": [
+    {
+      "sha": "b5912cc9dcc5d7fe71a4e1cdbd2002a9e0b74c07",
+      "subject": "fabric: capture completed model changes [CF-730bad1eadca827917337766]"
+    }
+  ],
+  "diff": {
+    "additions": 1324,
+    "changed_files": 23,
+    "commit_count": 1,
+    "deletions": 17
+  },
+  "error_code": null,
+  "evidence_manifest": {
+    "count": 5,
+    "items": [
+      {
+        "bytes": 4960,
+        "path": "README.md",
+        "sha256": "310aff4bd6a055b60e78213280568a7ff4f22e75caae798175ce6e3eedea6b9e"
+      },
+      {
+        "bytes": 8875,
+        "path": "docs/operations/CLOUD_DEPLOYMENT.md",
+        "sha256": "14811cc182f264a2d086390fecd38109047687390ae16a4137a5731ddd549000"
+      },
+      {
+        "bytes": 17416,
+        "path": "docs/operations/LOCAL_WORKER.md",
+        "sha256": "0aace61600bff6e4a2b314531b6a199bb6b3b58d591f9f0fd0b5ae43b0a9b9e1"
+      },
+      {
+        "bytes": 8324,
+        "path": "docs/production/CHG-94_EVIDENCE.md",
+        "sha256": "29d306f53334afe293bcbc755e0ee25cf841f3056ed9091294e2e86a8fc8699f"
+      },
+      {
+        "bytes": 22419,
+        "path": "docs/production/IMPLEMENTATION_STATUS.md",
+        "sha256": "4fcb376ce0849f8ccbd66dc818c945993fcc2c706e57940b886c6935dcbc3d72"
+      }
+    ],
+    "version": 1
+  },
+  "evidence_publisher_release": "1.2.3-resume-candidate",
+  "fabric_capture": {
+    "applied": true,
+    "commit_message": "fabric: capture completed model changes [CF-730bad1eadca827917337766]",
+    "commit_sha": "b5912cc9dcc5d7fe71a4e1cdbd2002a9e0b74c07",
+    "paths_before": 23,
+    "status_before": [
+      " M README.md",
+      " M docs/operations/CLOUD_DEPLOYMENT.md",
+      " M docs/operations/LOCAL_WORKER.md",
+      " M docs/production/IMPLEMENTATION_STATUS.md",
+      " M server/worker/cli.ts",
+      " M server/worker/contract.ts",
+      " M server/worker/managed.ts",
+      " M server/worker/run.ts",
+      " M server/worker/store.ts",
+      " M src/app/StockLedgerApp.tsx",
+      " M src/data/workspaceDefaults.ts",
+      " M src/domain/appDataSchema.ts",
+      " M src/hooks/useAppModel.ts",
+      " M src/lib/i18n.ts",
+      " M src/lib/seed.ts",
+      " M src/types.ts",
+      " M tests/e2e/workspace.spec.ts",
+      "?? docs/production/CHG-94_EVIDENCE.md",
+      "?? server/worker/notificationTransport.ts",
+      "?? src/domain/notificationDelivery.ts",
+      "?? src/domain/notificationPreferences.ts",
+      "?? src/features/notifications/",
+      "?? tests/notification.test.ts"
+    ],
+    "transient_untracked_removed": {
+      "count": 0,
+      "items": []
+    }
+  },
+  "fabric_release": "1.2.3-resume-candidate",
+  "failure_class": null,
+  "finished_at": "2026-09-18T22:54:29Z",
+  "git": {
+    "base_is_ancestor": true,
+    "base_sha": "4b4fc73a27b1a58a47405fe8cdf18c7ecf79975f",
+    "branch": "codex/stockledger-prod-c07-notification-delivery-v1",
+    "detached_verify": false,
+    "head_sha": "b5912cc9dcc5d7fe71a4e1cdbd2002a9e0b74c07",
+    "remote_exact_head": true,
+    "remote_head_sha": "b5912cc9dcc5d7fe71a4e1cdbd2002a9e0b74c07",
+    "target_branch": "main",
+    "target_drifted_since_acceptance": false,
+    "target_head_observed_after_execution": "4b4fc73a27b1a58a47405fe8cdf18c7ecf79975f",
+    "work_branch": "codex/stockledger-prod-c07-notification-delivery-v1",
+    "worktree_clean": true
+  },
+  "instructions": {
+    "files": [],
+    "total_bytes": 0,
+    "warning": null
+  },
+  "job_id": "CF-730bad1eadca827917337766",
+  "kind": "codex-fabric-audit-evidence",
+  "locator": {
+    "branch": "codex-fabric/evidence/stockledger/prod-c07-notification-delivery-v1",
+    "path": ".codex-fabric/audit.json",
+    "ref": "refs/heads/codex-fabric/evidence/stockledger/prod-c07-notification-delivery-v1"
+  },
+  "operation": "BUILD",
+  "policy": {
+    "environment_policy_sha256": "e077daca74297b3c30bee8989f00f8ca5338f7610b4d016a6c48db524205d064",
+    "fabric_release": "1.2.3-resume-candidate",
+    "policy_sha256": "44756118cd7fda0c45cd23ba1d31a48a3f4f2422d687df15264ba4406f40e1f2",
+    "registry_sha256": "cfc765f3211c37c7967a138f3b2d89a99341939b15b2623f92744d007f625d6f"
+  },
+  "project_id": "stockledger",
+  "recovery": {
+    "model_rerun_safe": false,
+    "recovery_required": false,
+    "retry_safe": false,
+    "retry_scope": null,
+    "worktree_retained": true
+  },
+  "request": "prod-c07-notification-delivery-v1",
+  "schema_version": 1,
+  "started_at": "2026-09-18T22:16:42Z",
+  "status": "EXECUTED_CHANGE",
+  "timing": {
+    "execution_seconds": 2267,
+    "queue_seconds": 0,
+    "total_seconds": 2267
+  },
+  "transport": {
+    "bytes": 9130,
+    "envelope": "FABRIC/2",
+    "prompt_bytes": 8793,
+    "prompt_sha256": "699415f8687523692a0dba9a7c5487466bfbba512b063ff86f34a433911c735d",
+    "sha256": "730bad1eadca827917337766c18b59828fc9d0f207c74cd06ef3e674c04898ed"
+  }
+}
