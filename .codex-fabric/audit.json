@@ -1,0 +1,332 @@
+{
+  "accepted_at": "2026-09-18T15:38:57Z",
+  "changed_files": [
+    {
+      "additions": 13,
+      "deletions": 4,
+      "path": "docs/operations/CLOUD_DEPLOYMENT.md",
+      "status": "M"
+    },
+    {
+      "additions": 63,
+      "deletions": 0,
+      "path": "docs/production/CHG-93_EVIDENCE.md",
+      "status": "A"
+    },
+    {
+      "additions": 1,
+      "deletions": 1,
+      "path": "src/app/StockLedgerApp.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 15,
+      "deletions": 0,
+      "path": "src/data/repositories/workspaceRepository.ts",
+      "status": "M"
+    },
+    {
+      "additions": 96,
+      "deletions": 37,
+      "path": "src/features/sync/CloudSyncPanel.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 1,
+      "deletions": 0,
+      "path": "src/features/sync/client.ts",
+      "status": "M"
+    },
+    {
+      "additions": 3,
+      "deletions": 2,
+      "path": "src/features/sync/sessionStorage.native.ts",
+      "status": "M"
+    },
+    {
+      "additions": 59,
+      "deletions": 10,
+      "path": "src/features/sync/syncPlan.ts",
+      "status": "M"
+    },
+    {
+      "additions": 345,
+      "deletions": 34,
+      "path": "src/features/sync/synchronize.ts",
+      "status": "M"
+    },
+    {
+      "additions": 116,
+      "deletions": 0,
+      "path": "src/lib/i18n.ts",
+      "status": "M"
+    },
+    {
+      "additions": 298,
+      "deletions": 0,
+      "path": "supabase/migrations/20260918000000_secure_personal_sync.sql",
+      "status": "A"
+    },
+    {
+      "additions": 47,
+      "deletions": 2,
+      "path": "tests/cloud.test.ts",
+      "status": "M"
+    },
+    {
+      "additions": 11,
+      "deletions": 0,
+      "path": "tests/e2e/workspace.spec.ts",
+      "status": "M"
+    },
+    {
+      "additions": 32,
+      "deletions": 5,
+      "path": "tests/integration/cloud.integration.ts",
+      "status": "M"
+    },
+    {
+      "additions": 9,
+      "deletions": 1,
+      "path": "tests/sync.test.ts",
+      "status": "M"
+    },
+    {
+      "additions": 345,
+      "deletions": 0,
+      "path": "tests/synchronize.test.ts",
+      "status": "A"
+    }
+  ],
+  "checks": [
+    {
+      "command": "/bin/zsh -lc \"pwd && printf '%s\\\\n' '--- AGENTS refs ---' && sed -n '1,240p' /Users/haewonkim/.codex/RTK.md && printf '%s\\\\n' '--- law ---' && sed -n '1,260p' /Users/haewonkim/.codex/law.md && printf '%s\\\\n' '--- repo files ---' && rg --files -g 'AGENTS.md' -g '\"'!node_modules'\"' -g '\"'!dist'\"' -g '\"'!build'\"' | sort && printf '%s\\\\n' '--- git status ---' && git status --short --branch && printf '%s\\\\n' '--- recent refs ---' && git log --oneline --decorate -12\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git status --short --branch && rtk git cat-file -t 1d99e86da7d059e543e49c6b6e2164dcc0b41346 && rtk git show --no-ext-diff --format=fuller --stat 1d99e86da7d059e543e49c6b6e2164dcc0b41346 && rtk git show -s --format='candidate=%H%nparent1=%P%nsubject=%s' 1d99e86da7d059e543e49c6b6e2164dcc0b41346 && rtk git branch -a --contains 1d99e86da7d059e543e49c6b6e2164dcc0b41346 && rtk node --version && rtk docker info\"",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk command -v node; rtk which -a node; rtk command -v nvm || true; rtk command -v fnm || true; rtk command -v mise || true; rtk command -v asdf || true; rtk ls -d /opt/homebrew/opt/node* /usr/local/opt/node* /opt/homebrew/Cellar/node* /usr/local/Cellar/node* 2>/dev/null || true; rtk git show -s --format='fix=%H%nparent=%P%nauthor=%an%nsubject=%s' 8a0e7fcc0345012768d3bf759ec6b0ee33ddba81; rtk git show -s --format='baseCandidateParent=%H%nparent=%P%nsubject=%s' 8a0e7fcc0345012768d3bf759ec6b0ee33ddba81\"'^; rtk git merge-base --is-ancestor ef253b3 1d99e86da7d059e543e49c6b6e2164dcc0b41346; printf '\"'main-to-candidate status=%s\\\\n' \\\"\"'$?\"; rtk git merge-base --is-ancestor 8a0e7fcc0345012768d3bf759ec6b0ee33ddba81 1d99e86da7d059e543e49c6b6e2164dcc0b41346; printf '\"'fix-to-candidate status=%s\\\\n' \\\"\"'$?\"; rtk git log --graph --decorate --oneline --all --max-count=24'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk /opt/homebrew/bin/node --version; rtk ls -1 /Users/haewonkim/.nvm/versions/node; rtk find /Users/haewonkim/.nvm/versions/node -maxdepth 2 -type f -name node -print 2>/dev/null; rtk find /opt/homebrew -maxdepth 4 -type f -path '*/bin/node' -print 2>/dev/null | head -20; rtk git rev-parse --verify HEAD\"'^{commit}; rtk git rev-parse --verify 1d99e86da7d059e543e49c6b6e2164dcc0b41346''^{tree}; rtk git rev-parse --verify ef253b3fad2475f0b52f7d1722c1350667a44694''^{tree}; rtk git diff --no-ext-diff --stat ef253b3fad2475f0b52f7d1722c1350667a44694 1d99e86da7d059e543e49c6b6e2164dcc0b41346; rtk git diff --no-ext-diff --name-status 8a0e7fcc0345012768d3bf759ec6b0ee33ddba81 1d99e86da7d059e543e49c6b6e2164dcc0b41346'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk open -a OrbStack'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk node --version && PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm --version && rtk docker info'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git switch --detach 1d99e86da7d059e543e49c6b6e2164dcc0b41346 && rtk git status --short --branch && rtk git rev-parse HEAD && rtk git rev-parse HEAD''^{tree} && rtk git rev-parse HEAD''^ && rtk git rev-parse HEAD''^''^{tree} && rtk git diff --no-ext-diff --name-status HEAD''^ HEAD && rtk git diff --no-ext-diff --check HEAD''^ HEAD && rtk git diff --no-ext-diff --exit-code HEAD -- && rtk git diff --cached --no-ext-diff --exit-code HEAD -- && rtk git ls-files -s | shasum -a 256'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm ci'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '1,260p' package.json && printf '%s\\\\n' '--- supabase-related files ---' && rg --files -g 'supabase/**' -g '*supabase*' -g 'docker-compose*' -g '\"'!node_modules'\"' | sort && printf '%s\\\\n' '--- supabase references ---' && rg -n --glob '\"'!node_modules/**'\"' --glob '\"'!dist/**'\"' --glob '\"'!build/**'\"' 'supabase (start|stop|db reset|status)|test:e2e|test:cloud|check:boundaries|check:frozen|export:all|SUPABASE' README.md package.json scripts src tests supabase 2>/dev/null | head -240\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '1,220p' README.md && printf '%s\\\\n' '--- config top ---' && rtk sed -n '1,220p' supabase/config.toml && printf '%s\\\\n' '--- integration test ---' && rtk sed -n '1,280p' tests/integration/cloud.integration.ts && printf '%s\\\\n' '--- e2e config ---' && rtk rg -n --glob '\"'!node_modules/**'\"' 'baseURL|SUPABASE|EXPO_PUBLIC|webServer|playwright' . | head -240\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk node_modules/.bin/supabase status -o json || true; rtk node_modules/.bin/supabase stop --help | head -80'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk node_modules/.bin/supabase stop --project-id stockledger-local --no-backup --yes && rtk node_modules/.bin/supabase start --workdir .'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run typecheck'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm test -- --run'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm test -- --run tests/cloud.test.ts tests/sync.test.ts tests/synchronize.test.ts tests/i18n.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run test:cloud'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npx supabase db lint --local --schema public,ledger_private --level warning --fail-on warning'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run check:boundaries'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run check:frozen'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run export:all'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run test:e2e'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git diff --check'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk node_modules/.bin/supabase status -o table\nrtk docker ps --filter name=stockledger-local --format '{{.Names}}\\\\t{{.Status}}'\nrtk git status --short --branch --untracked-files=all\nrtk git rev-parse HEAD\nrtk git rev-parse HEAD\"'^{tree}\nrtk git rev-parse HEAD''^\nrtk git rev-parse HEAD''^''^\nrtk git rev-parse HEAD''^''^''^\nrtk git merge-base HEAD origin/main\nrtk git diff --no-ext-diff --name-status HEAD''^ HEAD\nrtk git diff --no-ext-diff --quiet HEAD --\nrtk git diff --cached --no-ext-diff --quiet HEAD --\nrtk git ls-files -s | shasum -a 256\nrtk git write-tree'",
+      "exit_code": 0,
+      "type": "command_execution"
+    }
+  ],
+  "codex": {
+    "cli_version": "codex-cli 0.154.0",
+    "configured_model": "gpt-5.6-luna",
+    "event_count": 58,
+    "provider_reported_model": null,
+    "reasoning_effort": "xhigh",
+    "terminal_type": "turn.completed",
+    "usage": {
+      "cache_hit_percent": 95.58,
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 1204224,
+      "fresh_input_tokens": 55742,
+      "input_tokens": 1259966,
+      "non_reasoning_output_tokens": 5601,
+      "output_tokens": 14917,
+      "reasoning_output_tokens": 9316,
+      "total_processed_tokens": 1274883
+    },
+    "warnings": []
+  },
+  "commits": [
+    {
+      "sha": "1d99e86da7d059e543e49c6b6e2164dcc0b41346",
+      "subject": "docs: publish CHG-93 cursor evidence"
+    },
+    {
+      "sha": "8a0e7fcc0345012768d3bf759ec6b0ee33ddba81",
+      "subject": "fix: reconcile post-mutation cursor feed"
+    },
+    {
+      "sha": "4eb53988f35abd80198954b824f9084c5f3272b1",
+      "subject": "fabric: capture completed model changes [CF-8184e10cf918d80eef00766a]"
+    }
+  ],
+  "diff": null,
+  "error_code": null,
+  "evidence_manifest": {
+    "count": 2,
+    "items": [
+      {
+        "bytes": 8282,
+        "path": "docs/operations/CLOUD_DEPLOYMENT.md",
+        "sha256": "f425a22a72a5b5fbb53310ca103e947aeb6dd26959561676ca98bf701601c5e4"
+      },
+      {
+        "bytes": 6936,
+        "path": "docs/production/CHG-93_EVIDENCE.md",
+        "sha256": "4a3ee3b0df15b5c5a45e10acea1087e6d3697a2ccbd352b58d76a4827528a45b"
+      }
+    ],
+    "version": 1
+  },
+  "evidence_publisher_release": "1.2.3-resume-candidate",
+  "fabric_capture": null,
+  "fabric_release": "1.2.3-resume-candidate",
+  "failure_class": null,
+  "finished_at": "2026-09-18T21:07:39Z",
+  "git": {
+    "base_is_ancestor": true,
+    "base_sha": "ef253b3fad2475f0b52f7d1722c1350667a44694",
+    "branch": "codex/stockledger-prod-c06-account-sync-supabase-verify-v1",
+    "detached_verify": true,
+    "head_sha": "1d99e86da7d059e543e49c6b6e2164dcc0b41346",
+    "remote_exact_head": true,
+    "remote_head_sha": "1d99e86da7d059e543e49c6b6e2164dcc0b41346",
+    "target_branch": "main",
+    "target_drifted_since_acceptance": false,
+    "target_head_observed_after_execution": "ef253b3fad2475f0b52f7d1722c1350667a44694",
+    "work_branch": "codex/stockledger-prod-c06-account-sync-supabase-verify-v1",
+    "worktree_clean": true
+  },
+  "instructions": {
+    "files": [],
+    "total_bytes": 0,
+    "warning": null
+  },
+  "job_id": "CF-8a74ed2b7d34c3beca45eb1d",
+  "kind": "codex-fabric-audit-evidence",
+  "locator": {
+    "branch": "codex-fabric/evidence/stockledger/prod-c06-account-sync-supabase-verify-v1",
+    "path": ".codex-fabric/audit.json",
+    "ref": "refs/heads/codex-fabric/evidence/stockledger/prod-c06-account-sync-supabase-verify-v1"
+  },
+  "operation": "VERIFY",
+  "policy": {
+    "environment_policy_sha256": "e077daca74297b3c30bee8989f00f8ca5338f7610b4d016a6c48db524205d064",
+    "fabric_release": "1.2.3-resume-candidate",
+    "policy_sha256": "44756118cd7fda0c45cd23ba1d31a48a3f4f2422d687df15264ba4406f40e1f2",
+    "registry_sha256": "cfc765f3211c37c7967a138f3b2d89a99341939b15b2623f92744d007f625d6f"
+  },
+  "project_id": "stockledger",
+  "recovery": {
+    "model_rerun_safe": false,
+    "recovery_required": false,
+    "retry_safe": false,
+    "retry_scope": null,
+    "worktree_retained": true
+  },
+  "request": "prod-c06-account-sync-supabase-verify-v1",
+  "schema_version": 1,
+  "started_at": "2026-09-18T15:38:57Z",
+  "status": "EXECUTED_WITH_WARNINGS",
+  "timing": {
+    "execution_seconds": 19722,
+    "queue_seconds": 0,
+    "total_seconds": 19722
+  },
+  "transport": {
+    "bytes": 2784,
+    "envelope": "FABRIC/2",
+    "prompt_bytes": 2432,
+    "prompt_sha256": "05ed6cff5a968af998dc9613dfb154fe65f141abe6b51b9f3324fb2df4f2014e",
+    "sha256": "8a74ed2b7d34c3beca45eb1da33b19305fd1fdd297b9bcd104ed7cb46577141b"
+  }
+}
