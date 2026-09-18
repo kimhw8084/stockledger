@@ -11,7 +11,7 @@
 - Runtime: Node `v22.23.2`, npm `10.9.8`
 - Hosted scheduler: not provisioned or exercised; external deployment remains a gate
 
-The tested implementation head will be the exact source commit for the runtime/test evidence below; the evidence-publication commit changes documentation only. The protected-main base and R1 candidate were carried forward exactly before the focused recovery correction.
+The tested implementation head is the exact source commit for the runtime/test evidence below; the evidence-publication commit changes documentation only. The protected-main base and R1 candidate were carried forward exactly before the focused recovery correction.
 
 ## Changed files
 
