@@ -6,7 +6,8 @@ type Manifest = { generation: string; count: number };
 const manifest = async (key: string): Promise<Manifest | null> => {
   const raw = await SecureStore.getItemAsync(safeKey(key));
   if (!raw) return null;
-  const value = JSON.parse(raw) as Manifest;
+  let value: Manifest;
+  try { value = JSON.parse(raw) as Manifest; } catch { throw new Error("Saved sign-in session needs to be cleared before signing in again."); }
   if (!value || !/^[a-zA-Z0-9-]{1,100}$/.test(value.generation) || !Number.isInteger(value.count) || value.count < 1 || value.count > 64) throw new Error("Saved sign-in session needs to be cleared before signing in again.");
   return value;
 };
@@ -18,7 +19,7 @@ export default {
   },
   async setItem(key: string, value: string) {
     const old = await manifest(key);
-    const generation = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const generation = `${Date.now()}-${globalThis.crypto.randomUUID()}`;
     const chunks = value.match(/[\s\S]{1,1000}/g) ?? [""];
     if (chunks.length > 64) throw new Error("Sign-in session exceeds secure storage limits.");
     for (let i = 0; i < chunks.length; i++) await SecureStore.setItemAsync(`${safeKey(key)}.${generation}.${i}`, chunks[i]);

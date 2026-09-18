@@ -4646,7 +4646,7 @@ export default function App() {
           {tab === "Settings" ? (
             <>
               <WorkspacePanel data={data} actions={actions} language={language} />
-              <CloudSyncPanel data={data} actions={actions} />
+              <CloudSyncPanel data={data} actions={actions} language={language} />
               <Reveal>
                 <SectionHeader note={subtitleLabel(language, "Settings")} />
                 <View style={styles.homeSummaryStrip}>

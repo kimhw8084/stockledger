@@ -12,3 +12,4 @@ export const cloud = url && key && permittedUrl(url) ? createClient(url, key, { 
   detectSessionInUrl: Platform.OS === "web", flowType: "pkce", lock: processLock,
 } }) : null;
 export const cloudEndpoint = url ?? "";
+export const cloudRecoveryRedirect = Platform.OS === "web" && typeof window !== "undefined" ? window.location.origin : undefined;

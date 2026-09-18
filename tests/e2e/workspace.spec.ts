@@ -101,6 +101,17 @@ test("records a deliberate decision, reviews its outcome, and preserves an amend
   await expect(page.getByText(/Regression review: wait for confirmed evidence/)).toBeVisible();
 });
 
+test("keeps cloud optional and exposes the localized local-first account boundary", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "Settings", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Optional personal cloud sync" })).toBeVisible();
+  await expect(page.getByText("Cloud sync is not configured for this build.", { exact: false })).toBeVisible();
+  await page.getByRole("button", { name: "한국어", exact: true }).click();
+  await expect(page.getByText("선택적 개인 클라우드 동기화", { exact: true })).toBeVisible();
+  await expect(page.getByText("이 빌드에는 클라우드 동기화가 설정되지 않았습니다.", { exact: false })).toBeVisible();
+  await expect(page.getByRole("button", { name: "전체 클라우드 데이터 내보내기", exact: true })).toHaveCount(0);
+});
+
 test("resolves entity links, fails safely, and preserves language preference", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "Explore sample workspace" }).click();
