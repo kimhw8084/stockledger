@@ -39,6 +39,10 @@ const changesSchema = z.object({
   hasMore: z.boolean(),
   changes: z.array(rowSchema),
 });
+const highWaterSchema = z.object({
+  contractVersion: z.literal(syncContractVersion),
+  cursor: z.number().int().nonnegative(),
+});
 const acknowledgementSchema = z.array(z.object({
   collection: z.enum(syncCollections),
   recordId: z.string().min(1).max(200),
@@ -146,6 +150,9 @@ async function changesAfter(after: number): Promise<{ records: CloudRecord[]; cu
     const { data, error } = await cloud.rpc("get_ledger_changes", { p_after_cursor: cursor, p_limit: syncPageLimit });
     if (error) throw asError(error);
     const result = changesSchema.parse(data);
+    for (const change of result.changes) {
+      if (change.cursor === undefined || change.cursor <= cursor) throw new Error("Cloud change feed returned an unordered cursor.");
+    }
     records.push(...result.changes);
     if (!result.hasMore) return { records, cursor: result.highWaterCursor };
     if (result.nextCursor <= cursor) throw new Error("Cloud change pagination did not advance.");
@@ -154,20 +161,16 @@ async function changesAfter(after: number): Promise<{ records: CloudRecord[]; cu
   throw new Error("Cloud change feed exceeded the bounded page count. Retry before making more edits.");
 }
 
-const addAcknowledgement = (records: CloudRecord[], changes: SyncChange[], acknowledgements: z.infer<typeof acknowledgementSchema>) => {
+async function observeHighWaterCursor(): Promise<number> {
+  if (!cloud) throw new Error("Cloud sync is not configured.");
+  const { data, error } = await cloud.rpc("get_ledger_high_water_cursor");
+  if (error) throw asError(error);
+  return highWaterSchema.parse(data).cursor;
+}
+
+const applyChangeFeed = (records: CloudRecord[], changes: CloudRecord[]) => {
   const byKey = new Map(records.map(record => [recordKey(record), record]));
-  for (const acknowledgement of acknowledgements) {
-    const change = changes.find(item => item.collection === acknowledgement.collection && item.recordId === acknowledgement.recordId);
-    if (!change) throw new SyncAcknowledgementError();
-    byKey.set(`${acknowledgement.collection}/${acknowledgement.recordId}`, {
-      collection: acknowledgement.collection,
-      record_id: acknowledgement.recordId,
-      revision: acknowledgement.revision,
-      payload: change.payload,
-      deleted: change.deleted,
-      cursor: acknowledgement.cursor,
-    });
-  }
+  for (const change of changes) byKey.set(recordKey(change), change);
   return [...byKey.values()];
 };
 
@@ -211,76 +214,117 @@ export async function synchronize(
 
   let remoteRecords: CloudRecord[];
   let remoteCursor: number;
-  try {
-    if (!hadState || (state.cursor === 0 && state.records.length === 0 && Object.keys(state.baseline).length > 0)) {
+  const existingOutbox = state.outbox[0];
+  if (existingOutbox) {
+    // The outbox snapshot is the complete remote state at the cursor held just
+    // before this mutation was submitted. Do not pull from a later cursor: the
+    // post-submit reconciliation must replay from baseCursor, including any
+    // changes that raced the RPC and the acknowledged mutation itself.
+    remoteRecords = state.records;
+    remoteCursor = state.cursor;
+  } else {
+    try {
+      if (!hadState || (state.cursor === 0 && state.records.length === 0 && Object.keys(state.baseline).length > 0)) {
+        const bootstrapped = await bootstrap();
+        remoteRecords = bootstrapped.records;
+        remoteCursor = bootstrapped.cursor;
+      } else {
+        const feed = await changesAfter(state.cursor);
+        remoteRecords = applyChangeFeed(state.records, feed.records);
+        remoteCursor = feed.cursor;
+      }
+    } catch (error) {
+      if (!(error instanceof SyncCursorExpiredError) || !options.allowRebootstrap) throw error;
       const bootstrapped = await bootstrap();
       remoteRecords = bootstrapped.records;
       remoteCursor = bootstrapped.cursor;
-    } else {
-      const feed = await changesAfter(state.cursor);
-      const byKey = new Map(state.records.map(record => [recordKey(record), record]));
-      for (const change of feed.records) byKey.set(recordKey(change), change);
-      remoteRecords = [...byKey.values()];
-      remoteCursor = feed.cursor;
     }
-  } catch (error) {
-    if (!(error instanceof SyncCursorExpiredError) || !options.allowRebootstrap) throw error;
-    const bootstrapped = await bootstrap();
-    remoteRecords = bootstrapped.records;
-    remoteCursor = bootstrapped.cursor;
-  }
-  const existingOutbox = state.outbox[0];
-  let recoveredAcknowledgement = false;
-  if (existingOutbox) {
-    const acknowledgement = existingOutbox.acknowledgement ?? await submitMutation(existingOutbox);
-    const acknowledgedState: SyncStoredState = {
-      ...state,
-      cursor: Math.max(remoteCursor, ...acknowledgement.map(item => item.cursor)),
-      records: addAcknowledgement(remoteRecords, existingOutbox.changes, acknowledgement),
-      outbox: [{ ...existingOutbox, acknowledgement }],
-    };
-    await saveState(store, key, acknowledgedState);
-    state = acknowledgedState;
-    remoteRecords = state.records;
-    remoteCursor = state.cursor;
-    recoveredAcknowledgement = true;
   }
 
   if (!hadState && adoptLocal && Object.keys(state.baseline).length === 0) state.baseline = {};
-  const plan = planSync(data, remoteRecords, state.baseline, resolutions);
-  if (plan.conflicts.length) throw new SyncConflictError(plan.conflicts);
-  const merged = applyRecords(data, plan.merged); // validate the complete graph before any upload
+  let entry = existingOutbox;
+  let acknowledgement = existingOutbox?.acknowledgement;
+  let uploaded = 0;
 
-  // A recovered acknowledgement has already been submitted. Persist the
-  // resulting local state and baseline, then clear its intent. Any newer local
-  // edit remains against this new baseline for the next sync.
-  if (recoveredAcknowledgement) {
-    await persist(merged);
-    await saveState(store, key, { contractVersion: syncContractVersion, cursor: remoteCursor, records: remoteRecords, baseline: baselineFor(remoteRecords, remoteCursor), outbox: [] });
-    return { uploaded: 0, records: remoteRecords.length, cursor: remoteCursor, bootstrapped: !hadState || options.allowRebootstrap === true };
-  }
-
-  if (plan.changes.length > syncPageLimit) throw new Error("This sync exceeds the 500-record mutation limit. Retry in smaller local edits or export a backup before migrating a larger workspace.");
-  if (plan.changes.length) {
-    const entry: SyncOutboxEntry = {
+  if (!entry) {
+    const plan = planSync(data, remoteRecords, state.baseline, resolutions);
+    if (plan.conflicts.length) throw new SyncConflictError(plan.conflicts);
+    if (plan.changes.length > syncPageLimit) throw new Error("This sync exceeds the 500-record mutation limit. Retry in smaller local edits or export a backup before migrating a larger workspace.");
+    if (!plan.changes.length) {
+      const merged = applyRecords(data, plan.merged);
+      await persist(merged);
+      await saveState(store, key, { contractVersion: syncContractVersion, cursor: remoteCursor, records: remoteRecords, baseline: baselineFor(remoteRecords, remoteCursor), outbox: [] });
+      return { uploaded: 0, records: remoteRecords.length, cursor: remoteCursor, bootstrapped: !hadState || options.allowRebootstrap === true };
+    }
+    entry = {
       mutationId: globalThis.crypto.randomUUID(),
       createdAt: new Date().toISOString(),
-      baseCursor: state.cursor,
+      baseCursor: remoteCursor,
       changeHash: contentHash(plan.changes),
       localWorkspaceHash: contentHash(data),
       changes: plan.changes,
     };
+    // This is the durable pre-submit snapshot. In particular, baseCursor is
+    // the exact catch-up starting point, even if another device writes before
+    // the RPC begins or while it is committing.
     await saveState(store, key, { ...state, cursor: remoteCursor, records: remoteRecords, outbox: [entry] });
-    const acknowledgement = await submitMutation(entry);
-    remoteRecords = addAcknowledgement(remoteRecords, plan.changes, acknowledgement);
-    remoteCursor = Math.max(remoteCursor, ...acknowledgement.map(item => item.cursor));
-    // Save the acknowledgement before touching the workspace. A crash after
-    // the RPC but before local persistence can therefore replay safely.
-    await saveState(store, key, { ...state, cursor: remoteCursor, records: remoteRecords, outbox: [{ ...entry, acknowledgement }] });
+    acknowledgement = await submitMutation(entry);
+    uploaded = plan.changes.length;
+    // Persist the acknowledgement without advancing the cursor. The feed
+    // replay below is the only operation allowed to establish a new baseline.
+    const acknowledgedState: SyncStoredState = {
+      ...state,
+      cursor: Math.max(state.cursor, entry.baseCursor),
+      records: remoteRecords,
+      outbox: [{ ...entry, acknowledgement }],
+    };
+    await saveState(store, key, acknowledgedState);
+    state = acknowledgedState;
+  } else if (!acknowledgement) {
+    acknowledgement = await submitMutation(entry);
+    const acknowledgedState: SyncStoredState = {
+      ...state,
+      cursor: Math.max(state.cursor, entry.baseCursor),
+      records: remoteRecords,
+      outbox: [{ ...entry, acknowledgement }],
+    };
+    await saveState(store, key, acknowledgedState);
+    state = acknowledgedState;
   }
+
+  const catchUpStart = entry.baseCursor;
+  const acknowledgementCursor = Math.max(...acknowledgement.map(item => item.cursor));
+  let reconciledRecords: CloudRecord[];
+  let reconciledCursor: number;
+  try {
+    const observedHighWater = await observeHighWaterCursor();
+    const feed = await changesAfter(catchUpStart);
+    if (feed.cursor < observedHighWater || feed.cursor < acknowledgementCursor) throw new SyncAcknowledgementError("The cloud change feed did not reach the acknowledged server high-water mark. Local intent is retained; retry sync.");
+    reconciledRecords = applyChangeFeed(state.records, feed.records);
+    for (const item of acknowledgement) {
+      const acknowledgedChange = feed.records.some(candidate => recordKey(candidate) === `${item.collection}/${item.recordId}` && candidate.revision === item.revision && candidate.cursor === item.cursor);
+      if (!acknowledgedChange) throw new SyncAcknowledgementError("The ordered change feed did not include the acknowledged mutation. Local intent is retained; retry sync.");
+    }
+    reconciledCursor = Math.max(state.cursor, feed.cursor);
+  } catch (error) {
+    if (!(error instanceof SyncCursorExpiredError) || !options.allowRebootstrap) throw error;
+    const bootstrapped = await bootstrap();
+    if (bootstrapped.cursor < acknowledgementCursor) throw new SyncAcknowledgementError("Bounded re-bootstrap did not reach the acknowledged server cursor. Local intent is retained; retry sync.");
+    reconciledRecords = bootstrapped.records;
+    reconciledCursor = Math.max(state.cursor, bootstrapped.cursor);
+  }
+
+  // Recompute from the complete post-submit remote state. This applies
+  // unrelated device changes locally and retains any newer local edits as
+  // exact, version-bound conflicts instead of overwriting them.
+  const reconciledPlan = planSync(data, reconciledRecords, state.baseline, resolutions);
+  if (reconciledPlan.conflicts.length) throw new SyncConflictError(reconciledPlan.conflicts);
+  const merged = applyRecords(data, reconciledPlan.merged);
   await persist(merged);
-  await saveState(store, key, { contractVersion: syncContractVersion, cursor: remoteCursor, records: remoteRecords, baseline: baselineFor(remoteRecords, remoteCursor), outbox: [] });
-  return { uploaded: plan.changes.length, records: remoteRecords.length, cursor: remoteCursor, bootstrapped: !hadState || options.allowRebootstrap === true };
+  // Workspace persistence is intentionally before clearing the acknowledged
+  // outbox. A crash here leaves a replayable acknowledgement for the next run.
+  await saveState(store, key, { contractVersion: syncContractVersion, cursor: reconciledCursor, records: reconciledRecords, baseline: baselineFor(reconciledRecords, reconciledCursor), outbox: [] });
+  return { uploaded, records: reconciledRecords.length, cursor: reconciledCursor, bootstrapped: !hadState || options.allowRebootstrap === true };
 }
 
 export async function exportPersonalCloudData(): Promise<string> {
