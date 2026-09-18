@@ -21,6 +21,15 @@ const managedFixture = (endDate = "2026-09-14", count = 260) => {
   const histories = [...new Set([data.stocks[0].symbol, "SPY", "XLK"])].map(symbol => ({ symbol, rows: dates.map((date, index) => ({ symbol, date, open: 100 + index, close: 100 + index, high: 101 + index, low: 99 + index, volume: 1000 })) }));
   return { data, histories };
 };
+const managedKinds = ["ingestion-readiness", "evaluation-scan", "outcome-forward-proof", "notification-outbox-intent"] as const;
+const queuedWorkflow = (store: WorkerStore, workflowKey: string, inputHash: string, session = "2026-09-14", now = Date.parse("2026-09-14T22:00:00Z")) => {
+  const jobs = managedKinds.map(kind => jobIdentityFor({ kind, scheduledSession: session, workflowKey, inputHash, dueAtUtc: marketSessionDueAtUtc(session).toISOString() }));
+  store.enqueueMany(jobs, now);
+  return jobs;
+};
+const changedHistories = (histories: ReturnType<typeof managedFixture>["histories"]) => histories.map(history => history.symbol === "SPY"
+  ? { ...history, rows: history.rows.map((row, index) => index === history.rows.length - 1 ? { ...row, close: row.close + 0.5, high: row.high + 0.5 } : row) }
+  : history);
 it("persists revisions and rejects stale writes without losing records", () => {
   const path = databasePath(); const first = new WorkerStore(path);
   first.import(seedData, 0); first.close();
@@ -97,6 +106,179 @@ it("creates deterministic versioned stage keys and deduplicates repeated managed
   expect(store.listJobs()).toHaveLength(4);
   expect(store.pendingOutbox()).toHaveLength(1);
   expect(first.deadline.workloadSize).toEqual({ symbols: 3, rows: 780, scheduledSessions: 1, jobStages: 4 });
+  store.close();
+});
+
+it("atomically supersedes queued input A when restart recovery sees corrected input B", async () => {
+  const path = databasePath(); const store = new WorkerStore(path); const fixture = managedFixture();
+  store.import(fixture.data, 0);
+  const oldJobs = queuedWorkflow(store, "workflow-a", "input-a");
+  const corrected = await runManagedJob(store, changedHistories(fixture.histories), { source: "Drift fixture", adjustment: "adjusted", now: new Date("2026-09-14T22:00:00Z") });
+  expect(corrected.status).toBe("completed");
+  const superseded = oldJobs.map(job => store.getJob(job.id)!);
+  expect(superseded.every(job => job.status === "superseded")).toBe(true);
+  expect(superseded.every(job => job.attempts === 0 && job.reconciliationReplacementJobId)).toBe(true);
+  expect(superseded.every(job => job.reconciliationReplacementWorkflowKey !== "workflow-a" && job.reconciliationReason?.includes("active-input-drift"))).toBe(true);
+  expect(store.listReconciliations()).toHaveLength(4);
+  expect(corrected.scheduler.coverage.completedSessions).toEqual(["2026-09-14"]);
+  expect(corrected.scheduler.coverage.retryingSessions).toEqual([]);
+  expect(corrected.scheduler.missedSessions).toEqual([]);
+  expect(corrected.scheduler.lastSafeError).toBeNull();
+  expect(corrected.scheduler.schedulerInstalled).toBe(false);
+  expect(corrected.scheduler.jobsByStatus.superseded).toBe(4);
+  expect(corrected.scheduler.jobsByStatus.queued + corrected.scheduler.jobsByStatus.running + corrected.scheduler.jobsByStatus["retry-wait"]).toBe(0);
+  const revision = store.load()?.revision;
+  const scanRuns = store.load()?.data.scanRuns.map(run => run.id);
+  const signals = store.load()?.data.scanSignals.map(signal => signal.signalId);
+  const alerts = store.load()?.data.alerts.map(alert => alert.id);
+  const outbox = store.pendingOutbox().map(intent => intent.id);
+  const repeated = await runManagedJob(store, changedHistories(fixture.histories), { source: "Drift fixture", adjustment: "adjusted", now: new Date("2026-09-14T22:00:00Z") });
+  expect(repeated.status).toBe("already_claimed_or_completed");
+  expect(store.load()?.revision).toBe(revision);
+  expect(store.load()?.data.scanRuns.map(run => run.id)).toEqual(scanRuns);
+  expect(store.load()?.data.scanSignals.map(signal => signal.signalId)).toEqual(signals);
+  expect(store.load()?.data.alerts.map(alert => alert.id)).toEqual(alerts);
+  expect(store.pendingOutbox().map(intent => intent.id)).toEqual(outbox);
+  store.close();
+});
+
+it("supersedes retry-wait A before its retry deadline without recycling attempts or errors", async () => {
+  const path = databasePath(); const store = new WorkerStore(path); const fixture = managedFixture();
+  store.import(fixture.data, 0);
+  const oldJobs = queuedWorkflow(store, "workflow-a", "input-a");
+  const oldEvaluation = oldJobs.find(job => job.kind === "evaluation-scan")!;
+  const oldToken = store.claimJob(oldEvaluation.id, "old-worker", 1_000, 10_000)!;
+  store.failJob(oldEvaluation.id, oldToken, "input A provider timeout", 1_001);
+  const before = store.getJob(oldEvaluation.id)!;
+  expect(before.status).toBe("retry-wait");
+  const corrected = await runManagedJob(store, changedHistories(fixture.histories), { source: "Retry drift fixture", adjustment: "adjusted", now: new Date("2026-09-14T22:00:00Z") });
+  const after = store.getJob(oldEvaluation.id)!;
+  expect(corrected.status).toBe("completed");
+  expect(after.status).toBe("superseded");
+  expect(after.attempts).toBe(before.attempts);
+  expect(after.nextRetryAt).toBe(before.nextRetryAt);
+  expect(after.lastSafeError).toBe("input A provider timeout");
+  expect(after.reconciliationReplacementInputHash).not.toBe("input-a");
+  expect(store.listJobs({ scheduledSession: "2026-09-14" }).filter(job => job.workflowKey === "workflow-a" && ["queued", "running", "retry-wait"].includes(job.status))).toHaveLength(0);
+  expect(corrected.scheduler.coverage.retryingSessions).toEqual([]);
+  expect(corrected.scheduler.lastSafeError).toBeNull();
+  store.close();
+});
+
+it("supersedes expired-running A and rejects its former worker while preserving attempt history", async () => {
+  const path = databasePath(); const store = new WorkerStore(path); const fixture = managedFixture();
+  store.import(fixture.data, 0);
+  const oldJobs = queuedWorkflow(store, "workflow-a", "input-a");
+  const oldEvaluation = oldJobs.find(job => job.kind === "evaluation-scan")!;
+  const oldToken = store.claimJob(oldEvaluation.id, "old-worker", 1_000, 100)!;
+  const corrected = await runManagedJob(store, changedHistories(fixture.histories), { source: "Expired drift fixture", adjustment: "adjusted", now: new Date("2026-09-14T22:00:00Z") });
+  const after = store.getJob(oldEvaluation.id)!;
+  expect(corrected.status).toBe("completed");
+  expect(after.status).toBe("superseded");
+  expect(after.attempts).toBe(1);
+  expect(after.leaseUntil).toBe(1_100);
+  expect(after.leaseOwner).toBeNull();
+  expect(() => store.complete(oldEvaluation.id, oldToken, fixture.data, 1, Date.parse("2026-09-14T22:00:00Z"))).toThrow(/lease/);
+  expect(store.listJobs({ scheduledSession: "2026-09-14" }).filter(job => job.workflowKey === "workflow-a" && ["queued", "running", "retry-wait"].includes(job.status))).toHaveLength(0);
+  store.close();
+});
+
+it("keeps terminal-failed A immutable while corrected B gets a new identity and current coverage", async () => {
+  const path = databasePath(); const store = new WorkerStore(path); const fixture = managedFixture();
+  store.import(fixture.data, 0);
+  const oldJobs = queuedWorkflow(store, "workflow-a", "input-a");
+  const oldEvaluation = oldJobs.find(job => job.kind === "evaluation-scan")!;
+  let now = 1_000;
+  for (let attempt = 1; attempt <= WORKER_MAX_ATTEMPTS; attempt += 1) {
+    const token = store.claimJob(oldEvaluation.id, "old-worker", now, 10_000)!;
+    store.failJob(oldEvaluation.id, token, `terminal A failure ${attempt}`, now + 1);
+    const saved = store.getJob(oldEvaluation.id)!;
+    if (attempt < WORKER_MAX_ATTEMPTS) now = saved.nextRetryAt!;
+  }
+  const terminalBefore = store.getJob(oldEvaluation.id)!;
+  store.updateSchedulerState({ lastExpectedSession: "2026-09-14", lastInvocationAtUtc: "2026-09-14T22:00:00.000Z", now: Date.parse("2026-09-14T22:00:00Z") });
+  const corrected = await runManagedJob(store, changedHistories(fixture.histories), { source: "Terminal drift fixture", adjustment: "adjusted", now: new Date("2026-09-14T22:00:00Z") });
+  const terminalAfter = store.getJob(oldEvaluation.id)!;
+  const evaluationJobs = store.listJobs({ scheduledSession: "2026-09-14", kind: "evaluation-scan" });
+  expect(corrected.status).toBe("completed");
+  expect(terminalAfter.status).toBe("terminal-failed");
+  expect(terminalAfter.attempts).toBe(WORKER_MAX_ATTEMPTS);
+  expect(terminalAfter.lastSafeError).toBe(terminalBefore.lastSafeError);
+  expect(terminalAfter.completedAt).toBe(terminalBefore.completedAt);
+  expect(terminalAfter.reconciliationReplacementWorkflowKey).not.toBe("workflow-a");
+  expect(evaluationJobs).toHaveLength(2);
+  expect(evaluationJobs.find(job => job.workflowKey === "workflow-a")?.status).toBe("terminal-failed");
+  expect(evaluationJobs.find(job => job.workflowKey !== "workflow-a")?.status).toBe("completed");
+  expect(corrected.scheduler.coverage.terminalFailedSessions).toEqual([]);
+  expect(corrected.scheduler.coverage.completedSessions).toEqual(["2026-09-14"]);
+  expect(corrected.scheduler.state).toBe("healthy");
+  expect(corrected.scheduler.jobsByStatus["terminal-failed"]).toBe(1);
+  store.close();
+});
+
+it("preserves an unexpired A lease, defers B, then runs B once after A becomes terminal", async () => {
+  const path = databasePath(); const store = new WorkerStore(path); const fixture = managedFixture();
+  store.import(fixture.data, 0);
+  const oldJobs = queuedWorkflow(store, "workflow-a", "input-a");
+  const oldEvaluation = oldJobs.find(job => job.kind === "evaluation-scan")!;
+  const invocationAt = Date.parse("2026-09-14T22:00:00Z");
+  const oldToken = store.claimJob(oldEvaluation.id, "old-worker", invocationAt, 60_000)!;
+  const deferred = await runManagedJob(store, changedHistories(fixture.histories), { source: "Concurrent drift fixture", adjustment: "adjusted", now: new Date(invocationAt) });
+  expect(deferred.status).toBe("retry_wait");
+  expect(store.getJob(oldEvaluation.id)?.status).toBe("running");
+  expect(store.getJob(oldEvaluation.id)?.leaseToken).toBe(oldToken);
+  expect(store.listJobs({ scheduledSession: "2026-09-14" }).filter(job => job.workflowKey !== "workflow-a" && job.status === "completed")).toHaveLength(0);
+  expect(store.load()?.revision).toBe(1);
+  store.finishJob(oldEvaluation.id, oldToken, "completed", invocationAt + 1);
+  const completed = await runManagedJob(store, changedHistories(fixture.histories), { source: "Concurrent drift fixture", adjustment: "adjusted", now: new Date(invocationAt + 2) });
+  expect(completed.status).toBe("completed");
+  expect(store.load()?.revision).toBe(2);
+  expect(store.listJobs({ scheduledSession: "2026-09-14" }).filter(job => job.workflowKey !== "workflow-a" && job.kind === "evaluation-scan" && job.status === "completed")).toHaveLength(1);
+  expect(store.listJobs({ scheduledSession: "2026-09-14" }).filter(job => job.workflowKey === "workflow-a" && ["queued", "running", "retry-wait"].includes(job.status))).toHaveLength(0);
+  const revision = store.load()?.revision;
+  await runManagedJob(store, changedHistories(fixture.histories), { source: "Concurrent drift fixture", adjustment: "adjusted", now: new Date(invocationAt + 3) });
+  expect(store.load()?.revision).toBe(revision);
+  store.close();
+});
+
+it("does not let a late old-workflow invocation supersede its recorded replacement", () => {
+  const store = new WorkerStore(databasePath()); store.import(seedData, 0);
+  const oldJobs = queuedWorkflow(store, "workflow-a", "input-a");
+  const replacementJobs = queuedWorkflow(store, "workflow-b", "input-b");
+  const first = store.reconcileAndEnqueue(replacementJobs, 2_000);
+  expect(first.deferredSessions).toEqual([]);
+  expect(oldJobs.every(job => store.getJob(job.id)?.status === "superseded")).toBe(true);
+  const lateOldInvocation = store.reconcileAndEnqueue(oldJobs, 2_001);
+  expect(lateOldInvocation.deferredSessions).toEqual(["2026-09-14"]);
+  expect(replacementJobs.every(job => store.getJob(job.id)?.status === "queued")).toBe(true);
+  expect(store.listReconciliations()).toHaveLength(4);
+  store.close();
+});
+
+it("preserves reconciliation linkage and status across SQLite close/reopen", async () => {
+  const path = databasePath(); const store = new WorkerStore(path); const fixture = managedFixture();
+  store.import(fixture.data, 0);
+  const oldJobs = queuedWorkflow(store, "workflow-a", "input-a");
+  store.close();
+  const restarted = new WorkerStore(path);
+  await runManagedJob(restarted, changedHistories(fixture.histories), { source: "Restart drift fixture", adjustment: "adjusted", now: new Date("2026-09-14T22:00:00Z") });
+  const persistedOld = restarted.listJobs({ scheduledSession: "2026-09-14" }).filter(job => oldJobs.some(old => old.id === job.id));
+  expect(persistedOld.every(job => job.status === "superseded" && job.reconciledAt && job.reconciliationReplacementJobId)).toBe(true);
+  expect(restarted.listReconciliations()).toHaveLength(4);
+  expect(restarted.integrityCheck()).toBe(true);
+  restarted.close();
+});
+
+it("does not consume the active-job guard with superseded workflows", async () => {
+  const path = databasePath(); const store = new WorkerStore(path); const fixture = managedFixture();
+  store.import(fixture.data, 0);
+  for (let index = 0; index < WORKER_MAX_QUEUED_JOBS / managedKinds.length; index += 1) queuedWorkflow(store, `workflow-a-${index}`, `input-a-${index}`);
+  expect(store.listJobs().filter(job => ["queued", "running", "retry-wait"].includes(job.status))).toHaveLength(WORKER_MAX_QUEUED_JOBS);
+  const corrected = await runManagedJob(store, changedHistories(fixture.histories), { source: "Guard drift fixture", adjustment: "adjusted", now: new Date("2026-09-14T22:00:00Z") });
+  expect(corrected.status).toBe("completed");
+  expect(corrected.scheduler.jobsByStatus.superseded).toBe(WORKER_MAX_QUEUED_JOBS);
+  expect(store.listJobs().filter(job => ["queued", "running", "retry-wait"].includes(job.status))).toHaveLength(0);
+  expect(corrected.scheduler.coverage.completedSessions).toEqual(["2026-09-14"]);
   store.close();
 });
 

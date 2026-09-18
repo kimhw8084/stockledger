@@ -58,7 +58,7 @@ export interface ManagedWorkerResult {
   deadline: DeadlineEvidence;
 }
 
-const finalStatus = (job?: WorkerJob | null) => job && ["completed", "partial", "blocked", "terminal-failed"].includes(job.status);
+const finalStatus = (job?: WorkerJob | null) => job && ["completed", "partial", "blocked", "terminal-failed", "superseded"].includes(job.status);
 const sessionInstant = (session: string) => new Date(`${session}T23:00:00.000Z`);
 
 const sliceHistories = (histories: ManagedHistory[], session: string) => histories.map(history => ({
@@ -99,9 +99,12 @@ const plannedSessions = (store: WorkerStore, checkpoint: ReturnType<WorkerStore[
   const correctionSessions = persisted
     .filter(job => job.kind === "evaluation-scan" && correctionStatuses.has(job.status))
     .map(job => job.scheduledSession);
+  const terminalFailureSessions = persisted
+    .filter(job => job.kind === "evaluation-scan" && job.status === "terminal-failed")
+    .map(job => job.scheduledSession);
   // Keep every durable active session in the plan, including retry-wait jobs
   // whose deadline has not arrived. runSession will leave those untouched.
-  return [...new Set([...newlyDue, ...durableSessions, ...correctionSessions])].sort();
+  return [...new Set([...newlyDue, ...durableSessions, ...correctionSessions, ...terminalFailureSessions])].sort();
 };
 
 const workflowFor = (data: NonNullable<ReturnType<WorkerStore["load"]>>["data"], histories: ManagedHistory[], session: string, options: ManagedWorkerOptions) => {
@@ -293,8 +296,9 @@ export async function runManagedJob(store: WorkerStore, histories: ManagedHistor
   }
   const workflows = sessions.map(session => workflowFor(saved.data, histories, session, options));
   const queued = workflows.flatMap(workflow => workflow.jobs);
+  let reconciliation: { jobs: WorkerJob[]; deferredSessions: string[] };
   try {
-    store.enqueueMany(queued, now.getTime());
+    reconciliation = store.reconcileAndEnqueue(queued, now.getTime());
   } catch (cause) {
     const message = cause instanceof Error ? cause.message : "Scheduler admission guard blocked enqueue.";
     store.updateSchedulerState({ lastInvocationAtUtc: now.toISOString(), lastRunStatus: "admission_blocked", lastSafeError: message, now: now.getTime() });
@@ -312,6 +316,10 @@ export async function runManagedJob(store: WorkerStore, histories: ManagedHistor
 
   let latest: Awaited<ReturnType<typeof runSession>> | null = null;
   for (const workflow of workflows) {
+    if (reconciliation.deferredSessions.includes(workflow.jobs[0].scheduledSession)) {
+      latest = { status: "retry_wait", jobIds: workflow.jobs.map(job => job.id) };
+      break;
+    }
     const byKind = Object.fromEntries(workflow.jobs.map(job => [job.kind, job])) as Record<WorkerJobKind, JobContractResult["jobs"][number]>;
     try {
       latest = await runSession(store, histories, options, workflow.jobs[0].scheduledSession, { ...workflow, byKind, ids: workflow.jobs.map(job => job.id) }, now.getTime());

@@ -41,6 +41,23 @@ export interface WorkerJob {
   outputRef: string | null;
   createdAt: string;
   updatedAt: string;
+  reconciliationReplacementJobId: string | null;
+  reconciliationReplacementWorkflowKey: string | null;
+  reconciliationReplacementInputHash: string | null;
+  reconciliationReason: string | null;
+  reconciledAt: string | null;
+}
+
+export interface WorkerJobReconciliation {
+  sourceJobId: string;
+  sourceWorkflowKey: string;
+  sourceInputHash: string;
+  replacementJobId: string;
+  replacementWorkflowKey: string;
+  replacementInputHash: string;
+  replacementSemanticIdempotencyKey: string;
+  reason: string;
+  reconciledAt: string;
 }
 
 export interface SchedulerStatus {
@@ -87,7 +104,7 @@ type SchedulerState = {
   deadlineAtUtc: string | null;
 };
 
-type JobContractWithId = ProductionJobContract & { id: string };
+export type WorkerJobContractWithId = ProductionJobContract & { id: string };
 export type RelatedClaim = { id: string; token: string; status: Extract<WorkerJobStatus, "completed" | "partial" | "blocked"> };
 
 export class WorkerAdmissionError extends Error {
@@ -95,8 +112,9 @@ export class WorkerAdmissionError extends Error {
   constructor(message: string) { super(message); this.name = "WorkerAdmissionError"; }
 }
 
-const FINAL_STATUSES = new Set<WorkerJobStatus>(["completed", "partial", "blocked", "terminal-failed"]);
+const FINAL_STATUSES = new Set<WorkerJobStatus>(["completed", "partial", "blocked", "terminal-failed", "superseded"]);
 const ACTIVE_STATUSES = new Set<WorkerJobStatus>(["queued", "running", "retry-wait"]);
+const RECONCILABLE_STATUSES = new Set<WorkerJobStatus>(["queued", "running", "retry-wait"]);
 const iso = (value: unknown) => value === null || value === undefined ? null : String(value);
 const numberOrNull = (value: unknown) => value === null || value === undefined ? null : Number(value);
 
@@ -109,11 +127,12 @@ export class WorkerStore {
     if (path !== ":memory:") chmodSync(path, 0o600);
     this.db.exec("PRAGMA journal_mode=WAL; PRAGMA foreign_keys=ON; PRAGMA busy_timeout=5000;");
     const version = Number(this.db.prepare("PRAGMA user_version").get()?.user_version ?? 0);
-    if (version !== 0 && version !== 1 && version !== 2) throw new Error("Unsupported worker database version.");
+    if (version !== 0 && version !== 1 && version !== 2 && version !== 3) throw new Error("Unsupported worker database version.");
     this.createSchema();
     if (version === 1) this.migrateV1ToV2();
+    if (version === 1 || version === 2) this.migrateV2ToV3();
     this.createIndexes();
-    this.db.exec("PRAGMA user_version=2;");
+    this.db.exec("PRAGMA user_version=3;");
   }
 
   close() { this.db.close(); }
@@ -147,6 +166,17 @@ export class WorkerStore {
         updated_at TEXT NOT NULL
       );
       CREATE TABLE IF NOT EXISTS outbox (id TEXT PRIMARY KEY, job_id TEXT NOT NULL REFERENCES jobs(id), payload TEXT NOT NULL, created_at TEXT NOT NULL, delivered_at TEXT);
+      CREATE TABLE IF NOT EXISTS job_reconciliation (
+        source_job_id TEXT PRIMARY KEY REFERENCES jobs(id),
+        source_workflow_key TEXT NOT NULL,
+        source_input_hash TEXT NOT NULL,
+        replacement_job_id TEXT NOT NULL REFERENCES jobs(id),
+        replacement_workflow_key TEXT NOT NULL,
+        replacement_input_hash TEXT NOT NULL,
+        replacement_semantic_key TEXT NOT NULL,
+        reason TEXT NOT NULL,
+        reconciled_at TEXT NOT NULL
+      );
       CREATE TABLE IF NOT EXISTS scheduler_state (
         id INTEGER PRIMARY KEY CHECK(id=1),
         contract_version TEXT NOT NULL,
@@ -165,14 +195,14 @@ export class WorkerStore {
   }
 
   private createIndexes() {
-    this.db.exec("CREATE INDEX IF NOT EXISTS jobs_due_idx ON jobs(status, next_retry_at, due_at); CREATE INDEX IF NOT EXISTS jobs_session_idx ON jobs(scheduled_session, kind); CREATE UNIQUE INDEX IF NOT EXISTS jobs_semantic_key_idx ON jobs(semantic_key);");
+    this.db.exec("CREATE INDEX IF NOT EXISTS jobs_due_idx ON jobs(status, next_retry_at, due_at); CREATE INDEX IF NOT EXISTS jobs_session_idx ON jobs(scheduled_session, kind); CREATE UNIQUE INDEX IF NOT EXISTS jobs_semantic_key_idx ON jobs(semantic_key); CREATE INDEX IF NOT EXISTS job_reconciliation_replacement_idx ON job_reconciliation(replacement_workflow_key, replacement_job_id);");
   }
 
   private migrateV1ToV2() {
     const columns = new Set((this.db.prepare("PRAGMA table_info(jobs)").all() as Array<{ name: string }>).map(column => column.name));
     const additions: Array<[string, string]> = [
       ["contract_version", `TEXT NOT NULL DEFAULT '${WORKER_JOB_CONTRACT_VERSION}'`],
-      ["contract_revision", `INTEGER NOT NULL DEFAULT ${WORKER_JOB_CONTRACT_REVISION}`],
+      ["contract_revision", "INTEGER NOT NULL DEFAULT 1"],
       ["kind", "TEXT NOT NULL DEFAULT 'evaluation-scan'"],
       ["scheduled_session", "TEXT NOT NULL DEFAULT 'legacy'"],
       ["due_at", "INTEGER NOT NULL DEFAULT 0"],
@@ -195,6 +225,22 @@ export class WorkerStore {
       UPDATE jobs SET status='retry-wait', next_retry_at=lease_until WHERE status='failed';
     `);
     this.db.exec("CREATE UNIQUE INDEX IF NOT EXISTS jobs_semantic_key_idx ON jobs(semantic_key);");
+  }
+
+  private migrateV2ToV3() {
+    this.db.exec(`
+      CREATE TABLE IF NOT EXISTS job_reconciliation (
+        source_job_id TEXT PRIMARY KEY REFERENCES jobs(id),
+        source_workflow_key TEXT NOT NULL,
+        source_input_hash TEXT NOT NULL,
+        replacement_job_id TEXT NOT NULL REFERENCES jobs(id),
+        replacement_workflow_key TEXT NOT NULL,
+        replacement_input_hash TEXT NOT NULL,
+        replacement_semantic_key TEXT NOT NULL,
+        reason TEXT NOT NULL,
+        reconciled_at TEXT NOT NULL
+      );
+    `);
   }
 
   load(): { revision: number; data: AppData } | null {
@@ -226,11 +272,23 @@ export class WorkerStore {
       leaseOwner: iso(row.lease_owner), leaseToken: iso(row.token), leaseUntil: Number(row.lease_until ?? 0), attempts: Number(row.attempts ?? 0),
       nextRetryAt: numberOrNull(row.next_retry_at), startedAt: iso(row.started_at), completedAt: iso(row.completed_at), lastSafeError: iso(row.last_safe_error ?? row.error),
       outputRef: iso(row.output_ref), createdAt: String(row.created_at), updatedAt: String(row.updated_at),
+      reconciliationReplacementJobId: iso(row.reconciliation_replacement_job_id),
+      reconciliationReplacementWorkflowKey: iso(row.reconciliation_replacement_workflow_key),
+      reconciliationReplacementInputHash: iso(row.reconciliation_replacement_input_hash),
+      reconciliationReason: iso(row.reconciliation_reason), reconciledAt: iso(row.reconciled_at),
     };
   }
 
+  private jobSelect() {
+    return `SELECT jobs.*, reconciliation.replacement_job_id AS reconciliation_replacement_job_id,
+      reconciliation.replacement_workflow_key AS reconciliation_replacement_workflow_key,
+      reconciliation.replacement_input_hash AS reconciliation_replacement_input_hash,
+      reconciliation.reason AS reconciliation_reason, reconciliation.reconciled_at AS reconciled_at
+      FROM jobs LEFT JOIN job_reconciliation AS reconciliation ON reconciliation.source_job_id=jobs.id`;
+  }
+
   private getJobInside(id: string): WorkerJob | null {
-    const row = this.db.prepare("SELECT * FROM jobs WHERE id=?").get(id) as Record<string, unknown> | undefined;
+    const row = this.db.prepare(`${this.jobSelect()} WHERE jobs.id=?`).get(id) as Record<string, unknown> | undefined;
     return row ? this.rowToJob(row) : null;
   }
 
@@ -241,11 +299,21 @@ export class WorkerStore {
     const values: string[] = [];
     if (options.scheduledSession) { clauses.push("scheduled_session=?"); values.push(options.scheduledSession); }
     if (options.kind) { clauses.push("kind=?"); values.push(options.kind); }
-    const query = `SELECT * FROM jobs${clauses.length ? ` WHERE ${clauses.join(" AND ")}` : ""} ORDER BY due_at, kind, id`;
+    const query = `${this.jobSelect()}${clauses.length ? ` WHERE ${clauses.join(" AND ")}` : ""} ORDER BY due_at, kind, id`;
     return (this.db.prepare(query).all(...values) as Array<Record<string, unknown>>).map(row => this.rowToJob(row));
   }
 
-  private insertJobInside(job: JobContractWithId, now: number) {
+  listReconciliations(): WorkerJobReconciliation[] {
+    return this.db.prepare(`
+      SELECT source_job_id AS sourceJobId, source_workflow_key AS sourceWorkflowKey, source_input_hash AS sourceInputHash,
+        replacement_job_id AS replacementJobId, replacement_workflow_key AS replacementWorkflowKey,
+        replacement_input_hash AS replacementInputHash, replacement_semantic_key AS replacementSemanticIdempotencyKey,
+        reason, reconciled_at AS reconciledAt
+      FROM job_reconciliation ORDER BY reconciled_at, source_job_id
+    `).all() as unknown as WorkerJobReconciliation[];
+  }
+
+  private insertJobInside(job: WorkerJobContractWithId, now: number) {
     const timestamp = new Date(now).toISOString();
     this.db.prepare(`
       INSERT OR IGNORE INTO jobs(
@@ -258,7 +326,7 @@ export class WorkerStore {
     );
   }
 
-  enqueue(job: JobContractWithId, now = Date.now()): WorkerJob {
+  enqueue(job: WorkerJobContractWithId, now = Date.now()): WorkerJob {
     return this.transaction(() => {
       const existing = this.getJobInside(job.id);
       if (existing) return existing;
@@ -269,7 +337,7 @@ export class WorkerStore {
     });
   }
 
-  enqueueMany(jobs: JobContractWithId[], now = Date.now()): WorkerJob[] {
+  enqueueMany(jobs: WorkerJobContractWithId[], now = Date.now()): WorkerJob[] {
     return this.transaction(() => {
       const unique = [...new Map(jobs.map(job => [job.id, job])).values()];
       const newCount = unique.filter(job => !this.getJobInside(job.id)).length;
@@ -277,6 +345,73 @@ export class WorkerStore {
       if (Number(active) + newCount > WORKER_MAX_QUEUED_JOBS) throw new WorkerAdmissionError(`Queued work would exceed the ${WORKER_MAX_QUEUED_JOBS}-job admission guard; no jobs were discarded.`);
       for (const job of unique) this.insertJobInside(job, now);
       return unique.map(job => this.getJobInside(job.id)!);
+    });
+  }
+
+  reconcileAndEnqueue(jobs: WorkerJobContractWithId[], now = Date.now()): { jobs: WorkerJob[]; deferredSessions: string[] } {
+    return this.transaction(() => {
+      const unique = [...new Map(jobs.map(job => [job.id, job])).values()];
+      const currentWorkflows = new Map<string, { workflowKey: string; jobsByKind: Map<WorkerJobKind, WorkerJobContractWithId> }>();
+      for (const job of unique) {
+        const current = currentWorkflows.get(job.scheduledSession) ?? { workflowKey: job.workflowKey, jobsByKind: new Map() };
+        current.jobsByKind.set(job.kind, job);
+        currentWorkflows.set(job.scheduledSession, current);
+      }
+
+      // Insert replacement rows in this transaction before linking them. The admission
+      // check happens after supersession so reconciled work does not consume capacity.
+      for (const job of unique) this.insertJobInside(job, now);
+
+      const deferredSessions = new Set<string>();
+      for (const current of currentWorkflows.entries()) {
+        const [session, workflow] = current;
+        const replaced = this.db.prepare(`
+          SELECT 1 FROM job_reconciliation AS reconciliation
+          JOIN jobs AS source ON source.id=reconciliation.source_job_id
+          WHERE source.scheduled_session=? AND reconciliation.source_workflow_key=?
+            AND reconciliation.replacement_workflow_key<>?
+          LIMIT 1
+        `).get(session, workflow.workflowKey, workflow.workflowKey);
+        if (replaced) deferredSessions.add(session);
+      }
+      const persisted = this.listJobs().filter(job => job.scheduledSession !== "legacy");
+      for (const source of persisted) {
+        const current = currentWorkflows.get(source.scheduledSession);
+        if (!current || deferredSessions.has(source.scheduledSession) || source.workflowKey === current.workflowKey) continue;
+        const replacement = current.jobsByKind.get(source.kind);
+        if (!replacement) continue;
+
+        const replacementJob = this.getJobInside(replacement.id)!;
+        const timestamp = new Date(now).toISOString();
+        const reason = source.status === "running" && source.leaseUntil > now
+          ? `active-input-drift: ${source.inputHash} was replaced by ${replacement.inputHash}; unexpired lease preserved and corrected workflow deferred.`
+          : `active-input-drift: ${source.inputHash} was replaced by ${replacement.inputHash}; exact replay input is not durably available, so this workflow was reconciled to the replacement.`;
+        if (!source.reconciledAt) {
+          this.db.prepare(`
+            INSERT INTO job_reconciliation(
+              source_job_id,source_workflow_key,source_input_hash,replacement_job_id,replacement_workflow_key,
+              replacement_input_hash,replacement_semantic_key,reason,reconciled_at
+            ) VALUES(?,?,?,?,?,?,?,?,?)
+          `).run(
+            source.id, source.workflowKey, source.inputHash, replacementJob.id, replacementJob.workflowKey,
+            replacementJob.inputHash, replacementJob.semanticIdempotencyKey, reason, timestamp,
+          );
+        }
+
+        if (!RECONCILABLE_STATUSES.has(source.status)) continue;
+        if (source.status === "running" && source.leaseUntil > now) {
+          deferredSessions.add(source.scheduledSession);
+          continue;
+        }
+        this.db.prepare(`
+          UPDATE jobs SET status='superseded',completed_at=?,lease_owner=NULL,token=NULL,updated_at=?
+          WHERE id=? AND status IN ('queued','running','retry-wait')
+        `).run(timestamp, timestamp, source.id);
+      }
+
+      const active = (this.db.prepare("SELECT COUNT(*) AS count FROM jobs WHERE status IN ('queued','running','retry-wait')").get() as { count: number }).count;
+      if (Number(active) > WORKER_MAX_QUEUED_JOBS) throw new WorkerAdmissionError(`Queued work would exceed the ${WORKER_MAX_QUEUED_JOBS}-job admission guard; no jobs were discarded.`);
+      return { jobs: unique.map(job => this.getJobInside(job.id)!), deferredSessions: [...deferredSessions].sort() };
     });
   }
 
@@ -435,7 +570,8 @@ export class WorkerStore {
     const expected = latestCompletedTradingDate(now, providerDelayMinutesAfterClose);
     const state = this.readSchedulerState();
     const jobs = this.listJobs().filter(job => job.scheduledSession !== "legacy");
-    const statuses: WorkerJobStatus[] = ["queued", "running", "retry-wait", "completed", "partial", "blocked", "terminal-failed"];
+    const currentJobs = jobs.filter(job => !job.reconciledAt && job.status !== "superseded");
+    const statuses: WorkerJobStatus[] = ["queued", "running", "retry-wait", "completed", "partial", "blocked", "terminal-failed", "superseded"];
     const jobsByStatus = Object.fromEntries(statuses.map(status => [status, jobs.filter(job => job.status === status).length])) as Record<WorkerJobStatus, number>;
     const calendarSessions = state?.lastExpectedSession && state.lastExpectedSession < expected
       ? (() => {
@@ -450,13 +586,13 @@ export class WorkerStore {
       })()
       : [];
     const sessions = [...new Set([...jobs.map(job => job.scheduledSession), ...calendarSessions])].sort();
-    const bySession = new Map(sessions.map(session => [session, jobs.filter(job => job.scheduledSession === session)]));
+    const bySession = new Map(sessions.map(session => [session, currentJobs.filter(job => job.scheduledSession === session)]));
     const completedSessions = sessions.filter(session => bySession.get(session)?.some(job => job.kind === "evaluation-scan" && job.status === "completed"));
     const partialSessions = sessions.filter(session => bySession.get(session)?.some(job => job.kind === "evaluation-scan" && job.status === "partial"));
     const blockedSessions = sessions.filter(session => bySession.get(session)?.some(job => job.kind === "evaluation-scan" && job.status === "blocked"));
     const retryingSessions = sessions.filter(session => bySession.get(session)?.some(job => ACTIVE_STATUSES.has(job.status) && job.status !== "queued"));
     const terminalFailedSessions = sessions.filter(session => bySession.get(session)?.some(job => job.status === "terminal-failed"));
-    const currentJobSafeError = jobs
+    const currentJobSafeError = currentJobs
       .filter(job => ACTIVE_STATUSES.has(job.status) || job.status === "terminal-failed")
       .find(job => job.lastSafeError)?.lastSafeError ?? null;
     const missedSessions = sessions.filter(session => {

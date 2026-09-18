@@ -6,7 +6,7 @@ The no-subscription path remains local-first: the application can be closed, but
 
 ## Contract and durable state
 
-Each scheduled market session has four deterministic stage jobs:
+Each scheduled market session has four deterministic stage jobs. The production job contract is revision 2; revision-1 SQLite rows remain revision-1 records after additive migration to database version 3.
 
 | Kind | Meaning | Result boundary |
 |---|---|---|
@@ -17,9 +17,13 @@ Each scheduled market session has four deterministic stage jobs:
 
 The semantic identity includes the contract version, kind, scheduled session, calendar version, engine/rule versions, source content hash, adjustment declaration, scanner settings, recipes and Eye definitions. Repeating the same input produces the same job keys. Corrected input produces a new evidence revision and preserves the earlier records.
 
-SQLite WAL keeps the workspace, recovery copies, jobs, scheduler checkpoint and outbox together. Claims use an immediate transaction. A job records `queued`, `running`, `retry-wait`, `completed`, `partial`, `blocked`, or `terminal-failed`, plus scheduled/due session, attempt count, lease owner/token/expiry, next retry, completion time, last safe error, input hash, output reference and semantic idempotency key. Leases are 15 minutes by default and are renewed by the managed runner heartbeat for long work. A replaced or expired token cannot commit.
+SQLite WAL keeps the workspace, recovery copies, jobs, scheduler checkpoint, reconciliation links and outbox together. Claims use an immediate transaction. A job records `queued`, `running`, `retry-wait`, `completed`, `partial`, `blocked`, `terminal-failed`, or `superseded`, plus scheduled/due session, attempt count, lease owner/token/expiry, next retry, completion time, last safe error, input hash, output reference and semantic idempotency key. Leases are 15 minutes by default and are renewed by the managed runner heartbeat for long work. A replaced or expired token cannot commit.
 
 `lastExpectedSession` is an observation/planning watermark, not proof that all earlier work finished. After enqueueing, an invocation may have durable `queued`, expired `running`, or `retry-wait` jobs for older sessions. Every later invocation reconciles newly due calendar sessions with those persisted jobs and processes the union in chronological order. A retry-wait job remains visible with its original attempt count and `nextRetryAt`; it is runnable only after that time. A terminal-failed semantic job is never reset to obtain another five attempts.
+
+The runner also reconciles active semantic workflows by `workflowKey`/`inputHash`, not by scheduled session alone. If current provider histories/settings produce input B while queued, retry-wait, or expired-running workflow A is durable, the four replacement jobs are inserted and A is atomically linked through the SQLite `job_reconciliation` table with an immutable reason, replacement job/semantic identity and timestamp; eligible A jobs become `superseded` without changing attempts or saved errors. Superseded jobs remain queryable and retain retry-deadline/lease-time evidence, but no longer count toward active admission, retrying/missed coverage or current errors. Exact replay is not claimed because the old provider input is not persisted as a replay snapshot.
+
+An unexpired running A lease is never superseded underneath its owner. The replacement B is durably linked but remains queued until A becomes terminal, so only one workflow can commit against the workspace revision at a time. Completed, partial, blocked and terminal-failed A jobs are never mutated; a separate reconciliation link records a corrected B when one is planned. This preserves the old identity and attempt history while allowing corrected B to be a genuinely new semantic workflow. Coverage uses unreconciled current jobs, so a superseded/reconciled A cannot appear as a current retry, miss or quality failure after B succeeds.
 
 Retries are capped at five attempts. Backoff is deterministic: one minute, two, four, eight, then terminal failure; the delay is capped at 15 minutes. Result/evaluation/signal/alert/outbox writes use semantic IDs and one transaction, so retrying cannot duplicate semantic work. A workspace revision conflict rolls back the result and outbox together.
 
@@ -49,7 +53,7 @@ npm run worker -- --managed --csv /absolute/path/prices --adjustment adjusted --
 
 The scheduler checkpoint records the latest expected completed-market session it has observed/planned; it does not certify completion. If the computer wakes after a weekend, outage, or sleep, a later invocation reconciles the bounded set of newly due NYSE sessions with all persisted unfinished jobs, including work that was queued before a crash, and processes them in order. Already completed same-input semantic keys are not replayed. If the catch-up or queue exceeds an admission guard, existing work remains persisted and the invocation reports `admission_blocked`; it does not advance the watermark past unplanned work or drop old sessions.
 
-`--status` can report calendar sessions missed while the process was stopped even when no job row was created. Those derived obligations begin only after the scheduler has a known `lastExpectedSession` baseline and use the maintained NYSE calendar through `2028-12-31`; status does not invent obligations before that operating window. `partial` and `blocked` sessions remain separate quality coverage and are not counted as completed success. If corrected input for an older partial or blocked session changes its semantic input hash, new immutable stage/evidence rows may be created while the prior final job and evidence remain unchanged. Repeating the corrected input is a no-op. A terminal-failed semantic identity is not recycled.
+`--status` can report calendar sessions missed while the process was stopped even when no job row was created. Those derived obligations begin only after the scheduler has a known `lastExpectedSession` baseline and use the maintained NYSE calendar through `2028-12-31`; status does not invent obligations before that operating window. `partial` and `blocked` sessions remain separate quality coverage and are not counted as completed success. If corrected input for an older partial or blocked session changes its semantic input hash, new immutable stage/evidence rows may be created while the prior final job and evidence remain unchanged. The same applies to a terminal-failed identity: it remains terminal and is never granted another five attempts; corrected input creates a genuinely new semantic identity. Repeating the corrected input is a no-op. The reconciliation linkage/status survives SQLite close/reopen and is included in audit job queries.
 
 The current session is eligible only after the maintained NYSE close plus the workspace provider delay. The calendar is `NYSE-2026-09-15`, reviewed through `2028-12-31`, and handles holidays, early closes, DST and the recorded exceptional closure. Extend and independently verify it before scheduling outside that range.
 
@@ -59,7 +63,7 @@ For machine-readable coverage without running work:
 npm run worker -- --status --db /absolute/path/worker.sqlite
 ```
 
-The JSON includes contract version, `lastSuccessfulRunAtUtc`, `latestExpectedCompletedSession`, `nextDueAtUtc`, deadline budget/deadline, missed sessions, per-status counts, completed/partial/blocked/retrying/terminal-failed sessions, pending outbox intents, and the truthful local dependency. `schedulerInstalled` is always `false` in this repository because no schedule was installed here.
+The JSON includes contract version/revision, `lastSuccessfulRunAtUtc`, `latestExpectedCompletedSession`, `nextDueAtUtc`, deadline budget/deadline, missed sessions, per-status counts including audit-only `superseded`, completed/partial/blocked/retrying/terminal-failed sessions, pending outbox intents, and the truthful local dependency. `schedulerInstalled` is always `false` in this repository because no schedule was installed here.
 
 The app cannot show this as live monitoring: app and worker storage remain an explicit export/import handoff, not synchronization. Import the worker export into the app to review results. Do not add a UI claim that a schedule is installed or that app opening drives the worker.
 

@@ -2,7 +2,7 @@ import { contentHash } from "../../src/domain/contentHash";
 import { CALENDAR_VERSION, marketSessionDueAtUtc } from "../../src/lib/marketCalendar";
 
 export const WORKER_JOB_CONTRACT_VERSION = "stockledger-production-job-v1" as const;
-export const WORKER_JOB_CONTRACT_REVISION = 1 as const;
+export const WORKER_JOB_CONTRACT_REVISION = 2 as const;
 export const WORKER_MAX_ATTEMPTS = 5;
 export const WORKER_INITIAL_RETRY_DELAY_MS = 60_000;
 export const WORKER_MAX_RETRY_DELAY_MS = 15 * 60_000;
@@ -28,6 +28,7 @@ export const workerJobStatuses = [
   "partial",
   "blocked",
   "terminal-failed",
+  "superseded",
 ] as const;
 export type WorkerJobStatus = (typeof workerJobStatuses)[number];
 
