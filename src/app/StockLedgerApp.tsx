@@ -15,6 +15,7 @@ import {
 import { buildChartData } from "../domain/chartSeries";
 import { RecoveryPanel, StockEditor, WorkspacePanel } from "../features/workspace/WorkspacePanel";
 import { CloudSyncPanel } from "../features/sync/CloudSyncPanel";
+import { NotificationSettingsPanel } from "../features/notifications/NotificationSettingsPanel";
 import { OutcomeEditor } from "../features/journal/OutcomeEditor";
 import { optionalPositiveNumber, validateEntryRange } from "../domain/inputValidation";
 import { createId as createLocalId } from "../platform/identity";
@@ -4646,6 +4647,7 @@ export default function App() {
           {tab === "Settings" ? (
             <>
               <WorkspacePanel data={data} actions={actions} language={language} />
+              <NotificationSettingsPanel data={data} actions={actions} language={language} />
               <CloudSyncPanel data={data} actions={actions} language={language} />
               <Reveal>
                 <SectionHeader note={subtitleLabel(language, "Settings")} />

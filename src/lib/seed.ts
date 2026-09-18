@@ -1,4 +1,5 @@
 import { AppData, Recipe, MetricDefinition, LogicRule, LogicSet } from "../types";
+import { defaultNotificationPreferences } from "../domain/notificationPreferences";
 
 const now = new Date().toISOString();
 const daysAgo = (days: number, hours = 0) =>
@@ -465,4 +466,5 @@ export const seedData: AppData = {
     providerDelayMinutesAfterClose: 45,
     notifyNearMatches: true,
   },
+  notificationPreferences: defaultNotificationPreferences(new Date(now)),
 };

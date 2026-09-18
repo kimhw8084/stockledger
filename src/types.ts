@@ -653,6 +653,30 @@ export interface ScannerSettings {
   frozenUniverseBySector?: Record<string, string[]>;
 }
 
+export type NotificationChannel = "email";
+export type NotificationDeliveryMode = "immediate" | "digest";
+export type NotificationPrivacyMode = "minimal" | "rich";
+
+export interface NotificationPreferences {
+  contractVersion: "stockledger-notification-preferences-v1";
+  revision: 1;
+  explicitConsent: boolean;
+  enabled: boolean;
+  allowedChannels: NotificationChannel[];
+  destinations: {
+    email?: { address: string };
+  };
+  timezone: string;
+  quietHours: { enabled: boolean; start: string; end: string };
+  deliveryMode: NotificationDeliveryMode;
+  digestTime: string;
+  minimumPriority: "Low" | "Medium" | "High";
+  privacyMode: NotificationPrivacyMode;
+  /** CHG-93 does not sync delivery services; this setting is intentionally device-local. */
+  accountScope: "device-local";
+  updatedAt: string;
+}
+
 export interface AppData {
   workspaceId?: string;
   evaluations?: Evaluation[];
@@ -674,6 +698,7 @@ export interface AppData {
   reviewLogs: ReviewLog[];
   forwardProofLedger: ForwardProofLedger[];
   scannerSettings: ScannerSettings;
+  notificationPreferences: NotificationPreferences;
 }
 
 export interface ProviderHealthEntry {
