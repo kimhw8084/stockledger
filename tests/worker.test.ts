@@ -327,6 +327,12 @@ it("distinguishes an explicit null scheduler patch from an omitted property", ()
   expect(store.getSchedulerCheckpoint()?.lastSafeError).toBeNull();
   store.updateSchedulerState({ now: 1002 });
   expect(store.getSchedulerCheckpoint()?.lastSafeError).toBeNull();
+  const job = jobIdentityFor({ kind: "ingestion-readiness", scheduledSession: "2026-09-14", workflowKey: "current-error", inputHash: "current-error", dueAtUtc: marketSessionDueAtUtc("2026-09-14").toISOString() });
+  store.enqueue(job, 1000);
+  const token = store.claimJob(job.id, "error-worker", 1000)!;
+  store.failJob(job.id, token, "current job error", 1001);
+  store.updateSchedulerState({ lastSafeError: null, now: 1002 });
+  expect(store.schedulerStatus(new Date("2026-09-14T22:00:00Z")).lastSafeError).toBe("current job error");
   store.close();
 });
 

@@ -456,6 +456,9 @@ export class WorkerStore {
     const blockedSessions = sessions.filter(session => bySession.get(session)?.some(job => job.kind === "evaluation-scan" && job.status === "blocked"));
     const retryingSessions = sessions.filter(session => bySession.get(session)?.some(job => ACTIVE_STATUSES.has(job.status) && job.status !== "queued"));
     const terminalFailedSessions = sessions.filter(session => bySession.get(session)?.some(job => job.status === "terminal-failed"));
+    const currentJobSafeError = jobs
+      .filter(job => ACTIVE_STATUSES.has(job.status) || job.status === "terminal-failed")
+      .find(job => job.lastSafeError)?.lastSafeError ?? null;
     const missedSessions = sessions.filter(session => {
       const scan = bySession.get(session)?.find(job => job.kind === "evaluation-scan");
       if (scan) return Date.parse(scan.dueAtUtc) <= now.getTime() && !["completed", "partial", "blocked"].includes(scan.status);
@@ -480,7 +483,7 @@ export class WorkerStore {
       coverage: { scheduledSessions: sessions, completedSessions, partialSessions, blockedSessions, retryingSessions, terminalFailedSessions },
       jobsByStatus, pendingOutboxIntents: this.pendingOutbox().length,
       localDependency: { mode: "local-first", requiresAwakeMachine: true, requiresAuthorizedDataPath: true, appParticipationRequired: false },
-      lastSafeError: state ? state.lastSafeError : jobs.find(job => job.lastSafeError)?.lastSafeError ?? null,
+      lastSafeError: currentJobSafeError ?? state?.lastSafeError ?? (state ? null : jobs.find(job => job.lastSafeError)?.lastSafeError ?? null),
     };
   }
 
