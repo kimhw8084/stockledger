@@ -1,0 +1,490 @@
+{
+  "accepted_at": "2026-09-18T14:02:48Z",
+  "changed_files": [
+    {
+      "additions": 13,
+      "deletions": 4,
+      "path": "docs/operations/CLOUD_DEPLOYMENT.md",
+      "status": "M"
+    },
+    {
+      "additions": 56,
+      "deletions": 0,
+      "path": "docs/production/CHG-93_EVIDENCE.md",
+      "status": "A"
+    },
+    {
+      "additions": 1,
+      "deletions": 1,
+      "path": "src/app/StockLedgerApp.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 15,
+      "deletions": 0,
+      "path": "src/data/repositories/workspaceRepository.ts",
+      "status": "M"
+    },
+    {
+      "additions": 96,
+      "deletions": 37,
+      "path": "src/features/sync/CloudSyncPanel.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 1,
+      "deletions": 0,
+      "path": "src/features/sync/client.ts",
+      "status": "M"
+    },
+    {
+      "additions": 3,
+      "deletions": 2,
+      "path": "src/features/sync/sessionStorage.native.ts",
+      "status": "M"
+    },
+    {
+      "additions": 59,
+      "deletions": 10,
+      "path": "src/features/sync/syncPlan.ts",
+      "status": "M"
+    },
+    {
+      "additions": 300,
+      "deletions": 33,
+      "path": "src/features/sync/synchronize.ts",
+      "status": "M"
+    },
+    {
+      "additions": 116,
+      "deletions": 0,
+      "path": "src/lib/i18n.ts",
+      "status": "M"
+    },
+    {
+      "additions": 298,
+      "deletions": 0,
+      "path": "supabase/migrations/20260918000000_secure_personal_sync.sql",
+      "status": "A"
+    },
+    {
+      "additions": 47,
+      "deletions": 2,
+      "path": "tests/cloud.test.ts",
+      "status": "M"
+    },
+    {
+      "additions": 11,
+      "deletions": 0,
+      "path": "tests/e2e/workspace.spec.ts",
+      "status": "M"
+    },
+    {
+      "additions": 32,
+      "deletions": 5,
+      "path": "tests/integration/cloud.integration.ts",
+      "status": "M"
+    },
+    {
+      "additions": 9,
+      "deletions": 1,
+      "path": "tests/sync.test.ts",
+      "status": "M"
+    },
+    {
+      "additions": 68,
+      "deletions": 0,
+      "path": "tests/synchronize.test.ts",
+      "status": "A"
+    }
+  ],
+  "checks": [
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH node --version && rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm --version && rtk git diff --stat origin/main...HEAD && rtk git diff --name-status origin/main...HEAD | sed -n '\"'1,160p'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git log --graph --decorate --oneline -12 && rtk git show --no-patch --format='HEAD %H%nP1 %P%nrefs %D%nsubject %s' HEAD && rtk git show --no-patch --format='origin/main %H%nsubject %s' origin/main && rtk git tag --contains HEAD | head -20 && rtk rg -n -i 'protected.?main|cloud.?contract|db lint|security advisor|privilege|supabase.*lint|workflow' .github docs scripts supabase package.json README.md 2>/dev/null | sed -n '1,280p'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '1,180p' .github/workflows/check.yml && rtk sed -n '1,220p' docs/production/CHG-92_EVIDENCE.md && rtk git show origin/main:docs/production/CHG-92_EVIDENCE.md | sed -n '1,40p' && rtk git diff 59cc7c672cd6b759cf0ceefb5a77acea66c7435d..HEAD --stat && rtk git diff 59cc7c672cd6b759cf0ceefb5a77acea66c7435d..HEAD --name-status\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n -C 10 'applyCloudData|exportBackup\\\\(|actions:' src/hooks/useAppModel.ts src/app/StockLedgerApp.tsx | sed -n '1,260p' && rtk sed -n '650,900p' src/hooks/useAppModel.ts && rtk rg -n 'interface KeyValueStore|export type KeyValueStore|compareAndSetItem' src/platform/keyValueStore* && rtk sed -n '1,260p' src/platform/keyValueStore.ts && rtk sed -n '1,260p' src/platform/keyValueStore.native.ts && rtk sed -n '1,180p' src/platform/keyValueStore.web.ts\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n 'loadAppLanguage|saveAppLanguage|const \\\\[language|language, setLanguage|<CloudSyncPanel|Settings' src/app/StockLedgerApp.tsx | sed -n '1,220p' && rtk sed -n '2460,2600p' src/app/StockLedgerApp.tsx && rtk rg -n -C 8 '<CloudSyncPanel' src/app/StockLedgerApp.tsx && rtk sed -n '1080,1160p' src/lib/i18n.ts && rtk sed -n '700,780p' src/lib/i18n.ts\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '1930,2110p' src/app/StockLedgerApp.tsx && rtk sed -n '4638,4705p' src/app/StockLedgerApp.tsx && rtk sed -n '1,120p' src/lib/preferences.ts && rtk sed -n '1,120p' src/platform/fileAccess.ts && rtk sed -n '1,160p' src/platform/fileAccess.native.ts\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm ci'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '1,140p' src/platform/identity.ts && rtk sed -n '1,160p' src/domain/contentHash.ts && rtk sed -n '1,160p' src/data/workspaceDefaults.ts\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm run typecheck'",
+      "exit_code": 2,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n 'export function Button|export const Button|function Button' src/components/common.tsx && rtk sed -n '1,180p' src/components/common.tsx\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '1,35p' src/lib/i18n.ts && rtk rg -n 'export type AppLanguage' src/lib/i18n.ts\"",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n 'cloud.title|settings.language.korean' src/lib/i18n.ts | sed -n '1,40p' && rtk sed -n '180,300p' src/lib/i18n.ts && rtk sed -n '820,930p' src/lib/i18n.ts\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm run typecheck'",
+      "exit_code": 2,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk nl -ba src/features/sync/CloudSyncPanel.tsx | sed -n '34,48p'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm run typecheck'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm test -- --run tests/cloud.test.ts tests/sync.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npx supabase --version && rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npx supabase db lint --help | sed -n '\"'1,180p'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm test -- --run tests/cloud.test.ts tests/sync.test.ts'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm test -- --run tests/cloud.test.ts tests/sync.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm run typecheck && rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm run check:boundaries'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npx supabase start -x studio,edge-runtime,logflare,vector,supavisor,imgproxy,realtime,storage-api'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n 'max\\\\(cursor\\\\)|where user_id = owner_id|create policy own' supabase/migrations/20260918000000_secure_personal_sync.sql | sed -n '1,200p'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm test -- --run tests/cloud.test.ts tests/sync.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm run typecheck'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '1,340p' tests/e2e/workspace.spec.ts && rtk sed -n '1,220p' playwright.config.ts\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git status --short && rtk git diff --stat && rtk git diff --check && rtk rg -n 'payload|ledger_records|ledger_changes|snapshots|rawBarArchives|scanner' src/features/sync supabase/migrations/20260918000000_secure_personal_sync.sql docs/operations/CLOUD_DEPLOYMENT.md tests | sed -n '1,320p'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '136,172p' supabase/migrations/20260918000000_secure_personal_sync.sql\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm test -- --run'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git merge-base HEAD 59cc7c672cd6b759cf0ceefb5a77acea66c7435d && rtk git log --oneline --ancestry-path 59cc7c672cd6b759cf0ceefb5a77acea66c7435d..HEAD | sed -n '1,40p' && rtk git diff --numstat | tail -20\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm test -- --run tests/cloud.test.ts tests/sync.test.ts tests/i18n.test.ts && rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm run typecheck && rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm run check:boundaries'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npx supabase db lint --local --schema public,ledger_private --level warning --fail-on warning'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm run test:cloud'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm run check:frozen'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm run export:all'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm run test:e2e'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git diff -- src/features/sync/synchronize.ts src/features/sync/CloudSyncPanel.tsx src/features/sync/syncPlan.ts src/features/sync/client.ts src/data/repositories/workspaceRepository.ts src/features/sync/sessionStorage.native.ts | sed -n '1,520p'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n '\\\\brequire\\\\(|access_token|refresh_token|service_role|SUPABASE_SERVICE|JSON\\\\.stringify\\\\(.*payload|conflict\\\\.local\\\\?\\\\.payload|conflict\\\\.remote\\\\?\\\\.payload' src tests docs/production/CHG-93_EVIDENCE.md supabase | sed -n '1,240p'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm audit --audit-level=high'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npx supabase db lint --local --schema public,ledger_private --level warning --fail-on warning'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm run test:cloud'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git diff --check && rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm run typecheck && rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm test -- --run'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm run check:boundaries && rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm run check:frozen && rtk git diff --check && rtk git status --short'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm run typecheck && rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm test -- --run tests/cloud.test.ts tests/sync.test.ts tests/i18n.test.ts && rtk git diff --check'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n 'select coalesce\\\\(max\\\\(cursor\\\\)|select cursor into boundary|collection in' supabase/migrations/20260918000000_secure_personal_sync.sql | sed -n '1,160p' && rtk sed -n '1,320p' supabase/migrations/20260918000000_secure_personal_sync.sql | tail -80\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm test -- --run tests/cloud.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm test -- --run tests/synchronize.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm run typecheck && rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm test -- --run'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git status --short && rtk git diff --check && rtk git diff --stat && rtk wc -l docs/production/CHG-93_EVIDENCE.md supabase/migrations/20260918000000_secure_personal_sync.sql tests/synchronize.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm test -- --run tests/cloud.test.ts tests/sync.test.ts tests/synchronize.test.ts tests/i18n.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git diff --check && rtk git status --short && rtk git rev-parse HEAD'",
+      "exit_code": 0,
+      "type": "command_execution"
+    }
+  ],
+  "codex": {
+    "cli_version": "codex-cli 0.154.0",
+    "configured_model": "gpt-5.6-luna",
+    "event_count": 206,
+    "provider_reported_model": null,
+    "reasoning_effort": "xhigh",
+    "terminal_type": "turn.completed",
+    "usage": {
+      "cache_hit_percent": 98.42,
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 14977280,
+      "fresh_input_tokens": 241171,
+      "input_tokens": 15218451,
+      "non_reasoning_output_tokens": 44058,
+      "output_tokens": 81335,
+      "reasoning_output_tokens": 37277,
+      "total_processed_tokens": 15299786
+    },
+    "warnings": []
+  },
+  "commits": [
+    {
+      "sha": "196d52cc8b64ab3cbac2478d5ba2bdd7f9ee1a4d",
+      "subject": "fabric: capture completed model changes [CF-8184e10cf918d80eef00766a]"
+    }
+  ],
+  "diff": {
+    "additions": 1125,
+    "changed_files": 16,
+    "commit_count": 1,
+    "deletions": 95
+  },
+  "error_code": null,
+  "evidence_manifest": {
+    "count": 2,
+    "items": [
+      {
+        "bytes": 8282,
+        "path": "docs/operations/CLOUD_DEPLOYMENT.md",
+        "sha256": "f425a22a72a5b5fbb53310ca103e947aeb6dd26959561676ca98bf701601c5e4"
+      },
+      {
+        "bytes": 6183,
+        "path": "docs/production/CHG-93_EVIDENCE.md",
+        "sha256": "dee17b6c5b962d2b37f1cf767674885f830d3a84202fa4ff1214e68c9012e749"
+      }
+    ],
+    "version": 1
+  },
+  "evidence_publisher_release": "1.2.3-resume-candidate",
+  "fabric_capture": {
+    "applied": true,
+    "commit_message": "fabric: capture completed model changes [CF-8184e10cf918d80eef00766a]",
+    "commit_sha": "196d52cc8b64ab3cbac2478d5ba2bdd7f9ee1a4d",
+    "paths_before": 16,
+    "status_before": [
+      " M docs/operations/CLOUD_DEPLOYMENT.md",
+      " M src/app/StockLedgerApp.tsx",
+      " M src/data/repositories/workspaceRepository.ts",
+      " M src/features/sync/CloudSyncPanel.tsx",
+      " M src/features/sync/client.ts",
+      " M src/features/sync/sessionStorage.native.ts",
+      " M src/features/sync/syncPlan.ts",
+      " M src/features/sync/synchronize.ts",
+      " M src/lib/i18n.ts",
+      " M tests/cloud.test.ts",
+      " M tests/e2e/workspace.spec.ts",
+      " M tests/integration/cloud.integration.ts",
+      " M tests/sync.test.ts",
+      "?? docs/production/CHG-93_EVIDENCE.md",
+      "?? supabase/migrations/20260918000000_secure_personal_sync.sql",
+      "?? tests/synchronize.test.ts"
+    ],
+    "transient_untracked_removed": {
+      "count": 0,
+      "items": []
+    }
+  },
+  "fabric_release": "1.2.3-resume-candidate",
+  "failure_class": null,
+  "finished_at": "2026-09-18T14:33:08Z",
+  "git": {
+    "base_is_ancestor": true,
+    "base_sha": "ef253b3fad2475f0b52f7d1722c1350667a44694",
+    "branch": "codex/stockledger-prod-c06-account-sync-v1",
+    "head_sha": "196d52cc8b64ab3cbac2478d5ba2bdd7f9ee1a4d",
+    "remote_exact_head": true,
+    "remote_head_sha": "196d52cc8b64ab3cbac2478d5ba2bdd7f9ee1a4d",
+    "target_branch": "main",
+    "target_drifted_since_acceptance": false,
+    "target_head_observed_after_execution": "ef253b3fad2475f0b52f7d1722c1350667a44694",
+    "work_branch": "codex/stockledger-prod-c06-account-sync-v1",
+    "worktree_clean": true
+  },
+  "instructions": {
+    "files": [],
+    "total_bytes": 0,
+    "warning": null
+  },
+  "job_id": "CF-8184e10cf918d80eef00766a",
+  "kind": "codex-fabric-audit-evidence",
+  "locator": {
+    "branch": "codex-fabric/evidence/stockledger/prod-c06-account-sync-v1",
+    "path": ".codex-fabric/audit.json",
+    "ref": "refs/heads/codex-fabric/evidence/stockledger/prod-c06-account-sync-v1"
+  },
+  "operation": "BUILD",
+  "policy": {
+    "environment_policy_sha256": "e077daca74297b3c30bee8989f00f8ca5338f7610b4d016a6c48db524205d064",
+    "fabric_release": "1.2.3-resume-candidate",
+    "policy_sha256": "44756118cd7fda0c45cd23ba1d31a48a3f4f2422d687df15264ba4406f40e1f2",
+    "registry_sha256": "cfc765f3211c37c7967a138f3b2d89a99341939b15b2623f92744d007f625d6f"
+  },
+  "project_id": "stockledger",
+  "recovery": {
+    "model_rerun_safe": false,
+    "recovery_required": false,
+    "retry_safe": false,
+    "retry_scope": null,
+    "worktree_retained": true
+  },
+  "request": "prod-c06-account-sync-v1",
+  "schema_version": 1,
+  "started_at": "2026-09-18T14:02:49Z",
+  "status": "EXECUTED_CHANGE",
+  "timing": {
+    "execution_seconds": 1819,
+    "queue_seconds": 1,
+    "total_seconds": 1820
+  },
+  "transport": {
+    "bytes": 6700,
+    "envelope": "FABRIC/2",
+    "prompt_bytes": 6381,
+    "prompt_sha256": "51cf94654d9b766cec0fc963193c753cbe6a006254808984e16edd3fd66629a9",
+    "sha256": "8184e10cf918d80eef00766a54993d3d77d13557293a9637d3d93b103b892f32"
+  }
+}
