@@ -410,15 +410,17 @@ export class WorkerStore {
     this.transaction(() => {
       const current = this.readSchedulerState();
       const now = input.now ?? Date.now();
+      const provided = <K extends keyof SchedulerState>(key: K) =>
+        Object.prototype.hasOwnProperty.call(input, key) ? input[key] ?? null : current?.[key] ?? null;
       const next = {
-        lastInvocationAtUtc: input.lastInvocationAtUtc ?? current?.lastInvocationAtUtc ?? null,
-        lastExpectedSession: input.lastExpectedSession ?? current?.lastExpectedSession ?? null,
-        lastSuccessfulSession: input.lastSuccessfulSession ?? current?.lastSuccessfulSession ?? null,
-        lastSuccessfulRunAtUtc: input.lastSuccessfulRunAtUtc ?? current?.lastSuccessfulRunAtUtc ?? null,
-        lastRunStatus: input.lastRunStatus ?? current?.lastRunStatus ?? null,
-        lastSafeError: input.lastSafeError ?? current?.lastSafeError ?? null,
-        nextDueAtUtc: input.nextDueAtUtc ?? current?.nextDueAtUtc ?? null,
-        deadlineAtUtc: input.deadlineAtUtc ?? current?.deadlineAtUtc ?? null,
+        lastInvocationAtUtc: provided("lastInvocationAtUtc"),
+        lastExpectedSession: provided("lastExpectedSession"),
+        lastSuccessfulSession: provided("lastSuccessfulSession"),
+        lastSuccessfulRunAtUtc: provided("lastSuccessfulRunAtUtc"),
+        lastRunStatus: provided("lastRunStatus"),
+        lastSafeError: provided("lastSafeError"),
+        nextDueAtUtc: provided("nextDueAtUtc"),
+        deadlineAtUtc: provided("deadlineAtUtc"),
       };
       this.db.prepare(`
         INSERT INTO scheduler_state(id,contract_version,contract_revision,last_invocation_at,last_expected_session,last_successful_session,last_successful_run_at,last_run_status,last_safe_error,next_due_at,deadline_at,updated_at)
@@ -435,7 +437,19 @@ export class WorkerStore {
     const jobs = this.listJobs().filter(job => job.scheduledSession !== "legacy");
     const statuses: WorkerJobStatus[] = ["queued", "running", "retry-wait", "completed", "partial", "blocked", "terminal-failed"];
     const jobsByStatus = Object.fromEntries(statuses.map(status => [status, jobs.filter(job => job.status === status).length])) as Record<WorkerJobStatus, number>;
-    const sessions = [...new Set(jobs.map(job => job.scheduledSession))].sort();
+    const calendarSessions = state?.lastExpectedSession && state.lastExpectedSession < expected
+      ? (() => {
+        const result: string[] = [];
+        let cursor = nextUsTradingDate(state.lastExpectedSession);
+        while (cursor <= expected) {
+          result.push(cursor);
+          if (cursor === expected) break;
+          cursor = nextUsTradingDate(cursor);
+        }
+        return result;
+      })()
+      : [];
+    const sessions = [...new Set([...jobs.map(job => job.scheduledSession), ...calendarSessions])].sort();
     const bySession = new Map(sessions.map(session => [session, jobs.filter(job => job.scheduledSession === session)]));
     const completedSessions = sessions.filter(session => bySession.get(session)?.some(job => job.kind === "evaluation-scan" && job.status === "completed"));
     const partialSessions = sessions.filter(session => bySession.get(session)?.some(job => job.kind === "evaluation-scan" && job.status === "partial"));
@@ -444,7 +458,8 @@ export class WorkerStore {
     const terminalFailedSessions = sessions.filter(session => bySession.get(session)?.some(job => job.status === "terminal-failed"));
     const missedSessions = sessions.filter(session => {
       const scan = bySession.get(session)?.find(job => job.kind === "evaluation-scan");
-      return Boolean(scan && Date.parse(scan.dueAtUtc) <= now.getTime() && !["completed", "partial", "blocked"].includes(scan.status));
+      if (scan) return Date.parse(scan.dueAtUtc) <= now.getTime() && !["completed", "partial", "blocked"].includes(scan.status);
+      return calendarSessions.includes(session);
     });
     const nextDueAtUtc = state?.nextDueAtUtc ?? marketSessionDueAtUtc(nextUsTradingDate(expected), providerDelayMinutesAfterClose).toISOString();
     const deadlineAtUtc = state?.deadlineAtUtc ?? new Date(Date.parse(nextDueAtUtc) + deadlineBudgetMs).toISOString();
@@ -465,7 +480,7 @@ export class WorkerStore {
       coverage: { scheduledSessions: sessions, completedSessions, partialSessions, blockedSessions, retryingSessions, terminalFailedSessions },
       jobsByStatus, pendingOutboxIntents: this.pendingOutbox().length,
       localDependency: { mode: "local-first", requiresAwakeMachine: true, requiresAuthorizedDataPath: true, appParticipationRequired: false },
-      lastSafeError: state?.lastSafeError ?? jobs.find(job => job.lastSafeError)?.lastSafeError ?? null,
+      lastSafeError: state ? state.lastSafeError : jobs.find(job => job.lastSafeError)?.lastSafeError ?? null,
     };
   }
 

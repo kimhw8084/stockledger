@@ -7,7 +7,7 @@ import { WorkerStore } from "../server/worker/store";
 import { seedData } from "../src/lib/seed";
 import { runWorker } from "../server/worker/run";
 import { runManagedJob } from "../server/worker/managed";
-import { jobIdentityFor, retryDelayMs, WORKER_MAX_ATTEMPTS } from "../server/worker/contract";
+import { jobIdentityFor, retryDelayMs, WORKER_MAX_ATTEMPTS, WORKER_MAX_QUEUED_JOBS } from "../server/worker/contract";
 import { marketSessionDueAtUtc, previousUsTradingDate } from "../src/lib/marketCalendar";
 import { serializeExport } from "../src/domain/backupFormat";
 const folders: string[] = [];
@@ -86,8 +86,14 @@ it("creates deterministic versioned stage keys and deduplicates repeated managed
   expect(jobs.map(job => job.kind)).toEqual(["ingestion-readiness", "evaluation-scan", "notification-outbox-intent", "outcome-forward-proof"].sort());
   expect(new Set(jobs.map(job => job.contractVersion))).toEqual(new Set(["stockledger-production-job-v1"]));
   expect(new Set(jobs.map(job => job.semanticIdempotencyKey)).size).toBe(4);
+  const firstScanSignalIds = store.load()?.data.scanSignals.map(signal => signal.signalId);
+  const firstAlertIds = store.load()?.data.alerts.map(alert => alert.id);
   const second = await runManagedJob(store, histories, options);
   expect(second.status).toBe("already_claimed_or_completed");
+  expect(store.load()?.revision).toBe(2);
+  expect(store.load()?.data.scanRuns).toHaveLength(1);
+  expect(store.load()?.data.scanSignals.map(signal => signal.signalId)).toEqual(firstScanSignalIds);
+  expect(store.load()?.data.alerts.map(alert => alert.id)).toEqual(firstAlertIds);
   expect(store.listJobs()).toHaveLength(4);
   expect(store.pendingOutbox()).toHaveLength(1);
   expect(first.deadline.workloadSize).toEqual({ symbols: 3, rows: 780, scheduledSessions: 1, jobStages: 4 });
@@ -136,6 +142,9 @@ it("preserves partial provider coverage while committing one result and one outb
   expect(store.load()?.revision).toBe(2);
   expect(store.listJobs({ scheduledSession: "2026-09-14" }).find(job => job.kind === "evaluation-scan")?.status).toBe("partial");
   expect(store.listJobs({ scheduledSession: "2026-09-14" }).find(job => job.kind === "notification-outbox-intent")?.status).toBe("completed");
+  expect(result.scheduler.coverage.partialSessions).toEqual(["2026-09-14"]);
+  expect(result.scheduler.coverage.completedSessions).toEqual([]);
+  expect(result.scheduler.missedSessions).toEqual([]);
   expect(store.pendingOutbox()).toHaveLength(1);
   store.close();
 });
@@ -154,6 +163,170 @@ it("catches up missed completed-market sessions without replaying completed sema
   expect(repeated.status).toBe("already_claimed_or_completed");
   expect(store.listJobs()).toHaveLength(jobCount);
   expect(store.pendingOutbox()).toHaveLength(4);
+  store.close();
+});
+
+it.each([1, 2])("reconciles durable multi-session work after restart when interrupted before session %s completes", async interruptionAt => {
+  const path = databasePath();
+  const store = new WorkerStore(path);
+  const firstFixture = managedFixture();
+  store.import(firstFixture.data, 0);
+  await runManagedJob(store, firstFixture.histories, { source: "Restart fixture", adjustment: "adjusted", now: new Date("2026-09-14T22:00:00Z") });
+  const extended = managedFixture("2026-09-17", 263);
+  const originalCommit = store.commitJobResult.bind(store);
+  let commitCount = 0;
+  store.commitJobResult = (input: Parameters<WorkerStore["commitJobResult"]>[0]) => {
+    commitCount += 1;
+    if (commitCount === interruptionAt) throw new Error("simulated process interruption");
+    return originalCommit(input);
+  };
+  await expect(runManagedJob(store, extended.histories, { source: "Restart fixture", adjustment: "adjusted", now: new Date("2026-09-17T22:00:00Z") })).rejects.toThrow(/simulated process interruption/);
+  expect(store.getSchedulerCheckpoint()?.lastExpectedSession).toBe("2026-09-17");
+  expect(store.listJobs().filter(job => job.status === "retry-wait" || job.status === "queued")).not.toHaveLength(0);
+  store.close();
+
+  const restarted = new WorkerStore(path);
+  const resumed = await runManagedJob(restarted, extended.histories, { source: "Restart fixture", adjustment: "adjusted", now: new Date("2026-09-17T22:02:00Z") });
+  expect(resumed.sessions).toEqual(interruptionAt === 1 ? ["2026-09-15", "2026-09-16", "2026-09-17"] : ["2026-09-16", "2026-09-17"]);
+  expect(restarted.listJobs().filter(job => job.kind === "evaluation-scan").every(job => job.status === "completed")).toBe(true);
+  expect(restarted.schedulerStatus(new Date("2026-09-17T22:02:00Z")).coverage.completedSessions).toEqual(["2026-09-14", "2026-09-15", "2026-09-16", "2026-09-17"]);
+  const revision = restarted.load()?.revision;
+  const scanRuns = restarted.load()?.data.scanRuns.length;
+  const signalIds = restarted.load()?.data.scanSignals.map(signal => signal.signalId);
+  const alertIds = restarted.load()?.data.alerts.map(alert => alert.id);
+  const outboxCount = restarted.pendingOutbox().length;
+  const replay = await runManagedJob(restarted, extended.histories, { source: "Restart fixture", adjustment: "adjusted", now: new Date("2026-09-17T22:02:00Z") });
+  expect(replay.status).toBe("already_claimed_or_completed");
+  expect(restarted.load()?.revision).toBe(revision);
+  expect(restarted.load()?.data.scanRuns.length).toBe(scanRuns);
+  expect(restarted.load()?.data.scanSignals.map(signal => signal.signalId)).toEqual(signalIds);
+  expect(restarted.load()?.data.alerts.map(alert => alert.id)).toEqual(alertIds);
+  expect(restarted.pendingOutbox()).toHaveLength(outboxCount);
+  restarted.close();
+});
+
+it("persists retry deadlines and reclaims expired running work across SQLite restart", () => {
+  const path = databasePath();
+  const store = new WorkerStore(path);
+  store.import(seedData, 0);
+  const retryJob = jobIdentityFor({ kind: "ingestion-readiness", scheduledSession: "2026-09-14", workflowKey: "restart-retry", inputHash: "restart-retry", dueAtUtc: marketSessionDueAtUtc("2026-09-14").toISOString() });
+  store.enqueue(retryJob, 1000);
+  const retryToken = store.claimJob(retryJob.id, "retry-worker", 1000, 10_000)!;
+  store.failJob(retryJob.id, retryToken, "persisted failure", 1001);
+  const retryBeforeClose = store.getJob(retryJob.id)!;
+  store.close();
+  const restarted = new WorkerStore(path);
+  expect(restarted.getJob(retryJob.id)?.attempts).toBe(1);
+  expect(restarted.getJob(retryJob.id)?.nextRetryAt).toBe(retryBeforeClose.nextRetryAt);
+  expect(restarted.claimJob(retryJob.id, "retry-worker", retryBeforeClose.nextRetryAt! - 1, 10_000)).toBeNull();
+  expect(restarted.getJob(retryJob.id)?.attempts).toBe(1);
+  expect(restarted.claimJob(retryJob.id, "retry-worker", retryBeforeClose.nextRetryAt!, 10_000)).not.toBeNull();
+
+  const runningJob = jobIdentityFor({ kind: "evaluation-scan", scheduledSession: "2026-09-15", workflowKey: "restart-lease", inputHash: "restart-lease", dueAtUtc: marketSessionDueAtUtc("2026-09-15").toISOString() });
+  restarted.enqueue(runningJob, 2000);
+  const oldToken = restarted.claimJob(runningJob.id, "old-worker", 2000, 100)!;
+  restarted.close();
+  const reclaimed = new WorkerStore(path);
+  const newToken = reclaimed.claimJob(runningJob.id, "new-worker", 2101, 100)!;
+  expect(newToken).not.toBe(oldToken);
+  expect(() => reclaimed.complete(runningJob.id, oldToken, seedData, 1, 2101)).toThrow(/lease/);
+  reclaimed.close();
+});
+
+it("reports calendar missed sessions from a known baseline without inventing pre-baseline obligations", () => {
+  const path = databasePath();
+  const store = new WorkerStore(path);
+  store.import(seedData, 0);
+  store.updateSchedulerState({
+    lastInvocationAtUtc: "2026-09-14T22:00:00.000Z",
+    lastExpectedSession: "2026-09-14",
+    lastSafeError: null,
+    now: Date.parse("2026-09-14T22:00:00.000Z"),
+  });
+  store.close();
+  const restarted = new WorkerStore(path);
+  const status = restarted.schedulerStatus(new Date("2026-09-17T22:00:00Z"));
+  expect(status.missedSessions).toEqual(["2026-09-15", "2026-09-16", "2026-09-17"]);
+  expect(status.coverage.scheduledSessions).toEqual(["2026-09-15", "2026-09-16", "2026-09-17"]);
+  expect(status.coverage.completedSessions).toEqual([]);
+  expect(status.state).toBe("missed");
+  restarted.close();
+});
+
+it.each(["partial", "blocked"] as const)("creates a new immutable semantic revision for corrected older %s evidence", async mode => {
+  const path = databasePath();
+  const fixture = managedFixture();
+  const initialData = structuredClone(fixture.data);
+  if (mode === "blocked") initialData.scannerSettings = { ...initialData.scannerSettings, frozenUniverseBySector: {} };
+  const store = new WorkerStore(path);
+  store.import(initialData, 0);
+  const initialHistories = mode === "partial"
+    ? fixture.histories.map(history => history.symbol === initialData.stocks[0].symbol ? { ...history, rows: [], error: "provider timeout" } : history)
+    : fixture.histories;
+  const initial = await runManagedJob(store, initialHistories, { source: `Initial ${mode}`, adjustment: "adjusted", now: new Date("2026-09-14T22:00:00Z") });
+  expect(initial.status).toBe(mode);
+  const oldJob = store.listJobs({ scheduledSession: "2026-09-14", kind: "evaluation-scan" })[0];
+  const oldRun = store.load()?.data.scanRuns[0];
+  if (mode === "blocked") {
+    const recoveredData = structuredClone(store.load()!.data);
+    recoveredData.scannerSettings = fixture.data.scannerSettings;
+    store.import(recoveredData, 2);
+  }
+  const corrected = await runManagedJob(store, fixture.histories, { source: `Corrected ${mode}`, adjustment: "adjusted", now: new Date("2026-09-14T22:00:00Z") });
+  const evaluationJobs = store.listJobs({ scheduledSession: "2026-09-14", kind: "evaluation-scan" });
+  expect(corrected.status).toBe("completed");
+  expect(evaluationJobs).toHaveLength(2);
+  expect(evaluationJobs.find(job => job.id === oldJob.id)?.status).toBe(mode);
+  expect(evaluationJobs.find(job => job.id !== oldJob.id)?.status).toBe("completed");
+  expect(store.load()?.data.scanRuns).toHaveLength(2);
+  expect(store.load()?.data.scanRuns.some(run => run.id === oldRun?.id)).toBe(true);
+  const jobCount = store.listJobs().length;
+  const revision = store.load()?.revision;
+  await runManagedJob(store, fixture.histories, { source: `Corrected ${mode}`, adjustment: "adjusted", now: new Date("2026-09-14T22:00:00Z") });
+  expect(store.listJobs()).toHaveLength(jobCount);
+  expect(store.load()?.revision).toBe(revision);
+  store.close();
+});
+
+it("keeps durable work when the 32-session and 256-active-job guards reject new planning", async () => {
+  const firstPath = databasePath();
+  const first = new WorkerStore(firstPath);
+  const fixture = managedFixture("2026-09-17", 263);
+  first.import(fixture.data, 0);
+  const durable = jobIdentityFor({ kind: "evaluation-scan", scheduledSession: "2026-09-14", workflowKey: "guard-durable", inputHash: "guard-durable", dueAtUtc: marketSessionDueAtUtc("2026-09-14").toISOString() });
+  first.enqueue(durable, Date.parse("2026-09-14T22:00:00Z"));
+  first.updateSchedulerState({ lastExpectedSession: "2026-07-01", lastSafeError: null, now: Date.parse("2026-09-14T22:00:00Z") });
+  const catchUp = await runManagedJob(first, fixture.histories, { source: "guard", adjustment: "adjusted", now: new Date("2026-09-17T22:00:00Z") });
+  expect(catchUp.status).toBe("admission_blocked");
+  expect(first.getJob(durable.id)?.status).toBe("queued");
+  first.close();
+
+  const second = new WorkerStore(databasePath());
+  second.import(fixture.data, 0);
+  let session = "2026-09-17";
+  const jobs = [];
+  for (let index = 0; index < WORKER_MAX_QUEUED_JOBS / 4; index += 1) {
+    session = previousUsTradingDate(session);
+    for (const kind of ["ingestion-readiness", "evaluation-scan", "outcome-forward-proof", "notification-outbox-intent"] as const) {
+      jobs.push(jobIdentityFor({ kind, scheduledSession: session, workflowKey: `guard-${index}`, inputHash: `guard-${index}`, dueAtUtc: marketSessionDueAtUtc(session).toISOString() }));
+    }
+  }
+  second.enqueueMany(jobs, Date.parse("2026-09-17T22:00:00Z"));
+  const queueFull = await runManagedJob(second, fixture.histories, { source: "guard", adjustment: "adjusted", now: new Date("2026-09-17T22:00:00Z") });
+  expect(queueFull.status).toBe("admission_blocked");
+  expect(second.listJobs()).toHaveLength(WORKER_MAX_QUEUED_JOBS);
+  expect(second.listJobs().every(job => job.status === "queued")).toBe(true);
+  second.close();
+});
+
+it("distinguishes an explicit null scheduler patch from an omitted property", () => {
+  const store = new WorkerStore(databasePath());
+  store.updateSchedulerState({ lastSafeError: "stale safe error", now: 1000 });
+  expect(store.getSchedulerCheckpoint()?.lastSafeError).toBe("stale safe error");
+  store.updateSchedulerState({ lastSafeError: null, now: 1001 });
+  expect(store.getSchedulerCheckpoint()?.lastSafeError).toBeNull();
+  store.updateSchedulerState({ now: 1002 });
+  expect(store.getSchedulerCheckpoint()?.lastSafeError).toBeNull();
   store.close();
 });
 

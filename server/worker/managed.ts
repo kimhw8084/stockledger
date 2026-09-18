@@ -74,7 +74,8 @@ const validateBatchSize = (histories: ManagedHistory[]) => {
 };
 
 const dueSessions = (lastExpectedSession: string | null, latestExpectedSession: string) => {
-  if (!lastExpectedSession || latestExpectedSession <= lastExpectedSession) return [latestExpectedSession];
+  if (!lastExpectedSession) return [latestExpectedSession];
+  if (latestExpectedSession <= lastExpectedSession) return [];
   const sessions: string[] = [];
   let cursor = nextUsTradingDate(lastExpectedSession);
   while (cursor <= latestExpectedSession) {
@@ -84,6 +85,23 @@ const dueSessions = (lastExpectedSession: string | null, latestExpectedSession: 
     cursor = nextUsTradingDate(cursor);
   }
   return sessions;
+};
+
+const activeJobStatuses = new Set(["queued", "running", "retry-wait"]);
+const correctionStatuses = new Set(["partial", "blocked"]);
+
+const plannedSessions = (store: WorkerStore, checkpoint: ReturnType<WorkerStore["getSchedulerCheckpoint"]>, latestExpectedSession: string) => {
+  const newlyDue = dueSessions(checkpoint?.lastExpectedSession ?? null, latestExpectedSession);
+  const persisted = store.listJobs().filter(job => job.scheduledSession !== "legacy");
+  const durableSessions = persisted
+    .filter(job => activeJobStatuses.has(job.status))
+    .map(job => job.scheduledSession);
+  const correctionSessions = persisted
+    .filter(job => job.kind === "evaluation-scan" && correctionStatuses.has(job.status))
+    .map(job => job.scheduledSession);
+  // Keep every durable active session in the plan, including retry-wait jobs
+  // whose deadline has not arrived. runSession will leave those untouched.
+  return [...new Set([...newlyDue, ...durableSessions, ...correctionSessions])].sort();
 };
 
 const workflowFor = (data: NonNullable<ReturnType<WorkerStore["load"]>>["data"], histories: ManagedHistory[], session: string, options: ManagedWorkerOptions) => {
@@ -266,10 +284,10 @@ export async function runManagedJob(store: WorkerStore, histories: ManagedHistor
   const checkpoint = store.getSchedulerCheckpoint();
   let sessions: string[];
   try {
-    sessions = dueSessions(checkpoint?.lastExpectedSession ?? null, latestExpectedSession);
+    sessions = plannedSessions(store, checkpoint, latestExpectedSession);
   } catch (cause) {
     const message = cause instanceof Error ? cause.message : "Scheduler admission guard blocked catch-up.";
-    store.updateSchedulerState({ lastInvocationAtUtc: now.toISOString(), lastExpectedSession: latestExpectedSession, lastRunStatus: "admission_blocked", lastSafeError: message, now: now.getTime() });
+    store.updateSchedulerState({ lastInvocationAtUtc: now.toISOString(), lastRunStatus: "admission_blocked", lastSafeError: message, now: now.getTime() });
     const elapsedMs = Math.round(performance.now() - started);
     return { status: "admission_blocked", jobIds: [], sessions: [], scheduler: store.schedulerStatus(now, saved.data.scannerSettings.providerDelayMinutesAfterClose, deadlineBudgetMs), deadline: { elapsedMs, workloadSize: { symbols: histories.length, rows, scheduledSessions: 0, jobStages: 0 }, deadlineBudgetMs, remainingHeadroomMs: deadlineBudgetMs - elapsedMs, withinBudget: elapsedMs <= deadlineBudgetMs, evidenceOnly: true } };
   }
@@ -279,7 +297,7 @@ export async function runManagedJob(store: WorkerStore, histories: ManagedHistor
     store.enqueueMany(queued, now.getTime());
   } catch (cause) {
     const message = cause instanceof Error ? cause.message : "Scheduler admission guard blocked enqueue.";
-    store.updateSchedulerState({ lastInvocationAtUtc: now.toISOString(), lastExpectedSession: latestExpectedSession, lastRunStatus: "admission_blocked", lastSafeError: message, now: now.getTime() });
+    store.updateSchedulerState({ lastInvocationAtUtc: now.toISOString(), lastRunStatus: "admission_blocked", lastSafeError: message, now: now.getTime() });
     const elapsedMs = Math.round(performance.now() - started);
     return { status: "admission_blocked", jobIds: [], sessions, scheduler: store.schedulerStatus(now, saved.data.scannerSettings.providerDelayMinutesAfterClose, deadlineBudgetMs), deadline: { elapsedMs, workloadSize: { symbols: histories.length, rows, scheduledSessions: sessions.length, jobStages: queued.length }, deadlineBudgetMs, remainingHeadroomMs: deadlineBudgetMs - elapsedMs, withinBudget: elapsedMs <= deadlineBudgetMs, evidenceOnly: true } };
   }
@@ -295,7 +313,13 @@ export async function runManagedJob(store: WorkerStore, histories: ManagedHistor
   let latest: Awaited<ReturnType<typeof runSession>> | null = null;
   for (const workflow of workflows) {
     const byKind = Object.fromEntries(workflow.jobs.map(job => [job.kind, job])) as Record<WorkerJobKind, JobContractResult["jobs"][number]>;
-    latest = await runSession(store, histories, options, workflow.jobs[0].scheduledSession, { ...workflow, byKind, ids: workflow.jobs.map(job => job.id) }, now.getTime());
+    try {
+      latest = await runSession(store, histories, options, workflow.jobs[0].scheduledSession, { ...workflow, byKind, ids: workflow.jobs.map(job => job.id) }, now.getTime());
+    } catch (cause) {
+      const message = cause instanceof Error ? cause.message : "Managed worker failed.";
+      store.updateSchedulerState({ lastRunStatus: "failed", lastSafeError: message, now: now.getTime() });
+      throw cause;
+    }
     const sessionResult = latest;
     if (["completed", "partial", "blocked"].includes(sessionResult.status)) {
       const completed = sessionResult.status === "completed";
