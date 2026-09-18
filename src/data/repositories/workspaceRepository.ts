@@ -43,6 +43,21 @@ export interface WorkspaceRepository {
   restorePreviousBackup(): Promise<void>;
 }
 
+/** Sync metadata is local-only and deliberately lives outside the workspace export. */
+export type SyncStateStore = {
+  get(key: string): Promise<string | null>;
+  set(key: string, value: string): Promise<void>;
+  remove(key: string): Promise<void>;
+};
+
+export const createSyncStateStore = (keyValueStore: KeyValueStore = store): SyncStateStore => ({
+  get: key => keyValueStore.getItem(key),
+  set: (key, value) => keyValueStore.setItem(key, value),
+  remove: key => keyValueStore.removeItem(key),
+});
+
+export const syncStateStore = createSyncStateStore();
+
 /** The only supported migration currently promotes a legacy v1 payload. */
 export const prepareLegacyMigration = (legacy: string, revision = 1) => {
   const parsed = parseExport(legacy);

@@ -26,11 +26,12 @@ it("requires an explicit resolution bound to the exact conflicting revisions", (
   const base = baselineFor([remote()]); const cloud = remote("Cloud edit", 2);
   const conflict = planSync(data, [cloud], base).conflicts[0];
   expect(conflict.key).toBe(`stocks/${stock.id}`);
-  const resolutions = { [conflict.key]: { choice: "local" as const, localHash: conflict.localHash, remoteHash: conflict.remoteHash } };
+  const resolutions = { [conflict.key]: { choice: "local" as const, localHash: conflict.localHash, remoteHash: conflict.remoteHash, remoteRevision: conflict.remoteRevision, cursor: conflict.cursor } };
   expect(planSync(data, [cloud], base, resolutions).changes[0].expectedRevision).toBe(2);
   expect(planSync(data, [remote("Newer edit", 3)], base, resolutions).conflicts).toHaveLength(1);
   resolutions[conflict.key].choice = "remote" as any;
   expect(applyRecords(data, planSync(data, [cloud], base, resolutions).merged).stocks[0].name).toBe("Cloud edit");
+  expect(planSync(data, [cloud], base, { [conflict.key]: { ...resolutions[conflict.key], cursor: conflict.cursor + 1 } }).conflicts).toHaveLength(1);
 });
 it("uses tombstones and detects delete-versus-edit conflicts", () => {
   const base = baselineFor([remote()]); const local = createEmptyAppData();
@@ -45,4 +46,11 @@ it("validates the merged graph and retains historical evaluations without IDs", 
   expect(applyRecords(data, merged).evaluations).toEqual(data.evaluations ?? []);
   merged.delete(`stocks/${data.eyes[0].stockId}`);
   expect(() => applyRecords(data, merged)).toThrow(/missing stock/);
+});
+it("keeps provider-heavy archives out of the personal sync contract", () => {
+  const data = structuredClone(seedData);
+  const records = localRecords(data);
+  expect([...records.values()].every(record => ["stocks", "recipes", "customMetrics", "eyes", "alerts", "decisions", "outcomes", "evaluations", "reviewLogs"].includes(record.collection))).toBe(true);
+  expect(records.size).toBeGreaterThan(0);
+  expect(records.has("rawBarArchives/undefined")).toBe(false);
 });

@@ -2,15 +2,39 @@ import type { AppData, LogicRule, LogicSet } from "../../types";
 import { validateAppData } from "../../domain/appDataSchema";
 import { contentHash } from "../../domain/contentHash";
 import { unavailableSnapshot } from "../../domain/marketSnapshot";
+
+export const syncContractVersion = "stockledger-personal-sync-v1" as const;
+export const syncPageLimit = 500;
+export const syncPageBytes = 5 * 1024 * 1024;
 export const syncCollections = ["stocks", "recipes", "customMetrics", "eyes", "alerts", "decisions", "outcomes", "evaluations", "reviewLogs"] as const;
 export type SyncCollection = typeof syncCollections[number];
-export type CloudRecord = { collection: SyncCollection; record_id: string; revision: number; payload: Record<string, unknown>; deleted: boolean };
-export type SyncBaseline = Record<string, { hash: string; revision: number }>;
-export type SyncChange = { collection: string; recordId: string; expectedRevision: number; payload: Record<string, unknown>; deleted: boolean };
-export type SyncConflict = { key: string; local?: CloudRecord; remote?: CloudRecord; localHash: string; remoteHash: string };
-export type SyncResolution = { choice: "local" | "remote"; localHash: string; remoteHash: string };
+export type CloudRecord = { collection: SyncCollection; record_id: string; revision: number; payload: Record<string, unknown>; deleted: boolean; cursor?: number };
+export type SyncBaseline = Record<string, { hash: string; revision: number; cursor: number }>;
+export type SyncChange = {
+  collection: string;
+  recordId: string;
+  expectedRevision: number;
+  payload: Record<string, unknown>;
+  deleted: boolean;
+  localHash: string;
+  remoteHash: string;
+  remoteRevision: number;
+  remoteCursor: number;
+};
+export type SyncConflict = {
+  key: string;
+  local?: CloudRecord;
+  remote?: CloudRecord;
+  localHash: string;
+  remoteHash: string;
+  remoteRevision: number;
+  cursor: number;
+};
+export type SyncResolution = { choice: "local" | "remote"; localHash: string; remoteHash: string; remoteRevision: number; cursor: number };
+
 const keyFor = (record: Pick<CloudRecord, "collection" | "record_id">) => `${record.collection}/${record.record_id}`;
 const hashFor = (record?: Pick<CloudRecord, "payload" | "deleted">) => !record || record.deleted ? "deleted" : contentHash(record.payload);
+
 export function localRecords(data: AppData): Map<string, CloudRecord> {
   const records = new Map<string, CloudRecord>();
   for (const collection of syncCollections) for (const value of data[collection] ?? []) {
@@ -22,27 +46,45 @@ export function localRecords(data: AppData): Map<string, CloudRecord> {
   }
   return records;
 }
+
 export function planSync(local: AppData, remoteRows: CloudRecord[], baseline: SyncBaseline, resolutions: Record<string, SyncResolution> = {}) {
-  const localMap = localRecords(local), remoteMap = new Map(remoteRows.filter(row => syncCollections.includes(row.collection)).map(row => [keyFor(row), row]));
+  const localMap = localRecords(local);
+  const remoteMap = new Map(remoteRows.filter(row => syncCollections.includes(row.collection)).map(row => [keyFor(row), row]));
   const merged = new Map(localMap), changes: SyncChange[] = [], conflicts: SyncConflict[] = [];
   for (const key of new Set([...localMap.keys(), ...remoteMap.keys(), ...Object.keys(baseline)])) {
     const current = localMap.get(key), remote = remoteMap.get(key), base = baseline[key];
     const localHash = hashFor(current), remoteHash = hashFor(remote), baseHash = base?.hash ?? "deleted";
     const localChanged = localHash !== baseHash, remoteChanged = remoteHash !== baseHash;
+    const remoteRevision = remote?.revision ?? base?.revision ?? 0;
+    const cursor = remote?.cursor ?? base?.cursor ?? 0;
     if (localChanged && remoteChanged && localHash !== remoteHash) {
       const resolution = resolutions[key];
-      if (!resolution || resolution.localHash !== localHash || resolution.remoteHash !== remoteHash) { conflicts.push({ key, local: current, remote, localHash, remoteHash }); continue; }
+      if (!resolution || resolution.localHash !== localHash || resolution.remoteHash !== remoteHash || resolution.remoteRevision !== remoteRevision || resolution.cursor !== cursor) {
+        conflicts.push({ key, local: current, remote, localHash, remoteHash, remoteRevision, cursor });
+        continue;
+      }
       if (resolution.choice === "remote") { if (remote && !remote.deleted) merged.set(key, remote); else merged.delete(key); continue; }
     }
     if (localChanged && localHash !== remoteHash) {
       const identity = current ?? remote;
-      if (identity) changes.push({ collection: identity.collection, recordId: identity.record_id, expectedRevision: remote?.revision ?? 0, payload: current?.payload ?? remote!.payload, deleted: !current });
+      if (identity) changes.push({
+        collection: identity.collection,
+        recordId: identity.record_id,
+        expectedRevision: remote?.revision ?? 0,
+        payload: current?.payload ?? remote?.payload ?? {},
+        deleted: !current,
+        localHash,
+        remoteHash,
+        remoteRevision,
+        remoteCursor: cursor,
+      });
     } else if (remote) {
       if (remote.deleted) merged.delete(key); else merged.set(key, remote);
     }
   }
   return { changes, conflicts, merged };
 }
+
 export function applyRecords(local: AppData, records: Map<string, CloudRecord>): AppData {
   const next = { ...local } as AppData;
   for (const collection of syncCollections) {
@@ -56,6 +98,13 @@ export function applyRecords(local: AppData, records: Map<string, CloudRecord>):
   next.logicRules = next.recipes.flatMap(recipe => recipe.conditions.map(condition => ({ ...condition, setId: recipe.id, setVersion: recipe.version, createdAt: recipe.createdAt }))) as LogicRule[];
   return validateAppData(next);
 }
-export function baselineFor(records: CloudRecord[]): SyncBaseline {
-  return Object.fromEntries(records.map(record => [keyFor(record), { hash: hashFor(record), revision: record.revision }]));
+
+export function baselineFor(records: CloudRecord[], cursor = 0): SyncBaseline {
+  return Object.fromEntries(records.map(record => [keyFor(record), {
+    hash: hashFor(record),
+    revision: record.revision,
+    cursor: record.cursor ?? cursor,
+  }]));
 }
+
+export const recordKey = keyFor;
