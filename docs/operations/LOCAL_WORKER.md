@@ -2,7 +2,7 @@
 
 StockLedger has one provider-independent execution contract, `stockledger-production-job-v1`. The local CLI and an external cron/job platform may invoke the same `runManagedJob` entry point with authorized observations. The repository does not provision or exercise a hosted scheduler, so no managed scheduler deployment is claimed.
 
-The no-subscription path remains local-first: the application can be closed, but the configured computer must be awake, the authorized CSV path must be readable, and an operator must install and monitor launchd/cron. Sleep, power-off, a stopped schedule, an unavailable data path, and provider failure are visible as missed/blocked/partial coverage; they are not silently treated as fresh market data. No network requests, notification delivery, orders, billing, or email are performed.
+The no-subscription path remains local-first: the application can be closed, but the configured computer must be awake, the authorized CSV path must be readable, and an operator must install and monitor launchd/cron. Sleep, power-off, a stopped schedule, an unavailable data path, and provider failure are visible as missed/blocked/partial coverage; they are not silently treated as fresh market data. Notification delivery is optional and separate from evaluation: it runs only when this local worker is invoked with a server-side configured transport. The Expo app itself does not send background email or OS push.
 
 ## Contract and durable state
 
@@ -28,6 +28,34 @@ An unexpired running A lease is never superseded underneath its owner. The repla
 Retries are capped at five attempts. Backoff is deterministic: one minute, two, four, eight, then terminal failure; the delay is capped at 15 minutes. Result/evaluation/signal/alert/outbox writes use semantic IDs and one transaction, so retrying cannot duplicate semantic work. A workspace revision conflict rolls back the result and outbox together.
 
 Admission guards reject more than 600 symbols, more than 1,000,000 input rows, more than 32 missed sessions in one catch-up, or more than 256 active queued jobs. Rejection preserves all existing jobs and reports a safe error; it does not discard work.
+
+## Notification delivery contract
+
+The delivery contract is `stockledger-notification-delivery-v1`, revision 1. Preferences are `stockledger-notification-preferences-v1`, revision 1. Preferences are user-owned and included in the complete v2 backup envelope, but are explicitly `device-local`; CHG-93 personal sync does not sync a delivery destination or operate a provider. A managed deployment must add its own authenticated account-owned delivery boundary before treating a preference as cross-device. This local worker does not claim account-global cancellation.
+
+Evaluation remains the source of deterministic alert state. A newly committed semantic alert can create one `notification_intents` row per channel/policy inside the same SQLite transaction as the workspace revision and the existing `notification.intent` outbox row. The outbox row is an event/intent record, never a sent or delivered count. Duplicate/replayed jobs are protected by semantic alert IDs and a unique `(semantic_key, channel, policy_key)` index. Existing v3 worker databases migrate additively to schema v5; existing workspace, job, recovery and outbox rows are not rewritten or discarded.
+
+Each intent retains its alert identity, channel, policy, privacy mode, destination, scheduled/not-before time, cancellation reason, lease/fencing token, attempt count, next retry, terminal state and account scope. State meanings are:
+
+| State | Guarantee |
+|---|---|
+| `pending` | Eligible for a configured transport claim. |
+| `held` | Quiet hours, digest timing, or alert snooze has not elapsed; no retry is consumed. |
+| `claimed` | A leased worker may submit bytes; an expired/replaced token cannot record an outcome. An expired claim becomes `ambiguous` rather than being resent blindly. |
+| `delivered` | A transport-specific confirmed receipt was recorded. This is not a human-open/read claim. |
+| `failed` | Definitive transport failure reached the five-attempt cap. |
+| `retry-wait` | Definitive failure is retryable at deterministic 1/2/4/8-minute backoff, capped at 15 minutes. |
+| `canceled` | Future work was opted out, below policy priority, explicitly invalidated, or lost its alert; snooze is a hold, not cancellation, and already-delivered receipts remain immutable. |
+| `blocked-unconfigured` | Consent/destination/transport configuration is insufficient; it is never counted as delivered. Recovery can make it pending again. |
+| `ambiguous` | Bytes may have been accepted but final delivery is unknown; it is not resent automatically and requires provider reconciliation/idempotency evidence. A worker crash or expired claim is treated conservatively the same way. |
+
+Attempt and receipt rows are append-only. A provider submission alone never becomes `delivered`: the SMTP adapter records a `250` as `provider-accepted`/`ambiguous`, because SMTP has no recipient delivery proof. `SmtpEmailTransport` is server-only; host, port, sender, authentication and TLS configuration never enter Expo bundles. The isolated test transport can return an explicit confirmed receipt for lifecycle tests. No real recipient or unrelated provider was contacted during verification.
+
+The minimal privacy mode sends only “A review is needed in StockLedger” plus a safe alert deep link and deterministic message identity. It excludes thesis text, personal notes, condition evidence, holdings and cloud payloads. Rich content is an explicit preference and is still not a diagnostic/logging channel. Logs and status output are limited to opaque IDs, channel/state, attempt/timestamps and bounded error classes; credentials, access tokens and alert payloads are not logged.
+
+Preference opt-out transactionally cancels pending, held, retry-wait and blocked intents. Changes to destination/privacy/quiet hours affect eligible pending work. Quiet hours do not consume attempts. A snoozed alert is rechecked at claim time and cannot be newly submitted before expiry. Review state remains separate; this product policy does not cancel a pending delivery merely because an alert was reviewed. Account invalidation cancellation is implemented only for explicitly account-owned intents supplied by a deployment; device-local intents are not fabricated as cloud services.
+
+To configure a real SMTP endpoint, construct the server-side adapter with a private `SmtpEmailTransport({ host, port, from, secure, username, password, timeoutMs })` in the worker runtime and invoke `deliverDueNotifications`. Do not put these values in `EXPO_PUBLIC_*` variables, backups, UI status or logs. A missing adapter, endpoint, sender or destination produces `blocked-unconfigured`. A successful local-worker run therefore proves only the local transport boundary and its configured machine; it does not prove external email reputation, recipient delivery, background availability, hosting, or a scheduler installation.
 
 ## Bootstrap
 
@@ -83,10 +111,10 @@ npm run worker -- --import /absolute/path/edited-worker-export.json --import-rev
 
 The revision must match. A consistent `before-import` SQLite copy is created before replacement. This is whole-workspace replacement, not an automatic three-way merge. Stop writers before replacing a DB. Prefer `--backup` over copying a live SQLite file alone. Preserve DB/WAL/SHM together after an unclean shutdown. Open backups at a new `--db` path, check integrity, export and validate in the app before switching the schedule.
 
-Outbox rows are delivery intent only. `pendingNotificationIntents` is not a sent/delivered count. A future delivery transport must claim and acknowledge delivery separately, with its own idempotency and receipt semantics.
+Outbox rows are delivery intent only. `pendingNotificationIntents` is not a sent/delivered count. Delivery status must be read from the notification intent/attempt/receipt tables. The lifecycle distinguishes alert creation, outbox intent, transport attempt, provider acceptance and confirmed delivery; none is inferred from another.
 
 ## Measured representative fixture
 
-`npm run benchmark:worker` runs the deterministic synthetic fixture: **100 stocks × 260 sessions**, with SPY and three sector inputs, through the four-stage contract. The benchmark output reports elapsed time, workload size, the explicit **30-minute engineering deadline budget**, remaining headroom, result counts, serialized workspace bytes, SQLite/WAL bytes, RSS and integrity. A current Node 22.23.2 run recorded **2,211 ms elapsed**, **1,797,790 ms remaining headroom**, **100 Eye evaluations**, **200 scanner rows**, **5,812,831 workspace bytes**, **12,192,912 SQLite/WAL bytes**, **239,517,696 RSS bytes**, and integrity `true`.
+`npm run benchmark:worker` runs the deterministic synthetic fixture: **100 stocks × 260 sessions**, with SPY and three sector inputs, through the four-stage contract. The benchmark output reports elapsed time, workload size, the explicit **30-minute engineering deadline budget**, remaining headroom, result counts, serialized workspace bytes, SQLite/WAL bytes, RSS and integrity. A current Node 22.23.2 run recorded **2,242 ms elapsed**, **1,797,759 ms remaining headroom**, **100 Eye evaluations**, **200 scanner rows**, **5,813,254 workspace bytes**, **12,390,312 SQLite/WAL bytes**, **242,778,112 RSS bytes**, and integrity `true`.
 
-This is one deterministic engineering measurement, not p95 capacity, a production SLA, a hosted guarantee, or a user-count forecast.
+This is one deterministic engineering measurement, not p95 capacity, a production SLA, a hosted guarantee, or a user-count forecast. The CHG-94 notification delivery phase is not included in this evaluation benchmark; it has its own transport/lifecycle evidence.

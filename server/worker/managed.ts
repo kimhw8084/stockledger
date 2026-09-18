@@ -9,6 +9,7 @@ import {
 } from "../../src/lib/marketCalendar";
 import { runDailyStockConditionScan } from "../../src/lib/stockConditionScanner";
 import { FINANCIAL_TRUTH_ENGINE_VERSION } from "../../src/lib/metricCatalog";
+import { buildNotificationIntent, NOTIFICATION_DELIVERY_CONTRACT_VERSION } from "../../src/domain/notificationDelivery";
 import type { RawBarRecord, UniverseSnapshot } from "../../src/types";
 import {
   createProductionJob,
@@ -230,6 +231,14 @@ const runSession = async (store: WorkerStore, histories: ManagedHistory[], optio
       scanSignals: result.scanSignals,
       forwardProofLedger: result.forwardProofLedger,
     }, now);
+    const priorAlertIds = new Set(saved.data.alerts.map(alert => alert.id));
+    const newAlerts = next.alerts.filter(alert => !priorAlertIds.has(alert.id));
+    const notificationIntents = newAlerts.map(alert => buildNotificationIntent(
+      alert,
+      next.notificationPreferences,
+      leaseClock(),
+      { accountInvalidated: false },
+    ));
     if (leaseLost) throw new Error("Worker lease renewal failed before commit.");
     const resultStatus = result.scanRun.status;
     const relatedClaims: RelatedClaim[] = [];
@@ -242,17 +251,21 @@ const runSession = async (store: WorkerStore, histories: ManagedHistory[], optio
       expectedRevision: saved.revision,
       status: resultStatus,
       relatedClaims,
+      notificationIntents,
       outbox: notificationClaim ? {
         id: `intent-${notification.id}`,
         jobId: notification.id,
         payload: {
           type: "notification.intent",
-          version: 1,
+          version: 2,
+          deliveryContractVersion: NOTIFICATION_DELIVERY_CONTRACT_VERSION,
           semanticIdempotencyKey: notification.semanticIdempotencyKey,
           scheduledSession: session,
           scanRunId: result.scanRun.id,
           status: resultStatus,
-          newAlerts: next.alerts.filter(alert => !alert.reviewed).length,
+          alertIds: newAlerts.map(alert => alert.id),
+          intentIds: notificationIntents.map(intent => intent.id),
+          newAlerts: newAlerts.length,
         },
       } : undefined,
       now: leaseClock(),

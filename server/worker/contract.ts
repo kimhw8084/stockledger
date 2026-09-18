@@ -1,5 +1,19 @@
 import { contentHash } from "../../src/domain/contentHash";
 import { CALENDAR_VERSION, marketSessionDueAtUtc } from "../../src/lib/marketCalendar";
+export {
+  NOTIFICATION_DELIVERY_CONTRACT_REVISION,
+  NOTIFICATION_DELIVERY_CONTRACT_VERSION,
+  NOTIFICATION_MAX_ATTEMPTS,
+  NOTIFICATION_INITIAL_RETRY_DELAY_MS,
+  NOTIFICATION_MAX_RETRY_DELAY_MS,
+  NOTIFICATION_POLICY_VERSION,
+  notificationDeliveryStates,
+  notificationIntentIdentity,
+  notificationRetryDelayMs,
+  type NotificationAttemptOutcome,
+  type NotificationDeliveryState,
+  type NotificationIntentInput,
+} from "../../src/domain/notificationDelivery";
 
 export const WORKER_JOB_CONTRACT_VERSION = "stockledger-production-job-v1" as const;
 export const WORKER_JOB_CONTRACT_REVISION = 2 as const;

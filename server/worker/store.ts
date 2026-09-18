@@ -3,8 +3,10 @@ import { randomUUID } from "node:crypto";
 import { chmodSync, mkdirSync } from "node:fs";
 import { dirname } from "node:path";
 import { validateAppData } from "../../src/domain/appDataSchema";
+import { notificationEligibility, notificationRetryDelayMs, NOTIFICATION_MAX_ATTEMPTS, type NotificationAttemptOutcome, type NotificationDeliveryState, type NotificationIntentInput } from "../../src/domain/notificationDelivery";
+import { normalizeNotificationPreferences } from "../../src/domain/notificationPreferences";
 import { latestCompletedTradingDate, marketSessionDueAtUtc, nextUsTradingDate } from "../../src/lib/marketCalendar";
-import type { AppData } from "../../src/types";
+import type { AppData, NotificationPreferences } from "../../src/types";
 import {
   jobIdFor,
   retryDelayMs,
@@ -93,6 +95,62 @@ export interface SchedulerStatus {
   lastSafeError: string | null;
 }
 
+export interface NotificationIntent {
+  id: string;
+  contractVersion: string;
+  contractRevision: number;
+  semanticIdempotencyKey: string;
+  alertId: string;
+  channel: "email";
+  policyKey: string;
+  privacyMode: "minimal" | "rich";
+  destination: string | null;
+  status: NotificationDeliveryState;
+  scheduledAt: number;
+  notBefore: number;
+  cancellationReason: string | null;
+  leaseOwner: string | null;
+  leaseToken: string | null;
+  leaseUntil: number;
+  attemptCount: number;
+  nextRetryAt: number | null;
+  providerMessageId: string | null;
+  terminalErrorClass: string | null;
+  terminalState: Extract<NotificationDeliveryState, "delivered" | "failed" | "canceled" | "ambiguous"> | null;
+  accountScope: "device-local" | "account-owned";
+  accountId: string | null;
+  preferenceUpdatedAt: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface NotificationAttempt {
+  id: string;
+  intentId: string;
+  attemptNumber: number;
+  startedAt: string;
+  completedAt: string;
+  outcome: NotificationAttemptOutcome;
+  errorClass: string | null;
+  providerMessageId: string | null;
+  requestIdentity: string;
+}
+
+export interface NotificationReceipt {
+  id: string;
+  intentId: string;
+  attemptId: string;
+  receiptType: "confirmed" | "provider-accepted";
+  providerMessageId: string | null;
+  recordedAt: string;
+}
+
+export type NotificationOutcome =
+  | { kind: "confirmed"; providerMessageId?: string }
+  | { kind: "provider-accepted"; providerMessageId?: string }
+  | { kind: "definitive-failure"; errorClass: string }
+  | { kind: "ambiguous"; errorClass: string; providerMessageId?: string };
+
 type SchedulerState = {
   lastInvocationAtUtc: string | null;
   lastExpectedSession: string | null;
@@ -127,12 +185,14 @@ export class WorkerStore {
     if (path !== ":memory:") chmodSync(path, 0o600);
     this.db.exec("PRAGMA journal_mode=WAL; PRAGMA foreign_keys=ON; PRAGMA busy_timeout=5000;");
     const version = Number(this.db.prepare("PRAGMA user_version").get()?.user_version ?? 0);
-    if (version !== 0 && version !== 1 && version !== 2 && version !== 3) throw new Error("Unsupported worker database version.");
+    if (version !== 0 && version !== 1 && version !== 2 && version !== 3 && version !== 4 && version !== 5) throw new Error("Unsupported worker database version.");
     this.createSchema();
     if (version === 1) this.migrateV1ToV2();
     if (version === 1 || version === 2) this.migrateV2ToV3();
+    if (version <= 3) this.migrateV3ToV4();
+    if (version <= 4) this.migrateV4ToV5();
     this.createIndexes();
-    this.db.exec("PRAGMA user_version=3;");
+    this.db.exec("PRAGMA user_version=5;");
   }
 
   close() { this.db.close(); }
@@ -191,11 +251,58 @@ export class WorkerStore {
         deadline_at TEXT,
         updated_at TEXT NOT NULL
       );
+      CREATE TABLE IF NOT EXISTS notification_intents (
+        id TEXT PRIMARY KEY,
+        contract_version TEXT NOT NULL,
+        contract_revision INTEGER NOT NULL,
+        semantic_key TEXT NOT NULL,
+        alert_id TEXT NOT NULL,
+        channel TEXT NOT NULL,
+        policy_key TEXT NOT NULL,
+        privacy_mode TEXT NOT NULL,
+        destination TEXT,
+        status TEXT NOT NULL,
+        scheduled_at INTEGER NOT NULL,
+        not_before INTEGER NOT NULL,
+        cancellation_reason TEXT,
+        lease_owner TEXT,
+        token TEXT,
+        lease_until INTEGER NOT NULL DEFAULT 0,
+        attempt_count INTEGER NOT NULL DEFAULT 0,
+        next_retry_at INTEGER,
+        provider_message_id TEXT,
+        terminal_error_class TEXT,
+        terminal_state TEXT,
+        account_scope TEXT NOT NULL DEFAULT 'device-local',
+        account_id TEXT,
+        preference_updated_at TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+      );
+      CREATE TABLE IF NOT EXISTS notification_attempts (
+        id TEXT PRIMARY KEY,
+        intent_id TEXT NOT NULL REFERENCES notification_intents(id),
+        attempt_number INTEGER NOT NULL,
+        started_at TEXT NOT NULL,
+        completed_at TEXT NOT NULL,
+        outcome TEXT NOT NULL,
+        error_class TEXT,
+        provider_message_id TEXT,
+        request_identity TEXT NOT NULL
+      );
+      CREATE TABLE IF NOT EXISTS notification_receipts (
+        id TEXT PRIMARY KEY,
+        intent_id TEXT NOT NULL REFERENCES notification_intents(id),
+        attempt_id TEXT NOT NULL REFERENCES notification_attempts(id),
+        receipt_type TEXT NOT NULL,
+        provider_message_id TEXT,
+        recorded_at TEXT NOT NULL
+      );
     `);
   }
 
   private createIndexes() {
-    this.db.exec("CREATE INDEX IF NOT EXISTS jobs_due_idx ON jobs(status, next_retry_at, due_at); CREATE INDEX IF NOT EXISTS jobs_session_idx ON jobs(scheduled_session, kind); CREATE UNIQUE INDEX IF NOT EXISTS jobs_semantic_key_idx ON jobs(semantic_key); CREATE INDEX IF NOT EXISTS job_reconciliation_replacement_idx ON job_reconciliation(replacement_workflow_key, replacement_job_id);");
+    this.db.exec("CREATE INDEX IF NOT EXISTS jobs_due_idx ON jobs(status, next_retry_at, due_at); CREATE INDEX IF NOT EXISTS jobs_session_idx ON jobs(scheduled_session, kind); CREATE UNIQUE INDEX IF NOT EXISTS jobs_semantic_key_idx ON jobs(semantic_key); CREATE INDEX IF NOT EXISTS job_reconciliation_replacement_idx ON job_reconciliation(replacement_workflow_key, replacement_job_id); CREATE UNIQUE INDEX IF NOT EXISTS notification_semantic_channel_policy_idx ON notification_intents(semantic_key, channel, policy_key); CREATE INDEX IF NOT EXISTS notification_due_idx ON notification_intents(status, not_before, next_retry_at); CREATE INDEX IF NOT EXISTS notification_alert_idx ON notification_intents(alert_id, channel, policy_key); CREATE INDEX IF NOT EXISTS notification_attempt_intent_idx ON notification_attempts(intent_id, attempt_number); CREATE INDEX IF NOT EXISTS notification_receipt_intent_idx ON notification_receipts(intent_id, recorded_at);");
   }
 
   private migrateV1ToV2() {
@@ -243,6 +350,17 @@ export class WorkerStore {
     `);
   }
 
+  private migrateV3ToV4() {
+    // The delivery tables are additive. Existing workspace, job and outbox rows
+    // remain untouched and therefore remain recoverable during upgrade.
+    this.db.exec("CREATE TABLE IF NOT EXISTS notification_intents (id TEXT PRIMARY KEY, contract_version TEXT NOT NULL, contract_revision INTEGER NOT NULL, semantic_key TEXT NOT NULL, alert_id TEXT NOT NULL, channel TEXT NOT NULL, policy_key TEXT NOT NULL, privacy_mode TEXT NOT NULL, destination TEXT, status TEXT NOT NULL, scheduled_at INTEGER NOT NULL, not_before INTEGER NOT NULL, cancellation_reason TEXT, lease_owner TEXT, token TEXT, lease_until INTEGER NOT NULL DEFAULT 0, attempt_count INTEGER NOT NULL DEFAULT 0, next_retry_at INTEGER, provider_message_id TEXT, terminal_error_class TEXT, account_scope TEXT NOT NULL DEFAULT 'device-local', account_id TEXT, preference_updated_at TEXT NOT NULL, created_at TEXT NOT NULL, updated_at TEXT NOT NULL); CREATE TABLE IF NOT EXISTS notification_attempts (id TEXT PRIMARY KEY, intent_id TEXT NOT NULL REFERENCES notification_intents(id), attempt_number INTEGER NOT NULL, started_at TEXT NOT NULL, completed_at TEXT NOT NULL, outcome TEXT NOT NULL, error_class TEXT, provider_message_id TEXT, request_identity TEXT NOT NULL); CREATE TABLE IF NOT EXISTS notification_receipts (id TEXT PRIMARY KEY, intent_id TEXT NOT NULL REFERENCES notification_intents(id), attempt_id TEXT NOT NULL REFERENCES notification_attempts(id), receipt_type TEXT NOT NULL, provider_message_id TEXT, recorded_at TEXT NOT NULL);");
+  }
+
+  private migrateV4ToV5() {
+    const columns = new Set((this.db.prepare("PRAGMA table_info(notification_intents)").all() as Array<{ name: string }>).map(column => column.name));
+    if (!columns.has("terminal_state")) this.db.exec("ALTER TABLE notification_intents ADD COLUMN terminal_state TEXT");
+  }
+
   load(): { revision: number; data: AppData } | null {
     const row = this.db.prepare("SELECT revision,payload FROM workspace WHERE id=1").get();
     return row ? { revision: Number(row.revision), data: validateAppData(JSON.parse(String(row.payload))) } : null;
@@ -277,6 +395,30 @@ export class WorkerStore {
       reconciliationReplacementInputHash: iso(row.reconciliation_replacement_input_hash),
       reconciliationReason: iso(row.reconciliation_reason), reconciledAt: iso(row.reconciled_at),
     };
+  }
+
+  private rowToNotificationIntent(row: Record<string, unknown>): NotificationIntent {
+    return {
+      id: String(row.id), contractVersion: String(row.contract_version), contractRevision: Number(row.contract_revision),
+      semanticIdempotencyKey: String(row.semantic_key), alertId: String(row.alert_id), channel: String(row.channel) as "email",
+      policyKey: String(row.policy_key), privacyMode: String(row.privacy_mode) as "minimal" | "rich", destination: iso(row.destination),
+      status: String(row.status) as NotificationDeliveryState, scheduledAt: Number(row.scheduled_at), notBefore: Number(row.not_before),
+      cancellationReason: iso(row.cancellation_reason), leaseOwner: iso(row.lease_owner), leaseToken: iso(row.token), leaseUntil: Number(row.lease_until ?? 0),
+      attemptCount: Number(row.attempt_count ?? 0), nextRetryAt: numberOrNull(row.next_retry_at), providerMessageId: iso(row.provider_message_id),
+      terminalErrorClass: iso(row.terminal_error_class), terminalState: (iso(row.terminal_state) as NotificationIntent["terminalState"]) ?? null, accountScope: String(row.account_scope) as "device-local" | "account-owned", accountId: iso(row.account_id),
+      preferenceUpdatedAt: String(row.preference_updated_at), createdAt: String(row.created_at), updatedAt: String(row.updated_at),
+    };
+  }
+
+  private rowToNotificationAttempt(row: Record<string, unknown>): NotificationAttempt {
+    return {
+      id: String(row.id), intentId: String(row.intent_id), attemptNumber: Number(row.attempt_number), startedAt: String(row.started_at), completedAt: String(row.completed_at),
+      outcome: String(row.outcome) as NotificationAttemptOutcome, errorClass: iso(row.error_class), providerMessageId: iso(row.provider_message_id), requestIdentity: String(row.request_identity),
+    };
+  }
+
+  private rowToNotificationReceipt(row: Record<string, unknown>): NotificationReceipt {
+    return { id: String(row.id), intentId: String(row.intent_id), attemptId: String(row.attempt_id), receiptType: String(row.receipt_type) as NotificationReceipt["receiptType"], providerMessageId: iso(row.provider_message_id), recordedAt: String(row.recorded_at) };
   }
 
   private jobSelect() {
@@ -478,17 +620,21 @@ export class WorkerStore {
     status?: Extract<WorkerJobStatus, "completed" | "partial" | "blocked">;
     relatedClaims?: RelatedClaim[];
     outbox?: { id: string; jobId?: string; payload: unknown };
+    notificationIntents?: NotificationIntentInput[];
+    accountInvalidated?: boolean;
     now?: number;
   }) {
     const now = input.now ?? Date.now();
     this.transaction(() => {
       this.assertLeaseInside(input.id, input.token, now);
       for (const related of input.relatedClaims ?? []) this.assertLeaseInside(related.id, related.token, now);
+      this.refreshNotificationPolicyInside(input.data, now, input.accountInvalidated ?? false);
       this.writeInside(input.data, input.expectedRevision);
       const timestamp = new Date(now).toISOString();
       const status = input.status ?? "completed";
       this.db.prepare("UPDATE jobs SET status=?,completed_at=?,lease_owner=NULL,token=NULL,lease_until=0,next_retry_at=NULL,updated_at=? WHERE id=? AND token=?").run(status, timestamp, timestamp, input.id, input.token);
       for (const related of input.relatedClaims ?? []) this.db.prepare("UPDATE jobs SET status=?,completed_at=?,lease_owner=NULL,token=NULL,lease_until=0,next_retry_at=NULL,updated_at=? WHERE id=? AND token=?").run(related.status, timestamp, timestamp, related.id, related.token);
+      for (const intent of input.notificationIntents ?? []) this.insertNotificationIntentInside(intent);
       if (input.outbox) this.db.prepare("INSERT OR IGNORE INTO outbox(id,job_id,payload,created_at) VALUES(?,?,?,?)").run(input.outbox.id, input.outbox.jobId ?? input.id, JSON.stringify(input.outbox.payload), timestamp);
     });
   }
@@ -528,6 +674,191 @@ export class WorkerStore {
 
   pendingOutbox() { return this.db.prepare("SELECT id,payload FROM outbox WHERE delivered_at IS NULL ORDER BY created_at,id").all() as Array<{ id: string; payload: string }>; }
   acknowledge(id: string) { this.db.prepare("UPDATE outbox SET delivered_at=? WHERE id=?").run(new Date().toISOString(), id); }
+
+  private insertNotificationIntentInside(intent: NotificationIntentInput) {
+    this.db.prepare(`
+      INSERT OR IGNORE INTO notification_intents(
+        id,contract_version,contract_revision,semantic_key,alert_id,channel,policy_key,privacy_mode,destination,status,
+        scheduled_at,not_before,cancellation_reason,lease_owner,token,lease_until,attempt_count,next_retry_at,provider_message_id,
+        terminal_error_class,terminal_state,account_scope,account_id,preference_updated_at,created_at,updated_at
+      ) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,NULL,NULL,0,0,NULL,NULL,NULL,NULL,?,?,?,?,?)
+    `).run(
+      intent.id, intent.contractVersion, intent.contractRevision, intent.semanticIdempotencyKey, intent.alertId, intent.channel, intent.policyKey,
+      intent.privacyMode, intent.destination, intent.status, intent.scheduledAt, intent.notBefore, intent.cancellationReason,
+      intent.accountScope, intent.accountId, intent.preferenceUpdatedAt, intent.createdAt, intent.updatedAt,
+    );
+  }
+
+  private notificationIntentInside(id: string) {
+    const row = this.db.prepare("SELECT * FROM notification_intents WHERE id=?").get(id) as Record<string, unknown> | undefined;
+    return row ? this.rowToNotificationIntent(row) : null;
+  }
+
+  getNotificationIntent(id: string) { return this.notificationIntentInside(id); }
+
+  listNotificationIntents(options: { status?: NotificationDeliveryState; alertId?: string } = {}): NotificationIntent[] {
+    const clauses: string[] = [];
+    const values: string[] = [];
+    if (options.status) { clauses.push("status=?"); values.push(options.status); }
+    if (options.alertId) { clauses.push("alert_id=?"); values.push(options.alertId); }
+    const rows = this.db.prepare(`SELECT * FROM notification_intents${clauses.length ? ` WHERE ${clauses.join(" AND ")}` : ""} ORDER BY scheduled_at,id`).all(...values) as Array<Record<string, unknown>>;
+    return rows.map(row => this.rowToNotificationIntent(row));
+  }
+
+  listNotificationAttempts(intentId?: string): NotificationAttempt[] {
+    const rows = this.db.prepare(`SELECT * FROM notification_attempts${intentId ? " WHERE intent_id=?" : ""} ORDER BY started_at,id`).all(...(intentId ? [intentId] : [])) as Array<Record<string, unknown>>;
+    return rows.map(row => this.rowToNotificationAttempt(row));
+  }
+
+  listNotificationReceipts(intentId?: string): NotificationReceipt[] {
+    const rows = this.db.prepare(`SELECT * FROM notification_receipts${intentId ? " WHERE intent_id=?" : ""} ORDER BY recorded_at,id`).all(...(intentId ? [intentId] : [])) as Array<Record<string, unknown>>;
+    return rows.map(row => this.rowToNotificationReceipt(row));
+  }
+
+  private refreshNotificationPolicyInside(data: AppData, now: number, accountInvalidated = false) {
+    const preferences = normalizeNotificationPreferences(data.notificationPreferences, new Date(now));
+    const alerts = new Map(data.alerts.map(alert => [alert.id, alert]));
+    const intents = this.listNotificationIntents();
+    for (const intent of intents) {
+      if (!["pending", "held", "retry-wait", "blocked-unconfigured"].includes(intent.status)) continue;
+      const alert = alerts.get(intent.alertId);
+      if (!alert) {
+        this.db.prepare("UPDATE notification_intents SET status='canceled',terminal_state='canceled',cancellation_reason=?,lease_owner=NULL,token=NULL,lease_until=0,updated_at=? WHERE id=?").run("alert-not-found", new Date(now).toISOString(), intent.id);
+        continue;
+      }
+      const eligibility = notificationEligibility(alert, preferences, now, intent.channel, accountInvalidated && intent.accountScope === "account-owned");
+      const nextStatus = eligibility.status === "canceled"
+        ? "canceled"
+        : intent.status === "retry-wait" && (intent.nextRetryAt ?? 0) > now
+          ? "retry-wait"
+          : eligibility.status;
+      this.db.prepare("UPDATE notification_intents SET destination=?,privacy_mode=?,status=?,terminal_state=?,not_before=?,cancellation_reason=?,preference_updated_at=?,updated_at=? WHERE id=?").run(
+        eligibility.destination, preferences.privacyMode, nextStatus, eligibility.status === "canceled" ? "canceled" : null, Math.max(intent.notBefore, eligibility.notBefore), eligibility.cancellationReason,
+        preferences.updatedAt, new Date(now).toISOString(), intent.id,
+      );
+    }
+  }
+
+  syncNotificationPolicy(data: AppData, now = Date.now(), accountInvalidated = false) {
+    this.transaction(() => this.refreshNotificationPolicyInside(data, now, accountInvalidated));
+  }
+
+  commitNotificationPreferences(preferences: NotificationPreferences, expectedRevision: number, now = Date.now(), accountInvalidated = false) {
+    return this.transaction(() => {
+      const saved = this.load();
+      if (!saved) throw new Error("Import a StockLedger backup before changing notification preferences.");
+      const next = { ...saved.data, notificationPreferences: normalizeNotificationPreferences(preferences, new Date(now)) };
+      this.refreshNotificationPolicyInside(next, now, accountInvalidated);
+      this.writeInside(next, expectedRevision);
+      return { revision: expectedRevision + 1, data: next };
+    });
+  }
+
+  private assertNotificationLeaseInside(id: string, token: string, now: number) {
+    const intent = this.notificationIntentInside(id);
+    if (!intent || intent.status !== "claimed" || intent.leaseToken !== token || intent.leaseUntil < now) throw new Error("Notification lease expired or replaced.");
+    return intent;
+  }
+
+  private claimNotificationIntentInside(id: string, owner: string, now: number, leaseMs: number) {
+    const intent = this.notificationIntentInside(id);
+    if (!intent) return null;
+    if (intent.status === "claimed" && intent.leaseUntil <= now) {
+      const timestamp = new Date(now).toISOString();
+      const attemptId = `${intent.id}-attempt-${intent.attemptCount}`;
+      this.db.prepare("INSERT OR IGNORE INTO notification_attempts(id,intent_id,attempt_number,started_at,completed_at,outcome,error_class,provider_message_id,request_identity) VALUES(?,?,?,?,?,?,?,?,?)").run(
+        attemptId, intent.id, intent.attemptCount, timestamp, timestamp, "ambiguous", "lease-expired-unknown-delivery", null, intent.semanticIdempotencyKey,
+      );
+      this.db.prepare("UPDATE notification_intents SET status='ambiguous',terminal_state='ambiguous',terminal_error_class='lease-expired-unknown-delivery',lease_owner=NULL,token=NULL,lease_until=0,updated_at=? WHERE id=? AND status='claimed' AND lease_until<=?").run(new Date(now).toISOString(), id, now);
+      return null;
+    }
+    if (!["pending", "held", "retry-wait", "blocked-unconfigured"].includes(intent.status)) return null;
+    const saved = this.load();
+    if (saved) this.refreshNotificationPolicyInside(saved.data, now);
+    const current = this.notificationIntentInside(id);
+    if (!current || !["pending", "held", "retry-wait", "blocked-unconfigured"].includes(current.status)) return null;
+    if (current.status === "held" && current.notBefore > now) return null;
+    if (current.status === "retry-wait" && (current.nextRetryAt ?? 0) > now) return null;
+    if (current.status === "blocked-unconfigured" && !current.destination) return null;
+    const token = randomUUID();
+    const timestamp = new Date(now).toISOString();
+    this.db.prepare("UPDATE notification_intents SET status='claimed',lease_owner=?,token=?,lease_until=?,attempt_count=attempt_count+1,next_retry_at=NULL,updated_at=? WHERE id=? AND status IN ('pending','held','retry-wait','blocked-unconfigured')").run(owner, token, now + leaseMs, timestamp, id);
+    return token;
+  }
+
+  claimNotificationIntent(id: string, owner: string, now = Date.now(), leaseMs = WORKER_DEFAULT_LEASE_MS) {
+    return this.transaction(() => this.claimNotificationIntentInside(id, owner, now, leaseMs));
+  }
+
+  renewNotificationLease(id: string, token: string, now = Date.now(), leaseMs = WORKER_DEFAULT_LEASE_MS) {
+    return this.transaction(() => {
+      const intent = this.notificationIntentInside(id);
+      if (!intent || intent.status !== "claimed" || intent.leaseToken !== token || intent.leaseUntil < now) return false;
+      this.db.prepare("UPDATE notification_intents SET lease_until=?,updated_at=? WHERE id=? AND token=? AND status='claimed'").run(now + leaseMs, new Date(now).toISOString(), id, token);
+      return true;
+    });
+  }
+
+  recordNotificationOutcome(id: string, token: string, outcome: NotificationOutcome, now = Date.now()) {
+    return this.transaction(() => {
+      const intent = this.assertNotificationLeaseInside(id, token, now);
+      const timestamp = new Date(now).toISOString();
+      const attemptId = `${intent.id}-attempt-${intent.attemptCount}`;
+      const requestIdentity = intent.semanticIdempotencyKey;
+      this.db.prepare("INSERT INTO notification_attempts(id,intent_id,attempt_number,started_at,completed_at,outcome,error_class,provider_message_id,request_identity) VALUES(?,?,?,?,?,?,?,?,?)").run(
+        attemptId, intent.id, intent.attemptCount, timestamp, timestamp, outcome.kind, "errorClass" in outcome ? outcome.errorClass : null, "providerMessageId" in outcome ? outcome.providerMessageId ?? null : null, requestIdentity,
+      );
+      if (outcome.kind === "confirmed") {
+        this.db.prepare("INSERT INTO notification_receipts(id,intent_id,attempt_id,receipt_type,provider_message_id,recorded_at) VALUES(?,?,?,?,?,?)").run(`${attemptId}-receipt`, intent.id, attemptId, "confirmed", outcome.providerMessageId ?? null, timestamp);
+        this.db.prepare("UPDATE notification_intents SET status='delivered',terminal_state='delivered',provider_message_id=?,terminal_error_class=NULL,lease_owner=NULL,token=NULL,lease_until=0,next_retry_at=NULL,updated_at=? WHERE id=? AND token=?").run(outcome.providerMessageId ?? null, timestamp, id, token);
+      } else if (outcome.kind === "provider-accepted") {
+        this.db.prepare("INSERT INTO notification_receipts(id,intent_id,attempt_id,receipt_type,provider_message_id,recorded_at) VALUES(?,?,?,?,?,?)").run(`${attemptId}-receipt`, intent.id, attemptId, "provider-accepted", outcome.providerMessageId ?? null, timestamp);
+        this.db.prepare("UPDATE notification_intents SET status='ambiguous',terminal_state='ambiguous',provider_message_id=?,terminal_error_class=?,lease_owner=NULL,token=NULL,lease_until=0,next_retry_at=NULL,updated_at=? WHERE id=? AND token=?").run(outcome.providerMessageId ?? null, "provider-accepted-without-confirmation", timestamp, id, token);
+      } else if (outcome.kind === "ambiguous") {
+        this.db.prepare("UPDATE notification_intents SET status='ambiguous',terminal_state='ambiguous',provider_message_id=?,terminal_error_class=?,lease_owner=NULL,token=NULL,lease_until=0,next_retry_at=NULL,updated_at=? WHERE id=? AND token=?").run(outcome.providerMessageId ?? null, outcome.errorClass.slice(0, 120), timestamp, id, token);
+      } else {
+        const terminal = intent.attemptCount >= NOTIFICATION_MAX_ATTEMPTS;
+        this.db.prepare("UPDATE notification_intents SET status=?,terminal_state=?,terminal_error_class=?,lease_owner=NULL,token=NULL,lease_until=0,next_retry_at=?,updated_at=? WHERE id=? AND token=?").run(
+          terminal ? "failed" : "retry-wait", terminal ? "failed" : null, outcome.errorClass.slice(0, 120), terminal ? null : now + notificationRetryDelayMs(intent.attemptCount), timestamp, id, token,
+        );
+      }
+      return this.notificationIntentInside(id);
+    });
+  }
+
+  markNotificationBlocked(id: string, reason = "channel-unconfigured", now = Date.now()) {
+    this.transaction(() => {
+      const intent = this.notificationIntentInside(id);
+      if (!intent || ["delivered", "failed", "canceled", "ambiguous"].includes(intent.status)) return;
+      this.db.prepare("UPDATE notification_intents SET status='blocked-unconfigured',terminal_state=NULL,terminal_error_class=?,lease_owner=NULL,token=NULL,lease_until=0,updated_at=? WHERE id=? AND status IN ('pending','held','retry-wait','blocked-unconfigured')").run(reason.slice(0, 120), new Date(now).toISOString(), id);
+    });
+  }
+
+  cancelNotificationIntent(id: string, reason: string, now = Date.now()) {
+    this.transaction(() => {
+      this.db.prepare("UPDATE notification_intents SET status='canceled',terminal_state='canceled',cancellation_reason=?,lease_owner=NULL,token=NULL,lease_until=0,next_retry_at=NULL,updated_at=? WHERE id=? AND status IN ('pending','held','retry-wait','blocked-unconfigured')").run(reason.slice(0, 120), new Date(now).toISOString(), id);
+    });
+  }
+
+  cancelAccountOwnedNotifications(accountId: string, reason = "account-invalidated", now = Date.now()) {
+    this.transaction(() => {
+      this.db.prepare("UPDATE notification_intents SET status='canceled',terminal_state='canceled',cancellation_reason=?,lease_owner=NULL,token=NULL,lease_until=0,next_retry_at=NULL,updated_at=? WHERE account_scope='account-owned' AND account_id=? AND status IN ('pending','held','retry-wait','blocked-unconfigured')").run(reason.slice(0, 120), new Date(now).toISOString(), accountId);
+    });
+  }
+
+  reconcileAmbiguousNotification(id: string, providerMessageId: string, now = Date.now()) {
+    return this.transaction(() => {
+      const intent = this.notificationIntentInside(id);
+      if (!intent || intent.status !== "ambiguous") return false;
+      const timestamp = new Date(now).toISOString();
+      const attempt = this.db.prepare("SELECT * FROM notification_attempts WHERE intent_id=? ORDER BY attempt_number DESC LIMIT 1").get(id) as Record<string, unknown> | undefined;
+      if (!attempt) return false;
+      const receiptId = `${String(attempt.id)}-reconciled-receipt`;
+      this.db.prepare("INSERT OR IGNORE INTO notification_receipts(id,intent_id,attempt_id,receipt_type,provider_message_id,recorded_at) VALUES(?,?,?,?,?,?)").run(receiptId, id, String(attempt.id), "confirmed", providerMessageId, timestamp);
+      this.db.prepare("UPDATE notification_intents SET status='delivered',terminal_state='delivered',provider_message_id=?,terminal_error_class=NULL,updated_at=? WHERE id=? AND status='ambiguous'").run(providerMessageId, timestamp, id);
+      return true;
+    });
+  }
 
   private readSchedulerState(): SchedulerState | null {
     const row = this.db.prepare("SELECT * FROM scheduler_state WHERE id=1").get() as Record<string, unknown> | undefined;

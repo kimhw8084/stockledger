@@ -112,6 +112,25 @@ test("keeps cloud optional and exposes the localized local-first account boundar
   await expect(page.getByRole("button", { name: "전체 클라우드 데이터 내보내기", exact: true })).toHaveCount(0);
 });
 
+test("keeps notification consent explicit and exposes device-local delivery status", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "Settings", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Notification delivery", exact: true })).toBeVisible();
+  await page.getByRole("textbox", { name: "name@example.com", exact: true }).fill("local@example.test");
+  await page.getByRole("button", { name: "Enable email delivery", exact: true }).click();
+  await page.getByRole("button", { name: "Save notification preferences", exact: true }).click();
+  await expect(page.getByText("Email destination saved", { exact: true })).toBeVisible();
+  await expect(page.getByText(/server-only local worker/)).toBeVisible();
+  const downloadPromise = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Export complete backup", exact: true }).click();
+  const download = await downloadPromise;
+  const exported = JSON.parse(await readFile((await download.path())!, "utf8"));
+  expect(exported.data.notificationPreferences.enabled).toBe(true);
+  expect(exported.data.notificationPreferences.accountScope).toBe("device-local");
+  await page.getByRole("button", { name: "Opt out and cancel future delivery", exact: true }).click();
+  await expect(page.getByText("Off", { exact: true })).toBeVisible();
+});
+
 test("resolves entity links, fails safely, and preserves language preference", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "Explore sample workspace" }).click();

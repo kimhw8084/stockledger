@@ -2,7 +2,7 @@
 
 A local investment research workspace: keep a watchlist and thesis, monitor explicit recipe conditions, review alerts, and preserve decisions and lessons.
 
-**0.2.0 is a local-first beta candidate.** It includes a runnable SQLite worker and an optional Supabase sync pilot. It is not a deployed commercial service. Billing, commercial feeds, managed notification delivery, and store releases remain gated. See [implementation status](docs/production/IMPLEMENTATION_STATUS.md) for verified scope and remaining work.
+**0.2.0 is a local-first beta candidate.** It includes a runnable SQLite worker, an optional Supabase sync pilot, and a server-only local notification delivery lifecycle that remains dependent on an awake/configured worker. It is not a deployed commercial service. Billing, commercial feeds, hosted notification delivery, and store releases remain gated. See [implementation status](docs/production/IMPLEMENTATION_STATUS.md) for verified scope and remaining work.
 
 ## Run
 

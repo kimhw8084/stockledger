@@ -18,7 +18,7 @@ const help = () => console.log(`StockLedger worker
 --managed invokes the provider-independent production job contract used by external cron/job platforms. It does not install a hosted scheduler.
 --status prints machine-readable scheduler coverage/status without running work.
 --output FILE exports a validated app backup. --backup FILE creates a consistent SQLite snapshot.
---db FILE selects the worker database. No network requests, notification delivery or billing are performed.`);
+--db FILE selects the worker database. Evaluation does not contact a provider; server-only delivery is a separate runNotificationDelivery phase.`);
 
 async function main() {
   if (values.help) { help(); return; }
