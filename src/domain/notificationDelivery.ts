@@ -5,6 +5,8 @@ import type { Alert, NotificationChannel, NotificationPreferences } from "../typ
 export const NOTIFICATION_DELIVERY_CONTRACT_VERSION = "stockledger-notification-delivery-v1" as const;
 export const NOTIFICATION_DELIVERY_CONTRACT_REVISION = 1 as const;
 export const NOTIFICATION_POLICY_VERSION = "default-review-needed-v1" as const;
+export const NOTIFICATION_DIGEST_CONTRACT_VERSION = "stockledger-notification-digest-v1" as const;
+export const NOTIFICATION_DIGEST_CONTRACT_REVISION = 1 as const;
 export const NOTIFICATION_MAX_ATTEMPTS = 5;
 export const NOTIFICATION_INITIAL_RETRY_DELAY_MS = 60_000;
 export const NOTIFICATION_MAX_RETRY_DELAY_MS = 15 * 60_000;
@@ -24,6 +26,9 @@ export interface NotificationIntentInput {
   channel: NotificationChannel;
   policyKey: typeof NOTIFICATION_POLICY_VERSION;
   privacyMode: NotificationPreferences["privacyMode"];
+  deliveryMode: NotificationPreferences["deliveryMode"];
+  digestBucket: string | null;
+  digestTimezone: string;
   destination: string | null;
   status: NotificationDeliveryState;
   scheduledAt: number;
@@ -32,9 +37,19 @@ export interface NotificationIntentInput {
   accountScope: "device-local" | "account-owned";
   accountId: string | null;
   preferenceUpdatedAt: string;
+  preferenceHash: string;
   createdAt: string;
   updatedAt: string;
 }
+
+export type NotificationDigestGrouping = {
+  channel: NotificationChannel;
+  destination: string;
+  privacyMode: NotificationPreferences["privacyMode"];
+  policyKey: string;
+  digestBucket: string;
+  digestTimezone: string;
+};
 
 const priorityRank = { Low: 1, Medium: 2, High: 3 } as const;
 const validEmail = (value?: string) => Boolean(value && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value));
@@ -78,9 +93,48 @@ const nextDigestTime = (from: number, preferences: NotificationPreferences) => {
   return from + 24 * 60 * 60_000;
 };
 
+export const notificationPreferencesFingerprint = (preferences: NotificationPreferences) => contentHash({
+  contractVersion: preferences.contractVersion,
+  revision: preferences.revision,
+  explicitConsent: preferences.explicitConsent,
+  enabled: preferences.enabled,
+  allowedChannels: [...preferences.allowedChannels].sort(),
+  destinations: preferences.destinations,
+  timezone: preferences.timezone,
+  quietHours: preferences.quietHours,
+  deliveryMode: preferences.deliveryMode,
+  digestTime: preferences.digestTime,
+  minimumPriority: preferences.minimumPriority,
+  privacyMode: preferences.privacyMode,
+  accountScope: preferences.accountScope,
+  updatedAt: preferences.updatedAt,
+});
+
 export const notificationIntentIdentity = (alertId: string, channel: NotificationChannel, policyKey = NOTIFICATION_POLICY_VERSION) => {
   const semanticIdempotencyKey = `${NOTIFICATION_DELIVERY_CONTRACT_VERSION}:${contentHash({ alertId, channel, policyKey, revision: NOTIFICATION_DELIVERY_CONTRACT_REVISION })}`;
   return { semanticIdempotencyKey, id: `notification-${contentHash({ semanticIdempotencyKey })}` };
+};
+
+export const notificationDigestGrouping = (intent: { channel: NotificationChannel; destination: string | null; privacyMode: NotificationPreferences["privacyMode"]; policyKey: string; digestBucket: string | null; digestTimezone: string }): NotificationDigestGrouping | null => {
+  if (!intent.destination || !intent.digestBucket) return null;
+  return {
+    channel: intent.channel,
+    destination: intent.destination,
+    privacyMode: intent.privacyMode,
+    policyKey: intent.policyKey,
+    digestBucket: intent.digestBucket,
+    digestTimezone: intent.digestTimezone,
+  };
+};
+
+export const notificationDigestIdentity = (grouping: NotificationDigestGrouping, memberSemanticIdentities: string[]) => {
+  const members = [...new Set(memberSemanticIdentities)].sort();
+  const digestKey = `${NOTIFICATION_DIGEST_CONTRACT_VERSION}:${contentHash({
+    revision: NOTIFICATION_DIGEST_CONTRACT_REVISION,
+    ...grouping,
+    memberSemanticIdentities: members,
+  })}`;
+  return { digestKey, id: `notification-digest-${contentHash({ digestKey })}`, memberSemanticIdentities: members };
 };
 
 export const notificationRetryDelayMs = (attempt: number) => Math.min(
@@ -111,6 +165,33 @@ export const safeNotificationMessage = (input: {
   };
 };
 
+export const safeNotificationDigestMessage = (input: {
+  alerts: Array<Pick<Alert, "id" | "title" | "priority" | "stateChange">>;
+  destination: string;
+  privacyMode: NotificationPreferences["privacyMode"];
+  messageId: string;
+}) => {
+  const safeAlerts = input.alerts.map(alert => ({
+    id: alert.id,
+    title: alert.title.slice(0, 160),
+    priority: alert.priority,
+    stateChange: alert.stateChange.slice(0, 160),
+  }));
+  const lines = input.privacyMode === "rich"
+    ? safeAlerts.map(alert => `${alert.title} — ${alert.priority}. ${alert.stateChange}\nOpen StockLedger: stockledger://alerts/${encodeURIComponent(alert.id)}`)
+    : [`${safeAlerts.length} review${safeAlerts.length === 1 ? "" : "s"} ready in StockLedger.`];
+  return {
+    to: input.destination,
+    subject: "StockLedger review digest",
+    text: lines.join("\n\n"),
+    messageId: input.messageId,
+    headers: {
+      "Message-ID": `<${input.messageId}@stockledger.local>`,
+      "X-StockLedger-Delivery-Key": input.messageId,
+    },
+  };
+};
+
 export const notificationEligibility = (alert: Pick<Alert, "id" | "priority" | "snoozedUntil">, rawPreferences: NotificationPreferences, now: number, channel: NotificationChannel = "email", accountInvalidated = false) => {
   const preferences = normalizeNotificationPreferences(rawPreferences, new Date(now));
   const destination = preferences.destinations.email?.address ?? null;
@@ -133,6 +214,8 @@ export const buildNotificationIntent = (alert: Alert, preferences: NotificationP
   const identity = notificationIntentIdentity(alert.id, "email");
   const eligibility = notificationEligibility(alert, preferences, now, "email", Boolean(options.accountInvalidated && options.accountOwned));
   const timestamp = new Date(now).toISOString();
+  const preferenceHash = notificationPreferencesFingerprint(preferences);
+  const digestBucket = preferences.deliveryMode === "digest" ? new Date(eligibility.notBefore).toISOString() : null;
   return {
     ...identity,
     contractVersion: NOTIFICATION_DELIVERY_CONTRACT_VERSION,
@@ -141,6 +224,9 @@ export const buildNotificationIntent = (alert: Alert, preferences: NotificationP
     channel: "email",
     policyKey: NOTIFICATION_POLICY_VERSION,
     privacyMode: preferences.privacyMode,
+    deliveryMode: preferences.deliveryMode,
+    digestBucket,
+    digestTimezone: preferences.timezone,
     destination: eligibility.destination,
     status: eligibility.status,
     scheduledAt: now,
@@ -149,6 +235,7 @@ export const buildNotificationIntent = (alert: Alert, preferences: NotificationP
     accountScope: options.accountOwned ? "account-owned" : "device-local",
     accountId: options.accountId ?? null,
     preferenceUpdatedAt: preferences.updatedAt,
+    preferenceHash,
     createdAt: timestamp,
     updatedAt: timestamp,
   };

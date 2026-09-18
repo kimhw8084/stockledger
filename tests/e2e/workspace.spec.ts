@@ -131,6 +131,43 @@ test("keeps notification consent explicit and exposes device-local delivery stat
   await expect(page.getByText("Off", { exact: true })).toBeVisible();
 });
 
+test("shows imported last-known worker state and pending preference handoff", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "Settings", exact: true }).click();
+  const downloadPromise = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Export complete backup", exact: true }).click();
+  const download = await downloadPromise;
+  const exported = JSON.parse(await readFile((await download.path())!, "utf8"));
+  exported.data.notificationPreferences = {
+    ...exported.data.notificationPreferences,
+    enabled: false,
+    explicitConsent: false,
+    allowedChannels: [],
+    destinations: {},
+  };
+  exported.data.lastKnownNotificationDeliveryStatus = {
+    contractVersion: "stockledger-notification-status-v1",
+    revision: 1,
+    generatedAt: "2026-09-18T12:05:00.000Z",
+    channel: "email",
+    lastIntentId: "notification-handoff",
+    lastState: "canceled",
+    attemptCount: 0,
+    preferenceUpdatedAt: exported.data.notificationPreferences.updatedAt,
+    preferenceHash: "0".repeat(64),
+  };
+  const fileChooser = page.waitForEvent("filechooser");
+  await page.getByRole("button", { name: "Choose backup file", exact: true }).click();
+  await (await fileChooser).setFiles({ name: "worker-export.json", mimeType: "application/json", buffer: Buffer.from(JSON.stringify(exported)) });
+  await page.getByRole("button", { name: "Validate backup", exact: true }).click();
+  await expect(page.getByText(/Backup validated/)).toBeVisible();
+  await page.getByRole("button", { name: "Export current data and restore this backup" }).click();
+  await expect(page.getByText(/Last-known worker state \(not live monitoring\): Canceled \/ disabled/)).toBeVisible();
+  await page.getByRole("textbox", { name: "name@example.com", exact: true }).fill("handoff@example.test");
+  await page.getByRole("button", { name: "Enable email delivery", exact: true }).click();
+  await expect(page.getByText(/Pending worker handoff/)).toBeVisible();
+});
+
 test("resolves entity links, fails safely, and preserves language preference", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "Explore sample workspace" }).click();

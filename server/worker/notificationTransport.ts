@@ -1,18 +1,24 @@
 import { connect, type Socket } from "node:net";
 import { connect as tlsConnect } from "node:tls";
 import type { Alert } from "../../src/types";
-import { safeNotificationMessage } from "../../src/domain/notificationDelivery";
-import type { NotificationIntent, NotificationOutcome, WorkerStore } from "./store";
+import { notificationDigestGrouping, safeNotificationDigestMessage, safeNotificationMessage, type NotificationDigestGrouping } from "../../src/domain/notificationDelivery";
+import type { NotificationDigest, NotificationIntent, NotificationOutcome, NotificationPreflight, WorkerStore } from "./store";
 
 export interface NotificationTransportMessage {
   alert: Pick<Alert, "id" | "title" | "priority" | "stateChange">;
   intent: NotificationIntent;
+  alerts?: Array<Pick<Alert, "id" | "title" | "priority" | "stateChange">>;
+  intents?: NotificationIntent[];
+  digest?: NotificationDigest;
+  beforeAcceptance?: () => Promise<NotificationPreflight>;
 }
+
+export type NotificationSendOutcome = NotificationOutcome | { kind: "canceled"; reason: string };
 
 export interface NotificationTransport {
   readonly channel: "email";
   readonly configured: boolean;
-  send(message: NotificationTransportMessage): Promise<NotificationOutcome>;
+  send(message: NotificationTransportMessage): Promise<NotificationSendOutcome>;
 }
 
 export interface SmtpEmailTransportOptions {
@@ -76,13 +82,15 @@ export class SmtpEmailTransport implements NotificationTransport {
     this.configured = Boolean(this.options.host && this.options.port > 0 && this.options.from);
   }
 
-  async send(message: NotificationTransportMessage): Promise<NotificationOutcome> {
+  async send(message: NotificationTransportMessage): Promise<NotificationSendOutcome> {
     if (!this.configured || !message.intent.destination) return { kind: "definitive-failure", errorClass: "channel-unconfigured" };
     const timeoutMs = this.options.timeoutMs ?? 5_000;
     let socket: Socket | undefined;
     let bytesMayHaveBeenAccepted = false;
-    const messageId = message.intent.semanticIdempotencyKey.replace(/[^a-zA-Z0-9._:-]/g, "-");
-    const rendered = safeNotificationMessage({ alert: message.alert, destination: message.intent.destination, privacyMode: message.intent.privacyMode, messageId });
+    const messageId = (message.digest?.digestKey ?? message.intent.semanticIdempotencyKey).replace(/[^a-zA-Z0-9._:-]/g, "-");
+    const rendered = message.digest
+      ? safeNotificationDigestMessage({ alerts: message.alerts ?? [message.alert], destination: message.digest.destination, privacyMode: message.digest.privacyMode, messageId })
+      : safeNotificationMessage({ alert: message.alert, destination: message.intent.destination, privacyMode: message.intent.privacyMode, messageId });
     try {
       socket = this.options.secure
         ? tlsConnect({ host: this.options.host, port: this.options.port, servername: this.options.host, rejectUnauthorized: true })
@@ -97,6 +105,8 @@ export class SmtpEmailTransport implements NotificationTransport {
       }
       await writeCommand(socket, `MAIL FROM:<${this.options.from}>`, [250], timeoutMs);
       await writeCommand(socket, `RCPT TO:<${message.intent.destination}>`, [250, 251], timeoutMs);
+      const preflight = await message.beforeAcceptance?.();
+      if (preflight?.kind === "canceled") { socket.destroy(); return preflight; }
       await writeCommand(socket, "DATA", [354], timeoutMs);
       bytesMayHaveBeenAccepted = true;
       const body = [
@@ -130,38 +140,89 @@ export class InMemoryTestEmailTransport implements NotificationTransport {
   readonly messages: NotificationTransportMessage[] = [];
   private readonly accepted = new Set<string>();
   constructor(private readonly mode: "confirmed" | "definitive-failure" | "ambiguous" = "confirmed") {}
-  async send(message: NotificationTransportMessage): Promise<NotificationOutcome> {
-    if (this.accepted.has(message.intent.semanticIdempotencyKey)) return { kind: "confirmed", providerMessageId: `test-${message.intent.semanticIdempotencyKey}` };
+  async send(message: NotificationTransportMessage): Promise<NotificationSendOutcome> {
+    const identity = message.digest?.digestKey ?? message.intent.semanticIdempotencyKey;
+    const preflight = await message.beforeAcceptance?.();
+    if (preflight?.kind === "canceled") return preflight;
+    if (this.accepted.has(identity)) return { kind: "confirmed", providerMessageId: `test-${identity}` };
     this.messages.push(message);
     if (this.mode === "definitive-failure") return { kind: "definitive-failure", errorClass: "test-definitive-failure" };
     if (this.mode === "ambiguous") return { kind: "ambiguous", errorClass: "test-ambiguous" };
-    this.accepted.add(message.intent.semanticIdempotencyKey);
-    return { kind: "confirmed", providerMessageId: `test-${message.intent.semanticIdempotencyKey}` };
+    this.accepted.add(identity);
+    return { kind: "confirmed", providerMessageId: `test-${identity}` };
   }
 }
 
 export async function deliverDueNotifications(store: WorkerStore, transport: NotificationTransport | null, options: { owner: string; now?: number; leaseMs?: number } = { owner: `notification-${process.pid}` }) {
   const now = options.now ?? Date.now();
-  const candidates = store.listNotificationIntents().filter(intent => (
-    (["pending", "held", "retry-wait", "blocked-unconfigured"].includes(intent.status) && intent.notBefore <= now && (intent.nextRetryAt ?? 0) <= now)
-    || (intent.status === "claimed" && intent.leaseUntil <= now)
-  ));
   const results: Array<{ intentId: string; status: string }> = [];
-  for (const candidate of candidates) {
-    if (candidate.status === "claimed") {
-      store.claimNotificationIntent(candidate.id, options.owner, now, options.leaseMs);
-      results.push({ intentId: candidate.id, status: store.getNotificationIntent(candidate.id)?.status ?? "unknown" });
-      continue;
+  for (let pass = 0; pass < 2; pass += 1) {
+    for (const expired of store.listNotificationIntents({ status: "claimed" }).filter(intent => intent.deliveryMode !== "digest" && intent.leaseUntil <= now)) {
+      store.claimNotificationIntent(expired.id, options.owner, now, options.leaseMs);
+      results.push({ intentId: expired.id, status: store.getNotificationIntent(expired.id)?.status ?? "unknown" });
     }
-    if (!transport?.configured) { store.markNotificationBlocked(candidate.id, "channel-unconfigured", now); results.push({ intentId: candidate.id, status: "blocked-unconfigured" }); continue; }
-    const token = store.claimNotificationIntent(candidate.id, options.owner, now, options.leaseMs);
-    if (!token) continue;
-    const saved = store.load();
-    const alert = saved?.data.alerts.find(item => item.id === candidate.alertId);
-    if (!alert) { store.cancelNotificationIntent(candidate.id, "alert-not-found", now); continue; }
-    const outcome = await transport.send({ alert, intent: store.getNotificationIntent(candidate.id)! });
-    const updated = store.recordNotificationOutcome(candidate.id, token, outcome, now);
-    results.push({ intentId: candidate.id, status: updated?.status ?? "unknown" });
+    for (const expiredDigest of store.listNotificationDigests({ status: "claimed" }).filter(digest => digest.leaseUntil <= now)) {
+      for (const memberId of store.reclaimExpiredNotificationDigest(expiredDigest.id, now)) results.push({ intentId: memberId, status: store.getNotificationIntent(memberId)?.status ?? "unknown" });
+    }
+    const candidates = store.listNotificationIntents().filter(intent => ["pending", "held", "retry-wait", "blocked-unconfigured"].includes(intent.status) && intent.notBefore <= now && (intent.nextRetryAt ?? 0) <= now);
+    const digestGroups = new Map<string, NotificationDigestGrouping>();
+    for (const candidate of candidates) {
+      const grouping = candidate.deliveryMode === "digest" ? notificationDigestGrouping(candidate) : null;
+      if (grouping) digestGroups.set(JSON.stringify(grouping), grouping);
+    }
+    for (const grouping of digestGroups.values()) {
+      if (!transport?.configured) {
+        for (const candidate of candidates.filter(item => item.deliveryMode === "digest" && JSON.stringify(notificationDigestGrouping(item)) === JSON.stringify(grouping))) {
+          store.markNotificationBlocked(candidate.id, "channel-unconfigured", now);
+          results.push({ intentId: candidate.id, status: "blocked-unconfigured" });
+        }
+        continue;
+      }
+      const claim = store.claimNotificationDigest(grouping!, options.owner, now, options.leaseMs);
+      if (!claim || claim.kind !== "claimed") continue;
+      const saved = store.load();
+      const intents = claim.memberIds.map(id => store.getNotificationIntent(id)).filter((intent): intent is NonNullable<typeof intent> => Boolean(intent));
+      const alerts = intents.map(intent => saved?.data.alerts.find(item => item.id === intent.alertId)).filter((alert): alert is NonNullable<typeof alert> => Boolean(alert));
+      if (!alerts.length || alerts.length !== intents.length) {
+        store.preflightNotificationDigest(claim.digest.id, claim.token, now);
+        for (const memberId of claim.memberIds) results.push({ intentId: memberId, status: store.getNotificationIntent(memberId)?.status ?? "unknown" });
+        continue;
+      }
+      const preflight = store.preflightNotificationDigest(claim.digest.id, claim.token, now);
+      if (preflight.kind === "canceled") {
+        for (const memberId of claim.memberIds) results.push({ intentId: memberId, status: store.getNotificationIntent(memberId)?.status ?? "unknown" });
+        continue;
+      }
+      const representative = store.getNotificationIntent(claim.memberIds[0]);
+      if (!representative) continue;
+      const outcome = await transport.send({
+        alert: alerts[0], alerts, intents, digest: claim.digest, intent: representative,
+        beforeAcceptance: () => Promise.resolve(store.preflightNotificationDigest(claim.digest.id, claim.token, now)),
+      });
+      if (outcome.kind === "canceled") continue;
+      const updated = store.recordNotificationDigestOutcome(claim.digest.id, claim.token, outcome, now);
+      for (const memberId of claim.memberIds) results.push({ intentId: memberId, status: updated?.status ?? "unknown" });
+    }
+    const immediateCandidates = store.listNotificationIntents().filter(intent => intent.deliveryMode !== "digest" && ["pending", "held", "retry-wait", "blocked-unconfigured"].includes(intent.status) && intent.notBefore <= now && (intent.nextRetryAt ?? 0) <= now);
+    for (const candidate of immediateCandidates) {
+      if (!transport?.configured) { store.markNotificationBlocked(candidate.id, "channel-unconfigured", now); results.push({ intentId: candidate.id, status: "blocked-unconfigured" }); continue; }
+      const token = store.claimNotificationIntent(candidate.id, options.owner, now, options.leaseMs);
+      if (!token) continue;
+      const saved = store.load();
+      const alert = saved?.data.alerts.find(item => item.id === candidate.alertId);
+      if (!alert) {
+        store.cancelNotificationIntent(candidate.id, "alert-not-found", now);
+        const canceled = store.preflightNotificationIntent(candidate.id, token, now);
+        results.push({ intentId: candidate.id, status: canceled.kind === "canceled" ? "canceled" : "unknown" });
+        continue;
+      }
+      const preflight = store.preflightNotificationIntent(candidate.id, token, now);
+      if (preflight.kind === "canceled") { results.push({ intentId: candidate.id, status: "canceled" }); continue; }
+      const outcome = await transport.send({ alert, intent: store.getNotificationIntent(candidate.id)!, beforeAcceptance: () => Promise.resolve(store.preflightNotificationIntent(candidate.id, token, now)) });
+      if (outcome.kind === "canceled") { results.push({ intentId: candidate.id, status: "canceled" }); continue; }
+      const updated = store.recordNotificationOutcome(candidate.id, token, outcome, now);
+      results.push({ intentId: candidate.id, status: updated?.status ?? "unknown" });
+    }
   }
   return results;
 }

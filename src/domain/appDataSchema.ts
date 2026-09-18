@@ -61,6 +61,13 @@ const notificationPreferencesSchema = z.looseObject({
   deliveryMode: z.enum(["immediate", "digest"]), digestTime: text.refine(validClockTime, "Invalid digest time"), minimumPriority: priority,
   privacyMode: z.enum(["minimal", "rich"]), accountScope: z.literal("device-local"), updatedAt: timestamp,
 });
+const lastKnownNotificationDeliveryStatusSchema = z.looseObject({
+  contractVersion: z.literal("stockledger-notification-status-v1"), revision: z.literal(1), generatedAt: timestamp,
+  channel: z.literal("email"), lastIntentId: z.union([id, z.null()]),
+  lastState: z.union([z.enum(["pending", "held", "claimed", "delivered", "failed", "retry-wait", "canceled", "blocked-unconfigured", "ambiguous"]), z.null()]),
+  attemptCount: num.int().nonnegative().max(5), lastConfirmedAt: opt(timestamp), lastProviderAcceptedAt: opt(timestamp), lastFailureAt: opt(timestamp),
+  errorClass: opt(text.max(120)), preferenceUpdatedAt: timestamp, preferenceHash: text.regex(/^[a-f0-9]{64}$/),
+});
 const appDataSchema = z.looseObject({
   workspaceId: opt(id),
   evaluations: opt(z.array(evaluationSchema)),
@@ -74,6 +81,7 @@ const appDataSchema = z.looseObject({
   scanSignals: z.array(signalSchema),
   reviewLogs: z.array(z.looseObject({ id, signalId: id, reviewedAt: timestamp, userDecision: z.enum(["watch", "ignore", "bought", "skipped", "sold", "other"]), manualReason: text, convictionScoreOptional: opt(num.min(0).max(100)), notes: opt(text), entryPriceOptional: opt(num.positive()), exitPriceOptional: opt(num.positive()), resultNotes: opt(text) })),
   forwardProofLedger: z.array(forwardSchema), scannerSettings: scannerSettingsSchema, notificationPreferences: opt(notificationPreferencesSchema),
+  lastKnownNotificationDeliveryStatus: opt(lastKnownNotificationDeliveryStatusSchema),
 });
 
 export function validateAppData(raw: unknown): AppData {

@@ -43,7 +43,7 @@ Implementation began September 15, 2026, from `02e54c5`. Verification continued 
 - `server/worker` uses the shared engine and local CSV observations while the UI is closed. No server subscription is required.
 - SQLite WAL storage, expected revisions, job leases, capped retries, atomic result/outbox commits and restart idempotency are implemented.
 - Consistent SQLite backups and isolated restore tests pass. Importing a later app export requires a matching worker revision and creates a before-import backup.
-- Worker/app handoff is explicit export/import. CHG-94 adds a server-only versioned delivery lifecycle, local SMTP adapter boundary, durable intent/attempt/receipt tables and device-local preferences; no hosted provider, real recipient, OS push service or user scheduler is installed.
+- Worker/app handoff is explicit export/import. CHG-94 adds a server-only versioned delivery lifecycle, real deterministic digest batching, in-flight opt-out fencing, a safe device-local last-known status projection, local SMTP adapter boundary, durable intent/attempt/receipt tables and device-local preferences; no hosted provider, real recipient, OS push service or user scheduler is installed.
 
 ### Optional cloud pilot
 
@@ -112,7 +112,7 @@ The synthetic worker fixture processed **100 stocks × 260 sessions in 2,036 ms*
 | 040–042 | Auth and owner-scoped atomic sync contract implemented; full normalized APIs, account recovery/deletion/device controls and hosted isolation/advisor checks **partial**. |
 | 043–044 | Local SQLite worker and atomic client stores implemented. Scheduler installation, managed jobs and normalized local repositories **partial**; workspace payloads are still growing JSON documents. |
 | 045–046 | Full backup and simple watchlist CSV preview; optimistic three-way personal sync pilot implemented. Saved mappings, checksum manifests, durable mutation outbox/cursors and broader cross-device drills **partial**. |
-| 047–049 | Transactional notification intent now has versioned device-local preferences, email transport boundary, leases/fencing, privacy-safe rendering, digest/quiet-hours, cancellation, bounded retry and ambiguous-send reconciliation. Hosted delivery, account-level preference sync and archive retention/compression remain. |
+| 047–049 | Transactional notification intent now has versioned device-local preferences, email transport boundary, leases/fencing with in-flight opt-out preflight, privacy-safe real digest batching, cancellation, bounded retry, ambiguous-send reconciliation and an explicit app/worker last-known status projection. Hosted delivery, account-level preference sync and archive retention/compression remain. |
 | 050–051 | Quoted CSV parsing/content hashes and structural frozen-rule import validation implemented. The six-rule bundle is machine-checked; independent numerical parity is explicitly release-blocked until source golden outputs are supplied. |
 | 052–054 | Worker status, tested snapshots, bounded cloud RPC and a benchmark exist. Operator dashboards, measured RPO/RTO, hosted restore and per-plan budgets **partial**. |
 | 055–057 | Release/rollback/deployment/incident runbooks and CI exist. Actual staging promotion, account deletion lifecycle and incident tabletop evidence remain. |
