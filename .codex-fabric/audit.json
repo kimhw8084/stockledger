@@ -1,0 +1,478 @@
+{
+  "accepted_at": "2026-09-18T15:11:43Z",
+  "changed_files": [
+    {
+      "additions": 13,
+      "deletions": 4,
+      "path": "docs/operations/CLOUD_DEPLOYMENT.md",
+      "status": "M"
+    },
+    {
+      "additions": 63,
+      "deletions": 0,
+      "path": "docs/production/CHG-93_EVIDENCE.md",
+      "status": "A"
+    },
+    {
+      "additions": 1,
+      "deletions": 1,
+      "path": "src/app/StockLedgerApp.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 15,
+      "deletions": 0,
+      "path": "src/data/repositories/workspaceRepository.ts",
+      "status": "M"
+    },
+    {
+      "additions": 96,
+      "deletions": 37,
+      "path": "src/features/sync/CloudSyncPanel.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 1,
+      "deletions": 0,
+      "path": "src/features/sync/client.ts",
+      "status": "M"
+    },
+    {
+      "additions": 3,
+      "deletions": 2,
+      "path": "src/features/sync/sessionStorage.native.ts",
+      "status": "M"
+    },
+    {
+      "additions": 59,
+      "deletions": 10,
+      "path": "src/features/sync/syncPlan.ts",
+      "status": "M"
+    },
+    {
+      "additions": 345,
+      "deletions": 34,
+      "path": "src/features/sync/synchronize.ts",
+      "status": "M"
+    },
+    {
+      "additions": 116,
+      "deletions": 0,
+      "path": "src/lib/i18n.ts",
+      "status": "M"
+    },
+    {
+      "additions": 298,
+      "deletions": 0,
+      "path": "supabase/migrations/20260918000000_secure_personal_sync.sql",
+      "status": "A"
+    },
+    {
+      "additions": 47,
+      "deletions": 2,
+      "path": "tests/cloud.test.ts",
+      "status": "M"
+    },
+    {
+      "additions": 11,
+      "deletions": 0,
+      "path": "tests/e2e/workspace.spec.ts",
+      "status": "M"
+    },
+    {
+      "additions": 32,
+      "deletions": 5,
+      "path": "tests/integration/cloud.integration.ts",
+      "status": "M"
+    },
+    {
+      "additions": 9,
+      "deletions": 1,
+      "path": "tests/sync.test.ts",
+      "status": "M"
+    },
+    {
+      "additions": 345,
+      "deletions": 0,
+      "path": "tests/synchronize.test.ts",
+      "status": "A"
+    }
+  ],
+  "checks": [
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n \\\"create or replace function public|get_ledger_|apply_ledger_batch|grant execute|ledger_records|ledger_changes|sync_requests\\\" supabase/migrations/20260916032227_ledger_sync.sql supabase/migrations/20260918000000_secure_personal_sync.sql\nrtk sed -n '1,360p' supabase/migrations/20260916032227_ledger_sync.sql\nrtk sed -n '300,620p' supabase/migrations/20260918000000_secure_personal_sync.sql\nrtk sed -n '1,180p' tests/integration/cloud.integration.ts\nrtk sed -n '1,220p' tests/cloud.test.ts\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '184,245p' supabase/migrations/20260918000000_secure_personal_sync.sql\nrtk sed -n '245,315p' supabase/migrations/20260918000000_secure_personal_sync.sql\nrtk sed -n '1,180p' package.json\nrtk sed -n '1,160p' docs/production/CHG-93_EVIDENCE.md\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '1,220p' src/data/workspaceDefaults.ts\nrtk rg -n \\\"export type AppData|interface AppData|type Stock|interface Stock\\\" src/types.ts\nrtk sed -n '1,240p' src/types.ts\nrtk sed -n '1,160p' src/lib/storage.ts\nrtk sed -n '1,180p' src/domain/contentHash.ts\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n \\\"addAcknowledgement|acknowledgedKeys|entry\\\\.baseCursor|observeHighWaterCursor\\\" src/features/sync/synchronize.ts && rtk npm run typecheck\"",
+      "exit_code": 127,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk node --version\nrtk npm --version\nrtk npm ci'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sh -lc 'command -v node; command -v nvm || true; command -v fnm || true; command -v mise || true; command -v asdf || true; ls -1 /opt/homebrew/bin/node* /usr/local/bin/node* /Users/haewonkim/.nvm/versions/node/*/bin/node 2>/dev/null || true; find /opt /usr/local /Users/haewonkim -path '*/bin/node' -type f -perm -111 2>/dev/null | head -40'\"",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk which node\nrtk which nvm || true\nrtk which fnm || true\nrtk which mise || true\nrtk which asdf || true\nrtk find /opt /usr/local /Users/haewonkim -path '*/bin/node' -type f -perm -111 -print 2>/dev/null | head -40\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npx --yes node@22.23.2 --version'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npx --yes node@22.23.2 -e \"console.log(process.execPath); console.log(process.version)\"'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk ls -la /Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin\nrtk find /Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node -maxdepth 3 -type f -name 'npm*' -print | head\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npm root -g\nrtk ls /Users/haewonkim/.nvm/versions/node/v20.19.4/lib/node_modules/npm/bin/npm-cli.js'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin:/Users/haewonkim/.nvm/versions/node/v20.19.4/bin:/usr/bin:/bin /Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin/node /Users/haewonkim/.nvm/versions/node/v20.19.4/lib/node_modules/npm/bin/npm-cli.js --version\nrtk env PATH=/Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin:/Users/haewonkim/.nvm/versions/node/v20.19.4/bin:/usr/bin:/bin /Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin/node /Users/haewonkim/.nvm/versions/node/v20.19.4/lib/node_modules/npm/bin/npm-cli.js run typecheck'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin:/Users/haewonkim/.nvm/versions/node/v20.19.4/bin:/usr/bin:/bin /Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin/node /Users/haewonkim/.nvm/versions/node/v20.19.4/lib/node_modules/npm/bin/npm-cli.js test -- --run tests/synchronize.test.ts tests/sync.test.ts tests/cloud.test.ts'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '1,220p' tests/synchronize.test.ts\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin:/Users/haewonkim/.nvm/versions/node/v20.19.4/bin:/usr/bin:/bin /Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin/node /Users/haewonkim/.nvm/versions/node/v20.19.4/lib/node_modules/npm/bin/npm-cli.js run typecheck'",
+      "exit_code": 2,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin:/Users/haewonkim/.nvm/versions/node/v20.19.4/bin:/usr/bin:/bin /Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin/node /Users/haewonkim/.nvm/versions/node/v20.19.4/lib/node_modules/npm/bin/npm-cli.js test -- --run tests/synchronize.test.ts tests/sync.test.ts tests/cloud.test.ts'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin:/Users/haewonkim/.nvm/versions/node/v20.19.4/bin:/usr/bin:/bin /Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin/node /Users/haewonkim/.nvm/versions/node/v20.19.4/lib/node_modules/npm/bin/npm-cli.js test -- --run tests/synchronize.test.ts -t \"never regresses\"'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin:/Users/haewonkim/.nvm/versions/node/v20.19.4/bin:/usr/bin:/bin /Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin/node /Users/haewonkim/.nvm/versions/node/v20.19.4/lib/node_modules/npm/bin/npm-cli.js test -- --run tests/synchronize.test.ts -t \"never regresses\"'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin:/Users/haewonkim/.nvm/versions/node/v20.19.4/bin:/usr/bin:/bin /Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin/node /Users/haewonkim/.nvm/versions/node/v20.19.4/lib/node_modules/npm/bin/npm-cli.js test -- --run tests/synchronize.test.ts tests/sync.test.ts tests/cloud.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '1,380p' src/features/sync/synchronize.ts\nrtk git diff -- src/features/sync/synchronize.ts tests/synchronize.test.ts\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin:/Users/haewonkim/.nvm/versions/node/v20.19.4/bin:/usr/bin:/bin /Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin/node /Users/haewonkim/.nvm/versions/node/v20.19.4/lib/node_modules/npm/bin/npm-cli.js run typecheck\nrtk env PATH=/Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin:/Users/haewonkim/.nvm/versions/node/v20.19.4/bin:/usr/bin:/bin /Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin/node /Users/haewonkim/.nvm/versions/node/v20.19.4/lib/node_modules/npm/bin/npm-cli.js test -- --run'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin:/Users/haewonkim/.nvm/versions/node/v20.19.4/bin:/usr/bin:/bin /Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin/node /Users/haewonkim/.nvm/versions/node/v20.19.4/lib/node_modules/npm/bin/npm-cli.js test -- --run tests/cloud.test.ts tests/sync.test.ts tests/synchronize.test.ts tests/i18n.test.ts\nrtk env PATH=/Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin:/Users/haewonkim/.nvm/versions/node/v20.19.4/bin:/usr/bin:/bin /Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin/node /Users/haewonkim/.nvm/versions/node/v20.19.4/lib/node_modules/npm/bin/npm-cli.js run check:boundaries\nrtk env PATH=/Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin:/Users/haewonkim/.nvm/versions/node/v20.19.4/bin:/usr/bin:/bin /Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin/node /Users/haewonkim/.nvm/versions/node/v20.19.4/lib/node_modules/npm/bin/npm-cli.js run check:frozen\nrtk env PATH=/Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin:/Users/haewonkim/.nvm/versions/node/v20.19.4/bin:/usr/bin:/bin /Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin/node /Users/haewonkim/.nvm/versions/node/v20.19.4/lib/node_modules/npm/bin/npm-cli.js run export:all\nrtk git diff --check'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk docker info\nrtk env PATH=/Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin:/Users/haewonkim/.nvm/versions/node/v20.19.4/bin:/usr/bin:/bin /Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin/node /Users/haewonkim/.nvm/versions/node/v20.19.4/lib/node_modules/npm/bin/npm-cli.js run test:cloud\nrtk env PATH=/Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin:/Users/haewonkim/.nvm/versions/node/v20.19.4/bin:/usr/bin:/bin /Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin/node node_modules/supabase/bin/supabase db lint --local --schema public,ledger_private --level warning --fail-on warning'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin:/Users/haewonkim/.nvm/versions/node/v20.19.4/bin:/usr/bin:/bin /Users/haewonkim/.nvm/versions/node/v20.19.4/bin/npx supabase db lint --local --schema public,ledger_private --level warning --fail-on warning'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin:/Users/haewonkim/.nvm/versions/node/v20.19.4/bin:/usr/bin:/bin /Users/haewonkim/.nvm/versions/node/v20.19.4/bin/npx supabase start'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin:/Users/haewonkim/.nvm/versions/node/v20.19.4/bin:/usr/bin:/bin /Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin/node /Users/haewonkim/.nvm/versions/node/v20.19.4/lib/node_modules/npm/bin/npm-cli.js run test:e2e'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git status --short --branch\nrtk git diff --stat\nrtk git diff --check\nrtk git log --oneline --decorate -4'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin:/Users/haewonkim/.nvm/versions/node/v20.19.4/bin:/usr/bin:/bin /Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin/node /Users/haewonkim/.nvm/versions/node/v20.19.4/lib/node_modules/npm/bin/npm-cli.js test -- --run tests/synchronize.test.ts'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin:/Users/haewonkim/.nvm/versions/node/v20.19.4/bin:/usr/bin:/bin /Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin/node /Users/haewonkim/.nvm/versions/node/v20.19.4/lib/node_modules/npm/bin/npm-cli.js test -- --run tests/synchronize.test.ts'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin:/Users/haewonkim/.nvm/versions/node/v20.19.4/bin:/usr/bin:/bin /Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin/node /Users/haewonkim/.nvm/versions/node/v20.19.4/lib/node_modules/npm/bin/npm-cli.js test -- --run tests/synchronize.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '1,240p' docs/production/CHG-93_EVIDENCE.md\nrtk git diff --check\nrtk git diff --numstat\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git show -s --format='%H%n%P%n%s' 59cc7c672cd6b759cf0ceefb5a77acea66c7435d 2>/dev/null || true\nrtk git log --oneline --decorate --ancestry-path 59cc7c672cd6b759cf0ceefb5a77acea66c7435d..ef253b3fad2475f0b52f7d1722c1350667a44694\nrtk git merge-base 59cc7c672cd6b759cf0ceefb5a77acea66c7435d ef253b3fad2475f0b52f7d1722c1350667a44694\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin:/Users/haewonkim/.nvm/versions/node/v20.19.4/bin:/usr/bin:/bin /Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin/node --version && /Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin/node /Users/haewonkim/.nvm/versions/node/v20.19.4/lib/node_modules/npm/bin/npm-cli.js --version'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin:/Users/haewonkim/.nvm/versions/node/v20.19.4/bin:/usr/bin:/bin /Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin/node /Users/haewonkim/.nvm/versions/node/v20.19.4/lib/node_modules/npm/bin/npm-cli.js ci'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin:/Users/haewonkim/.nvm/versions/node/v20.19.4/bin:/usr/bin:/bin /Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin/node /Users/haewonkim/.nvm/versions/node/v20.19.4/lib/node_modules/npm/bin/npm-cli.js run typecheck'",
+      "exit_code": 2,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin:/Users/haewonkim/.nvm/versions/node/v20.19.4/bin:/usr/bin:/bin /Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin/node /Users/haewonkim/.nvm/versions/node/v20.19.4/lib/node_modules/npm/bin/npm-cli.js test -- --run'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin:/Users/haewonkim/.nvm/versions/node/v20.19.4/bin:/usr/bin:/bin /Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin/node /Users/haewonkim/.nvm/versions/node/v20.19.4/lib/node_modules/npm/bin/npm-cli.js test -- --run tests/cloud.test.ts tests/sync.test.ts tests/synchronize.test.ts tests/i18n.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin:/Users/haewonkim/.nvm/versions/node/v20.19.4/bin:/usr/bin:/bin /Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin/node /Users/haewonkim/.nvm/versions/node/v20.19.4/lib/node_modules/npm/bin/npm-cli.js run check:boundaries'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin:/Users/haewonkim/.nvm/versions/node/v20.19.4/bin:/usr/bin:/bin /Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin/node /Users/haewonkim/.nvm/versions/node/v20.19.4/lib/node_modules/npm/bin/npm-cli.js run check:frozen'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin:/Users/haewonkim/.nvm/versions/node/v20.19.4/bin:/usr/bin:/bin /Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin/node /Users/haewonkim/.nvm/versions/node/v20.19.4/lib/node_modules/npm/bin/npm-cli.js run export:all'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin:/Users/haewonkim/.nvm/versions/node/v20.19.4/bin:/usr/bin:/bin /Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin/node /Users/haewonkim/.nvm/versions/node/v20.19.4/lib/node_modules/npm/bin/npm-cli.js run test:e2e'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin:/Users/haewonkim/.nvm/versions/node/v20.19.4/bin:/usr/bin:/bin git diff --check'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin:/Users/haewonkim/.nvm/versions/node/v20.19.4/bin:/usr/bin:/bin /Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin/node /Users/haewonkim/.nvm/versions/node/v20.19.4/lib/node_modules/npm/bin/npm-cli.js run typecheck'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin:/Users/haewonkim/.nvm/versions/node/v20.19.4/bin:/usr/bin:/bin /Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin/node /Users/haewonkim/.nvm/versions/node/v20.19.4/lib/node_modules/npm/bin/npm-cli.js test -- --run'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.npm/_npx/5dad66f2cb301fc2/node_modules/node/bin:/Users/haewonkim/.nvm/versions/node/v20.19.4/bin:/usr/bin:/bin git diff --check'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git add src/features/sync/synchronize.ts tests/synchronize.test.ts && rtk git commit -m \"fix: reconcile post-mutation cursor feed\" && rtk git rev-parse HEAD && rtk git status --short --branch'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n \\\"schemaVersion|contractVersion|version\\\" src/features/sync supabase/migrations docs/production/CHG-93_EVIDENCE.md | head -80\nrtk git show -s --format='%H%n%P%n%s' 8a0e7fcc0345012768d3bf759ec6b0ee33ddba81\nrtk git status --short --branch\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git diff --check && rtk git diff --stat && rtk git status --short --branch && rtk git diff -- docs/production/CHG-93_EVIDENCE.md | sed -n '1,240p'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git add docs/production/CHG-93_EVIDENCE.md && rtk git commit -m \"docs: publish CHG-93 cursor evidence\" && rtk git rev-parse HEAD && rtk git status --short --branch && rtk git log --oneline --decorate -5'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git diff --check ef253b3fad2475f0b52f7d1722c1350667a44694..HEAD\nrtk git status --short --branch\nrtk git show -s --format='final %H%nparent %P%ntitle %s' HEAD\nrtk git merge-base --is-ancestor HEAD origin/main; printf 'head_is_ancestor_of_main=%s\\\\n' \"'$?'",
+      "exit_code": 0,
+      "type": "command_execution"
+    }
+  ],
+  "codex": {
+    "cli_version": "codex-cli 0.154.0",
+    "configured_model": "gpt-5.6-luna",
+    "event_count": 161,
+    "provider_reported_model": null,
+    "reasoning_effort": "xhigh",
+    "terminal_type": "turn.completed",
+    "usage": {
+      "cache_hit_percent": 97.41,
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 6594560,
+      "fresh_input_tokens": 174993,
+      "input_tokens": 6769553,
+      "non_reasoning_output_tokens": 29075,
+      "output_tokens": 57591,
+      "reasoning_output_tokens": 28516,
+      "total_processed_tokens": 6827144
+    },
+    "warnings": []
+  },
+  "commits": [
+    {
+      "sha": "1d99e86da7d059e543e49c6b6e2164dcc0b41346",
+      "subject": "docs: publish CHG-93 cursor evidence"
+    },
+    {
+      "sha": "8a0e7fcc0345012768d3bf759ec6b0ee33ddba81",
+      "subject": "fix: reconcile post-mutation cursor feed"
+    },
+    {
+      "sha": "4eb53988f35abd80198954b824f9084c5f3272b1",
+      "subject": "fabric: capture completed model changes [CF-8184e10cf918d80eef00766a]"
+    }
+  ],
+  "diff": {
+    "additions": 1454,
+    "changed_files": 16,
+    "commit_count": 3,
+    "deletions": 96
+  },
+  "error_code": null,
+  "evidence_manifest": {
+    "count": 2,
+    "items": [
+      {
+        "bytes": 8282,
+        "path": "docs/operations/CLOUD_DEPLOYMENT.md",
+        "sha256": "f425a22a72a5b5fbb53310ca103e947aeb6dd26959561676ca98bf701601c5e4"
+      },
+      {
+        "bytes": 6936,
+        "path": "docs/production/CHG-93_EVIDENCE.md",
+        "sha256": "4a3ee3b0df15b5c5a45e10acea1087e6d3697a2ccbd352b58d76a4827528a45b"
+      }
+    ],
+    "version": 1
+  },
+  "evidence_publisher_release": "1.2.3-resume-candidate",
+  "fabric_capture": {
+    "applied": false,
+    "paths_before": 0,
+    "transient_untracked_removed": {
+      "count": 0,
+      "items": []
+    }
+  },
+  "fabric_release": "1.2.3-resume-candidate",
+  "failure_class": null,
+  "finished_at": "2026-09-18T15:32:05Z",
+  "git": {
+    "base_is_ancestor": true,
+    "base_sha": "ef253b3fad2475f0b52f7d1722c1350667a44694",
+    "branch": "codex/stockledger-prod-c06-account-sync-cursor-fix-v1",
+    "head_sha": "1d99e86da7d059e543e49c6b6e2164dcc0b41346",
+    "remote_exact_head": true,
+    "remote_head_sha": "1d99e86da7d059e543e49c6b6e2164dcc0b41346",
+    "target_branch": "main",
+    "target_drifted_since_acceptance": false,
+    "target_head_observed_after_execution": "ef253b3fad2475f0b52f7d1722c1350667a44694",
+    "work_branch": "codex/stockledger-prod-c06-account-sync-cursor-fix-v1",
+    "worktree_clean": true
+  },
+  "instructions": {
+    "files": [],
+    "total_bytes": 0,
+    "warning": null
+  },
+  "job_id": "CF-48aee9063e967fdee1b04dfb",
+  "kind": "codex-fabric-audit-evidence",
+  "locator": {
+    "branch": "codex-fabric/evidence/stockledger/prod-c06-account-sync-cursor-fix-v1",
+    "path": ".codex-fabric/audit.json",
+    "ref": "refs/heads/codex-fabric/evidence/stockledger/prod-c06-account-sync-cursor-fix-v1"
+  },
+  "operation": "FIX",
+  "policy": {
+    "environment_policy_sha256": "e077daca74297b3c30bee8989f00f8ca5338f7610b4d016a6c48db524205d064",
+    "fabric_release": "1.2.3-resume-candidate",
+    "policy_sha256": "44756118cd7fda0c45cd23ba1d31a48a3f4f2422d687df15264ba4406f40e1f2",
+    "registry_sha256": "cfc765f3211c37c7967a138f3b2d89a99341939b15b2623f92744d007f625d6f"
+  },
+  "project_id": "stockledger",
+  "recovery": {
+    "model_rerun_safe": false,
+    "recovery_required": false,
+    "retry_safe": false,
+    "retry_scope": null,
+    "worktree_retained": true
+  },
+  "request": "prod-c06-account-sync-cursor-fix-v1",
+  "schema_version": 1,
+  "started_at": "2026-09-18T15:11:43Z",
+  "status": "EXECUTED_CHANGE",
+  "timing": {
+    "execution_seconds": 1222,
+    "queue_seconds": 0,
+    "total_seconds": 1222
+  },
+  "transport": {
+    "bytes": 5313,
+    "envelope": "FABRIC/2",
+    "prompt_bytes": 4974,
+    "prompt_sha256": "1608b515476c491e0d155c61c7b86385c207aa7631a936b6f92d8151d6c1fe75",
+    "sha256": "48aee9063e967fdee1b04dfb7caff35b16db05e7e975e8cda0fabfde00cdbd16"
+  }
+}
