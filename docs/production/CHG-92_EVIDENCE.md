@@ -3,7 +3,7 @@
 ## Source identity
 
 - Protected-main base: `59cc7c672cd6b759cf0ceefb5a77acea66c7435d` (`origin/main` at task start)
-- Tested implementation head: `215a5fda5eb5e316bc35f0ccda5eb7ec92e370f4`
+- Tested implementation head: `5c54d5fba96d67af86d37b074d13405106c95def`
 - Evidence publication head: documentation-only child commit of the tested implementation head; exact final head is reported with this publication.
 - R1 candidate carried forward exactly: `66ba55796e58c2d37882f091854860d7998a8842`
 - Branch: `codex/stockledger-prod-c05-scheduler-recovery-fix-v1`
@@ -64,17 +64,17 @@ All commands ran from the implementation workspace with Node `v22.23.2` on the t
 
 ```json
 {
-  "elapsedMs": 2197,
+  "elapsedMs": 2069,
   "workloadSize": { "stocks": 100, "sessions": 260, "symbols": 104, "rows": 27040, "jobStages": 4 },
   "deadlineBudgetMs": 1800000,
-  "remainingHeadroomMs": 1797803,
+  "remainingHeadroomMs": 1797931,
   "withinBudget": true,
   "evidenceOnly": true,
   "evaluations": 100,
   "scannerRows": 200,
   "workspaceBytes": 5812831,
   "databaseBytesIncludingWal": 12160024,
-  "endingRssBytes": 240320512,
+  "endingRssBytes": 240467968,
   "integrity": true
 }
 ```
