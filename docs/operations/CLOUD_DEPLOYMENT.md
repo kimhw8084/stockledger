@@ -1,4 +1,4 @@
-# Optional managed sync pilot
+# Optional managed personal sync
 
 This mode adds personal sync to the local workspace. It is not an operated market-data or paid service. Both public cloud variables may remain blank.
 
@@ -9,10 +9,19 @@ This mode adds personal sync to the local workspace. It is not an operated marke
 - `apply_ledger_batch` derives identity from Auth, checks expected revisions and limits, serializes each owner's writes, and commits records/change metadata/retry receipts atomically.
 - Published recipe definitions/evaluation payloads cannot be overwritten; retirement metadata is allowed. Deletes use tombstones.
 - Sync includes personal stocks, recipes, metrics, Eyes, alerts, decisions, outcomes, evaluations and signal review notes. OHLCV archives, scanner datasets and snapshots remain local. Derived evidence still requires appropriate contractual/privacy treatment.
-- Independent edits merge. Conflicts require a per-record choice and a backup export; choices are bound to the exact contents shown. Newer edits prompt again.
+- `stockledger-personal-sync-v1` provides a bounded initial bootstrap (`500 records / 5 MiB` pages) and ordered server-cursor pages (`500 records / 5 MiB` pages) after a cursor. Cursor ordering comes from server identity values, not client clocks. The server retains a per-owner history floor and returns an explicit `CURSOR_EXPIRED` error when a compacted cursor cannot be continued; the client requires an explicit bounded re-bootstrap.
+- Local sync state stores the owner cursor, cloud baseline, current tombstones and a durable mutation outbox. Each outbox intent has a stable UUID, exact payload/hash and remote revision/cursor metadata, is written before RPC submission, and is retained through ambiguous or duplicate acknowledgements until the workspace and baseline are durable. Local hash guards preserve edits made during a request.
+- Independent edits merge. Delete-versus-edit and concurrent-edit conflicts require a per-record choice and a backup export; choices are bound to the exact local hash, remote hash, remote revision and cursor shown. Newer edits prompt again.
 - A durable local merge precedes baseline acknowledgement. Changes made locally during a request are preserved and cause a retry. Baselines are scoped to endpoint/user/workspace; restore requires adoption again.
 
-Pilot bounds: **500 records / 5 MiB per batch; 256 KiB per payload; 5,000 records / 20 MiB per owner; 60 new mutations/hour**. Receipts retain at most 200 requests and at most 30 days; stale revisions remain rejected after eviction. Change metadata keeps at most 10,000 rows/owner. These are resource bounds, not paid plans. The pilot reads full owner records in 500-row pages; cursor/snapshot sync remains future work.
+Contract bounds: **500 records / 5 MiB per mutation or page; 256 KiB per payload; 5,000 accepted records / 20 MiB per owner; 60 new mutations/hour**. Receipts retain at most 200 requests and at most 30 days; stale revisions remain rejected after eviction. Change metadata keeps at most 10,000 accepted rows/owner and carries payload-bearing tombstones. These are resource bounds, not paid plans. Price/OHLCV archives, universe snapshots, processed scanner features, scan runs and provider-heavy raw data are rejected from new cloud writes, filtered from the client-readable contract, and remain local.
+
+## Account lifecycle contract
+
+- Password recovery uses the supported `resetPasswordForEmail` and `updateUser` APIs. Native sessions use OS SecureStore with crash-safe chunk manifests; browser sessions use the existing device store. The UI shows only account/session state and expiry metadata, never access or refresh tokens.
+- Local sign-out removes this device session. Global sign-out uses Supabase's supported global scope and reports errors; the isolated local stack does not independently prove revocation of every existing session, so that remains a deployment acceptance gate.
+- Cloud export is a bounded export of all current accepted personal records and tombstones under `stockledger-personal-sync-v1`. It does not include local workspace bytes, local backups, provider archives or tokens.
+- Deletion request is server-controlled: it records `requested`, invalidates the owner's sync state, removes StockLedger-owned records/change receipts, and leaves the valid local workspace/backups untouched. `in_progress`, `completed` and `failed` transitions require an operator/worker using supported server mechanisms. Full Auth-user deletion is not claimed until that mechanism proves it; provider backup/email retention is outside StockLedger control and is not claimed erased. No hosted scheduler or notification transport is deployed, so none is fabricated as cancelled.
 
 ## Local integration
 
@@ -46,7 +55,7 @@ EXPO_PUBLIC_SUPABASE_URL=https://YOUR_PROJECT.supabase.co EXPO_PUBLIC_SUPABASE_P
 
 ## Before external users or charges
 
-Still unimplemented: complete password recovery/device-session management, self-service account deletion/backup expiry, managed ingestion/scheduling/notification delivery, checkout/portal/entitlements/webhooks/reconciliation, and support/admin projections. These are code and operational work, not just missing variables.
+Still externally gated: hosted Auth email configuration, full Auth-user deletion/global-session-revocation proof, provider-backup/email retention, managed ingestion/scheduling/notification delivery, checkout/portal/entitlements/webhooks/reconciliation, and support/admin projections. These are deployment/operations work, not missing client variables.
 
 Also required: actual hosting/project/domain, authorized data rights, email setup, privacy/retention terms, pilot usage and unit economics, restore/load drills, and native signing/device/store QA if distributing native clients. Do not represent this candidate as paid-launch ready.
 
