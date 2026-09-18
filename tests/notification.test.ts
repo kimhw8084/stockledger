@@ -3,13 +3,13 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, expect, it } from "vitest";
-import { buildNotificationIntent, notificationIntentIdentity, safeNotificationMessage } from "../src/domain/notificationDelivery";
+import { buildNotificationIntent, notificationDigestGrouping, notificationDigestIdentity, notificationIntentIdentity, safeNotificationDigestMessage, safeNotificationMessage } from "../src/domain/notificationDelivery";
 import { defaultNotificationPreferences } from "../src/domain/notificationPreferences";
 import { parseExport, serializeExport } from "../src/domain/backupFormat";
 import { seedData } from "../src/lib/seed";
 import type { Alert, NotificationPreferences } from "../src/types";
 import { jobIdentityFor } from "../server/worker/contract";
-import { deliverDueNotifications, InMemoryTestEmailTransport, SmtpEmailTransport } from "../server/worker/notificationTransport";
+import { deliverDueNotifications, InMemoryTestEmailTransport, SmtpEmailTransport, type NotificationTransport, type NotificationTransportMessage } from "../server/worker/notificationTransport";
 import { WorkerStore } from "../server/worker/store";
 
 const folders: string[] = [];
@@ -45,6 +45,16 @@ const commitIntent = (store: WorkerStore, suffix: string, input = buildNotificat
   const revision = store.load()?.revision ?? 0;
   store.commitJobResult({ id: job.id, token, data, expectedRevision: revision, notificationIntents: [input], now });
   return input;
+};
+const commitDigestPair = (store: WorkerStore, suffix: string, preferences = { ...enabledPreferences(), deliveryMode: "digest" as const, digestTime: "13:00" }) => {
+  const firstAlert = testAlert(`alert-${suffix}-a`); const secondAlert = testAlert(`alert-${suffix}-b`);
+  const data = { ...testData(preferences, firstAlert), alerts: [firstAlert, secondAlert] };
+  store.import(data, 0);
+  const first = buildNotificationIntent(firstAlert, preferences, now); const firstJob = queueJob(store, `${suffix}-a`);
+  store.commitJobResult({ id: firstJob.job.id, token: firstJob.token, data, expectedRevision: 1, notificationIntents: [first], now });
+  const second = buildNotificationIntent(secondAlert, preferences, now); const secondJob = queueJob(store, `${suffix}-b`);
+  store.commitJobResult({ id: secondJob.job.id, token: secondJob.token, data, expectedRevision: 2, notificationIntents: [second], now });
+  return { data, first, second };
 };
 
 afterEach(() => { for (const folder of folders.splice(0)) rmSync(folder, { recursive: true, force: true }); });
@@ -150,9 +160,191 @@ it("holds quiet-hours and digest work deterministically, then delivers the group
   store.commitJobResult({ id: job.id, token, data: { ...testData(preferences, firstAlert), alerts: [firstAlert, secondAlert] }, expectedRevision: 2, notificationIntents: [secondIntent], now });
   const transport = new InMemoryTestEmailTransport();
   expect(await deliverDueNotifications(store, transport, { owner: "digest", now: firstIntent.notBefore })).toHaveLength(2);
+  expect(transport.messages).toHaveLength(1);
+  expect(store.listNotificationDigests()).toHaveLength(1);
+  expect(store.listNotificationDigestMembers(store.listNotificationDigests()[0].id)).toHaveLength(2);
   expect(store.load()?.data.alerts.every(alert => !alert.reviewed)).toBe(true);
   store.close();
 });
+
+it("uses one deterministic digest submission, preserves idempotency, and shares one retry budget", async () => {
+  const preferences = { ...enabledPreferences(), deliveryMode: "digest" as const, digestTime: "13:00" };
+  const firstAlert = testAlert("alert-digest-contract-a"); const secondAlert = testAlert("alert-digest-contract-b");
+  const first = buildNotificationIntent(firstAlert, preferences, now); const second = buildNotificationIntent(secondAlert, preferences, now);
+  const store = new WorkerStore(databasePath()); store.import({ ...testData(preferences, firstAlert), alerts: [firstAlert, secondAlert] }, 0);
+  const firstJob = queueJob(store, "digest-contract-a");
+  store.commitJobResult({ id: firstJob.job.id, token: firstJob.token, data: { ...testData(preferences, firstAlert), alerts: [firstAlert, secondAlert] }, expectedRevision: 1, notificationIntents: [first], now });
+  const secondJob = queueJob(store, "digest-contract-b");
+  store.commitJobResult({ id: secondJob.job.id, token: secondJob.token, data: { ...testData(preferences, firstAlert), alerts: [firstAlert, secondAlert] }, expectedRevision: 2, notificationIntents: [second], now });
+  const transport = new InMemoryTestEmailTransport();
+  const grouping = notificationDigestGrouping(first)!;
+  const expected = notificationDigestIdentity(grouping, [first.semanticIdempotencyKey, second.semanticIdempotencyKey]).digestKey;
+  expect(await deliverDueNotifications(store, transport, { owner: "digest-contract", now: first.notBefore })).toHaveLength(2);
+  expect(transport.messages).toHaveLength(1);
+  expect(transport.messages[0].digest?.digestKey).toBe(expected);
+  expect(await deliverDueNotifications(store, transport, { owner: "digest-contract-replay", now: first.notBefore + 1 })).toEqual([]);
+  expect(transport.messages).toHaveLength(1);
+  expect(store.listNotificationAttempts(first.id)).toHaveLength(1);
+  expect(store.listNotificationAttempts(second.id)).toHaveLength(1);
+  expect(store.listNotificationReceipts(first.id)[0].receiptType).toBe("confirmed");
+  expect(store.listNotificationReceipts(second.id)[0].receiptType).toBe("confirmed");
+  const minimal = safeNotificationDigestMessage({ alerts: [{ ...firstAlert, title: "private thesis", stateChange: "private evidence" }, { ...secondAlert, title: "another thesis", stateChange: "another note" }], destination: "local@example.test", privacyMode: "minimal", messageId: expected });
+  expect(minimal.text).not.toContain("private thesis"); expect(minimal.text).not.toContain("private evidence");
+  store.close();
+});
+
+it("atomically claims a digest across concurrent workers and never splits the batch", async () => {
+  const path = databasePath(); const firstStore = new WorkerStore(path); const { first, second } = commitDigestPair(firstStore, "concurrent");
+  const secondStore = new WorkerStore(path); const transport = new InMemoryTestEmailTransport();
+  const [firstRun, secondRun] = await Promise.all([
+    deliverDueNotifications(firstStore, transport, { owner: "digest-worker-a", now: first.notBefore }),
+    deliverDueNotifications(secondStore, transport, { owner: "digest-worker-b", now: first.notBefore }),
+  ]);
+  expect(firstRun.length + secondRun.length).toBe(2);
+  expect(transport.messages).toHaveLength(1);
+  expect(firstStore.listNotificationDigests()).toHaveLength(1);
+  expect(firstStore.listNotificationDigestMembers(firstStore.listNotificationDigests()[0].id).map(member => member.memberSemanticKey)).toEqual([first.semanticIdempotencyKey, second.semanticIdempotencyKey].sort());
+  firstStore.close(); secondStore.close();
+});
+
+it("survives restart before and after a digest send without a duplicate submission", async () => {
+  const path = databasePath();
+  const firstStore = new WorkerStore(path); const { first, second } = commitDigestPair(firstStore, "restart");
+  firstStore.close();
+
+  const sendingStore = new WorkerStore(path); const firstTransport = new InMemoryTestEmailTransport();
+  expect(await deliverDueNotifications(sendingStore, firstTransport, { owner: "restart-before-send", now: first.notBefore })).toHaveLength(2);
+  expect(firstTransport.messages).toHaveLength(1);
+  sendingStore.close();
+
+  const restartedStore = new WorkerStore(path); const replayTransport = new InMemoryTestEmailTransport();
+  expect(await deliverDueNotifications(restartedStore, replayTransport, { owner: "restart-after-send", now: first.notBefore + 1 })).toEqual([]);
+  expect(replayTransport.messages).toHaveLength(0);
+  expect(restartedStore.getNotificationIntent(first.id)?.status).toBe("delivered");
+  expect(restartedStore.getNotificationIntent(second.id)?.status).toBe("delivered");
+  restartedStore.close();
+});
+
+it("retries a definitive digest failure five times as one bounded batch", async () => {
+  const store = new WorkerStore(databasePath()); const { first, second } = commitDigestPair(store, "digest-retry");
+  let clock = first.notBefore; let submissions = 0;
+  for (let attempt = 1; attempt <= 5; attempt += 1) {
+    const transport = new InMemoryTestEmailTransport("definitive-failure");
+    const result = await deliverDueNotifications(store, transport, { owner: `digest-failure-${attempt}`, now: clock });
+    submissions += transport.messages.length;
+    expect(result.every(item => item.status === (attempt === 5 ? "failed" : "retry-wait"))).toBe(true);
+    if (attempt < 5) clock = store.getNotificationIntent(first.id)!.nextRetryAt!;
+  }
+  expect(submissions).toBe(5);
+  expect(store.getNotificationIntent(first.id)?.attemptCount).toBe(5);
+  expect(store.getNotificationIntent(second.id)?.attemptCount).toBe(5);
+  expect(store.listNotificationAttempts(first.id)).toHaveLength(5);
+  expect(store.listNotificationAttempts(second.id)).toHaveLength(5);
+  store.close();
+});
+
+it("keeps an ambiguous digest terminal and links reconciliation to every member without resending", async () => {
+  const store = new WorkerStore(databasePath()); const { first, second } = commitDigestPair(store, "digest-ambiguous");
+  const transport = new InMemoryTestEmailTransport("ambiguous");
+  await deliverDueNotifications(store, transport, { owner: "digest-ambiguous", now: first.notBefore });
+  expect(transport.messages).toHaveLength(1);
+  expect(store.getNotificationDigest(store.listNotificationDigests()[0].id)?.status).toBe("ambiguous");
+  expect(await deliverDueNotifications(store, new InMemoryTestEmailTransport(), { owner: "digest-replay", now: first.notBefore + 1 })).toEqual([]);
+  expect(store.reconcileAmbiguousNotificationDigest(store.listNotificationDigests()[0].id, "digest-reconciled", now + 2)).toBe(true);
+  expect(store.getNotificationIntent(first.id)?.status).toBe("delivered");
+  expect(store.getNotificationIntent(second.id)?.status).toBe("delivered");
+  expect(store.listNotificationReceipts(first.id).some(receipt => receipt.receiptType === "confirmed")).toBe(true);
+  expect(store.listNotificationReceipts(second.id).some(receipt => receipt.receiptType === "confirmed")).toBe(true);
+  store.close();
+});
+
+it.each(["before-claim", "after-claim-before-acceptance"] as const)("fences opt-out %s without a false delivery", async phase => {
+  const store = new WorkerStore(databasePath()); const input = commitIntent(store, `opt-out-${phase}`);
+  if (phase === "before-claim") {
+    const disabled = { ...enabledPreferences(), enabled: false, explicitConsent: false, allowedChannels: [], updatedAt: new Date(now + 1).toISOString() };
+    store.import({ ...testData(disabled), notificationPreferences: disabled }, store.load()!.revision, now + 1);
+    const transport = new InMemoryTestEmailTransport();
+    expect(await deliverDueNotifications(store, transport, { owner: phase, now: now + 1 })).toEqual([]);
+    expect(transport.messages).toHaveLength(0);
+    expect(store.getNotificationIntent(input.id)?.status).toBe("canceled");
+  } else {
+    let entered!: () => void; let release!: () => void;
+    const enteredPromise = new Promise<void>(resolve => { entered = resolve; });
+    const releasePromise = new Promise<void>(resolve => { release = resolve; });
+    const transport: NotificationTransport = { channel: "email", configured: true, async send(message) {
+      entered(); await releasePromise;
+      const preflight = await message.beforeAcceptance?.();
+      return preflight?.kind === "canceled" ? preflight : { kind: "confirmed", providerMessageId: "test" };
+    } };
+    const delivery = deliverDueNotifications(store, transport, { owner: phase, now });
+    await enteredPromise;
+    store.cancelNotificationIntent(input.id, "user-opted-out", now + 1);
+    release();
+    expect(await delivery).toEqual([{ intentId: input.id, status: "canceled" }]);
+    expect(store.getNotificationIntent(input.id)?.status).toBe("canceled");
+    expect(store.listNotificationAttempts(input.id)).toHaveLength(0);
+  }
+  store.close();
+});
+
+it("keeps a provider-accepted outcome truthful when opt-out occurs after the acceptance point", async () => {
+  const store = new WorkerStore(databasePath()); const input = commitIntent(store, "opt-out-after-acceptance");
+  const transport: NotificationTransport = { channel: "email", configured: true, async send(message) {
+    const preflight = await message.beforeAcceptance?.();
+    if (preflight?.kind === "canceled") return preflight;
+    store.cancelNotificationIntent(input.id, "late-opt-out", now + 1);
+    return { kind: "provider-accepted", providerMessageId: "provider-accepted-after-opt-out" };
+  } };
+  await deliverDueNotifications(store, transport, { owner: "late-opt-out", now });
+  expect(store.getNotificationIntent(input.id)?.status).toBe("ambiguous");
+  expect(store.getNotificationIntent(input.id)?.status).not.toBe("canceled");
+  expect(store.listNotificationAttempts(input.id)[0].outcome).toBe("provider-accepted");
+  store.close();
+});
+
+it("excludes a digest member canceled while transport waits and sends the remaining member once", async () => {
+  const store = new WorkerStore(databasePath()); const { first, second } = commitDigestPair(store, "member-cancel");
+  let entered!: () => void; let release!: () => void;
+  const enteredPromise = new Promise<void>(resolve => { entered = resolve; });
+  const releasePromise = new Promise<void>(resolve => { release = resolve; });
+  const transportMessages: NotificationTransportMessage[] = [];
+  const transport: NotificationTransport = { channel: "email", configured: true, async send(message) {
+    entered(); await releasePromise;
+    const preflight = await message.beforeAcceptance?.();
+    if (preflight?.kind === "canceled") return preflight;
+    transportMessages.push(message);
+    return { kind: "confirmed", providerMessageId: "remaining-member" };
+  } };
+  const delivery = deliverDueNotifications(store, transport, { owner: "member-cancel", now: first.notBefore });
+  await enteredPromise;
+  store.cancelNotificationIntent(first.id, "member-canceled", now + 1);
+  release();
+  const result = await delivery;
+  expect(transportMessages).toHaveLength(1);
+  expect(transportMessages[0].intents).toHaveLength(1);
+  expect(transportMessages[0].intents?.[0].id).toBe(second.id);
+  expect(store.getNotificationIntent(first.id)?.status).toBe("canceled");
+  expect(store.getNotificationIntent(second.id)?.status).toBe("delivered");
+  expect(result.some(item => item.intentId === second.id && item.status === "delivered")).toBe(true);
+  store.close();
+});
+
+it("imports disabled worker policy atomically, preserves immutable delivery history, and exports safe last-known status", () => {
+  const store = new WorkerStore(databasePath()); const data = testData(); store.import(data, 0); const input = commitIntent(store, "handoff");
+  const delivered = new InMemoryTestEmailTransport();
+  const disabled = { ...data, notificationPreferences: { ...data.notificationPreferences, enabled: false, explicitConsent: false, allowedChannels: [], updatedAt: new Date(now + 1).toISOString() } };
+  store.import(disabled, store.load()!.revision, now + 1);
+  expect(store.getNotificationIntent(input.id)?.status).toBe("canceled");
+  expect(store.listNotificationAttempts(input.id)).toHaveLength(0);
+  const projection = store.load()?.data.lastKnownNotificationDeliveryStatus;
+  expect(projection?.lastState).toBe("canceled");
+  expect(projection?.preferenceUpdatedAt).toBe(disabled.notificationPreferences.updatedAt);
+  expect(projection?.preferenceHash).toMatch(/^[a-f0-9]{64}$/);
+  expect(JSON.stringify(projection)).not.toContain("Sensitive thesis");
+  expect(delivered.messages).toHaveLength(0);
+  store.close();
+});
+
 
 it("does not release a stale held intent while quiet hours are still active", async () => {
   const preferences = { ...enabledPreferences(), quietHours: { enabled: true, start: "22:00", end: "07:00" } };
