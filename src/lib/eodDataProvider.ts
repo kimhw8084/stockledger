@@ -1,11 +1,16 @@
 import { RawBarArchiveBatch, RawBarRecord } from "../types";
 import { parseCsvRows } from "./csv";
 import { fetchText, mapConcurrent } from "./network";
-import { isSessionDate, isUsTradingDate, previousUsTradingDate } from "./marketCalendar";
+import { isSessionDate } from "./marketCalendar";
 import { contentHash } from "../domain/contentHash";
+import { createResearchOnlyRightsProfile, type MarketDataArchiveMetadata, validateDailyBars } from "./marketDataContract";
 
 const STOOQ_BASE = "https://stooq.com/q/d/l/";
 const SCHEMA_VERSION = "scanner_raw_bar_v1";
+export const STOOQ_PROVIDER_ID = "stooq" as const;
+export const STOOQ_PRODUCT_ID = "public-daily-csv" as const;
+/** Stooq remains a public/research adapter. It is never a production managed feed. */
+export const STOOQ_RESEARCH_RIGHTS_PROFILE = createResearchOnlyRightsProfile(STOOQ_PROVIDER_ID, STOOQ_PRODUCT_ID);
 
 const normalizeSymbolForStooq = (symbol: string) => `${symbol.toLowerCase()}.us`;
 
@@ -19,40 +24,15 @@ const parseCsv = (csv: string): RawBarRecord[] => {
 };
 
 export const validateResponse = (bars: RawBarRecord[], latestExpectedTradingDate: string) => {
-  if (!bars.length) return { valid: false, issues: ["missing_symbol_history"] };
-  const issues: string[] = [];
-  const latest = bars[bars.length - 1];
-  if (latest.date !== latestExpectedTradingDate) {
-    issues.push(`latest_bar_date_mismatch:${latest.date}`);
-  }
-  const seen = new Set<string>();
-  let previousDate = "";
-  bars.forEach((bar) => {
-    if (!isSessionDate(bar.date)) issues.push(`invalid_date:${bar.date}`);
-    else {
-      try {
-        if (!isUsTradingDate(bar.date)) issues.push(`non_trading_date:${bar.date}`);
-        else if (previousDate && previousDate !== previousUsTradingDate(bar.date)) issues.push(`session_gap_before:${bar.date}`);
-      } catch { issues.push(`calendar_coverage_unavailable:${bar.date}`); }
-    }
-    if (bar.date < previousDate) issues.push(`unsorted_date:${bar.date}`);
-    previousDate = bar.date;
-    if (![bar.open, bar.high, bar.low, bar.close].every(value => Number.isFinite(value) && value > 0) || !Number.isFinite(bar.volume)) issues.push(`invalid_value:${bar.date}`);
-    if (seen.has(bar.date)) {
-      issues.push(`duplicate_date:${bar.date}`);
-    }
-    seen.add(bar.date);
-    if (
-      bar.high < Math.max(bar.open, bar.close, bar.low) ||
-      bar.low > Math.min(bar.open, bar.close, bar.high)
-    ) {
-      issues.push(`ohlc_inconsistent:${bar.date}`);
-    }
-    if (bar.volume < 0) {
-      issues.push(`negative_volume:${bar.date}`);
-    }
+  const firstDate = bars[0]?.date ?? latestExpectedTradingDate;
+  const report = validateDailyBars({
+    symbol: bars[0]?.symbol ?? "UNKNOWN",
+    rows: bars,
+    requestedStartDate: firstDate,
+    requestedEndDate: latestExpectedTradingDate,
+    expectedLatestSession: latestExpectedTradingDate,
   });
-  return { valid: issues.length === 0, issues };
+  return { valid: report.valid, issues: report.issues };
 };
 
 export const normalizeToSchema = (symbol: string, csv: string) =>
@@ -91,6 +71,7 @@ export const write_raw_archive = (
   latestExpectedTradingDate: string,
   existingBatches: RawBarArchiveBatch[],
   adjustment: "adjusted" | "unadjusted" | "unknown" = "unknown",
+  metadata?: MarketDataArchiveMetadata,
 ) => {
   const startDate = histories.flatMap((entry) => entry.rows).sort((a, b) => a.date.localeCompare(b.date))[0]?.date ?? latestExpectedTradingDate;
   const endDate = latestExpectedTradingDate;
@@ -105,7 +86,7 @@ export const write_raw_archive = (
   );
 
   const batch: RawBarArchiveBatch = {
-    id: `raw-${contentHash({ provider, startDate, endDate, adjustment, bars })}`,
+    id: `raw-${contentHash({ provider, startDate, endDate, adjustment, bars, metadata })}`,
     provider,
     downloadedAtUtc: new Date().toISOString(),
     symbols: histories.map((entry) => entry.symbol),
@@ -117,6 +98,27 @@ export const write_raw_archive = (
     archiveVersion,
     schemaVersion: SCHEMA_VERSION,
     bars,
+    ...(metadata ? {
+      contractVersion: metadata.contractVersion,
+      contractRevision: metadata.revision,
+      providerIdentity: metadata.providerIdentity,
+      providerProductId: metadata.providerProductId,
+      datasetCategory: metadata.datasetCategory,
+      requestedStartDate: metadata.requestedStartDate,
+      requestedEndDate: metadata.requestedEndDate,
+      observedStartDate: metadata.observedStartDate,
+      observedEndDate: metadata.observedEndDate,
+      retrievalTimestampUtc: metadata.retrievalTimestampUtc,
+      sourceRequestIdentity: metadata.sourceRequestIdentity,
+      freshnessState: metadata.freshnessState,
+      coverageState: metadata.coverageState,
+      contentHash: metadata.stableContentHash,
+      datasetIdentity: metadata.datasetIdentity,
+      validationIssues: metadata.validationIssues,
+      failureClass: metadata.failureClass,
+      rightsProfileId: metadata.rightsProfileId,
+      rightsProvenance: metadata.rightsProvenance,
+    } : {}),
   };
 
   return { batch: existingBatches.find(existing => existing.id === batch.id) ?? batch, validationIssues };

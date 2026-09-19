@@ -1,5 +1,5 @@
 import { evaluateWorkspace } from "../domain/evaluateWorkspace";
-import { parseExport, serializeExport } from "../domain/backupFormat";
+import { parseExport, serializeUserExport } from "../domain/backupFormat";
 import { runDailyStockConditionScan } from "../lib/stockConditionScanner";
 import { createId } from "../platform/identity";
 import type { AppData } from "../types";
@@ -83,7 +83,7 @@ export const createWorkspaceApplicationService = (dependencies: {
     exportBackup() {
       const current = dependencies.getCurrent();
       if (!current) throw new Error("Workspace is not loaded.");
-      return serializeExport(current);
+      return serializeUserExport(current);
     },
     readRecoveryData: () => repository.readRecoveryData(),
     restorePreviousBackup: () => repository.restorePreviousBackup(),

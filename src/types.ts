@@ -1,3 +1,5 @@
+import type { MarketDataRightsProvenance } from "./lib/marketDataContract";
+
 export type EyeState =
   | "Not Relevant"
   | "Becoming Interesting"
@@ -223,6 +225,17 @@ export interface SnapshotProvenance {
   currency: "USD";
   adjustment: "adjusted" | "unadjusted" | "unknown";
   datasetId: string;
+  providerIdentity?: string;
+  providerProductId?: string;
+  datasetCategory?: string;
+  sourceRequestIdentity?: string;
+  freshnessState?: string;
+  coverageState?: string;
+  contentHash?: string;
+  rightsProfileId?: string;
+  validationIssues?: string[];
+  failureClass?: string;
+  rightsProvenance?: MarketDataRightsProvenance;
 }
 /** Historical name retained for import compatibility; isMock/provenance identify origin. */
 export interface MockSnapshot {
@@ -423,6 +436,7 @@ export interface Alert {
   reviewed: boolean;
   snoozedUntil?: string;
   usefulness?: "Useful" | "Not Useful";
+  rightsProvenance?: MarketDataRightsProvenance;
 }
 
 export interface Decision {
@@ -499,6 +513,25 @@ export interface RawBarArchiveBatch {
   schemaVersion: string;
   bars: RawBarRecord[];
   supersededByBatchId?: string;
+  contractVersion?: string;
+  contractRevision?: number;
+  providerIdentity?: string;
+  providerProductId?: string;
+  datasetCategory?: string;
+  requestedStartDate?: string;
+  requestedEndDate?: string;
+  observedStartDate?: string;
+  observedEndDate?: string;
+  retrievalTimestampUtc?: string;
+  sourceRequestIdentity?: string;
+  freshnessState?: string;
+  coverageState?: string;
+  contentHash?: string;
+  datasetIdentity?: string;
+  validationIssues?: string[];
+  failureClass?: string;
+  rightsProfileId?: string;
+  rightsProvenance?: MarketDataRightsProvenance;
 }
 
 export interface UniverseSectorSnapshot {
@@ -541,6 +574,7 @@ export interface ProcessedFeatureRecord {
       featureVersion: string;
     }
   >;
+  rightsProvenance?: MarketDataRightsProvenance;
 }
 
 export interface ScanRun {
@@ -558,6 +592,7 @@ export interface ScanRun {
   status: "completed" | "blocked" | "partial";
   warnings: string[];
   blockedReason?: string;
+  rightsProvenance?: MarketDataRightsProvenance;
 }
 
 export interface FrozenRuleProofSummary {
@@ -598,6 +633,7 @@ export interface ScanSignal {
   universeSnapshotHash?: string;
   sectorMemberCount: number;
   createdAtUtc: string;
+  rightsProvenance?: MarketDataRightsProvenance;
 }
 
 export interface ReviewLog {

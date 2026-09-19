@@ -2,7 +2,7 @@
  * Compatibility exports for existing callers. New application code uses the
  * workspace repository/application service boundary directly.
  */
-export { parseExport, serializeExport } from "../domain/backupFormat";
+export { parseExport, serializeExport, serializeUserExport } from "../domain/backupFormat";
 export { createDemoAppData, createEmptyAppData } from "../data/workspaceDefaults";
 export {
   STORAGE_KEYS,
