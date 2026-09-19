@@ -1,0 +1,98 @@
+{
+  "schema": "codex-fabric-stockledger-evidence-identity-recovery-verification-v1",
+  "project": "stockledger",
+  "request": "prod-c13-ui-perfection-inspection-evidence-recovery-v1",
+  "operation": "VERIFY",
+  "current_fabric_job_id": "CF-eb1fd1a7b2c40e4fc24e8eea",
+  "identity_resolution": {
+    "query": {
+      "project": "stockledger",
+      "request": "prod-c13-ui-perfection-inspection-v1",
+      "operation": "VERIFY"
+    },
+    "candidate_count": 1,
+    "unique_match": true,
+    "recovered_original_job_id": "CF-0ed4d7996089f309b9406f3a",
+    "job_state": "executed",
+    "result_state": "EXECUTED_WITH_WARNINGS",
+    "source_base": "ddc1f1f6c1bd3b1a62043673ade679c9de15e352",
+    "work_branch": "codex/stockledger-prod-c13-ui-perfection-inspection-v1",
+    "accepted_at": "2026-09-19T18:46:14Z",
+    "started_at": "2026-09-19T18:46:14Z",
+    "finished_at": "2026-09-19T19:08:22Z",
+    "transport_sha256": "0ed4d7996089f309b9406f3ad89971eea58567e01424dea686e404d685d57b8c",
+    "prompt_sha256": "136aee28211123a1c52483242146fa030bdc53d66de0cf02d0033f337fa0e6ea",
+    "remote_head": "ddc1f1f6c1bd3b1a62043673ade679c9de15e352",
+    "worktree_clean": true,
+    "changed_files": 0
+  },
+  "remote_product_refs": {
+    "main": {
+      "ref": "refs/heads/main",
+      "sha": "ddc1f1f6c1bd3b1a62043673ade679c9de15e352"
+    },
+    "original_product_branch": {
+      "ref": "refs/heads/codex/stockledger-prod-c13-ui-perfection-inspection-v1",
+      "sha": "ddc1f1f6c1bd3b1a62043673ade679c9de15e352"
+    },
+    "recovery_branch": {
+      "ref": "refs/heads/codex/stockledger-prod-c13-ui-perfection-inspection-evidence-recovery-v1",
+      "local_sha": "ddc1f1f6c1bd3b1a62043673ade679c9de15e352",
+      "local_tree": "551e4f7c56e79a08bf3961b2a620fb9efe1a0353",
+      "commits_after_source": 0,
+      "changed_paths_after_source": 0,
+      "worktree_clean": true
+    }
+  },
+  "artifact_readback": {
+    "ref": "refs/heads/project-os-artifacts/stockledger/prod-c13-ui-perfection-inspection-v1",
+    "remote_sha": "a56966efc0206fc3fd9fdf19369e129852c2aad9",
+    "commit": "a56966efc0206fc3fd9fdf19369e129852c2aad9",
+    "tree": "c468f6561d493c728b68dc7d63a77fb24c4d3fd8",
+    "required_files": [
+      "git-publish-receipt.json",
+      "visual-atlas/surface-manifest.json",
+      "visual-atlas/capture-report.json",
+      "visual-atlas/reader-index.json",
+      "visual-atlas/review-desktop.pdf",
+      "visual-atlas/review-mobile.pdf",
+      "visual-atlas/artifact-bundle.zip",
+      "visual-atlas/screenshots/*.png"
+    ],
+    "required_files_present": true,
+    "hashes_match_published_receipt": true,
+    "bundle_zip_integrity": true,
+    "bundle_member_count": 20,
+    "surface_count": 7,
+    "canonical_screenshot_count": 14,
+    "canonical_png_binary_readback": {
+      "path": "visual-atlas/screenshots/today--desktop-1440x900.png",
+      "png_signature_valid": true,
+      "signature_hex": "89504e470d0a1a0a",
+      "base64_prefix_24_bytes": "iVBORw0KGgoAAAANSUhEUgAABaAAAAOE",
+      "dimensions": [1440, 900],
+      "sha256": "c7e4592b938bdce652999581d5672ab73a4e279ddd3632405b3b94a8a60e2498"
+    }
+  },
+  "artifact_hashes": {
+    "visual-atlas/surface-manifest.json": "8d8e7d529930da4b04150a5c88b85a918b5e49106cc56c80815f22b5ab3cac2c",
+    "visual-atlas/capture-report.json": "fffeea09927405038cdf645dac639d66005a9912183cd0e88dacc23a566aab13",
+    "visual-atlas/reader-index.json": "723124db56afe911c4e61016e9ad712eb8a7db0fc661f750d6c55cfd8bfcc91a",
+    "visual-atlas/review-desktop.pdf": "b0671f11f1dcb4858cfaf09acce4a3c61a2b62b9533757c4d6ca5004164889d4",
+    "visual-atlas/review-mobile.pdf": "8940960e116879fd380ab3aed6973de5c1399f675826619f23364967d0ffac05",
+    "visual-atlas/artifact-bundle.zip": "da504e172a09e0b3d7afc89b803358436e578fad0fa503bd0679408ad89457e8"
+  },
+  "prohibited_actions_confirmed": {
+    "atlas_bytes_changed": false,
+    "atlas_bytes_recompressed": false,
+    "atlas_republished": false,
+    "browser_recapture": false,
+    "new_screenshots": false,
+    "product_source_mutation": false,
+    "dependency_change": false,
+    "test_change": false,
+    "main_merge": false,
+    "notion_write": false
+  },
+  "disposition": "EVIDENCE_IDENTITY_RECOVERED_AWAITING_GPT_STAGE"
+}
