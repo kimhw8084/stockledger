@@ -15,6 +15,7 @@
     "export:web": "EXPO_NO_DOTENV=1 expo export --platform web",
     "worker": "tsx server/worker/cli.ts",
     "check:boundaries": "node scripts/check-boundaries.mjs",
+    "check:release-base": "node scripts/check-release-base.mjs",
     "check:release-workflow": "node scripts/check-release-workflow.mjs",
     "check:frozen": "tsx scripts/validate-frozen-research-bundle.ts",
     "profile:workspace": "tsx scripts/profile-workspace.ts",

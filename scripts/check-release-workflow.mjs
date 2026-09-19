@@ -10,6 +10,15 @@ const expectedPins = new Map([
 const refs = [...workflow.matchAll(/^\s*-\s*uses:\s*([^\s#]+)\s*(?:#.*)?$/gm)].map(match => match[1]);
 if (!refs.length) throw new Error(`No action references found in ${workflowPath}.`);
 
+const operationsStart = workflow.indexOf("\n  operations:\n");
+if (operationsStart < 0) throw new Error("Operations job is missing from the release workflow.");
+const operationsWorkflow = workflow.slice(operationsStart);
+const operationsCheckout = operationsWorkflow.match(/^\s*-\s*uses:\s*actions\/checkout@[a-f0-9]{40}[^\n]*\n\s+with:\n\s+fetch-depth:\s*0\s*$/m);
+if (!operationsCheckout) throw new Error("Operations checkout must use fetch-depth: 0 for protected-base ancestry verification.");
+const baseCheck = operationsWorkflow.indexOf("npm run check:release-base");
+const evidenceGeneration = operationsWorkflow.indexOf("npm run release:evidence");
+if (baseCheck < 0 || evidenceGeneration < 0 || baseCheck > evidenceGeneration) throw new Error("Operations must verify protected-base resolution and ancestry before release:evidence.");
+
 for (const value of refs) {
   const separator = value.lastIndexOf("@");
   const action = separator > 0 ? value.slice(0, separator) : value;
@@ -20,4 +29,4 @@ for (const value of refs) {
   if (expected && ref !== expected) throw new Error(`Known-good pin changed for ${action}.`);
 }
 
-console.log(JSON.stringify({ workflow: workflowPath, firstPartyActionRefs: refs.filter(ref => ref.startsWith("actions/")), valid: true }));
+console.log(JSON.stringify({ workflow: workflowPath, firstPartyActionRefs: refs.filter(ref => ref.startsWith("actions/")), operationsCheckout: "fetch-depth: 0", protectedBaseCheck: "before release:evidence", valid: true }));

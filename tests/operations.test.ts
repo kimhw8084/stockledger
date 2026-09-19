@@ -1,14 +1,31 @@
-import { beforeEach, expect, it } from "vitest";
+import { execFileSync } from "node:child_process";
+import { afterEach, beforeEach, expect, it } from "vitest";
 import { buildNotificationIntent } from "../src/domain/notificationDelivery";
 import { createOperationsStatus, OPERATIONS_STATUS_CONTRACT_VERSION } from "../server/worker/operations";
 import { jobIdentityFor } from "../server/worker/contract";
 import { WorkerStore } from "../server/worker/store";
 import { seedData } from "../src/lib/seed";
-import { verifyRuntimeReleaseEvidence } from "../server/worker/releaseEvidenceRuntime";
+import { buildReleaseEvidence } from "../src/operations/releaseEvidence";
+import { collectReleaseVerificationFacts, verifyRuntimeReleaseEvidence } from "../server/worker/releaseEvidenceRuntime";
 
 const observedAt = new Date("2026-09-18T16:00:00.000Z");
 let store: WorkerStore;
 beforeEach(() => { store = new WorkerStore(":memory:"); store.import(structuredClone(seedData), 0, observedAt.getTime()); });
+
+const releaseEnvironment = ["GITHUB_SHA", "STOCKLEDGER_PROTECTED_BASE", "STOCKLEDGER_SOURCE_COMMIT", "STOCKLEDGER_SOURCE_TREE"] as const;
+const ambientEnvironment = { ...process.env };
+const setReleaseEnvironment = (values: Partial<Record<typeof releaseEnvironment[number], string | undefined>>) => {
+  for (const key of releaseEnvironment) {
+    const value = values[key];
+    if (value === undefined) delete process.env[key];
+    else process.env[key] = value;
+  }
+};
+
+afterEach(() => {
+  for (const key of Object.keys(process.env)) delete process.env[key];
+  Object.assign(process.env, ambientEnvironment);
+});
 
 it("projects a stable versioned status with deterministic safe classification", () => {
   const job = jobIdentityFor({ kind: "evaluation-scan", scheduledSession: "2026-09-17", workflowKey: "operations-test", inputHash: "operations-test", dueAtUtc: "2026-09-17T15:00:00.000Z" });
@@ -52,9 +69,35 @@ it("keeps notification state counts and safe diagnostics free of private fields"
 });
 
 it("keeps release identity unavailable or mismatched unless independently verified", () => {
-  const unavailable = verifyRuntimeReleaseEvidence({ source: { commit: "a".repeat(40), tree: "b".repeat(40) } });
+  const base = "62c21af2f781b3ff53505f4582d86e24fead528d";
+  const sourceCommit = execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim();
+  const sourceTree = execFileSync("git", ["rev-parse", "HEAD^{tree}"], { encoding: "utf8" }).trim();
+  const invalidEvidence = { source: { commit: "a".repeat(40), tree: "b".repeat(40) } };
+
+  setReleaseEnvironment({
+    GITHUB_SHA: undefined,
+    STOCKLEDGER_PROTECTED_BASE: undefined,
+    STOCKLEDGER_SOURCE_COMMIT: sourceCommit,
+    STOCKLEDGER_SOURCE_TREE: sourceTree,
+  });
+  const unavailable = verifyRuntimeReleaseEvidence(invalidEvidence);
   expect(unavailable.state).toBe("unavailable");
   expect(unavailable.reason).toBe("release_identity_unavailable");
+
+  setReleaseEnvironment({
+    GITHUB_SHA: undefined,
+    STOCKLEDGER_PROTECTED_BASE: base,
+    STOCKLEDGER_SOURCE_COMMIT: sourceCommit,
+    STOCKLEDGER_SOURCE_TREE: sourceTree,
+  });
+  const mismatchedRuntimeEvidence = verifyRuntimeReleaseEvidence(invalidEvidence);
+  expect(mismatchedRuntimeEvidence.state).toBe("mismatched");
+  expect(mismatchedRuntimeEvidence.reason).toBe("release_identity_mismatched");
+
+  const validEvidence = buildReleaseEvidence(collectReleaseVerificationFacts(base, { sourceCommit, sourceTree }));
+  const known = verifyRuntimeReleaseEvidence(validEvidence);
+  expect(known.state).toBe("known");
+  expect(known.reason).toBe("release_identity_verified");
 
   const mismatched = createOperationsStatus(store, {
     observedAt,
