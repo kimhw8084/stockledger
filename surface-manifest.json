@@ -1,0 +1,478 @@
+{
+  "schema": "project-os-visual-atlas-surface-manifest-v2",
+  "frozenAt": "2026-09-19T18:57:33.593Z",
+  "frozenBeforeCanonicalCapture": true,
+  "source": {
+    "sha": "ddc1f1f6c1bd3b1a62043673ade679c9de15e352",
+    "tree": "551e4f7c56e79a08bf3961b2a620fb9efe1a0353",
+    "branch": "codex/stockledger-prod-c13-ui-perfection-inspection-v1"
+  },
+  "discovery": {
+    "browserPath": "Playwright Chromium",
+    "sampleState": "synthetic representative app sample via supported Explore sample workspace action",
+    "observedNavigation": [
+      {
+        "via": "tab:Today",
+        "hash": "#/today",
+        "text": "Today\n0 urgent · 9 open alerts\n!\n9\nH\n7\nS\nSample data is present. Mock prices and outcomes are for exploring the app.\nSUMMARY\n?\nURGENT\n0\nRISK\n0\nSTALE\n5\nALERTS\n9\nVISUAL TRIAGE\n?\nTODAY PULSE\nUrgency constellation\nAlerts\nLogic\nAMD\n1\nCOIN\n1\nINTC\n1\nMETA\n1\nMSFT\n1\nMU\n1\nNVDA\n1\nSNOW\n1\nTSLA\n1\nAAPL\n0\nADBE\n0\nAMZN\n0\nAMD\nWatch\n8d\nCOIN\nWatch\n13d\nINTC\nWatch\n15d\nMETA\nWatch\n3d\nMSFT\nWatch\n16d\nMU\nWatch\n2d\nNVDA\nWatch\n2"
+      },
+      {
+        "via": "tab:Watchlist",
+        "hash": "#/watchlist",
+        "text": "Watchlist\nSearch any stock and inspect the full board\n!\n9\nH\n7\nS\nADD STOCK\nMANAGE MONITORING EYES\nSample data is present. Mock prices and outcomes are for exploring the app.\nADD\nYOUR WATCHLIST\n20 shown\nAAPL\nAAPL\nApple\n$190.20\nDummy-backed\nADBE\nADBE\nAdobe\n$475.20\nDummy-backed\nAMD\nAMD\nAdvanced Micro Devices\n$142.35\nDummy-backed\nAMZN\nAMZN\nAmazon\n$185.20\nDummy-backed\nAVGO\nAVGO\nBroadcom\n$1,420.50\nDummy-"
+      },
+      {
+        "via": "tab:Recipes",
+        "hash": "#/recipes",
+        "text": "Recipes\nBuild formulas, rules, and sets in one flow\n!\n9\nH\n7\nS\nSample data is present. Mock prices and outcomes are for exploring the app.\n1\nFeatures\n2\nRules\n3\nSignals\nRaw\nDaily Condition Scanner\nNo scan run yet.\nRUN SCAN\nMATCHED\n0\nNEAR\n0\nBLOCKED\n0\nRULES\n6\nCondition matched — human review required. Near match — watchlist only.\nPROCESSED FEATURES\n?\nNo processed features yet.\nNo processed features ye"
+      },
+      {
+        "via": "tab:Journal",
+        "hash": "#/journal",
+        "text": "Journal\n12 journal entries in view\n!\n9\nH\n7\nS\nSample data is present. Mock prices and outcomes are for exploring the app.\nDecision history first.\nENTRIES\n12\nENTERED\n4\nSKIPPED\n2\nPENDING OUTCOMES\n7\nALL\nENTERED\nSKIPPED\nRISKY\nNEW\nSEP 19, 10:57 AM\nRejected · COIN · Reset Recovery\n변동성이 과도해 아직 복구 구간으로 보기 어렵습니다.\nTHESIS RISK RISING\nNO DATA NOTE\nTHESIS NO\nON TIME\nConcern: 가격 안정화 부재\nOPEN\nSTOCK\nALERT\nOutcome ·"
+      },
+      {
+        "via": "button:Alerts",
+        "hash": "#/alerts",
+        "text": "Alerts\n9 stocks with open alerts\n!\n9\nH\n7\nS\nSample data is present. Mock prices and outcomes are for exploring the app.\nWhat changed and why now.\nOPEN\n9\nGROUPED STOCKS\n9\nSNOOZED\n1\nREVIEWED\n2\nCURRENT\nHISTORY\nCurrent Alerts · 9\nAlerts are grouped by stock first so related signals stay together.\nADVANCED MICRO DEVICES\nAMD\nOPEN\nHigh\n1 Alerts\nTEMPORARY BARGAIN SALE · 1\nTemporary Bargain Sale v1 remains "
+      },
+      {
+        "via": "button:Settings",
+        "hash": "#/settings",
+        "text": "Settings\n0 healthy providers\n!\n9\nH\n7\nS\nSample data is present. Mock prices and outcomes are for exploring the app.\nYour workspace\nStored on this device. Export regular backups to keep your investment notes safe.\nEXPORT COMPLETE BACKUP\nEXPORT WEEKLY REVIEW REPORT\nRE-EVALUATE SAVED DATA\nEXPORT SAMPLE NOTES AND START A CLEAN PERSONAL WORKSPACE\nRestore a backup\nCHOOSE BACKUP FILE\nVALIDATE BACKUP\nImpor"
+      }
+    ],
+    "initialControls": [
+      {
+        "role": "button",
+        "name": "Alerts",
+        "selected": null
+      },
+      {
+        "role": "button",
+        "name": "Journal",
+        "selected": null
+      },
+      {
+        "role": "button",
+        "name": "Settings",
+        "selected": null
+      },
+      {
+        "role": "button",
+        "name": "Summary help",
+        "selected": null
+      },
+      {
+        "role": "button",
+        "name": "Urgent: 0",
+        "selected": null
+      },
+      {
+        "role": "button",
+        "name": "Risk: 0",
+        "selected": null
+      },
+      {
+        "role": "button",
+        "name": "Stale: 5",
+        "selected": null
+      },
+      {
+        "role": "button",
+        "name": "Alerts: 9",
+        "selected": null
+      },
+      {
+        "role": "button",
+        "name": "Visual Triage help",
+        "selected": null
+      },
+      {
+        "role": "button",
+        "name": "Open alerts",
+        "selected": null
+      },
+      {
+        "role": "button",
+        "name": "Open logic lab",
+        "selected": null
+      },
+      {
+        "role": "button",
+        "name": "AMD Advanced Micro Devices",
+        "selected": null
+      },
+      {
+        "role": "button",
+        "name": "COIN Coinbase",
+        "selected": null
+      },
+      {
+        "role": "button",
+        "name": "INTC Intel",
+        "selected": null
+      },
+      {
+        "role": "button",
+        "name": "META Meta Platforms",
+        "selected": null
+      },
+      {
+        "role": "button",
+        "name": "MSFT Microsoft",
+        "selected": null
+      },
+      {
+        "role": "button",
+        "name": "MU Micron",
+        "selected": null
+      },
+      {
+        "role": "button",
+        "name": "NVDA NVIDIA",
+        "selected": null
+      },
+      {
+        "role": "button",
+        "name": "SNOW Snowflake",
+        "selected": null
+      },
+      {
+        "role": "button",
+        "name": "TSLA Tesla",
+        "selected": null
+      },
+      {
+        "role": "button",
+        "name": "AAPL Apple",
+        "selected": null
+      },
+      {
+        "role": "button",
+        "name": "ADBE Adobe",
+        "selected": null
+      },
+      {
+        "role": "button",
+        "name": "AMZN Amazon",
+        "selected": null
+      },
+      {
+        "role": "button",
+        "name": "AMD Watch",
+        "selected": null
+      },
+      {
+        "role": "button",
+        "name": "COIN Watch",
+        "selected": null
+      },
+      {
+        "role": "button",
+        "name": "INTC Watch",
+        "selected": null
+      },
+      {
+        "role": "button",
+        "name": "META Watch",
+        "selected": null
+      },
+      {
+        "role": "button",
+        "name": "MSFT Watch",
+        "selected": null
+      },
+      {
+        "role": "button",
+        "name": "MU Watch",
+        "selected": null
+      },
+      {
+        "role": "button",
+        "name": "NVDA Watch",
+        "selected": null
+      },
+      {
+        "role": "button",
+        "name": "SNOW Watch",
+        "selected": null
+      },
+      {
+        "role": "button",
+        "name": "TSLA Watch",
+        "selected": null
+      },
+      {
+        "role": "button",
+        "name": "AAPL Watch",
+        "selected": null
+      },
+      {
+        "role": "button",
+        "name": "ADBE Watch",
+        "selected": null
+      },
+      {
+        "role": "button",
+        "name": "AMZN Watch",
+        "selected": null
+      },
+      {
+        "role": "button",
+        "name": "Decision Loop help",
+        "selected": null
+      },
+      {
+        "role": "button",
+        "name": "AAPL Entered",
+        "selected": null
+      },
+      {
+        "role": "button",
+        "name": "AMD Entered",
+        "selected": null
+      },
+      {
+        "role": "button",
+        "name": "COIN Rejected",
+        "selected": null
+      },
+      {
+        "role": "button",
+        "name": "INTC Rejected",
+        "selected": null
+      },
+      {
+        "role": "button",
+        "name": "META Revised",
+        "selected": null
+      },
+      {
+        "role": "button",
+        "name": "MSFT Revised",
+        "selected": null
+      },
+      {
+        "role": "button",
+        "name": "Monitoring Board help",
+        "selected": null
+      },
+      {
+        "role": "button",
+        "name": "Review Now: 0",
+        "selected": null
+      },
+      {
+        "role": "button",
+        "name": "Forming: 0",
+        "selected": null
+      },
+      {
+        "role": "button",
+        "name": "Risk Rising: 0",
+        "selected": null
+      },
+      {
+        "role": "button",
+        "name": "Review Soon: 5",
+        "selected": null
+      },
+      {
+        "role": "button",
+        "name": "All: 20",
+        "selected": null
+      },
+      {
+        "role": "tab",
+        "name": "Today",
+        "selected": "true"
+      },
+      {
+        "role": "tab",
+        "name": "Watchlist",
+        "selected": "false"
+      },
+      {
+        "role": "tab",
+        "name": "Recipes",
+        "selected": "false"
+      },
+      {
+        "role": "tab",
+        "name": "Journal",
+        "selected": "false"
+      }
+    ],
+    "errors": {
+      "console": [],
+      "pageErrors": [],
+      "requestFailures": [],
+      "responses": []
+    }
+  },
+  "surfaces": [
+    {
+      "surfaceKey": "today",
+      "canonicalRoute": "#/today",
+      "aliases": [
+        "#/",
+        "#/today"
+      ],
+      "materialStates": [
+        "empty/personal",
+        "sample/populated",
+        "loading",
+        "error/recovery",
+        "dialog/sheet/overlay",
+        "long-label/dense",
+        "language/ko",
+        "reduced-motion",
+        "keyboard"
+      ],
+      "canonicalAnchors": [
+        "desktop-1440x900",
+        "mobile-390x844"
+      ],
+      "discoveryStatus": "runtime-confirmed-or-router-reachable"
+    },
+    {
+      "surfaceKey": "watchlist",
+      "canonicalRoute": "#/watchlist",
+      "aliases": [
+        "#/watchlist"
+      ],
+      "materialStates": [
+        "empty/personal",
+        "sample/populated",
+        "loading",
+        "error/recovery",
+        "dialog/sheet/overlay",
+        "long-label/dense",
+        "language/ko",
+        "reduced-motion",
+        "keyboard"
+      ],
+      "canonicalAnchors": [
+        "desktop-1440x900",
+        "mobile-390x844"
+      ],
+      "discoveryStatus": "runtime-confirmed-or-router-reachable"
+    },
+    {
+      "surfaceKey": "recipes",
+      "canonicalRoute": "#/recipes",
+      "aliases": [
+        "#/recipes"
+      ],
+      "materialStates": [
+        "empty/personal",
+        "sample/populated",
+        "loading",
+        "error/recovery",
+        "dialog/sheet/overlay",
+        "long-label/dense",
+        "language/ko",
+        "reduced-motion",
+        "keyboard"
+      ],
+      "canonicalAnchors": [
+        "desktop-1440x900",
+        "mobile-390x844"
+      ],
+      "discoveryStatus": "runtime-confirmed-or-router-reachable"
+    },
+    {
+      "surfaceKey": "monitoring",
+      "canonicalRoute": "#/monitoring",
+      "aliases": [
+        "#/monitoring"
+      ],
+      "materialStates": [
+        "empty/personal",
+        "sample/populated",
+        "loading",
+        "error/recovery",
+        "dialog/sheet/overlay",
+        "long-label/dense",
+        "language/ko",
+        "reduced-motion",
+        "keyboard"
+      ],
+      "canonicalAnchors": [
+        "desktop-1440x900",
+        "mobile-390x844"
+      ],
+      "discoveryStatus": "runtime-confirmed-or-router-reachable"
+    },
+    {
+      "surfaceKey": "alerts",
+      "canonicalRoute": "#/alerts",
+      "aliases": [
+        "#/alerts"
+      ],
+      "materialStates": [
+        "empty/personal",
+        "sample/populated",
+        "loading",
+        "error/recovery",
+        "dialog/sheet/overlay",
+        "long-label/dense",
+        "language/ko",
+        "reduced-motion",
+        "keyboard"
+      ],
+      "canonicalAnchors": [
+        "desktop-1440x900",
+        "mobile-390x844"
+      ],
+      "discoveryStatus": "runtime-confirmed-or-router-reachable"
+    },
+    {
+      "surfaceKey": "journal",
+      "canonicalRoute": "#/journal",
+      "aliases": [
+        "#/journal"
+      ],
+      "materialStates": [
+        "empty/personal",
+        "sample/populated",
+        "loading",
+        "error/recovery",
+        "dialog/sheet/overlay",
+        "long-label/dense",
+        "language/ko",
+        "reduced-motion",
+        "keyboard"
+      ],
+      "canonicalAnchors": [
+        "desktop-1440x900",
+        "mobile-390x844"
+      ],
+      "discoveryStatus": "runtime-confirmed-or-router-reachable"
+    },
+    {
+      "surfaceKey": "settings",
+      "canonicalRoute": "#/settings",
+      "aliases": [
+        "#/settings"
+      ],
+      "materialStates": [
+        "empty/personal",
+        "sample/populated",
+        "loading",
+        "error/recovery",
+        "dialog/sheet/overlay",
+        "long-label/dense",
+        "language/ko",
+        "reduced-motion",
+        "keyboard"
+      ],
+      "canonicalAnchors": [
+        "desktop-1440x900",
+        "mobile-390x844"
+      ],
+      "discoveryStatus": "runtime-confirmed-or-router-reachable"
+    }
+  ]
+}

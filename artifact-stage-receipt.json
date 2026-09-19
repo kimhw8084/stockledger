@@ -1,0 +1,18 @@
+{
+  "schema": "codex-fabric-artifact-stage-receipt-v2",
+  "project": "stockledger",
+  "request": "prod-c13-ui-perfection-inspection-v1",
+  "operation": "VERIFY",
+  "artifact_ref": "refs/heads/project-os-artifacts/stockledger/prod-c13-ui-perfection-inspection-v1",
+  "artifact_commit": "a56966efc0206fc3fd9fdf19369e129852c2aad9",
+  "artifact_tree": "c468f6561d493c728b68dc7d63a77fb24c4d3fd8",
+  "source_sha": "ddc1f1f6c1bd3b1a62043673ade679c9de15e352",
+  "tree_sha": "551e4f7c56e79a08bf3961b2a620fb9efe1a0353",
+  "bundle_sha256": "da504e172a09e0b3d7afc89b803358436e578fad0fa503bd0679408ad89457e8",
+  "manifest_sha256": "8d8e7d529930da4b04150a5c88b85a918b5e49106cc56c80815f22b5ab3cac2c",
+  "capture_report_sha256": "fffeea09927405038cdf645dac639d66005a9912183cd0e88dacc23a566aab13",
+  "reader_index_sha256": "723124db56afe911c4e61016e9ad712eb8a7db0fc661f750d6c55cfd8bfcc91a",
+  "review_desktop_sha256": "b0671f11f1dcb4858cfaf09acce4a3c61a2b62b9533757c4d6ca5004164889d4",
+  "review_mobile_sha256": "8940960e116879fd380ab3aed6973de5c1399f675826619f23364967d0ffac05",
+  "remote_readback_verified": true
+}
