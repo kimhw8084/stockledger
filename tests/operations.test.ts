@@ -13,7 +13,7 @@ let store: WorkerStore;
 beforeEach(() => { store = new WorkerStore(":memory:"); store.import(structuredClone(seedData), 0, observedAt.getTime()); });
 
 const releaseEnvironment = ["GITHUB_SHA", "STOCKLEDGER_PROTECTED_BASE", "STOCKLEDGER_SOURCE_COMMIT", "STOCKLEDGER_SOURCE_TREE"] as const;
-const ambientEnvironment = { ...process.env };
+const ambientReleaseEnvironment = Object.fromEntries(releaseEnvironment.map(key => [key, process.env[key]])) as Record<typeof releaseEnvironment[number], string | undefined>;
 const setReleaseEnvironment = (values: Partial<Record<typeof releaseEnvironment[number], string | undefined>>) => {
   for (const key of releaseEnvironment) {
     const value = values[key];
@@ -21,11 +21,15 @@ const setReleaseEnvironment = (values: Partial<Record<typeof releaseEnvironment[
     else process.env[key] = value;
   }
 };
+const restoreReleaseEnvironment = () => {
+  for (const key of releaseEnvironment) {
+    const value = ambientReleaseEnvironment[key];
+    if (value === undefined) delete process.env[key];
+    else process.env[key] = value;
+  }
+};
 
-afterEach(() => {
-  for (const key of Object.keys(process.env)) delete process.env[key];
-  Object.assign(process.env, ambientEnvironment);
-});
+afterEach(restoreReleaseEnvironment);
 
 it("projects a stable versioned status with deterministic safe classification", () => {
   const job = jobIdentityFor({ kind: "evaluation-scan", scheduledSession: "2026-09-17", workflowKey: "operations-test", inputHash: "operations-test", dueAtUtc: "2026-09-17T15:00:00.000Z" });
@@ -69,13 +73,13 @@ it("keeps notification state counts and safe diagnostics free of private fields"
 });
 
 it("keeps release identity unavailable or mismatched unless independently verified", () => {
-  const base = "62c21af2f781b3ff53505f4582d86e24fead528d";
   const sourceCommit = execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim();
   const sourceTree = execFileSync("git", ["rev-parse", "HEAD^{tree}"], { encoding: "utf8" }).trim();
+  const base = sourceCommit;
   const invalidEvidence = { source: { commit: "a".repeat(40), tree: "b".repeat(40) } };
 
   setReleaseEnvironment({
-    GITHUB_SHA: undefined,
+    GITHUB_SHA: "f".repeat(40),
     STOCKLEDGER_PROTECTED_BASE: undefined,
     STOCKLEDGER_SOURCE_COMMIT: sourceCommit,
     STOCKLEDGER_SOURCE_TREE: sourceTree,
@@ -85,7 +89,7 @@ it("keeps release identity unavailable or mismatched unless independently verifi
   expect(unavailable.reason).toBe("release_identity_unavailable");
 
   setReleaseEnvironment({
-    GITHUB_SHA: undefined,
+    GITHUB_SHA: "f".repeat(40),
     STOCKLEDGER_PROTECTED_BASE: base,
     STOCKLEDGER_SOURCE_COMMIT: sourceCommit,
     STOCKLEDGER_SOURCE_TREE: sourceTree,
