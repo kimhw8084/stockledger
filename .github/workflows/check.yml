@@ -48,7 +48,32 @@ jobs:
       - name: Start isolated local Supabase
         run: npx supabase start -x studio,edge-runtime,logflare,vector,supavisor,imgproxy,realtime,storage-api
       - run: npm run test:cloud
+      - name: Run isolated application-owned recovery checks
+        run: npm run test -- --run tests/cloud.test.ts
       - name: Lint application database functions
         run: npx supabase db lint --local --schema public,ledger_private --level warning --fail-on warning
       - if: always()
         run: npx supabase stop --no-backup
+  operations:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CI: "1"
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-node@249970729cb0ef3589644e289664e5dc5ba9c38 # v6
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run test -- --run tests/operations.test.ts tests/recovery.test.ts tests/releaseEvidence.test.ts tests/qualification.test.ts
+      - run: npm run recovery:drill -- --output artifacts/recovery-result.json
+      - run: npm run operations:qualify -- --output artifacts/operations-qualification.json
+      - run: npm run release:evidence -- --output artifacts/release-evidence.json --base 62c21af2f781b3ff53505f4582d86e24fead528d
+      - run: npm run release:verify -- --input artifacts/release-evidence.json
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        if: failure()
+        with:
+          name: operations-evidence
+          path: artifacts/*.json
+          retention-days: 3

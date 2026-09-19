@@ -1,5 +1,7 @@
 import { contentHash } from "../../src/domain/contentHash";
 import { CALENDAR_VERSION, marketSessionDueAtUtc } from "../../src/lib/marketCalendar";
+import { WORKER_JOB_CONTRACT_REVISION, WORKER_JOB_CONTRACT_VERSION } from "../../src/operations/releaseContracts";
+export { WORKER_JOB_CONTRACT_REVISION, WORKER_JOB_CONTRACT_VERSION } from "../../src/operations/releaseContracts";
 export {
   NOTIFICATION_DELIVERY_CONTRACT_REVISION,
   NOTIFICATION_DELIVERY_CONTRACT_VERSION,
@@ -15,8 +17,6 @@ export {
   type NotificationIntentInput,
 } from "../../src/domain/notificationDelivery";
 
-export const WORKER_JOB_CONTRACT_VERSION = "stockledger-production-job-v1" as const;
-export const WORKER_JOB_CONTRACT_REVISION = 2 as const;
 export const WORKER_MAX_ATTEMPTS = 5;
 export const WORKER_INITIAL_RETRY_DELAY_MS = 60_000;
 export const WORKER_MAX_RETRY_DELAY_MS = 15 * 60_000;

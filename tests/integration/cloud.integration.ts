@@ -53,6 +53,15 @@ async function main() {
     assert.equal(deleted.error, null);
     const tombstone = await first.rpc("get_ledger_changes", { p_after_cursor: changesPage.data.changes[0].cursor, p_limit: 10 });
     assert.equal(tombstone.error, null); assert.equal(tombstone.data.changes.at(-1).deleted, true);
+    const rollback = await first.rpc("apply_ledger_batch", {
+      p_mutation_id: randomUUID(),
+      p_changes: [
+        { collection: "stocks", recordId: "cloud-recovery-new", expectedRevision: 0, payload: { id: "cloud-recovery-new", symbol: "REC" }, deleted: false },
+        { collection: "stocks", recordId: "cloud-test-stock", expectedRevision: 0, payload: { id: "cloud-test-stock", symbol: "ABC" }, deleted: false },
+      ],
+    });
+    assert.equal(rollback.error?.code, "40001");
+    assert.deepEqual((await first.from("ledger_records").select("record_id").eq("record_id", "cloud-recovery-new")).data, []);
     const deletion = await deletionAccount.rpc("request_account_deletion");
     assert.equal(deletion.error, null); assert.equal(deletion.data.status, "requested"); assert.equal(deletion.data.authUserDeletion, "unproven");
     assert.deepEqual((await deletionAccount.from("ledger_records").select("record_id")).data, []);

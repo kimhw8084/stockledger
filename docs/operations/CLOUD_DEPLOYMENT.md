@@ -41,6 +41,8 @@ Docker startup/listing was unresponsive on the implementation Mac. Its standalon
 
 ## Deployment sequence
 
+CHG-96 adds only repository-owned evidence. The local embedded PostgreSQL/disposable Supabase checks cover application-owned rollback semantics—atomic batches, owner isolation, revisions, tombstones, mutation replay and cursor behavior. They do not prove a hosted provider backup/restore, hosted Auth backup/revocation, deployment recovery, or production cloud restore. `npm run recovery:drill` is SQLite-only and synthetic; it must not be presented as a hosted cloud recovery exercise.
+
 1. Select a dedicated StockLedger project and region. Existing unrelated connected projects are not targets. Free/paid project selection belongs to the operator; no paid service was activated.
 2. Separate staging/production refs. Review the migration, run integration tests, database lint and Supabase security/performance advisors before deployment. Consult the pinned CLI's `link`, `db push`, and `db lint` help. Never reset production.
 3. Enable hosted email confirmation; minimum password length 12; configure SMTP, exact redirect/site URLs, abuse controls and operator MFA. Local configuration intentionally disables email confirmation for tests.
