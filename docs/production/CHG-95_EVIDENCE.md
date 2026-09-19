@@ -9,7 +9,8 @@ This document is an implementation and verification record. It is not evidence o
 - Protected-main base: `c290037e6de0079d47048850ee52f86800c8a992`
 - Work branch: `codex/stockledger-prod-c08-market-data-rights-enforcement-fix-v1`
 - R1 candidate carried forward: `3b6ca51a02194a736db6abd083a34aae810cec98` (implementation head `a062a9856f3148681d999bb6daff5d4f8778db66`).
-- Rights-enforcement fix and evidence closeout commits are recorded in the final handoff and Fabric evidence ref.
+- Rights-enforcement fix: `ff696e6` (`fix(stockledger): enforce market data rights at use boundaries`).
+- Evidence closeout commit and Fabric evidence ref are recorded in the final handoff.
 - Node qualification: repository requirement is `>=22.23.2`; verification uses Node `22.23.2`.
 
 ## Changed scope
