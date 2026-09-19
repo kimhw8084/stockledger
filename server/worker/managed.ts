@@ -10,6 +10,7 @@ import {
 import { runDailyStockConditionScan } from "../../src/lib/stockConditionScanner";
 import { FINANCIAL_TRUTH_ENGINE_VERSION } from "../../src/lib/metricCatalog";
 import { buildNotificationIntent, NOTIFICATION_DELIVERY_CONTRACT_VERSION } from "../../src/domain/notificationDelivery";
+import { checkProductionManagedRights, isDeferredMarketDataCategory, rightsFailureMessage, type MarketDataArchiveMetadata, type MarketDataRightsProfile } from "../../src/lib/marketDataContract";
 import type { RawBarRecord, UniverseSnapshot } from "../../src/types";
 import {
   createProductionJob,
@@ -31,6 +32,10 @@ export interface ManagedHistory {
 export interface ManagedWorkerOptions {
   source: string;
   adjustment: "adjusted" | "unadjusted" | "unknown";
+  /** Omitted means the complete local CSV/user-supplied path. Provider input must opt in explicitly. */
+  sourceKind?: "local-csv" | "provider";
+  rightsProfile?: MarketDataRightsProfile;
+  ingestionMetadata?: MarketDataArchiveMetadata;
   now?: Date;
   owner?: string;
   leaseMs?: number;
@@ -48,7 +53,7 @@ export interface DeadlineEvidence {
 }
 
 export interface ManagedWorkerResult {
-  status: "completed" | "partial" | "blocked" | "already_claimed_or_completed" | "retry_wait" | "terminal-failed" | "admission_blocked";
+  status: "completed" | "partial" | "blocked" | "blocked-rights" | "already_claimed_or_completed" | "retry_wait" | "terminal-failed" | "admission_blocked";
   jobId?: string;
   jobIds: string[];
   scanDate?: string;
@@ -118,6 +123,11 @@ const workflowFor = (data: NonNullable<ReturnType<WorkerStore["load"]>>["data"],
     sourceHash,
     adjustment: options.adjustment,
     source: options.source,
+    sourceKind: options.sourceKind ?? "local-csv",
+    providerIdentity: options.ingestionMetadata?.providerIdentity,
+    providerProductId: options.ingestionMetadata?.providerProductId,
+    datasetIdentity: options.ingestionMetadata?.datasetIdentity,
+    rightsProfileId: options.ingestionMetadata?.rightsProfileId ?? options.rightsProfile?.profileId,
     settings: data.scannerSettings,
     recipes: data.recipes,
     eyes: data.eyes.map(({ lastEvaluation, ...eye }) => eye),
@@ -141,6 +151,9 @@ const claimedStage = (store: WorkerStore, job: WorkerJob, owner: string, now: nu
 const readinessStatus = (histories: ManagedHistory[], data: NonNullable<ReturnType<WorkerStore["load"]>>["data"]) => {
   const requiredSymbols = new Set([
     "SPY",
+    "XLY",
+    "XLI",
+    "XLK",
     ...Object.values(data.scannerSettings.frozenUniverseBySector ?? {}).flat(),
     ...Object.keys(data.scannerSettings.frozenUniverseBySector ?? {}).filter(Boolean),
   ]);
@@ -209,13 +222,14 @@ const runSession = async (store: WorkerStore, histories: ManagedHistory[], optio
       scheduledSession: session,
       adjustment: options.adjustment,
       providerName: options.source,
+      ingestionMetadata: options.ingestionMetadata,
     });
     const snapshots = saved.data.stocks.map(stock => {
       const existing = saved.data.snapshots.find(snapshot => snapshot.stockId === stock.id);
       const history = jobs.sessionHistories.find(history => history.symbol === stock.symbol);
       if (!history?.rows.length || stock.archivedAt) return existing;
       try {
-        const snapshot = snapshotFromBars(stock, history.rows, jobs.sessionHistories.find(entry => entry.symbol === "SPY")?.rows ?? [], { source: options.source, origin: "import", adjustment: options.adjustment, datasetId: jobs.inputHash, now });
+        const snapshot = snapshotFromBars(stock, history.rows, jobs.sessionHistories.find(entry => entry.symbol === "SPY")?.rows ?? [], { source: options.source, origin: "import", adjustment: options.adjustment, datasetId: jobs.inputHash, now, metadata: options.ingestionMetadata, rightsProfileId: options.rightsProfile?.profileId });
         return { ...snapshot, plannedEntryLow: existing?.plannedEntryLow, plannedEntryHigh: existing?.plannedEntryHigh, lastThesisReviewAt: existing?.lastThesisReviewAt, riskFlags: existing?.riskFlags ?? [] };
       } catch {
         return existing;
@@ -293,6 +307,28 @@ export async function runManagedJob(store: WorkerStore, histories: ManagedHistor
   const started = performance.now();
   const now = options.now ?? new Date();
   const deadlineBudgetMs = options.deadlineBudgetMs ?? WORKER_DEFAULT_DEADLINE_BUDGET_MS;
+  if (options.sourceKind === "provider") {
+    const metadata = options.ingestionMetadata;
+    const decision = checkProductionManagedRights(options.rightsProfile, "internal_computation", metadata ? { providerIdentity: metadata.providerIdentity, providerProductId: metadata.providerProductId, now } : undefined);
+    const reason = !metadata
+      ? "missing_ingestion_contract"
+      : metadata.datasetCategory !== "daily_ohlcv"
+        ? isDeferredMarketDataCategory(metadata.datasetCategory) ? "unsupported_deferred_dataset_category" : "unsupported_dataset_category"
+        : metadata.rightsProfileId !== options.rightsProfile?.profileId
+          ? "rights_profile_identity_mismatch"
+          : decision.allowed ? undefined : rightsFailureMessage(options.rightsProfile, "internal_computation", { providerIdentity: metadata.providerIdentity, providerProductId: metadata.providerProductId, now });
+    if (reason) {
+      const saved = store.load();
+      if (!saved) throw new Error("Import a StockLedger backup before running the worker.");
+      const elapsedMs = Math.round(performance.now() - started);
+      store.updateSchedulerState({ lastInvocationAtUtc: now.toISOString(), lastRunStatus: "blocked-rights", lastSafeError: reason, now: now.getTime() });
+      return {
+        status: "blocked-rights", jobIds: [], sessions: [],
+        scheduler: store.schedulerStatus(now, saved.data.scannerSettings.providerDelayMinutesAfterClose, deadlineBudgetMs),
+        deadline: { elapsedMs, workloadSize: { symbols: histories.length, rows: 0, scheduledSessions: 0, jobStages: 0 }, deadlineBudgetMs, remainingHeadroomMs: deadlineBudgetMs - elapsedMs, withinBudget: elapsedMs <= deadlineBudgetMs, evidenceOnly: true },
+      };
+    }
+  }
   const rows = validateBatchSize(histories);
   const saved = store.load();
   if (!saved) throw new Error("Import a StockLedger backup before running the worker.");

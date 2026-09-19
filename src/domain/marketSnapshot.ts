@@ -2,6 +2,7 @@ import type { MockSnapshot, RawBarRecord, SnapshotProvenance, Stock } from "../t
 import { lastExpectedTradingDate } from "../lib/marketCalendar";
 import { validateResponse } from "../lib/eodDataProvider";
 import { getMetricContract } from "../lib/metricCatalog";
+import type { MarketDataArchiveMetadata } from "../lib/marketDataContract";
 
 const mean = (values: number[], count: number) => values.length >= count ? values.slice(-count).reduce((a, b) => a + b, 0) / count : undefined;
 const pct = (current: number, base?: number) => base !== undefined && base > 0 ? (current / base - 1) * 100 : undefined;
@@ -11,7 +12,7 @@ export const unavailableSnapshot = (stock: Stock, now = new Date()): MockSnapsho
 });
 export function snapshotFromBars(stock: Stock, bars: RawBarRecord[], benchmark: RawBarRecord[], options: {
   source: string; origin: SnapshotProvenance["origin"]; adjustment: SnapshotProvenance["adjustment"];
-  datasetId: string; now?: Date; benchmarkSymbol?: string;
+  datasetId: string; now?: Date; benchmarkSymbol?: string; metadata?: Partial<MarketDataArchiveMetadata>; rightsProfileId?: string;
 }): MockSnapshot {
   const now = options.now ?? new Date();
   const expected = lastExpectedTradingDate(now);
@@ -68,6 +69,20 @@ export function snapshotFromBars(stock: Stock, bars: RawBarRecord[], benchmark: 
     benchmarkSymbol, volumeHistorySeries: volumes, volatilityHistorySeries: ranges,
     updatedAt: now.toISOString(), sourceName: options.source, isMock: options.origin === "demo",
     freshness: latest.date < expected ? "Stale" : options.adjustment !== "adjusted" ? "Partial" : "Delayed",
-    provenance: { schemaVersion: 2, origin: options.origin, observedDate: latest.date, retrievedAt: now.toISOString(), currency: "USD", adjustment: options.adjustment, datasetId: options.datasetId },
+    provenance: {
+      schemaVersion: 2, origin: options.origin, observedDate: latest.date, retrievedAt: options.metadata?.retrievalTimestampUtc ?? now.toISOString(), currency: "USD", adjustment: options.adjustment, datasetId: options.datasetId,
+      ...(options.metadata ? {
+        providerIdentity: options.metadata.providerIdentity,
+        providerProductId: options.metadata.providerProductId,
+        datasetCategory: options.metadata.datasetCategory,
+        sourceRequestIdentity: options.metadata.sourceRequestIdentity,
+        freshnessState: options.metadata.freshnessState,
+        coverageState: options.metadata.coverageState,
+        contentHash: options.metadata.stableContentHash,
+        rightsProfileId: options.metadata.rightsProfileId,
+        validationIssues: options.metadata.validationIssues,
+        failureClass: options.metadata.failureClass,
+      } : options.rightsProfileId ? { rightsProfileId: options.rightsProfileId } : {}),
+    },
   };
 }

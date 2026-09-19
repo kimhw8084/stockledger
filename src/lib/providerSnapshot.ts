@@ -13,7 +13,7 @@ export const buildSnapshotsFromAdapters = async (stocks: Stock[], now = new Date
     if (!history?.rows.length) return { stockId: stock.id, error: history?.error ?? "No market data.", snapshot: undefined };
     try {
       return { stockId: stock.id, snapshot: snapshotFromBars(stock, history.rows, bySymbol.get("SPY")?.rows ?? [], {
-        source: "Stooq Daily Provider", origin: "provider", adjustment: "unknown", datasetId: `stooq-${stock.symbol}-${end}`, now,
+        source: "Stooq Daily Provider (research-only)", origin: "provider", adjustment: "unknown", datasetId: `stooq-${stock.symbol}-${end}`, now, rightsProfileId: "stooq:public-daily-csv:research-only",
       }), error: undefined };
     } catch (cause) { return { stockId: stock.id, error: cause instanceof Error ? cause.message : "Invalid provider data.", snapshot: undefined }; }
   });

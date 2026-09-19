@@ -17,6 +17,7 @@ import { computeProcessedFeaturesForSymbol } from "./processedFeatureEngine";
 import { loadDynamicCurrentUniverse, requiredSymbolsForRules } from "./universeProvider";
 import { contentHash } from "../domain/contentHash";
 import { FINANCIAL_TRUTH_ENGINE_VERSION, getMetricContract } from "./metricCatalog";
+import type { MarketDataArchiveMetadata } from "./marketDataContract";
 
 const PROVIDER_NAME = "Stooq Daily Provider";
 const SURVIVORSHIP_LABEL = "Current-constituent biased historical proof";
@@ -273,6 +274,7 @@ export const runDailyStockConditionScan = async (input: {
   histories?: { symbol: string; rows: RawBarRecord[]; error?: string }[];
   universeSnapshot?: UniverseSnapshot;
   scheduledSession?: string;
+  ingestionMetadata?: MarketDataArchiveMetadata;
 }) : Promise<ScannerExecutionResult> => {
   const startedAt = (input.now ?? new Date()).toISOString();
   const latestExpectedDate = input.scheduledSession ?? latestCompletedTradingDate(
@@ -322,6 +324,7 @@ export const runDailyStockConditionScan = async (input: {
     latestExpectedDate,
     input.existingBatches,
     input.adjustment ?? "unknown",
+    input.ingestionMetadata,
   );
   batch.adjustedStatus = input.adjustment ?? "unknown";
   if (batch.adjustedStatus !== "adjusted") validationIssues.push("adjusted_price_history_required");

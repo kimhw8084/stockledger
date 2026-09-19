@@ -8,6 +8,7 @@ import { notificationDigestIdentity, notificationDigestGrouping, notificationEli
 import { normalizeNotificationPreferences } from "../../src/domain/notificationPreferences";
 import { latestCompletedTradingDate, marketSessionDueAtUtc, nextUsTradingDate } from "../../src/lib/marketCalendar";
 import type { AppData, LastKnownNotificationDeliveryStatus, NotificationPreferences } from "../../src/types";
+import type { MarketDataFailureClass, MarketDataDatasetCategory, NormalizedMarketDataItem } from "../../src/lib/marketDataContract";
 import {
   jobIdFor,
   retryDelayMs,
@@ -49,6 +50,56 @@ export interface WorkerJob {
   reconciliationReplacementInputHash: string | null;
   reconciliationReason: string | null;
   reconciledAt: string | null;
+}
+
+export type IngestionRunStatus = "queued" | "running" | "completed" | "partial" | "blocked-rights" | "blocked-budget" | "failed";
+export type IngestionItemStatus = "queued" | "running" | "completed" | "partial" | "retry-wait" | "failed" | "blocked-rights" | "blocked-budget";
+
+export interface IngestionRun {
+  id: string;
+  contractVersion: string;
+  contractRevision: number;
+  providerIdentity: string;
+  providerProductId: string;
+  datasetCategory: MarketDataDatasetCategory;
+  requestedStartDate: string;
+  requestedEndDate: string;
+  rightsProfileId: string;
+  status: IngestionRunStatus;
+  requestBudget: number;
+  budgetUsed: number;
+  createdAt: string;
+  updatedAt: string;
+  lastError: string | null;
+}
+
+export interface IngestionItem {
+  id: string;
+  runId: string;
+  symbol: string;
+  status: IngestionItemStatus;
+  attempts: number;
+  nextRetryAt: number | null;
+  contentHash: string | null;
+  result: NormalizedMarketDataItem | null;
+  errorClass: MarketDataFailureClass | null;
+  errorMessage: string | null;
+  createdAt: string;
+  updatedAt: string;
+  completedAt: string | null;
+}
+
+export interface IngestionRunInput {
+  id: string;
+  contractVersion: string;
+  contractRevision: number;
+  providerIdentity: string;
+  providerProductId: string;
+  datasetCategory: MarketDataDatasetCategory;
+  requestedStartDate: string;
+  requestedEndDate: string;
+  rightsProfileId: string;
+  requestBudget: number;
 }
 
 export interface WorkerJobReconciliation {
@@ -239,15 +290,16 @@ export class WorkerStore {
     if (path !== ":memory:") chmodSync(path, 0o600);
     this.db.exec("PRAGMA journal_mode=WAL; PRAGMA foreign_keys=ON; PRAGMA busy_timeout=5000;");
     const version = Number(this.db.prepare("PRAGMA user_version").get()?.user_version ?? 0);
-    if (version !== 0 && version !== 1 && version !== 2 && version !== 3 && version !== 4 && version !== 5 && version !== 6) throw new Error("Unsupported worker database version.");
+    if (version !== 0 && version !== 1 && version !== 2 && version !== 3 && version !== 4 && version !== 5 && version !== 6 && version !== 7) throw new Error("Unsupported worker database version.");
     this.createSchema();
     if (version === 1) this.migrateV1ToV2();
     if (version === 1 || version === 2) this.migrateV2ToV3();
     if (version <= 3) this.migrateV3ToV4();
     if (version <= 4) this.migrateV4ToV5();
     if (version <= 5) this.migrateV5ToV6();
+    if (version <= 6) this.migrateV6ToV7();
     this.createIndexes();
-    this.db.exec("PRAGMA user_version=6;");
+    this.db.exec("PRAGMA user_version=7;");
   }
 
   close() { this.db.close(); }
@@ -291,6 +343,39 @@ export class WorkerStore {
         replacement_semantic_key TEXT NOT NULL,
         reason TEXT NOT NULL,
         reconciled_at TEXT NOT NULL
+      );
+      CREATE TABLE IF NOT EXISTS ingestion_runs (
+        id TEXT PRIMARY KEY,
+        contract_version TEXT NOT NULL,
+        contract_revision INTEGER NOT NULL,
+        provider_identity TEXT NOT NULL,
+        provider_product_id TEXT NOT NULL,
+        dataset_category TEXT NOT NULL,
+        requested_start_date TEXT NOT NULL,
+        requested_end_date TEXT NOT NULL,
+        rights_profile_id TEXT NOT NULL,
+        status TEXT NOT NULL,
+        request_budget INTEGER NOT NULL,
+        budget_used INTEGER NOT NULL DEFAULT 0,
+        last_error TEXT,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+      );
+      CREATE TABLE IF NOT EXISTS ingestion_items (
+        id TEXT PRIMARY KEY,
+        run_id TEXT NOT NULL REFERENCES ingestion_runs(id),
+        symbol TEXT NOT NULL,
+        status TEXT NOT NULL,
+        attempts INTEGER NOT NULL DEFAULT 0,
+        next_retry_at INTEGER,
+        content_hash TEXT,
+        result_json TEXT,
+        error_class TEXT,
+        error_message TEXT,
+        completed_at TEXT,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        UNIQUE(run_id, symbol)
       );
       CREATE TABLE IF NOT EXISTS scheduler_state (
         id INTEGER PRIMARY KEY CHECK(id=1),
@@ -399,7 +484,7 @@ export class WorkerStore {
   }
 
   private createIndexes() {
-    this.db.exec("CREATE INDEX IF NOT EXISTS jobs_due_idx ON jobs(status, next_retry_at, due_at); CREATE INDEX IF NOT EXISTS jobs_session_idx ON jobs(scheduled_session, kind); CREATE UNIQUE INDEX IF NOT EXISTS jobs_semantic_key_idx ON jobs(semantic_key); CREATE INDEX IF NOT EXISTS job_reconciliation_replacement_idx ON job_reconciliation(replacement_workflow_key, replacement_job_id); CREATE UNIQUE INDEX IF NOT EXISTS notification_semantic_channel_policy_idx ON notification_intents(semantic_key, channel, policy_key); CREATE INDEX IF NOT EXISTS notification_due_idx ON notification_intents(status, not_before, next_retry_at); CREATE INDEX IF NOT EXISTS notification_alert_idx ON notification_intents(alert_id, channel, policy_key); CREATE INDEX IF NOT EXISTS notification_attempt_intent_idx ON notification_attempts(intent_id, attempt_number); CREATE INDEX IF NOT EXISTS notification_receipt_intent_idx ON notification_receipts(intent_id, recorded_at); CREATE INDEX IF NOT EXISTS notification_digest_due_idx ON notification_digests(status, next_retry_at, digest_bucket); CREATE INDEX IF NOT EXISTS notification_digest_member_intent_idx ON notification_digest_members(intent_id, digest_id);");
+    this.db.exec("CREATE INDEX IF NOT EXISTS jobs_due_idx ON jobs(status, next_retry_at, due_at); CREATE INDEX IF NOT EXISTS jobs_session_idx ON jobs(scheduled_session, kind); CREATE UNIQUE INDEX IF NOT EXISTS jobs_semantic_key_idx ON jobs(semantic_key); CREATE INDEX IF NOT EXISTS job_reconciliation_replacement_idx ON job_reconciliation(replacement_workflow_key, replacement_job_id); CREATE INDEX IF NOT EXISTS ingestion_items_run_idx ON ingestion_items(run_id, status, next_retry_at); CREATE INDEX IF NOT EXISTS ingestion_runs_status_idx ON ingestion_runs(status, updated_at); CREATE UNIQUE INDEX IF NOT EXISTS notification_semantic_channel_policy_idx ON notification_intents(semantic_key, channel, policy_key); CREATE INDEX IF NOT EXISTS notification_due_idx ON notification_intents(status, not_before, next_retry_at); CREATE INDEX IF NOT EXISTS notification_alert_idx ON notification_intents(alert_id, channel, policy_key); CREATE INDEX IF NOT EXISTS notification_attempt_intent_idx ON notification_attempts(intent_id, attempt_number); CREATE INDEX IF NOT EXISTS notification_receipt_intent_idx ON notification_receipts(intent_id, recorded_at); CREATE INDEX IF NOT EXISTS notification_digest_due_idx ON notification_digests(status, next_retry_at, digest_bucket); CREATE INDEX IF NOT EXISTS notification_digest_member_intent_idx ON notification_digest_members(intent_id, digest_id);");
   }
 
   private migrateV1ToV2() {
@@ -484,6 +569,24 @@ export class WorkerStore {
       CREATE TABLE IF NOT EXISTS notification_digest_members (
         digest_id TEXT NOT NULL REFERENCES notification_digests(id), intent_id TEXT NOT NULL REFERENCES notification_intents(id),
         member_semantic_key TEXT NOT NULL, member_order INTEGER NOT NULL, PRIMARY KEY (digest_id, intent_id), UNIQUE (digest_id, member_semantic_key)
+      );
+    `);
+  }
+
+  private migrateV6ToV7() {
+    this.db.exec(`
+      CREATE TABLE IF NOT EXISTS ingestion_runs (
+        id TEXT PRIMARY KEY, contract_version TEXT NOT NULL, contract_revision INTEGER NOT NULL,
+        provider_identity TEXT NOT NULL, provider_product_id TEXT NOT NULL, dataset_category TEXT NOT NULL,
+        requested_start_date TEXT NOT NULL, requested_end_date TEXT NOT NULL, rights_profile_id TEXT NOT NULL,
+        status TEXT NOT NULL, request_budget INTEGER NOT NULL, budget_used INTEGER NOT NULL DEFAULT 0,
+        last_error TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL
+      );
+      CREATE TABLE IF NOT EXISTS ingestion_items (
+        id TEXT PRIMARY KEY, run_id TEXT NOT NULL REFERENCES ingestion_runs(id), symbol TEXT NOT NULL,
+        status TEXT NOT NULL, attempts INTEGER NOT NULL DEFAULT 0, next_retry_at INTEGER, content_hash TEXT,
+        result_json TEXT, error_class TEXT, error_message TEXT, completed_at TEXT, created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL, UNIQUE(run_id, symbol)
       );
     `);
   }
@@ -638,6 +741,104 @@ export class WorkerStore {
         reason, reconciled_at AS reconciledAt
       FROM job_reconciliation ORDER BY reconciled_at, source_job_id
     `).all() as unknown as WorkerJobReconciliation[];
+  }
+
+  private rowToIngestionRun(row: Record<string, unknown>): IngestionRun {
+    return {
+      id: String(row.id), contractVersion: String(row.contract_version), contractRevision: Number(row.contract_revision),
+      providerIdentity: String(row.provider_identity), providerProductId: String(row.provider_product_id), datasetCategory: String(row.dataset_category) as MarketDataDatasetCategory,
+      requestedStartDate: String(row.requested_start_date), requestedEndDate: String(row.requested_end_date), rightsProfileId: String(row.rights_profile_id),
+      status: String(row.status) as IngestionRunStatus, requestBudget: Number(row.request_budget), budgetUsed: Number(row.budget_used),
+      createdAt: String(row.created_at), updatedAt: String(row.updated_at), lastError: iso(row.last_error),
+    };
+  }
+
+  private rowToIngestionItem(row: Record<string, unknown>): IngestionItem {
+    return {
+      id: String(row.id), runId: String(row.run_id), symbol: String(row.symbol), status: String(row.status) as IngestionItemStatus,
+      attempts: Number(row.attempts), nextRetryAt: numberOrNull(row.next_retry_at), contentHash: iso(row.content_hash),
+      result: row.result_json ? JSON.parse(String(row.result_json)) as NormalizedMarketDataItem : null,
+      errorClass: iso(row.error_class) as MarketDataFailureClass | null, errorMessage: iso(row.error_message),
+      createdAt: String(row.created_at), updatedAt: String(row.updated_at), completedAt: iso(row.completed_at),
+    };
+  }
+
+  createIngestionRun(input: IngestionRunInput, symbols: string[], now = Date.now()): { run: IngestionRun; items: IngestionItem[] } {
+    return this.transaction(() => {
+      const timestamp = new Date(now).toISOString();
+      this.db.prepare(`
+        INSERT OR IGNORE INTO ingestion_runs(
+          id,contract_version,contract_revision,provider_identity,provider_product_id,dataset_category,
+          requested_start_date,requested_end_date,rights_profile_id,status,request_budget,budget_used,last_error,created_at,updated_at
+        ) VALUES(?,?,?,?,?,?,?,?,?,'queued',?,0,NULL,?,?)
+      `).run(input.id, input.contractVersion, input.contractRevision, input.providerIdentity, input.providerProductId, input.datasetCategory, input.requestedStartDate, input.requestedEndDate, input.rightsProfileId, input.requestBudget, timestamp, timestamp);
+      const itemStatement = this.db.prepare(`
+        INSERT OR IGNORE INTO ingestion_items(id,run_id,symbol,status,attempts,next_retry_at,content_hash,result_json,error_class,error_message,completed_at,created_at,updated_at)
+        VALUES(?,?,?,'queued',0,NULL,NULL,NULL,NULL,NULL,NULL,?,?)
+      `);
+      for (const symbol of [...new Set(symbols)]) itemStatement.run(`ingestion-item-${contentHash({ runId: input.id, symbol })}`, input.id, symbol, timestamp, timestamp);
+      return { run: this.getIngestionRunInside(input.id)!, items: this.listIngestionItemsInside(input.id) };
+    });
+  }
+
+  private getIngestionRunInside(id: string): IngestionRun | null {
+    const row = this.db.prepare("SELECT * FROM ingestion_runs WHERE id=?").get(id) as Record<string, unknown> | undefined;
+    return row ? this.rowToIngestionRun(row) : null;
+  }
+
+  getIngestionRun(id: string) { return this.getIngestionRunInside(id); }
+
+  private listIngestionItemsInside(runId: string): IngestionItem[] {
+    return (this.db.prepare("SELECT * FROM ingestion_items WHERE run_id=? ORDER BY symbol").all(runId) as Array<Record<string, unknown>>).map(row => this.rowToIngestionItem(row));
+  }
+
+  listIngestionItems(runId: string) { return this.listIngestionItemsInside(runId); }
+
+  claimIngestionItem(runId: string, symbol: string, now = Date.now(), maxAttempts = 3): IngestionItem | null {
+    return this.transaction(() => {
+      const row = this.db.prepare("SELECT * FROM ingestion_items WHERE run_id=? AND symbol=?").get(runId, symbol) as Record<string, unknown> | undefined;
+      if (!row) return null;
+      const item = this.rowToIngestionItem(row);
+      if (item.status === "completed" || item.status === "partial" || item.status === "blocked-rights" || item.status === "failed") return item;
+      if (item.nextRetryAt !== null && item.nextRetryAt > now) return null;
+      if (item.attempts >= maxAttempts) return item;
+      const timestamp = new Date(now).toISOString();
+      this.db.prepare("UPDATE ingestion_items SET status='running',attempts=attempts+1,next_retry_at=NULL,updated_at=? WHERE run_id=? AND symbol=?").run(timestamp, runId, symbol);
+      return this.rowToIngestionItem(this.db.prepare("SELECT * FROM ingestion_items WHERE run_id=? AND symbol=?").get(runId, symbol) as Record<string, unknown>);
+    });
+  }
+
+  finishIngestionItem(input: {
+    runId: string;
+    symbol: string;
+    status: Extract<IngestionItemStatus, "completed" | "partial" | "retry-wait" | "failed" | "blocked-rights" | "blocked-budget">;
+    result?: NormalizedMarketDataItem;
+    contentHash?: string;
+    errorClass?: MarketDataFailureClass;
+    errorMessage?: string;
+    nextRetryAt?: number | null;
+    now?: number;
+  }): IngestionItem {
+    return this.transaction(() => {
+      const timestamp = new Date(input.now ?? Date.now()).toISOString();
+      this.db.prepare(`
+        UPDATE ingestion_items SET status=?,next_retry_at=?,content_hash=?,result_json=?,error_class=?,error_message=?,completed_at=?,updated_at=?
+        WHERE run_id=? AND symbol=?
+      `).run(input.status, input.nextRetryAt ?? null, input.contentHash ?? input.result?.stableContentHash ?? null, input.result ? JSON.stringify(input.result) : null, input.errorClass ?? null, input.errorMessage?.slice(0, 240) ?? null, ["completed", "partial", "failed", "blocked-rights", "blocked-budget"].includes(input.status) ? timestamp : null, timestamp, input.runId, input.symbol);
+      const row = this.db.prepare("SELECT * FROM ingestion_items WHERE run_id=? AND symbol=?").get(input.runId, input.symbol) as Record<string, unknown> | undefined;
+      if (!row) throw new Error(`Unknown ingestion item ${input.runId}/${input.symbol}.`);
+      return this.rowToIngestionItem(row);
+    });
+  }
+
+  updateIngestionRun(id: string, patch: { status?: IngestionRunStatus; requestBudget?: number; budgetUsed?: number; lastError?: string | null; now?: number }): IngestionRun {
+    return this.transaction(() => {
+      const current = this.getIngestionRunInside(id);
+      if (!current) throw new Error(`Unknown ingestion run ${id}.`);
+      const timestamp = new Date(patch.now ?? Date.now()).toISOString();
+      this.db.prepare("UPDATE ingestion_runs SET status=?,request_budget=?,budget_used=?,last_error=?,updated_at=? WHERE id=?").run(patch.status ?? current.status, patch.requestBudget ?? current.requestBudget, patch.budgetUsed ?? current.budgetUsed, patch.lastError === undefined ? current.lastError : patch.lastError, timestamp, id);
+      return this.getIngestionRunInside(id)!;
+    });
   }
 
   private insertJobInside(job: WorkerJobContractWithId, now: number) {

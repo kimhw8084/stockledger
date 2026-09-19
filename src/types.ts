@@ -223,6 +223,16 @@ export interface SnapshotProvenance {
   currency: "USD";
   adjustment: "adjusted" | "unadjusted" | "unknown";
   datasetId: string;
+  providerIdentity?: string;
+  providerProductId?: string;
+  datasetCategory?: string;
+  sourceRequestIdentity?: string;
+  freshnessState?: string;
+  coverageState?: string;
+  contentHash?: string;
+  rightsProfileId?: string;
+  validationIssues?: string[];
+  failureClass?: string;
 }
 /** Historical name retained for import compatibility; isMock/provenance identify origin. */
 export interface MockSnapshot {
@@ -499,6 +509,24 @@ export interface RawBarArchiveBatch {
   schemaVersion: string;
   bars: RawBarRecord[];
   supersededByBatchId?: string;
+  contractVersion?: string;
+  contractRevision?: number;
+  providerIdentity?: string;
+  providerProductId?: string;
+  datasetCategory?: string;
+  requestedStartDate?: string;
+  requestedEndDate?: string;
+  observedStartDate?: string;
+  observedEndDate?: string;
+  retrievalTimestampUtc?: string;
+  sourceRequestIdentity?: string;
+  freshnessState?: string;
+  coverageState?: string;
+  contentHash?: string;
+  datasetIdentity?: string;
+  validationIssues?: string[];
+  failureClass?: string;
+  rightsProfileId?: string;
 }
 
 export interface UniverseSectorSnapshot {
