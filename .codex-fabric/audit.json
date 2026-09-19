@@ -1,0 +1,560 @@
+{
+  "accepted_at": "2026-09-19T04:13:51Z",
+  "changed_files": [
+    {
+      "additions": 25,
+      "deletions": 0,
+      "path": ".github/workflows/check.yml",
+      "status": "M"
+    },
+    {
+      "additions": 2,
+      "deletions": 0,
+      "path": "docs/operations/CLOUD_DEPLOYMENT.md",
+      "status": "M"
+    },
+    {
+      "additions": 2,
+      "deletions": 0,
+      "path": "docs/operations/LOCAL_WORKER.md",
+      "status": "M"
+    },
+    {
+      "additions": 14,
+      "deletions": 2,
+      "path": "docs/operations/RELEASE_RUNBOOK.md",
+      "status": "M"
+    },
+    {
+      "additions": 58,
+      "deletions": 0,
+      "path": "docs/production/CHG-96_EVIDENCE.md",
+      "status": "A"
+    },
+    {
+      "additions": 6,
+      "deletions": 1,
+      "path": "package.json",
+      "status": "M"
+    },
+    {
+      "additions": 2,
+      "deletions": 1,
+      "path": "scripts/benchmark-worker.ts",
+      "status": "M"
+    },
+    {
+      "additions": 15,
+      "deletions": 0,
+      "path": "scripts/operations-qualification.ts",
+      "status": "A"
+    },
+    {
+      "additions": 14,
+      "deletions": 0,
+      "path": "scripts/recovery-drill.ts",
+      "status": "A"
+    },
+    {
+      "additions": 44,
+      "deletions": 0,
+      "path": "scripts/release-evidence.ts",
+      "status": "A"
+    },
+    {
+      "additions": 26,
+      "deletions": 0,
+      "path": "scripts/verify-release-evidence.ts",
+      "status": "A"
+    },
+    {
+      "additions": 13,
+      "deletions": 2,
+      "path": "server/worker/cli.ts",
+      "status": "M"
+    },
+    {
+      "additions": 2,
+      "deletions": 2,
+      "path": "server/worker/contract.ts",
+      "status": "M"
+    },
+    {
+      "additions": 283,
+      "deletions": 0,
+      "path": "server/worker/operations.ts",
+      "status": "A"
+    },
+    {
+      "additions": 109,
+      "deletions": 0,
+      "path": "server/worker/qualification.ts",
+      "status": "A"
+    },
+    {
+      "additions": 168,
+      "deletions": 0,
+      "path": "server/worker/recovery.ts",
+      "status": "A"
+    },
+    {
+      "additions": 11,
+      "deletions": 1,
+      "path": "server/worker/store.ts",
+      "status": "M"
+    },
+    {
+      "additions": 4,
+      "deletions": 0,
+      "path": "src/operations/releaseContracts.ts",
+      "status": "A"
+    },
+    {
+      "additions": 145,
+      "deletions": 0,
+      "path": "src/operations/releaseEvidence.ts",
+      "status": "A"
+    },
+    {
+      "additions": 17,
+      "deletions": 0,
+      "path": "tests/cloud.test.ts",
+      "status": "M"
+    },
+    {
+      "additions": 9,
+      "deletions": 0,
+      "path": "tests/integration/cloud.integration.ts",
+      "status": "M"
+    },
+    {
+      "additions": 51,
+      "deletions": 0,
+      "path": "tests/operations.test.ts",
+      "status": "A"
+    },
+    {
+      "additions": 8,
+      "deletions": 0,
+      "path": "tests/qualification.test.ts",
+      "status": "A"
+    },
+    {
+      "additions": 17,
+      "deletions": 0,
+      "path": "tests/recovery.test.ts",
+      "status": "A"
+    },
+    {
+      "additions": 21,
+      "deletions": 0,
+      "path": "tests/releaseEvidence.test.ts",
+      "status": "A"
+    }
+  ],
+  "checks": [
+    {
+      "command": "/bin/zsh -lc 'rtk /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/node scripts/check-boundaries.mjs'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/node node_modules/vitest/vitest.mjs run tests/cloud.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/node node_modules/typescript/bin/tsc --noEmit'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git status --short && rtk git diff --stat && rtk git diff -- server/worker/operations.ts src/operations/releaseEvidence.ts | sed -n '1,320p'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/node /Users/haewonkim/.nvm/versions/node/v22.23.2/lib/node_modules/npm/bin/npm-cli.js test -- --run'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/local/bin:/usr/bin:/bin node --version'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/local/bin:/usr/bin:/bin npm test -- --run'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/local/bin:/usr/bin:/bin npm run check:frozen'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/local/bin:/usr/bin:/bin npm audit --audit-level=high'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/local/bin:/usr/bin:/bin npm run benchmark:worker'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/local/bin:/usr/bin:/bin npm run check'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/local/bin:/usr/bin:/bin npm run check:boundaries'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/local/bin:/usr/bin:/bin npm run recovery:drill -- --output /tmp/chg96-recovery-final.json'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/local/bin:/usr/bin:/bin EXPO_NO_DOTENV=1 npm run export:all'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/local/bin:/usr/bin:/bin npm run test:e2e'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/local/bin:/usr/bin:/bin npm run test:cloud'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/local/bin:/usr/bin:/bin npm audit --audit-level=high'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/local/bin:/usr/bin:/bin npm run benchmark:worker'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/local/bin:/usr/bin:/bin npm run operations:qualify -- --output /tmp/chg96-operations-final.json'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk wc -l server/worker/operations.ts server/worker/recovery.ts server/worker/qualification.ts src/operations/releaseEvidence.ts scripts/recovery-drill.ts scripts/operations-qualification.ts scripts/release-evidence.ts scripts/verify-release-evidence.ts docs/production/CHG-96_EVIDENCE.md tests/operations.test.ts tests/recovery.test.ts tests/releaseEvidence.test.ts tests/qualification.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git status --short --branch'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git diff --check'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/local/bin:/usr/bin:/bin npm run check:boundaries'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/local/bin:/usr/bin:/bin npm run typecheck'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git diff --check'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/local/bin:/usr/bin:/bin npm run test -- --run tests/operations.test.ts tests/recovery.test.ts tests/releaseEvidence.test.ts tests/qualification.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/local/bin:/usr/bin:/bin npm run typecheck'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git add . && rtk git diff --cached --check && rtk git diff --cached --stat && rtk git diff --cached --name-only'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git diff --cached -- src/operations/releaseEvidence.ts scripts/release-evidence.ts scripts/verify-release-evidence.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git diff --cached -- server/worker/recovery.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git diff --cached -- .github/workflows/check.yml package.json'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git diff --cached -- server/worker/operations.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git diff --cached -- docs/production/CHG-96_EVIDENCE.md docs/operations/RELEASE_RUNBOOK.md'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git commit -m \"feat(operations): add recovery and release evidence foundation\"'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git status --short --branch'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/local/bin:/usr/bin:/bin npm run release:evidence -- --output artifacts/release-evidence.json --base 62c21af2f781b3ff53505f4582d86e24fead528d --artifacts dist'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/local/bin:/usr/bin:/bin npm run release:verify -- --input artifacts/release-evidence.json --artifacts dist --base 62c21af2f781b3ff53505f4582d86e24fead528d && rtk git status --short --branch && rtk git rev-parse HEAD && rtk git rev-parse HEAD''^{tree}'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git diff --check'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/local/bin:/usr/bin:/bin node node_modules/tsx/dist/cli.mjs server/worker/cli.ts --status --db /tmp/chg96-status-bound.json --release-evidence artifacts/release-evidence.json'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/local/bin:/usr/bin:/bin npm run typecheck'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git add server/worker/cli.ts docs/production/CHG-96_EVIDENCE.md docs/operations/LOCAL_WORKER.md && rtk git diff --cached --check && rtk git commit --amend --no-edit'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git rev-parse HEAD && rtk git rev-parse HEAD''^{tree} && rtk git status --short --branch'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/local/bin:/usr/bin:/bin npm run release:evidence -- --output artifacts/release-evidence.json --base 62c21af2f781b3ff53505f4582d86e24fead528d --artifacts dist'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/local/bin:/usr/bin:/bin npm run release:verify -- --input artifacts/release-evidence.json --artifacts dist --base 62c21af2f781b3ff53505f4582d86e24fead528d'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git diff --check && rtk git status --short --branch'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/local/bin:/usr/bin:/bin npm run check:frozen'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/local/bin:/usr/bin:/bin npm run operations:status -- --db /tmp/chg96-final-status.sqlite --release-evidence artifacts/release-evidence.json'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/local/bin:/usr/bin:/bin npm run check'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git push --set-upstream origin codex/stockledger-prod-c09-operations-recovery-release-foundation-v1'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git status --short --branch && rtk git log -1 --oneline --decorate && rtk git rev-parse HEAD && rtk git rev-parse origin/codex/stockledger-prod-c09-operations-recovery-release-foundation-v1 && rtk git diff --check 62c21af2f781b3ff53505f4582d86e24fead528d..HEAD && rtk git diff --stat 62c21af2f781b3ff53505f4582d86e24fead528d..HEAD'",
+      "exit_code": 0,
+      "type": "command_execution"
+    }
+  ],
+  "codex": {
+    "cli_version": "codex-cli 0.154.0",
+    "configured_model": "gpt-5.6-luna",
+    "event_count": 377,
+    "provider_reported_model": null,
+    "reasoning_effort": "xhigh",
+    "terminal_type": "turn.completed",
+    "usage": {
+      "cache_hit_percent": 97.84,
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 18534400,
+      "fresh_input_tokens": 410131,
+      "input_tokens": 18944531,
+      "non_reasoning_output_tokens": 44810,
+      "output_tokens": 67614,
+      "reasoning_output_tokens": 22804,
+      "total_processed_tokens": 19012145
+    },
+    "warnings": []
+  },
+  "commits": [
+    {
+      "sha": "09d520a29b2b0e319dc1937e6eb97ae96ede7466",
+      "subject": "feat(operations): add recovery and release evidence foundation"
+    }
+  ],
+  "diff": {
+    "additions": 1066,
+    "changed_files": 25,
+    "commit_count": 1,
+    "deletions": 9
+  },
+  "error_code": null,
+  "evidence_manifest": {
+    "count": 9,
+    "items": [
+      {
+        "bytes": 9365,
+        "path": "docs/operations/CLOUD_DEPLOYMENT.md",
+        "sha256": "21e093aa5add9df66fd74936c9caf90f6ca26ea40c441de6ed5381e9f294c510"
+      },
+      {
+        "bytes": 24203,
+        "path": "docs/operations/LOCAL_WORKER.md",
+        "sha256": "fe3a49b744948b8464dee9da230dff54c9f408ebb8eb8b4e1df13afa2cf93e46"
+      },
+      {
+        "bytes": 5329,
+        "path": "docs/operations/RELEASE_RUNBOOK.md",
+        "sha256": "e3c3a0d4222ced9bc1f4fb68d5d044a234c712bd8fe31468c0c55957ad25478f"
+      },
+      {
+        "bytes": 6569,
+        "path": "docs/production/CHG-96_EVIDENCE.md",
+        "sha256": "7f4016f94645052ce87cbb417e7937b58cac4c020cb68223abda68acfbf86f68"
+      },
+      {
+        "bytes": 2464,
+        "path": "package.json",
+        "sha256": "18c5354141838e0a2024e8eb85658ff88d1d120a382c01ce3c0e07a2e60a8a1d"
+      },
+      {
+        "bytes": 2909,
+        "path": "scripts/release-evidence.ts",
+        "sha256": "d1ad6231e36c33692253a08f42bac824768849fc38f04469d0b0e73d8be739e9"
+      },
+      {
+        "bytes": 2509,
+        "path": "scripts/verify-release-evidence.ts",
+        "sha256": "552ccbfaef7ceaa89aad2eeb4b50965632242a5e2c7bd753170bc3dcf9a39f77"
+      },
+      {
+        "bytes": 10078,
+        "path": "src/operations/releaseEvidence.ts",
+        "sha256": "8a70688219b7fba1c1f7a5b277a0bc2d24bf5967033d416b00d88c44ff3ba21b"
+      },
+      {
+        "bytes": 1547,
+        "path": "tests/releaseEvidence.test.ts",
+        "sha256": "8ee5ce45337ef836d1d3b6ebbb9fc92df58ef3ff3ca759b19ea9ac3ea317a301"
+      }
+    ],
+    "version": 1
+  },
+  "evidence_publisher_release": "1.2.3-resume-candidate",
+  "fabric_capture": {
+    "applied": false,
+    "paths_before": 0,
+    "transient_untracked_removed": {
+      "count": 0,
+      "items": []
+    }
+  },
+  "fabric_release": "1.2.3-resume-candidate",
+  "failure_class": null,
+  "finished_at": "2026-09-19T04:39:26Z",
+  "git": {
+    "base_is_ancestor": true,
+    "base_sha": "62c21af2f781b3ff53505f4582d86e24fead528d",
+    "branch": "codex/stockledger-prod-c09-operations-recovery-release-foundation-v1",
+    "detached_verify": false,
+    "head_sha": "09d520a29b2b0e319dc1937e6eb97ae96ede7466",
+    "remote_exact_head": true,
+    "remote_head_sha": "09d520a29b2b0e319dc1937e6eb97ae96ede7466",
+    "target_branch": "main",
+    "target_drifted_since_acceptance": false,
+    "target_head_observed_after_execution": "62c21af2f781b3ff53505f4582d86e24fead528d",
+    "work_branch": "codex/stockledger-prod-c09-operations-recovery-release-foundation-v1",
+    "worktree_clean": true
+  },
+  "instructions": {
+    "files": [],
+    "total_bytes": 0,
+    "warning": null
+  },
+  "job_id": "CF-5d73037695a6fbfea212604e",
+  "kind": "codex-fabric-audit-evidence",
+  "locator": {
+    "branch": "codex-fabric/evidence/stockledger/prod-c09-operations-recovery-release-foundation-v1",
+    "path": ".codex-fabric/audit.json",
+    "ref": "refs/heads/codex-fabric/evidence/stockledger/prod-c09-operations-recovery-release-foundation-v1"
+  },
+  "operation": "BUILD",
+  "policy": {
+    "environment_policy_sha256": "e077daca74297b3c30bee8989f00f8ca5338f7610b4d016a6c48db524205d064",
+    "fabric_release": "1.2.3-resume-candidate",
+    "policy_sha256": "44756118cd7fda0c45cd23ba1d31a48a3f4f2422d687df15264ba4406f40e1f2",
+    "registry_sha256": "cfc765f3211c37c7967a138f3b2d89a99341939b15b2623f92744d007f625d6f"
+  },
+  "project_id": "stockledger",
+  "recovery": {
+    "model_rerun_safe": false,
+    "recovery_required": false,
+    "retry_safe": false,
+    "retry_scope": null,
+    "worktree_retained": true
+  },
+  "request": "prod-c09-operations-recovery-release-foundation-v1",
+  "schema_version": 1,
+  "started_at": "2026-09-19T04:13:51Z",
+  "status": "EXECUTED_CHANGE",
+  "timing": {
+    "execution_seconds": 1535,
+    "queue_seconds": 0,
+    "total_seconds": 1535
+  },
+  "transport": {
+    "bytes": 16173,
+    "envelope": "FABRIC/2",
+    "prompt_bytes": 15801,
+    "prompt_sha256": "a9e62fec58cab61ae5a19ed8f6b359d4be8c5b7b168bd8f35b6063520395541f",
+    "sha256": "5d73037695a6fbfea212604e7dc6eda008b08f0d634f7e56386b5adb2847b240"
+  }
+}
