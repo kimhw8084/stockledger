@@ -5,11 +5,13 @@ import { parseExport, serializeExport } from "../../src/domain/backupFormat";
 import { normalizeToSchema } from "../../src/lib/eodDataProvider";
 import { runWorker } from "./run";
 import { WorkerStore } from "./store";
+import { createOperationsStatus } from "./operations";
+import { readReleasePackage, verifyRuntimeReleaseEvidence } from "./releaseEvidenceRuntime";
 
 const { values } = parseArgs({ options: {
   db: { type: "string", default: ".local/stockledger.sqlite" }, import: { type: "string" }, "import-revision": { type: "string" },
   csv: { type: "string" }, output: { type: "string", default: ".local/StockLedger-worker.json" }, backup: { type: "string" },
-  adjustment: { type: "string", default: "unknown" }, source: { type: "string", default: "Local CSV import" }, managed: { type: "boolean" }, status: { type: "boolean" }, help: { type: "boolean" },
+  adjustment: { type: "string", default: "unknown" }, source: { type: "string", default: "Local CSV import" }, managed: { type: "boolean" }, status: { type: "boolean" }, "release-evidence": { type: "string" }, help: { type: "boolean" },
 } });
 
 const help = () => console.log(`StockLedger worker
@@ -17,6 +19,7 @@ const help = () => console.log(`StockLedger worker
 --csv DIRECTORY evaluates SYMBOL.csv files; --adjustment adjusted|unadjusted|unknown declares provider metadata.
 --managed invokes the provider-independent production job contract used by external cron/job platforms. It does not install a hosted scheduler.
 --status prints machine-readable scheduler coverage/status without running work.
+--release-evidence FILE supplies source-bound evidence to --status; it is accepted only after independent verification with STOCKLEDGER_PROTECTED_BASE.
 --output FILE exports a validated app backup. --backup FILE creates a consistent SQLite snapshot.
 --db FILE selects the worker database. Evaluation does not contact a provider; server-only delivery is a separate runNotificationDelivery phase.`);
 
@@ -37,7 +40,24 @@ async function main() {
     }
     if (values.status) {
       const workspace = store.load();
-      console.log(JSON.stringify({ scheduler: store.schedulerStatus(new Date(), workspace?.data.scannerSettings.providerDelayMinutesAfterClose ?? 45) }));
+      const scheduler = store.schedulerStatus(new Date(), workspace?.data.scannerSettings.providerDelayMinutesAfterClose ?? 45);
+      const packageJson = readReleasePackage();
+      const releaseIdentity = (() => {
+        if (!values["release-evidence"]) return { state: "unavailable" as const, reason: "release_identity_unavailable" as const, sourceCommit: null, sourceTree: null };
+        try {
+          return verifyRuntimeReleaseEvidence(JSON.parse(readFileSync(resolve(values["release-evidence"]!), "utf8")), process.env.STOCKLEDGER_PROTECTED_BASE);
+        } catch {
+          return { state: "mismatched" as const, reason: "release_identity_mismatched" as const, sourceCommit: null, sourceTree: null };
+        }
+      })();
+      const operations = createOperationsStatus(store, {
+        appVersion: packageJson.version,
+        nodeRequirement: packageJson.engines?.node ?? "unknown",
+        sourceIdentity: { commit: releaseIdentity.sourceCommit, tree: releaseIdentity.sourceTree, state: releaseIdentity.state, reason: releaseIdentity.reason },
+      });
+      // Keep the historical scheduler shape, but replace free-form worker errors
+      // with the safe versioned projection so --status cannot print private input.
+      console.log(JSON.stringify({ scheduler: { ...scheduler, lastSafeError: operations.scheduler.lastErrorClass }, operations }));
       return;
     }
     if (values.csv) {

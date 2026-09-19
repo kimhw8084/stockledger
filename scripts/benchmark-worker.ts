@@ -3,6 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { WorkerStore } from "../server/worker/store";
 import { runWorker } from "../server/worker/run";
+import { createOperationsStatus } from "../server/worker/operations";
 import { seedData } from "../src/lib/seed";
 import { previousUsTradingDate } from "../src/lib/marketCalendar";
 async function main() {
@@ -20,7 +21,7 @@ async function main() {
     const result = await runWorker(store, histories, { source: "Synthetic benchmark", adjustment: "adjusted", now });
     const elapsedMs = Math.round(performance.now() - started);
     const saved = store.load()!;
-    console.log(JSON.stringify({ synthetic: true, stocks: 100, sessions: 260, evaluations: saved.data.evaluations?.length, scannerRows: saved.data.scanSignals.length, elapsedMs, databaseBytesIncludingWal: [path, path + "-wal", path + "-shm"].reduce((sum, file) => sum + (existsSync(file) ? statSync(file).size : 0), 0), workspaceBytes: Buffer.byteLength(JSON.stringify(saved.data)), endingRssBytes: process.memoryUsage().rss, integrity: store.integrityCheck(), deadlineEvidence: { elapsedMs: result.deadline.elapsedMs, workloadSize: { stocks: 100, sessions: 260, symbols: result.deadline.workloadSize.symbols, rows: result.deadline.workloadSize.rows, jobStages: result.deadline.workloadSize.jobStages }, deadlineBudgetMs: result.deadline.deadlineBudgetMs, remainingHeadroomMs: result.deadline.remainingHeadroomMs, withinBudget: result.deadline.withinBudget, evidenceOnly: true } }, null, 2));
+    console.log(JSON.stringify({ synthetic: true, stocks: 100, sessions: 260, evaluations: saved.data.evaluations?.length, scannerRows: saved.data.scanSignals.length, elapsedMs, databaseBytesIncludingWal: [path, path + "-wal", path + "-shm"].reduce((sum, file) => sum + (existsSync(file) ? statSync(file).size : 0), 0), workspaceBytes: Buffer.byteLength(JSON.stringify(saved.data)), endingRssBytes: process.memoryUsage().rss, integrity: store.integrityCheck(), operations: createOperationsStatus(store, { observedAt: now, appVersion: "benchmark" }), deadlineEvidence: { elapsedMs: result.deadline.elapsedMs, workloadSize: { stocks: 100, sessions: 260, symbols: result.deadline.workloadSize.symbols, rows: result.deadline.workloadSize.rows, jobStages: result.deadline.workloadSize.jobStages }, deadlineBudgetMs: result.deadline.deadlineBudgetMs, remainingHeadroomMs: result.deadline.remainingHeadroomMs, withinBudget: result.deadline.withinBudget, evidenceOnly: true } }, null, 2));
   } finally { store.close(); rmSync(directory, { recursive: true, force: true }); }
 }
 main().catch(error => { console.error(error); process.exitCode = 1; });

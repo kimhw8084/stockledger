@@ -107,6 +107,8 @@ For machine-readable coverage without running work:
 npm run worker -- --status --db /absolute/path/worker.sqlite
 ```
 
+The same command now includes the versioned `stockledger-operations-status-v1` projection. Add `--release-evidence /absolute/path/release-evidence.json` when a verified source-bound manifest is available to bind the reported source identity. It is a repository-owned diagnostic view over the existing workspace, scheduler, jobs, ingestion, notification and SQLite recovery state. It reports safe state/error classes and bounded measurements only; it never prints private workspace fields, raw provider payloads, notification destinations/bodies or credentials. `npm run recovery:drill` runs the synthetic backup/restore rejection drill, and `npm run operations:qualify` runs bounded synthetic workload/retry/storage/recovery qualification. Their JSON is evidence only, not a hosted availability or capacity claim.
+
 The JSON includes contract version/revision, `lastSuccessfulRunAtUtc`, `latestExpectedCompletedSession`, `nextDueAtUtc`, deadline budget/deadline, missed sessions, per-status counts including audit-only `superseded`, completed/partial/blocked/retrying/terminal-failed sessions, pending outbox intents, and the truthful local dependency. `schedulerInstalled` is always `false` in this repository because no schedule was installed here.
 
 The app cannot show this as live monitoring: app and worker storage remain an explicit export/import handoff, not synchronization. Import the worker export into the app to review results. Do not add a UI claim that a schedule is installed or that app opening drives the worker.

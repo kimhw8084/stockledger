@@ -15,13 +15,20 @@
     "export:web": "EXPO_NO_DOTENV=1 expo export --platform web",
     "worker": "tsx server/worker/cli.ts",
     "check:boundaries": "node scripts/check-boundaries.mjs",
+    "check:release-base": "node scripts/check-release-base.mjs",
+    "check:release-workflow": "node scripts/check-release-workflow.mjs",
     "check:frozen": "tsx scripts/validate-frozen-research-bundle.ts",
     "profile:workspace": "tsx scripts/profile-workspace.ts",
     "test:e2e": "playwright test",
     "test:cloud": "tsx tests/integration/cloud.integration.ts",
     "export:all": "EXPO_NO_DOTENV=1 expo export --platform all",
     "preview": "node scripts/serve-preview.mjs",
-    "benchmark:worker": "tsx scripts/benchmark-worker.ts"
+    "benchmark:worker": "tsx scripts/benchmark-worker.ts",
+    "operations:status": "tsx server/worker/cli.ts --status",
+    "recovery:drill": "tsx scripts/recovery-drill.ts",
+    "operations:qualify": "tsx scripts/operations-qualification.ts",
+    "release:evidence": "tsx scripts/release-evidence.ts",
+    "release:verify": "tsx scripts/verify-release-evidence.ts"
   },
   "dependencies": {
     "@expo/metro-runtime": "~57.0.15",

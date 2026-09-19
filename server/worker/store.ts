@@ -22,6 +22,8 @@ import {
   type WorkerJobKind,
   type WorkerJobStatus,
 } from "./contract";
+import { WORKER_DATABASE_SCHEMA_VERSION } from "../../src/operations/releaseContracts";
+export { WORKER_DATABASE_SCHEMA_VERSION } from "../../src/operations/releaseContracts";
 
 export interface WorkerJob {
   id: string;
@@ -283,8 +285,10 @@ const numberOrNull = (value: unknown) => value === null || value === undefined ?
 
 export class WorkerStore {
   private db: DatabaseSync;
+  readonly path: string;
 
   constructor(path: string) {
+    this.path = path;
     if (path !== ":memory:") mkdirSync(dirname(path), { recursive: true, mode: 0o700 });
     this.db = new DatabaseSync(path);
     if (path !== ":memory:") chmodSync(path, 0o600);
@@ -299,7 +303,7 @@ export class WorkerStore {
     if (version <= 5) this.migrateV5ToV6();
     if (version <= 6) this.migrateV6ToV7();
     this.createIndexes();
-    this.db.exec("PRAGMA user_version=7;");
+    this.db.exec(`PRAGMA user_version=${WORKER_DATABASE_SCHEMA_VERSION};`);
   }
 
   close() { this.db.close(); }
@@ -793,6 +797,10 @@ export class WorkerStore {
   }
 
   listIngestionItems(runId: string) { return this.listIngestionItemsInside(runId); }
+
+  listIngestionRuns(): IngestionRun[] {
+    return (this.db.prepare("SELECT * FROM ingestion_runs ORDER BY created_at,id").all() as Array<Record<string, unknown>>).map(row => this.rowToIngestionRun(row));
+  }
 
   claimIngestionItem(runId: string, symbol: string, now = Date.now(), maxAttempts = 3): IngestionItem | null {
     return this.transaction(() => {
@@ -1647,6 +1655,8 @@ export class WorkerStore {
       lastSafeError: currentJobSafeError ?? state?.lastSafeError ?? (state ? null : jobs.find(job => job.lastSafeError)?.lastSafeError ?? null),
     };
   }
+
+  databaseSchemaVersion() { return Number(this.db.prepare("PRAGMA user_version").get()?.user_version ?? 0); }
 
   async backup(path: string) { mkdirSync(dirname(path), { recursive: true, mode: 0o700 }); await backup(this.db, path); chmodSync(path, 0o600); }
   integrityCheck() { return this.db.prepare("PRAGMA integrity_check").get()?.integrity_check === "ok"; }

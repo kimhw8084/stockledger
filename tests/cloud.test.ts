@@ -43,6 +43,23 @@ it("rolls back a whole batch when one record conflicts", async () => {
   ])).rejects.toThrow(/Revision conflict/);
   expect((await db.query("select * from public.ledger_records where record_id='stock-new'")).rows).toHaveLength(0);
 });
+it("keeps owner-scoped revisions and tombstones after an application-owned recovery rollback", async () => {
+  await asUser(other);
+  const recordId = "recovery-rollback-stock";
+  await apply("44444444-4444-4444-8444-444444444441", change(0, { id: recordId, symbol: "REC" }, recordId));
+  const beforeRollback = (await db.query<{ revision: number; deleted: boolean }>(`select revision,deleted from public.ledger_records where record_id='${recordId}'`)).rows[0];
+  await expect(apply("44444444-4444-4444-8444-444444444442", [
+    { ...change(0)[0] },
+    { ...change(0, { id: recordId, symbol: "REC-CONFLICT" }, recordId)[0], expectedRevision: 0 },
+  ])).rejects.toThrow(/Revision conflict/);
+  const afterRollback = (await db.query<{ revision: number; deleted: boolean }>(`select revision,deleted from public.ledger_records where record_id='${recordId}'`)).rows[0];
+  expect(afterRollback).toEqual(beforeRollback);
+  await apply("44444444-4444-4444-8444-444444444443", [{ ...change(1, { id: recordId, symbol: "REC" }, recordId)[0], deleted: true }]);
+  const tombstone = (await db.query<{ deleted: boolean; revision: number }>(`select deleted,revision from public.ledger_records where record_id='${recordId}'`)).rows[0];
+  expect(tombstone).toEqual({ deleted: true, revision: 2 });
+  await asUser(owner);
+  expect((await db.query(`select * from public.ledger_records where record_id='${recordId}'`)).rows).toHaveLength(0);
+});
 it("rejects writes after account removal even with an old subject claim", async () => {
   await db.exec(`reset role; delete from auth.users where id='${other}'`);
   await asUser(other);
