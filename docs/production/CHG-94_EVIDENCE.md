@@ -3,8 +3,8 @@
 ## Exact base and scope
 
 - Protected-main base: 4b4fc73a27b1a58a47405fe8cdf18c7ecf79975f (origin/main).
-- Prior candidate carried forward exactly before correction: b5912cc9dcc5d7fe71a4e1cdbd2002a9e0b74c07.
-- Final implementation commit: 77dbde2 (the evidence publication commit is its direct child and is reported in the Fabric handoff).
+- Exact R2 candidate carried forward before correction: dbf622b4700e5c4e9e0317858ac74e086a6a967b, with executable control implementation 77dbde223441edbb006867cacebe0f0e9c09a49f and its direct evidence-only child. Its complete ancestry from protected-main was replayed as local commits 1c27974, 43deb8a and a876e3a before correction.
+- Immediate-preflight correction implementation commit: 38bd19516450518d544ca53d94fbce161bf45ec1 (the evidence publication commit is its direct child and is reported in the Fabric handoff).
 - Branch: codex/stockledger-prod-c07-notification-control-fix-v1.
 - No merge to main and no external deployment were performed. The final implementation and evidence commit hashes are supplied in the Fabric handoff because a commit cannot embed its own hash without becoming self-referential.
 - Runtime proved for this work: Node v22.23.2 from .nvmrc, npm 10.9.8.
@@ -26,6 +26,7 @@
 - App settings/model/i18n: accessible EN/KR consent/channel/configuration, privacy, quiet-hours, digest, last-status boundary and actionable unconfigured/opt-out UI.
 - Tests: focused lifecycle/provider/privacy/persistence tests and browser coverage.
 - Operations/evidence docs: exact guarantees and external gates.
+- CHG-94 correction: non-digest claimed-intent preflight now distinguishes true revocation from still-eligible policy drift, rolls back the claim-only attempt increment on cancellation/replan, and fences SMTP before recipient and DATA submission.
 
 ## Lifecycle guarantees proved
 
@@ -41,7 +42,7 @@
 | Privacy | Minimal messages contain only a generic review-needed sentence and safe alert deep link/semantic message identity. Thesis text, notes, holdings, evidence and cloud payloads are excluded. Diagnostics contain IDs, channel/state/attempt/timestamps and bounded error classes only. |
 | Transport | An isolated local SMTP server received actual RFC-style request serialization; 250 is recorded as provider-accepted/ambiguous, not delivered. Local test transport proves explicit confirmed receipts and semantic idempotency. Definitive SMTP rejection and post-DATA timeout were exercised. |
 | Availability/account | Missing destination/transport is blocked-unconfigured; recovery can release it. Delivery only exists while the local worker and configured server-side transport run. Account-owned pending work can be canceled on explicit invalidation; unconnected services are not claimed canceled. |
-| In-flight opt-out fence | Claim captures preference updatedAt/hash. Immediately before transport acceptance, a transaction rereads current preferences, alert snooze/account validity and cancellation state. Revoked work is canceled without an attempt; a cancellation request against an existing claim preserves claim history. The SMTP adapter checks the fence before `DATA`; after bytes may be accepted, provider-accepted/ambiguous evidence remains immutable and is never rewritten as canceled. |
+| In-flight opt-out fence | Claim captures preference updatedAt/hash. Immediately before transport acceptance, a transaction rereads current preferences, alert snooze/account validity and cancellation state. Revoked work is canceled without an attempt; a still-eligible destination/privacy/mode/timing drift returns a non-terminal replan with the claim-only increment rolled back. The SMTP adapter fences before `MAIL`/`RCPT TO` and again before `DATA`; after bytes may be accepted, provider-accepted/ambiguous evidence remains immutable and is never rewritten as canceled. |
 | App/worker handoff | Worker import reconciles notification policy in the same workspace-replacement transaction. Opt-out cancels eligible pending/retry/blocked work; destination/privacy/timing changes update eligible work; delivered/ambiguous history is untouched. The safe v1 last-known projection contains only status/timestamps/count/error class/preference timestamp/hash, travels in the explicit backup, remains device-local and outside CHG-93 synced collections, and is labeled worker-only in the app. |
 
 ## Verification commands and exits
@@ -50,17 +51,18 @@ All commands ran from this worktree with Node v22.23.2; the rtk command wrapper 
 
 | Command | Exit | Evidence |
 |---|---:|---|
-| node --version / npm --version | 0 | v22.23.2 / 10.9.8. |
+| node --version / npm --version | 0 | v22.23.2 / 10.9.8; the obsolete positive `--experimental-sqlite` launcher flag was removed because Node 22.23.2 enables `node:sqlite` by default. |
 | npm ci | 0 | 595 packages installed; npm reported 0 vulnerabilities. |
 | npm run typecheck | 0 | Strict TypeScript passed. |
-| npm test -- --run | 0 | 17 test files and 154 tests passed on the final run. |
+| npm test -- --run | 0 | 17 test files and 161 tests passed on the final run. |
 | npm test -- --run tests/worker.test.ts | 0 | 28 worker tests passed. |
-| npm test -- --run tests/notification.test.ts | 0 | 25 focused delivery tests passed, including real digest batching, deterministic member linkage, concurrent claims, restart/idempotency, shared five-attempt retry, ambiguous reconciliation, member cancellation, opt-out fencing, import reconciliation, projection safety, preference changes, quiet/snooze/outage recovery, privacy, SMTP serialization/rejection/timeout and backup round-trip. |
-| npm run benchmark:worker | 0 | Synthetic 100-stock/260-session run: 2,837 ms, 1,800,000 ms budget, 1,797,163 ms remaining, SQLite integrity true; database including WAL 12,505,456 bytes, workspace 5,813,608 bytes, RSS 234,176,512 bytes. |
+| npm test -- --run tests/notification.test.ts | 0 | 32 focused delivery tests passed, including real digest batching, deterministic member linkage, concurrent claims, restart/idempotency, shared five-attempt retry, ambiguous reconciliation, member cancellation, opt-out fencing, import reconciliation, projection safety, destination/privacy/mode/timing replans, quiet/snooze/outage recovery, privacy, SMTP serialization/rejection/timeout/no-submission and backup round-trip. |
+| strongest immediate-preflight/replan focus (`npm test -- --run tests/notification.test.ts -t 'rolls back an immediate claim\|replans a claimed destination\|replans privacy\|replans immediate-to-digest\|returns a claimed intent\|fences the former token\|cancels or replans SMTP'`) | 0 | 7 focused tests passed; 25 unrelated notification tests skipped by the filter. |
+| npm run benchmark:worker | 0 | Synthetic 100-stock/260-session run: 2,451 ms, 1,800,000 ms budget, 1,797,549 ms remaining, SQLite integrity true; database including WAL 12,505,456 bytes, workspace 5,813,608 bytes, RSS 258,228,224 bytes. |
 | npm run check:boundaries | 0 | Client secret/runtime parser/server-import boundary passed. |
 | npm run check:frozen | 0 | Structural frozen bundle check passed; existing research status remains blocked_unverified for its documented independent-golden-output/survivorship/point-in-time/forward-proof limits. |
 | npm run export:all | 0 | Web, iOS and Android Expo bundles exported. |
-| npm run test:e2e | 0 | 16 desktop/mobile journeys passed, including imported last-known worker state and pending preference handoff. The first attempt exited before tests because `dist` was not yet exported; `npm run export:all` then completed and the clean rerun exited 0. |
+| npm run test:e2e | 0 | 16 desktop/mobile journeys passed, including imported last-known worker state and pending preference handoff. |
 | git diff --check | 0 | No whitespace errors. |
 | npm audit --audit-level=high | 0 | No high-or-higher audit findings. |
 | npm run test:cloud | N/A | CHG-93 sync/Supabase schema was not changed; no cloud stack was contacted. |
@@ -80,6 +82,20 @@ Minimal digest content is generic and contains no thesis text, notes, evidence, 
 | After claim, before acceptance | Cancellation generation/preference fence is observed by transactional preflight. | Claimed work is canceled without consuming a transport retry. |
 | Transport waiting before acceptance | The transport callback rechecks the fence immediately before SMTP `DATA`/test acceptance. | No submission and no false delivered receipt; digest members are re-grouped deterministically if eligible members remain. |
 | After bytes may be accepted | Existing accepted/ambiguous evidence wins over the late opt-out. | Attempt is recorded as provider-accepted/ambiguous; it is not rewritten as canceled and is not blindly resent. |
+
+## Immediate preflight/replan correction proof
+
+The immediate path now treats the claim increment as provisional. A claim changes `attempt_count` from `n` to `n+1`; a true revocation or still-eligible policy drift observed before acceptance clears the lease/token, restores the durable policy state and atomically changes it back to `n`. Neither path inserts a `notification_attempts` or `notification_receipts` row. The next eligible pass may claim the refreshed semantic intent and consume exactly one attempt only when transport acceptance proceeds.
+
+| Race | Durable result | Attempt and transport proof |
+|---|---|---|
+| Opt-out/disabled/disallowed/below-priority/account invalidation/alert disappearance after immediate claim | `canceled`, terminal cancellation reason preserved, lease/token cleared | `attempt_count` returns to zero for a first claim; zero attempt rows, zero receipts, no submission; projection reports no phantom attempt. |
+| Destination/privacy/mode/timezone/quiet-hours or digest `notBefore` drift after claim while still eligible | `pending`, `held` or `blocked-unconfigured` with current fields, semantic intent identity and alert history preserved | `replan` is internal only; claim increment is rolled back, no attempt/receipt is written, and the stale token cannot record an outcome. |
+| Immediate → digest drift | Refreshed intent is held/re-pending and regrouped by the existing deterministic digest contract | The next pass creates/joins the digest; no stale standalone submission is accepted. |
+| SMTP fence before recipient or DATA | `canceled` or `replan` returned before `RCPT TO`/`DATA` | No message body, attempt or false receipt; rendering is deferred until after the final pre-DATA fence. |
+| Policy change after bytes may be accepted | Existing provider-accepted/ambiguous state | The late policy change cannot rewrite immutable transport evidence as canceled. |
+
+Regression coverage includes opt-out projection/attempt-count proof, exactly-once new-destination delivery and replay, new privacy rendering, immediate-to-digest deterministic member linkage, quiet-hours hold, stale-token rejection, SMTP recipient/DATA/body fencing, and true-revocation versus policy-drift durable-state distinction.
 
 ## App/worker handoff projection
 
