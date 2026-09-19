@@ -60,15 +60,7 @@ export const Card = ({
   </View>
 );
 
-export const Button = ({
-  label,
-  onPress,
-  tone = "primary",
-  disabled = false,
-  style,
-  accessibilityLabel,
-  accessibilityHint,
-}: {
+interface ButtonProps {
   label: string;
   onPress: () => void | Promise<unknown>;
   tone?: "primary" | "secondary" | "ghost" | "risk";
@@ -76,12 +68,23 @@ export const Button = ({
   style?: any;
   accessibilityLabel?: string;
   accessibilityHint?: string;
-}) => {
+}
+
+export const Button = React.forwardRef<any, ButtonProps>(function Button({
+  label,
+  onPress,
+  tone = "primary",
+  disabled = false,
+  style,
+  accessibilityLabel,
+  accessibilityHint,
+}, ref) {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
   const [focused, setFocused] = useState(false);
   const busy = useRef(false);
   return <><Pressable
+    ref={ref}
     accessibilityRole="button"
     accessibilityLabel={accessibilityLabel ?? label}
     accessibilityHint={accessibilityHint}
@@ -126,7 +129,7 @@ export const Button = ({
       {pending ? "…" : label}
     </Text>
   </Pressable>{error ? <Text accessibilityRole="alert" style={{ color: "#a12935", fontSize: 14, lineHeight: 20 }}>{error}</Text> : null}</>;
-};
+});
 
 export const Input = ({
   value,

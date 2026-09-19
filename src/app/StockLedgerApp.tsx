@@ -2042,6 +2042,9 @@ export default function App() {
   const [eyeComposerEditingId, setEyeComposerEditingId] = useState("");
   const [journalComposerOpen, setJournalComposerOpen] = useState(false);
   const [journalComposerEditingId, setJournalComposerEditingId] = useState("");
+  const journalComposerReturnFocusRef = useRef<any>(null);
+  const journalComposerNewButtonRef = useRef<any>(null);
+  const journalSurfaceFallbackRef = useRef<any>(null);
   const [alertDetailOpen, setAlertDetailOpen] = useState(false);
   const [scannerSignalReviewId, setScannerSignalReviewId] = useState("");
   const [scannerReviewForm, setScannerReviewForm] = useState({
@@ -3171,9 +3174,27 @@ export default function App() {
     );
   };
 
+  const captureJournalComposerInvoker = (explicitInvoker?: any) => {
+    if (explicitInvoker) {
+      journalComposerReturnFocusRef.current = explicitInvoker;
+      return;
+    }
+    if (Platform.OS === "web" && typeof document !== "undefined") {
+      const activeElement = document.activeElement;
+      journalComposerReturnFocusRef.current = activeElement && activeElement !== document.body ? activeElement : null;
+      return;
+    }
+    journalComposerReturnFocusRef.current = null;
+  };
+
+  const openJournalComposer = (explicitInvoker?: any) => {
+    captureJournalComposerInvoker(explicitInvoker);
+    setJournalComposerOpen(true);
+  };
+
   const quickDecision = (alert: Alert, action: DecisionAction) => {
     setDecisionForm({ eyeId: alert.eyeId, alertId: alert.id, action, note: "", concern: "", thesisValid: "", timing: "" });
-    setJournalComposerEditingId(""); setJournalFormAttempted(false); setJournalComposerOpen(true);
+    setJournalComposerEditingId(""); setJournalFormAttempted(false); openJournalComposer();
   };
 
   const acknowledgeAlertGroup = async (alerts: Alert[]) => {
@@ -3476,7 +3497,7 @@ export default function App() {
     });
     setJournalComposerEditingId("");
     setJournalFormAttempted(false);
-    setJournalComposerOpen(true);
+    openJournalComposer();
   };
 
   const selectedScannerSignal = scannerSignalReviewId
@@ -3870,6 +3891,7 @@ export default function App() {
               ) : null}
             </Pressable>
             <Pressable
+              ref={journalSurfaceFallbackRef}
               accessibilityRole="button" accessibilityLabel={t(language, "common.journal")} accessibilityState={{ selected: tab === "Journal" }}
               onPress={() => setTab("Journal")}
               style={[styles.alertBell, tab === "Journal" ? styles.topHeaderActionActive : null]}
@@ -4579,7 +4601,7 @@ export default function App() {
                 </View>
                 <HorizontalChoice options={journalFilters} value={journalFilter} onSelect={(filter: JournalFilter) => setJournalFilter(filter)} labelForOption={(filter: JournalFilter) => journalFilterLabel(language, filter)} />
                 <View style={styles.actionRow}>
-                  <Button label={t(language, "common.new")} onPress={() => setJournalComposerOpen(true)} />
+                  <Button ref={journalComposerNewButtonRef} label={t(language, "common.new")} onPress={() => openJournalComposer(journalComposerNewButtonRef.current)} />
                 </View>
               </Reveal>
 
@@ -5994,7 +6016,7 @@ export default function App() {
                   resetJournalComposerDraft();
                   setDecisionForm((current) => ({ ...current, eyeId: selectedEye.id }));
                   closeEntityRoute("Eyes");
-                  setJournalComposerOpen(true);
+                  openJournalComposer();
                 }}
               />
               <Button
@@ -6169,6 +6191,8 @@ export default function App() {
           <WindowPanel
             title={t(language, "journal.composer.title")}
             subtitle={t(language, "journal.composer.subtitle")}
+            returnFocusRef={journalComposerReturnFocusRef}
+            fallbackFocusRef={journalSurfaceFallbackRef}
             onClose={() => {
               setJournalComposerOpen(false);
               resetJournalComposerDraft();
@@ -6265,7 +6289,7 @@ export default function App() {
                     timing: selectedDecision.timing,
                   });
                   closeEntityRoute("Journal");
-                  setJournalComposerOpen(true);
+                  openJournalComposer();
                 }}
               />
               <Button

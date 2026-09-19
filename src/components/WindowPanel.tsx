@@ -23,12 +23,23 @@ interface WindowPanelProps {
   title: string;
   subtitle?: string;
   onClose: () => void;
-  children: React.ReactNode;
+  children: React.ReactNode | ((close: () => void) => React.ReactNode);
   language?: AppLanguage;
   closeLabel?: string;
+  returnFocusRef?: React.RefObject<any>;
+  fallbackFocusRef?: React.RefObject<any>;
 }
 
-export const WindowPanel = ({ title, subtitle, onClose, children, language = "en", closeLabel = t(language, "common.done") }: WindowPanelProps) => {
+export const WindowPanel = ({
+  title,
+  subtitle,
+  onClose,
+  children,
+  language = "en",
+  closeLabel = t(language, "common.done"),
+  returnFocusRef,
+  fallbackFocusRef,
+}: WindowPanelProps) => {
   const insets = useSafeAreaInsets();
   const reduced = useReducedMotion();
   const overlayOpacity = useRef(new Animated.Value(0)).current;
@@ -36,17 +47,8 @@ export const WindowPanel = ({ title, subtitle, onClose, children, language = "en
   const sheetScale = useRef(new Animated.Value(0.985)).current;
   const closingRef = useRef(false);
   const closeButtonRef = useRef<any>(null);
-  const returnFocusRef = useRef<any>(null);
-
-  if (Platform.OS === "web" && typeof document !== "undefined" && returnFocusRef.current === null) {
-    const activeElement = document.activeElement;
-    if (activeElement && activeElement !== document.body) returnFocusRef.current = activeElement;
-  }
 
   useEffect(() => {
-    if (Platform.OS === "web" && typeof document !== "undefined" && returnFocusRef.current === null) {
-      returnFocusRef.current = document.activeElement;
-    }
     const focusInitialControl = () => {
       if (Platform.OS === "web") {
         closeButtonRef.current?.focus?.();
@@ -59,12 +61,20 @@ export const WindowPanel = ({ title, subtitle, onClose, children, language = "en
     return () => clearTimeout(timer);
   }, []);
 
+  const restoreFocus = () => {
+    const target = [returnFocusRef?.current, fallbackFocusRef?.current].find((candidate) => candidate && candidate.isConnected !== false);
+    if (!target || target.isConnected === false) return;
+    if (Platform.OS === "web") {
+      target.focus?.();
+      return;
+    }
+    const node = findNodeHandle(target);
+    if (node) AccessibilityInfo.setAccessibilityFocus(node);
+  };
+
   const finishClose = () => {
     onClose();
-    setTimeout(() => {
-      const target = returnFocusRef.current;
-      if (target?.isConnected !== false) target?.focus?.();
-    }, 0);
+    setTimeout(restoreFocus, 0);
   };
 
   const panelKeyboardProps =
@@ -102,6 +112,8 @@ export const WindowPanel = ({ title, subtitle, onClose, children, language = "en
       }),
     ]).start(finishClose);
   };
+
+  const panelChildren = typeof children === "function" ? children(animateClose) : children;
 
   const dragResponder = useRef(
     PanResponder.create({
@@ -189,7 +201,7 @@ export const WindowPanel = ({ title, subtitle, onClose, children, language = "en
           </View>
           <View style={styles.windowHeader}>
             <View style={styles.flexOne}>
-              <Text style={styles.windowTitle} numberOfLines={2}>
+              <Text accessibilityRole="header" style={styles.windowTitle} numberOfLines={2}>
                 {title}
               </Text>
               {subtitle ? (
@@ -209,7 +221,7 @@ export const WindowPanel = ({ title, subtitle, onClose, children, language = "en
             keyboardShouldPersistTaps="handled"
             nestedScrollEnabled
           >
-            {children}
+            {panelChildren}
           </ScrollView>
         </Animated.View>
       </Animated.View>
