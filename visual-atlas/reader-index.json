@@ -1,0 +1,94 @@
+{
+  "schema": "project-os-visual-atlas-reader-index-v2",
+  "generatedAt": "2026-09-19T18:58:05.072Z",
+  "readers": {
+    "review-desktop.pdf": [
+      {
+        "page": 1,
+        "surfaceKey": "today",
+        "viewport": "desktop-1440x900",
+        "pngSha256": "c7e4592b938bdce652999581d5672ab73a4e279ddd3632405b3b94a8a60e2498"
+      },
+      {
+        "page": 2,
+        "surfaceKey": "watchlist",
+        "viewport": "desktop-1440x900",
+        "pngSha256": "f47e4429dc9b3bd061fcb4f3462b1f4e133d8e5bf2eb41c9932c2466d8f623e8"
+      },
+      {
+        "page": 3,
+        "surfaceKey": "recipes",
+        "viewport": "desktop-1440x900",
+        "pngSha256": "ac6f9fa88ca180c8b85d24256b25ba82329bdc440695f8e112a6e280aaa072a0"
+      },
+      {
+        "page": 4,
+        "surfaceKey": "monitoring",
+        "viewport": "desktop-1440x900",
+        "pngSha256": "0e985b1fa75712d5bf67cffbc1f7465fbf413bf43727e1c7c86a69f9770747c9"
+      },
+      {
+        "page": 5,
+        "surfaceKey": "alerts",
+        "viewport": "desktop-1440x900",
+        "pngSha256": "6aec8bfbc9a050f2bfdf0fdfe9adc35b80f45ef12a169a5419d69e32e5987c1a"
+      },
+      {
+        "page": 6,
+        "surfaceKey": "journal",
+        "viewport": "desktop-1440x900",
+        "pngSha256": "14e76812134e173762bdb40692e5e49c614d8575e69032f4a02e5e58b8a7e9ca"
+      },
+      {
+        "page": 7,
+        "surfaceKey": "settings",
+        "viewport": "desktop-1440x900",
+        "pngSha256": "52c751ee4f8701103aac42604ed5ffd736213a496c226e0f2aed7254f32cb394"
+      }
+    ],
+    "review-mobile.pdf": [
+      {
+        "page": 1,
+        "surfaceKey": "today",
+        "viewport": "mobile-390x844",
+        "pngSha256": "7fc64e8a972e7b10a25469ee354eed7d8def8b763a4f2fb8c4ee1421460fccfb"
+      },
+      {
+        "page": 2,
+        "surfaceKey": "watchlist",
+        "viewport": "mobile-390x844",
+        "pngSha256": "5085539ba5ddfffd4911e40d9d2732546c7096ea24682b9a223b3c6655ff2f3a"
+      },
+      {
+        "page": 3,
+        "surfaceKey": "recipes",
+        "viewport": "mobile-390x844",
+        "pngSha256": "d318399a0ac247990a8c811d4c3e2fa11eb1aaea8f7d88c7fa485a9da5782a12"
+      },
+      {
+        "page": 4,
+        "surfaceKey": "monitoring",
+        "viewport": "mobile-390x844",
+        "pngSha256": "63b1d2ef6034d7286303777bf59a3d941a9b105c9a73f85718170f8c3634562d"
+      },
+      {
+        "page": 5,
+        "surfaceKey": "alerts",
+        "viewport": "mobile-390x844",
+        "pngSha256": "895022c13ad8bc5266e658c7c4214c1a0522b9d13067bdbe19106290081cc207"
+      },
+      {
+        "page": 6,
+        "surfaceKey": "journal",
+        "viewport": "mobile-390x844",
+        "pngSha256": "660facc0dd806caadc78f5e4fc81d6a9defa9987297a101023e3c8cc8dbb3198"
+      },
+      {
+        "page": 7,
+        "surfaceKey": "settings",
+        "viewport": "mobile-390x844",
+        "pngSha256": "fe5a4c15f7c0675f50d14a82eecc0ff343a7034a07b52f82af8e061440556641"
+      }
+    ]
+  }
+}
