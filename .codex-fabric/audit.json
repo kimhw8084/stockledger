@@ -1,0 +1,555 @@
+{
+  "accepted_at": "2026-09-19T14:26:41Z",
+  "changed_files": [
+    {
+      "additions": 27,
+      "deletions": 0,
+      "path": ".github/workflows/check.yml",
+      "status": "M"
+    },
+    {
+      "additions": 2,
+      "deletions": 0,
+      "path": "docs/operations/CLOUD_DEPLOYMENT.md",
+      "status": "M"
+    },
+    {
+      "additions": 2,
+      "deletions": 0,
+      "path": "docs/operations/LOCAL_WORKER.md",
+      "status": "M"
+    },
+    {
+      "additions": 15,
+      "deletions": 2,
+      "path": "docs/operations/RELEASE_RUNBOOK.md",
+      "status": "M"
+    },
+    {
+      "additions": 60,
+      "deletions": 0,
+      "path": "docs/production/CHG-96_EVIDENCE.md",
+      "status": "A"
+    },
+    {
+      "additions": 7,
+      "deletions": 1,
+      "path": "package.json",
+      "status": "M"
+    },
+    {
+      "additions": 2,
+      "deletions": 1,
+      "path": "scripts/benchmark-worker.ts",
+      "status": "M"
+    },
+    {
+      "additions": 23,
+      "deletions": 0,
+      "path": "scripts/check-release-workflow.mjs",
+      "status": "A"
+    },
+    {
+      "additions": 15,
+      "deletions": 0,
+      "path": "scripts/operations-qualification.ts",
+      "status": "A"
+    },
+    {
+      "additions": 14,
+      "deletions": 0,
+      "path": "scripts/recovery-drill.ts",
+      "status": "A"
+    },
+    {
+      "additions": 35,
+      "deletions": 0,
+      "path": "scripts/release-evidence.ts",
+      "status": "A"
+    },
+    {
+      "additions": 15,
+      "deletions": 0,
+      "path": "scripts/verify-release-evidence.ts",
+      "status": "A"
+    },
+    {
+      "additions": 22,
+      "deletions": 2,
+      "path": "server/worker/cli.ts",
+      "status": "M"
+    },
+    {
+      "additions": 2,
+      "deletions": 2,
+      "path": "server/worker/contract.ts",
+      "status": "M"
+    },
+    {
+      "additions": 287,
+      "deletions": 0,
+      "path": "server/worker/operations.ts",
+      "status": "A"
+    },
+    {
+      "additions": 109,
+      "deletions": 0,
+      "path": "server/worker/qualification.ts",
+      "status": "A"
+    },
+    {
+      "additions": 168,
+      "deletions": 0,
+      "path": "server/worker/recovery.ts",
+      "status": "A"
+    },
+    {
+      "additions": 122,
+      "deletions": 0,
+      "path": "server/worker/releaseEvidenceRuntime.ts",
+      "status": "A"
+    },
+    {
+      "additions": 11,
+      "deletions": 1,
+      "path": "server/worker/store.ts",
+      "status": "M"
+    },
+    {
+      "additions": 4,
+      "deletions": 0,
+      "path": "src/operations/releaseContracts.ts",
+      "status": "A"
+    },
+    {
+      "additions": 167,
+      "deletions": 0,
+      "path": "src/operations/releaseEvidence.ts",
+      "status": "A"
+    },
+    {
+      "additions": 17,
+      "deletions": 0,
+      "path": "tests/cloud.test.ts",
+      "status": "M"
+    },
+    {
+      "additions": 9,
+      "deletions": 0,
+      "path": "tests/integration/cloud.integration.ts",
+      "status": "M"
+    },
+    {
+      "additions": 68,
+      "deletions": 0,
+      "path": "tests/operations.test.ts",
+      "status": "A"
+    },
+    {
+      "additions": 8,
+      "deletions": 0,
+      "path": "tests/qualification.test.ts",
+      "status": "A"
+    },
+    {
+      "additions": 17,
+      "deletions": 0,
+      "path": "tests/recovery.test.ts",
+      "status": "A"
+    },
+    {
+      "additions": 69,
+      "deletions": 0,
+      "path": "tests/releaseEvidence.test.ts",
+      "status": "A"
+    }
+  ],
+  "checks": [
+    {
+      "command": "/bin/zsh -lc \"pwd && printf '%s\\\\n' '--- RTK.md ---' && sed -n '1,240p' /Users/haewonkim/.codex/RTK.md && printf '%s\\\\n' '--- law.md ---' && sed -n '1,260p' /Users/haewonkim/.codex/law.md && printf '%s\\\\n' '--- git status ---' && git status --short --branch && printf '%s\\\\n' '--- recent commits ---' && git log --oneline --decorate -12\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git show --no-ext-diff --stat --oneline 09d520a29b2b0e319dc1937e6eb97ae96ede7466 && rtk git show -s --format=fuller 09d520a29b2b0e319dc1937e6eb97ae96ede7466 && printf '%s\\\\n' '--- parents ---' && rtk git rev-list --parents -n 1 09d520a29b2b0e319dc1937e6eb97ae96ede7466 && printf '%s\\\\n' '--- merge base / ancestry ---' && rtk git merge-base 62c21af2f781b3ff53505f4582d86e24fead528d 09d520a29b2b0e319dc1937e6eb97ae96ede7466 && rtk git merge-base --is-ancestor 62c21af2f781b3ff53505f4582d86e24fead528d 09d520a29b2b0e319dc1937e6eb97ae96ede7466; printf 'ancestor_exit=%s\\\\n' \"'$?; printf '\"'%s\\\\n' '--- candidate files ---'; rtk git diff-tree --no-commit-id --name-status -r 09d520a29b2b0e319dc1937e6eb97ae96ede7466\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git merge --ff-only 09d520a29b2b0e319dc1937e6eb97ae96ede7466 && rtk git status --short --branch && printf '%s\\\\n' '--- package scripts ---' && node -e \\\"const p=require('./package.json'); console.log(JSON.stringify(p.scripts,null,2))\\\" && printf '%s\\\\n' '--- source tree ---' && rtk rg --files -g '\"'!node_modules'\"' | sed -n '1,220p'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"printf '%s\\\\n' '--- workflow ---' && sed -n '1,280p' .github/workflows/check.yml && printf '%s\\\\n' '--- release contracts ---' && sed -n '1,260p' src/operations/releaseContracts.ts && printf '%s\\\\n' '--- release evidence ---' && sed -n '1,360p' src/operations/releaseEvidence.ts && printf '%s\\\\n' '--- evidence script ---' && sed -n '1,320p' scripts/release-evidence.ts && printf '%s\\\\n' '--- verify script ---' && sed -n '1,360p' scripts/verify-release-evidence.ts && printf '%s\\\\n' '--- cli ---' && sed -n '1,360p' server/worker/cli.ts\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"printf '%s\\\\n' '--- operations ---' && sed -n '1,420p' server/worker/operations.ts && printf '%s\\\\n' '--- recovery ---' && sed -n '1,360p' server/worker/recovery.ts && printf '%s\\\\n' '--- release tests ---' && sed -n '1,360p' tests/releaseEvidence.test.ts && printf '%s\\\\n' '--- operations tests ---' && sed -n '1,360p' tests/operations.test.ts && printf '%s\\\\n' '--- qualification/recovery tests ---' && sed -n '1,320p' tests/qualification.test.ts && sed -n '1,360p' tests/recovery.test.ts\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n \\\"releaseIdentity|createOperationsStatus|overall\\\\.state|operations:status|release-evidence|PROTECTED_BASE|62c21af|release:evidence|release:verify|setup-node\\\" --glob '\"'!node_modules/**'\"' . | sed -n '1,360p' && printf '%s\\\\n' '--- docs runbook ---' && sed -n '1,320p' docs/operations/RELEASE_RUNBOOK.md && printf '%s\\\\n' '--- CHG-96 evidence ---' && sed -n '1,360p' docs/production/CHG-96_EVIDENCE.md && printf '%s\\\\n' '--- nvm ---' && sed -n '1,80p' .nvmrc && printf '%s\\\\n' '--- gitignore ---' && sed -n '1,200p' .gitignore 2>/dev/null || true\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"sed -n '1,160p' src/domain/contentHash.ts && sed -n '1,220p' tsconfig.json && sed -n '1,160p' package.json && git remote -v\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '1,180p' .github/workflows/check.yml\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"node - <<'NODE'\nconst fs=require('fs'); const s=fs.readFileSync('.github/workflows/check.yml','utf8'); for(const m of s.matchAll(/uses:\\\\s*([\"'^'\"\\\\s#]+)/g)){const [a,ref]=m[1].split('@'); console.log(a,ref,ref.length)}\nNODE\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npm run typecheck'",
+      "exit_code": 127,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npm ci'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk node --version && rtk which -a node && rtk ls -1 /opt/homebrew/opt/node@22/bin/node /usr/local/opt/node@22/bin/node /Users/haewonkim/.nvm/versions/node 2>/dev/null || true && rtk git status --short'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk node --version && env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run typecheck'",
+      "exit_code": 2,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run typecheck'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm test -- --run tests/operations.test.ts tests/recovery.test.ts tests/releaseEvidence.test.ts tests/qualification.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run check:release-workflow && env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run release:evidence -- --output /tmp/stockledger-release-evidence.json --base 09d520a29b2b0e319dc1937e6eb97ae96ede7466'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run test:cloud'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm test -- --run'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git diff --check'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run check:boundaries'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run check:frozen'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run recovery:drill'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm audit --audit-level=high'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run benchmark:worker'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run operations:qualify'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run check:boundaries && env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run typecheck && env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm test -- --run tests/releaseEvidence.test.ts tests/operations.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run export:all'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npx playwright install --with-deps chromium && env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run test:e2e'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git diff --stat && rtk git diff -- .github/workflows/check.yml package.json src/operations/releaseEvidence.ts server/worker/releaseEvidenceRuntime.ts server/worker/cli.ts server/worker/operations.ts scripts/release-evidence.ts scripts/verify-release-evidence.ts scripts/check-release-workflow.mjs tests/releaseEvidence.test.ts tests/operations.test.ts docs/operations/RELEASE_RUNBOOK.md docs/production/CHG-96_EVIDENCE.md | sed -n '1,520p'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npx supabase db lint --local --schema public,ledger_private --level warning --fail-on warning'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run check'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n \\\"62c21af2f781b3ff53505f4582d86e24fead528d|249970729cb0ef3589644e289664e5dc5ba9c38|STOCKLEDGER_PROTECTED_BASE|release_identity_(unavailable|mismatched)|rollback-semantics-mismatch\\\" --glob '\"'!node_modules/**'\"' --glob '\"'!dist/**'\"' . && printf '%s\\\\n' '--- status ---' && rtk git status --short --branch && printf '%s\\\\n' '--- diff check ---' && rtk git diff --check\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git add .github/workflows/check.yml docs/operations/RELEASE_RUNBOOK.md docs/production/CHG-96_EVIDENCE.md package.json scripts/check-release-workflow.mjs scripts/release-evidence.ts scripts/verify-release-evidence.ts server/worker/cli.ts server/worker/operations.ts server/worker/releaseEvidenceRuntime.ts src/operations/releaseEvidence.ts tests/operations.test.ts tests/releaseEvidence.test.ts && rtk git commit -m \"fix(operations): enforce release evidence integrity\" && rtk git status --short --branch && rtk git log --oneline --decorate -4'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run check:release-workflow && env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run release:evidence -- --output artifacts/release-evidence.json --base 09d520a29b2b0e319dc1937e6eb97ae96ede7466 && env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run release:verify -- --input artifacts/release-evidence.json --base 09d520a29b2b0e319dc1937e6eb97ae96ede7466 && rtk git status --short --branch && rtk git rev-parse HEAD && rtk git rev-parse HEAD''^{tree}'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'env -u STOCKLEDGER_PROTECTED_BASE PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run release:verify -- --input artifacts/release-evidence.json'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'env STOCKLEDGER_PROTECTED_BASE=09d520a29b2b0e319dc1937e6eb97ae96ede7466 PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run operations:status -- --db /tmp/stockledger-c09-status.sqlite --release-evidence artifacts/release-evidence.json'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'env STOCKLEDGER_PROTECTED_BASE=09d520a29b2b0e319dc1937e6eb97ae96ede7466 PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run operations:status -- --db /tmp/stockledger-c09-status-bad.sqlite --release-evidence /etc/hosts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git rev-list --parents -n 1 HEAD && rtk git merge-base --is-ancestor 62c21af2f781b3ff53505f4582d86e24fead528d HEAD; printf 'main_ancestor_exit=%s\\\\n' \"'$? && rtk git merge-base --is-ancestor 09d520a29b2b0e319dc1937e6eb97ae96ede7466 HEAD; printf '\"'r1_ancestor_exit=%s\\\\n' \"'$? && rtk git status --porcelain=v1 --branch && rtk git diff --check && rtk git ls-remote --heads origin codex/stockledger-prod-c09-operations-release-integrity-fix-v1'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git push --set-upstream origin codex/stockledger-prod-c09-operations-release-integrity-fix-v1'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git add docs/production/CHG-96_EVIDENCE.md && rtk git commit -m \"docs(operations): record cloud qualification boundary\" && rtk git status --short --branch && rtk git log --oneline --decorate -4'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run release:evidence -- --output artifacts/release-evidence.json --base 09d520a29b2b0e319dc1937e6eb97ae96ede7466 && env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run release:verify -- --input artifacts/release-evidence.json --base 09d520a29b2b0e319dc1937e6eb97ae96ede7466 && rtk git diff --check && rtk git status --short --branch && rtk git rev-parse HEAD && rtk git rev-parse HEAD''^{tree}'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git push && rtk git status --short --branch && rtk git rev-parse HEAD && rtk git rev-parse origin/codex/stockledger-prod-c09-operations-release-integrity-fix-v1 && rtk git rev-list --parents -n 1 HEAD'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk node -e \"const e=require('\"'./artifacts/release-evidence.json'); console.log(JSON.stringify({evidenceHash:e.evidenceHash,baseCommit:e.baseCommit,sourceCommit:e.source.commit,sourceTree:e.source.tree,workingTree:e.source.workingTree},null,2))\\\" && rtk git merge-base --is-ancestor 62c21af2f781b3ff53505f4582d86e24fead528d HEAD; printf 'main_ancestor_exit=%s\\\\n' \"'$? && rtk git merge-base --is-ancestor 09d520a29b2b0e319dc1937e6eb97ae96ede7466 HEAD; printf '\"'r1_ancestor_exit=%s\\\\n' \"'$? && rtk git status --porcelain=v1 --branch && rtk git diff --check'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm ci && env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run typecheck && rtk git status --short --branch'",
+      "exit_code": 0,
+      "type": "command_execution"
+    }
+  ],
+  "codex": {
+    "cli_version": "codex-cli 0.154.0",
+    "configured_model": "gpt-5.6-luna",
+    "event_count": 149,
+    "provider_reported_model": null,
+    "reasoning_effort": "xhigh",
+    "terminal_type": "turn.completed",
+    "usage": {
+      "cache_hit_percent": 97.51,
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 6402304,
+      "fresh_input_tokens": 163514,
+      "input_tokens": 6565818,
+      "non_reasoning_output_tokens": 26174,
+      "output_tokens": 49057,
+      "reasoning_output_tokens": 22883,
+      "total_processed_tokens": 6614875
+    },
+    "warnings": []
+  },
+  "commits": [
+    {
+      "sha": "0d7e529826aac55a763fac36bfba8b69d6945e74",
+      "subject": "docs(operations): record cloud qualification boundary"
+    },
+    {
+      "sha": "7b8232e135a3d69f9330273f9d83efeaef200fa7",
+      "subject": "fix(operations): enforce release evidence integrity"
+    },
+    {
+      "sha": "09d520a29b2b0e319dc1937e6eb97ae96ede7466",
+      "subject": "feat(operations): add recovery and release evidence foundation"
+    }
+  ],
+  "diff": {
+    "additions": 1297,
+    "changed_files": 27,
+    "commit_count": 3,
+    "deletions": 9
+  },
+  "error_code": null,
+  "evidence_manifest": {
+    "count": 10,
+    "items": [
+      {
+        "bytes": 9365,
+        "path": "docs/operations/CLOUD_DEPLOYMENT.md",
+        "sha256": "21e093aa5add9df66fd74936c9caf90f6ca26ea40c441de6ed5381e9f294c510"
+      },
+      {
+        "bytes": 24203,
+        "path": "docs/operations/LOCAL_WORKER.md",
+        "sha256": "fe3a49b744948b8464dee9da230dff54c9f408ebb8eb8b4e1df13afa2cf93e46"
+      },
+      {
+        "bytes": 5738,
+        "path": "docs/operations/RELEASE_RUNBOOK.md",
+        "sha256": "483007b22f55590b9225dde3908d8b22d49e75cfb0136ffbabf05eb9b356d256"
+      },
+      {
+        "bytes": 7368,
+        "path": "docs/production/CHG-96_EVIDENCE.md",
+        "sha256": "962b31332ee65e0eabfb9aea9f4301c6066fde3b08ed243c13f3ffd18aeb02c3"
+      },
+      {
+        "bytes": 2537,
+        "path": "package.json",
+        "sha256": "21ebc42f70c791484f4168cc92bc0599a2f78bd31f7be76e03e803c24c3b32b0"
+      },
+      {
+        "bytes": 2474,
+        "path": "scripts/release-evidence.ts",
+        "sha256": "7f74df440f3e2efd0d2c1264bc29d7b353b17b82bfeb8573e50c0542dcb9f1ef"
+      },
+      {
+        "bytes": 1119,
+        "path": "scripts/verify-release-evidence.ts",
+        "sha256": "a80ec2f00b3d22aeded6a14b870403f05b2eb628c6e6eaf5ba396476aad142ec"
+      },
+      {
+        "bytes": 5830,
+        "path": "server/worker/releaseEvidenceRuntime.ts",
+        "sha256": "b38d8b65f42b5d8a187a9e6c4dc1221ea33cff5ecbcc991f4a765e536ef63fc2"
+      },
+      {
+        "bytes": 11482,
+        "path": "src/operations/releaseEvidence.ts",
+        "sha256": "4fa7e5ccbff5f8f8557774da2569370f74e19a9f78202dd80f65033715da561c"
+      },
+      {
+        "bytes": 5097,
+        "path": "tests/releaseEvidence.test.ts",
+        "sha256": "471da575d43c842841f132fceae92e26ec29516c5a0869dc996a10e225a06b66"
+      }
+    ],
+    "version": 1
+  },
+  "evidence_publisher_release": "1.2.3-resume-candidate",
+  "fabric_capture": {
+    "applied": false,
+    "paths_before": 0,
+    "transient_untracked_removed": {
+      "count": 0,
+      "items": []
+    }
+  },
+  "fabric_release": "1.2.3-resume-candidate",
+  "failure_class": null,
+  "finished_at": "2026-09-19T14:54:48Z",
+  "git": {
+    "base_is_ancestor": true,
+    "base_sha": "62c21af2f781b3ff53505f4582d86e24fead528d",
+    "branch": "codex/stockledger-prod-c09-operations-release-integrity-fix-v1",
+    "detached_verify": false,
+    "head_sha": "0d7e529826aac55a763fac36bfba8b69d6945e74",
+    "remote_exact_head": true,
+    "remote_head_sha": "0d7e529826aac55a763fac36bfba8b69d6945e74",
+    "target_branch": "main",
+    "target_drifted_since_acceptance": false,
+    "target_head_observed_after_execution": "62c21af2f781b3ff53505f4582d86e24fead528d",
+    "work_branch": "codex/stockledger-prod-c09-operations-release-integrity-fix-v1",
+    "worktree_clean": true
+  },
+  "instructions": {
+    "files": [],
+    "total_bytes": 0,
+    "warning": null
+  },
+  "job_id": "CF-9fa7fb867b0b80b5f6e2df9c",
+  "kind": "codex-fabric-audit-evidence",
+  "locator": {
+    "branch": "codex-fabric/evidence/stockledger/prod-c09-operations-release-integrity-fix-v1",
+    "path": ".codex-fabric/audit.json",
+    "ref": "refs/heads/codex-fabric/evidence/stockledger/prod-c09-operations-release-integrity-fix-v1"
+  },
+  "operation": "FIX",
+  "policy": {
+    "environment_policy_sha256": "e077daca74297b3c30bee8989f00f8ca5338f7610b4d016a6c48db524205d064",
+    "fabric_release": "1.2.3-resume-candidate",
+    "policy_sha256": "44756118cd7fda0c45cd23ba1d31a48a3f4f2422d687df15264ba4406f40e1f2",
+    "registry_sha256": "cfc765f3211c37c7967a138f3b2d89a99341939b15b2623f92744d007f625d6f"
+  },
+  "project_id": "stockledger",
+  "recovery": {
+    "model_rerun_safe": false,
+    "recovery_required": false,
+    "retry_safe": false,
+    "retry_scope": null,
+    "worktree_retained": true
+  },
+  "request": "prod-c09-operations-release-integrity-fix-v1",
+  "schema_version": 1,
+  "started_at": "2026-09-19T14:26:41Z",
+  "status": "EXECUTED_CHANGE",
+  "timing": {
+    "execution_seconds": 1687,
+    "queue_seconds": 0,
+    "total_seconds": 1687
+  },
+  "transport": {
+    "bytes": 10228,
+    "envelope": "FABRIC/2",
+    "prompt_bytes": 9871,
+    "prompt_sha256": "19b94bf63b2edf29fae5bb5adff7419f89e891121d138fca31e0616ab3989a7f",
+    "sha256": "9fa7fb867b0b80b5f6e2df9cdfc5cc16271e349f1a23c4abd3bc1ded291361db"
+  }
+}
