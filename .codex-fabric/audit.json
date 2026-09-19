@@ -1,0 +1,157 @@
+{
+  "schema_version": 1,
+  "kind": "codex-fabric-audit-evidence",
+  "operation": "REMEDIATION",
+  "status": "EXECUTED_CHANGE",
+  "project_id": "stockledger",
+  "request": "prod-c08-market-data-rights-enforcement-fix-v1",
+  "evidence_id": "stockledger-prod-c08-market-data-rights-enforcement-fix-v1-cd2f1bf",
+  "parent_fabric_job_id": "CF-e7766c26dc69b97bc8574b33",
+  "accepted_source": {
+    "protected_main_sha": "c290037e6de0079d47048850ee52f86800c8a992",
+    "carried_forward_r1_candidate_sha": "3b6ca51a02194a736db6abd083a34aae810cec98",
+    "carried_forward_implementation_head_sha": "a062a9856f3148681d999bb6daff5d4f8778db66",
+    "rights_fix_commit_sha": "ff696e65ad2564189b8293e0cf48ae64e499d534",
+    "documentation_closeout_sha": "cd2f1bf28b97a5df7ebc4f8a8a6d0db61403b275"
+  },
+  "git": {
+    "base_sha": "c290037e6de0079d47048850ee52f86800c8a992",
+    "base_is_ancestor": true,
+    "work_branch": "codex/stockledger-prod-c08-market-data-rights-enforcement-fix-v1",
+    "work_branch_head_sha": "cd2f1bf28b97a5df7ebc4f8a8a6d0db61403b275",
+    "remote_work_branch_exact_head": true,
+    "target_branch": "main",
+    "target_head_observed": "c290037e6de0079d47048850ee52f86800c8a992",
+    "target_merged": false,
+    "work_branch_worktree_clean": true
+  },
+  "rights_contract": {
+    "revision": 2,
+    "authority_model_version": "stockledger-market-data-rights-authority-v1",
+    "production_provider_selection": "UNSELECTED",
+    "repository_truth": "NO executed real market-data agreement",
+    "synthetic_executed_agreement_fixtures": "test-only and unmistakably labeled"
+  },
+  "checks": [
+    {
+      "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm ci",
+      "exit_code": 0,
+      "result": "clean install; 595 packages added; 0 vulnerabilities"
+    },
+    {
+      "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm run typecheck",
+      "exit_code": 0,
+      "result": "passed"
+    },
+    {
+      "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm test -- --run",
+      "exit_code": 0,
+      "result": "18 files; 175 tests passed"
+    },
+    {
+      "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm test -- --run tests/marketDataIngestion.test.ts",
+      "exit_code": 0,
+      "result": "14 tests passed; CHG-95 rights and ingestion regression coverage"
+    },
+    {
+      "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm test -- --run tests/worker.test.ts tests/monitoring.test.ts tests/financialTruth.test.ts tests/notification.test.ts tests/repository.test.ts",
+      "exit_code": 0,
+      "result": "5 files; 91 tests passed"
+    },
+    {
+      "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm run benchmark:worker",
+      "exit_code": 0,
+      "result": "synthetic=true; stocks=100; sessions=260; evaluations=100; scannerRows=200; elapsedMs=4751; remainingHeadroomMs=1795250; endingRssBytes=229998592; databaseBytesIncludingWal=12591808; workspaceBytes=5813608; integrity=true; withinBudget=true"
+    },
+    {
+      "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm run check:boundaries",
+      "exit_code": 0,
+      "result": "passed"
+    },
+    {
+      "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm run check:frozen",
+      "exit_code": 0,
+      "result": "passed expected blocked_unverified release gate"
+    },
+    {
+      "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm run export:all",
+      "exit_code": 0,
+      "result": "web, iOS, and Android bundles generated"
+    },
+    {
+      "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm run test:e2e",
+      "exit_code": 0,
+      "result": "16 tests passed across desktop and mobile"
+    },
+    {
+      "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm audit --audit-level=high",
+      "exit_code": 0,
+      "result": "0 vulnerabilities"
+    },
+    {
+      "command": "rtk git diff --check",
+      "exit_code": 0,
+      "result": "passed"
+    }
+  ],
+  "qualification_notes": [
+    "No SQLite schema migration was introduced; retained persistence, close/reopen, idempotency, resume, retry, provenance, and partial-failure coverage remains green.",
+    "Cloud/Supabase tests were not run because cloud contracts were unchanged.",
+    "Local-user CSV remains first-class and does not require commercial rights.",
+    "Stooq remains research-only and cannot satisfy production managed rights."
+  ],
+  "nonclaims": [
+    "No provider is selected or licensed; provider selection remains UNSELECTED.",
+    "StockLedger repository truth has NO executed real market-data agreement.",
+    "Massive, Twelve Data, Tiingo, Intrinio, and every other provider remain non-claims.",
+    "Synthetic executed-agreement profiles exist only in explicitly labeled test fixtures.",
+    "Fundamentals, events, and intraday remain deferred.",
+    "Financial calculation semantics, notification delivery semantics, sync/cloud contracts, billing, unrelated UI, and scheduler architecture were not changed."
+  ],
+  "changed_files": [
+    {"path": "docs/operations/LOCAL_WORKER.md", "additions": 16, "deletions": 2},
+    {"path": "docs/production/CHG-95_EVIDENCE.md", "additions": 90, "deletions": 0},
+    {"path": "server/worker/managed.ts", "additions": 155, "deletions": 31},
+    {"path": "server/worker/marketDataIngestion.ts", "additions": 215, "deletions": 0},
+    {"path": "server/worker/store.ts", "additions": 204, "deletions": 3},
+    {"path": "src/application/workspaceApplicationService.ts", "additions": 2, "deletions": 2},
+    {"path": "src/domain/appDataSchema.ts", "additions": 9, "deletions": 6},
+    {"path": "src/domain/backupFormat.ts", "additions": 45, "deletions": 0},
+    {"path": "src/domain/marketSnapshot.ts", "additions": 18, "deletions": 2},
+    {"path": "src/lib/eodDataProvider.ts", "additions": 37, "deletions": 35},
+    {"path": "src/lib/marketDataContract.ts", "additions": 489, "deletions": 0},
+    {"path": "src/lib/providerHealth.ts", "additions": 1, "deletions": 1},
+    {"path": "src/lib/providerSnapshot.ts", "additions": 1, "deletions": 1},
+    {"path": "src/lib/stockConditionScanner.ts", "additions": 15, "deletions": 4},
+    {"path": "src/lib/storage.ts", "additions": 1, "deletions": 1},
+    {"path": "src/types.ts", "additions": 36, "deletions": 0},
+    {"path": "tests/marketDataIngestion.test.ts", "additions": 279, "deletions": 0}
+  ],
+  "evidence_manifest": {
+    "version": 1,
+    "count": 2,
+    "items": [
+      {
+        "path": "docs/production/CHG-95_EVIDENCE.md",
+        "bytes": 11888,
+        "sha256": "bd5b5bdf4241c64dc06ca89fc4b6b934ddaa77e7a9e28f7cca0398faedebca07"
+      },
+      {
+        "path": "docs/operations/LOCAL_WORKER.md",
+        "bytes": 23388,
+        "sha256": "c258d5fdbe285f4607a4e372a45ba3a5ad57b5932abfae48b4d27d67b4b4155c"
+      }
+    ]
+  },
+  "locator": {
+    "branch": "codex-fabric/evidence/stockledger/prod-c08-market-data-rights-enforcement-fix-v1",
+    "path": ".codex-fabric/audit.json",
+    "ref": "refs/heads/codex-fabric/evidence/stockledger/prod-c08-market-data-rights-enforcement-fix-v1"
+  },
+  "publisher": {
+    "mode": "repository-convention",
+    "fabric_job_created_in_this_run": false,
+    "note": "Deterministic evidence is published from the exact qualified work-branch head; parent_fabric_job_id identifies the carried-forward R1 Fabric run."
+  },
+  "finished_at": "2026-09-19T02:30:29Z"
+}
