@@ -117,6 +117,7 @@ export const write_raw_archive = (
       validationIssues: metadata.validationIssues,
       failureClass: metadata.failureClass,
       rightsProfileId: metadata.rightsProfileId,
+      rightsProvenance: metadata.rightsProvenance,
     } : {}),
   };
 

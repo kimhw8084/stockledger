@@ -141,6 +141,7 @@ const buildSignal = (
   status: SignalStatus,
   tokenResults: Record<string, boolean | null>,
   features: ProcessedFeatureRecord,
+  rightsProvenance?: MarketDataArchiveMetadata["rightsProvenance"],
 ) : ScanSignal => {
   const signalDate = scanRun.scanDate;
   const matchedConditionsJson = Object.entries(tokenResults)
@@ -184,6 +185,7 @@ const buildSignal = (
     universeSnapshotHash: universeSnapshot.snapshotHash,
     sectorMemberCount,
     createdAtUtc: new Date().toISOString(),
+    rightsProvenance,
   };
 };
 
@@ -285,6 +287,7 @@ export const runDailyStockConditionScan = async (input: {
     input.scannerSettings,
     input.previousUniverseSnapshot,
   );
+  const rightsProvenance = input.ingestionMetadata?.rightsProvenance;
 
   if (
     universeSnapshot.universeSourceStatus === "current_universe_unavailable" ||
@@ -305,6 +308,7 @@ export const runDailyStockConditionScan = async (input: {
       status: "blocked",
       warnings: universeSnapshot.warning ? [universeSnapshot.warning] : [],
       blockedReason: "current universe unavailable",
+      rightsProvenance,
     };
     return {
       universeSnapshot,
@@ -347,6 +351,7 @@ export const runDailyStockConditionScan = async (input: {
     sourceStatus: universeSnapshot.universeSourceStatus,
     status: validationIssues.length ? "partial" : "completed",
     warnings: validationIssues,
+    rightsProvenance,
   };
 
   const processedFeatures: ProcessedFeatureRecord[] = [];
@@ -365,7 +370,8 @@ export const runDailyStockConditionScan = async (input: {
       if (batch.adjustedStatus !== "adjusted") missingWarmup.push("adjusted_price_history_required");
       if (!symbolValidation.valid || missingWarmup.length > 0) {
         const blockedFeature = computeProcessedFeaturesForSymbol(ticker, rule.sector, stockBars, spyBars, sectorBars, input.now?.toISOString() ?? scanRun.startedAtUtc);
-        if (blockedFeature) processedFeatures.push(blockedFeature);
+        const rightsBlockedFeature = blockedFeature ? { ...blockedFeature, rightsProvenance } : blockedFeature;
+        if (rightsBlockedFeature) processedFeatures.push(rightsBlockedFeature);
         scanSignals.push(
           buildSignal(
             scanRun,
@@ -375,7 +381,7 @@ export const runDailyStockConditionScan = async (input: {
             rule,
             "BLOCKED_OR_INCOMPLETE_DATA",
             Object.fromEntries(rule.activeConditions.map((token) => [token, null])),
-            blockedFeature ?? {
+            rightsBlockedFeature ?? {
               id: `feature-${ticker}-${latestExpectedDate}`,
               symbol: ticker,
               asOfDate: latestExpectedDate,
@@ -386,12 +392,14 @@ export const runDailyStockConditionScan = async (input: {
               featureValues: {},
               featureMeta: {},
             },
+            rightsProvenance,
           ),
         );
         return;
       }
 
-      const featureRecord = computeProcessedFeaturesForSymbol(ticker, rule.sector, stockBars, spyBars, sectorBars, input.now?.toISOString() ?? scanRun.startedAtUtc);
+      const computedFeatureRecord = computeProcessedFeaturesForSymbol(ticker, rule.sector, stockBars, spyBars, sectorBars, input.now?.toISOString() ?? scanRun.startedAtUtc);
+      const featureRecord = computedFeatureRecord ? { ...computedFeatureRecord, rightsProvenance } : computedFeatureRecord;
       if (!featureRecord) return;
       processedFeatures.push(featureRecord);
       const tokenResults = Object.fromEntries(
@@ -410,7 +418,7 @@ export const runDailyStockConditionScan = async (input: {
 
       {
         scanSignals.push(
-          buildSignal(scanRun, universeSnapshot, ticker, rule.sector, rule, status, tokenResults, featureRecord),
+          buildSignal(scanRun, universeSnapshot, ticker, rule.sector, rule, status, tokenResults, featureRecord, rightsProvenance),
         );
       }
     });

@@ -80,6 +80,7 @@ export function snapshotFromBars(stock: Stock, bars: RawBarRecord[], benchmark: 
         coverageState: options.metadata.coverageState,
         contentHash: options.metadata.stableContentHash,
         rightsProfileId: options.metadata.rightsProfileId,
+        rightsProvenance: options.metadata.rightsProvenance,
         validationIssues: options.metadata.validationIssues,
         failureClass: options.metadata.failureClass,
       } : options.rightsProfileId ? { rightsProfileId: options.rightsProfileId } : {}),

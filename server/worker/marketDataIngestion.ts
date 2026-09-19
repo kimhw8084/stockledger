@@ -1,6 +1,7 @@
 import { contentHash } from "../../src/domain/contentHash";
 import {
   checkProductionManagedRights,
+  createRightsProvenance,
   createResearchOnlyRightsProfile,
   MARKET_DATA_INGESTION_CONTRACT_REVISION,
   MARKET_DATA_INGESTION_CONTRACT_VERSION,
@@ -108,6 +109,7 @@ export async function acquireManagedDailyBars(
   const now = request.now ?? new Date();
   const rightsProfile = request.rightsProfile;
   const rights = checkProductionManagedRights(rightsProfile, "internal_computation", { providerIdentity: adapter.providerIdentity, providerProductId: adapter.providerProductId, now });
+  const rightsProvenance = rightsProfile ? createRightsProvenance(rightsProfile, { internal_computation: rights }, now.toISOString()) : undefined;
   const rightsProfileId = rightsProfile?.profileId ?? "missing-rights-profile";
   const runId = `ingestion-${contentHash({ contract: MARKET_DATA_INGESTION_CONTRACT_VERSION, revision: MARKET_DATA_INGESTION_CONTRACT_REVISION, providerIdentity: adapter.providerIdentity, providerProductId: adapter.providerProductId, datasetCategory: validated.datasetCategory, symbols: validated.symbols, startDate: request.startDate, endDate: request.endDate, expectedLatestSession: request.expectedLatestSession, rightsProfileId })}`;
   const prepared = store.createIngestionRun({
@@ -119,7 +121,7 @@ export async function acquireManagedDailyBars(
     for (const item of prepared.items) store.finishIngestionItem({ runId, symbol: item.symbol, status: "blocked-rights", errorClass: "rights_blocked", errorMessage: rights.reason, now: now.getTime() });
     const run = store.updateIngestionRun(runId, { status: "blocked-rights", lastError: rights.reason, now: now.getTime() });
     const items = store.listIngestionItems(runId);
-    const batch = normalizeProviderBatch({ providerIdentity: adapter.providerIdentity, providerProductId: adapter.providerProductId, datasetCategory: validated.datasetCategory, symbols: validated.symbols, requestedStartDate: request.startDate, requestedEndDate: request.endDate, responses: [], rightsProfile: rightsProfile ?? createResearchOnlyRightsProfile(adapter.providerIdentity, adapter.providerProductId), expectedLatestSession: request.expectedLatestSession, minimumSessions: request.minimumSessions });
+    const batch = normalizeProviderBatch({ providerIdentity: adapter.providerIdentity, providerProductId: adapter.providerProductId, datasetCategory: validated.datasetCategory, symbols: validated.symbols, requestedStartDate: request.startDate, requestedEndDate: request.endDate, responses: [], rightsProfile: rightsProfile ?? createResearchOnlyRightsProfile(adapter.providerIdentity, adapter.providerProductId), rightsProvenance, expectedLatestSession: request.expectedLatestSession, minimumSessions: request.minimumSessions });
     return { status: "blocked-rights", run, items, batch: { ...batch, failureClass: "rights_blocked", validationIssues: [rights.reason], coverageState: "unsupported", freshnessState: "unavailable" }, histories: validated.symbols.map(symbol => ({ symbol, rows: [], error: `rights_blocked:${rights.reason}` })) };
   }
 
@@ -128,7 +130,7 @@ export async function acquireManagedDailyBars(
   if (run.status === "completed" || run.status === "blocked-rights") {
     const items = store.listIngestionItems(runId);
     const completedResponses = items.flatMap(item => item.result && item.result.validation.valid ? [itemToResponse(item.result)] : []);
-    const batch = normalizeProviderBatch({ providerIdentity: adapter.providerIdentity, providerProductId: adapter.providerProductId, datasetCategory: validated.datasetCategory, symbols: validated.symbols, requestedStartDate: request.startDate, requestedEndDate: request.endDate, responses: completedResponses, rightsProfile: rightsProfile!, expectedLatestSession: request.expectedLatestSession, minimumSessions: request.minimumSessions });
+    const batch = normalizeProviderBatch({ providerIdentity: adapter.providerIdentity, providerProductId: adapter.providerProductId, datasetCategory: validated.datasetCategory, symbols: validated.symbols, requestedStartDate: request.startDate, requestedEndDate: request.endDate, responses: completedResponses, rightsProfile: rightsProfile!, rightsProvenance, expectedLatestSession: request.expectedLatestSession, minimumSessions: request.minimumSessions });
     return { status: run.status, run, items, batch, histories: items.map(item => ({ symbol: item.symbol, rows: item.result?.validation.valid ? item.result.rows : [], ...(item.status === "completed" ? {} : { error: itemError(item) }) })) };
   }
 
@@ -150,7 +152,7 @@ export async function acquireManagedDailyBars(
       try {
         const response = await adapter.fetchDailyBars({ symbol, startDate: request.startDate, endDate: request.endDate, requestIdentity });
         if (!response || response.symbol !== symbol || !Array.isArray(response.rows) || !response.retrievedAtUtc || !response.adjustmentBasis || !["adjusted", "unadjusted", "unknown"].includes(response.adjustmentBasis) || response.rows.some(row => !row || typeof row !== "object")) throw new ProviderAcquisitionError("malformed_payload", "Provider response did not match the normalized daily-bars shape.");
-        const batch = normalizeProviderBatch({ providerIdentity: adapter.providerIdentity, providerProductId: adapter.providerProductId, datasetCategory: validated.datasetCategory, symbols: [symbol], requestedStartDate: request.startDate, requestedEndDate: request.endDate, responses: [response], rightsProfile: rightsProfile!, expectedLatestSession: request.expectedLatestSession, minimumSessions: request.minimumSessions });
+        const batch = normalizeProviderBatch({ providerIdentity: adapter.providerIdentity, providerProductId: adapter.providerProductId, datasetCategory: validated.datasetCategory, symbols: [symbol], requestedStartDate: request.startDate, requestedEndDate: request.endDate, responses: [response], rightsProfile: rightsProfile!, rightsProvenance, expectedLatestSession: request.expectedLatestSession, minimumSessions: request.minimumSessions });
         const normalized = batch.items[0];
         if (normalized.validation.valid) store.finishIngestionItem({ runId, symbol, status: "completed", result: normalized, now: Date.now() });
         else store.finishIngestionItem({ runId, symbol, status: "partial", result: normalized, contentHash: normalized.stableContentHash, errorClass: normalized.validation.failureClass, errorMessage: normalized.validation.issues.join(", "), now: Date.now() });
@@ -188,7 +190,7 @@ export async function acquireManagedDailyBars(
   run = store.updateIngestionRun(runId, { status, budgetUsed, lastError: status === "completed" ? null : "One or more symbols did not produce a complete validated observation.", now: Date.now() });
   items = store.listIngestionItems(runId);
   const responses = items.flatMap(item => item.result && item.result.validation.valid ? [itemToResponse(item.result)] : []);
-  const batch = normalizeProviderBatch({ providerIdentity: adapter.providerIdentity, providerProductId: adapter.providerProductId, datasetCategory: validated.datasetCategory, symbols: validated.symbols, requestedStartDate: request.startDate, requestedEndDate: request.endDate, responses, rightsProfile: rightsProfile!, expectedLatestSession: request.expectedLatestSession, minimumSessions: request.minimumSessions });
+  const batch = normalizeProviderBatch({ providerIdentity: adapter.providerIdentity, providerProductId: adapter.providerProductId, datasetCategory: validated.datasetCategory, symbols: validated.symbols, requestedStartDate: request.startDate, requestedEndDate: request.endDate, responses, rightsProfile: rightsProfile!, rightsProvenance, expectedLatestSession: request.expectedLatestSession, minimumSessions: request.minimumSessions });
   const histories = items.map(item => ({ symbol: item.symbol, rows: item.result?.validation.valid ? item.result.rows : [], ...(item.status === "completed" ? {} : { error: itemError(item) }) }));
   return { status, run, items, batch, histories };
 }

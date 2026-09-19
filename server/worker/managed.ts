@@ -10,8 +10,8 @@ import {
 import { runDailyStockConditionScan } from "../../src/lib/stockConditionScanner";
 import { FINANCIAL_TRUTH_ENGINE_VERSION } from "../../src/lib/metricCatalog";
 import { buildNotificationIntent, NOTIFICATION_DELIVERY_CONTRACT_VERSION } from "../../src/domain/notificationDelivery";
-import { checkProductionManagedRights, isDeferredMarketDataCategory, rightsFailureMessage, type MarketDataArchiveMetadata, type MarketDataRightsProfile } from "../../src/lib/marketDataContract";
-import type { RawBarRecord, UniverseSnapshot } from "../../src/types";
+import { checkProductionManagedRights, createRightsProvenance, isDeferredMarketDataCategory, rightsFailureMessage, type MarketDataArchiveMetadata, type MarketDataRightsProfile, type MarketDataRightsProvenance, type RightsDecision, type RightsUseCategory } from "../../src/lib/marketDataContract";
+import type { AppData, RawBarRecord, UniverseSnapshot } from "../../src/types";
 import {
   createProductionJob,
   jobIdFor,
@@ -63,6 +63,17 @@ export interface ManagedWorkerResult {
   scheduler: SchedulerStatus;
   deadline: DeadlineEvidence;
 }
+
+interface ManagedRightsContext {
+  profile: MarketDataRightsProfile;
+  metadata: MarketDataArchiveMetadata;
+  provenance: MarketDataRightsProvenance;
+  decisions: Partial<Record<RightsUseCategory, RightsDecision>>;
+  blockedReasons: string[];
+  baseBlockedReasons: string[];
+}
+
+const rightsBlockedReason = (use: RightsUseCategory, decision: RightsDecision) => `rights_blocked:${use}:${decision.reason}`;
 
 const finalStatus = (job?: WorkerJob | null) => job && ["completed", "partial", "blocked", "terminal-failed", "superseded"].includes(job.status);
 const sessionInstant = (session: string) => new Date(`${session}T23:00:00.000Z`);
@@ -128,6 +139,7 @@ const workflowFor = (data: NonNullable<ReturnType<WorkerStore["load"]>>["data"],
     providerProductId: options.ingestionMetadata?.providerProductId,
     datasetIdentity: options.ingestionMetadata?.datasetIdentity,
     rightsProfileId: options.ingestionMetadata?.rightsProfileId ?? options.rightsProfile?.profileId,
+    rightsProvenance: options.ingestionMetadata?.rightsProvenance,
     settings: data.scannerSettings,
     recipes: data.recipes,
     eyes: data.eyes.map(({ lastEvaluation, ...eye }) => eye),
@@ -162,9 +174,10 @@ const readinessStatus = (histories: ManagedHistory[], data: NonNullable<ReturnTy
   return problems.length ? "partial" as const : "completed" as const;
 };
 
-const runSession = async (store: WorkerStore, histories: ManagedHistory[], options: ManagedWorkerOptions, session: string, jobs: JobContractResult, nowMs: number) => {
+const runSession = async (store: WorkerStore, histories: ManagedHistory[], options: ManagedWorkerOptions, session: string, jobs: JobContractResult, nowMs: number, rightsContext?: ManagedRightsContext) => {
   const owner = options.owner ?? `managed-${process.pid}`;
   const leaseMs = options.leaseMs ?? WORKER_DEFAULT_LEASE_MS;
+  const rightsBlockedReasons = [...(rightsContext?.baseBlockedReasons ?? [])];
   const claims: Array<{ id: string; token: string }> = [];
   const ingestionJob = store.getJob(jobs.byKind["ingestion-readiness"].id)!;
   const ingestionClaim = claimedStage(store, ingestionJob, owner, nowMs, leaseMs);
@@ -222,42 +235,83 @@ const runSession = async (store: WorkerStore, histories: ManagedHistory[], optio
       scheduledSession: session,
       adjustment: options.adjustment,
       providerName: options.source,
-      ingestionMetadata: options.ingestionMetadata,
+      ingestionMetadata: rightsContext?.metadata ?? options.ingestionMetadata,
     });
-    const snapshots = saved.data.stocks.map(stock => {
-      const existing = saved.data.snapshots.find(snapshot => snapshot.stockId === stock.id);
-      const history = jobs.sessionHistories.find(history => history.symbol === stock.symbol);
-      if (!history?.rows.length || stock.archivedAt) return existing;
-      try {
-        const snapshot = snapshotFromBars(stock, history.rows, jobs.sessionHistories.find(entry => entry.symbol === "SPY")?.rows ?? [], { source: options.source, origin: "import", adjustment: options.adjustment, datasetId: jobs.inputHash, now, metadata: options.ingestionMetadata, rightsProfileId: options.rightsProfile?.profileId });
-        return { ...snapshot, plannedEntryLow: existing?.plannedEntryLow, plannedEntryHigh: existing?.plannedEntryHigh, lastThesisReviewAt: existing?.lastThesisReviewAt, riskFlags: existing?.riskFlags ?? [] };
-      } catch {
-        return existing;
-      }
-    }).filter((snapshot): snapshot is NonNullable<typeof snapshot> => Boolean(snapshot));
-    const next = evaluateWorkspace({
-      ...saved.data,
-      snapshots,
-      rawBarArchives: result.rawArchiveBatch ? [result.rawArchiveBatch, ...saved.data.rawBarArchives.filter(batch => batch.id !== result.rawArchiveBatch!.id)] : saved.data.rawBarArchives,
-      universeSnapshots: [result.universeSnapshot, ...saved.data.universeSnapshots.filter(snapshot => snapshot.id !== result.universeSnapshot.id)],
-      processedFeatures: [...result.processedFeatures, ...saved.data.processedFeatures.filter(feature => !result.processedFeatures.some(nextFeature => nextFeature.id === feature.id))],
-      scanRuns: [result.scanRun, ...saved.data.scanRuns.filter(run => run.id !== result.scanRun.id)],
-      scanSignals: result.scanSignals,
-      forwardProofLedger: result.forwardProofLedger,
-    }, now);
+    const rawBarArchives = result.rawArchiveBatch
+      ? [result.rawArchiveBatch, ...saved.data.rawBarArchives.filter(batch => batch.id !== result.rawArchiveBatch!.id)]
+      : saved.data.rawBarArchives;
+    const universeSnapshots = [result.universeSnapshot, ...saved.data.universeSnapshots.filter(snapshot => snapshot.id !== result.universeSnapshot.id)];
+    const outputRightsBlocked = rightsBlockedReasons.length > 0;
+    let next: AppData;
+    if (outputRightsBlocked) {
+      const blockedRun = {
+        ...result.scanRun,
+        status: "partial" as const,
+        warnings: [...result.scanRun.warnings, ...rightsBlockedReasons],
+        blockedReason: rightsBlockedReasons.join(";") || "rights_blocked",
+        rightsProvenance: rightsContext?.provenance ?? result.scanRun.rightsProvenance,
+      };
+      next = {
+        ...saved.data,
+        rawBarArchives,
+        universeSnapshots,
+        scanRuns: [blockedRun, ...saved.data.scanRuns.filter(run => run.id !== result.scanRun.id)],
+      };
+    } else {
+      const snapshots = saved.data.stocks.map(stock => {
+        const existing = saved.data.snapshots.find(snapshot => snapshot.stockId === stock.id);
+        const history = jobs.sessionHistories.find(history => history.symbol === stock.symbol);
+        if (!history?.rows.length || stock.archivedAt) return existing;
+        try {
+          const snapshot = snapshotFromBars(stock, history.rows, jobs.sessionHistories.find(entry => entry.symbol === "SPY")?.rows ?? [], { source: options.source, origin: options.sourceKind === "provider" ? "provider" : "import", adjustment: options.adjustment, datasetId: jobs.inputHash, now, metadata: rightsContext?.metadata ?? options.ingestionMetadata, rightsProfileId: options.rightsProfile?.profileId });
+          return { ...snapshot, plannedEntryLow: existing?.plannedEntryLow, plannedEntryHigh: existing?.plannedEntryHigh, lastThesisReviewAt: existing?.lastThesisReviewAt, riskFlags: existing?.riskFlags ?? [] };
+        } catch {
+          return existing;
+        }
+      }).filter((snapshot): snapshot is NonNullable<typeof snapshot> => Boolean(snapshot));
+      const evaluated = evaluateWorkspace({
+        ...saved.data,
+        snapshots,
+        rawBarArchives,
+        universeSnapshots,
+        processedFeatures: [...result.processedFeatures, ...saved.data.processedFeatures.filter(feature => !result.processedFeatures.some(nextFeature => nextFeature.id === feature.id))],
+        scanRuns: [result.scanRun, ...saved.data.scanRuns.filter(run => run.id !== result.scanRun.id)],
+        scanSignals: result.scanSignals,
+        forwardProofLedger: result.forwardProofLedger,
+      }, now);
+      const priorAlertIds = new Set(saved.data.alerts.map(alert => alert.id));
+      next = rightsContext
+        ? { ...evaluated, alerts: evaluated.alerts.map(alert => priorAlertIds.has(alert.id) ? alert : { ...alert, rightsProvenance: rightsContext.provenance }) }
+        : evaluated;
+    }
     const priorAlertIds = new Set(saved.data.alerts.map(alert => alert.id));
     const newAlerts = next.alerts.filter(alert => !priorAlertIds.has(alert.id));
-    const notificationIntents = newAlerts.map(alert => buildNotificationIntent(
+    let notificationBlockedReason: string | undefined;
+    if (rightsContext && newAlerts.length > 0) {
+      const notificationDecision = checkProductionManagedRights(rightsContext.profile, "notification", { providerIdentity: rightsContext.metadata.providerIdentity, providerProductId: rightsContext.metadata.providerProductId, now });
+      if (!notificationDecision.allowed) {
+        notificationBlockedReason = rightsBlockedReason("notification", notificationDecision);
+        rightsBlockedReasons.push(notificationBlockedReason);
+      }
+    }
+    if (rightsBlockedReasons.length) {
+      const currentRun = next.scanRuns.find(run => run.id === result.scanRun.id);
+      if (currentRun) {
+        const blockedRun = { ...currentRun, status: "partial" as const, warnings: [...new Set([...currentRun.warnings, ...rightsBlockedReasons])], blockedReason: rightsBlockedReasons.join(";"), rightsProvenance: rightsContext?.provenance ?? currentRun.rightsProvenance };
+        next = { ...next, scanRuns: [blockedRun, ...next.scanRuns.filter(run => run.id !== currentRun.id)] };
+      }
+    }
+    const notificationIntents = notificationBlockedReason ? [] : newAlerts.map(alert => buildNotificationIntent(
       alert,
       next.notificationPreferences,
       leaseClock(),
       { accountInvalidated: false },
     ));
     if (leaseLost) throw new Error("Worker lease renewal failed before commit.");
-    const resultStatus = result.scanRun.status;
+    const resultStatus = rightsBlockedReasons.length ? "partial" as const : result.scanRun.status;
     const relatedClaims: RelatedClaim[] = [];
     if (outcomeClaim) relatedClaims.push({ ...outcomeClaim, status: resultStatus });
-    if (notificationClaim) relatedClaims.push({ ...notificationClaim, status: "completed" });
+    if (notificationClaim) relatedClaims.push({ ...notificationClaim, status: notificationBlockedReason ? "blocked" : "completed" });
     store.commitJobResult({
       id: evaluationClaim.id,
       token: evaluationClaim.token,
@@ -266,7 +320,7 @@ const runSession = async (store: WorkerStore, histories: ManagedHistory[], optio
       status: resultStatus,
       relatedClaims,
       notificationIntents,
-      outbox: notificationClaim ? {
+      outbox: notificationClaim && !notificationBlockedReason ? {
         id: `intent-${notification.id}`,
         jobId: notification.id,
         payload: {
@@ -284,7 +338,7 @@ const runSession = async (store: WorkerStore, histories: ManagedHistory[], optio
       } : undefined,
       now: leaseClock(),
     });
-    return { status: resultStatus, jobIds: jobs.ids, scanDate: session, signals: result.scanSignals.length, alerts: next.alerts.length };
+    return { status: resultStatus, jobIds: jobs.ids, scanDate: session, signals: outputRightsBlocked ? 0 : result.scanSignals.length, alerts: next.alerts.length };
   } catch (cause) {
     const message = cause instanceof Error ? cause.message : "Managed worker failed.";
     for (const claim of claims) store.failJob(claim.id, claim.token, message, leaseClock());
@@ -307,16 +361,24 @@ export async function runManagedJob(store: WorkerStore, histories: ManagedHistor
   const started = performance.now();
   const now = options.now ?? new Date();
   const deadlineBudgetMs = options.deadlineBudgetMs ?? WORKER_DEFAULT_DEADLINE_BUDGET_MS;
+  let rightsContext: ManagedRightsContext | undefined;
   if (options.sourceKind === "provider") {
     const metadata = options.ingestionMetadata;
     const decision = checkProductionManagedRights(options.rightsProfile, "internal_computation", metadata ? { providerIdentity: metadata.providerIdentity, providerProductId: metadata.providerProductId, now } : undefined);
+    const provenanceMismatch = metadata?.rightsProvenance && (
+      metadata.rightsProvenance.rightsProfileId !== options.rightsProfile?.profileId
+      || metadata.rightsProvenance.rightsProviderIdentity !== metadata.providerIdentity
+      || metadata.rightsProvenance.rightsProviderProductId !== metadata.providerProductId
+    );
     const reason = !metadata
       ? "missing_ingestion_contract"
       : metadata.datasetCategory !== "daily_ohlcv"
         ? isDeferredMarketDataCategory(metadata.datasetCategory) ? "unsupported_deferred_dataset_category" : "unsupported_dataset_category"
         : metadata.rightsProfileId !== options.rightsProfile?.profileId
           ? "rights_profile_identity_mismatch"
-          : decision.allowed ? undefined : rightsFailureMessage(options.rightsProfile, "internal_computation", { providerIdentity: metadata.providerIdentity, providerProductId: metadata.providerProductId, now });
+          : provenanceMismatch
+            ? "rights_provenance_identity_mismatch"
+            : decision.allowed ? undefined : rightsFailureMessage(options.rightsProfile, "internal_computation", { providerIdentity: metadata.providerIdentity, providerProductId: metadata.providerProductId, now });
     if (reason) {
       const saved = store.load();
       if (!saved) throw new Error("Import a StockLedger backup before running the worker.");
@@ -328,6 +390,31 @@ export async function runManagedJob(store: WorkerStore, histories: ManagedHistor
         deadline: { elapsedMs, workloadSize: { symbols: histories.length, rows: 0, scheduledSessions: 0, jobStages: 0 }, deadlineBudgetMs, remainingHeadroomMs: deadlineBudgetMs - elapsedMs, withinBudget: elapsedMs <= deadlineBudgetMs, evidenceOnly: true },
       };
     }
+    if (!metadata) throw new Error("missing_ingestion_contract");
+    const expected = { providerIdentity: metadata.providerIdentity, providerProductId: metadata.providerProductId, now };
+    const derivedDecision = checkProductionManagedRights(options.rightsProfile, "derived_metrics", expected);
+    const displayDecision = checkProductionManagedRights(options.rightsProfile, "end_user_display", expected);
+    const decisions = {
+      internal_computation: decision,
+      derived_metrics: derivedDecision,
+      end_user_display: displayDecision,
+      notification: checkProductionManagedRights(options.rightsProfile, "notification", expected),
+      user_export: checkProductionManagedRights(options.rightsProfile, "user_export", expected),
+      raw_redistribution: checkProductionManagedRights(options.rightsProfile, "raw_redistribution", expected),
+    };
+    const baseBlockedReasons = [
+      ...(derivedDecision.allowed ? [] : [rightsBlockedReason("derived_metrics", derivedDecision)]),
+      ...(displayDecision.allowed ? [] : [rightsBlockedReason("end_user_display", displayDecision)]),
+    ];
+    const provenance = createRightsProvenance(options.rightsProfile!, decisions, now.toISOString());
+    rightsContext = {
+      profile: options.rightsProfile!,
+      metadata: { ...metadata, rightsProvenance: provenance },
+      provenance,
+      decisions,
+      blockedReasons: baseBlockedReasons,
+      baseBlockedReasons,
+    };
   }
   const rows = validateBatchSize(histories);
   const saved = store.load();
@@ -371,7 +458,7 @@ export async function runManagedJob(store: WorkerStore, histories: ManagedHistor
     }
     const byKind = Object.fromEntries(workflow.jobs.map(job => [job.kind, job])) as Record<WorkerJobKind, JobContractResult["jobs"][number]>;
     try {
-      latest = await runSession(store, histories, options, workflow.jobs[0].scheduledSession, { ...workflow, byKind, ids: workflow.jobs.map(job => job.id) }, now.getTime());
+      latest = await runSession(store, histories, options, workflow.jobs[0].scheduledSession, { ...workflow, byKind, ids: workflow.jobs.map(job => job.id) }, now.getTime(), rightsContext);
     } catch (cause) {
       const message = cause instanceof Error ? cause.message : "Managed worker failed.";
       store.updateSchedulerState({ lastRunStatus: "failed", lastSafeError: message, now: now.getTime() });
@@ -380,11 +467,12 @@ export async function runManagedJob(store: WorkerStore, histories: ManagedHistor
     const sessionResult = latest;
     if (["completed", "partial", "blocked"].includes(sessionResult.status)) {
       const completed = sessionResult.status === "completed";
+      const durableRightsBlock = store.load()?.data.scanRuns.find(run => run.scanDate === workflow.jobs[0].scheduledSession)?.blockedReason;
       store.updateSchedulerState({
         lastSuccessfulSession: completed ? workflow.jobs[0].scheduledSession : undefined,
         lastSuccessfulRunAtUtc: completed ? now.toISOString() : undefined,
         lastRunStatus: sessionResult.status,
-        lastSafeError: null,
+        lastSafeError: durableRightsBlock?.startsWith("rights_blocked:") ? durableRightsBlock : null,
         now: now.getTime(),
       });
     }

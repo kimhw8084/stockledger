@@ -5,7 +5,8 @@ import { isSessionDate, isUsTradingDate, previousUsTradingDate } from "./marketC
 export const MARKET_DATA_INGESTION_CONTRACT_VERSION = "stockledger-market-data-ingestion-v1" as const;
 export const MARKET_DATA_INGESTION_CONTRACT_REVISION = 1 as const;
 export const MARKET_DATA_RIGHTS_CONTRACT_VERSION = "stockledger-market-data-rights-v1" as const;
-export const MARKET_DATA_RIGHTS_CONTRACT_REVISION = 1 as const;
+export const MARKET_DATA_RIGHTS_CONTRACT_REVISION = 2 as const;
+export const MARKET_DATA_RIGHTS_AUTHORITY_MODEL_VERSION = "stockledger-market-data-rights-authority-v1" as const;
 
 export type MarketDataDatasetCategory =
   | "daily_ohlcv"
@@ -59,6 +60,23 @@ export type RightsUseCategory =
 
 export type RightsState = "allowed" | "denied" | "unknown";
 export type RightsProfileKind = "commercial" | "research-only" | "local-user";
+export type RightsAuthorityState =
+  | "executed-agreement"
+  | "public-comparison"
+  | "research-only"
+  | "internal-only"
+  | "unverified"
+  | "expired"
+  | "local-user";
+
+export interface MarketDataRightsAuthority {
+  modelVersion: typeof MARKET_DATA_RIGHTS_AUTHORITY_MODEL_VERSION;
+  state: RightsAuthorityState;
+  /** Safe agreement/evidence identifier only; never a credential or contract document. */
+  evidenceRef?: string;
+  effectiveAtUtc?: string;
+  expiresAtUtc?: string;
+}
 
 export interface MarketDataRightsPermission {
   state: RightsState;
@@ -71,12 +89,15 @@ export type MarketDataRightsPermissions = Record<RightsUseCategory, MarketDataRi
 
 export interface MarketDataRightsProfile {
   contractVersion: typeof MARKET_DATA_RIGHTS_CONTRACT_VERSION;
-  revision: typeof MARKET_DATA_RIGHTS_CONTRACT_REVISION;
+  /** Kept numeric so old persisted profiles can be inspected and rejected safely. */
+  revision: number;
   profileId: string;
   providerIdentity: string;
   providerProductId: string;
   profileKind: RightsProfileKind;
   evidenceRef?: string;
+  /** Optional only for backward reading; current production profiles must provide it. */
+  authority?: MarketDataRightsAuthority;
   permissions: MarketDataRightsPermissions;
 }
 
@@ -86,6 +107,31 @@ export interface RightsDecision {
   use: RightsUseCategory;
   profileId?: string;
   reason: string;
+}
+
+export interface MarketDataRightsDecisionMetadata {
+  use: RightsUseCategory;
+  allowed: boolean;
+  state: RightsState;
+  reason: string;
+  decidedAtUtc: string;
+  effectiveAtUtc?: string;
+  expiresAtUtc?: string;
+}
+
+/** Immutable, safe provenance attached when provider data enters the managed path. */
+export interface MarketDataRightsProvenance {
+  rightsContractVersion: typeof MARKET_DATA_RIGHTS_CONTRACT_VERSION;
+  rightsContractRevision: number;
+  rightsAuthorityModelVersion: string;
+  rightsAuthorityState: RightsAuthorityState;
+  rightsEvidenceRef?: string;
+  rightsAuthorityEffectiveAtUtc?: string;
+  rightsAuthorityExpiresAtUtc?: string;
+  rightsProviderIdentity: string;
+  rightsProviderProductId: string;
+  rightsProfileId: string;
+  rightsDecisions: Partial<Record<RightsUseCategory, MarketDataRightsDecisionMetadata>>;
 }
 
 export interface MarketDataValidationReport {
@@ -134,6 +180,7 @@ export interface NormalizedMarketDataBatch {
   validationIssues: string[];
   failureClass: MarketDataFailureClass;
   rightsProfileId: string;
+  rightsProvenance?: MarketDataRightsProvenance;
   items: NormalizedMarketDataItem[];
 }
 
@@ -142,6 +189,7 @@ export type MarketDataArchiveMetadata = Pick<NormalizedMarketDataBatch,
   | "requestedStartDate" | "requestedEndDate" | "observedStartDate" | "observedEndDate"
   | "retrievalTimestampUtc" | "sourceRequestIdentity" | "freshnessState" | "coverageState"
   | "stableContentHash" | "datasetIdentity" | "validationIssues" | "failureClass" | "rightsProfileId"
+  | "rightsProvenance"
 >;
 
 export interface ProviderDailyBarsResponse {
@@ -179,6 +227,7 @@ export const createResearchOnlyRightsProfile = (providerIdentity: string, provid
   providerIdentity,
   providerProductId,
   profileKind: "research-only",
+  authority: { modelVersion: MARKET_DATA_RIGHTS_AUTHORITY_MODEL_VERSION, state: "research-only" },
   permissions: makeRightsPermissions("denied", { internal_computation: { state: "allowed" } }),
 });
 
@@ -189,7 +238,43 @@ export const createLocalUserRightsProfile = (providerIdentity = "local-user", pr
   providerIdentity,
   providerProductId,
   profileKind: "local-user",
+  authority: { modelVersion: MARKET_DATA_RIGHTS_AUTHORITY_MODEL_VERSION, state: "local-user" },
   permissions: makeRightsPermissions("allowed", { raw_redistribution: { state: "denied" } }),
+});
+
+const nonEmptyReference = (value: unknown): value is string => typeof value === "string" && value.trim().length > 0;
+
+const authorityDecision = (
+  profile: MarketDataRightsProfile,
+  use: RightsUseCategory,
+  decision: RightsDecision,
+  decidedAtUtc: string,
+): MarketDataRightsDecisionMetadata => ({
+  use,
+  allowed: decision.allowed,
+  state: decision.state,
+  reason: decision.reason,
+  decidedAtUtc,
+  effectiveAtUtc: profile.permissions?.[use]?.effectiveAtUtc,
+  expiresAtUtc: profile.permissions?.[use]?.expiresAtUtc,
+});
+
+export const createRightsProvenance = (
+  profile: MarketDataRightsProfile,
+  decisions: Partial<Record<RightsUseCategory, RightsDecision>>,
+  decidedAtUtc: string,
+): MarketDataRightsProvenance => ({
+  rightsContractVersion: MARKET_DATA_RIGHTS_CONTRACT_VERSION,
+  rightsContractRevision: profile.revision,
+  rightsAuthorityModelVersion: profile.authority?.modelVersion ?? "unknown",
+  rightsAuthorityState: profile.authority?.state ?? "unverified",
+  rightsEvidenceRef: profile.evidenceRef?.trim() || profile.authority?.evidenceRef?.trim() || undefined,
+  rightsAuthorityEffectiveAtUtc: profile.authority?.effectiveAtUtc,
+  rightsAuthorityExpiresAtUtc: profile.authority?.expiresAtUtc,
+  rightsProviderIdentity: profile.providerIdentity,
+  rightsProviderProductId: profile.providerProductId,
+  rightsProfileId: profile.profileId,
+  rightsDecisions: Object.fromEntries(Object.entries(decisions).map(([use, decision]) => [use, authorityDecision(profile, use as RightsUseCategory, decision!, decidedAtUtc)])),
 });
 
 export const checkRights = (
@@ -228,10 +313,20 @@ export const checkProductionManagedRights = (
   expected?: { providerIdentity: string; providerProductId: string; now?: Date },
 ): RightsDecision => {
   const decision = checkRights(profile, use, expected);
-  if (!profile || profile.profileKind !== "commercial") {
-    return { ...decision, allowed: false, state: decision.state === "allowed" ? "denied" : decision.state, reason: "production_requires_commercial_profile" };
-  }
-  return decision;
+  if (!profile || profile.profileKind !== "commercial") return { ...decision, allowed: false, state: decision.state === "allowed" ? "denied" : decision.state, reason: "production_requires_commercial_profile" };
+  if (profile.revision !== MARKET_DATA_RIGHTS_CONTRACT_REVISION) return { ...decision, allowed: false, state: "unknown", reason: "unsupported_rights_profile_revision" };
+  const authority = profile.authority;
+  if (!authority || authority.modelVersion !== MARKET_DATA_RIGHTS_AUTHORITY_MODEL_VERSION) return { ...decision, allowed: false, state: "unknown", reason: "missing_or_unsupported_rights_authority" };
+  if (authority.state !== "executed-agreement") return { ...decision, allowed: false, state: "denied", reason: "production_requires_executed_agreement" };
+  const profileEvidenceRef = profile.evidenceRef?.trim();
+  const authorityEvidenceRef = authority.evidenceRef?.trim();
+  if (!nonEmptyReference(profileEvidenceRef) || !nonEmptyReference(authorityEvidenceRef)) return { ...decision, allowed: false, state: "unknown", reason: "missing_evidence_reference" };
+  if (profileEvidenceRef !== authorityEvidenceRef) return { ...decision, allowed: false, state: "unknown", reason: "evidence_reference_mismatch" };
+  const now = expected?.now ?? new Date();
+  if (!authority.effectiveAtUtc || !validTimestamp(authority.effectiveAtUtc) || now < new Date(authority.effectiveAtUtc)) return { ...decision, allowed: false, state: "unknown", reason: "authority_not_effective" };
+  if (authority.expiresAtUtc && (!validTimestamp(authority.expiresAtUtc) || now >= new Date(authority.expiresAtUtc))) return { ...decision, allowed: false, state: "denied", reason: "authority_expired" };
+  if (!decision.allowed) return decision;
+  return { ...decision, reason: "allowed" };
 };
 
 export const rightsFailureMessage = (profile: MarketDataRightsProfile | undefined, use: RightsUseCategory, expected?: { providerIdentity: string; providerProductId: string; now?: Date }) => {
@@ -338,6 +433,7 @@ export const normalizeProviderBatch = (input: {
   requestedEndDate: string;
   responses: ProviderDailyBarsResponse[];
   rightsProfile: MarketDataRightsProfile;
+  rightsProvenance?: MarketDataRightsProvenance;
   expectedLatestSession?: string;
   minimumSessions?: number;
 }): NormalizedMarketDataBatch => {
@@ -386,7 +482,7 @@ export const normalizeProviderBatch = (input: {
     observedStartDate: allRows.map(row => row.date).sort().at(0), observedEndDate: allRows.map(row => row.date).sort().at(-1),
     retrievalTimestampUtc, adjustmentBasis: acceptedItems[0]?.adjustmentBasis ?? "unknown", sourceRequestIdentity: items.map(item => item.sourceRequestIdentity).filter(Boolean).join(",") || undefined,
     freshnessState, coverageState, stableContentHash, datasetIdentity: `dataset-${stableContentHash}`,
-    validationIssues, failureClass, rightsProfileId: input.rightsProfile.profileId, items,
+    validationIssues, failureClass, rightsProfileId: input.rightsProfile.profileId, rightsProvenance: input.rightsProvenance, items,
   };
 };
 
