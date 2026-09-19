@@ -192,7 +192,8 @@ export interface NotificationDigestMember {
 
 export type NotificationPreflight =
   | { kind: "send" }
-  | { kind: "canceled"; reason: string };
+  | { kind: "canceled"; reason: string }
+  | { kind: "replan"; reason: string };
 
 export type NotificationDigestClaim =
   | { kind: "claimed"; digest: NotificationDigest; token: string; memberIds: string[] }
@@ -930,10 +931,9 @@ export class WorkerStore {
         continue;
       }
       const eligibility = notificationEligibility(alert, preferences, now, intent.channel, accountInvalidated && intent.accountScope === "account-owned");
-      const grouping = intent.deliveryMode === "digest" ? notificationDigestGrouping({ ...intent, destination: eligibility.destination, privacyMode: preferences.privacyMode, digestBucket: preferences.deliveryMode === "digest" ? new Date(eligibility.notBefore).toISOString() : null, digestTimezone: preferences.timezone }) : null;
       const policyChanged = intent.preferenceHash !== preferenceHash || intent.preferenceUpdatedAt !== preferences.updatedAt;
       if (intent.status === "claimed") {
-        if (intent.cancellationRequested || eligibility.status === "canceled" || policyChanged || (intent.deliveryMode === "digest" && (!grouping || intent.destination !== grouping.destination || intent.digestBucket !== grouping.digestBucket || intent.digestTimezone !== grouping.digestTimezone || intent.privacyMode !== grouping.privacyMode))) {
+        if (intent.cancellationRequested || eligibility.status === "canceled") {
           this.db.prepare("UPDATE notification_intents SET cancellation_requested=1,cancellation_requested_reason=?,updated_at=? WHERE id=? AND status='claimed'").run(
             intent.cancellationRequestedReason ?? (eligibility.status === "canceled" ? eligibility.cancellationReason : "preference-changed-before-submit"), new Date(now).toISOString(), intent.id,
           );
@@ -1120,12 +1120,38 @@ export class WorkerStore {
       const preferences = saved ? normalizeNotificationPreferences(saved.data.notificationPreferences, new Date(now)) : null;
       const preferenceHash = preferences ? notificationPreferencesFingerprint(preferences) : "";
       const eligibility = alert && preferences ? notificationEligibility(alert, preferences, now, intent.channel, false) : { status: "canceled" as const, notBefore: now, cancellationReason: "workspace-unavailable" as const, destination: null };
+      const digestBucket = preferences?.deliveryMode === "digest" ? new Date(eligibility.notBefore).toISOString() : null;
+      const timingChanged = alert && preferences && intent.notBefore !== eligibility.notBefore && (
+        intent.deliveryMode === "digest"
+        || preferences.deliveryMode === "digest"
+        || intent.notBefore !== intent.scheduledAt
+        || eligibility.notBefore > now
+      );
+      const effectivePolicyChanged = Boolean(
+        intent.destination !== eligibility.destination
+        || intent.privacyMode !== preferences?.privacyMode
+        || intent.deliveryMode !== preferences?.deliveryMode
+        || intent.digestBucket !== digestBucket
+        || intent.digestTimezone !== preferences?.timezone
+        || timingChanged
+        || eligibility.status === "blocked-unconfigured"
+        || intent.cancellationReason !== eligibility.cancellationReason,
+      );
       if (intent.cancellationRequested || eligibility.status === "canceled") {
-        this.db.prepare("UPDATE notification_intents SET status='canceled',terminal_state='canceled',cancellation_reason=?,lease_owner=NULL,token=NULL,lease_until=0,next_retry_at=NULL,updated_at=? WHERE id=? AND status='claimed' AND token=?").run(intent.cancellationRequestedReason ?? eligibility.cancellationReason, new Date(now).toISOString(), id, token);
+        this.db.prepare("UPDATE notification_intents SET status='canceled',terminal_state='canceled',cancellation_reason=?,terminal_error_class=NULL,lease_owner=NULL,token=NULL,lease_until=0,next_retry_at=NULL,attempt_count=MAX(0,attempt_count-1),cancellation_requested=0,cancellation_requested_reason=NULL,updated_at=? WHERE id=? AND status='claimed' AND token=?").run(intent.cancellationRequestedReason ?? eligibility.cancellationReason ?? "preference-opted-out", new Date(now).toISOString(), id, token);
+        this.persistWorkerProjectionInside(now);
         return { kind: "canceled", reason: intent.cancellationRequestedReason ?? eligibility.cancellationReason ?? "preference-opted-out" };
       }
+      if (effectivePolicyChanged) {
+        this.db.prepare("UPDATE notification_intents SET status=?,terminal_state=NULL,destination=?,privacy_mode=?,delivery_mode=?,digest_bucket=?,digest_timezone=?,preference_updated_at=?,preference_hash=?,not_before=?,cancellation_reason=?,terminal_error_class=NULL,digest_id=NULL,lease_owner=NULL,token=NULL,lease_until=0,next_retry_at=NULL,attempt_count=MAX(0,attempt_count-1),cancellation_requested=0,cancellation_requested_reason=NULL,updated_at=? WHERE id=? AND status='claimed' AND token=?").run(
+          eligibility.status, eligibility.destination, preferences!.privacyMode, preferences!.deliveryMode, digestBucket, preferences!.timezone,
+          preferences!.updatedAt, preferenceHash, eligibility.notBefore, eligibility.cancellationReason, new Date(now).toISOString(), id, token,
+        );
+        this.persistWorkerProjectionInside(now);
+        return { kind: "replan", reason: eligibility.status === "blocked-unconfigured" ? "channel-unconfigured" : "preference-changed-before-submit" };
+      }
       this.db.prepare("UPDATE notification_intents SET destination=?,privacy_mode=?,delivery_mode=?,digest_bucket=?,digest_timezone=?,preference_updated_at=?,preference_hash=?,claimed_preference_updated_at=?,claimed_preference_hash=?,not_before=?,cancellation_requested=0,cancellation_requested_reason=NULL,updated_at=? WHERE id=? AND status='claimed' AND token=?").run(
-        eligibility.destination, preferences!.privacyMode, preferences!.deliveryMode, preferences!.deliveryMode === "digest" ? new Date(eligibility.notBefore).toISOString() : null, preferences!.timezone,
+        eligibility.destination, preferences!.privacyMode, preferences!.deliveryMode, digestBucket, preferences!.timezone,
         preferences!.updatedAt, preferenceHash, preferences!.updatedAt, preferenceHash, eligibility.notBefore, new Date(now).toISOString(), id, token,
       );
       return { kind: "send" };

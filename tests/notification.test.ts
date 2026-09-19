@@ -46,6 +46,11 @@ const commitIntent = (store: WorkerStore, suffix: string, input = buildNotificat
   store.commitJobResult({ id: job.id, token, data, expectedRevision: revision, notificationIntents: [input], now });
   return input;
 };
+const commitIntentData = (store: WorkerStore, suffix: string, data: ReturnType<typeof testData>, input: ReturnType<typeof buildNotificationIntent>, at = now) => {
+  const { job, token } = queueJob(store, suffix, at);
+  store.commitJobResult({ id: job.id, token, data, expectedRevision: store.load()?.revision ?? 0, notificationIntents: [input], now: at });
+  return input;
+};
 const commitDigestPair = (store: WorkerStore, suffix: string, preferences = { ...enabledPreferences(), deliveryMode: "digest" as const, digestTime: "13:00" }) => {
   const firstAlert = testAlert(`alert-${suffix}-a`); const secondAlert = testAlert(`alert-${suffix}-b`);
   const data = { ...testData(preferences, firstAlert), alerts: [firstAlert, secondAlert] };
@@ -285,6 +290,209 @@ it.each(["before-claim", "after-claim-before-acceptance"] as const)("fences opt-
     expect(store.listNotificationAttempts(input.id)).toHaveLength(0);
   }
   store.close();
+});
+
+it("rolls back an immediate claim on opt-out, including the safe worker projection", async () => {
+  const store = new WorkerStore(databasePath()); const data = testData(); store.import(data, 0);
+  const input = commitIntentData(store, "preflight-opt-out", data, buildNotificationIntent(data.alerts[0], data.notificationPreferences, now));
+  let submitted = false;
+  const transport: NotificationTransport = { channel: "email", configured: true, async send(message) {
+    store.cancelNotificationIntent(input.id, "user-opted-out", now + 1);
+    const preflight = await message.beforeAcceptance?.();
+    if (!preflight || preflight.kind === "send") { submitted = true; return { kind: "confirmed", providerMessageId: "unexpected" }; }
+    return preflight;
+  } };
+  await deliverDueNotifications(store, transport, { owner: "preflight-opt-out", now });
+  const intent = store.getNotificationIntent(input.id)!;
+  expect(submitted).toBe(false);
+  expect(intent.status).toBe("canceled");
+  expect(intent.cancellationReason).toBe("user-opted-out");
+  expect(intent.attemptCount).toBe(0);
+  expect(intent.leaseToken).toBeNull();
+  expect(store.listNotificationAttempts(input.id)).toHaveLength(0);
+  expect(store.load()?.data.lastKnownNotificationDeliveryStatus?.lastState).toBe("canceled");
+  expect(store.load()?.data.lastKnownNotificationDeliveryStatus?.attemptCount).toBe(0);
+  store.close();
+});
+
+it("replans a claimed destination change and sends exactly once to the new destination", async () => {
+  const store = new WorkerStore(databasePath()); const initial = enabledPreferences(); const data = testData(initial); store.import(data, 0);
+  const input = commitIntentData(store, "preflight-destination", data, buildNotificationIntent(data.alerts[0], initial, now));
+  let changed = false; const destinations: string[] = [];
+  const transport: NotificationTransport = { channel: "email", configured: true, async send(message) {
+    if (!changed) {
+      changed = true;
+      const updated = { ...initial, destinations: { email: { address: "new@example.test" } }, updatedAt: new Date(now + 1).toISOString() };
+      store.commitNotificationPreferences(updated, store.load()!.revision, now + 1);
+    }
+    const preflight = await message.beforeAcceptance?.();
+    if (preflight && preflight.kind !== "send") return preflight;
+    destinations.push(message.intent.destination!);
+    return { kind: "confirmed", providerMessageId: `destination-${destinations.length}` };
+  } };
+  await deliverDueNotifications(store, transport, { owner: "preflight-destination", now });
+  expect(destinations).toEqual(["new@example.test"]);
+  expect(store.getNotificationIntent(input.id)?.status).toBe("delivered");
+  expect(store.getNotificationIntent(input.id)?.cancellationReason).toBeNull();
+  expect(store.getNotificationIntent(input.id)?.attemptCount).toBe(1);
+  expect(store.listNotificationAttempts(input.id)).toHaveLength(1);
+  expect(await deliverDueNotifications(store, transport, { owner: "preflight-destination-replay", now: now + 1 })).toEqual([]);
+  expect(destinations).toHaveLength(1);
+  store.close();
+});
+
+it("replans privacy drift before acceptance and renders only the current privacy mode", async () => {
+  const store = new WorkerStore(databasePath()); const initial = enabledPreferences(); const data = testData(initial); store.import(data, 0);
+  const input = commitIntentData(store, "preflight-privacy", data, buildNotificationIntent(data.alerts[0], initial, now));
+  let changed = false; const rendered: string[] = [];
+  const transport: NotificationTransport = { channel: "email", configured: true, async send(message) {
+    if (!changed) {
+      changed = true;
+      const updated = { ...initial, privacyMode: "rich" as const, updatedAt: new Date(now + 1).toISOString() };
+      store.commitNotificationPreferences(updated, store.load()!.revision, now + 1);
+    }
+    const preflight = await message.beforeAcceptance?.();
+    if (preflight && preflight.kind !== "send") return preflight;
+    rendered.push(safeNotificationMessage({ alert: message.alert, destination: message.intent.destination!, privacyMode: message.intent.privacyMode, messageId: message.intent.semanticIdempotencyKey }).text);
+    return { kind: "confirmed", providerMessageId: "privacy-current" };
+  } };
+  await deliverDueNotifications(store, transport, { owner: "preflight-privacy", now });
+  expect(store.getNotificationIntent(input.id)?.privacyMode).toBe("rich");
+  expect(rendered).toHaveLength(1);
+  expect(rendered[0]).toContain(data.alerts[0].title);
+  expect(store.listNotificationAttempts(input.id)).toHaveLength(1);
+  store.close();
+});
+
+it("replans immediate-to-digest drift and joins the deterministic digest", async () => {
+  const store = new WorkerStore(databasePath()); const initial = enabledPreferences(); const firstAlert = testAlert("alert-immediate-to-digest"); const data = testData(initial, firstAlert); store.import(data, 0);
+  const first = commitIntentData(store, "immediate-to-digest", data, buildNotificationIntent(firstAlert, initial, now));
+  let changed = false;
+  const firstPassTransport: NotificationTransport = { channel: "email", configured: true, async send(message) {
+    if (!changed) {
+      changed = true;
+      const updated = { ...initial, deliveryMode: "digest" as const, digestTime: "13:00", updatedAt: new Date(now + 1).toISOString() };
+      store.commitNotificationPreferences(updated, store.load()!.revision, now + 1);
+    }
+    const preflight = await message.beforeAcceptance?.();
+    return preflight && preflight.kind !== "send" ? preflight : { kind: "confirmed", providerMessageId: "unexpected" };
+  } };
+  await deliverDueNotifications(store, firstPassTransport, { owner: "immediate-to-digest", now });
+  expect(store.getNotificationIntent(first.id)?.status).toBe("held");
+  expect(store.getNotificationIntent(first.id)?.deliveryMode).toBe("digest");
+  expect(store.getNotificationIntent(first.id)?.attemptCount).toBe(0);
+  expect(store.listNotificationAttempts(first.id)).toHaveLength(0);
+
+  const secondAlert = testAlert("alert-immediate-to-digest-second");
+  const expanded = { ...store.load()!.data, alerts: [firstAlert, secondAlert] };
+  store.import(expanded, store.load()!.revision, now + 1);
+  const digestPreferences = store.load()!.data.notificationPreferences;
+  const second = commitIntentData(store, "immediate-to-digest-second", store.load()!.data, buildNotificationIntent(secondAlert, digestPreferences, now));
+  const digestTransport = new InMemoryTestEmailTransport();
+  await deliverDueNotifications(store, digestTransport, { owner: "immediate-to-digest-digest", now: Date.parse("2026-09-18T13:00:00.000Z") });
+  expect(digestTransport.messages).toHaveLength(1);
+  expect(digestTransport.messages[0].intents?.map(intent => intent.id).sort()).toEqual([first.id, second.id].sort());
+  expect(store.getNotificationIntent(first.id)?.status).toBe("delivered");
+  expect(store.getNotificationIntent(second.id)?.status).toBe("delivered");
+  expect(store.listNotificationDigests()).toHaveLength(1);
+  store.close();
+});
+
+it("returns a claimed intent to held when a new quiet-hours notBefore appears", async () => {
+  const store = new WorkerStore(databasePath()); const initial = enabledPreferences(); const data = testData(initial); store.import(data, 0);
+  const input = commitIntentData(store, "preflight-quiet", data, buildNotificationIntent(data.alerts[0], initial, now));
+  let changed = false;
+  const transport: NotificationTransport = { channel: "email", configured: true, async send(message) {
+    if (!changed) {
+      changed = true;
+      const updated = { ...initial, quietHours: { enabled: true, start: "11:00", end: "13:00" }, updatedAt: new Date(now + 1).toISOString() };
+      store.commitNotificationPreferences(updated, store.load()!.revision, now + 1);
+    }
+    const preflight = await message.beforeAcceptance?.();
+    return preflight && preflight.kind !== "send" ? preflight : { kind: "confirmed", providerMessageId: "unexpected" };
+  } };
+  await deliverDueNotifications(store, transport, { owner: "preflight-quiet", now });
+  const intent = store.getNotificationIntent(input.id)!;
+  expect(intent.status).toBe("held");
+  expect(intent.notBefore).toBeGreaterThan(now);
+  expect(intent.attemptCount).toBe(0);
+  expect(store.listNotificationAttempts(input.id)).toHaveLength(0);
+  expect(store.load()?.data.lastKnownNotificationDeliveryStatus?.attemptCount).toBe(0);
+  store.close();
+});
+
+it("fences the former token after a replan and keeps drift distinct from revocation", () => {
+  const store = new WorkerStore(databasePath()); const initial = enabledPreferences(); const data = testData(initial); store.import(data, 0);
+  const input = commitIntentData(store, "preflight-token", data, buildNotificationIntent(data.alerts[0], initial, now));
+  const token = store.claimNotificationIntent(input.id, "former-token", now, 10_000)!;
+  const updated = { ...initial, destinations: { email: { address: "replanned@example.test" } }, updatedAt: new Date(now + 1).toISOString() };
+  store.commitNotificationPreferences(updated, store.load()!.revision, now + 1);
+  expect(store.preflightNotificationIntent(input.id, token, now + 1)).toEqual({ kind: "replan", reason: "preference-changed-before-submit" });
+  expect(store.getNotificationIntent(input.id)?.status).toBe("pending");
+  expect(store.getNotificationIntent(input.id)?.cancellationReason).toBeNull();
+  expect(store.getNotificationIntent(input.id)?.attemptCount).toBe(0);
+  expect(store.listNotificationAttempts(input.id)).toHaveLength(0);
+  expect(() => store.recordNotificationOutcome(input.id, token, { kind: "confirmed", providerMessageId: "stale" }, now + 2)).toThrow(/lease/);
+  store.close();
+});
+
+it("cancels or replans SMTP before recipient and DATA submission", async () => {
+  const runFence = async (mode: "cancel" | "replan") => {
+    const store = new WorkerStore(databasePath()); const initial = enabledPreferences(); const data = testData(initial); store.import(data, 0);
+    const input = commitIntentData(store, `smtp-${mode}`, data, buildNotificationIntent(data.alerts[0], initial, now));
+    const token = store.claimNotificationIntent(input.id, `smtp-${mode}`, now, 10_000)!;
+    const lines: string[] = []; const sockets = new Set<import("node:net").Socket>();
+    const server = createServer(socket => {
+      sockets.add(socket); socket.write("220 local-test\r\n"); let buffer = "";
+      socket.on("data", chunk => {
+        buffer += chunk.toString(); let end = buffer.indexOf("\r\n");
+        while (end >= 0) {
+          const line = buffer.slice(0, end); buffer = buffer.slice(end + 2); end = buffer.indexOf("\r\n"); lines.push(line);
+          if (line.startsWith("EHLO")) socket.write("250 local-test\r\n"); else socket.write("250 ok\r\n");
+        }
+      });
+    });
+    await new Promise<void>(resolve => server.listen(0, "127.0.0.1", () => resolve()));
+    const port = (server.address() as { port: number }).port; let fenced = false;
+    const transport = new SmtpEmailTransport({ host: "127.0.0.1", port, from: "worker@local.test", timeoutMs: 500 });
+    const outcome = await transport.send({
+      alert: data.alerts[0], intent: store.getNotificationIntent(input.id)!, beforeAcceptance: async () => {
+        if (!fenced) {
+          fenced = true;
+          if (mode === "cancel") store.cancelNotificationIntent(input.id, "smtp-opted-out", now + 1);
+          else {
+            const updated = { ...initial, destinations: { email: { address: "smtp-new@example.test" } }, updatedAt: new Date(now + 1).toISOString() };
+            store.commitNotificationPreferences(updated, store.load()!.revision, now + 1);
+          }
+        }
+        return store.preflightNotificationIntent(input.id, token, now + 1);
+      },
+    });
+    const result = { outcome, lines, intent: store.getNotificationIntent(input.id)!, attempts: store.listNotificationAttempts(input.id), receipts: store.listNotificationReceipts(input.id) };
+    for (const socket of sockets) socket.destroy();
+    await new Promise<void>(resolve => server.close(() => resolve()));
+    store.close();
+    return result;
+  };
+
+  const canceled = await runFence("cancel");
+  expect(canceled.outcome).toEqual({ kind: "canceled", reason: "smtp-opted-out" });
+  expect(canceled.lines.some(line => line === "RCPT TO:<local@example.test>" || line === "DATA")).toBe(false);
+  expect(canceled.lines.join("\n")).not.toContain("StockLedger review needed");
+  expect(canceled.intent.status).toBe("canceled");
+  expect(canceled.intent.attemptCount).toBe(0);
+  expect(canceled.attempts).toHaveLength(0);
+  expect(canceled.receipts).toHaveLength(0);
+
+  const replanned = await runFence("replan");
+  expect(replanned.outcome).toEqual({ kind: "replan", reason: "preference-changed-before-submit" });
+  expect(replanned.lines.some(line => line.startsWith("RCPT") || line === "DATA")).toBe(false);
+  expect(replanned.lines.join("\n")).not.toContain("StockLedger review needed");
+  expect(replanned.intent.status).toBe("pending");
+  expect(replanned.intent.destination).toBe("smtp-new@example.test");
+  expect(replanned.intent.attemptCount).toBe(0);
+  expect(replanned.attempts).toHaveLength(0);
+  expect(replanned.receipts).toHaveLength(0);
 });
 
 it("keeps a provider-accepted outcome truthful when opt-out occurs after the acceptance point", async () => {

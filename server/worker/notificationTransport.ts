@@ -13,7 +13,7 @@ export interface NotificationTransportMessage {
   beforeAcceptance?: () => Promise<NotificationPreflight>;
 }
 
-export type NotificationSendOutcome = NotificationOutcome | { kind: "canceled"; reason: string };
+export type NotificationSendOutcome = NotificationOutcome | { kind: "canceled"; reason: string } | { kind: "replan"; reason: string };
 
 export interface NotificationTransport {
   readonly channel: "email";
@@ -88,9 +88,6 @@ export class SmtpEmailTransport implements NotificationTransport {
     let socket: Socket | undefined;
     let bytesMayHaveBeenAccepted = false;
     const messageId = (message.digest?.digestKey ?? message.intent.semanticIdempotencyKey).replace(/[^a-zA-Z0-9._:-]/g, "-");
-    const rendered = message.digest
-      ? safeNotificationDigestMessage({ alerts: message.alerts ?? [message.alert], destination: message.digest.destination, privacyMode: message.digest.privacyMode, messageId })
-      : safeNotificationMessage({ alert: message.alert, destination: message.intent.destination, privacyMode: message.intent.privacyMode, messageId });
     try {
       socket = this.options.secure
         ? tlsConnect({ host: this.options.host, port: this.options.port, servername: this.options.host, rejectUnauthorized: true })
@@ -103,12 +100,19 @@ export class SmtpEmailTransport implements NotificationTransport {
         await writeCommand(socket, "AUTH PLAIN", [334], timeoutMs);
         await writeCommand(socket, Buffer.from(`\0${this.options.username}\0${this.options.password}`).toString("base64"), [235], timeoutMs);
       }
+      const beforeMail = await message.beforeAcceptance?.();
+      if (beforeMail?.kind && beforeMail.kind !== "send") { socket.destroy(); return beforeMail; }
       await writeCommand(socket, `MAIL FROM:<${this.options.from}>`, [250], timeoutMs);
+      const beforeRecipient = await message.beforeAcceptance?.();
+      if (beforeRecipient?.kind && beforeRecipient.kind !== "send") { socket.destroy(); return beforeRecipient; }
       await writeCommand(socket, `RCPT TO:<${message.intent.destination}>`, [250, 251], timeoutMs);
-      const preflight = await message.beforeAcceptance?.();
-      if (preflight?.kind === "canceled") { socket.destroy(); return preflight; }
+      const beforeData = await message.beforeAcceptance?.();
+      if (beforeData?.kind && beforeData.kind !== "send") { socket.destroy(); return beforeData; }
       await writeCommand(socket, "DATA", [354], timeoutMs);
       bytesMayHaveBeenAccepted = true;
+      const rendered = message.digest
+        ? safeNotificationDigestMessage({ alerts: message.alerts ?? [message.alert], destination: message.digest.destination, privacyMode: message.digest.privacyMode, messageId })
+        : safeNotificationMessage({ alert: message.alert, destination: message.intent.destination, privacyMode: message.intent.privacyMode, messageId });
       const body = [
         `From: ${this.options.from}`,
         `To: ${rendered.to}`,
@@ -143,7 +147,7 @@ export class InMemoryTestEmailTransport implements NotificationTransport {
   async send(message: NotificationTransportMessage): Promise<NotificationSendOutcome> {
     const identity = message.digest?.digestKey ?? message.intent.semanticIdempotencyKey;
     const preflight = await message.beforeAcceptance?.();
-    if (preflight?.kind === "canceled") return preflight;
+    if (preflight?.kind && preflight.kind !== "send") return preflight;
     if (this.accepted.has(identity)) return { kind: "confirmed", providerMessageId: `test-${identity}` };
     this.messages.push(message);
     if (this.mode === "definitive-failure") return { kind: "definitive-failure", errorClass: "test-definitive-failure" };
@@ -189,7 +193,7 @@ export async function deliverDueNotifications(store: WorkerStore, transport: Not
         continue;
       }
       const preflight = store.preflightNotificationDigest(claim.digest.id, claim.token, now);
-      if (preflight.kind === "canceled") {
+      if (preflight.kind !== "send") {
         for (const memberId of claim.memberIds) results.push({ intentId: memberId, status: store.getNotificationIntent(memberId)?.status ?? "unknown" });
         continue;
       }
@@ -199,7 +203,7 @@ export async function deliverDueNotifications(store: WorkerStore, transport: Not
         alert: alerts[0], alerts, intents, digest: claim.digest, intent: representative,
         beforeAcceptance: () => Promise.resolve(store.preflightNotificationDigest(claim.digest.id, claim.token, now)),
       });
-      if (outcome.kind === "canceled") continue;
+      if (outcome.kind === "canceled" || outcome.kind === "replan") continue;
       const updated = store.recordNotificationDigestOutcome(claim.digest.id, claim.token, outcome, now);
       for (const memberId of claim.memberIds) results.push({ intentId: memberId, status: updated?.status ?? "unknown" });
     }
@@ -217,9 +221,12 @@ export async function deliverDueNotifications(store: WorkerStore, transport: Not
         continue;
       }
       const preflight = store.preflightNotificationIntent(candidate.id, token, now);
-      if (preflight.kind === "canceled") { results.push({ intentId: candidate.id, status: "canceled" }); continue; }
+      if (preflight.kind !== "send") { results.push({ intentId: candidate.id, status: store.getNotificationIntent(candidate.id)?.status ?? "unknown" }); continue; }
       const outcome = await transport.send({ alert, intent: store.getNotificationIntent(candidate.id)!, beforeAcceptance: () => Promise.resolve(store.preflightNotificationIntent(candidate.id, token, now)) });
-      if (outcome.kind === "canceled") { results.push({ intentId: candidate.id, status: "canceled" }); continue; }
+      if (outcome.kind !== "confirmed" && outcome.kind !== "provider-accepted" && outcome.kind !== "definitive-failure" && outcome.kind !== "ambiguous") {
+        results.push({ intentId: candidate.id, status: store.getNotificationIntent(candidate.id)?.status ?? "unknown" });
+        continue;
+      }
       const updated = store.recordNotificationOutcome(candidate.id, token, outcome, now);
       results.push({ intentId: candidate.id, status: updated?.status ?? "unknown" });
     }
