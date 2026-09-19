@@ -1,0 +1,599 @@
+{
+  "accepted_at": "2026-09-19T15:46:33Z",
+  "changed_files": [
+    {
+      "additions": 30,
+      "deletions": 0,
+      "path": ".github/workflows/check.yml",
+      "status": "M"
+    },
+    {
+      "additions": 2,
+      "deletions": 0,
+      "path": "docs/operations/CLOUD_DEPLOYMENT.md",
+      "status": "M"
+    },
+    {
+      "additions": 2,
+      "deletions": 0,
+      "path": "docs/operations/LOCAL_WORKER.md",
+      "status": "M"
+    },
+    {
+      "additions": 15,
+      "deletions": 2,
+      "path": "docs/operations/RELEASE_RUNBOOK.md",
+      "status": "M"
+    },
+    {
+      "additions": 60,
+      "deletions": 0,
+      "path": "docs/production/CHG-96_EVIDENCE.md",
+      "status": "A"
+    },
+    {
+      "additions": 8,
+      "deletions": 1,
+      "path": "package.json",
+      "status": "M"
+    },
+    {
+      "additions": 2,
+      "deletions": 1,
+      "path": "scripts/benchmark-worker.ts",
+      "status": "M"
+    },
+    {
+      "additions": 21,
+      "deletions": 0,
+      "path": "scripts/check-release-base.mjs",
+      "status": "A"
+    },
+    {
+      "additions": 32,
+      "deletions": 0,
+      "path": "scripts/check-release-workflow.mjs",
+      "status": "A"
+    },
+    {
+      "additions": 15,
+      "deletions": 0,
+      "path": "scripts/operations-qualification.ts",
+      "status": "A"
+    },
+    {
+      "additions": 14,
+      "deletions": 0,
+      "path": "scripts/recovery-drill.ts",
+      "status": "A"
+    },
+    {
+      "additions": 35,
+      "deletions": 0,
+      "path": "scripts/release-evidence.ts",
+      "status": "A"
+    },
+    {
+      "additions": 15,
+      "deletions": 0,
+      "path": "scripts/verify-release-evidence.ts",
+      "status": "A"
+    },
+    {
+      "additions": 22,
+      "deletions": 2,
+      "path": "server/worker/cli.ts",
+      "status": "M"
+    },
+    {
+      "additions": 2,
+      "deletions": 2,
+      "path": "server/worker/contract.ts",
+      "status": "M"
+    },
+    {
+      "additions": 287,
+      "deletions": 0,
+      "path": "server/worker/operations.ts",
+      "status": "A"
+    },
+    {
+      "additions": 109,
+      "deletions": 0,
+      "path": "server/worker/qualification.ts",
+      "status": "A"
+    },
+    {
+      "additions": 168,
+      "deletions": 0,
+      "path": "server/worker/recovery.ts",
+      "status": "A"
+    },
+    {
+      "additions": 122,
+      "deletions": 0,
+      "path": "server/worker/releaseEvidenceRuntime.ts",
+      "status": "A"
+    },
+    {
+      "additions": 11,
+      "deletions": 1,
+      "path": "server/worker/store.ts",
+      "status": "M"
+    },
+    {
+      "additions": 4,
+      "deletions": 0,
+      "path": "src/operations/releaseContracts.ts",
+      "status": "A"
+    },
+    {
+      "additions": 167,
+      "deletions": 0,
+      "path": "src/operations/releaseEvidence.ts",
+      "status": "A"
+    },
+    {
+      "additions": 17,
+      "deletions": 0,
+      "path": "tests/cloud.test.ts",
+      "status": "M"
+    },
+    {
+      "additions": 9,
+      "deletions": 0,
+      "path": "tests/integration/cloud.integration.ts",
+      "status": "M"
+    },
+    {
+      "additions": 115,
+      "deletions": 0,
+      "path": "tests/operations.test.ts",
+      "status": "A"
+    },
+    {
+      "additions": 8,
+      "deletions": 0,
+      "path": "tests/qualification.test.ts",
+      "status": "A"
+    },
+    {
+      "additions": 17,
+      "deletions": 0,
+      "path": "tests/recovery.test.ts",
+      "status": "A"
+    },
+    {
+      "additions": 69,
+      "deletions": 0,
+      "path": "tests/releaseEvidence.test.ts",
+      "status": "A"
+    }
+  ],
+  "checks": [
+    {
+      "command": "/bin/zsh -lc 'rtk mktemp -d /tmp/stockledger-r4-shallow.XXXXXX'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git clone --depth 1 --branch codex/stockledger-prod-c09-app-ci-release-identity-fixture-fix-v1 file:///Users/haewonkim/.codex-fabric/worktrees/CF-5da6b6356d2b115818795d83 /tmp/stockledger-r4-shallow.HeEZ6N/repo'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk git rev-parse --is-shallow-repository && PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk git log --oneline --all -3 && PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm ci && PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm test -- --run tests/operations.test.ts'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm test -- --run tests/operations.test.ts && PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk git status --short --branch && PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk git rev-parse --is-shallow-repository'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk git status --short --branch && PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk git rev-parse HEAD && PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk git rev-parse '\"'HEAD\"'^{tree}'\"' && PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:\"'$PATH rtk git rev-parse --verify '\"'babea4ba5ea63cf054bd64488e09f3f3723080bf\"'^{commit}'\"' && PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:\"'$PATH rtk git merge-base --is-ancestor babea4ba5ea63cf054bd64488e09f3f3723080bf babea4ba5ea63cf054bd64488e09f3f3723080bf; echo merge_base:$? && PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk git rev-parse --is-shallow-repository && PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk cat .git/shallow'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH STOCKLEDGER_PROTECTED_BASE=babea4ba5ea63cf054bd64488e09f3f3723080bf STOCKLEDGER_SOURCE_COMMIT=babea4ba5ea63cf054bd64488e09f3f3723080bf STOCKLEDGER_SOURCE_TREE=ab28da1540f5caf342a479920468a7b91b4a4304 GITHUB_SHA=ffffffffffffffffffffffffffffffffffffffff rtk npx tsx -e '\"'import { buildReleaseEvidence } from \\\"./src/operations/releaseEvidence\\\"; import { collectReleaseVerificationFacts, verifyRuntimeReleaseEvidence, establishCurrentSourceIdentity } from \\\"./server/worker/releaseEvidenceRuntime\\\"; const c=\\\"babea4ba5ea63cf054bd64488e09f3f3723080bf\\\", t=\\\"ab28da1540f5caf342a479920468a7b91b4a4304\\\"; const f=collectReleaseVerificationFacts(c,{sourceCommit:c,sourceTree:t}); console.log(JSON.stringify({current:establishCurrentSourceIdentity(),facts:f,evidence:buildReleaseEvidence(f),runtime:verifyRuntimeReleaseEvidence(buildReleaseEvidence(f))},null,2));'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"sed -n '68,112p' tests/operations.test.ts && PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:\"'$PATH rtk pwd && PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk git status --porcelain'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run typecheck'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm test -- --run'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm test -- --run tests/worker.test.ts tests/monitoring.test.ts tests/storage.test.ts tests/repository.test.ts tests/sync.test.ts tests/synchronize.test.ts tests/notification.test.ts tests/marketDataIngestion.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run check:release-workflow && STOCKLEDGER_PROTECTED_BASE=62c21af2f781b3ff53505f4582d86e24fead528d PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run check:release-base'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '1,200p' .gitignore && printf '%s\\\\n' '--- scripts package names ---' && rtk rg -n '\\\"(recovery:drill|operations:qualify|release:evidence|release:verify)' package.json && printf '%s\\\\n' '--- working tree ---' && rtk git status --short --branch\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"sed -n '1,240p' scripts/recovery-drill.ts && printf '%s\\\\n' '--- qualification script ---' && sed -n '1,280p' scripts/operations-qualification.ts && printf '%s\\\\n' '--- benchmark script ---' && sed -n '1,220p' scripts/benchmark-worker.ts\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk env -u STOCKLEDGER_PROTECTED_BASE GITHUB_SHA=ffffffffffffffffffffffffffffffffffffffff GITHUB_EVENT_NAME=pull_request GITHUB_BASE_REF=main GITHUB_HEAD_REF=codex/stockledger-prod-c09-app-ci-release-identity-fixture-fix-v1 rtk npm test -- --run tests/operations.test.ts tests/recovery.test.ts tests/releaseEvidence.test.ts tests/qualification.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk ls -l artifacts && rtk git status --short --branch && rtk npm run operations:qualify -- --output artifacts/r4-operations-qualification.json'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run recovery:drill -- --output artifacts/r4-recovery-result.json && PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run operations:qualify -- --output artifacts/r4-operations-qualification.json && PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run benchmark:worker'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run operations:qualify -- --output artifacts/r4-operations-qualification.json'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk ls -l artifacts && PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run benchmark:worker'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '1,220p' artifacts/r4-operations-qualification.json && rtk git diff --check && rtk git status --short --branch\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run check:boundaries'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run check:frozen'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm audit --audit-level=high'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run export:all'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk test -d dist -type f | head -20 && rtk du -sh dist 2>/dev/null || true && PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run test:e2e'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk ls -ld test-results playwright-report 2>/dev/null || true && rtk find test-results -maxdepth 2 -type f 2>/dev/null | head -20 && rtk git status --short --branch'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk proxy npm run test:e2e'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk ps -axo pid,command | rg 'playwright|expo|vite' || true && rtk ls -l test-results 2>/dev/null || true\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk proxy npm run test:e2e'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git diff --check && rtk git diff --stat && rtk git diff -- tests/operations.test.ts && rtk git add tests/operations.test.ts && rtk git commit -m \"test(operations): make release identity fixture shallow-safe\"'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git status --short --branch && rtk git rev-parse HEAD && rtk git merge-base --is-ancestor 62c21af2f781b3ff53505f4582d86e24fead528d HEAD && rtk git log --oneline --decorate --graph -7 && rtk mktemp -d /tmp/stockledger-r4-final-shallow.XXXXXX'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git clone --depth 1 --branch codex/stockledger-prod-c09-app-ci-release-identity-fixture-fix-v1 file:///Users/haewonkim/.codex-fabric/worktrees/CF-5da6b6356d2b115818795d83 /tmp/stockledger-r4-final-shallow.BeKpxQ/repo'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk git rev-parse --is-shallow-repository && PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk git rev-list --count HEAD && PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk git rev-parse HEAD && PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk git rev-parse '\"'HEAD\"'^{tree}'\"'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm ci'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm test -- --run tests/operations.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git status --short --branch && PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run release:evidence -- --output artifacts/r4-release-evidence.json --base 62c21af2f781b3ff53505f4582d86e24fead528d'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk npm run release:verify -- --input artifacts/r4-release-evidence.json --base 62c21af2f781b3ff53505f4582d86e24fead528d'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n -i 'fabric|evidence|release-evidence|CF-' docs scripts .github README.md 2>/dev/null | head -240 && printf '%s\\\\n' '--- remotes ---' && rtk git remote -v && printf '%s\\\\n' '--- evidence refs ---' && rtk git branch -a --no-color | rg 'evidence|fabric|c09'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk ls -la /Users/haewonkim/.codex-fabric && rtk find /Users/haewonkim/.codex-fabric -maxdepth 3 -type f | head -120 && printf '%s\\\\n' '--- CHG96 evidence ---' && sed -n '1,220p' docs/production/CHG-96_EVIDENCE.md && printf '%s\\\\n' '--- implementation status tail ---' && sed -n '145,220p' docs/production/IMPLEMENTATION_STATUS.md\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk find /Users/haewonkim/.codex-fabric/evidence -maxdepth 3 -type f | head -100 && printf '%s\\\\n' '--- latest evidence metadata ---' && rtk find /Users/haewonkim/.codex-fabric/evidence -maxdepth 3 -type f -name '*.json' -print | tail -20\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk find /Users/haewonkim/.codex-fabric/results -maxdepth 3 -type f | head -120 && printf '%s\\\\n' '--- jobs c09/cf ---' && rtk find /Users/haewonkim/.codex-fabric/jobs -maxdepth 3 -type f | rg 'CF|stockledger|c09|a2bd' | tail -120\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk /Users/haewonkim/.codex-fabric/bin/fabricctl --help'",
+      "exit_code": 2,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk ls -lt /Users/haewonkim/.codex-fabric/jobs | head -30 && printf '%s\\\\n' '--- recent result dirs ---' && rtk ls -lt /Users/haewonkim/.codex-fabric/results | head -30 && printf '%s\\\\n' '--- current branch/worktree metadata ---' && rtk git config --local --list | rg -i 'fabric|worktree|branch' || true && rtk env | rg 'CF-|FABRIC|CODEX' || true\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"printf '%s\\\\n' '--- current job ---' && rtk sed -n '1,240p' /Users/haewonkim/.codex-fabric/jobs/CF-5da6b6356d2b115818795d83.running/job.json && printf '%s\\\\n' '--- current result ---' && rtk sed -n '1,280p' /Users/haewonkim/.codex-fabric/results/CF-5da6b6356d2b115818795d83/result.json 2>/dev/null || true && printf '%s\\\\n' '--- current evidence manifest ---' && rtk sed -n '1,280p' /Users/haewonkim/.codex-fabric/results/CF-5da6b6356d2b115818795d83/evidence-manifest.json 2>/dev/null || true\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n 'publish-evidence|publish_evidence|refresh-evidence|evidence-manifest|final-receipt' /Users/haewonkim/.codex-fabric/bin /Users/haewonkim/.codex-fabric/libexec /Users/haewonkim/.codex-fabric -g '*.py' -g '*.sh' -g '*.md' | head -240\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '2780,2875p' /Users/haewonkim/.codex-fabric/releases/1.2.3-resume-candidate/fabric.py && printf '%s\\\\n' '--- publication helpers ---' && rtk sed -n '2875,2965p' /Users/haewonkim/.codex-fabric/releases/1.2.3-resume-candidate/fabric.py && printf '%s\\\\n' '--- current job prompt tail ---' && rtk sed -n '1,180p' /Users/haewonkim/.codex-fabric/jobs/CF-5da6b6356d2b115818795d83.running/prompt.md\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git push --set-upstream origin codex/stockledger-prod-c09-app-ci-release-identity-fixture-fix-v1'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git status --short --branch && rtk git diff --check && rtk git rev-parse HEAD && rtk git rev-parse origin/codex/stockledger-prod-c09-app-ci-release-identity-fixture-fix-v1 && rtk git rev-parse origin/main && rtk git rev-parse origin/codex/stockledger-prod-c09-operations-pr-ci-hermetic-fix-v1 && rtk git ls-remote origin refs/heads/codex/stockledger-prod-c09-app-ci-release-identity-fixture-fix-v1 refs/heads/main refs/heads/codex/stockledger-prod-c09-operations-pr-ci-hermetic-fix-v1'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk /Users/haewonkim/.codex-fabric/bin/fabricctl status CF-5da6b6356d2b115818795d83 && printf '%s\\\\n' '--- final manifest binding ---' && rtk rg -n '\\\"baseCommit\\\"|\\\"source\\\"|\\\"commit\\\"|\\\"tree\\\"|\\\"workingTree\\\"|\\\"evidenceHash\\\"' artifacts/r4-release-evidence.json | head -30 && printf '%s\\\\n' '--- final diff stat vs protected main ---' && rtk git diff --stat 62c21af2f781b3ff53505f4582d86e24fead528d HEAD && printf '%s\\\\n' '--- final commits ---' && rtk git log --oneline --decorate 62c21af2f781b3ff53505f4582d86e24fead528d..HEAD\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk proxy npm run export:all'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git status --short --branch && rtk git diff --check && rtk git rev-parse HEAD && rtk git rev-parse origin/codex/stockledger-prod-c09-app-ci-release-identity-fixture-fix-v1'",
+      "exit_code": 0,
+      "type": "command_execution"
+    }
+  ],
+  "codex": {
+    "cli_version": "codex-cli 0.154.0",
+    "configured_model": "gpt-5.6-luna",
+    "event_count": 145,
+    "provider_reported_model": null,
+    "reasoning_effort": "xhigh",
+    "terminal_type": "turn.completed",
+    "usage": {
+      "cache_hit_percent": 96.23,
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 3331584,
+      "fresh_input_tokens": 130643,
+      "input_tokens": 3462227,
+      "non_reasoning_output_tokens": 13115,
+      "output_tokens": 24741,
+      "reasoning_output_tokens": 11626,
+      "total_processed_tokens": 3486968
+    },
+    "warnings": []
+  },
+  "commits": [
+    {
+      "sha": "c8e8180cbf8dfc7e9fd90b32b4a822958de26ea7",
+      "subject": "test(operations): make release identity fixture shallow-safe"
+    },
+    {
+      "sha": "babea4ba5ea63cf054bd64488e09f3f3723080bf",
+      "subject": "fix(operations): make release CI verification hermetic"
+    },
+    {
+      "sha": "0d7e529826aac55a763fac36bfba8b69d6945e74",
+      "subject": "docs(operations): record cloud qualification boundary"
+    },
+    {
+      "sha": "7b8232e135a3d69f9330273f9d83efeaef200fa7",
+      "subject": "fix(operations): enforce release evidence integrity"
+    },
+    {
+      "sha": "09d520a29b2b0e319dc1937e6eb97ae96ede7466",
+      "subject": "feat(operations): add recovery and release evidence foundation"
+    }
+  ],
+  "diff": {
+    "additions": 1378,
+    "changed_files": 28,
+    "commit_count": 5,
+    "deletions": 9
+  },
+  "error_code": null,
+  "evidence_manifest": {
+    "count": 10,
+    "items": [
+      {
+        "bytes": 9365,
+        "path": "docs/operations/CLOUD_DEPLOYMENT.md",
+        "sha256": "21e093aa5add9df66fd74936c9caf90f6ca26ea40c441de6ed5381e9f294c510"
+      },
+      {
+        "bytes": 24203,
+        "path": "docs/operations/LOCAL_WORKER.md",
+        "sha256": "fe3a49b744948b8464dee9da230dff54c9f408ebb8eb8b4e1df13afa2cf93e46"
+      },
+      {
+        "bytes": 5738,
+        "path": "docs/operations/RELEASE_RUNBOOK.md",
+        "sha256": "483007b22f55590b9225dde3908d8b22d49e75cfb0136ffbabf05eb9b356d256"
+      },
+      {
+        "bytes": 7368,
+        "path": "docs/production/CHG-96_EVIDENCE.md",
+        "sha256": "962b31332ee65e0eabfb9aea9f4301c6066fde3b08ed243c13f3ffd18aeb02c3"
+      },
+      {
+        "bytes": 2602,
+        "path": "package.json",
+        "sha256": "4dc618dca7d3fc9f3a9b0168a61ac99e65c3ace021e2cf3030d5713beaaebf56"
+      },
+      {
+        "bytes": 2474,
+        "path": "scripts/release-evidence.ts",
+        "sha256": "7f74df440f3e2efd0d2c1264bc29d7b353b17b82bfeb8573e50c0542dcb9f1ef"
+      },
+      {
+        "bytes": 1119,
+        "path": "scripts/verify-release-evidence.ts",
+        "sha256": "a80ec2f00b3d22aeded6a14b870403f05b2eb628c6e6eaf5ba396476aad142ec"
+      },
+      {
+        "bytes": 5830,
+        "path": "server/worker/releaseEvidenceRuntime.ts",
+        "sha256": "b38d8b65f42b5d8a187a9e6c4dc1221ea33cff5ecbcc991f4a765e536ef63fc2"
+      },
+      {
+        "bytes": 11482,
+        "path": "src/operations/releaseEvidence.ts",
+        "sha256": "4fa7e5ccbff5f8f8557774da2569370f74e19a9f78202dd80f65033715da561c"
+      },
+      {
+        "bytes": 5097,
+        "path": "tests/releaseEvidence.test.ts",
+        "sha256": "471da575d43c842841f132fceae92e26ec29516c5a0869dc996a10e225a06b66"
+      }
+    ],
+    "version": 1
+  },
+  "evidence_publisher_release": "1.2.3-resume-candidate",
+  "fabric_capture": {
+    "applied": false,
+    "paths_before": 0,
+    "transient_untracked_removed": {
+      "count": 0,
+      "items": []
+    }
+  },
+  "fabric_release": "1.2.3-resume-candidate",
+  "failure_class": null,
+  "finished_at": "2026-09-19T16:00:18Z",
+  "git": {
+    "base_is_ancestor": true,
+    "base_sha": "62c21af2f781b3ff53505f4582d86e24fead528d",
+    "branch": "codex/stockledger-prod-c09-app-ci-release-identity-fixture-fix-v1",
+    "detached_verify": false,
+    "head_sha": "c8e8180cbf8dfc7e9fd90b32b4a822958de26ea7",
+    "remote_exact_head": true,
+    "remote_head_sha": "c8e8180cbf8dfc7e9fd90b32b4a822958de26ea7",
+    "target_branch": "main",
+    "target_drifted_since_acceptance": false,
+    "target_head_observed_after_execution": "62c21af2f781b3ff53505f4582d86e24fead528d",
+    "work_branch": "codex/stockledger-prod-c09-app-ci-release-identity-fixture-fix-v1",
+    "worktree_clean": true
+  },
+  "instructions": {
+    "files": [],
+    "total_bytes": 0,
+    "warning": null
+  },
+  "job_id": "CF-5da6b6356d2b115818795d83",
+  "kind": "codex-fabric-audit-evidence",
+  "locator": {
+    "branch": "codex-fabric/evidence/stockledger/prod-c09-app-ci-release-identity-fixture-fix-v1",
+    "path": ".codex-fabric/audit.json",
+    "ref": "refs/heads/codex-fabric/evidence/stockledger/prod-c09-app-ci-release-identity-fixture-fix-v1"
+  },
+  "operation": "FIX",
+  "policy": {
+    "environment_policy_sha256": "e077daca74297b3c30bee8989f00f8ca5338f7610b4d016a6c48db524205d064",
+    "fabric_release": "1.2.3-resume-candidate",
+    "policy_sha256": "44756118cd7fda0c45cd23ba1d31a48a3f4f2422d687df15264ba4406f40e1f2",
+    "registry_sha256": "cfc765f3211c37c7967a138f3b2d89a99341939b15b2623f92744d007f625d6f"
+  },
+  "project_id": "stockledger",
+  "recovery": {
+    "model_rerun_safe": false,
+    "recovery_required": false,
+    "retry_safe": false,
+    "retry_scope": null,
+    "worktree_retained": true
+  },
+  "request": "prod-c09-app-ci-release-identity-fixture-fix-v1",
+  "schema_version": 1,
+  "started_at": "2026-09-19T15:46:33Z",
+  "status": "EXECUTED_CHANGE",
+  "timing": {
+    "execution_seconds": 825,
+    "queue_seconds": 0,
+    "total_seconds": 825
+  },
+  "transport": {
+    "bytes": 7576,
+    "envelope": "FABRIC/2",
+    "prompt_bytes": 7213,
+    "prompt_sha256": "54b7b9303c4cb2a5394970a61312b622b2fc18fc4fc38866dc10d10e42aedaca",
+    "sha256": "5da6b6356d2b115818795d836f81f2902419d1e6f9275389283e11079eee3dad"
+  }
+}
