@@ -12,11 +12,12 @@ Use one source tree/lockfile for both operating paths. Reference SL backlog IDs 
 6. Generate source-bound evidence from the exact candidate and verify it before release:
 
    ```sh
-   npm run release:evidence -- --output artifacts/release-evidence.json --base 62c21af2f781b3ff53505f4582d86e24fead528d
-   npm run release:verify -- --input artifacts/release-evidence.json
+   export STOCKLEDGER_PROTECTED_BASE=<trusted-protected-base-commit-sha>
+   npm run release:evidence -- --output artifacts/release-evidence.json --base "$STOCKLEDGER_PROTECTED_BASE"
+   npm run release:verify -- --input artifacts/release-evidence.json --base "$STOCKLEDGER_PROTECTED_BASE"
    ```
 
-   Verification is fail-closed for a stale/mismatched tree, changed migration digest/order, schema/contract mismatch, malformed manifest or incompatible rollback assertion. Generate release proof from a clean candidate tree; optional artifacts are hashed by path and bytes.
+   The base is a required trusted input, must be an exact ancestor of the candidate, and has no historical fallback. Pull-request CI supplies the exact PR base SHA; push-to-main CI supplies the event's prior target SHA; local and manually dispatched proof must provide an explicit trusted SHA. Verification is fail-closed for a stale/mismatched tree, changed migration digest/order, schema/contract mismatch, malformed manifest, dirty source tree or incompatible rollback assertion. Generate release proof from a clean candidate tree; optional artifacts are hashed by path and bytes.
 7. Apply compatible additive/server-first migrations only after a backup is confirmed. Test staging, retain the preceding compatible artifact, verify after restore, and never perform a destructive database downgrade.
 8. Review CI and compare local/remote HEAD. Configure required checks/branch protection if supported by the account plan; a workflow file alone is not protection.
 

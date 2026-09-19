@@ -24,7 +24,7 @@ type SafeTimestamp = string | null;
 
 export interface OperationsStatusOptions {
   observedAt?: Date;
-  sourceIdentity?: { commit: string | null; tree: string | null; state?: "known" | "unavailable" | "mismatched" };
+  sourceIdentity?: { commit: string | null; tree: string | null; state?: "known" | "unavailable" | "mismatched"; reason?: string };
   appVersion?: string;
   nodeRequirement?: string;
 }
@@ -119,6 +119,7 @@ export interface OperationsStatus {
     syncContractVersion: string;
     sourceCommit: string | null;
     sourceTree: string | null;
+    reason: string;
   };
   externalDependencies: {
     hostedScheduler: "not-configured";
@@ -194,8 +195,9 @@ export function createOperationsStatus(store: WorkerStore, options: OperationsSt
   const scanRunsByState = Object.fromEntries([...new Set(saved?.data.scanRuns.map(run => run.status) ?? [])].sort().map(state => [state, saved?.data.scanRuns.filter(run => run.status === state).length ?? 0]));
   const archivesByValidation = Object.fromEntries([...new Set(saved?.data.rawBarArchives.map(archive => archive.validationStatus) ?? [])].sort().map(state => [state, saved?.data.rawBarArchives.filter(archive => archive.validationStatus === state).length ?? 0]));
   const staleOrPartialCoverage = (saved?.data.scanRuns.filter(run => run.status !== "completed").length ?? 0) + (saved?.data.rawBarArchives.filter(archive => archive.validationStatus !== "valid").length ?? 0);
-  const source = options.sourceIdentity ?? { commit: process.env.GITHUB_SHA ?? process.env.STOCKLEDGER_SOURCE_COMMIT ?? null, tree: null, state: "unavailable" as const };
+  const source = options.sourceIdentity ?? { commit: process.env.GITHUB_SHA ?? process.env.STOCKLEDGER_SOURCE_COMMIT ?? null, tree: process.env.STOCKLEDGER_SOURCE_TREE ?? null, state: "unavailable" as const, reason: "release_identity_unavailable" };
   const sourceState = source.state ?? (source.commit ? "known" : "unavailable");
+  const releaseReason = source.reason ?? (sourceState === "known" ? "release_identity_verified" : `release_identity_${sourceState}`);
   const reasons = new Set<string>();
   if (!saved) reasons.add("workspace_missing");
   if (integrity === "failed") reasons.add("storage_integrity_failed");
@@ -210,13 +212,15 @@ export function createOperationsStatus(store: WorkerStore, options: OperationsSt
   if (failureClasses.budgetBlocked > 0) reasons.add("ingestion_budget_blocked");
   if (notificationCounts.failed > 0 || notificationCounts.ambiguous > 0 || notificationCounts["blocked-unconfigured"] > 0) reasons.add("notification_delivery_actionable_or_ambiguous");
   if (staleOrPartialCoverage > 0) reasons.add("stale_or_partial_market_coverage");
+  if (sourceState === "unavailable") reasons.add("release_identity_unavailable");
+  if (sourceState === "mismatched") reasons.add("release_identity_mismatched");
   const state: OperationsOverallState = !saved
     ? "unconfigured"
     : integrity === "failed" || scheduler.state === "blocked" || countsByState["terminal-failed"] > 0 || failureClasses.rightsBlocked > 0
       ? "blocked"
       : reasons.size > 0
         ? "degraded"
-        : integrity === "unknown" || sourceState === "mismatched"
+        : integrity === "unknown"
           ? "unknown"
           : "healthy";
   return {
@@ -271,7 +275,7 @@ export function createOperationsStatus(store: WorkerStore, options: OperationsSt
       notificationContracts: { delivery: NOTIFICATION_DELIVERY_CONTRACT_VERSION, deliveryRevision: NOTIFICATION_DELIVERY_CONTRACT_REVISION, digest: NOTIFICATION_DIGEST_CONTRACT_VERSION, digestRevision: NOTIFICATION_DIGEST_CONTRACT_REVISION, preferences: NOTIFICATION_PREFERENCES_CONTRACT_VERSION },
       ingestionContract: { version: MARKET_DATA_INGESTION_CONTRACT_VERSION, revision: MARKET_DATA_INGESTION_CONTRACT_REVISION },
       rightsContract: { version: MARKET_DATA_RIGHTS_CONTRACT_VERSION, revision: MARKET_DATA_RIGHTS_CONTRACT_REVISION, authorityModelVersion: MARKET_DATA_RIGHTS_AUTHORITY_MODEL_VERSION },
-      syncContractVersion: syncContractVersion, sourceCommit: source.commit, sourceTree: source.tree,
+      syncContractVersion: syncContractVersion, sourceCommit: source.commit, sourceTree: source.tree, reason: releaseReason,
     },
     externalDependencies: {
       hostedScheduler: "not-configured", providerQuotaCostRunway: "unavailable", commercialMarketDataProvider: "external-gate",

@@ -4,6 +4,7 @@ import { createOperationsStatus, OPERATIONS_STATUS_CONTRACT_VERSION } from "../s
 import { jobIdentityFor } from "../server/worker/contract";
 import { WorkerStore } from "../server/worker/store";
 import { seedData } from "../src/lib/seed";
+import { verifyRuntimeReleaseEvidence } from "../server/worker/releaseEvidenceRuntime";
 
 const observedAt = new Date("2026-09-18T16:00:00.000Z");
 let store: WorkerStore;
@@ -47,5 +48,21 @@ it("keeps notification state counts and safe diagnostics free of private fields"
   expect(serialized).not.toContain("notification body");
   expect(serialized).not.toContain("private provider detail");
   expect(Object.keys(status.notificationDelivery)).not.toContain("destination");
+  store.close();
+});
+
+it("keeps release identity unavailable or mismatched unless independently verified", () => {
+  const unavailable = verifyRuntimeReleaseEvidence({ source: { commit: "a".repeat(40), tree: "b".repeat(40) } });
+  expect(unavailable.state).toBe("unavailable");
+  expect(unavailable.reason).toBe("release_identity_unavailable");
+
+  const mismatched = createOperationsStatus(store, {
+    observedAt,
+    sourceIdentity: { commit: "a".repeat(40), tree: "b".repeat(40), state: "mismatched", reason: "release_identity_mismatched" },
+  });
+  expect(mismatched.releaseIdentity.state).toBe("mismatched");
+  expect(mismatched.releaseIdentity.reason).toBe("release_identity_mismatched");
+  expect(mismatched.overall.reasons).toContain("release_identity_mismatched");
+  expect(mismatched.overall.state).not.toBe("healthy");
   store.close();
 });
