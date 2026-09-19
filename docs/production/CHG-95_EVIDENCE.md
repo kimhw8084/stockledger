@@ -8,7 +8,8 @@ This document is an implementation and verification record. It is not evidence o
 
 - Protected-main base: `c290037e6de0079d47048850ee52f86800c8a992`
 - Work branch: `codex/stockledger-prod-c08-market-data-ingestion-foundation-v1`
-- Final implementation candidate: recorded below after the runtime/tests/docs candidate commit; the evidence closeout commit is recorded in the final handoff.
+- Final implementation candidate: `a062a9856f3148681d999bb6daff5d4f8778db66`.
+- Evidence closeout: a documentation-only follow-up commit on this same work branch; its exact SHA is recorded in the final handoff.
 - Node qualification: repository requirement is `>=22.23.2`; verification uses Node `22.23.2`.
 
 ## Changed scope
