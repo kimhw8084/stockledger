@@ -525,7 +525,7 @@ it("runs the managed entry point from the app-closed CLI and reports truthful st
   mkdirSync(csvDirectory);
   writeFileSync(backup, serializeExport(data, 0));
   for (const history of histories) writeFileSync(join(csvDirectory, `${history.symbol}.csv`), `Date,Open,High,Low,Close,Volume\n${history.rows.map(row => `${row.date},${row.open},${row.high},${row.low},${row.close},${row.volume}`).join("\n")}\n`);
-  const stdout = execFileSync(process.execPath, ["--experimental-sqlite", join(process.cwd(), "node_modules/tsx/dist/cli.mjs"), "server/worker/cli.ts", "--managed", "--db", db, "--import", backup, "--csv", csvDirectory, "--output", output, "--adjustment", "adjusted", "--source", "CLI fixture"], { cwd: process.cwd(), encoding: "utf8" });
+  const stdout = execFileSync(process.execPath, [join(process.cwd(), "node_modules/tsx/dist/cli.mjs"), "server/worker/cli.ts", "--managed", "--db", db, "--import", backup, "--csv", csvDirectory, "--output", output, "--adjustment", "adjusted", "--source", "CLI fixture"], { cwd: process.cwd(), encoding: "utf8" });
   expect(stdout).toContain('"mode":"managed"');
   expect(stdout).toContain('"schedulerInstalled":false');
   expect(existsSync(output)).toBe(true);

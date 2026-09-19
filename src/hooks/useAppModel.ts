@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { contentHash } from "../domain/contentHash";
+import { normalizeNotificationPreferences } from "../domain/notificationPreferences";
 import { validateEntryRange } from "../domain/inputValidation";
 import { mergeWatchlist, parseWatchlistCsv } from "../domain/watchlistImport";
 import { publishRecipeRevision } from "../domain/recipeRevision";
@@ -25,6 +26,7 @@ import {
   Recipe,
   RecipeCondition,
   Stock,
+  NotificationPreferences,
 } from "../types";
 import { createId } from "../platform/identity";
 
@@ -712,6 +714,17 @@ export const useAppModel = () => {
           if (contentHash(prev) !== expectedHash) throw new Error("The workspace changed while syncing. Your edits are saved; retry sync.");
           return next;
         });
+      },
+      async updateNotificationPreferences(change: Partial<NotificationPreferences>) {
+        await commit(prev => ({
+          ...prev,
+          notificationPreferences: normalizeNotificationPreferences({
+            ...prev.notificationPreferences,
+            ...change,
+            quietHours: { ...prev.notificationPreferences.quietHours, ...(change.quietHours ?? {}) },
+            updatedAt: new Date().toISOString(),
+          }),
+        }));
       },
       exportBackup() {
         return applicationService.exportBackup();

@@ -653,6 +653,61 @@ export interface ScannerSettings {
   frozenUniverseBySector?: Record<string, string[]>;
 }
 
+export type NotificationChannel = "email";
+export type NotificationDeliveryMode = "immediate" | "digest";
+export type NotificationPrivacyMode = "minimal" | "rich";
+export type NotificationProjectionState =
+  | "pending"
+  | "held"
+  | "claimed"
+  | "delivered"
+  | "failed"
+  | "retry-wait"
+  | "canceled"
+  | "blocked-unconfigured"
+  | "ambiguous";
+
+export interface NotificationPreferences {
+  contractVersion: "stockledger-notification-preferences-v1";
+  revision: 1;
+  explicitConsent: boolean;
+  enabled: boolean;
+  allowedChannels: NotificationChannel[];
+  destinations: {
+    email?: { address: string };
+  };
+  timezone: string;
+  quietHours: { enabled: boolean; start: string; end: string };
+  deliveryMode: NotificationDeliveryMode;
+  digestTime: string;
+  minimumPriority: "Low" | "Medium" | "High";
+  privacyMode: NotificationPrivacyMode;
+  /** CHG-93 does not sync delivery services; this setting is intentionally device-local. */
+  accountScope: "device-local";
+  updatedAt: string;
+}
+
+/**
+ * Safe, device-local worker evidence carried by the explicit backup handoff.
+ * It is intentionally not a delivery history table and is not part of CHG-93
+ * personal cloud collections.
+ */
+export interface LastKnownNotificationDeliveryStatus {
+  contractVersion: "stockledger-notification-status-v1";
+  revision: 1;
+  generatedAt: string;
+  channel: NotificationChannel;
+  lastIntentId: string | null;
+  lastState: NotificationProjectionState | null;
+  attemptCount: number;
+  lastConfirmedAt?: string;
+  lastProviderAcceptedAt?: string;
+  lastFailureAt?: string;
+  errorClass?: string;
+  preferenceUpdatedAt: string;
+  preferenceHash: string;
+}
+
 export interface AppData {
   workspaceId?: string;
   evaluations?: Evaluation[];
@@ -674,6 +729,9 @@ export interface AppData {
   reviewLogs: ReviewLog[];
   forwardProofLedger: ForwardProofLedger[];
   scannerSettings: ScannerSettings;
+  notificationPreferences: NotificationPreferences;
+  /** Device-local worker projection; never uploaded by CHG-93 sync. */
+  lastKnownNotificationDeliveryStatus?: LastKnownNotificationDeliveryStatus;
 }
 
 export interface ProviderHealthEntry {

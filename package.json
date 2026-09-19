@@ -9,7 +9,7 @@
     "android": "expo start --android",
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
-    "test": "node --experimental-sqlite node_modules/vitest/vitest.mjs run",
+    "test": "node node_modules/vitest/vitest.mjs run",
     "test:watch": "vitest",
     "check": "npm run typecheck && npm test",
     "export:web": "EXPO_NO_DOTENV=1 expo export --platform web",

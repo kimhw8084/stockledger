@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { AppData } from "../types";
+import { defaultNotificationPreferences, NOTIFICATION_PREFERENCES_CONTRACT_VERSION, validClockTime } from "./notificationPreferences";
 // Loose objects retain future fields. Known fields are validated recursively; no
 // filter, seed merge or catch-and-reset is allowed at the persistence boundary.
 const text = z.string();
@@ -53,6 +54,20 @@ const forwardSchema = z.looseObject({ id, signalId: id, completed5d: bool, compl
   ...Object.fromEntries(["ret5", "ret10", "ret20", "ret30", "spyRet5", "spyRet10", "spyRet20", "spyRet30", "sectorRet5", "sectorRet10", "sectorRet20", "sectorRet30", "mfe30", "mae30"].map(key => [key, opt(num)])),
   ...Object.fromEntries(["beatSpy5", "beatSpy10", "beatSpy20", "beatSpy30", "beatSector5", "beatSector10", "beatSector20", "beatSector30"].map(key => [key, opt(bool)])) });
 export const scannerSettingsSchema = z.looseObject({ universeMode, fallbackToFrozenUniverse: bool, providerDelayMinutesAfterClose: num.min(0).max(360), notifyNearMatches: bool, frozenUniverseBySector: opt(z.record(text, strings)) });
+const notificationPreferencesSchema = z.looseObject({
+  contractVersion: z.literal(NOTIFICATION_PREFERENCES_CONTRACT_VERSION), revision: z.literal(1), explicitConsent: bool, enabled: bool,
+  allowedChannels: z.array(z.literal("email")), destinations: z.looseObject({ email: opt(z.looseObject({ address: text.email() })) }),
+  timezone: text.min(1).max(100), quietHours: z.looseObject({ enabled: bool, start: text.refine(validClockTime, "Invalid quiet-hours start"), end: text.refine(validClockTime, "Invalid quiet-hours end") }),
+  deliveryMode: z.enum(["immediate", "digest"]), digestTime: text.refine(validClockTime, "Invalid digest time"), minimumPriority: priority,
+  privacyMode: z.enum(["minimal", "rich"]), accountScope: z.literal("device-local"), updatedAt: timestamp,
+});
+const lastKnownNotificationDeliveryStatusSchema = z.looseObject({
+  contractVersion: z.literal("stockledger-notification-status-v1"), revision: z.literal(1), generatedAt: timestamp,
+  channel: z.literal("email"), lastIntentId: z.union([id, z.null()]),
+  lastState: z.union([z.enum(["pending", "held", "claimed", "delivered", "failed", "retry-wait", "canceled", "blocked-unconfigured", "ambiguous"]), z.null()]),
+  attemptCount: num.int().nonnegative().max(5), lastConfirmedAt: opt(timestamp), lastProviderAcceptedAt: opt(timestamp), lastFailureAt: opt(timestamp),
+  errorClass: opt(text.max(120)), preferenceUpdatedAt: timestamp, preferenceHash: text.regex(/^[a-f0-9]{64}$/),
+});
 const appDataSchema = z.looseObject({
   workspaceId: opt(id),
   evaluations: opt(z.array(evaluationSchema)),
@@ -65,7 +80,8 @@ const appDataSchema = z.looseObject({
   scanRuns: z.array(z.looseObject({ id, scanDate: text, latestExpectedTradingDate: text, startedAtUtc: timestamp, completedAtUtc: opt(timestamp), universeMode, universeSource: text, universeSnapshotDate: opt(text), universeSnapshotHash: opt(text), providerName: text, sourceStatus, status: z.enum(["completed", "blocked", "partial"]), warnings: strings, blockedReason: opt(text) })),
   scanSignals: z.array(signalSchema),
   reviewLogs: z.array(z.looseObject({ id, signalId: id, reviewedAt: timestamp, userDecision: z.enum(["watch", "ignore", "bought", "skipped", "sold", "other"]), manualReason: text, convictionScoreOptional: opt(num.min(0).max(100)), notes: opt(text), entryPriceOptional: opt(num.positive()), exitPriceOptional: opt(num.positive()), resultNotes: opt(text) })),
-  forwardProofLedger: z.array(forwardSchema), scannerSettings: scannerSettingsSchema,
+  forwardProofLedger: z.array(forwardSchema), scannerSettings: scannerSettingsSchema, notificationPreferences: opt(notificationPreferencesSchema),
+  lastKnownNotificationDeliveryStatus: opt(lastKnownNotificationDeliveryStatusSchema),
 });
 
 export function validateAppData(raw: unknown): AppData {
@@ -74,7 +90,10 @@ export function validateAppData(raw: unknown): AppData {
     throw new Error(parsed.error.issues.slice(0, 5).map(issue => `${issue.path.join(".")}: ${issue.message}`).join("; "));
   }
   // Parsed output is structurally checked above, including all nested collections.
-  const data = parsed.data as unknown as AppData;
+  const data = {
+    ...parsed.data,
+    notificationPreferences: parsed.data.notificationPreferences ?? defaultNotificationPreferences(),
+  } as unknown as AppData;
   const keys: Partial<Record<keyof AppData, string>> = { stocks: "id", recipes: "id", customMetrics: "key", logicRules: "id", logicSets: "id", eyes: "id", alerts: "id", decisions: "id", outcomes: "id", snapshots: "stockId", scanSignals: "signalId", scanRuns: "id", reviewLogs: "id", forwardProofLedger: "id", rawBarArchives: "id", universeSnapshots: "id", processedFeatures: "id" };
   for (const [collection, key] of Object.entries(keys)) {
     const rows = parsed.data[collection] as Record<string, unknown>[];
