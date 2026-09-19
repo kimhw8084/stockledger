@@ -17,7 +17,7 @@ Each scheduled market session has four deterministic stage jobs. The production 
 
 The semantic identity includes the contract version, kind, scheduled session, calendar version, engine/rule versions, source content hash, adjustment declaration, scanner settings, recipes and Eye definitions. Repeating the same input produces the same job keys. Corrected input produces a new evidence revision and preserves the earlier records.
 
-SQLite WAL keeps the workspace, recovery copies, jobs, scheduler checkpoint, reconciliation links and outbox together. Claims use an immediate transaction. A job records `queued`, `running`, `retry-wait`, `completed`, `partial`, `blocked`, `terminal-failed`, or `superseded`, plus scheduled/due session, attempt count, lease owner/token/expiry, next retry, completion time, last safe error, input hash, output reference and semantic idempotency key. Leases are 15 minutes by default and are renewed by the managed runner heartbeat for long work. A replaced or expired token cannot commit.
+SQLite WAL keeps the workspace, recovery copies, jobs, scheduler checkpoint, reconciliation links, outbox, and CHG-95 ingestion run/item tables together. Claims use an immediate transaction. A job records `queued`, `running`, `retry-wait`, `completed`, `partial`, `blocked`, `terminal-failed`, or `superseded`, plus scheduled/due session, attempt count, lease owner/token/expiry, next retry, completion time, last safe error, input hash, output reference and semantic idempotency key. Leases are 15 minutes by default and are renewed by the managed runner heartbeat for long work. A replaced or expired token cannot commit.
 
 `lastExpectedSession` is an observation/planning watermark, not proof that all earlier work finished. After enqueueing, an invocation may have durable `queued`, expired `running`, or `retry-wait` jobs for older sessions. Every later invocation reconciles newly due calendar sessions with those persisted jobs and processes the union in chronological order. A retry-wait job remains visible with its original attempt count and `nextRetryAt`; it is runnable only after that time. A terminal-failed semantic job is never reset to obtain another five attempts.
 
@@ -73,6 +73,16 @@ npm run worker -- --help
 npm run worker -- --managed --import /absolute/path/StockLedger.json --csv /absolute/path/prices --adjustment adjusted --source "Provider / dataset release" --backup /absolute/path/backups/worker-initial.sqlite
 ```
 
+## CHG-95 market-data boundary
+
+The provider-neutral contract is `stockledger-market-data-ingestion-v1`, revision 1. It currently covers completed US-equity/ETF daily OHLCV plus the reference-identity and corporate-action capability boundaries needed to interpret dated bars. Fundamentals, earnings/events/news, and intraday/real-time data are deferred and remain unsupported; they are not synthesized from price history.
+
+Commercial managed acquisition is server/worker-only. A future adapter must return exact symbol/date-range observations with UTC retrieval time, adjustment basis, source/request identity where safe, freshness/coverage, stable content identity, validation issues, failure class, and a matching `stockledger-market-data-rights-v1` revision-1 profile. Rights are checked independently for internal computation, end-user display, derived metrics, notifications, user export, and raw redistribution. Missing, unknown, expired, mismatched, research-only, and non-commercial profiles fail closed. No provider is selected in this repository, and no commercial license is claimed.
+
+Stooq remains the explicit public/research-only on-demand adapter. It cannot activate production managed ingestion. User-supplied CSV remains the complete local path and is a local-user boundary, not a commercial license claim.
+
+The worker’s additive schema 7 stores `ingestion_runs` and `ingestion_items`. Run IDs include the contract/provider/product/symbol/date/rights identity; item IDs are stable per run/symbol. Accepted normalized items are retained, completed items are not refetched on replay, and unfinished retryable items resume within the persisted request budget. Symbol count, concurrency, request budget, and attempts are capped. Retryable timeout/outage/rate-limit failures use deterministic capped backoff; provider outage, malformed/empty/stale/partial input, missing required symbols, rate limits, and budget exhaustion remain partial/blocked states. None can be reported as a successful zero-match scan.
+
 Defaults are `.local/stockledger.sqlite` and `.local/StockLedger-worker.json`. Override them with `--db` and `--output`. Generated directories/files have restrictive permissions. Backups are plaintext private records. Node 22 labels its built-in SQLite API experimental; the pinned version has restart, transaction, lease, migration and snapshot tests.
 
 ## Repeated operation and catch-up
@@ -119,6 +129,6 @@ Outbox rows are delivery intent only. `pendingNotificationIntents` is not a sent
 
 ## Measured representative fixture
 
-`npm run benchmark:worker` runs the deterministic synthetic fixture: **100 stocks × 260 sessions**, with SPY and three sector inputs, through the four-stage contract. The benchmark output reports elapsed time, workload size, the explicit **30-minute engineering deadline budget**, remaining headroom, result counts, serialized workspace bytes, SQLite/WAL bytes, RSS and integrity. A current Node 22.23.2 run recorded **2,837 ms elapsed**, **1,797,163 ms remaining headroom**, **100 Eye evaluations**, **200 scanner rows**, **5,813,608 workspace bytes**, **12,505,456 SQLite/WAL bytes**, **234,176,512 RSS bytes**, and integrity `true`.
+`npm run benchmark:worker` runs the deterministic synthetic fixture: **100 stocks × 260 sessions**, with SPY and three sector inputs, through the four-stage contract. The benchmark output reports elapsed time, workload size, the explicit **30-minute engineering deadline budget**, remaining headroom, result counts, serialized workspace bytes, SQLite/WAL bytes, RSS and integrity. The CHG-95 Node 22.23.2 run recorded **5,260 ms elapsed**, **1,794,740 ms remaining headroom**, **100 Eye evaluations**, **200 scanner rows**, **5,813,608 workspace bytes**, **12,591,808 SQLite/WAL bytes**, **223,100,928 RSS bytes**, and integrity `true`.
 
 This is one deterministic engineering measurement, not p95 capacity, a production SLA, a hosted guarantee, or a user-count forecast. The CHG-94 notification delivery phase is not included in this evaluation benchmark; it has its own transport/lifecycle evidence.
