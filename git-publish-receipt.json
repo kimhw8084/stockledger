@@ -31,7 +31,7 @@
     "payloadFileCount": 50,
     "payloadByteCount": 11277838,
     "carrierFileCount": 52,
-    "carrierByteCount": 15871365,
+    "carrierByteCount": 15871479,
     "carrierByteCountIncludesReceipt": true
   },
   "canonicalPngSha256": {
@@ -274,8 +274,9 @@
     "node": "v22.23.2"
   },
   "remoteVerification": {
-    "result": "pending-post-publish-readback",
+    "result": "verified",
     "path": "readback/remote-verification.json",
-    "note": "Carrier commit/tree are intentionally read back after publication because embedding a commit hash inside its own commit is self-referential."
+    "verifiedRef": "refs/heads/project-os-artifacts/stockledger/prod-c13-ui-perfection-postfix-evidence-repair-v1",
+    "note": "The exact final carrier commit/tree are read back in the sibling verification record because embedding a commit hash inside its own commit is self-referential."
   }
 }
