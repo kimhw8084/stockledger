@@ -222,25 +222,30 @@ test("resolves entity links, fails safely, and preserves language preference", a
   await expect(page.getByText(/Sample data is present/)).toBeVisible();
 
   const homeHelpInvoker = page.getByRole("button", { name: "Summary help", exact: true });
+  const homeHelpFallback = page.getByRole("tab", { name: "Today", exact: true });
   await expect(homeHelpInvoker).toBeVisible();
-  await homeHelpInvoker.focus();
+  await homeHelpFallback.focus();
+  await expect(homeHelpFallback).toBeFocused();
   await homeHelpInvoker.click();
-  await expect(page.getByRole("dialog")).toBeVisible();
+  const homeHelpDialog = page.getByRole("dialog");
+  await expect(homeHelpDialog).toBeVisible();
+  await expect(homeHelpDialog.getByRole("button", { name: "Done", exact: true })).toBeFocused();
   await page.keyboard.press("Escape");
-  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(homeHelpDialog).toHaveCount(0);
   await expect(homeHelpInvoker).toBeFocused();
 
   await homeHelpInvoker.click();
-  await page.getByRole("dialog").getByRole("button", { name: "Done", exact: true }).click();
-  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(homeHelpDialog.getByRole("button", { name: "Done", exact: true })).toBeFocused();
+  await homeHelpDialog.getByRole("button", { name: "Done", exact: true }).click();
+  await expect(homeHelpDialog).toHaveCount(0);
   await expect(homeHelpInvoker).toBeFocused();
 
   await homeHelpInvoker.click();
-  await expect(page.getByRole("dialog")).toBeVisible();
+  await expect(homeHelpDialog).toBeVisible();
   await homeHelpInvoker.evaluate((element) => element.remove());
-  await page.getByRole("dialog").getByRole("button", { name: "Done", exact: true }).click();
-  await expect(page.getByRole("dialog")).toHaveCount(0);
-  await expect(page.getByRole("tab", { name: "Today", exact: true })).toBeFocused();
+  await homeHelpDialog.getByRole("button", { name: "Done", exact: true }).click();
+  await expect(homeHelpDialog).toHaveCount(0);
+  await expect(homeHelpFallback).toBeFocused();
 
   await page.goto("/#/watchlist?stockId=stock-amd");
   await expect(page.getByText("Advanced Micro Devices", { exact: true }).first()).toBeVisible();
@@ -289,4 +294,21 @@ test("resolves entity links, fails safely, and preserves language preference", a
   await expect(page.getByText("Advanced Micro Devices", { exact: true }).first()).toBeVisible();
   await page.goto("/#/monitoring?stockId=stock-amd&eyeId=eye-amd");
   await expect(page.getByText("Deep discount logic.", { exact: true }).first()).toBeVisible();
+});
+
+test("home help prefers its explicit press target over stale active focus", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "Explore sample workspace" }).click();
+  const homeHelpInvoker = page.getByRole("button", { name: "Summary help", exact: true });
+  const staleActiveControl = page.getByRole("tab", { name: "Today", exact: true });
+  await staleActiveControl.focus();
+  await expect(staleActiveControl).toBeFocused();
+
+  // Dispatch the press while B remains active so the callback receives A as currentTarget.
+  await homeHelpInvoker.dispatchEvent("click");
+  const homeHelpDialog = page.getByRole("dialog");
+  await expect(homeHelpDialog).toBeVisible();
+  await homeHelpDialog.getByRole("button", { name: "Done", exact: true }).click();
+  await expect(homeHelpDialog).toHaveCount(0);
+  await expect(homeHelpInvoker).toBeFocused();
 });

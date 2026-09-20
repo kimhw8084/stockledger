@@ -463,7 +463,7 @@ const HomeVisualDashboard: React.FC<HomeVisualDashboardProps> = ({
         accessibilityRole="button"
         accessibilityLabel={language === "ko" ? `${label} 설명` : `${label} help`}
         accessibilityHint={language === "ko" ? "이 구역의 설명을 엽니다" : "Opens help for this section"}
-        onPress={() => {
+        onPress={(event) => {
           helpFocus.captureInvoker(event);
           setHelpTarget(target);
         }}

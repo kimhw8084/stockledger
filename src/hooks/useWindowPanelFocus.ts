@@ -9,6 +9,26 @@ const eventInvoker = (source: WindowPanelFocusSource) => {
   return source;
 };
 
+const isFocusableWebElement = (target: unknown) => {
+  if (typeof document === "undefined" || !target || typeof target !== "object") return false;
+  const element = target as {
+    disabled?: unknown;
+    isConnected?: unknown;
+    nodeType?: unknown;
+    focus?: unknown;
+    getAttribute?: (name: string) => string | null;
+  };
+  return (
+    target !== document.body &&
+    element.isConnected !== false &&
+    element.nodeType === 1 &&
+    typeof element.focus === "function" &&
+    element.disabled !== true &&
+    element.getAttribute?.("aria-disabled") !== "true" &&
+    element.getAttribute?.("tabindex") !== "-1"
+  );
+};
+
 /**
  * Owns the focus transaction for one WindowPanel opening path. When a caller
  * does not pass an explicit source, the focused control is read synchronously
@@ -20,28 +40,17 @@ export const useWindowPanelFocus = (fallbackFocusRef?: React.RefObject<any>) => 
 
   const captureInvoker = useCallback((source?: WindowPanelFocusSource) => {
     const explicitTarget = eventInvoker(source);
-    const sourceIsEvent = Boolean(source && typeof source === "object" && "currentTarget" in source);
-    const explicitWebElement =
-      Platform.OS === "web" &&
-      explicitTarget &&
-      typeof explicitTarget === "object" &&
-      (explicitTarget as { nodeType?: unknown }).nodeType === 1 &&
-      typeof (explicitTarget as { focus?: unknown }).focus === "function";
     if (Platform.OS !== "web" && explicitTarget) {
       returnFocusRef.current = explicitTarget;
       return;
     }
 
     if (Platform.OS === "web" && typeof document !== "undefined") {
-      const activeElement = document.activeElement;
-      if (sourceIsEvent && activeElement && activeElement !== document.body && activeElement.nodeType === 1) {
-        returnFocusRef.current = activeElement;
-        return;
-      }
-      if (explicitWebElement) {
+      if (isFocusableWebElement(explicitTarget)) {
         returnFocusRef.current = explicitTarget;
         return;
       }
+      const activeElement = document.activeElement;
       returnFocusRef.current = activeElement && activeElement !== document.body && activeElement.nodeType === 1 ? activeElement : null;
       return;
     }
