@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "kind": "codex-fabric-audit-evidence",
+  "project_id": "stockledger",
+  "request": "CHG-143-R9",
+  "job_id": "CF-2d03d5cfb4067bac2b858521",
+  "operation": "VERIFY",
+  "status": "VERIFY_REQUIRED",
+  "accepted_at": "2026-09-20T21:17:09Z",
+  "source": {
+    "protected_base": "26f3dfb077bea75013fef58975979f02041dc490",
+    "head_commit": "26f3dfb077bea75013fef58975979f02041dc490",
+    "head_tree": "7a6ee3872b6967631fa539f4455904d00b56e4ef",
+    "base_is_ancestor": true,
+    "working_tree_clean": true,
+    "source_files_changed_from_base": []
+  },
+  "changed_files": [],
+  "focused_result": {
+    "r8_predecessor_job": "CF-a20c6d64f73a0333d2833a17",
+    "r8_candidate_commit": "2dc820af21f81a715f5492492f0944610d9b2b64",
+    "r8_candidate_tree": "1d7a63beb20056d67fbc3cc6b932e217ed468aef",
+    "r8_evidence_commit": "f793dfae85d0d5531f7c08d640b1b1cd813e158a",
+    "inspected_diff": "tests/e2e/workspace.spec.ts only; 53-line page.keyboard browser-zoom test",
+    "reproduction": {
+      "command": "npm run test:e2e -- tests/e2e/workspace.spec.ts -g 'proves real Chromium 200% browser zoom' --project=desktop",
+      "exit_code": 1,
+      "failure": "expect.poll DPR > baseline*1.8 timed out; received 1",
+      "baseline": {
+        "device_pixel_ratio": 1,
+        "css_viewport_width": 1280,
+        "css_viewport_height": 720
+      },
+      "observed_after_five_page_keyboard_zoom_presses": {
+        "device_pixel_ratio": 1,
+        "css_viewport_width": 1280,
+        "css_viewport_height": 720
+      },
+      "dpr_ratio": 1,
+      "css_viewport_width_ratio": 1,
+      "classification": "page_keyboard_events_did_not_control_browser_chrome"
+    },
+    "native_browser_observation": {
+      "mechanism": "Chrome View menu Zoom In driven by native computer-use UI",
+      "observed": [
+        { "browser_zoom_percent": 110, "device_pixel_ratio": 2.2, "css_viewport_width": 1869 },
+        { "browser_zoom_percent": 125, "device_pixel_ratio": 2.5, "css_viewport_width": 1645 }
+      ],
+      "qualification_status": "not_attachable_to_repository_playwright_runner",
+      "two_hundred_percent_proof": "not retained; no regression was created from proxy or partial evidence"
+    },
+    "product_semantics_preserved": {
+      "tabs": ["Today", "Watchlist", "Recipes", "Journal"],
+      "settings": "button",
+      "product_source_modified": false
+    }
+  },
+  "qualification": {
+    "npm_run_check": { "exit_code": 0, "summary": "typecheck plus 22 test files / 187 tests passed" },
+    "npm_run_check_release_workflow": { "exit_code": 0 },
+    "npm_run_check_boundaries": { "exit_code": 0 },
+    "npm_audit_high": { "exit_code": 0, "summary": "0 vulnerabilities" },
+    "npm_run_export_all": { "exit_code": 0, "summary": "web, Android, and iOS bundles exported" },
+    "npm_run_test_e2e": { "exit_code": 0, "summary": "18 passed across desktop and mobile projects" },
+    "npm_run_check_release_base": { "exit_code": 0, "summary": "protected base resolves and is HEAD ancestor" },
+    "npm_run_recovery_drill": { "exit_code": 0, "summary": "failureClassification none; 78 ms; evidence-only synthetic drill" },
+    "npm_run_operations_qualify": { "exit_code": 0, "summary": "daily workload and restore within synthetic engineering budgets; evidence-only" },
+    "npm_run_release_evidence": { "exit_code": 0, "summary": "source-bound evidence generated for exact base/tree" },
+    "npm_run_release_verify": { "exit_code": 0, "summary": "verified true" },
+    "cloud_contract": {
+      "npm_run_test_cloud": {
+        "exit_code": 1,
+        "status": "UNAVAILABLE",
+        "limitation": "Docker/OrbStack daemon unavailable at unix:///Users/haewonkim/.orbstack/run/docker.sock"
+      },
+      "supabase_db_lint_local": {
+        "exit_code": 1,
+        "status": "UNAVAILABLE",
+        "limitation": "Postgres connection refused at 127.0.0.1:55422 because the local Supabase stack was unavailable"
+      }
+    }
+  },
+  "retained_limitations": [
+    "VERIFY_REQUIRED: the repository Playwright runner cannot drive or attach to the native Chrome browser-level zoom control in this environment",
+    "No invalid proxy-based or permanently red browser-zoom regression was retained",
+    "No Product FIX is requested or claimed; Product source is unchanged",
+    "AR-42 E scanner-review pixel inspection remains separate and open",
+    "This evidence does not claim native-device, screen-reader, human-task, or field acceptance"
+  ],
+  "non_claims": [
+    "No genuine Chromium 200% zoom regression PASS",
+    "No Product clipping, overflow, reachability, containment, or focus defect diagnosis under proven 200% zoom",
+    "No AR-42 gate closure"
+  ],
+  "checks": [
+    { "command": "npm run check", "exit_code": 0, "type": "command_execution" },
+    { "command": "npm run check:release-workflow", "exit_code": 0, "type": "command_execution" },
+    { "command": "npm run check:boundaries", "exit_code": 0, "type": "command_execution" },
+    { "command": "npm audit --audit-level=high", "exit_code": 0, "type": "command_execution" },
+    { "command": "npm run export:all", "exit_code": 0, "type": "command_execution" },
+    { "command": "npm run test:e2e", "exit_code": 0, "type": "command_execution" },
+    { "command": "STOCKLEDGER_PROTECTED_BASE=26f3dfb077bea75013fef58975979f02041dc490 npm run check:release-base", "exit_code": 0, "type": "command_execution" },
+    { "command": "npm run recovery:drill", "exit_code": 0, "type": "command_execution" },
+    { "command": "npm run operations:qualify", "exit_code": 0, "type": "command_execution" },
+    { "command": "npm run release:evidence -- --base 26f3dfb077bea75013fef58975979f02041dc490", "exit_code": 0, "type": "command_execution" },
+    { "command": "npm run release:verify -- --base 26f3dfb077bea75013fef58975979f02041dc490", "exit_code": 0, "type": "command_execution" },
+    { "command": "npm run test:cloud", "exit_code": 1, "type": "command_execution", "status": "UNAVAILABLE" },
+    { "command": "npx supabase db lint --local --schema public,ledger_private --level warning --fail-on warning", "exit_code": 1, "type": "command_execution", "status": "UNAVAILABLE" }
+  ]
+}
