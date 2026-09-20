@@ -312,3 +312,56 @@ test("home help prefers its explicit press target over stale active focus", asyn
   await expect(homeHelpDialog).toHaveCount(0);
   await expect(homeHelpInvoker).toBeFocused();
 });
+
+test("proves real Chromium 200% browser zoom keeps navigation and Summary help usable", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "desktop", "Real browser zoom is qualified in the desktop Chromium project.");
+  await page.goto("/");
+  const zoomModifier = process.platform === "darwin" ? "Meta" : "Control";
+  try {
+    await page.keyboard.press(`${zoomModifier}+0`);
+    const baseline = await page.evaluate(() => ({ devicePixelRatio: window.devicePixelRatio, cssViewportWidth: window.innerWidth }));
+    await expect(page.getByRole("button", { name: "Explore sample workspace", exact: true })).toBeVisible();
+    await page.getByRole("button", { name: "Explore sample workspace", exact: true }).click();
+
+    for (let step = 0; step < 5; step += 1) await page.keyboard.press(`${zoomModifier}++`);
+    await expect.poll(() => page.evaluate(() => window.devicePixelRatio)).toBeGreaterThan(baseline.devicePixelRatio * 1.8);
+    const zoomed = await page.evaluate(() => ({ devicePixelRatio: window.devicePixelRatio, cssViewportWidth: window.innerWidth }));
+    expect(zoomed.devicePixelRatio / baseline.devicePixelRatio).toBeGreaterThan(1.8);
+    expect(zoomed.devicePixelRatio / baseline.devicePixelRatio).toBeLessThan(2.2);
+    expect(zoomed.cssViewportWidth).toBeLessThan(baseline.cssViewportWidth * 0.6);
+    expect(zoomed.cssViewportWidth).toBeGreaterThan(baseline.cssViewportWidth * 0.45);
+    expect(zoomed.cssViewportWidth).not.toBe(baseline.cssViewportWidth);
+    await page.screenshot({ path: testInfo.outputPath("browser-zoom-200-viewport.png") });
+
+    const documentOverflow = await page.evaluate(() => Math.max(document.documentElement.scrollWidth, document.body?.scrollWidth ?? 0) - window.innerWidth);
+    expect(documentOverflow).toBeLessThanOrEqual(1);
+
+    for (const name of ["Today", "Watchlist", "Recipes", "Journal", "Settings"]) {
+      const tab = page.getByRole("tab", { name, exact: true });
+      await expect(tab).toBeVisible();
+      await expect(tab).toBeEnabled();
+      await tab.click();
+      await expect(tab).toHaveAttribute("aria-selected", "true");
+    }
+
+    await page.getByRole("tab", { name: "Today", exact: true }).click();
+    const homeHelpInvoker = page.getByRole("button", { name: "Summary help", exact: true });
+    await expect(homeHelpInvoker).toBeVisible();
+    await homeHelpInvoker.click();
+    const homeHelpDialog = page.getByRole("dialog");
+    await expect(homeHelpDialog).toBeVisible();
+    await expect(homeHelpDialog.getByRole("button", { name: "Done", exact: true })).toBeFocused();
+    const dialogBounds = await homeHelpDialog.boundingBox();
+    const cssViewport = await page.evaluate(() => ({ width: window.innerWidth, height: window.innerHeight }));
+    expect(dialogBounds).not.toBeNull();
+    expect(dialogBounds!.x).toBeGreaterThanOrEqual(-1);
+    expect(dialogBounds!.y).toBeGreaterThanOrEqual(-1);
+    expect(dialogBounds!.x + dialogBounds!.width).toBeLessThanOrEqual(cssViewport.width + 1);
+    expect(dialogBounds!.y + dialogBounds!.height).toBeLessThanOrEqual(cssViewport.height + 1);
+    await page.keyboard.press("Escape");
+    await expect(homeHelpDialog).toHaveCount(0);
+    await expect(homeHelpInvoker).toBeFocused();
+  } finally {
+    await page.keyboard.press(`${zoomModifier}+0`).catch(() => undefined);
+  }
+});
