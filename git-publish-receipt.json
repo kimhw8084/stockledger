@@ -1,0 +1,281 @@
+{
+  "schema": "project-os-visual-atlas-git-publish-receipt-v2",
+  "status": "GIT_PUBLISHED_AWAITING_AUDIT",
+  "publishedAt": "2026-09-20T15:19:32.053097Z",
+  "fabric": {
+    "jobId": "CF-e77c01b1337781471842a4f1",
+    "operation": "VERIFY",
+    "project": "stockledger",
+    "request": "prod-c13-ui-perfection-postfix-evidence-repair-v1"
+  },
+  "source": {
+    "branch": "codex/stockledger-prod-c13-ui-perfection-postfix-evidence-repair-v1",
+    "sha": "26f3dfb077bea75013fef58975979f02041dc490",
+    "tree": "7a6ee3872b6967631fa539f4455904d00b56e4ef",
+    "productSourceChanged": false,
+    "protectedMainUndrifted": true
+  },
+  "artifact": {
+    "ref": "refs/heads/project-os-artifacts/stockledger/prod-c13-ui-perfection-postfix-evidence-repair-v1",
+    "payloadCommit": "6494975e35fac236220f519effbd50509a871338",
+    "payloadTree": "3a90d55377c74fdcb15fda883fc1b91d442a6e4b",
+    "artifact_commit": "6494975e35fac236220f519effbd50509a871338",
+    "artifact_tree": "3a90d55377c74fdcb15fda883fc1b91d442a6e4b",
+    "carrierCommit": "final-ref-readback-recorded-separately-to-avoid-self-referential-receipt",
+    "carrierTree": "final-ref-readback-recorded-separately-to-avoid-self-referential-receipt",
+    "carrierReadback": "readback/remote-verification.json"
+  },
+  "counts": {
+    "canonicalPngCount": 34,
+    "canonicalSurfaceCount": 17,
+    "payloadFileCount": 50,
+    "payloadByteCount": 11277838,
+    "carrierFileCount": 52,
+    "carrierByteCount": 15955477,
+    "carrierByteCountIncludesReceipt": true
+  },
+  "canonicalPngSha256": {
+    "today:desktop-1440x900": {
+      "path": "visual-atlas/screenshots/today--desktop-1440x900.png",
+      "bytes": 94827,
+      "sha256": "de3241198aeb93c7a91fbd8fd6646cc220a308d1195b090804abe2375ea071f4"
+    },
+    "watchlist:desktop-1440x900": {
+      "path": "visual-atlas/screenshots/watchlist--desktop-1440x900.png",
+      "bytes": 83052,
+      "sha256": "a152308a11ba2e24680fffad82a20d67f3766208e9a7d9884a01dc3bf6bd1d5b"
+    },
+    "recipes-logic-lab:desktop-1440x900": {
+      "path": "visual-atlas/screenshots/recipes-logic-lab--desktop-1440x900.png",
+      "bytes": 77360,
+      "sha256": "7a2eb376402873ae6e0ff77cf993256be90ae32e09ec09b8e5261b28a39ccd43"
+    },
+    "journal:desktop-1440x900": {
+      "path": "visual-atlas/screenshots/journal--desktop-1440x900.png",
+      "bytes": 88968,
+      "sha256": "ccea2bf9aa82fba3bf396566980683017f6fc43e23d529c3ee2d0d4a95637468"
+    },
+    "alerts:desktop-1440x900": {
+      "path": "visual-atlas/screenshots/alerts--desktop-1440x900.png",
+      "bytes": 82985,
+      "sha256": "31101183f27c1b072d3d1b29a59d029b1ac8cac8bfcad44ba9dc82ffe290c234"
+    },
+    "settings:desktop-1440x900": {
+      "path": "visual-atlas/screenshots/settings--desktop-1440x900.png",
+      "bytes": 76246,
+      "sha256": "de0a8a620d49b9836d5fc4a796fb9d807cd8440acd8d22bbd2a75284bffea4db"
+    },
+    "stock-entity-detail:desktop-1440x900": {
+      "path": "visual-atlas/screenshots/stock-entity-detail--desktop-1440x900.png",
+      "bytes": 78317,
+      "sha256": "12798cb109517d331a1de0e1ec208f53d792de4aed43ae3eb2a8ac5d45456dd7"
+    },
+    "recipe-builder:desktop-1440x900": {
+      "path": "visual-atlas/screenshots/recipe-builder--desktop-1440x900.png",
+      "bytes": 87476,
+      "sha256": "32fe53b6a13c696b760789e183b7f825489b0e2a566aa53dc10bee5613ea7453"
+    },
+    "logic-registry:desktop-1440x900": {
+      "path": "visual-atlas/screenshots/logic-registry--desktop-1440x900.png",
+      "bytes": 97093,
+      "sha256": "98aee0f4ec1034094c2c9cee55448131aaf17d8b788db719c3c4c46e4b3273eb"
+    },
+    "eye-flows:desktop-1440x900": {
+      "path": "visual-atlas/screenshots/eye-flows--desktop-1440x900.png",
+      "bytes": 71850,
+      "sha256": "de57dc5f49976c36e20cac32697a4dfae8af250086af78fb832fdb218034a178"
+    },
+    "eye-detail:desktop-1440x900": {
+      "path": "visual-atlas/screenshots/eye-detail--desktop-1440x900.png",
+      "bytes": 74482,
+      "sha256": "0ee858957bc32515a55086711436d7d5103406641e221d6ae3f398078145f1d5"
+    },
+    "eye-composer:desktop-1440x900": {
+      "path": "visual-atlas/screenshots/eye-composer--desktop-1440x900.png",
+      "bytes": 54908,
+      "sha256": "464298cb83a8349065bf04d24674879c007813fc8d138a1f8cda4ba2434120d7"
+    },
+    "scanner-review:desktop-1440x900": {
+      "path": "visual-atlas/screenshots/scanner-review--desktop-1440x900.png",
+      "bytes": 66076,
+      "sha256": "d9c2b9fdf1d974513bc1565c5432e5b1d4cd95811154169dcb7f2457656e004d"
+    },
+    "metric-detail-sheet:desktop-1440x900": {
+      "path": "visual-atlas/screenshots/metric-detail-sheet--desktop-1440x900.png",
+      "bytes": 68099,
+      "sha256": "93d9fe917222eca3b306317beb5ac8e54fc06295a47d694c59b9fea10a47a5b0"
+    },
+    "journal-composer:desktop-1440x900": {
+      "path": "visual-atlas/screenshots/journal-composer--desktop-1440x900.png",
+      "bytes": 52802,
+      "sha256": "7d2c710ce42eaedfee950f45aecad6941c5bf4061f8ada35b0613eca99a1030d"
+    },
+    "decision-detail:desktop-1440x900": {
+      "path": "visual-atlas/screenshots/decision-detail--desktop-1440x900.png",
+      "bytes": 92629,
+      "sha256": "ad7849186e956736ed6bc2701952a2b3a7d8650b9617016d37fcc2ab8e3e2447"
+    },
+    "notification-confirmation:desktop-1440x900": {
+      "path": "visual-atlas/screenshots/notification-confirmation--desktop-1440x900.png",
+      "bytes": 38992,
+      "sha256": "76c150bf07ff849600d165e159cf2354be637035e1bb263db330a27f8f0ce224"
+    },
+    "today:mobile-390x844": {
+      "path": "visual-atlas/screenshots/today--mobile-390x844.png",
+      "bytes": 73393,
+      "sha256": "56236f0f2853c6788218f897520d9b87ae137e3bf0aa42b75bf77f7afe4820c9"
+    },
+    "watchlist:mobile-390x844": {
+      "path": "visual-atlas/screenshots/watchlist--mobile-390x844.png",
+      "bytes": 66392,
+      "sha256": "d8b9f6393e8e97c116f0e1401aaea0d1c8e2c2f087b468040df760b94a5a469e"
+    },
+    "recipes-logic-lab:mobile-390x844": {
+      "path": "visual-atlas/screenshots/recipes-logic-lab--mobile-390x844.png",
+      "bytes": 68495,
+      "sha256": "6e0444dd100dc0837683bcd8054379744d796d108e2ec4280cf9f31800a57fd1"
+    },
+    "journal:mobile-390x844": {
+      "path": "visual-atlas/screenshots/journal--mobile-390x844.png",
+      "bytes": 60720,
+      "sha256": "d08d7e1b3859033eccf12ea9644c3594a2fc4fd7f77cd726aa120769a96c71ce"
+    },
+    "alerts:mobile-390x844": {
+      "path": "visual-atlas/screenshots/alerts--mobile-390x844.png",
+      "bytes": 56860,
+      "sha256": "b0fb2c9cf5d9bfe16e9ddc4437befca3c4fb227c5920f3f396fea93b2fd11b39"
+    },
+    "settings:mobile-390x844": {
+      "path": "visual-atlas/screenshots/settings--mobile-390x844.png",
+      "bytes": 56913,
+      "sha256": "a04bb6130bd01d12e18bfc71a76df1ca01a57caa2b5f856625bd65b9b3095396"
+    },
+    "stock-entity-detail:mobile-390x844": {
+      "path": "visual-atlas/screenshots/stock-entity-detail--mobile-390x844.png",
+      "bytes": 63072,
+      "sha256": "aa9e3afc95ffe9d47907b988a224806428ea97ac6b84c0d5a3a230c3e77fb5cd"
+    },
+    "recipe-builder:mobile-390x844": {
+      "path": "visual-atlas/screenshots/recipe-builder--mobile-390x844.png",
+      "bytes": 62353,
+      "sha256": "14700808bfe3f5d342a3f9e53a204596aba47cd09aaa656fd15b6da305ffa465"
+    },
+    "logic-registry:mobile-390x844": {
+      "path": "visual-atlas/screenshots/logic-registry--mobile-390x844.png",
+      "bytes": 66032,
+      "sha256": "3c6e32f485883daac063c0021750fba6ae6fbca051e7dd4961c9cabffa3b7903"
+    },
+    "eye-flows:mobile-390x844": {
+      "path": "visual-atlas/screenshots/eye-flows--mobile-390x844.png",
+      "bytes": 53181,
+      "sha256": "545314edbc0290146be7fbeb3129ec981a70a3a0b32525e5caf06d070c19ff71"
+    },
+    "eye-detail:mobile-390x844": {
+      "path": "visual-atlas/screenshots/eye-detail--mobile-390x844.png",
+      "bytes": 61595,
+      "sha256": "c1438b79215400e11ad5790a30b53ae44384443451d6d4388f99fc8ef3c40042"
+    },
+    "eye-composer:mobile-390x844": {
+      "path": "visual-atlas/screenshots/eye-composer--mobile-390x844.png",
+      "bytes": 44643,
+      "sha256": "1d2f82c4259d2b6230ea90927446728793d92a7a3c4613a0a42c8007dfd4a79d"
+    },
+    "scanner-review:mobile-390x844": {
+      "path": "visual-atlas/screenshots/scanner-review--mobile-390x844.png",
+      "bytes": 55080,
+      "sha256": "8880dbb45db5fd5924cea0e1b1a819e1cfb34f84c37f55a677dc6366b0302527"
+    },
+    "metric-detail-sheet:mobile-390x844": {
+      "path": "visual-atlas/screenshots/metric-detail-sheet--mobile-390x844.png",
+      "bytes": 47081,
+      "sha256": "9080aad7ac4918c00dd03f1a6775563c4d38e47fe2f238e527d6194730a74a3d"
+    },
+    "journal-composer:mobile-390x844": {
+      "path": "visual-atlas/screenshots/journal-composer--mobile-390x844.png",
+      "bytes": 41087,
+      "sha256": "bae7cf9ef956a803ead2b2bed74250d1ec7ee00a61c62e12ad2ae4d090c9b881"
+    },
+    "decision-detail:mobile-390x844": {
+      "path": "visual-atlas/screenshots/decision-detail--mobile-390x844.png",
+      "bytes": 62873,
+      "sha256": "b42768ef9e83481c4ca6064eac9cf44b0ebf7d448875512a04f28927dcff032a"
+    },
+    "notification-confirmation:mobile-390x844": {
+      "path": "visual-atlas/screenshots/notification-confirmation--mobile-390x844.png",
+      "bytes": 33554,
+      "sha256": "ed73ce776a6b1b064e5cc298d590062c4437215daf6c6e4ff34ecef11ece70ce"
+    }
+  },
+  "decisiveSha256": {
+    "visual-atlas/artifact-bundle.zip": {
+      "bytes": 4581456,
+      "sha256": "0b4d73af8dfcf698551bf34f8c66f1dd811f72c67e67c26080711aae7a1f72b5"
+    },
+    "visual-atlas/capture-report.json": {
+      "bytes": 6226865,
+      "sha256": "0c7217f68e8aedf06846fee9e3c59f24c1fa7e789b2f91379973a62333fda42d"
+    },
+    "visual-atlas/diagnostics/qualification-summary.json": {
+      "bytes": 3181,
+      "sha256": "703f67c10d3df901c1a2c5aabfff7896cec081fa4196cb161c4a2f2d829ce7c9"
+    },
+    "visual-atlas/diagnostics/runtime-diagnostics.json": {
+      "bytes": 123634,
+      "sha256": "0aacd60f537b5e4b11ece40015714bd6b8e618f3c5d1059503474ed4affad4e4"
+    },
+    "visual-atlas/diagnostics/task-traces.json": {
+      "bytes": 32071,
+      "sha256": "ca88f02e0f27be170bff0cc6d1b5421db38e03c387a9801bf18948db02830ccb"
+    },
+    "visual-atlas/reader-index.json": {
+      "bytes": 17685,
+      "sha256": "f23f1aefbcd9720b241fdf93428bc4126c619a83bc0d5e29785e160bfd46ca3e"
+    },
+    "visual-atlas/review-desktop.pdf": {
+      "bytes": 1258096,
+      "sha256": "6cdbe44acbf78b7289c7e829ed6f1b84119e76cdc9b1724f28b7e2881abe85b0"
+    },
+    "visual-atlas/review-mobile.pdf": {
+      "bytes": 919883,
+      "sha256": "80aac09ca351fcbe5021f6de7fed7095ac19ccb72292286ba84591901a71ccb5"
+    },
+    "visual-atlas/surface-manifest.json": {
+      "bytes": 71675,
+      "sha256": "754083f0eee21fb34d897fd29db686f17734b19729b6b5459592f05558ee3b21"
+    }
+  },
+  "manifest": {
+    "path": "visual-atlas/surface-manifest.json",
+    "schema": "project-os-visual-atlas-surface-manifest-v3",
+    "requiredSurfaceCount": 17,
+    "scannerReview": "supported-synthetic-blocked-signal",
+    "sha256": {
+      "bytes": 71675,
+      "sha256": "754083f0eee21fb34d897fd29db686f17734b19729b6b5459592f05558ee3b21"
+    }
+  },
+  "reuse": {
+    "path": "visual-atlas/diagnostics/reuse-manifest.json",
+    "r6CarrierCommit": "9f9e75735c7b5c3863f1a707858ab92d6d5bd990",
+    "r6CarrierTree": "6ea44b95e751b724ef06be89a9375974cb122e5a",
+    "hashDeferredForReceipt": true
+  },
+  "historicalEvidence": {
+    "AR-31": "immutable",
+    "AR-32": "immutable",
+    "r6Carrier": "immutable input; unaffected bytes reused"
+  },
+  "qualification": {
+    "path": "visual-atlas/diagnostics/qualification-summary.json",
+    "sha256": {
+      "bytes": 3181,
+      "sha256": "703f67c10d3df901c1a2c5aabfff7896cec081fa4196cb161c4a2f2d829ce7c9"
+    },
+    "node": "v22.23.2"
+  },
+  "remoteVerification": {
+    "result": "pending-post-publish-readback",
+    "path": "readback/remote-verification.json",
+    "note": "Carrier commit/tree are intentionally read back after publication because embedding a commit hash inside its own commit is self-referential."
+  }
+}

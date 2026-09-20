@@ -14,8 +14,9 @@
       "classification": "R7-regenerated",
       "reason": "dependent deterministic bundle regenerated after repaired evidence",
       "oldSha256": "05566dd7ab45340334dafce0dfa55e26181be59566ecf62b5ddeb9faeab89226",
-      "newSha256": "7c92471360880d3bb2681f2380c0e5b42faf2f58d054138b72df2edeaa058eea",
-      "equal": false
+      "newSha256": null,
+      "equal": false,
+      "selfDependent": true
     },
     "visual-atlas/capture-report.json": {
       "classification": "R7-regenerated",
@@ -362,11 +363,12 @@
     },
     "git-publish-receipt.json": {
       "classification": "R7-regenerated",
-      "reason": "new R7 Fabric publish receipt; finalized after carrier readback",
+      "reason": "new R7 Fabric publish receipt; hash deferred because the receipt is outside the bundle and the reuse manifest is inside it",
       "oldSha256": "0ce4a31d80d35dde6307d0d4a32dd6d8d7d2c542d309c20ecab29c9e5ed5d018",
       "newSha256": null,
       "equal": false,
-      "pendingFinalization": true
+      "pendingFinalization": false,
+      "hashDeferred": true
     }
   },
   "selfHashExcluded": [
