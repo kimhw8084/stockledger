@@ -1,0 +1,388 @@
+{
+  "accepted_at": "2026-09-20T03:17:24Z",
+  "changed_files": [
+    {
+      "additions": 171,
+      "deletions": 47,
+      "path": "src/app/StockLedgerApp.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 3,
+      "deletions": 1,
+      "path": "src/components/BottomNav.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 13,
+      "deletions": 4,
+      "path": "src/components/HomeVisualDashboard.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 50,
+      "deletions": 15,
+      "path": "src/components/WindowPanel.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 17,
+      "deletions": 13,
+      "path": "src/components/common.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 1,
+      "deletions": 1,
+      "path": "src/components/logic/L0DataLayer.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 3,
+      "deletions": 3,
+      "path": "src/components/logic/L15ConditionsLayer.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 1,
+      "deletions": 1,
+      "path": "src/components/logic/L1MetricsLayer.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 1,
+      "deletions": 1,
+      "path": "src/components/logic/L2RecipesLayer.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 1,
+      "deletions": 1,
+      "path": "src/components/stocks/StockSearchPanel.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 1,
+      "deletions": 1,
+      "path": "src/components/stocks/StockTrendHero.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 67,
+      "deletions": 22,
+      "path": "src/features/notifications/NotificationSettingsPanel.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 2,
+      "deletions": 2,
+      "path": "src/features/workspace/WorkspacePanel.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 62,
+      "deletions": 0,
+      "path": "src/hooks/useWindowPanelFocus.ts",
+      "status": "A"
+    },
+    {
+      "additions": 8,
+      "deletions": 0,
+      "path": "src/lib/i18n.ts",
+      "status": "M"
+    },
+    {
+      "additions": 97,
+      "deletions": 1,
+      "path": "tests/e2e/workspace.spec.ts",
+      "status": "M"
+    }
+  ],
+  "checks": [
+    {
+      "command": "/bin/zsh -lc \"pwd && sed -n '1,240p' /Users/haewonkim/.codex/RTK.md && sed -n '1,260p' /Users/haewonkim/.codex/law.md && printf '\\\\n--- repo files ---\\\\n' && rg --files -g 'AGENTS.md' -g 'package.json' -g 'src/**' -g 'tests/**' -g 'e2e/**' -g 'playwright.config.*' -g 'project-os-artifacts/**' -g 'AR-31*' | sed -n '1,240p'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git status --short --branch && rtk git branch --all --verbose --no-abbrev && rtk git log --oneline --decorate --graph --all -n 24 && printf '\\\\n--- exact commits ---\\\\n' && rtk git show --no-ext-diff --stat --oneline ddc1f1f6c1bd3b1a62043673ade679c9de15e352 && rtk git show --no-ext-diff --stat --oneline d8ff5a52de00c0d98d46b17b59b598dd56d86221 && printf '\\\\n--- package scripts/node ---\\\\n' && node --version && rtk cat package.json\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git remote -v && printf '\\\\n--- ancestry ---\\\\n' && rtk git rev-list --parents -n 1 d8ff5a52de00c0d98d46b17b59b598dd56d86221 && rtk git rev-list --parents -n 1 f0336e0742dccf90c372258cefd6143d59c378c3 && rtk git merge-base --is-ancestor ddc1f1f6c1bd3b1a62043673ade679c9de15e352 d8ff5a52de00c0d98d46b17b59b598dd56d86221; printf 'merge-base-status=%s\\\\n' \\\"\"'$?\" && printf '\"'\\\\n--- local refs ---\\\\n' && rtk git show-ref | rg 'codex/stockledger-prod-c13|main|project-os-artifacts/stockledger/prod-c13' && printf '\\\\n--- node tools ---\\\\n' && command -v node && command -v nvm || true && command -v fnm || true && command -v volta || true && ls -1 /opt/homebrew/opt/node*/bin/node /usr/local/opt/node*/bin/node /Users/haewonkim/.nvm/versions/node/*/bin/node 2>/dev/null || true && printf '\\\\n--- lockfiles ---\\\\n' && rtk ls -1 | rg 'lock|node_modules'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git merge --ff-only d8ff5a52de00c0d98d46b17b59b598dd56d86221 && rtk git status --short --branch && printf '\\\\n--- candidate changes ---\\\\n' && rtk git diff --no-ext-diff --stat ddc1f1f6c1bd3b1a62043673ade679c9de15e352..HEAD && printf '\\\\n--- focus helper ---\\\\n' && rtk sed -n '1,260p' src/hooks/useWindowPanelFocus.ts && printf '\\\\n--- home dashboard focus references ---\\\\n' && rtk rg -n -C 8 'helpFocus|captureInvoker|helpTarget|Summary|section help' src/components/HomeVisualDashboard.tsx && printf '\\\\n--- all captureInvoker call sites ---\\\\n' && rtk rg -n -C 3 'captureInvoker' src tests\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"printf '%s\\\\n' '--- Home imports/component props ---' && rtk sed -n '1,180p' src/components/HomeVisualDashboard.tsx && rtk sed -n '280,500p' src/components/HomeVisualDashboard.tsx && printf '%s\\\\n' '--- helper/component definitions ---' && rtk sed -n '1,240p' src/components/WindowPanel.tsx && rtk sed -n '1,220p' src/components/common.tsx && printf '%s\\\\n' '--- app invoker wiring around definitions ---' && rtk sed -n '3070,3260p' src/app/StockLedgerApp.tsx && printf '%s\\\\n' '--- e2e focus tests ---' && rtk rg -n -C 12 'help|Journal|notification|focus|Summary|Today' tests/e2e/workspace.spec.ts && printf '%s\\\\n' '--- app open callback references ---' && rtk rg -n -C 5 'openStockEditor|openEyeDetail|openAlertDetail|openDecisionDetail|openRecipeDetail|openMetricDetail|openJournalComposer|openEyeComposer|openRecipeBuilder|openLogicInfo|openLogicRegistry|openLogicSetBuilder|openConditionBuilder|openScannerReview|openMetricBuilder|duplicateMetric' src | sed -n '1,1000p'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"printf '%s\\\\n' '--- Button and Pressable definitions ---' && rtk rg -n -C 10 'export const Button|interface Button|type Button|onPress:' src/components/common.tsx src/components/*.tsx src/features/**/*.tsx | sed -n '1,500p' && printf '%s\\\\n' '--- callback calls with event/invoker ---' && rtk rg -n -C 2 'onPress=\\\\{\\\\(event\\\\)|onPress=\\\\{\\\\(.*event|open[A-Za-z]+\\\\([\"'^'\"\\\\n]*event|invoker' src/app/StockLedgerApp.tsx src/components src/features | sed -n '1,900p' && printf '%s\\\\n' '--- R4 e2e tail/all ---' && rtk sed -n '1,280p' tests/e2e/workspace.spec.ts\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '280,520p' tests/e2e/workspace.spec.ts && printf '\\\\n--- Button implementation ---\\\\n' && rtk sed -n '1,150p' src/components/common.tsx && printf '\\\\n--- logic caller paths ---\\\\n' && for f in src/components/logic/L0DataLayer.tsx src/components/logic/L1MetricsLayer.tsx src/components/logic/L2RecipesLayer.tsx src/components/logic/L3EyesLayer.tsx src/components/logic/L15ConditionsLayer.tsx; do echo \\\"### \"'$f\"; rtk rg -n -C 4 '\"'onOpenHelp|onOpenReview|onPress' \\\"\"'$f\"; done'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg --files -g '*vitest*' -g 'tsconfig*' -g 'vite.config*' -g 'setup*' | sort && printf '\\\\n--- test imports/environment ---\\\\n' && rtk sed -n '1,180p' tests/app.test.tsx && rtk sed -n '1,160p' tests/navigation.test.ts && printf '\\\\n--- all package config refs ---\\\\n' && rtk rg -n 'environment|jsdom|happy-dom|setupFiles|vitest' . --glob '\"'!node_modules/**'\"' --glob '\"'!package-lock.json'\"' | sed -n '1,260p' && printf '\\\\n--- exact full candidate diff helper/home/e2e ---\\\\n' && rtk git diff --no-ext-diff ddc1f1f6c1bd3b1a62043673ade679c9de15e352..HEAD -- src/hooks/useWindowPanelFocus.ts src/components/HomeVisualDashboard.tsx tests/e2e/workspace.spec.ts\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk ls -la /Users/haewonkim/.nvm/versions/node && rtk find /Users/haewonkim/.nvm/versions/node -maxdepth 3 -type f -name node -print 2>/dev/null | sort && rtk sed -n '1,180p' vitest.config.ts && rtk sed -n '1,220p' playwright.config.ts && rtk git show --format=fuller --no-patch HEAD && rtk git log --oneline --decorate --ancestry-path ddc1f1f6c1bd3b1a62043673ade679c9de15e352..HEAD\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk ls -la /Users/haewonkim/.nvm/versions/node/v22.23.2/bin && /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/node --version && /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npm --version && /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npx --version'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"printf '%s\\\\n' '--- release evidence script ---' && rtk sed -n '1,280p' scripts/release-evidence.ts && printf '%s\\\\n' '--- verify script ---' && rtk sed -n '1,240p' scripts/verify-release-evidence.ts && printf '%s\\\\n' '--- runtime evidence ---' && rtk sed -n '1,240p' server/worker/releaseEvidenceRuntime.ts && printf '%s\\\\n' '--- recent evidence branch commits ---' && rtk git log --stat --oneline origin/codex-fabric/evidence/stockledger/prod-c13-ui-perfection-shared-focus-fix-v1 -n 3 && printf '%s\\\\n' '--- evidence branch files ---' && rtk git diff --name-status d8ff5a52de00c0d98d46b17b59b598dd56d86221 origin/codex-fabric/evidence/stockledger/prod-c13-ui-perfection-shared-focus-fix-v1 && printf '%s\\\\n' '--- operations/release docs references ---' && rtk rg -n -C 3 'release:evidence|release:verify|STOCKLEDGER_PROTECTED_BASE|Fabric evidence|evidence/' docs scripts package.json .github | sed -n '1,600p'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"printf '%s\\\\n' '--- prior audit json ---' && rtk git show origin/codex-fabric/evidence/stockledger/prod-c13-ui-perfection-shared-focus-fix-v1:.codex-fabric/audit.json | sed -n '1,260p' && printf '%s\\\\n' '--- fabric/local metadata ---' && rtk find .codex-fabric -maxdepth 2 -type f -print -exec sh -c 'echo --- \"'$1; sed -n \"1,80p\" \"$1\"'\"' _ {} \\\\; 2>/dev/null | sed -n '1,600p' && printf '%s\\\\n' '--- environment fabric vars (names only) ---' && env | sort | rg '\"'^(CF|CODEX|FABRIC|STOCKLEDGER)='\"' | sed -E 's/=.*/=<set>/'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git diff --check && rtk git diff -- src/hooks/useWindowPanelFocus.ts src/components/HomeVisualDashboard.tsx tests/e2e/workspace.spec.ts && printf '\\\\n--- status ---\\\\n' && rtk git status --short --branch && printf '\\\\n--- node ---\\\\n' && PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:\"'$PATH node --version && PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm run typecheck'",
+      "exit_code": 127,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk ls -ld node_modules node_modules/.bin node_modules/.bin/tsc 2>&1 || true && rtk ls node_modules/.bin 2>/dev/null | sed -n '1,100p' && rtk git status --short --ignored | sed -n '1,160p' && PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:\"'$PATH npm exec -- tsc --version 2>&1 || true && PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm ls --depth=0 2>&1 | sed -n '\"'1,120p'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm ci'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm run typecheck && PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm run export:web && PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npx playwright test tests/e2e/workspace.spec.ts --project=desktop --grep '\"'resolves entity links|home help prefers' --workers=1\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"printf '%s\\\\n' '--- all explicit invoker plumbing ---' && rtk rg -n -C 3 'invoker|onOpenDetail|onOpenReview|onOpenHelp|onAddStock|onEditStock|openLogicRegistry\\\\(event\\\\)|openEyeDetail\\\\(.*event|openDecisionDetail\\\\(.*event|openAlertDetail\\\\(.*event|openJournalComposer\\\\(.*event|openMetricBuilder\\\\(.*event|openConditionBuilder\\\\(.*event|openScannerReview\\\\(.*event' src/components src/features src/app/StockLedgerApp.tsx | sed -n '1,1400p' && printf '%s\\\\n' '--- all active focus helper call paths in raw callbacks ---' && rtk rg -n -C 2 'onPress=\\\\{\\\\(event[\"'^'\"\\\\n]*\\\\)|onPress=\\\\{\\\\(event' src/components src/features src/app/StockLedgerApp.tsx | sed -n '1,1400p'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm test -- --run && PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npx playwright test tests/e2e/workspace.spec.ts --project=desktop --grep '\"'notification consent|resolves entity links' --workers=1\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm run test:e2e'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm run check:release-workflow'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm run check:boundaries'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH STOCKLEDGER_PROTECTED_BASE=ddc1f1f6c1bd3b1a62043673ade679c9de15e352 npm run check:release-base'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm audit --audit-level=high'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm run export:all && rtk git diff --check'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git status --short --branch && printf '\\\\n--- final source diff ---\\\\n' && rtk git diff --stat && rtk git diff -- src/components/HomeVisualDashboard.tsx src/hooks/useWindowPanelFocus.ts tests/e2e/workspace.spec.ts && printf '\\\\n--- candidate ancestry ---\\\\n' && rtk git merge-base --is-ancestor ddc1f1f6c1bd3b1a62043673ade679c9de15e352 HEAD; printf 'base-ancestor=%s\\\\n' \\\"\"'$?\" && rtk git log --oneline --decorate --graph -n 8'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git add src/components/HomeVisualDashboard.tsx src/hooks/useWindowPanelFocus.ts tests/e2e/workspace.spec.ts && rtk git commit -m \"fix(stockledger): prioritize explicit panel invokers\" && rtk git status --short --branch && rtk git show --stat --oneline --decorate HEAD'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'STOCKLEDGER_PROTECTED_BASE=ddc1f1f6c1bd3b1a62043673ade679c9de15e352 PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm run release:evidence -- --output artifacts/release-evidence.json --base \"$STOCKLEDGER_PROTECTED_BASE\" && STOCKLEDGER_PROTECTED_BASE=ddc1f1f6c1bd3b1a62043673ade679c9de15e352 PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm run release:verify -- --input artifacts/release-evidence.json --base \"$STOCKLEDGER_PROTECTED_BASE\" && rtk git status --short --branch'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git show origin/codex-fabric/evidence/stockledger/prod-c13-ui-perfection-shared-focus-fix-v1:.codex-fabric/audit.json | tail -n 220'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk /Users/haewonkim/.codex-fabric/bin/fabricctl --help && printf '\\\\n--- current job status ---\\\\n' && rtk /Users/haewonkim/.codex-fabric/bin/fabricctl status CF-1254bacb4fd636776550ee82 | sed -n '1,240p' && printf '\\\\n--- local jobs matching current worktree ---\\\\n' && rtk find /Users/haewonkim/.codex-fabric/jobs/CF-1254bacb4fd636776550ee82 -maxdepth 3 -type f -print 2>/dev/null | sort\"",
+      "exit_code": 2,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk /Users/haewonkim/.codex-fabric/bin/fabricctl status CF-1254bacb4fd636776550ee82 | sed -n '1,260p' || true && printf '\\\\n--- local job files ---\\\\n' && rtk find /Users/haewonkim/.codex-fabric/jobs -maxdepth 2 -type f -name job.json -print | rg 'CF-1254bacb4fd636776550ee82' || true && rtk find /Users/haewonkim/.codex-fabric/results/CF-1254bacb4fd636776550ee82 -maxdepth 2 -type f -print 2>/dev/null | sort | sed -n '1,120p'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '1,260p' /Users/haewonkim/.codex-fabric/jobs/CF-1254bacb4fd636776550ee82.running/job.json && printf '\\\\n--- fabric publish implementation ---\\\\n' && rtk rg -n -C 8 'publish-evidence|publish_pending|publish_pending_evidence|evidence' /Users/haewonkim/.codex-fabric/current/fabric.py | sed -n '1,500p'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git push -u origin codex/stockledger-prod-c13-ui-perfection-pointer-focus-fix-v1'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"set -o pipefail\nprintf '%s\\\\n' '--- local identity ---'\nrtk git status --short --branch\nrtk git diff --check\nrtk git show -s --format='%H%n%P%n%s' HEAD\nrtk git merge-base --is-ancestor ddc1f1f6c1bd3b1a62043673ade679c9de15e352 HEAD\nprintf 'protected-base-ancestor=%s\\\\n' \\\"\"'$?\"\nrtk git merge-base --is-ancestor f0336e0742dccf90c372258cefd6143d59c378c3 HEAD\nprintf '\"'R4-interaction-ancestor=%s\\\\n' \\\"\"'$?\"\nrtk git merge-base --is-ancestor d8ff5a52de00c0d98d46b17b59b598dd56d86221 HEAD\nprintf '\"'R4-candidate-ancestor=%s\\\\n' \\\"\"'$?\"\nprintf '\"'%s\\\\n' '--- remote refs ---'\nrtk git ls-remote origin \\\\\n  refs/heads/codex/stockledger-prod-c13-ui-perfection-pointer-focus-fix-v1 \\\\\n  refs/heads/main \\\\\n  refs/heads/project-os-artifacts/stockledger/prod-c13-ui-perfection-inspection-v1 \\\\\n  refs/heads/codex/stockledger-prod-c13-ui-perfection-shared-focus-fix-v1 \\\\\n  refs/heads/codex/stockledger-prod-c13-ui-perfection-interaction-fix-v1 \\\\\n  refs/heads/codex-fabric/evidence/stockledger/prod-c13-ui-perfection-shared-focus-fix-v1 \\\\\n  refs/heads/codex-fabric/evidence/stockledger/prod-c13-ui-perfection-interaction-fix-v1\nprintf '%s\\\\n' '--- release manifest identity ---'\nrtk sed -n '1,120p' artifacts/release-evidence.json\nprintf '%s\\\\n' '--- historical carrier identity ---'\nrtk git rev-parse project-os-artifacts/stockledger/prod-c13-ui-perfection-inspection-v1 origin/project-os-artifacts/stockledger/prod-c13-ui-perfection-inspection-v1\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH STOCKLEDGER_PROTECTED_BASE=ddc1f1f6c1bd3b1a62043673ade679c9de15e352 npm run release:evidence -- --output artifacts/release-evidence.json --base ddc1f1f6c1bd3b1a62043673ade679c9de15e352 && PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH STOCKLEDGER_PROTECTED_BASE=ddc1f1f6c1bd3b1a62043673ade679c9de15e352 npm run release:verify -- --input artifacts/release-evidence.json --base ddc1f1f6c1bd3b1a62043673ade679c9de15e352 && rtk git status --short --branch'",
+      "exit_code": 0,
+      "type": "command_execution"
+    }
+  ],
+  "codex": {
+    "cli_version": "codex-cli 0.155.1",
+    "configured_model": "gpt-5.6-luna",
+    "event_count": 83,
+    "provider_reported_model": null,
+    "reasoning_effort": "xhigh",
+    "terminal_type": "turn.completed",
+    "usage": {
+      "cache_hit_percent": 96.3,
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 3618560,
+      "fresh_input_tokens": 139052,
+      "input_tokens": 3757612,
+      "non_reasoning_output_tokens": 10391,
+      "output_tokens": 21676,
+      "reasoning_output_tokens": 11285,
+      "total_processed_tokens": 3779288
+    },
+    "warnings": []
+  },
+  "commits": [
+    {
+      "sha": "f18faba01c7eea980a81debb9fbe8fb17c6ee33d",
+      "subject": "fix(stockledger): prioritize explicit panel invokers"
+    },
+    {
+      "sha": "d8ff5a52de00c0d98d46b17b59b598dd56d86221",
+      "subject": "fix(stockledger): restore shared window panel focus ownership"
+    },
+    {
+      "sha": "f0336e0742dccf90c372258cefd6143d59c378c3",
+      "subject": "fix: repair golden ui interaction gates"
+    }
+  ],
+  "diff": {
+    "additions": 498,
+    "changed_files": 16,
+    "commit_count": 3,
+    "deletions": 113
+  },
+  "error_code": null,
+  "evidence_manifest": {
+    "count": 0,
+    "items": [],
+    "version": 1
+  },
+  "evidence_publisher_release": "1.2.3-resume-candidate",
+  "fabric_capture": {
+    "applied": false,
+    "paths_before": 0,
+    "transient_untracked_removed": {
+      "count": 0,
+      "items": []
+    }
+  },
+  "fabric_release": "1.2.3-resume-candidate",
+  "failure_class": null,
+  "finished_at": "2026-09-20T03:25:32Z",
+  "git": {
+    "base_is_ancestor": true,
+    "base_sha": "ddc1f1f6c1bd3b1a62043673ade679c9de15e352",
+    "branch": "codex/stockledger-prod-c13-ui-perfection-pointer-focus-fix-v1",
+    "detached_verify": false,
+    "head_sha": "f18faba01c7eea980a81debb9fbe8fb17c6ee33d",
+    "remote_exact_head": true,
+    "remote_head_sha": "f18faba01c7eea980a81debb9fbe8fb17c6ee33d",
+    "target_branch": "main",
+    "target_drifted_since_acceptance": false,
+    "target_head_observed_after_execution": "ddc1f1f6c1bd3b1a62043673ade679c9de15e352",
+    "work_branch": "codex/stockledger-prod-c13-ui-perfection-pointer-focus-fix-v1",
+    "worktree_clean": true
+  },
+  "instructions": {
+    "files": [],
+    "total_bytes": 0,
+    "warning": null
+  },
+  "job_id": "CF-1254bacb4fd636776550ee82",
+  "kind": "codex-fabric-audit-evidence",
+  "locator": {
+    "branch": "codex-fabric/evidence/stockledger/prod-c13-ui-perfection-pointer-focus-fix-v1",
+    "path": ".codex-fabric/audit.json",
+    "ref": "refs/heads/codex-fabric/evidence/stockledger/prod-c13-ui-perfection-pointer-focus-fix-v1"
+  },
+  "operation": "FIX",
+  "policy": {
+    "environment_policy_sha256": "e077daca74297b3c30bee8989f00f8ca5338f7610b4d016a6c48db524205d064",
+    "fabric_release": "1.2.3-resume-candidate",
+    "policy_sha256": "a642c9f63bab2cb555704bdb0b9d1f28222591f133f934c1d0f93cc5a25ab8a1",
+    "registry_sha256": "cfc765f3211c37c7967a138f3b2d89a99341939b15b2623f92744d007f625d6f"
+  },
+  "project_id": "stockledger",
+  "recovery": {
+    "model_rerun_safe": false,
+    "recovery_required": false,
+    "retry_safe": false,
+    "retry_scope": null,
+    "worktree_retained": true
+  },
+  "request": "prod-c13-ui-perfection-pointer-focus-fix-v1",
+  "schema_version": 1,
+  "started_at": "2026-09-20T03:17:24Z",
+  "status": "EXECUTED_CHANGE",
+  "timing": {
+    "execution_seconds": 488,
+    "queue_seconds": 0,
+    "total_seconds": 488
+  },
+  "transport": {
+    "bytes": 7031,
+    "envelope": "FABRIC/2",
+    "prompt_bytes": 6676,
+    "prompt_sha256": "8c088930f78de27dd366796c1025f7917744e8d14162763984a9aad6ec9b56c5",
+    "sha256": "1254bacb4fd636776550ee82e04730e34b32edab8de43a9c23451fd8f418bb55"
+  }
+}
