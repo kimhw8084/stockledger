@@ -8,7 +8,7 @@ import { LogicLevelCard } from "./LogicLevelCard";
 interface L2RecipesLayerProps {
   language: AppLanguage;
   rules: FrozenScannerRule[];
-  onOpenHelp: () => void;
+  onOpenHelp: (invoker?: unknown) => void;
   SectionHeader: React.FC<any>;
   Button: React.FC<any>;
   MetaPill: React.FC<any>;

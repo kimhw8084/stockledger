@@ -11,9 +11,10 @@ interface BottomNavProps<T extends string> {
   labels?: Partial<Record<T, string>>;
   icons?: Partial<Record<T, string>>;
   navigationLabel?: string;
+  focusRefs?: Partial<Record<T, React.Ref<any>>>;
 }
 
-export const BottomNav = <T extends string>({ tabs, currentTab, onSelect, labels, icons, navigationLabel = "Primary navigation" }: BottomNavProps<T>) => {
+export const BottomNav = <T extends string>({ tabs, currentTab, onSelect, labels, icons, navigationLabel = "Primary navigation", focusRefs }: BottomNavProps<T>) => {
   const reduced = useReducedMotion();
   const [itemFrames, setItemFrames] = useState<Record<string, { x: number; y: number; width: number; height: number }>>({});
   const pillX = useRef(new Animated.Value(0)).current;
@@ -81,6 +82,7 @@ export const BottomNav = <T extends string>({ tabs, currentTab, onSelect, labels
             return (
               <Pressable
                 key={item}
+                ref={focusRefs?.[item]}
                 accessibilityRole="tab"
                 accessibilityLabel={labels?.[item] ?? item}
                 accessibilityState={{ selected: active }}

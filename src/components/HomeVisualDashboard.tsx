@@ -22,6 +22,7 @@ import { Alert, Decision, Eye, Evaluation, MockSnapshot, Outcome, Stock } from "
 import { Card, Reveal } from "./common";
 import { WindowPanel } from "./WindowPanel";
 import { useReducedMotion } from "../hooks/useReducedMotion";
+import { useWindowPanelFocus } from "../hooks/useWindowPanelFocus";
 
 if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -54,7 +55,8 @@ interface HomeVisualDashboardProps {
   onSelectStock: (stockId: string, eyeId: string) => void;
   onOpenAlerts: () => void;
   onOpenLogicLab: () => void;
-  onOpenJournal: (eyeId: string, alertId?: string) => void;
+  onOpenJournal: (eyeId: string, alertId?: string, invoker?: unknown) => void;
+  fallbackFocusRef?: React.RefObject<any>;
 }
 
 const HOME_BUCKETS: HomeBucket[] = [
@@ -316,6 +318,7 @@ const HomeVisualDashboard: React.FC<HomeVisualDashboardProps> = ({
   onOpenAlerts,
   onOpenLogicLab,
   onOpenJournal,
+  fallbackFocusRef,
 }) => {
   const reduced = useReducedMotion();
   const pulseAnim = useRef(new Animated.Value(0)).current;
@@ -323,6 +326,7 @@ const HomeVisualDashboard: React.FC<HomeVisualDashboardProps> = ({
   const [bucket, setBucket] = useState<HomeBucket>("Review Now");
   const [expandedStockIds, setExpandedStockIds] = useState<string[]>([]);
   const [helpTarget, setHelpTarget] = useState<HomeHelpTarget | "">("");
+  const helpFocus = useWindowPanelFocus(fallbackFocusRef);
 
   useEffect(() => {
     if (reduced) { pulseAnim.setValue(0); floatAnim.setValue(0); return; }
@@ -459,7 +463,10 @@ const HomeVisualDashboard: React.FC<HomeVisualDashboardProps> = ({
         accessibilityRole="button"
         accessibilityLabel={language === "ko" ? `${label} 설명` : `${label} help`}
         accessibilityHint={language === "ko" ? "이 구역의 설명을 엽니다" : "Opens help for this section"}
-        onPress={() => setHelpTarget(target)}
+        onPress={(event) => {
+          helpFocus.captureInvoker(event);
+          setHelpTarget(target);
+        }}
         style={styles.sectionHelpButton}
       >
         <Text style={styles.sectionHelpButtonText}>?</Text>
@@ -620,7 +627,7 @@ const HomeVisualDashboard: React.FC<HomeVisualDashboardProps> = ({
                 key={`loop-${decision.id}`}
                 accessibilityRole="button"
                 accessibilityLabel={`${item.stock.symbol} ${localizedDecisionAction(language, decision.action)}`}
-                onPress={() => onOpenJournal(item.dominantEye?.id ?? decision.eyeId, decision.alertId)}
+                onPress={(event) => onOpenJournal(item.dominantEye?.id ?? decision.eyeId, decision.alertId, event)}
                 style={styles.loopCard}
               >
                 <Text style={styles.loopSymbol}>{item.stock.symbol}</Text>
@@ -866,7 +873,7 @@ const HomeVisualDashboard: React.FC<HomeVisualDashboardProps> = ({
                           accessibilityRole="button"
                           accessibilityLabel={language === "ko" ? "저널 열기" : "Open journal"}
                           style={styles.quickAction}
-                          onPress={() => onOpenJournal(item.dominantEye!.id, item.openAlerts[0]?.id)}
+                          onPress={(event) => onOpenJournal(item.dominantEye!.id, item.openAlerts[0]?.id, event)}
                         >
                           <Text style={styles.quickActionText}>{language === "ko" ? "저널" : "Journal"}</Text>
                         </Pressable>
@@ -891,6 +898,8 @@ const HomeVisualDashboard: React.FC<HomeVisualDashboardProps> = ({
           }
           onClose={() => setHelpTarget("")}
           closeLabel={t(language, "common.done")}
+          returnFocusRef={helpFocus.returnFocusRef}
+          fallbackFocusRef={helpFocus.fallbackFocusRef}
         >
           <Card style={styles.helpCard}>
             <Text style={styles.helpBody}>{homeHelpContent(language, helpTarget).body}</Text>

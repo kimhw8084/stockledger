@@ -11,7 +11,7 @@ interface L1MetricsLayerProps {
   processedFeatures: ProcessedFeatureRecord[];
   latestScanDate?: string;
   rules: FrozenScannerRule[];
-  onOpenHelp: () => void;
+  onOpenHelp: (invoker?: unknown) => void;
   MetaPill: React.FC<any>;
   SectionHeader: React.FC<any>;
   Button: React.FC<any>;

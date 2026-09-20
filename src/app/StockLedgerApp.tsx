@@ -21,6 +21,7 @@ import { optionalPositiveNumber, validateEntryRange } from "../domain/inputValid
 import { createId as createLocalId } from "../platform/identity";
 import { useWorkspaceNavigation } from "../hooks/useWorkspaceNavigation";
 import { useSavedStringList } from "../hooks/useSavedStringList";
+import { useWindowPanelFocus } from "../hooks/useWindowPanelFocus";
 import { appDialog as RNAlert } from "../platform/dialog";
 import { useAppModel } from "../hooks/useAppModel";
 import { BottomNav } from "../components/BottomNav";
@@ -1816,7 +1817,7 @@ const AlertClusterCard = ({
   };
   selectedStockId: string;
   onOpenStock: () => void;
-  onOpenDetail: (alertId: string) => void;
+  onOpenDetail: (alertId: string, invoker?: unknown) => void;
   onQuickDecision: (alert: Alert, action: DecisionAction) => void;
   onSnooze: (alertId: string) => void;
   onReviewed: (alertId: string) => void;
@@ -1879,7 +1880,7 @@ const AlertClusterCard = ({
               key={alert.id}
               accessibilityRole="button"
               accessibilityLabel={alert.title}
-              onPress={() => onOpenDetail(alert.id)}
+              onPress={(event) => onOpenDetail(alert.id, event)}
               style={styles.alertClusterItem}
             >
               <View style={styles.inlineBetween}>
@@ -2040,8 +2041,17 @@ export default function App() {
   const [eyeDetailOpen, setEyeDetailOpen] = useState(false);
   const [eyeComposerOpen, setEyeComposerOpen] = useState(false);
   const [eyeComposerEditingId, setEyeComposerEditingId] = useState("");
+  const [eyeComposerFallbackRef, setEyeComposerFallbackRef] = useState<React.RefObject<any>>();
   const [journalComposerOpen, setJournalComposerOpen] = useState(false);
   const [journalComposerEditingId, setJournalComposerEditingId] = useState("");
+  const journalComposerNewButtonRef = useRef<any>(null);
+  const journalSurfaceFallbackRef = useRef<any>(null);
+  const homeSurfaceFallbackRef = useRef<any>(null);
+  const stocksSurfaceFallbackRef = useRef<any>(null);
+  const logicSurfaceFallbackRef = useRef<any>(null);
+  const eyesSurfaceFallbackRef = useRef<any>(null);
+  const alertsSurfaceFallbackRef = useRef<any>(null);
+  const settingsSurfaceFallbackRef = useRef<any>(null);
   const [alertDetailOpen, setAlertDetailOpen] = useState(false);
   const [scannerSignalReviewId, setScannerSignalReviewId] = useState("");
   const [scannerReviewForm, setScannerReviewForm] = useState({
@@ -2057,6 +2067,22 @@ export default function App() {
   const [metricFormAttempted, setMetricFormAttempted] = useState(false);
   const [eyeFormAttempted, setEyeFormAttempted] = useState(false);
   const [journalFormAttempted, setJournalFormAttempted] = useState(false);
+  const stockEditorFocus = useWindowPanelFocus(stocksSurfaceFallbackRef);
+  const conditionBuilderFocus = useWindowPanelFocus(logicSurfaceFallbackRef);
+  const logicRegistryFocus = useWindowPanelFocus(logicSurfaceFallbackRef);
+  const logicVersionFocus = useWindowPanelFocus(logicSurfaceFallbackRef);
+  const logicInfoFocus = useWindowPanelFocus(logicSurfaceFallbackRef);
+  const metricBuilderFocus = useWindowPanelFocus(logicSurfaceFallbackRef);
+  const logicSetBuilderFocus = useWindowPanelFocus(logicSurfaceFallbackRef);
+  const recipeBuilderFocus = useWindowPanelFocus(logicSurfaceFallbackRef);
+  const recipeDetailFocus = useWindowPanelFocus(logicSurfaceFallbackRef);
+  const eyeDetailFocus = useWindowPanelFocus(eyesSurfaceFallbackRef);
+  const eyeComposerFocus = useWindowPanelFocus();
+  const alertDetailFocus = useWindowPanelFocus(alertsSurfaceFallbackRef);
+  const journalComposerFocus = useWindowPanelFocus(journalSurfaceFallbackRef);
+  const decisionDetailFocus = useWindowPanelFocus(journalSurfaceFallbackRef);
+  const scannerReviewFocus = useWindowPanelFocus(logicSurfaceFallbackRef);
+  const metricDetailFocus = useWindowPanelFocus(stocksSurfaceFallbackRef);
   const deferredStockSearch = useDeferredValue(stockSearch);
   const { width: viewportWidth } = useWindowDimensions();
   const isCompactPhone = viewportWidth < 390;
@@ -3076,16 +3102,23 @@ export default function App() {
         })
       : [];
 
+  const openStockEditor = (stockId: string, invoker?: unknown) => {
+    stockEditorFocus.captureInvoker(invoker);
+    setStockEditor(stockId);
+  };
+
   const openStockContext = ({
     stockId,
     eyeId,
     alertId,
     target = "Stocks",
+    invoker,
   }: {
     stockId: string;
     eyeId?: string;
     alertId?: string;
     target?: StockRouteTarget;
+    invoker?: unknown;
   }) => {
     setSelectedStockId(stockId);
     setStockSearch("");
@@ -3101,6 +3134,7 @@ export default function App() {
     }
     if (target === "Alerts") {
       setAlertWorkspaceTab("Current");
+      alertDetailFocus.captureInvoker(invoker);
       setAlertDetailOpen(Boolean(alertId));
       setTab("Alerts", { stockId, ...(alertId ? { alertId } : {}) });
       return;
@@ -3112,38 +3146,43 @@ export default function App() {
     setTab("Journal", { stockId });
   };
 
-  const openEyeDetail = (eyeId: string) => {
+  const openEyeDetail = (eyeId: string, invoker?: unknown) => {
     const eye = data?.eyes.find((item) => item.id === eyeId);
     if (!eye) return;
+    eyeDetailFocus.captureInvoker(invoker);
     setSelectedEyeId(eyeId);
     setEyeDetailOpen(true);
     setTab("Eyes", { stockId: eye.stockId, eyeId });
   };
 
-  const openAlertDetail = (alertId: string) => {
+  const openAlertDetail = (alertId: string, invoker?: unknown) => {
     const alert = data?.alerts.find((item) => item.id === alertId);
     if (!alert) return;
+    alertDetailFocus.captureInvoker(invoker);
     setSelectedAlertId(alertId);
     setAlertDetailOpen(true);
     setAlertWorkspaceTab(alert.reviewed ? "History" : "Current");
     setTab("Alerts", { alertId });
   };
 
-  const openDecisionDetail = (decisionId: string) => {
+  const openDecisionDetail = (decisionId: string, invoker?: unknown) => {
     const decision = data?.decisions.find((item) => item.id === decisionId);
     if (!decision) return;
+    decisionDetailFocus.captureInvoker(invoker);
     setSelectedDecisionId(decisionId);
     setTab("Journal", { decisionId });
   };
 
-  const openRecipeDetail = (recipeId: string) => {
+  const openRecipeDetail = (recipeId: string, invoker?: unknown) => {
     if (!data?.recipes.some((recipe) => recipe.id === recipeId)) return;
+    recipeDetailFocus.captureInvoker(invoker);
     setRecipeDetailId(recipeId);
     setTab("Logic Lab", { recipeId });
   };
 
-  const openMetricDetail = (card: VisualEvidenceCard) => {
+  const openMetricDetail = (card: VisualEvidenceCard, invoker?: unknown) => {
     if (!selectedStockSummary) return;
+    metricDetailFocus.captureInvoker(invoker);
     setSelectedEvidenceCard(card);
     setTab("Stocks", { stockId: selectedStockSummary.stock.id, metricId: card.id });
   };
@@ -3171,9 +3210,40 @@ export default function App() {
     );
   };
 
-  const quickDecision = (alert: Alert, action: DecisionAction) => {
+  const openJournalComposer = (invoker?: unknown) => {
+    journalComposerFocus.captureInvoker(invoker);
+    setJournalComposerOpen(true);
+  };
+
+  const openEyeComposer = (invoker?: unknown) => {
+    const fallbackRef = tab === "Logic Lab"
+      ? logicSurfaceFallbackRef
+      : tab === "Stocks"
+        ? stocksSurfaceFallbackRef
+        : eyesSurfaceFallbackRef;
+    setEyeComposerFallbackRef(fallbackRef);
+    eyeComposerFocus.captureInvoker(invoker);
+    setEyeComposerOpen(true);
+  };
+
+  const openRecipeBuilder = (invoker?: unknown) => {
+    recipeBuilderFocus.captureInvoker(invoker);
+    setRecipeBuilderOpen(true);
+  };
+
+  const openLogicInfo = (target: LogicInfoTarget, invoker?: unknown) => {
+    logicInfoFocus.captureInvoker(invoker);
+    setLogicInfoTarget(target);
+  };
+
+  const openLogicRegistry = (invoker?: unknown) => {
+    logicRegistryFocus.captureInvoker(invoker);
+    setLogicL0RegistryOpen(true);
+  };
+
+  const quickDecision = (alert: Alert, action: DecisionAction, invoker?: unknown) => {
     setDecisionForm({ eyeId: alert.eyeId, alertId: alert.id, action, note: "", concern: "", thesisValid: "", timing: "" });
-    setJournalComposerEditingId(""); setJournalFormAttempted(false); setJournalComposerOpen(true);
+    setJournalComposerEditingId(""); setJournalFormAttempted(false); openJournalComposer(invoker);
   };
 
   const acknowledgeAlertGroup = async (alerts: Alert[]) => {
@@ -3295,7 +3365,8 @@ export default function App() {
     setConditionBuilderRecipeId(logicLabCompatibleRecipes[0]?.id ?? "");
   };
 
-  const openLogicSetBuilder = (recipe?: Recipe) => {
+  const openLogicSetBuilder = (recipe?: Recipe, invoker?: unknown) => {
+    logicSetBuilderFocus.captureInvoker(invoker);
     if (!recipe) {
       resetLogicSetBuilderDraft();
       setLogicSetBuilderOpen(true);
@@ -3352,7 +3423,8 @@ export default function App() {
     } satisfies RecipeCondition;
   };
 
-  const openConditionBuilder = (row?: { recipeId?: string; condition?: RecipeCondition }) => {
+  const openConditionBuilder = (row?: { recipeId?: string; condition?: RecipeCondition }, invoker?: unknown) => {
+    conditionBuilderFocus.captureInvoker(invoker);
     if (row?.condition) {
       const metric = logicLabMetricCatalog.find((item) => item.key === row.condition?.metricKey);
       const formula = getFormulaDefinition(row.condition.formulaKey ?? metric?.formulaKey ?? "");
@@ -3464,7 +3536,7 @@ export default function App() {
     );
   };
 
-  const openHomeJournalComposer = (eyeId: string, alertId?: string) => {
+  const openHomeJournalComposer = (eyeId: string, alertId?: string, invoker?: unknown) => {
     setDecisionForm({
       eyeId,
       alertId: alertId ?? "",
@@ -3476,14 +3548,15 @@ export default function App() {
     });
     setJournalComposerEditingId("");
     setJournalFormAttempted(false);
-    setJournalComposerOpen(true);
+    openJournalComposer(invoker);
   };
 
   const selectedScannerSignal = scannerSignalReviewId
     ? data?.scanSignals.find((signal) => signal.signalId === scannerSignalReviewId)
     : undefined;
 
-  const openScannerReview = (signal: ScanSignal) => {
+  const openScannerReview = (signal: ScanSignal, invoker?: unknown) => {
+    scannerReviewFocus.captureInvoker(invoker);
     setScannerSignalReviewId(signal.signalId);
     setScannerReviewForm({
       userDecision: "watch",
@@ -3546,7 +3619,8 @@ export default function App() {
     resetLogicRuleBuilderDraft();
   };
 
-  const openMetricBuilder = (metric?: MetricDefinition) => {
+  const openMetricBuilder = (metric?: MetricDefinition, invoker?: unknown) => {
+    metricBuilderFocus.captureInvoker(invoker);
     if (!metric) {
       resetMetricBuilderDraft();
       setMetricBuilderOpen(true);
@@ -3587,7 +3661,8 @@ export default function App() {
     setMetricBuilderOpen(true);
   };
 
-  const duplicateMetric = (metric: MetricDefinition) => {
+  const duplicateMetric = (metric: MetricDefinition, invoker?: unknown) => {
+    metricBuilderFocus.captureInvoker(invoker);
     setMetricForm({
       name: language === "ko" ? `${metric.name} 사본` : `${metric.name} Copy`,
       humanMeaning: metric.humanMeaning,
@@ -3836,7 +3911,15 @@ export default function App() {
   return (
     <View nativeID="stockledger-root" style={styles.screen}>
       <StatusBar style="dark" />
-      {stockEditor !== null ? <StockEditor stock={data.stocks.find(stock => stock.id === stockEditor)} onClose={() => setStockEditor(null)} actions={actions} onSaved={id => { setSelectedStockId(id); setTab("Stocks", { stockId: id }); }} language={language} /> : null}
+      {stockEditor !== null ? <StockEditor
+        stock={data.stocks.find(stock => stock.id === stockEditor)}
+        onClose={() => setStockEditor(null)}
+        actions={actions}
+        onSaved={id => { setSelectedStockId(id); setTab("Stocks", { stockId: id }); }}
+        language={language}
+        returnFocusRef={stockEditorFocus.returnFocusRef}
+        fallbackFocusRef={stockEditorFocus.fallbackFocusRef}
+      /> : null}
       <View style={styles.frame}>
         {routeNotice ? (
           <View style={styles.routeNotice} accessibilityRole="alert" accessibilityLiveRegion="assertive">
@@ -3855,6 +3938,7 @@ export default function App() {
           </View>
           <View style={styles.topBarActions}>
             <Pressable
+              ref={alertsSurfaceFallbackRef}
               accessibilityRole="button" accessibilityLabel={t(language, "common.alerts")} accessibilityState={{ selected: tab === "Alerts" }}
               onPress={() => {
                 setAlertWorkspaceTab("Current");
@@ -3870,6 +3954,7 @@ export default function App() {
               ) : null}
             </Pressable>
             <Pressable
+              ref={journalSurfaceFallbackRef}
               accessibilityRole="button" accessibilityLabel={t(language, "common.journal")} accessibilityState={{ selected: tab === "Journal" }}
               onPress={() => setTab("Journal")}
               style={[styles.alertBell, tab === "Journal" ? styles.topHeaderActionActive : null]}
@@ -3882,6 +3967,7 @@ export default function App() {
               ) : null}
             </Pressable>
             <Pressable
+              ref={settingsSurfaceFallbackRef}
               accessibilityRole="button" accessibilityLabel={t(language, "nav.Settings")} accessibilityState={{ selected: tab === "Settings" }}
               onPress={() => setTab("Settings")}
               style={[styles.alertBell, tab === "Settings" ? styles.topHeaderActionActive : null]}
@@ -3899,11 +3985,11 @@ export default function App() {
           {data.stocks.length === 0 ? <Card>
             <Text style={styles.cardTitle}>{t(language, "home.onboarding.title")}</Text>
             <Text style={styles.cardBody}>{t(language, "home.onboarding.body")}</Text>
-            <Button label={t(language, "home.onboarding.addStock")} onPress={() => setStockEditor("")} />
+            <Button label={t(language, "home.onboarding.addStock")} onPress={() => openStockEditor("")} />
             <Button label={t(language, "home.onboarding.addRecipes")} tone="secondary" onPress={() => actions.addStarterRecipes()} />
             <Button label={t(language, "home.onboarding.exploreSample")} tone="ghost" onPress={() => actions.resetToSeed()} />
           </Card> : null}
-          {tab === "Stocks" ? <View style={{ flexDirection: "row", gap: 12 }}><Button label={t(language, "stocks.action.add")} onPress={() => setStockEditor("")} /><Button label={t(language, "stocks.action.manageEyes")} tone="secondary" onPress={() => setTab("Eyes")} /></View> : null}
+          {tab === "Stocks" ? <View style={{ flexDirection: "row", gap: 12 }}><Button label={t(language, "stocks.action.add")} onPress={() => openStockEditor("")} /><Button label={t(language, "stocks.action.manageEyes")} tone="secondary" onPress={() => setTab("Eyes")} /></View> : null}
           {data.snapshots.some(snapshot => snapshot.isMock) ? <Text style={{ padding: 10, color: "#6d4b16", fontSize: 14 }}>{t(language, "home.sampleNotice")}</Text> : null}
           {tab === "Home" && data.stocks.length > 0 ? (
             <HomeVisualDashboard
@@ -3917,7 +4003,8 @@ export default function App() {
               onSelectStock={(stockId, eyeId) => openStockContext({ stockId, eyeId })}
               onOpenAlerts={() => setTab("Alerts")}
               onOpenLogicLab={() => setTab("Logic Lab")}
-              onOpenJournal={(eyeId, alertId) => openHomeJournalComposer(eyeId, alertId)}
+              onOpenJournal={(eyeId, alertId, invoker) => openHomeJournalComposer(eyeId, alertId, invoker)}
+              fallbackFocusRef={homeSurfaceFallbackRef}
             />
           ) : null}
 
@@ -3936,7 +4023,7 @@ export default function App() {
                   deferredStockSearch={deferredStockSearch}
                   recentStocksCount={recentStocks.length}
                   setRecentStockIds={setRecentStockIds}
-                  onAddStock={() => setStockEditor("")}
+                  onAddStock={(invoker) => openStockEditor("", invoker)}
                   isCompactPhone={isCompactPhone}
                   isVeryCompactPhone={isVeryCompactPhone}
                   Input={Input}
@@ -3958,7 +4045,7 @@ export default function App() {
                         label={t(language, "common.registerEye")}
                         onPress={() => {
                           setEyeForm((current) => ({ ...current, stockId: selectedStockSummary.stock.id }));
-                          setEyeComposerOpen(true);
+                          openEyeComposer();
                         }}
                       />
                    </View>
@@ -3991,7 +4078,7 @@ export default function App() {
                         setStockSearch("");
                         closeEntityRoute("Stocks");
                       }}
-                      onEditStock={() => setStockEditor(selectedStockSummary.stock.id)}
+                      onEditStock={(invoker) => openStockEditor(selectedStockSummary.stock.id, invoker)}
                       onDeleteStock={async () => { await actions.archiveStock(selectedStockSummary.stock.id); setSelectedStockId(""); closeEntityRoute("Stocks"); }}
                       lookbackControl={
                         <HorizontalChoice
@@ -4175,7 +4262,7 @@ export default function App() {
                       })}
                     </View>
                     <Pressable
-                      onPress={() => setLogicL0RegistryOpen(true)}
+                      onPress={(event) => openLogicRegistry(event)}
                       style={({ pressed }) => [
                         styles.logicL0Button,
                         pressed ? styles.logicLayerChipPressed : null,
@@ -4299,7 +4386,7 @@ export default function App() {
                       MetaPill={MetaPill}
                       SectionHeader={SectionHeader}
                       Button={Button}
-                      onOpenHelp={() => setLogicInfoTarget("Processed Features")}
+                      onOpenHelp={(invoker) => openLogicInfo("Processed Features", invoker)}
                     />
                   )}
                   {logicLabLayer === "Frozen Rules" && (
@@ -4309,7 +4396,7 @@ export default function App() {
                       SectionHeader={SectionHeader}
                       Button={Button}
                       MetaPill={MetaPill}
-                      onOpenHelp={() => setLogicInfoTarget("Frozen Rules")}
+                      onOpenHelp={(invoker) => openLogicInfo("Frozen Rules", invoker)}
                     />
                   )}
                   {logicLabLayer === "Signals" && (
@@ -4321,7 +4408,7 @@ export default function App() {
                       MetaPill={MetaPill}
                       SectionHeader={SectionHeader}
                       Button={Button}
-                      onOpenHelp={() => setLogicInfoTarget("Signals")}
+                      onOpenHelp={(invoker) => openLogicInfo("Signals", invoker)}
                       onOpenReview={openScannerReview}
                     />
                   )}
@@ -4343,10 +4430,11 @@ export default function App() {
                 <HorizontalChoice options={eyesShelfFilters} value={eyesShelfFilter} onSelect={(filter: EyesShelfFilter) => setEyesShelfFilter(filter)} labelForOption={(filter: EyesShelfFilter) => eyesShelfFilterLabel(language, filter)} />
                 <View style={styles.actionRow}>
                   <Button
+                    ref={eyesSurfaceFallbackRef}
                     label={t(language, "common.new")}
                     onPress={() => {
                       resetEyeComposerDraft();
-                      setEyeComposerOpen(true);
+                      openEyeComposer();
                     }}
                   />
                 </View>
@@ -4366,8 +4454,8 @@ export default function App() {
                         accessibilityRole="button"
                         accessibilityLabel={`${stockLabel(data.stocks, eye.stockId)} ${recipeLabel(data.recipes, eye.recipeId)}`}
                         accessibilityState={{ selected: selectedEye?.id === eye.id }}
-                        onPress={() => {
-                          openEyeDetail(eye.id);
+                        onPress={(event) => {
+                          openEyeDetail(eye.id, event);
                         }}
                         style={({ pressed }) => [styles.pressableCardWrap, pressed ? styles.pressableCardWrapPressed : null]}
                       >
@@ -4402,8 +4490,8 @@ export default function App() {
                           <Button
                             label={t(language, "eyes.action.detail")}
                             tone="ghost"
-                            onPress={() => {
-                              openEyeDetail(eye.id);
+                            onPress={(event) => {
+                              openEyeDetail(eye.id, event);
                             }}
                           />
                         </View>
@@ -4428,8 +4516,8 @@ export default function App() {
                         accessibilityRole="button"
                         accessibilityLabel={`${stockLabel(data.stocks, eye.stockId)} ${recipeLabel(data.recipes, eye.recipeId)}`}
                         accessibilityState={{ selected: selectedEye?.id === eye.id }}
-                        onPress={() => {
-                          openEyeDetail(eye.id);
+                        onPress={(event) => {
+                          openEyeDetail(eye.id, event);
                         }}
                         style={({ pressed }) => [styles.pressableCardWrap, pressed ? styles.pressableCardWrapPressed : null]}
                       >
@@ -4455,8 +4543,8 @@ export default function App() {
                           <Button
                             label={t(language, "eyes.action.detail")}
                             tone="secondary"
-                            onPress={() => {
-                              openEyeDetail(eye.id);
+                            onPress={(event) => {
+                              openEyeDetail(eye.id, event);
                             }}
                           />
                         </View>
@@ -4503,8 +4591,8 @@ export default function App() {
                           language={language}
                           selectedStockId={selectedStockId}
                           onOpenStock={() => openStockContext({ stockId: group.stock.id })}
-                          onOpenDetail={(alertId) => {
-                            openAlertDetail(alertId);
+                          onOpenDetail={(alertId, invoker) => {
+                            openAlertDetail(alertId, invoker);
                           }}
                           onQuickDecision={(alert, action) => quickDecision(alert, action)}
                           onSnooze={(alertId) => actions.snoozeAlert(alertId, 24)}
@@ -4579,7 +4667,7 @@ export default function App() {
                 </View>
                 <HorizontalChoice options={journalFilters} value={journalFilter} onSelect={(filter: JournalFilter) => setJournalFilter(filter)} labelForOption={(filter: JournalFilter) => journalFilterLabel(language, filter)} />
                 <View style={styles.actionRow}>
-                  <Button label={t(language, "common.new")} onPress={() => setJournalComposerOpen(true)} />
+                  <Button ref={journalComposerNewButtonRef} label={t(language, "common.new")} onPress={() => openJournalComposer(journalComposerNewButtonRef.current)} />
                 </View>
               </Reveal>
 
@@ -4598,7 +4686,7 @@ export default function App() {
                         accessibilityRole="button"
                         accessibilityLabel={`${localizedDecisionAction(language, decision.action)} · ${decisionTitle(decision.eyeId, data.eyes, data.stocks, data.recipes)}`}
                         accessibilityState={{ selected: selectedDecision?.id === decision.id }}
-                        onPress={() => openDecisionDetail(decision.id)}
+                        onPress={(event) => openDecisionDetail(decision.id, event)}
                         style={({ pressed }) => [styles.pressableCardWrap, pressed ? styles.pressableCardWrapPressed : null]}
                       >
                       <Card>
@@ -4647,7 +4735,7 @@ export default function App() {
           {tab === "Settings" ? (
             <>
               <WorkspacePanel data={data} actions={actions} language={language} />
-              <NotificationSettingsPanel data={data} actions={actions} language={language} />
+              <NotificationSettingsPanel data={data} actions={actions} language={language} fallbackFocusRef={settingsSurfaceFallbackRef} />
               <CloudSyncPanel data={data} actions={actions} language={language} />
               <Reveal>
                 <SectionHeader note={subtitleLabel(language, "Settings")} />
@@ -4760,6 +4848,8 @@ export default function App() {
               resetLogicRuleBuilderDraft();
             }}
             closeLabel={t(language, "common.done")}
+            returnFocusRef={conditionBuilderFocus.returnFocusRef}
+            fallbackFocusRef={conditionBuilderFocus.fallbackFocusRef}
           >
             <Card style={styles.logicBuilderCompactCard}>
               <View style={styles.metricBuilderSectionHeader}>
@@ -4889,6 +4979,8 @@ export default function App() {
             }
             onClose={() => setLogicL0RegistryOpen(false)}
             closeLabel={t(language, "common.done")}
+            returnFocusRef={logicRegistryFocus.returnFocusRef}
+            fallbackFocusRef={logicRegistryFocus.fallbackFocusRef}
           >
             <L0DataLayer
               language={language}
@@ -4897,7 +4989,7 @@ export default function App() {
               MetaPill={MetaPill}
               SectionHeader={SectionHeader}
               Button={Button}
-              onOpenHelp={() => setLogicInfoTarget("Raw Data")}
+              onOpenHelp={(invoker) => openLogicInfo("Raw Data", invoker)}
             />
           </WindowPanel>
         ) : null}
@@ -4912,6 +5004,8 @@ export default function App() {
             }
             onClose={() => setLogicVersionsRecipeId("")}
             closeLabel={t(language, "common.done")}
+            returnFocusRef={logicVersionFocus.returnFocusRef}
+            fallbackFocusRef={logicVersionFocus.fallbackFocusRef}
           >
             <View style={styles.versionHistoryStack}>
               {selectedLogicVersionLineage.map((recipe, index) => {
@@ -4973,6 +5067,8 @@ export default function App() {
             subtitle={language === "ko" ? "이 레벨이 맡는 역할과 입력, 출력, 연결 구조를 설명합니다." : "This explains the role, input, output, and connection model of the selected level."}
             onClose={() => setLogicInfoTarget("")}
             closeLabel={t(language, "common.done")}
+            returnFocusRef={logicInfoFocus.returnFocusRef}
+            fallbackFocusRef={logicInfoFocus.fallbackFocusRef}
           >
             <Card style={styles.logicInfoCard}>
               <Text style={styles.logicInfoBody}>{logicInfoContent(language, logicInfoTarget).body}</Text>
@@ -4997,6 +5093,8 @@ export default function App() {
               resetMetricBuilderDraft();
             }}
             closeLabel={t(language, "common.done")}
+            returnFocusRef={metricBuilderFocus.returnFocusRef}
+            fallbackFocusRef={metricBuilderFocus.fallbackFocusRef}
           >
             <Card style={styles.metricBuilderSectionCard}>
               <View style={styles.metricBuilderMetaGrid}>
@@ -5494,6 +5592,8 @@ export default function App() {
               resetLogicSetBuilderDraft();
             }}
             closeLabel={t(language, "common.done")}
+            returnFocusRef={logicSetBuilderFocus.returnFocusRef}
+            fallbackFocusRef={logicSetBuilderFocus.fallbackFocusRef}
           >
             <Card style={styles.logicBuilderCompactCard}>
               <View style={styles.metricBuilderSectionHeader}>
@@ -5641,6 +5741,8 @@ export default function App() {
               resetRecipeBuilderDraft();
             }}
             closeLabel={t(language, "common.done")}
+            returnFocusRef={recipeBuilderFocus.returnFocusRef}
+            fallbackFocusRef={recipeBuilderFocus.fallbackFocusRef}
           >
             <StepFlow
               steps={recipeBuilderSteps}
@@ -5848,6 +5950,8 @@ export default function App() {
             subtitle={`${t(language, "recipes.card.version", { version: selectedRecipe.version })} · ${localizedTimeHorizon(language, selectedRecipe.timeHorizon)}`}
             onClose={() => closeEntityRoute("Logic Lab")}
             closeLabel={t(language, "common.done")}
+            returnFocusRef={recipeDetailFocus.returnFocusRef}
+            fallbackFocusRef={recipeDetailFocus.fallbackFocusRef}
           >
             <Text style={styles.cardBody}>{selectedRecipe.purpose}</Text>
             <View style={styles.dualDenseGrid}>
@@ -5879,7 +5983,7 @@ export default function App() {
                 onPress={() => {
                   setEyeForm((current) => ({ ...current, recipeId: selectedRecipe.id }));
                   closeEntityRoute("Logic Lab");
-                  setEyeComposerOpen(true);
+                  openEyeComposer();
                 }}
               />
               <Button
@@ -5912,7 +6016,7 @@ export default function App() {
                   setDraftConditions(selectedRecipe.conditions);
                   closeEntityRoute("Logic Lab");
                   setRecipeBuilderStep("Purpose");
-                  setRecipeBuilderOpen(true);
+                  openRecipeBuilder();
                 }}
               />
             </View>
@@ -5939,6 +6043,8 @@ export default function App() {
             subtitle={`${recipeLabel(data.recipes, selectedEye.recipeId)} · ${selectedEye.lastEvaluation?.currentState ? localizedEyeState(language, selectedEye.lastEvaluation.currentState) : t(language, "eyes.notEvaluated")}`}
             onClose={() => closeEntityRoute("Eyes")}
             closeLabel={t(language, "common.done")}
+            returnFocusRef={eyeDetailFocus.returnFocusRef}
+            fallbackFocusRef={eyeDetailFocus.fallbackFocusRef}
           >
             <WhyNowPanel
               title={t(language, "eyes.detail.currentState")}
@@ -5994,7 +6100,7 @@ export default function App() {
                   resetJournalComposerDraft();
                   setDecisionForm((current) => ({ ...current, eyeId: selectedEye.id }));
                   closeEntityRoute("Eyes");
-                  setJournalComposerOpen(true);
+                  openJournalComposer();
                 }}
               />
               <Button
@@ -6014,7 +6120,7 @@ export default function App() {
                       : reviewDateOptions[2].daysAgo,
                   });
                   closeEntityRoute("Eyes");
-                  setEyeComposerOpen(true);
+                  openEyeComposer();
                 }}
               />
               {selectedEyeLinkedDecisions[0] ? (
@@ -6053,6 +6159,8 @@ export default function App() {
               resetEyeComposerDraft();
             }}
             closeLabel={t(language, "common.done")}
+            returnFocusRef={eyeComposerFocus.returnFocusRef}
+            fallbackFocusRef={eyeComposerFallbackRef}
           >
             <SearchableSelect
               language={language}
@@ -6104,6 +6212,8 @@ export default function App() {
             subtitle={`${stockLabel(data.stocks, selectedAlertEye.stockId)} · ${localizedAlertPriority(language, selectedAlert.priority)}`}
             onClose={() => closeEntityRoute("Alerts")}
             closeLabel={t(language, "common.done")}
+            returnFocusRef={alertDetailFocus.returnFocusRef}
+            fallbackFocusRef={alertDetailFocus.fallbackFocusRef}
           >
             <WhyNowPanel language={language} title={t(language, "alerts.detail.whatHappened")} body={selectedAlert.whyNow} state={selectedAlertEvaluation?.currentState ?? selectedAlert.evaluationContext?.currentState ?? t(language, "common.notCaptured")} recipeVersion={`${selectedAlertRecipe.name} v${selectedAlertRecipe.version}`} />
             <View style={styles.detailMetricStrip}>
@@ -6174,6 +6284,8 @@ export default function App() {
               resetJournalComposerDraft();
             }}
             closeLabel={t(language, "common.done")}
+            returnFocusRef={journalComposerFocus.returnFocusRef}
+            fallbackFocusRef={journalComposerFocus.fallbackFocusRef}
           >
             <SearchableSelect
               language={language}
@@ -6211,6 +6323,8 @@ export default function App() {
             subtitle={decisionTitle(selectedDecision.eyeId, data.eyes, data.stocks, data.recipes)}
             onClose={() => closeEntityRoute("Journal")}
             closeLabel={t(language, "common.done")}
+            returnFocusRef={decisionDetailFocus.returnFocusRef}
+            fallbackFocusRef={decisionDetailFocus.fallbackFocusRef}
           >
             <WhatChangedPanel
               title={t(language, "journal.detail.context")}
@@ -6265,7 +6379,7 @@ export default function App() {
                     timing: selectedDecision.timing,
                   });
                   closeEntityRoute("Journal");
-                  setJournalComposerOpen(true);
+                  openJournalComposer();
                 }}
               />
               <Button
@@ -6313,6 +6427,8 @@ export default function App() {
             subtitle={`${selectedScannerSignal.ticker} · ${selectedScannerSignal.ruleId}`}
             onClose={() => setScannerSignalReviewId("")}
             closeLabel={t(language, "common.done")}
+            returnFocusRef={scannerReviewFocus.returnFocusRef}
+            fallbackFocusRef={scannerReviewFocus.fallbackFocusRef}
           >
             <Card>
               <Text style={styles.cardBody}>
@@ -6442,6 +6558,8 @@ export default function App() {
             }`}
             onClose={() => closeEntityRoute("Stocks")}
             closeLabel={t(language, "common.done")}
+            returnFocusRef={metricDetailFocus.returnFocusRef}
+            fallbackFocusRef={metricDetailFocus.fallbackFocusRef}
           >
             <MotionSwap
               swapKey={`metric-sheet-${selectedEvidenceCard.id}-${selectedEvidenceIndex}`}
@@ -6480,6 +6598,12 @@ export default function App() {
           onSelect={setTab}
           labels={tabLabels}
           navigationLabel={language === "ko" ? "주요 탐색" : "Primary navigation"}
+          focusRefs={{
+            Home: homeSurfaceFallbackRef,
+            Stocks: stocksSurfaceFallbackRef,
+            "Logic Lab": logicSurfaceFallbackRef,
+            Journal: journalSurfaceFallbackRef,
+          }}
           icons={{
             Home: "◦",
             Stocks: "≈",

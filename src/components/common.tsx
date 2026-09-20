@@ -60,7 +60,17 @@ export const Card = ({
   </View>
 );
 
-export const Button = ({
+interface ButtonProps {
+  label: string;
+  onPress: (event?: any) => void | Promise<unknown>;
+  tone?: "primary" | "secondary" | "ghost" | "risk";
+  disabled?: boolean;
+  style?: any;
+  accessibilityLabel?: string;
+  accessibilityHint?: string;
+}
+
+export const Button = React.forwardRef<any, ButtonProps>(function Button({
   label,
   onPress,
   tone = "primary",
@@ -68,20 +78,13 @@ export const Button = ({
   style,
   accessibilityLabel,
   accessibilityHint,
-}: {
-  label: string;
-  onPress: () => void | Promise<unknown>;
-  tone?: "primary" | "secondary" | "ghost" | "risk";
-  disabled?: boolean;
-  style?: any;
-  accessibilityLabel?: string;
-  accessibilityHint?: string;
-}) => {
+}, ref) {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
   const [focused, setFocused] = useState(false);
   const busy = useRef(false);
   return <><Pressable
+    ref={ref}
     accessibilityRole="button"
     accessibilityLabel={accessibilityLabel ?? label}
     accessibilityHint={accessibilityHint}
@@ -89,10 +92,11 @@ export const Button = ({
     disabled={disabled || pending}
     onFocus={() => setFocused(true)}
     onBlur={() => setFocused(false)}
-    onPress={async () => {
+    onPress={async (event: any) => {
       if (disabled || busy.current) return;
+      event?.currentTarget?.focus?.();
       busy.current = true; setPending(true); setError("");
-      try { await onPress(); } catch (cause) { setError(cause instanceof Error ? cause.message : "Could not complete action. Please try again."); }
+      try { await onPress(event); } catch (cause) { setError(cause instanceof Error ? cause.message : "Could not complete action. Please try again."); }
       finally { busy.current = false; setPending(false); }
     }}
     style={({ pressed }) => [
@@ -126,7 +130,7 @@ export const Button = ({
       {pending ? "…" : label}
     </Text>
   </Pressable>{error ? <Text accessibilityRole="alert" style={{ color: "#a12935", fontSize: 14, lineHeight: 20 }}>{error}</Text> : null}</>;
-};
+});
 
 export const Input = ({
   value,

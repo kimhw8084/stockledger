@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Button, Card, HorizontalChoice, Input, MetaPill } from "../../components/common";
+import { WindowPanel } from "../../components/WindowPanel";
+import { useWindowPanelFocus } from "../../hooks/useWindowPanelFocus";
 import { defaultNotificationPreferences, validClockTime } from "../../domain/notificationPreferences";
 import type { useAppModel } from "../../hooks/useAppModel";
 import { t, type AppLanguage } from "../../lib/i18n";
@@ -9,33 +11,48 @@ import type { AppData, NotificationPreferences } from "../../types";
 const deliveryModes = ["immediate", "digest"] as const;
 const privacyModes = ["minimal", "rich"] as const;
 
-export function NotificationSettingsPanel({ data, actions, language }: { data: AppData; actions: ReturnType<typeof useAppModel>["actions"]; language: AppLanguage }) {
+export function NotificationSettingsPanel({ data, actions, language, fallbackFocusRef }: { data: AppData; actions: ReturnType<typeof useAppModel>["actions"]; language: AppLanguage; fallbackFocusRef?: React.RefObject<any> }) {
   const preferences = data.notificationPreferences ?? defaultNotificationPreferences();
   const [email, setEmail] = useState(preferences.destinations.email?.address ?? "");
   const [start, setStart] = useState(preferences.quietHours.start);
   const [end, setEnd] = useState(preferences.quietHours.end);
   const [digestTime, setDigestTime] = useState(preferences.digestTime);
+  const [disableConfirmationOpen, setDisableConfirmationOpen] = useState(false);
+  const disableButtonRef = useRef<any>(null);
+  const disableConfirmationFocus = useWindowPanelFocus(fallbackFocusRef);
   const save = (change: Partial<NotificationPreferences>) => actions.updateNotificationPreferences(change);
-  const configured = preferences.enabled && preferences.explicitConsent && preferences.allowedChannels.includes("email") && Boolean(preferences.destinations.email?.address);
+  const notificationsEnabled = preferences.enabled && preferences.explicitConsent;
+  const configured = notificationsEnabled && preferences.allowedChannels.includes("email") && Boolean(preferences.destinations.email?.address);
   const workerStatus = data.lastKnownNotificationDeliveryStatus;
   const pendingWorkerHandoff = Boolean(workerStatus && Date.parse(preferences.updatedAt) > Date.parse(workerStatus.preferenceUpdatedAt));
   const workerStateKey = workerStatus?.lastState ? `settings.notifications.state.${workerStatus.lastState}` : "settings.notifications.state.none";
-  return <Card>
-    <View style={styles.panel}>
-      <Text accessibilityRole="header" style={styles.title}>{t(language, "settings.notifications.title")}</Text>
-      <Text style={styles.body}>{t(language, "settings.notifications.note")}</Text>
-      <View style={styles.statusRow} accessibilityLiveRegion="polite">
-        <MetaPill label={configured ? t(language, "settings.notifications.configured") : t(language, "settings.notifications.unconfigured")} tone={configured ? "success" : "risk"} />
-        <MetaPill label={preferences.enabled && preferences.explicitConsent ? t(language, "settings.notifications.enabled") : t(language, "settings.notifications.off")} />
-      </View>
-      <Text style={styles.label}>{t(language, "settings.notifications.email")}</Text>
-      <Input value={email} onChangeText={setEmail} placeholder={t(language, "settings.notifications.emailPlaceholder")} keyboardType="email-address" autoCapitalize="none" autoComplete="email" />
-      <Button label={preferences.enabled && preferences.explicitConsent ? t(language, "settings.notifications.disable") : t(language, "settings.notifications.enable")} tone={preferences.enabled && preferences.explicitConsent ? "risk" : "primary"} onPress={() => save({
-        explicitConsent: !(preferences.enabled && preferences.explicitConsent),
-        enabled: !(preferences.enabled && preferences.explicitConsent),
-        allowedChannels: !(preferences.enabled && preferences.explicitConsent) ? ["email"] : [],
-        destinations: !(preferences.enabled && preferences.explicitConsent) && email.trim() ? { email: { address: email.trim() } } : preferences.destinations,
-      })} />
+  const disableNotifications = async (close: () => void) => {
+    await save({ explicitConsent: false, enabled: false, allowedChannels: [] });
+    close();
+  };
+  const openDisableConfirmation = () => {
+    disableConfirmationFocus.captureInvoker(disableButtonRef.current);
+    setDisableConfirmationOpen(true);
+  };
+  return <>
+    <Card>
+      <View style={styles.panel}>
+        <Text accessibilityRole="header" style={styles.title}>{t(language, "settings.notifications.title")}</Text>
+        <Text style={styles.body}>{t(language, "settings.notifications.note")}</Text>
+        <View style={styles.statusRow} accessibilityLiveRegion="polite">
+          <MetaPill label={configured ? t(language, "settings.notifications.configured") : t(language, "settings.notifications.unconfigured")} tone={configured ? "success" : "risk"} />
+          <MetaPill label={notificationsEnabled ? t(language, "settings.notifications.enabled") : t(language, "settings.notifications.off")} />
+        </View>
+        <Text style={styles.label}>{t(language, "settings.notifications.email")}</Text>
+        <Input value={email} onChangeText={setEmail} placeholder={t(language, "settings.notifications.emailPlaceholder")} keyboardType="email-address" autoCapitalize="none" autoComplete="email" />
+        <Button
+          ref={disableButtonRef}
+          label={notificationsEnabled ? t(language, "settings.notifications.disable") : t(language, "settings.notifications.enable")}
+          tone={notificationsEnabled ? "risk" : "primary"}
+          onPress={() => notificationsEnabled
+            ? openDisableConfirmation()
+            : save({ explicitConsent: true, enabled: true, allowedChannels: ["email"], destinations: email.trim() ? { email: { address: email.trim() } } : preferences.destinations })}
+        />
       <Text style={styles.label}>{t(language, "settings.notifications.mode")}</Text>
       <HorizontalChoice options={deliveryModes} value={preferences.deliveryMode} onSelect={deliveryMode => save({ deliveryMode })} variant="segmented" labelForOption={option => t(language, `settings.notifications.mode.${option}`)} />
       {preferences.deliveryMode === "digest" ? <Input value={digestTime} onChangeText={setDigestTime} placeholder={t(language, "settings.notifications.digestTime")} autoCapitalize="none" invalid={!validClockTime(digestTime)} /> : null}
@@ -54,10 +71,38 @@ export function NotificationSettingsPanel({ data, actions, language }: { data: A
       <Text style={styles.detail}>{t(language, "settings.notifications.workerStatus")}</Text>
       <Text style={styles.detail}>{t(language, "settings.notifications.handoffNote")}</Text>
       <Text style={styles.detail}>{t(language, "settings.notifications.privacyNote")}</Text>
-    </View>
-  </Card>;
+      </View>
+    </Card>
+    {disableConfirmationOpen ? (
+      <WindowPanel
+        title={t(language, "settings.notifications.disableConfirmTitle")}
+        onClose={() => setDisableConfirmationOpen(false)}
+        closeLabel={t(language, "common.close")}
+        returnFocusRef={disableConfirmationFocus.returnFocusRef}
+        fallbackFocusRef={disableConfirmationFocus.fallbackFocusRef}
+      >
+        {(close) => (
+          <View style={styles.confirmationContent}>
+            <Text style={styles.body}>{t(language, "settings.notifications.disableConfirmBody")}</Text>
+            <View style={styles.confirmActions}>
+              <Button
+                label={t(language, "settings.notifications.disableConfirmCancel")}
+                tone="secondary"
+                onPress={close}
+              />
+              <Button
+                label={t(language, "settings.notifications.disableConfirmConfirm")}
+                tone="risk"
+                onPress={() => disableNotifications(close)}
+              />
+            </View>
+          </View>
+        )}
+      </WindowPanel>
+    ) : null}
+  </>;
 }
 
 const styles = StyleSheet.create({
-  panel: { padding: 16, gap: 12 }, title: { fontSize: 22, fontWeight: "700", color: "#15283b" }, body: { fontSize: 15, lineHeight: 23, color: "#334b62" }, detail: { fontSize: 12, lineHeight: 18, color: "#334b62" }, pending: { fontSize: 13, lineHeight: 19, color: "#8a4b08", fontWeight: "700" }, label: { fontSize: 13, fontWeight: "700", color: "#15283b" }, inline: { flexDirection: "row", gap: 8 }, statusRow: { flexDirection: "row", gap: 8, flexWrap: "wrap" },
+  panel: { padding: 16, gap: 12 }, title: { fontSize: 22, fontWeight: "700", color: "#15283b" }, body: { fontSize: 15, lineHeight: 23, color: "#334b62" }, detail: { fontSize: 12, lineHeight: 18, color: "#334b62" }, pending: { fontSize: 13, lineHeight: 19, color: "#8a4b08", fontWeight: "700" }, label: { fontSize: 13, fontWeight: "700", color: "#15283b" }, inline: { flexDirection: "row", gap: 8 }, statusRow: { flexDirection: "row", gap: 8, flexWrap: "wrap" }, confirmationContent: { gap: 16 }, confirmActions: { flexDirection: "row", gap: 12, flexWrap: "wrap" },
 });

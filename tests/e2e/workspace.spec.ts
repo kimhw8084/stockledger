@@ -127,8 +127,56 @@ test("keeps notification consent explicit and exposes device-local delivery stat
   const exported = JSON.parse(await readFile((await download.path())!, "utf8"));
   expect(exported.data.notificationPreferences.enabled).toBe(true);
   expect(exported.data.notificationPreferences.accountScope).toBe("device-local");
-  await page.getByRole("button", { name: "Opt out and cancel future delivery", exact: true }).click();
+  const disable = page.getByRole("button", { name: "Opt out and cancel future delivery", exact: true });
+  await disable.click();
+  const confirmation = page.getByRole("dialog");
+  await expect(confirmation.getByRole("heading", { name: "Turn off notification delivery?", exact: true })).toBeVisible();
+  await expect(confirmation.getByText(/withdraws your consent.*clears allowed channels/)).toBeVisible();
+  await expect(page.getByText("Off", { exact: true })).toHaveCount(0);
+  await confirmation.getByRole("button", { name: "Cancel", exact: true }).click();
+  await expect(confirmation).toHaveCount(0);
+  await expect(disable).toBeFocused();
+  await expect(page.getByText("Enabled", { exact: true })).toBeVisible();
+  const canceledDownloadPromise = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Export complete backup", exact: true }).click();
+  const canceledDownload = await canceledDownloadPromise;
+  const canceledExported = JSON.parse(await readFile((await canceledDownload.path())!, "utf8"));
+  expect(canceledExported.data.notificationPreferences).toEqual(exported.data.notificationPreferences);
+
+  await disable.click();
+  await page.keyboard.press("Escape");
+  await expect(confirmation).toHaveCount(0);
+  await expect(disable).toBeFocused();
+  await expect(page.getByText("Enabled", { exact: true })).toBeVisible();
+
+  await page.getByRole("button", { name: "한국어", exact: true }).click();
+  const koreanDisable = page.getByRole("button", { name: "옵트아웃하고 이후 전달 취소", exact: true });
+  await koreanDisable.click();
+  const koreanConfirmation = page.getByRole("dialog");
+  await expect(koreanConfirmation.getByRole("heading", { name: "알림 전달을 끌까요?", exact: true })).toBeVisible();
+  await expect(koreanConfirmation.getByRole("button", { name: "취소", exact: true })).toBeVisible();
+  await expect(koreanConfirmation.getByRole("button", { name: "알림 끄기", exact: true })).toBeVisible();
+  await koreanConfirmation.getByRole("button", { name: "취소", exact: true }).click();
+  await expect(koreanConfirmation).toHaveCount(0);
+  await expect(koreanDisable).toBeFocused();
+  await page.getByRole("button", { name: "English", exact: true }).click();
+
+  const englishDisable = page.getByRole("button", { name: "Opt out and cancel future delivery", exact: true });
+  await englishDisable.click();
+  await page.getByRole("dialog").getByRole("button", { name: "Turn off notifications", exact: true }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  const enable = page.getByRole("button", { name: "Enable email delivery", exact: true });
+  await expect(enable).toBeFocused();
   await expect(page.getByText("Off", { exact: true })).toBeVisible();
+
+  const disabledDownloadPromise = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Export complete backup", exact: true }).click();
+  const disabledDownload = await disabledDownloadPromise;
+  const disabledExported = JSON.parse(await readFile((await disabledDownload.path())!, "utf8"));
+  expect(disabledExported.data.notificationPreferences.explicitConsent).toBe(false);
+  expect(disabledExported.data.notificationPreferences.enabled).toBe(false);
+  expect(disabledExported.data.notificationPreferences.allowedChannels).toEqual([]);
+  expect(disabledExported.data.notificationPreferences.destinations.email.address).toBe("local@example.test");
 });
 
 test("shows imported last-known worker state and pending preference handoff", async ({ page }) => {
@@ -173,6 +221,32 @@ test("resolves entity links, fails safely, and preserves language preference", a
   await page.getByRole("button", { name: "Explore sample workspace" }).click();
   await expect(page.getByText(/Sample data is present/)).toBeVisible();
 
+  const homeHelpInvoker = page.getByRole("button", { name: "Summary help", exact: true });
+  const homeHelpFallback = page.getByRole("tab", { name: "Today", exact: true });
+  await expect(homeHelpInvoker).toBeVisible();
+  await homeHelpFallback.focus();
+  await expect(homeHelpFallback).toBeFocused();
+  await homeHelpInvoker.click();
+  const homeHelpDialog = page.getByRole("dialog");
+  await expect(homeHelpDialog).toBeVisible();
+  await expect(homeHelpDialog.getByRole("button", { name: "Done", exact: true })).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(homeHelpDialog).toHaveCount(0);
+  await expect(homeHelpInvoker).toBeFocused();
+
+  await homeHelpInvoker.click();
+  await expect(homeHelpDialog.getByRole("button", { name: "Done", exact: true })).toBeFocused();
+  await homeHelpDialog.getByRole("button", { name: "Done", exact: true }).click();
+  await expect(homeHelpDialog).toHaveCount(0);
+  await expect(homeHelpInvoker).toBeFocused();
+
+  await homeHelpInvoker.click();
+  await expect(homeHelpDialog).toBeVisible();
+  await homeHelpInvoker.evaluate((element) => element.remove());
+  await homeHelpDialog.getByRole("button", { name: "Done", exact: true }).click();
+  await expect(homeHelpDialog).toHaveCount(0);
+  await expect(homeHelpFallback).toBeFocused();
+
   await page.goto("/#/watchlist?stockId=stock-amd");
   await expect(page.getByText("Advanced Micro Devices", { exact: true }).first()).toBeVisible();
   await page.reload();
@@ -190,6 +264,11 @@ test("resolves entity links, fails safely, and preserves language preference", a
   await expect(page.getByRole("dialog")).toBeVisible();
   await expect(page.getByRole("button", { name: "Done", exact: true })).toBeFocused();
   await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(newEntry).toBeFocused();
+  await newEntry.click();
+  await expect(page.getByRole("button", { name: "Done", exact: true })).toBeFocused();
+  await page.getByRole("button", { name: "Done", exact: true }).click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await expect(newEntry).toBeFocused();
 
@@ -215,4 +294,21 @@ test("resolves entity links, fails safely, and preserves language preference", a
   await expect(page.getByText("Advanced Micro Devices", { exact: true }).first()).toBeVisible();
   await page.goto("/#/monitoring?stockId=stock-amd&eyeId=eye-amd");
   await expect(page.getByText("Deep discount logic.", { exact: true }).first()).toBeVisible();
+});
+
+test("home help prefers its explicit press target over stale active focus", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "Explore sample workspace" }).click();
+  const homeHelpInvoker = page.getByRole("button", { name: "Summary help", exact: true });
+  const staleActiveControl = page.getByRole("tab", { name: "Today", exact: true });
+  await staleActiveControl.focus();
+  await expect(staleActiveControl).toBeFocused();
+
+  // Dispatch the press while B remains active so the callback receives A as currentTarget.
+  await homeHelpInvoker.dispatchEvent("click");
+  const homeHelpDialog = page.getByRole("dialog");
+  await expect(homeHelpDialog).toBeVisible();
+  await homeHelpDialog.getByRole("button", { name: "Done", exact: true }).click();
+  await expect(homeHelpDialog).toHaveCount(0);
+  await expect(homeHelpInvoker).toBeFocused();
 });

@@ -12,7 +12,7 @@ interface L0DataLayerProps {
   MetaPill: React.FC<any>;
   SectionHeader: React.FC<any>;
   Button: React.FC<any>;
-  onOpenHelp: () => void;
+  onOpenHelp: (invoker?: unknown) => void;
 }
 
 type L0FieldDefinition = {
