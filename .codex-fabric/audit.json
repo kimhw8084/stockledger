@@ -1,0 +1,218 @@
+{
+  "accepted_at": "2026-09-20T21:30:20Z",
+  "changed_files": [],
+  "checks": [
+    {
+      "command": "/bin/zsh -lc \"pwd && printf '%s\\\\n' '--- status ---' && git status --short --branch && printf '%s\\\\n' '--- instructions ---' && sed -n '1,240p' /Users/haewonkim/.codex/RTK.md && printf '%s\\\\n' '--- law ---' && sed -n '1,260p' /Users/haewonkim/.codex/law.md && printf '%s\\\\n' '--- root files ---' && rg --files -g '\"'!node_modules'\"' -g '\"'!dist'\"' | sed -n '1,240p'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git status --short --branch\nrtk git rev-parse --verify HEAD\nrtk git rev-parse --verify main\nrtk git rev-parse HEAD''^{tree}\nrtk git rev-parse main''^{tree}\nrtk git diff --exit-code main...HEAD\nrtk git diff --exit-code --cached\nrtk git status --porcelain=v1'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git branch --all --verbose --no-abbrev\nrtk git show -s --format=fuller HEAD\nrtk git show -s --format=fuller main\nrtk git show-ref --head\nrtk git rev-list --all --objects --not HEAD | sed -n '1,80p'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git rev-parse --verify origin/main\nrtk git rev-parse origin/main''^{tree}\nrtk git diff --exit-code origin/main...HEAD\nrtk git status --porcelain=v1\nrtk sed -n '\"'1,240p' package.json\nrtk sed -n '1,260p' playwright.config.ts\nrtk sed -n '1,260p' scripts/operations-qualification.ts\nrtk sed -n '1,220p' scripts/check-release-base.mjs\nrtk rg -n \\\"typecheck|playwright|e2e|qualification|release-evidence|audit|Fabric|fabric\\\" package.json README.md docs scripts server tests -g '\"'!*.snap'\"' | sed -n '1,320p'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '1,240p' scripts/serve-preview.mjs\nrtk sed -n '1,320p' tests/e2e/workspace.spec.ts\nrtk rg -n \\\"Summary|Watchlist|Recipes|Journal|Settings|Done|help|dialog|zoom|overflow|viewport\\\" src tests/e2e -g '\"'!*.snap'\"' | sed -n '1,360p'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n \\\"zoom|200%|DPR|devicePixelRatio|scrollWidth|Summary help|Done\\\" tests src scripts docs -g '\"'!docs/production/CHG-*.md'\"' | sed -n '1,320p'\nrtk sed -n '1,240p' README.md\nrtk sed -n '1,220p' docs/operations/RELEASE_RUNBOOK.md\nrtk rg --files -g '.codex-fabric/**' -g '.openai/**' -g 'artifacts/**' -g '.local/**' | sed -n '1,240p'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk ls -ld dist node_modules artifacts .local 2>/dev/null || true\nrtk git check-ignore -v dist artifacts .local 2>/dev/null || true\nrtk node --version\nrtk npm --version'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk cat .nvmrc\nrtk zsh -lc 'command -v nvm || true; nvm ls 2>/dev/null || true; command -v node; node --version; command -v npm; npm --version'\"",
+      "exit_code": 134,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk --version\nrtk which node\nrtk which npm\nrtk node --version\nrtk npm --version\nrtk ls -la /opt/homebrew/Cellar/node* /opt/homebrew/opt/node* /Users/haewonkim/.nvm/versions/node 2>/dev/null || true'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/node --version\nrtk /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npm --version\nrtk /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npm exec -- tsc --version'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npm ci'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/bin:/bin /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/node --version\nrtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/bin:/bin /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npm --version\nrtk git status --short --branch'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/bin:/bin /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npm test'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/bin:/bin /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npm run typecheck'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/bin:/bin /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npm run export:web'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/bin:/bin /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npm run test:e2e'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '1,260p' tests/integration/cloud.integration.ts\nrtk sed -n '1,180p' scripts/check-boundaries.mjs\nrtk git status --short --branch\nrtk git diff --stat\nrtk git diff --name-only\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/bin:/bin /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npm run check:boundaries'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env STOCKLEDGER_PROTECTED_BASE=26f3dfb077bea75013fef58975979f02041dc490 PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/bin:/bin /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npm run check:release-base'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/bin:/bin /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npm run test:cloud'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:/usr/bin:/bin /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/npm run preview'",
+      "exit_code": 130,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git status --short --branch\nrtk git status --porcelain=v1\nrtk git rev-parse --abbrev-ref HEAD\nrtk git rev-parse HEAD\nrtk git rev-parse HEAD''^{tree}\nrtk git rev-parse origin/main\nrtk git rev-parse origin/main''^{tree}\nrtk git diff --exit-code origin/main...HEAD\nrtk git diff --exit-code --cached\nrtk git diff --exit-code\nrtk git show-ref --verify --hash refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c13-ui-perfection-zoom200-proof-reconcile-v1 2>/dev/null || true'",
+      "exit_code": 0,
+      "type": "command_execution"
+    }
+  ],
+  "codex": {
+    "cli_version": "codex-cli 0.155.1",
+    "configured_model": "gpt-5.6-luna",
+    "event_count": 152,
+    "provider_reported_model": null,
+    "reasoning_effort": "xhigh",
+    "terminal_type": "turn.completed",
+    "usage": {
+      "cache_hit_percent": 97.13,
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 7476480,
+      "fresh_input_tokens": 220750,
+      "input_tokens": 7697230,
+      "non_reasoning_output_tokens": 7349,
+      "output_tokens": 19198,
+      "reasoning_output_tokens": 11849,
+      "total_processed_tokens": 7716428
+    },
+    "warnings": []
+  },
+  "commits": [],
+  "diff": {
+    "additions": 0,
+    "changed_files": 0,
+    "commit_count": 0,
+    "deletions": 0
+  },
+  "error_code": null,
+  "evidence_manifest": {
+    "count": 0,
+    "items": [],
+    "version": 1
+  },
+  "evidence_publisher_release": "1.2.3-resume-candidate",
+  "fabric_capture": {
+    "applied": false,
+    "paths_before": 0,
+    "transient_untracked_removed": {
+      "count": 0,
+      "items": []
+    }
+  },
+  "fabric_release": "1.2.3-resume-candidate",
+  "failure_class": null,
+  "finished_at": "2026-09-20T21:48:55Z",
+  "git": {
+    "base_is_ancestor": true,
+    "base_sha": "26f3dfb077bea75013fef58975979f02041dc490",
+    "branch": "codex/stockledger-prod-c13-ui-perfection-zoom200-proof-reconcile-v1",
+    "detached_verify": false,
+    "head_sha": "26f3dfb077bea75013fef58975979f02041dc490",
+    "remote_exact_head": true,
+    "remote_head_sha": "26f3dfb077bea75013fef58975979f02041dc490",
+    "target_branch": "main",
+    "target_drifted_since_acceptance": false,
+    "target_head_observed_after_execution": "26f3dfb077bea75013fef58975979f02041dc490",
+    "work_branch": "codex/stockledger-prod-c13-ui-perfection-zoom200-proof-reconcile-v1",
+    "worktree_clean": true
+  },
+  "instructions": {
+    "files": [],
+    "total_bytes": 0,
+    "warning": null
+  },
+  "job_id": "CF-280b234cb2ab8555976f7744",
+  "kind": "codex-fabric-audit-evidence",
+  "locator": {
+    "branch": "codex-fabric/evidence/stockledger/stockledger-prod-c13-ui-perfection-zoom200-proof-reconcile-v1",
+    "path": ".codex-fabric/audit.json",
+    "ref": "refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c13-ui-perfection-zoom200-proof-reconcile-v1"
+  },
+  "operation": "VERIFY",
+  "policy": {
+    "environment_policy_sha256": "e077daca74297b3c30bee8989f00f8ca5338f7610b4d016a6c48db524205d064",
+    "fabric_release": "1.2.3-resume-candidate",
+    "policy_sha256": "a642c9f63bab2cb555704bdb0b9d1f28222591f133f934c1d0f93cc5a25ab8a1",
+    "registry_sha256": "cfc765f3211c37c7967a138f3b2d89a99341939b15b2623f92744d007f625d6f"
+  },
+  "project_id": "stockledger",
+  "recovery": {
+    "model_rerun_safe": false,
+    "recovery_required": false,
+    "retry_safe": false,
+    "retry_scope": null,
+    "worktree_retained": true
+  },
+  "request": "stockledger-prod-c13-ui-perfection-zoom200-proof-reconcile-v1",
+  "schema_version": 1,
+  "started_at": "2026-09-20T21:30:21Z",
+  "status": "EXECUTED_NO_CHANGE",
+  "timing": {
+    "execution_seconds": 1114,
+    "queue_seconds": 1,
+    "total_seconds": 1115
+  },
+  "transport": {
+    "bytes": 3403,
+    "envelope": "FABRIC/2",
+    "prompt_bytes": 3021,
+    "prompt_sha256": "df1776d3890705bc3497d5acc6cfca5f74acaa97a187ae144b188b7a9dadacff",
+    "sha256": "280b234cb2ab8555976f77443b474ecce27fb06a4683fedc787ca3f8bd8b0b19"
+  }
+}
