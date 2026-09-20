@@ -1,0 +1,260 @@
+{
+  "accepted_at": "2026-09-20T03:47:55Z",
+  "artifact_commit": "a30b7099a3400be1e5ef0194b23a516833cec538",
+  "artifact_publication": {
+    "final_byte_count": 15554031,
+    "final_carrier_commit": "9f9e75735c7b5c3863f1a707858ab92d6d5bd990",
+    "final_carrier_tree": "6ea44b95e751b724ef06be89a9375974cb122e5a",
+    "final_file_count": 50,
+    "payload_byte_count": 15541144,
+    "payload_commit": "a30b7099a3400be1e5ef0194b23a516833cec538",
+    "payload_file_count": 49,
+    "payload_tree": "c9cc0e142ea7ac5a9b39274c32cd1d6a9a817580",
+    "ref": "refs/heads/project-os-artifacts/stockledger/prod-c13-ui-perfection-postfix-verify-v1",
+    "remote_verified": true
+  },
+  "artifact_ref": "refs/heads/project-os-artifacts/stockledger/prod-c13-ui-perfection-postfix-verify-v1",
+  "artifact_tree": "c9cc0e142ea7ac5a9b39274c32cd1d6a9a817580",
+  "changed_files": [],
+  "checks": [
+    {
+      "command": "npm ci",
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "npm test -- --run",
+      "exitCode": 0,
+      "files": 22,
+      "status": "passed",
+      "tests": 187
+    },
+    {
+      "command": "npm run test:e2e",
+      "exitCode": 0,
+      "status": "passed",
+      "tests": 18
+    },
+    {
+      "command": "npm run check:boundaries",
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "npm run check:release-workflow",
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "STOCKLEDGER_PROTECTED_BASE=26f3dfb077bea75013fef58975979f02041dc490 npm run check:release-base",
+      "exactBase": true,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "npm run export:all",
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "npm audit --audit-level=high",
+      "exitCode": 0,
+      "status": "passed",
+      "vulnerabilities": 0
+    },
+    {
+      "command": "npm run check:frozen",
+      "exitCode": 0,
+      "releaseBlocked": true,
+      "status": "passed-with-declared-domain-limitations"
+    },
+    {
+      "command": "fresh Golden UI v2 capture runner",
+      "exitCode": 0,
+      "status": "passed-with-recorded-anomalies"
+    },
+    {
+      "command": "remote artifact ref readback",
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "remote artifact bundle integrity",
+      "exitCode": 0,
+      "status": "passed"
+    }
+  ],
+  "claim_boundary": [
+    "No native-device, screen-reader, human, pilot, hosted/public/paid/native readiness claim.",
+    "Fabric reports factual anomalies; no final visual GO/promotion decision."
+  ],
+  "codex": {
+    "cli_version": "codex-cli 0.155.1",
+    "configured_model": "gpt-5.6-luna",
+    "reasoning_effort": "xhigh",
+    "terminal_type": "pty",
+    "warnings": [
+      {
+        "class": "capture-action",
+        "error": "Error: No scanner signal review invoker after supported Run Scan action\n    at openScannerReview (file:///Users/haewonkim/.codex-fabric/worktrees/CF-2eedc22e441bf50f8b74f4a0/.local/golden-ui-v2/capture.mjs:243:22)\n    at async capturePage (file:///Users/haewonkim/.codex-fabric/worktrees/CF-2eedc22e441bf50f8b74f4a0/.local/golden-ui-v2/capture.mjs:164:24)\n    at async captureCanonical (file:///Users/haewonkim/.codex-fabric/worktrees/CF-2eedc22e441bf50f8b74f4a0/.local/golden-ui-v2/capture.mjs:340:24)\n    at async main (file:///Users/haewonkim/.codex-fabric/worktrees/CF-2eedc22e441bf50f8b74f4a0/.local/golden-ui-v2/capture.mjs:561:21)\n    at async file:///Users/haewonkim/.codex-fabric/worktrees/CF-2eedc22e441bf50f8b74f4a0/.local/golden-ui-v2/capture.mjs:598:1",
+        "profile": "desktop-1440x900",
+        "surfaceKey": "scanner-review"
+      },
+      {
+        "class": "capture-action",
+        "error": "Error: No scanner signal review invoker after supported Run Scan action\n    at openScannerReview (file:///Users/haewonkim/.codex-fabric/worktrees/CF-2eedc22e441bf50f8b74f4a0/.local/golden-ui-v2/capture.mjs:243:22)\n    at async capturePage (file:///Users/haewonkim/.codex-fabric/worktrees/CF-2eedc22e441bf50f8b74f4a0/.local/golden-ui-v2/capture.mjs:164:24)\n    at async captureCanonical (file:///Users/haewonkim/.codex-fabric/worktrees/CF-2eedc22e441bf50f8b74f4a0/.local/golden-ui-v2/capture.mjs:340:24)\n    at async main (file:///Users/haewonkim/.codex-fabric/worktrees/CF-2eedc22e441bf50f8b74f4a0/.local/golden-ui-v2/capture.mjs:561:21)\n    at async file:///Users/haewonkim/.codex-fabric/worktrees/CF-2eedc22e441bf50f8b74f4a0/.local/golden-ui-v2/capture.mjs:598:1",
+        "profile": "mobile-390x844",
+        "surfaceKey": "scanner-review"
+      },
+      "Rendered browser evidence only",
+      "No native VoiceOver/TalkBack",
+      "No physical device/OS IME/screen-reader evidence",
+      "No human visual acceptance or usability preference evidence",
+      "No hosted/public/paid/native readiness claim",
+      "Conflict state not exposed by supported web UI",
+      "Browser UI zoom is not available in headless Playwright; Control++ attempt recorded truthfully"
+    ]
+  },
+  "commits": [],
+  "current_fabric_job_id": "CF-2eedc22e441bf50f8b74f4a0",
+  "diff": {
+    "additions": 0,
+    "changed_files": 0,
+    "commit_count": 0,
+    "deletions": 0,
+    "product_source_changed": false
+  },
+  "error_code": null,
+  "evidence_manifest": {
+    "artifact_final_commit": "9f9e75735c7b5c3863f1a707858ab92d6d5bd990",
+    "artifact_final_tree": "6ea44b95e751b724ef06be89a9375974cb122e5a",
+    "artifact_payload_commit": "a30b7099a3400be1e5ef0194b23a516833cec538",
+    "artifact_payload_tree": "c9cc0e142ea7ac5a9b39274c32cd1d6a9a817580",
+    "artifact_ref": "refs/heads/project-os-artifacts/stockledger/prod-c13-ui-perfection-postfix-verify-v1",
+    "count": 8,
+    "items": [
+      {
+        "bytes": 4504368,
+        "path": "visual-atlas/artifact-bundle.zip",
+        "sha256": "05566dd7ab45340334dafce0dfa55e26181be59566ecf62b5ddeb9faeab89226"
+      },
+      {
+        "bytes": 6177126,
+        "path": "visual-atlas/capture-report.json",
+        "sha256": "56fd1d36c1488fabfed55ab474a747a0c3d254e2fd6b2078f1d136198d29e4ce"
+      },
+      {
+        "bytes": 92416,
+        "path": "visual-atlas/diagnostics/runtime-diagnostics.json",
+        "sha256": "621318a8a783bee788188c33fc5952fdfe183d6aaf9bd752b70ee3112828ccf3"
+      },
+      {
+        "bytes": 8074,
+        "path": "visual-atlas/diagnostics/task-traces.json",
+        "sha256": "52c37eaa81bbeaec346a88ca2363953fb99379916a79c6b85fc1640a04306c33"
+      },
+      {
+        "bytes": 10257,
+        "path": "visual-atlas/reader-index.json",
+        "sha256": "b87f611574877698dc76ea9b053e40bb01e09f0f3a11371cd94ffe59ed427959"
+      },
+      {
+        "bytes": 1192998,
+        "path": "visual-atlas/review-desktop.pdf",
+        "sha256": "1ce7d4f21b3a7767e6b2eb4b3308ce459d3888cf116a53bce30dcb3ea5618f21"
+      },
+      {
+        "bytes": 867480,
+        "path": "visual-atlas/review-mobile.pdf",
+        "sha256": "49163d8276ec9f91e706b117fc4262d8f6bc9c7e2f68b3d21dc41f13ecd1b9ce"
+      },
+      {
+        "bytes": 70311,
+        "path": "visual-atlas/surface-manifest.json",
+        "sha256": "283fd32dfd3983c7e40fc209c84d2cff9d9656def60fae45b82a61ec9b8c2a9a"
+      }
+    ],
+    "version": 1
+  },
+  "evidence_publisher_release": "1.2.3-resume-candidate",
+  "execution_outcome": "EXECUTED_NO_CHANGE",
+  "fabric_capture": {
+    "actual_product_pixels": true,
+    "canonical_dpr1": {
+      "desktop": "1440x900",
+      "mobile": "390x844",
+      "requiredAnchors": 32
+    },
+    "captured": true,
+    "english_and_korean": true,
+    "fresh": true,
+    "holdout_executed_last": true,
+    "remote_artifact_verified": true,
+    "responsive_stress": [
+      "1366x768",
+      "1920x1080",
+      "360x800",
+      "844x390",
+      "200% zoom/reflow where supported"
+    ],
+    "source_derived_manifest": true
+  },
+  "fabric_job_id": "CF-2eedc22e441bf50f8b74f4a0",
+  "fabric_release": "1.2.3-resume-candidate",
+  "failure_class": null,
+  "final_status": "GIT_PUBLISHED_AWAITING_AUDIT",
+  "finished_at": "2026-09-20T04:35:00Z",
+  "git": {
+    "base_is_ancestor": true,
+    "base_sha": "26f3dfb077bea75013fef58975979f02041dc490",
+    "branch": "codex/stockledger-prod-c13-ui-perfection-postfix-verify-v1",
+    "head_sha": "26f3dfb077bea75013fef58975979f02041dc490",
+    "head_tree": "7a6ee3872b6967631fa539f4455904d00b56e4ef",
+    "protected_main_sha": "26f3dfb077bea75013fef58975979f02041dc490",
+    "protected_main_tree": "7a6ee3872b6967631fa539f4455904d00b56e4ef",
+    "remote_exact_head": true,
+    "remote_head_sha": "26f3dfb077bea75013fef58975979f02041dc490",
+    "target_branch": "main",
+    "target_drifted_since_acceptance": false,
+    "target_head_observed_after_execution": "26f3dfb077bea75013fef58975979f02041dc490",
+    "work_branch": "codex/stockledger-prod-c13-ui-perfection-postfix-verify-v1",
+    "worktree_clean": true
+  },
+  "instructions": "Fresh post-integration Golden UI v2 VERIFY only; no Product source repair or promotion.",
+  "job_id": "CF-2eedc22e441bf50f8b74f4a0",
+  "kind": "codex-fabric-audit-evidence",
+  "locator": {
+    "branch": "codex-fabric/evidence/stockledger/prod-c13-ui-perfection-postfix-verify-v1",
+    "path": ".codex-fabric/audit.json",
+    "ref": "refs/heads/codex-fabric/evidence/stockledger/prod-c13-ui-perfection-postfix-verify-v1"
+  },
+  "operation": "VERIFY",
+  "policy": {
+    "no_atlas_promotion": true,
+    "no_main_merge": true,
+    "no_notion_write": true,
+    "no_product_source_changes": true,
+    "verify_only": true
+  },
+  "product_source_changed": false,
+  "project_id": "stockledger",
+  "recovery": {
+    "historical_ar31_untouched": true,
+    "required": false
+  },
+  "request": "prod-c13-ui-perfection-postfix-verify-v1",
+  "schema_version": 1,
+  "status": "GIT_PUBLISHED_AWAITING_AUDIT",
+  "transport": {
+    "bytes": 8588,
+    "envelope": "FABRIC/2",
+    "prompt_bytes": 8236,
+    "prompt_sha256": "1b297e621272d29639fc06a41c181d0842848dbb876246adcf3f3accdb2bf605",
+    "sha256": "2eedc22e441bf50f8b74f4a0f55b21c086bb0d33c5335c67c91d5e88983ede5c"
+  }
+}
