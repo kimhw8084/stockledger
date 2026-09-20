@@ -1,0 +1,358 @@
+{
+  "accepted_at": "2026-09-20T14:49:50Z",
+  "changed_files": [],
+  "checks": [
+    {
+      "command": "/bin/zsh -lc \"rtk jq '.notifications[] | {profile:.profile, keys:keys, actions:[.actions[].action]}' /Users/haewonkim/.codex-fabric/runs/stockledger/prod-c13-ui-perfection-postfix-evidence-repair-v1/remote-readback/visual-atlas/diagnostics/r7-focused-browser-evidence.json\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk jq '.notifications[0] | {actions:.actions, korean:.korean}' /Users/haewonkim/.codex-fabric/runs/stockledger/prod-c13-ui-perfection-postfix-evidence-repair-v1/remote-readback/visual-atlas/diagnostics/r7-focused-browser-evidence.json\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk jq '.notifications[0].korean' /Users/haewonkim/.codex-fabric/runs/stockledger/prod-c13-ui-perfection-postfix-evidence-repair-v1/remote-readback/visual-atlas/diagnostics/r7-focused-browser-evidence.json\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk jq '.notifications[0].actions[2]' /Users/haewonkim/.codex-fabric/runs/stockledger/prod-c13-ui-perfection-postfix-evidence-repair-v1/remote-readback/visual-atlas/diagnostics/r7-focused-browser-evidence.json\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk python3 r7-verify-remote.py'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk jq '.counts' /Users/haewonkim/.codex-fabric/runs/stockledger/prod-c13-ui-perfection-postfix-evidence-repair-v1/remote-readback/git-publish-receipt.json && rtk proxy du -sk /Users/haewonkim/.codex-fabric/runs/stockledger/prod-c13-ui-perfection-postfix-evidence-repair-v1/remote-readback\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk python3 -c 'from pathlib import Path; p=Path(\\\"/Users/haewonkim/.codex-fabric/runs/stockledger/prod-c13-ui-perfection-postfix-evidence-repair-v1/remote-readback\\\"); print(sum(x.stat().st_size for x in p.rglob(\\\"*\\\") if x.is_file()))'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk python3 -c 'from pathlib import Path; p=Path(\\\"/Users/haewonkim/.codex-fabric/runs/stockledger/prod-c13-ui-perfection-postfix-evidence-repair-v1/carrier-stage\\\"); print(sum(x.stat().st_size for x in p.rglob(\\\"*\\\") if x.is_file())); print((p/\\\"git-publish-receipt.json\\\").stat().st_size)'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk python3 r7-correct-count.py'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk cp /Users/haewonkim/.codex-fabric/runs/stockledger/prod-c13-ui-perfection-postfix-evidence-repair-v1/carrier-stage/git-publish-receipt.json /Users/haewonkim/.codex-fabric/runs/stockledger/prod-c13-ui-perfection-postfix-evidence-repair-v1/carrier-git/git-publish-receipt.json && rtk git -C /Users/haewonkim/.codex-fabric/runs/stockledger/prod-c13-ui-perfection-postfix-evidence-repair-v1/carrier-git add git-publish-receipt.json && rtk git -C /Users/haewonkim/.codex-fabric/runs/stockledger/prod-c13-ui-perfection-postfix-evidence-repair-v1/carrier-git commit -m 'Record final carrier byte count'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git -C /Users/haewonkim/.codex-fabric/runs/stockledger/prod-c13-ui-perfection-postfix-evidence-repair-v1/carrier-git rev-parse HEAD''^{commit} HEAD''^{tree}'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git -C /Users/haewonkim/.codex-fabric/runs/stockledger/prod-c13-ui-perfection-postfix-evidence-repair-v1/carrier-git push origin HEAD:refs/heads/project-os-artifacts/stockledger/prod-c13-ui-perfection-postfix-evidence-repair-v1'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git -C /Users/haewonkim/.codex-fabric/runs/stockledger/prod-c13-ui-perfection-postfix-evidence-repair-v1/carrier-git fetch origin refs/heads/project-os-artifacts/stockledger/prod-c13-ui-perfection-postfix-evidence-repair-v1'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy rm -rf /Users/haewonkim/.codex-fabric/runs/stockledger/prod-c13-ui-perfection-postfix-evidence-repair-v1/remote-readback'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk mkdir -p /Users/haewonkim/.codex-fabric/runs/stockledger/prod-c13-ui-perfection-postfix-evidence-repair-v1/remote-readback'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git -C /Users/haewonkim/.codex-fabric/runs/stockledger/prod-c13-ui-perfection-postfix-evidence-repair-v1/carrier-git archive FETCH_HEAD | rtk tar -x -C /Users/haewonkim/.codex-fabric/runs/stockledger/prod-c13-ui-perfection-postfix-evidence-repair-v1/remote-readback'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk python3 r7-verify-remote.py'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk python3 r7-mark-receipt-verified.py'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk cp /Users/haewonkim/.codex-fabric/runs/stockledger/prod-c13-ui-perfection-postfix-evidence-repair-v1/carrier-stage/git-publish-receipt.json /Users/haewonkim/.codex-fabric/runs/stockledger/prod-c13-ui-perfection-postfix-evidence-repair-v1/carrier-git/git-publish-receipt.json && rtk git -C /Users/haewonkim/.codex-fabric/runs/stockledger/prod-c13-ui-perfection-postfix-evidence-repair-v1/carrier-git add git-publish-receipt.json && rtk git -C /Users/haewonkim/.codex-fabric/runs/stockledger/prod-c13-ui-perfection-postfix-evidence-repair-v1/carrier-git commit -m 'Record remote verification result'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git -C /Users/haewonkim/.codex-fabric/runs/stockledger/prod-c13-ui-perfection-postfix-evidence-repair-v1/carrier-git rev-parse HEAD''^{commit} HEAD''^{tree}'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git -C /Users/haewonkim/.codex-fabric/runs/stockledger/prod-c13-ui-perfection-postfix-evidence-repair-v1/carrier-git push origin HEAD:refs/heads/project-os-artifacts/stockledger/prod-c13-ui-perfection-postfix-evidence-repair-v1'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git -C /Users/haewonkim/.codex-fabric/runs/stockledger/prod-c13-ui-perfection-postfix-evidence-repair-v1/carrier-git fetch origin refs/heads/project-os-artifacts/stockledger/prod-c13-ui-perfection-postfix-evidence-repair-v1 && rtk git -C /Users/haewonkim/.codex-fabric/runs/stockledger/prod-c13-ui-perfection-postfix-evidence-repair-v1/carrier-git rev-parse FETCH_HEAD''^{commit} FETCH_HEAD''^{tree}'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy rm -rf /Users/haewonkim/.codex-fabric/runs/stockledger/prod-c13-ui-perfection-postfix-evidence-repair-v1/remote-readback'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk mkdir -p /Users/haewonkim/.codex-fabric/runs/stockledger/prod-c13-ui-perfection-postfix-evidence-repair-v1/remote-readback && rtk git -C /Users/haewonkim/.codex-fabric/runs/stockledger/prod-c13-ui-perfection-postfix-evidence-repair-v1/carrier-git archive FETCH_HEAD | rtk tar -x -C /Users/haewonkim/.codex-fabric/runs/stockledger/prod-c13-ui-perfection-postfix-evidence-repair-v1/remote-readback'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk python3 r7-verify-remote.py'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk python3 r7-write-readback.py'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk /Users/haewonkim/.codex-fabric/bin/fabricctl publish-evidence --help'",
+      "exit_code": 2,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git cat-file -e refs/remotes/origin/codex-fabric/evidence/stockledger/prod-c13-ui-perfection-postfix-verify-v1:.codex-fabric/audit.json && rtk git show refs/remotes/origin/codex-fabric/evidence/stockledger/prod-c13-ui-perfection-postfix-verify-v1:.codex-fabric/audit.json | rtk jq '.'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git show refs/remotes/origin/codex-fabric/evidence/stockledger/prod-c13-ui-perfection-postfix-verify-v1:.codex-fabric/audit.json | rtk jq 'keys, {job_id, request, source_commit, source_tree, status, policy, product_source_changed, artifact_publication}'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy find /Users/haewonkim/.codex-fabric/runs/stockledger -path '*/.codex-fabric/audit.json' -print | tail -20\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk jq 'keys, {job_id, current_fabric_job_id, fabric_job_id, request, final_status, status, operation, artifact_publication, evidence_manifest, git, checks}' /Users/haewonkim/.codex-fabric/runs/stockledger/prod-c13-ui-perfection-postfix-verify-v1/fabric-evidence-stage/.codex-fabric/audit.json\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk jq '{job_id, current_fabric_job_id, fabric_job_id, request, final_status, status, operation, artifact_ref, artifact_tree, artifact_commit, artifact_publication, product_source_changed, changed_files, commits, git, evidence_manifest}' /Users/haewonkim/.codex-fabric/runs/stockledger/prod-c13-ui-perfection-postfix-verify-v1/fabric-evidence-stage/.codex-fabric/audit.json\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy find /Users/haewonkim/.codex-fabric/runs/stockledger/prod-c13-ui-perfection-postfix-verify-v1/fabric-evidence-stage -maxdepth 3 -type f -print | sort | head -50'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk jq '.checks' /Users/haewonkim/.codex-fabric/runs/stockledger/prod-c13-ui-perfection-postfix-verify-v1/fabric-evidence-stage/.codex-fabric/audit.json\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk jq -r '.checks[] | [.command,.status,.exitCode] | @tsv' /Users/haewonkim/.codex-fabric/runs/stockledger/prod-c13-ui-perfection-postfix-verify-v1/fabric-evidence-stage/.codex-fabric/audit.json\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk file /Users/haewonkim/.codex-fabric/bin/fabricctl && rtk head -80 /Users/haewonkim/.codex-fabric/bin/fabricctl'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk rg -n \"publish-evidence|audit.json|evidence-stage|job_id\" /Users/haewonkim/.codex-fabric/current/fabric.py | head -80'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '2440,2625p' /Users/haewonkim/.codex-fabric/current/fabric.py\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '2788,2848p' /Users/haewonkim/.codex-fabric/current/fabric.py\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk ls -la /Users/haewonkim/.codex-fabric/results/CF-e77c01b1337781471842a4f1 && rtk jq '{status, evidence_publication, git, checks: .checks}' /Users/haewonkim/.codex-fabric/results/CF-e77c01b1337781471842a4f1/result.json\"",
+      "exit_code": 2,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy ls -la /Users/haewonkim/.codex-fabric/jobs | tail -20 && rtk proxy find /Users/haewonkim/.codex-fabric/jobs -maxdepth 1 -name 'CF-e77*' -print\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk jq '{job_id, request, project_id, operation, status, accepted_at, source: .source, routes}' /Users/haewonkim/.codex-fabric/jobs/CF-e77c01b1337781471842a4f1.running/job.json\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk jq '{schema_version, kind, fabric_release, evidence_publisher_release, project_id, operation, policy, claim_boundary, execution_outcome, fabric_capture, codex, locator}' /Users/haewonkim/.codex-fabric/runs/stockledger/prod-c13-ui-perfection-postfix-verify-v1/fabric-evidence-stage/.codex-fabric/audit.json\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk python3 r7-write-audit.py'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk python3 r7-verify-remote.py'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk tail -30 /Users/haewonkim/.codex-fabric/results/CF-e77c01b1337781471842a4f1/codex.events.jsonl'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git status --short --branch && rtk git rev-parse HEAD HEAD''^{tree} refs/remotes/origin/main refs/remotes/origin/project-os-artifacts/stockledger/prod-c13-ui-perfection-postfix-verify-v1'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git status --short --branch && rtk git diff --quiet && rtk git diff --cached --quiet && rtk git rev-parse HEAD HEAD''^{tree} refs/remotes/origin/main refs/remotes/origin/project-os-artifacts/stockledger/prod-c13-ui-perfection-postfix-verify-v1 && rtk git show-ref | rtk rg '\"'stockledger/(prod-c13-ui-perfection-inspection-v1|prod-c13-ui-perfection-postfix-verify-v1|prod-c13-ui-perfection-postfix-evidence-repair-v1)'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'export PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH; rtk node --version && rtk git ls-remote origin refs/heads/project-os-artifacts/stockledger/prod-c13-ui-perfection-postfix-evidence-repair-v1 refs/heads/project-os-artifacts/stockledger/prod-c13-ui-perfection-postfix-verify-v1'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk jq '{job_id,current_fabric_job_id,status,artifact_publication,product_source_changed}' /Users/haewonkim/.codex-fabric/runs/stockledger/prod-c13-ui-perfection-postfix-evidence-repair-v1/fabric-evidence-stage/.codex-fabric/audit.json && rtk jq '{result,fabricJobId,artifact,remote,evidence}' /Users/haewonkim/.codex-fabric/runs/stockledger/prod-c13-ui-perfection-postfix-evidence-repair-v1/readback/remote-verification.json\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    }
+  ],
+  "codex": {
+    "cli_version": "codex-cli 0.155.1",
+    "configured_model": "gpt-5.6-luna",
+    "event_count": 362,
+    "provider_reported_model": null,
+    "reasoning_effort": "xhigh",
+    "terminal_type": "turn.completed",
+    "usage": {
+      "cache_hit_percent": 97.49,
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 19812864,
+      "fresh_input_tokens": 510088,
+      "input_tokens": 20322952,
+      "non_reasoning_output_tokens": 53345,
+      "output_tokens": 86217,
+      "reasoning_output_tokens": 32872,
+      "total_processed_tokens": 20409169
+    },
+    "warnings": []
+  },
+  "commits": [],
+  "diff": {
+    "additions": 0,
+    "changed_files": 0,
+    "commit_count": 0,
+    "deletions": 0
+  },
+  "error_code": null,
+  "evidence_manifest": {
+    "count": 0,
+    "items": [],
+    "version": 1
+  },
+  "evidence_publisher_release": "1.2.3-resume-candidate",
+  "fabric_capture": {
+    "applied": false,
+    "paths_before": 0,
+    "transient_untracked_removed": {
+      "count": 0,
+      "items": []
+    }
+  },
+  "fabric_release": "1.2.3-resume-candidate",
+  "failure_class": null,
+  "finished_at": "2026-09-20T15:35:09Z",
+  "git": {
+    "base_is_ancestor": true,
+    "base_sha": "26f3dfb077bea75013fef58975979f02041dc490",
+    "branch": "codex/stockledger-prod-c13-ui-perfection-postfix-evidence-repair-v1",
+    "detached_verify": false,
+    "head_sha": "26f3dfb077bea75013fef58975979f02041dc490",
+    "remote_exact_head": true,
+    "remote_head_sha": "26f3dfb077bea75013fef58975979f02041dc490",
+    "target_branch": "main",
+    "target_drifted_since_acceptance": false,
+    "target_head_observed_after_execution": "26f3dfb077bea75013fef58975979f02041dc490",
+    "work_branch": "codex/stockledger-prod-c13-ui-perfection-postfix-evidence-repair-v1",
+    "worktree_clean": true
+  },
+  "instructions": {
+    "files": [],
+    "total_bytes": 0,
+    "warning": null
+  },
+  "job_id": "CF-e77c01b1337781471842a4f1",
+  "kind": "codex-fabric-audit-evidence",
+  "locator": {
+    "branch": "codex-fabric/evidence/stockledger/prod-c13-ui-perfection-postfix-evidence-repair-v1",
+    "path": ".codex-fabric/audit.json",
+    "ref": "refs/heads/codex-fabric/evidence/stockledger/prod-c13-ui-perfection-postfix-evidence-repair-v1"
+  },
+  "operation": "VERIFY",
+  "policy": {
+    "environment_policy_sha256": "e077daca74297b3c30bee8989f00f8ca5338f7610b4d016a6c48db524205d064",
+    "fabric_release": "1.2.3-resume-candidate",
+    "policy_sha256": "a642c9f63bab2cb555704bdb0b9d1f28222591f133f934c1d0f93cc5a25ab8a1",
+    "registry_sha256": "cfc765f3211c37c7967a138f3b2d89a99341939b15b2623f92744d007f625d6f"
+  },
+  "project_id": "stockledger",
+  "recovery": {
+    "model_rerun_safe": false,
+    "recovery_required": false,
+    "retry_safe": false,
+    "retry_scope": null,
+    "worktree_retained": true
+  },
+  "request": "prod-c13-ui-perfection-postfix-evidence-repair-v1",
+  "schema_version": 1,
+  "started_at": "2026-09-20T14:49:50Z",
+  "status": "EXECUTED_NO_CHANGE",
+  "timing": {
+    "execution_seconds": 2719,
+    "queue_seconds": 0,
+    "total_seconds": 2719
+  },
+  "transport": {
+    "bytes": 11212,
+    "envelope": "FABRIC/2",
+    "prompt_bytes": 10841,
+    "prompt_sha256": "247b2de0b49ee709bc5d95ef3019cc66e6682a271798167ca7441c139081eb23",
+    "sha256": "e77c01b1337781471842a4f1e6cd071b8e3e8b2717f40f5636917f87c1d6a40d"
+  }
+}
