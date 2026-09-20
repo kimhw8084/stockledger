@@ -1,0 +1,338 @@
+{
+  "artifact": {
+    "artifact_commit": "a30b7099a3400be1e5ef0194b23a516833cec538",
+    "artifact_tree": "c9cc0e142ea7ac5a9b39274c32cd1d6a9a817580",
+    "carrierCommit": "final-ref-readback-recorded-separately-to-avoid-self-referential-receipt",
+    "carrierTree": "final-ref-readback-recorded-separately-to-avoid-self-referential-receipt",
+    "payloadCommit": "a30b7099a3400be1e5ef0194b23a516833cec538",
+    "payloadTree": "c9cc0e142ea7ac5a9b39274c32cd1d6a9a817580",
+    "ref": "refs/heads/project-os-artifacts/stockledger/prod-c13-ui-perfection-postfix-verify-v1"
+  },
+  "canonicalPngSha256": {
+    "alerts:desktop-1440x900": {
+      "bytes": 82985,
+      "height": 900,
+      "path": "visual-atlas/screenshots/alerts--desktop-1440x900.png",
+      "sha256": "31101183f27c1b072d3d1b29a59d029b1ac8cac8bfcad44ba9dc82ffe290c234",
+      "signature": "89504e470d0a1a0a",
+      "width": 1440
+    },
+    "alerts:mobile-390x844": {
+      "bytes": 56860,
+      "height": 844,
+      "path": "visual-atlas/screenshots/alerts--mobile-390x844.png",
+      "sha256": "b0fb2c9cf5d9bfe16e9ddc4437befca3c4fb227c5920f3f396fea93b2fd11b39",
+      "signature": "89504e470d0a1a0a",
+      "width": 390
+    },
+    "decision-detail:desktop-1440x900": {
+      "bytes": 92629,
+      "height": 900,
+      "path": "visual-atlas/screenshots/decision-detail--desktop-1440x900.png",
+      "sha256": "ad7849186e956736ed6bc2701952a2b3a7d8650b9617016d37fcc2ab8e3e2447",
+      "signature": "89504e470d0a1a0a",
+      "width": 1440
+    },
+    "decision-detail:mobile-390x844": {
+      "bytes": 62873,
+      "height": 844,
+      "path": "visual-atlas/screenshots/decision-detail--mobile-390x844.png",
+      "sha256": "b42768ef9e83481c4ca6064eac9cf44b0ebf7d448875512a04f28927dcff032a",
+      "signature": "89504e470d0a1a0a",
+      "width": 390
+    },
+    "eye-composer:desktop-1440x900": {
+      "bytes": 54908,
+      "height": 900,
+      "path": "visual-atlas/screenshots/eye-composer--desktop-1440x900.png",
+      "sha256": "464298cb83a8349065bf04d24674879c007813fc8d138a1f8cda4ba2434120d7",
+      "signature": "89504e470d0a1a0a",
+      "width": 1440
+    },
+    "eye-composer:mobile-390x844": {
+      "bytes": 44643,
+      "height": 844,
+      "path": "visual-atlas/screenshots/eye-composer--mobile-390x844.png",
+      "sha256": "1d2f82c4259d2b6230ea90927446728793d92a7a3c4613a0a42c8007dfd4a79d",
+      "signature": "89504e470d0a1a0a",
+      "width": 390
+    },
+    "eye-detail:desktop-1440x900": {
+      "bytes": 74482,
+      "height": 900,
+      "path": "visual-atlas/screenshots/eye-detail--desktop-1440x900.png",
+      "sha256": "0ee858957bc32515a55086711436d7d5103406641e221d6ae3f398078145f1d5",
+      "signature": "89504e470d0a1a0a",
+      "width": 1440
+    },
+    "eye-detail:mobile-390x844": {
+      "bytes": 61595,
+      "height": 844,
+      "path": "visual-atlas/screenshots/eye-detail--mobile-390x844.png",
+      "sha256": "c1438b79215400e11ad5790a30b53ae44384443451d6d4388f99fc8ef3c40042",
+      "signature": "89504e470d0a1a0a",
+      "width": 390
+    },
+    "eye-flows:desktop-1440x900": {
+      "bytes": 71850,
+      "height": 900,
+      "path": "visual-atlas/screenshots/eye-flows--desktop-1440x900.png",
+      "sha256": "de57dc5f49976c36e20cac32697a4dfae8af250086af78fb832fdb218034a178",
+      "signature": "89504e470d0a1a0a",
+      "width": 1440
+    },
+    "eye-flows:mobile-390x844": {
+      "bytes": 53181,
+      "height": 844,
+      "path": "visual-atlas/screenshots/eye-flows--mobile-390x844.png",
+      "sha256": "545314edbc0290146be7fbeb3129ec981a70a3a0b32525e5caf06d070c19ff71",
+      "signature": "89504e470d0a1a0a",
+      "width": 390
+    },
+    "journal-composer:desktop-1440x900": {
+      "bytes": 52802,
+      "height": 900,
+      "path": "visual-atlas/screenshots/journal-composer--desktop-1440x900.png",
+      "sha256": "7d2c710ce42eaedfee950f45aecad6941c5bf4061f8ada35b0613eca99a1030d",
+      "signature": "89504e470d0a1a0a",
+      "width": 1440
+    },
+    "journal-composer:mobile-390x844": {
+      "bytes": 41087,
+      "height": 844,
+      "path": "visual-atlas/screenshots/journal-composer--mobile-390x844.png",
+      "sha256": "bae7cf9ef956a803ead2b2bed74250d1ec7ee00a61c62e12ad2ae4d090c9b881",
+      "signature": "89504e470d0a1a0a",
+      "width": 390
+    },
+    "journal:desktop-1440x900": {
+      "bytes": 88968,
+      "height": 900,
+      "path": "visual-atlas/screenshots/journal--desktop-1440x900.png",
+      "sha256": "ccea2bf9aa82fba3bf396566980683017f6fc43e23d529c3ee2d0d4a95637468",
+      "signature": "89504e470d0a1a0a",
+      "width": 1440
+    },
+    "journal:mobile-390x844": {
+      "bytes": 60720,
+      "height": 844,
+      "path": "visual-atlas/screenshots/journal--mobile-390x844.png",
+      "sha256": "d08d7e1b3859033eccf12ea9644c3594a2fc4fd7f77cd726aa120769a96c71ce",
+      "signature": "89504e470d0a1a0a",
+      "width": 390
+    },
+    "logic-registry:desktop-1440x900": {
+      "bytes": 97093,
+      "height": 900,
+      "path": "visual-atlas/screenshots/logic-registry--desktop-1440x900.png",
+      "sha256": "98aee0f4ec1034094c2c9cee55448131aaf17d8b788db719c3c4c46e4b3273eb",
+      "signature": "89504e470d0a1a0a",
+      "width": 1440
+    },
+    "logic-registry:mobile-390x844": {
+      "bytes": 66032,
+      "height": 844,
+      "path": "visual-atlas/screenshots/logic-registry--mobile-390x844.png",
+      "sha256": "3c6e32f485883daac063c0021750fba6ae6fbca051e7dd4961c9cabffa3b7903",
+      "signature": "89504e470d0a1a0a",
+      "width": 390
+    },
+    "metric-detail-sheet:desktop-1440x900": {
+      "bytes": 68099,
+      "height": 900,
+      "path": "visual-atlas/screenshots/metric-detail-sheet--desktop-1440x900.png",
+      "sha256": "93d9fe917222eca3b306317beb5ac8e54fc06295a47d694c59b9fea10a47a5b0",
+      "signature": "89504e470d0a1a0a",
+      "width": 1440
+    },
+    "metric-detail-sheet:mobile-390x844": {
+      "bytes": 47081,
+      "height": 844,
+      "path": "visual-atlas/screenshots/metric-detail-sheet--mobile-390x844.png",
+      "sha256": "9080aad7ac4918c00dd03f1a6775563c4d38e47fe2f238e527d6194730a74a3d",
+      "signature": "89504e470d0a1a0a",
+      "width": 390
+    },
+    "notification-confirmation:desktop-1440x900": {
+      "bytes": 38992,
+      "height": 900,
+      "path": "visual-atlas/screenshots/notification-confirmation--desktop-1440x900.png",
+      "sha256": "76c150bf07ff849600d165e159cf2354be637035e1bb263db330a27f8f0ce224",
+      "signature": "89504e470d0a1a0a",
+      "width": 1440
+    },
+    "notification-confirmation:mobile-390x844": {
+      "bytes": 33554,
+      "height": 844,
+      "path": "visual-atlas/screenshots/notification-confirmation--mobile-390x844.png",
+      "sha256": "ed73ce776a6b1b064e5cc298d590062c4437215daf6c6e4ff34ecef11ece70ce",
+      "signature": "89504e470d0a1a0a",
+      "width": 390
+    },
+    "recipe-builder:desktop-1440x900": {
+      "bytes": 87476,
+      "height": 900,
+      "path": "visual-atlas/screenshots/recipe-builder--desktop-1440x900.png",
+      "sha256": "32fe53b6a13c696b760789e183b7f825489b0e2a566aa53dc10bee5613ea7453",
+      "signature": "89504e470d0a1a0a",
+      "width": 1440
+    },
+    "recipe-builder:mobile-390x844": {
+      "bytes": 62353,
+      "height": 844,
+      "path": "visual-atlas/screenshots/recipe-builder--mobile-390x844.png",
+      "sha256": "14700808bfe3f5d342a3f9e53a204596aba47cd09aaa656fd15b6da305ffa465",
+      "signature": "89504e470d0a1a0a",
+      "width": 390
+    },
+    "recipes-logic-lab:desktop-1440x900": {
+      "bytes": 77360,
+      "height": 900,
+      "path": "visual-atlas/screenshots/recipes-logic-lab--desktop-1440x900.png",
+      "sha256": "7a2eb376402873ae6e0ff77cf993256be90ae32e09ec09b8e5261b28a39ccd43",
+      "signature": "89504e470d0a1a0a",
+      "width": 1440
+    },
+    "recipes-logic-lab:mobile-390x844": {
+      "bytes": 68495,
+      "height": 844,
+      "path": "visual-atlas/screenshots/recipes-logic-lab--mobile-390x844.png",
+      "sha256": "6e0444dd100dc0837683bcd8054379744d796d108e2ec4280cf9f31800a57fd1",
+      "signature": "89504e470d0a1a0a",
+      "width": 390
+    },
+    "settings:desktop-1440x900": {
+      "bytes": 76246,
+      "height": 900,
+      "path": "visual-atlas/screenshots/settings--desktop-1440x900.png",
+      "sha256": "de0a8a620d49b9836d5fc4a796fb9d807cd8440acd8d22bbd2a75284bffea4db",
+      "signature": "89504e470d0a1a0a",
+      "width": 1440
+    },
+    "settings:mobile-390x844": {
+      "bytes": 56913,
+      "height": 844,
+      "path": "visual-atlas/screenshots/settings--mobile-390x844.png",
+      "sha256": "a04bb6130bd01d12e18bfc71a76df1ca01a57caa2b5f856625bd65b9b3095396",
+      "signature": "89504e470d0a1a0a",
+      "width": 390
+    },
+    "stock-entity-detail:desktop-1440x900": {
+      "bytes": 78317,
+      "height": 900,
+      "path": "visual-atlas/screenshots/stock-entity-detail--desktop-1440x900.png",
+      "sha256": "12798cb109517d331a1de0e1ec208f53d792de4aed43ae3eb2a8ac5d45456dd7",
+      "signature": "89504e470d0a1a0a",
+      "width": 1440
+    },
+    "stock-entity-detail:mobile-390x844": {
+      "bytes": 63072,
+      "height": 844,
+      "path": "visual-atlas/screenshots/stock-entity-detail--mobile-390x844.png",
+      "sha256": "aa9e3afc95ffe9d47907b988a224806428ea97ac6b84c0d5a3a230c3e77fb5cd",
+      "signature": "89504e470d0a1a0a",
+      "width": 390
+    },
+    "today:desktop-1440x900": {
+      "bytes": 94827,
+      "height": 900,
+      "path": "visual-atlas/screenshots/today--desktop-1440x900.png",
+      "sha256": "de3241198aeb93c7a91fbd8fd6646cc220a308d1195b090804abe2375ea071f4",
+      "signature": "89504e470d0a1a0a",
+      "width": 1440
+    },
+    "today:mobile-390x844": {
+      "bytes": 73393,
+      "height": 844,
+      "path": "visual-atlas/screenshots/today--mobile-390x844.png",
+      "sha256": "56236f0f2853c6788218f897520d9b87ae137e3bf0aa42b75bf77f7afe4820c9",
+      "signature": "89504e470d0a1a0a",
+      "width": 390
+    },
+    "watchlist:desktop-1440x900": {
+      "bytes": 83052,
+      "height": 900,
+      "path": "visual-atlas/screenshots/watchlist--desktop-1440x900.png",
+      "sha256": "a152308a11ba2e24680fffad82a20d67f3766208e9a7d9884a01dc3bf6bd1d5b",
+      "signature": "89504e470d0a1a0a",
+      "width": 1440
+    },
+    "watchlist:mobile-390x844": {
+      "bytes": 66392,
+      "height": 844,
+      "path": "visual-atlas/screenshots/watchlist--mobile-390x844.png",
+      "sha256": "d8b9f6393e8e97c116f0e1401aaea0d1c8e2c2f087b468040df760b94a5a469e",
+      "signature": "89504e470d0a1a0a",
+      "width": 390
+    }
+  },
+  "counts": {
+    "canonicalPngCount": 32,
+    "canonicalSurfaceCount": 16,
+    "payloadByteCount": 15541144,
+    "payloadFileCount": 49
+  },
+  "decisiveSha256": {
+    "visual-atlas/artifact-bundle.zip": {
+      "bytes": 4504368,
+      "sha256": "05566dd7ab45340334dafce0dfa55e26181be59566ecf62b5ddeb9faeab89226"
+    },
+    "visual-atlas/capture-report.json": {
+      "bytes": 6177126,
+      "sha256": "56fd1d36c1488fabfed55ab474a747a0c3d254e2fd6b2078f1d136198d29e4ce"
+    },
+    "visual-atlas/diagnostics/runtime-diagnostics.json": {
+      "bytes": 92416,
+      "sha256": "621318a8a783bee788188c33fc5952fdfe183d6aaf9bd752b70ee3112828ccf3"
+    },
+    "visual-atlas/diagnostics/task-traces.json": {
+      "bytes": 8074,
+      "sha256": "52c37eaa81bbeaec346a88ca2363953fb99379916a79c6b85fc1640a04306c33"
+    },
+    "visual-atlas/reader-index.json": {
+      "bytes": 10257,
+      "sha256": "b87f611574877698dc76ea9b053e40bb01e09f0f3a11371cd94ffe59ed427959"
+    },
+    "visual-atlas/review-desktop.pdf": {
+      "bytes": 1192998,
+      "sha256": "1ce7d4f21b3a7767e6b2eb4b3308ce459d3888cf116a53bce30dcb3ea5618f21"
+    },
+    "visual-atlas/review-mobile.pdf": {
+      "bytes": 867480,
+      "sha256": "49163d8276ec9f91e706b117fc4262d8f6bc9c7e2f68b3d21dc41f13ecd1b9ce"
+    },
+    "visual-atlas/surface-manifest.json": {
+      "bytes": 70311,
+      "sha256": "283fd32dfd3983c7e40fc209c84d2cff9d9656def60fae45b82a61ec9b8c2a9a"
+    }
+  },
+  "fabric": {
+    "jobId": "CF-2eedc22e441bf50f8b74f4a0",
+    "operation": "VERIFY",
+    "project": "stockledger",
+    "request": "prod-c13-ui-perfection-postfix-verify-v1"
+  },
+  "historicalEvidence": {
+    "overwritten": false,
+    "promoted": false,
+    "reused": false,
+    "run": "AR-31",
+    "status": "rejected-pre-fix"
+  },
+  "immutable": true,
+  "manifest": {
+    "requiredSurfaceCount": 16,
+    "scannerReview": "retained as anomaly; not promoted",
+    "schema": "project-os-visual-atlas-surface-manifest-v3"
+  },
+  "publishedAt": "2026-09-20T04:30:00Z",
+  "schema": "project-os-golden-ui-v2-git-publish-stage-receipt-v1",
+  "source": {
+    "baseSha": "26f3dfb077bea75013fef58975979f02041dc490",
+    "product_source_changed": false,
+    "sourceSha": "26f3dfb077bea75013fef58975979f02041dc490",
+    "sourceTree": "7a6ee3872b6967631fa539f4455904d00b56e4ef",
+    "workBranch": "codex/stockledger-prod-c13-ui-perfection-postfix-verify-v1"
+  },
+  "status": "GIT_PUBLISHED_AWAITING_AUDIT"
+}
