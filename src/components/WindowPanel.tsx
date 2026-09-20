@@ -61,9 +61,22 @@ export const WindowPanel = ({
     return () => clearTimeout(timer);
   }, []);
 
+  const canRestoreFocus = (candidate: any) => {
+    if (!candidate || candidate.isConnected === false) return false;
+    if (Platform.OS === "web") {
+      if (candidate === document.body) return false;
+      if (candidate.nodeType !== 1) return false;
+      if (typeof candidate.focus !== "function") return false;
+      if (candidate.disabled || candidate.getAttribute?.("aria-disabled") === "true") return false;
+      if (candidate.getAttribute?.("tabindex") === "-1") return false;
+      return true;
+    }
+    return Boolean(findNodeHandle(candidate));
+  };
+
   const restoreFocus = () => {
-    const target = [returnFocusRef?.current, fallbackFocusRef?.current].find((candidate) => candidate && candidate.isConnected !== false);
-    if (!target || target.isConnected === false) return;
+    const target = [returnFocusRef?.current, fallbackFocusRef?.current].find(canRestoreFocus);
+    if (!target) return;
     if (Platform.OS === "web") {
       target.focus?.();
       return;
@@ -74,7 +87,17 @@ export const WindowPanel = ({
 
   const finishClose = () => {
     onClose();
-    setTimeout(restoreFocus, 0);
+    const restoreAfterCommit = () => {
+      restoreFocus();
+      if (returnFocusRef) returnFocusRef.current = null;
+    };
+    setTimeout(() => {
+      if (Platform.OS === "web" && typeof requestAnimationFrame === "function") {
+        requestAnimationFrame(() => requestAnimationFrame(restoreAfterCommit));
+        return;
+      }
+      restoreAfterCommit();
+    }, 0);
   };
 
   const panelKeyboardProps =

@@ -1,7 +1,8 @@
 import React, { useRef, useState } from "react";
-import { Platform, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { Button, Card, HorizontalChoice, Input, MetaPill } from "../../components/common";
 import { WindowPanel } from "../../components/WindowPanel";
+import { useWindowPanelFocus } from "../../hooks/useWindowPanelFocus";
 import { defaultNotificationPreferences, validClockTime } from "../../domain/notificationPreferences";
 import type { useAppModel } from "../../hooks/useAppModel";
 import { t, type AppLanguage } from "../../lib/i18n";
@@ -10,7 +11,7 @@ import type { AppData, NotificationPreferences } from "../../types";
 const deliveryModes = ["immediate", "digest"] as const;
 const privacyModes = ["minimal", "rich"] as const;
 
-export function NotificationSettingsPanel({ data, actions, language }: { data: AppData; actions: ReturnType<typeof useAppModel>["actions"]; language: AppLanguage }) {
+export function NotificationSettingsPanel({ data, actions, language, fallbackFocusRef }: { data: AppData; actions: ReturnType<typeof useAppModel>["actions"]; language: AppLanguage; fallbackFocusRef?: React.RefObject<any> }) {
   const preferences = data.notificationPreferences ?? defaultNotificationPreferences();
   const [email, setEmail] = useState(preferences.destinations.email?.address ?? "");
   const [start, setStart] = useState(preferences.quietHours.start);
@@ -18,7 +19,7 @@ export function NotificationSettingsPanel({ data, actions, language }: { data: A
   const [digestTime, setDigestTime] = useState(preferences.digestTime);
   const [disableConfirmationOpen, setDisableConfirmationOpen] = useState(false);
   const disableButtonRef = useRef<any>(null);
-  const disableConfirmationReturnFocusRef = useRef<any>(null);
+  const disableConfirmationFocus = useWindowPanelFocus(fallbackFocusRef);
   const save = (change: Partial<NotificationPreferences>) => actions.updateNotificationPreferences(change);
   const notificationsEnabled = preferences.enabled && preferences.explicitConsent;
   const configured = notificationsEnabled && preferences.allowedChannels.includes("email") && Boolean(preferences.destinations.email?.address);
@@ -30,12 +31,7 @@ export function NotificationSettingsPanel({ data, actions, language }: { data: A
     close();
   };
   const openDisableConfirmation = () => {
-    if (Platform.OS === "web" && typeof document !== "undefined") {
-      const activeElement = document.activeElement;
-      disableConfirmationReturnFocusRef.current = activeElement && activeElement !== document.body ? activeElement : disableButtonRef.current;
-    } else {
-      disableConfirmationReturnFocusRef.current = disableButtonRef.current;
-    }
+    disableConfirmationFocus.captureInvoker(disableButtonRef.current);
     setDisableConfirmationOpen(true);
   };
   return <>
@@ -82,7 +78,8 @@ export function NotificationSettingsPanel({ data, actions, language }: { data: A
         title={t(language, "settings.notifications.disableConfirmTitle")}
         onClose={() => setDisableConfirmationOpen(false)}
         closeLabel={t(language, "common.close")}
-        returnFocusRef={disableConfirmationReturnFocusRef}
+        returnFocusRef={disableConfirmationFocus.returnFocusRef}
+        fallbackFocusRef={disableConfirmationFocus.fallbackFocusRef}
       >
         {(close) => (
           <View style={styles.confirmationContent}>

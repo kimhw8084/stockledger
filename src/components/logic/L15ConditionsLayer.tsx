@@ -11,8 +11,8 @@ interface L15ConditionsLayerProps {
   signals: ScanSignal[];
   rules: FrozenScannerRule[];
   reviewLogsBySignal: Map<string, ReviewLog>;
-  onOpenHelp: () => void;
-  onOpenReview: (signal: ScanSignal) => void;
+  onOpenHelp: (invoker?: unknown) => void;
+  onOpenReview: (signal: ScanSignal, invoker?: unknown) => void;
   SectionHeader: React.FC<any>;
   Button: React.FC<any>;
   MetaPill: React.FC<any>;
@@ -119,7 +119,7 @@ export const L15ConditionsLayer: React.FC<L15ConditionsLayerProps> = ({
                   <Button
                     label={language === "ko" ? "검토 기록" : "Log Review"}
                     tone="secondary"
-                    onPress={() => onOpenReview(signal)}
+                    onPress={(event: any) => onOpenReview(signal, event)}
                   />
                 </View>
               </LogicLevelCard>

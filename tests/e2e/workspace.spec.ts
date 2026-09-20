@@ -221,6 +221,27 @@ test("resolves entity links, fails safely, and preserves language preference", a
   await page.getByRole("button", { name: "Explore sample workspace" }).click();
   await expect(page.getByText(/Sample data is present/)).toBeVisible();
 
+  const homeHelpInvoker = page.getByRole("button", { name: "Summary help", exact: true });
+  await expect(homeHelpInvoker).toBeVisible();
+  await homeHelpInvoker.focus();
+  await homeHelpInvoker.click();
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(homeHelpInvoker).toBeFocused();
+
+  await homeHelpInvoker.click();
+  await page.getByRole("dialog").getByRole("button", { name: "Done", exact: true }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(homeHelpInvoker).toBeFocused();
+
+  await homeHelpInvoker.click();
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await homeHelpInvoker.evaluate((element) => element.remove());
+  await page.getByRole("dialog").getByRole("button", { name: "Done", exact: true }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(page.getByRole("tab", { name: "Today", exact: true })).toBeFocused();
+
   await page.goto("/#/watchlist?stockId=stock-amd");
   await expect(page.getByText("Advanced Micro Devices", { exact: true }).first()).toBeVisible();
   await page.reload();

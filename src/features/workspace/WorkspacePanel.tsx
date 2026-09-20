@@ -21,12 +21,12 @@ export function RecoveryPanel({ error, retry, actions, language }: { error: stri
     <Button label={t(language, "workspace.recovery.retry")} tone="secondary" onPress={retry} />
   </View>;
 }
-export function StockEditor({ stock, onClose, actions, onSaved, language }: { stock?: Stock; onClose: () => void; actions: Actions; onSaved: (id: string) => void; language: AppLanguage }) {
+export function StockEditor({ stock, onClose, actions, onSaved, language, returnFocusRef, fallbackFocusRef }: { stock?: Stock; onClose: () => void; actions: Actions; onSaved: (id: string) => void; language: AppLanguage; returnFocusRef?: React.RefObject<any>; fallbackFocusRef?: React.RefObject<any> }) {
   const [symbol, setSymbol] = useState(stock?.symbol ?? "");
   const [name, setName] = useState(stock?.name ?? "");
   const [thesis, setThesis] = useState(stock?.thesis ?? "");
   const [error, setError] = useState("");
-  return <WindowPanel title={stock ? t(language, "stocks.editor.editTitle") : t(language, "stocks.editor.addTitle")} onClose={onClose} closeLabel={t(language, "common.done")}>
+  return <WindowPanel title={stock ? t(language, "stocks.editor.editTitle") : t(language, "stocks.editor.addTitle")} onClose={onClose} closeLabel={t(language, "common.done")} returnFocusRef={returnFocusRef} fallbackFocusRef={fallbackFocusRef}>
     <Text style={styles.label}>{t(language, "stocks.editor.ticker")}</Text><Input placeholder={t(language, "stocks.editor.tickerPlaceholder")} value={symbol} onChangeText={setSymbol} autoCapitalize="characters" />
     <Text style={styles.label}>{t(language, "stocks.editor.companyName")}</Text><Input placeholder={t(language, "stocks.editor.companyNamePlaceholder")} value={name} onChangeText={setName} />
     <Text style={styles.label}>{t(language, "stocks.editor.thesis")}</Text><Input placeholder={t(language, "stocks.editor.thesisPlaceholder")} value={thesis} onChangeText={setThesis} multiline />

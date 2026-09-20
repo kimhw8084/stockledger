@@ -42,7 +42,7 @@ export const StockSearchPanel = ({
   deferredStockSearch: string;
   recentStocksCount: number;
   setRecentStockIds: React.Dispatch<React.SetStateAction<string[]>>;
-  onAddStock: () => void;
+  onAddStock: (invoker?: unknown) => void;
   isCompactPhone: boolean;
   isVeryCompactPhone: boolean;
   Input: React.ComponentType<any>;

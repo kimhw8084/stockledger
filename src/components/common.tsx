@@ -62,7 +62,7 @@ export const Card = ({
 
 interface ButtonProps {
   label: string;
-  onPress: () => void | Promise<unknown>;
+  onPress: (event?: any) => void | Promise<unknown>;
   tone?: "primary" | "secondary" | "ghost" | "risk";
   disabled?: boolean;
   style?: any;
@@ -92,10 +92,11 @@ export const Button = React.forwardRef<any, ButtonProps>(function Button({
     disabled={disabled || pending}
     onFocus={() => setFocused(true)}
     onBlur={() => setFocused(false)}
-    onPress={async () => {
+    onPress={async (event: any) => {
       if (disabled || busy.current) return;
+      event?.currentTarget?.focus?.();
       busy.current = true; setPending(true); setError("");
-      try { await onPress(); } catch (cause) { setError(cause instanceof Error ? cause.message : "Could not complete action. Please try again."); }
+      try { await onPress(event); } catch (cause) { setError(cause instanceof Error ? cause.message : "Could not complete action. Please try again."); }
       finally { busy.current = false; setPending(false); }
     }}
     style={({ pressed }) => [

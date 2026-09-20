@@ -55,7 +55,7 @@ export const StockTrendHero = ({
   stockSnapshotModeLabel: (snapshot?: { isMock: boolean } | null) => string;
   Button: React.ComponentType<any>;
   onClearStock: () => void;
-  onEditStock: () => void;
+  onEditStock: (invoker?: unknown) => void;
   onDeleteStock: () => void;
   lookbackControl: React.ReactNode;
   benchmarkControl: React.ReactNode;
