@@ -1,0 +1,370 @@
+{
+  "accepted_at": "2026-09-20T19:28:14Z",
+  "changed_files": [
+    {
+      "additions": 53,
+      "deletions": 0,
+      "path": "tests/e2e/workspace.spec.ts",
+      "status": "M"
+    }
+  ],
+  "checks": [
+    {
+      "command": "/bin/zsh -lc 'rtk node scripts/serve-preview.mjs'",
+      "exit_code": 130,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npm run check'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk ls -l /opt/homebrew/opt/node@22/bin/node /opt/homebrew/opt/node/bin/node 2>/dev/null || true'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk brew list --versions node node@22 2>/dev/null || true'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH node --version'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm --version'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm ci'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm run check'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm run check:release-workflow'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm run check:boundaries'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm audit --audit-level=high'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm run export:all'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm run test:e2e'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH STOCKLEDGER_PROTECTED_BASE=26f3dfb077bea75013fef58975979f02041dc490 npm run check:release-base'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm run recovery:drill -- --output artifacts/recovery-result.json'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm run test -- --run tests/operations.test.ts tests/recovery.test.ts tests/releaseEvidence.test.ts tests/qualification.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm run operations:qualify -- --output artifacts/operations-qualification.json'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk docker --version'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npx supabase --version'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npx supabase start -x studio,edge-runtime,logflare,vector,supavisor,imgproxy,realtime,storage-api'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk ls /Applications | rg -i 'OrbStack|Docker' | sed -n '1,80p'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk open -a OrbStack'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk docker info --format '{{.ServerVersion}} {{.Containers}} containers'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npx supabase start -x studio,edge-runtime,logflare,vector,supavisor,imgproxy,realtime,storage-api'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm run test:cloud'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm run test -- --run tests/cloud.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npx supabase db lint --local --schema public,ledger_private --level warning --fail-on warning'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npx supabase stop --no-backup'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git diff --check && rtk git status --short && rtk git diff --numstat'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git add tests/e2e/workspace.spec.ts && rtk git commit -m \"test(e2e): prove 200% browser zoom workspace reachability\"'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git show --stat --oneline --decorate HEAD'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git rev-parse HEAD && rtk git rev-parse HEAD''^{tree} && rtk git status --short'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH STOCKLEDGER_PROTECTED_BASE=26f3dfb077bea75013fef58975979f02041dc490 npm run release:evidence -- --output artifacts/release-evidence.json --base 26f3dfb077bea75013fef58975979f02041dc490'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH STOCKLEDGER_PROTECTED_BASE=26f3dfb077bea75013fef58975979f02041dc490 npm run release:verify -- --input artifacts/release-evidence.json --base 26f3dfb077bea75013fef58975979f02041dc490'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git show --format=fuller --no-patch HEAD && rtk nl -ba tests/e2e/workspace.spec.ts | sed -n '312,380p'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk node -e 'const fs=require(\\\"fs\\\"); const e=JSON.parse(fs.readFileSync(\\\"artifacts/release-evidence.json\\\",\\\"utf8\\\")); console.log(JSON.stringify({baseCommit:e.baseCommit, sourceCommit:e.source.commit, sourceTree:e.source.tree, evidenceHash:e.evidenceHash, workingTree:e.source.workingTree, artifacts:e.artifacts}, null, 2));'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git status --short --branch && rtk git rev-parse HEAD && rtk git rev-parse HEAD''^{tree} && rtk git diff HEAD''^ HEAD --name-status'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git diff --check && rtk tail -n 70 tests/e2e/workspace.spec.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm run typecheck'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm run test:e2e -- --project=desktop -g \"proves real Chromium 200% browser zoom\"'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm run test:e2e -- --project=desktop -g \"proves real Chromium 200% browser zoom\"'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git diff --check && rtk git diff --stat && rtk git status --short'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH npm run typecheck'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git add tests/e2e/workspace.spec.ts && rtk git commit --amend --no-edit'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git show --stat --oneline --decorate HEAD'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git rev-parse HEAD && rtk git rev-parse HEAD''^{tree} && rtk git status --short --branch'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH STOCKLEDGER_PROTECTED_BASE=26f3dfb077bea75013fef58975979f02041dc490 npm run release:evidence -- --output artifacts/release-evidence.json --base 26f3dfb077bea75013fef58975979f02041dc490'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH STOCKLEDGER_PROTECTED_BASE=26f3dfb077bea75013fef58975979f02041dc490 npm run release:verify -- --input artifacts/release-evidence.json --base 26f3dfb077bea75013fef58975979f02041dc490'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git status --short --branch && rtk git rev-parse HEAD && rtk git rev-parse HEAD''^{tree} && rtk git diff HEAD''^ HEAD --name-status'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk env PATH=/opt/homebrew/opt/node@22/bin:$PATH node -e '\"'const fs=require(\\\"fs\\\"); const e=JSON.parse(fs.readFileSync(\\\"artifacts/release-evidence.json\\\",\\\"utf8\\\")); console.log(JSON.stringify({baseCommit:e.baseCommit, sourceCommit:e.source.commit, sourceTree:e.source.tree, evidenceHash:e.evidenceHash, workingTree:e.source.workingTree}, null, 2));'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    }
+  ],
+  "codex": {
+    "cli_version": "codex-cli 0.155.1",
+    "configured_model": "gpt-5.6-luna",
+    "event_count": 249,
+    "provider_reported_model": null,
+    "reasoning_effort": "xhigh",
+    "terminal_type": "turn.completed",
+    "usage": {
+      "cache_hit_percent": 97.95,
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 8954880,
+      "fresh_input_tokens": 187606,
+      "input_tokens": 9142486,
+      "non_reasoning_output_tokens": 20731,
+      "output_tokens": 41476,
+      "reasoning_output_tokens": 20745,
+      "total_processed_tokens": 9183962
+    },
+    "warnings": []
+  },
+  "commits": [
+    {
+      "sha": "2dc820af21f81a715f5492492f0944610d9b2b64",
+      "subject": "test(e2e): prove 200% browser zoom workspace reachability"
+    }
+  ],
+  "diff": {
+    "additions": 53,
+    "changed_files": 1,
+    "commit_count": 1,
+    "deletions": 0
+  },
+  "error_code": null,
+  "evidence_manifest": {
+    "count": 0,
+    "items": [],
+    "version": 1
+  },
+  "evidence_publisher_release": "1.2.3-resume-candidate",
+  "fabric_capture": {
+    "applied": false,
+    "paths_before": 0,
+    "transient_untracked_removed": {
+      "count": 0,
+      "items": []
+    }
+  },
+  "fabric_release": "1.2.3-resume-candidate",
+  "failure_class": null,
+  "finished_at": "2026-09-20T19:52:02Z",
+  "git": {
+    "base_is_ancestor": true,
+    "base_sha": "26f3dfb077bea75013fef58975979f02041dc490",
+    "branch": "codex/stockledger-prod-c13-ui-perfection-zoom200-proof-v1",
+    "detached_verify": false,
+    "head_sha": "2dc820af21f81a715f5492492f0944610d9b2b64",
+    "remote_exact_head": true,
+    "remote_head_sha": "2dc820af21f81a715f5492492f0944610d9b2b64",
+    "target_branch": "main",
+    "target_drifted_since_acceptance": false,
+    "target_head_observed_after_execution": "26f3dfb077bea75013fef58975979f02041dc490",
+    "work_branch": "codex/stockledger-prod-c13-ui-perfection-zoom200-proof-v1",
+    "worktree_clean": true
+  },
+  "instructions": {
+    "files": [],
+    "total_bytes": 0,
+    "warning": null
+  },
+  "job_id": "CF-a20c6d64f73a0333d2833a17",
+  "kind": "codex-fabric-audit-evidence",
+  "locator": {
+    "branch": "codex-fabric/evidence/stockledger/stockledger-prod-c13-ui-perfection-zoom200-proof-v1",
+    "path": ".codex-fabric/audit.json",
+    "ref": "refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c13-ui-perfection-zoom200-proof-v1"
+  },
+  "operation": "BUILD",
+  "policy": {
+    "environment_policy_sha256": "e077daca74297b3c30bee8989f00f8ca5338f7610b4d016a6c48db524205d064",
+    "fabric_release": "1.2.3-resume-candidate",
+    "policy_sha256": "a642c9f63bab2cb555704bdb0b9d1f28222591f133f934c1d0f93cc5a25ab8a1",
+    "registry_sha256": "cfc765f3211c37c7967a138f3b2d89a99341939b15b2623f92744d007f625d6f"
+  },
+  "project_id": "stockledger",
+  "recovery": {
+    "model_rerun_safe": false,
+    "recovery_required": false,
+    "retry_safe": false,
+    "retry_scope": null,
+    "worktree_retained": true
+  },
+  "request": "stockledger-prod-c13-ui-perfection-zoom200-proof-v1",
+  "schema_version": 1,
+  "started_at": "2026-09-20T19:28:14Z",
+  "status": "EXECUTED_CHANGE",
+  "timing": {
+    "execution_seconds": 1428,
+    "queue_seconds": 0,
+    "total_seconds": 1428
+  },
+  "transport": {
+    "bytes": 2856,
+    "envelope": "FABRIC/2",
+    "prompt_bytes": 2495,
+    "prompt_sha256": "b0afd51508bd4fe8c66bc20fccf9841d613a857b8f7d2a40779a3da4b5378ae0",
+    "sha256": "a20c6d64f73a0333d2833a17362ca5fe90ed34fc0026e9dd5ca7dda9148b706c"
+  }
+}
