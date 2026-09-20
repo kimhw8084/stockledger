@@ -1,0 +1,89 @@
+{
+  "checks": [
+    {
+      "command": "npm ci",
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "npm test -- --run",
+      "exitCode": 0,
+      "files": 22,
+      "status": "passed",
+      "tests": 187
+    },
+    {
+      "command": "npm run test:e2e",
+      "exitCode": 0,
+      "status": "passed",
+      "tests": 18
+    },
+    {
+      "command": "npm run check:boundaries",
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "npm run check:release-workflow",
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "STOCKLEDGER_PROTECTED_BASE=26f3dfb077bea75013fef58975979f02041dc490 npm run check:release-base",
+      "exactBase": true,
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "npm run export:all",
+      "exitCode": 0,
+      "status": "passed"
+    },
+    {
+      "command": "npm audit --audit-level=high",
+      "exitCode": 0,
+      "status": "passed",
+      "vulnerabilities": 0
+    },
+    {
+      "command": "npm run check:frozen",
+      "exitCode": 0,
+      "releaseBlocked": true,
+      "status": "passed-with-declared-domain-limitations"
+    },
+    {
+      "command": "fresh Golden UI v2 capture runner",
+      "exitCode": 0,
+      "status": "passed-with-recorded-anomalies"
+    }
+  ],
+  "domainLimitations": [
+    "research_numeric_golden_outputs_not_included_in_repository",
+    "current_constituents_survivorship_biased",
+    "point_in_time_membership_unavailable",
+    "forward_proof_required"
+  ],
+  "fabricJobId": "CF-2eedc22e441bf50f8b74f4a0",
+  "node": {
+    "observed": "v22.23.2",
+    "required": ">=22.23.2"
+  },
+  "operation": "VERIFY",
+  "product_source_changed": false,
+  "project": "stockledger",
+  "request": "prod-c13-ui-perfection-postfix-verify-v1",
+  "schema": "project-os-golden-ui-v2-qualification-v1",
+  "source": {
+    "branch": "codex/stockledger-prod-c13-ui-perfection-postfix-verify-v1",
+    "productCommitExpected": false,
+    "productSourceChanged": false,
+    "protectedBase": "26f3dfb077bea75013fef58975979f02041dc490",
+    "sha": "26f3dfb077bea75013fef58975979f02041dc490",
+    "tree": "7a6ee3872b6967631fa539f4455904d00b56e4ef"
+  }
+}

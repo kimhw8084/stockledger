@@ -1,0 +1,306 @@
+{
+  "decisiveFiles": [
+    "surface-manifest.json",
+    "capture-report.json",
+    "reader-index.json",
+    "review-desktop.pdf",
+    "review-mobile.pdf",
+    "artifact-bundle.zip"
+  ],
+  "diagnostics": [
+    "diagnostics/runtime-diagnostics.json",
+    "diagnostics/task-traces.json",
+    "diagnostics/qualification-summary.json"
+  ],
+  "fabric": {
+    "artifactRef": "refs/heads/project-os-artifacts/stockledger/prod-c13-ui-perfection-postfix-verify-v1",
+    "jobId": "CF-2eedc22e441bf50f8b74f4a0",
+    "request": "prod-c13-ui-perfection-postfix-verify-v1"
+  },
+  "historicalEvidence": {
+    "reused": false,
+    "run": "AR-31",
+    "status": "rejected-pre-fix"
+  },
+  "immutable": true,
+  "operation": "VERIFY",
+  "pages": [
+    {
+      "height": 900,
+      "path": "screenshots/today--desktop-1440x900.png",
+      "profile": "desktop-1440x900",
+      "sha256": "de3241198aeb93c7a91fbd8fd6646cc220a308d1195b090804abe2375ea071f4",
+      "surfaceKey": "today",
+      "width": 1440
+    },
+    {
+      "height": 900,
+      "path": "screenshots/watchlist--desktop-1440x900.png",
+      "profile": "desktop-1440x900",
+      "sha256": "a152308a11ba2e24680fffad82a20d67f3766208e9a7d9884a01dc3bf6bd1d5b",
+      "surfaceKey": "watchlist",
+      "width": 1440
+    },
+    {
+      "height": 900,
+      "path": "screenshots/recipes-logic-lab--desktop-1440x900.png",
+      "profile": "desktop-1440x900",
+      "sha256": "7a2eb376402873ae6e0ff77cf993256be90ae32e09ec09b8e5261b28a39ccd43",
+      "surfaceKey": "recipes-logic-lab",
+      "width": 1440
+    },
+    {
+      "height": 900,
+      "path": "screenshots/journal--desktop-1440x900.png",
+      "profile": "desktop-1440x900",
+      "sha256": "ccea2bf9aa82fba3bf396566980683017f6fc43e23d529c3ee2d0d4a95637468",
+      "surfaceKey": "journal",
+      "width": 1440
+    },
+    {
+      "height": 900,
+      "path": "screenshots/alerts--desktop-1440x900.png",
+      "profile": "desktop-1440x900",
+      "sha256": "31101183f27c1b072d3d1b29a59d029b1ac8cac8bfcad44ba9dc82ffe290c234",
+      "surfaceKey": "alerts",
+      "width": 1440
+    },
+    {
+      "height": 900,
+      "path": "screenshots/settings--desktop-1440x900.png",
+      "profile": "desktop-1440x900",
+      "sha256": "de0a8a620d49b9836d5fc4a796fb9d807cd8440acd8d22bbd2a75284bffea4db",
+      "surfaceKey": "settings",
+      "width": 1440
+    },
+    {
+      "height": 900,
+      "path": "screenshots/stock-entity-detail--desktop-1440x900.png",
+      "profile": "desktop-1440x900",
+      "sha256": "12798cb109517d331a1de0e1ec208f53d792de4aed43ae3eb2a8ac5d45456dd7",
+      "surfaceKey": "stock-entity-detail",
+      "width": 1440
+    },
+    {
+      "height": 900,
+      "path": "screenshots/recipe-builder--desktop-1440x900.png",
+      "profile": "desktop-1440x900",
+      "sha256": "32fe53b6a13c696b760789e183b7f825489b0e2a566aa53dc10bee5613ea7453",
+      "surfaceKey": "recipe-builder",
+      "width": 1440
+    },
+    {
+      "height": 900,
+      "path": "screenshots/logic-registry--desktop-1440x900.png",
+      "profile": "desktop-1440x900",
+      "sha256": "98aee0f4ec1034094c2c9cee55448131aaf17d8b788db719c3c4c46e4b3273eb",
+      "surfaceKey": "logic-registry",
+      "width": 1440
+    },
+    {
+      "height": 900,
+      "path": "screenshots/eye-flows--desktop-1440x900.png",
+      "profile": "desktop-1440x900",
+      "sha256": "de57dc5f49976c36e20cac32697a4dfae8af250086af78fb832fdb218034a178",
+      "surfaceKey": "eye-flows",
+      "width": 1440
+    },
+    {
+      "height": 900,
+      "path": "screenshots/eye-detail--desktop-1440x900.png",
+      "profile": "desktop-1440x900",
+      "sha256": "0ee858957bc32515a55086711436d7d5103406641e221d6ae3f398078145f1d5",
+      "surfaceKey": "eye-detail",
+      "width": 1440
+    },
+    {
+      "height": 900,
+      "path": "screenshots/eye-composer--desktop-1440x900.png",
+      "profile": "desktop-1440x900",
+      "sha256": "464298cb83a8349065bf04d24674879c007813fc8d138a1f8cda4ba2434120d7",
+      "surfaceKey": "eye-composer",
+      "width": 1440
+    },
+    {
+      "height": 900,
+      "path": "screenshots/metric-detail-sheet--desktop-1440x900.png",
+      "profile": "desktop-1440x900",
+      "sha256": "93d9fe917222eca3b306317beb5ac8e54fc06295a47d694c59b9fea10a47a5b0",
+      "surfaceKey": "metric-detail-sheet",
+      "width": 1440
+    },
+    {
+      "height": 900,
+      "path": "screenshots/journal-composer--desktop-1440x900.png",
+      "profile": "desktop-1440x900",
+      "sha256": "7d2c710ce42eaedfee950f45aecad6941c5bf4061f8ada35b0613eca99a1030d",
+      "surfaceKey": "journal-composer",
+      "width": 1440
+    },
+    {
+      "height": 900,
+      "path": "screenshots/decision-detail--desktop-1440x900.png",
+      "profile": "desktop-1440x900",
+      "sha256": "ad7849186e956736ed6bc2701952a2b3a7d8650b9617016d37fcc2ab8e3e2447",
+      "surfaceKey": "decision-detail",
+      "width": 1440
+    },
+    {
+      "height": 900,
+      "path": "screenshots/notification-confirmation--desktop-1440x900.png",
+      "profile": "desktop-1440x900",
+      "sha256": "76c150bf07ff849600d165e159cf2354be637035e1bb263db330a27f8f0ce224",
+      "surfaceKey": "notification-confirmation",
+      "width": 1440
+    },
+    {
+      "height": 844,
+      "path": "screenshots/today--mobile-390x844.png",
+      "profile": "mobile-390x844",
+      "sha256": "56236f0f2853c6788218f897520d9b87ae137e3bf0aa42b75bf77f7afe4820c9",
+      "surfaceKey": "today",
+      "width": 390
+    },
+    {
+      "height": 844,
+      "path": "screenshots/watchlist--mobile-390x844.png",
+      "profile": "mobile-390x844",
+      "sha256": "d8b9f6393e8e97c116f0e1401aaea0d1c8e2c2f087b468040df760b94a5a469e",
+      "surfaceKey": "watchlist",
+      "width": 390
+    },
+    {
+      "height": 844,
+      "path": "screenshots/recipes-logic-lab--mobile-390x844.png",
+      "profile": "mobile-390x844",
+      "sha256": "6e0444dd100dc0837683bcd8054379744d796d108e2ec4280cf9f31800a57fd1",
+      "surfaceKey": "recipes-logic-lab",
+      "width": 390
+    },
+    {
+      "height": 844,
+      "path": "screenshots/journal--mobile-390x844.png",
+      "profile": "mobile-390x844",
+      "sha256": "d08d7e1b3859033eccf12ea9644c3594a2fc4fd7f77cd726aa120769a96c71ce",
+      "surfaceKey": "journal",
+      "width": 390
+    },
+    {
+      "height": 844,
+      "path": "screenshots/alerts--mobile-390x844.png",
+      "profile": "mobile-390x844",
+      "sha256": "b0fb2c9cf5d9bfe16e9ddc4437befca3c4fb227c5920f3f396fea93b2fd11b39",
+      "surfaceKey": "alerts",
+      "width": 390
+    },
+    {
+      "height": 844,
+      "path": "screenshots/settings--mobile-390x844.png",
+      "profile": "mobile-390x844",
+      "sha256": "a04bb6130bd01d12e18bfc71a76df1ca01a57caa2b5f856625bd65b9b3095396",
+      "surfaceKey": "settings",
+      "width": 390
+    },
+    {
+      "height": 844,
+      "path": "screenshots/stock-entity-detail--mobile-390x844.png",
+      "profile": "mobile-390x844",
+      "sha256": "aa9e3afc95ffe9d47907b988a224806428ea97ac6b84c0d5a3a230c3e77fb5cd",
+      "surfaceKey": "stock-entity-detail",
+      "width": 390
+    },
+    {
+      "height": 844,
+      "path": "screenshots/recipe-builder--mobile-390x844.png",
+      "profile": "mobile-390x844",
+      "sha256": "14700808bfe3f5d342a3f9e53a204596aba47cd09aaa656fd15b6da305ffa465",
+      "surfaceKey": "recipe-builder",
+      "width": 390
+    },
+    {
+      "height": 844,
+      "path": "screenshots/logic-registry--mobile-390x844.png",
+      "profile": "mobile-390x844",
+      "sha256": "3c6e32f485883daac063c0021750fba6ae6fbca051e7dd4961c9cabffa3b7903",
+      "surfaceKey": "logic-registry",
+      "width": 390
+    },
+    {
+      "height": 844,
+      "path": "screenshots/eye-flows--mobile-390x844.png",
+      "profile": "mobile-390x844",
+      "sha256": "545314edbc0290146be7fbeb3129ec981a70a3a0b32525e5caf06d070c19ff71",
+      "surfaceKey": "eye-flows",
+      "width": 390
+    },
+    {
+      "height": 844,
+      "path": "screenshots/eye-detail--mobile-390x844.png",
+      "profile": "mobile-390x844",
+      "sha256": "c1438b79215400e11ad5790a30b53ae44384443451d6d4388f99fc8ef3c40042",
+      "surfaceKey": "eye-detail",
+      "width": 390
+    },
+    {
+      "height": 844,
+      "path": "screenshots/eye-composer--mobile-390x844.png",
+      "profile": "mobile-390x844",
+      "sha256": "1d2f82c4259d2b6230ea90927446728793d92a7a3c4613a0a42c8007dfd4a79d",
+      "surfaceKey": "eye-composer",
+      "width": 390
+    },
+    {
+      "height": 844,
+      "path": "screenshots/metric-detail-sheet--mobile-390x844.png",
+      "profile": "mobile-390x844",
+      "sha256": "9080aad7ac4918c00dd03f1a6775563c4d38e47fe2f238e527d6194730a74a3d",
+      "surfaceKey": "metric-detail-sheet",
+      "width": 390
+    },
+    {
+      "height": 844,
+      "path": "screenshots/journal-composer--mobile-390x844.png",
+      "profile": "mobile-390x844",
+      "sha256": "bae7cf9ef956a803ead2b2bed74250d1ec7ee00a61c62e12ad2ae4d090c9b881",
+      "surfaceKey": "journal-composer",
+      "width": 390
+    },
+    {
+      "height": 844,
+      "path": "screenshots/decision-detail--mobile-390x844.png",
+      "profile": "mobile-390x844",
+      "sha256": "b42768ef9e83481c4ca6064eac9cf44b0ebf7d448875512a04f28927dcff032a",
+      "surfaceKey": "decision-detail",
+      "width": 390
+    },
+    {
+      "height": 844,
+      "path": "screenshots/notification-confirmation--mobile-390x844.png",
+      "profile": "mobile-390x844",
+      "sha256": "ed73ce776a6b1b064e5cc298d590062c4437215daf6c6e4ff34ecef11ece70ce",
+      "surfaceKey": "notification-confirmation",
+      "width": 390
+    }
+  ],
+  "project": "stockledger",
+  "readers": [
+    "surface-manifest.json",
+    "capture-report.json",
+    "diagnostics/runtime-diagnostics.json",
+    "diagnostics/task-traces.json",
+    "diagnostics/qualification-summary.json",
+    "review-desktop.pdf",
+    "review-mobile.pdf",
+    "screenshots/"
+  ],
+  "request": "prod-c13-ui-perfection-postfix-verify-v1",
+  "schema": "project-os-visual-atlas-reader-index-v3",
+  "source": {
+    "branch": "codex/stockledger-prod-c13-ui-perfection-postfix-verify-v1",
+    "productCommitExpected": false,
+    "productSourceChanged": false,
+    "protectedBase": "26f3dfb077bea75013fef58975979f02041dc490",
+    "sha": "26f3dfb077bea75013fef58975979f02041dc490",
+    "tree": "7a6ee3872b6967631fa539f4455904d00b56e4ef"
+  }
+}
