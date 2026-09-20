@@ -1,0 +1,845 @@
+{
+  "schema": "stockledger-r7-task-traces-v1",
+  "request": "prod-c13-ui-perfection-postfix-evidence-repair-v1",
+  "fabricJobId": "CF-e77c01b1337781471842a4f1",
+  "source": {
+    "sha": "26f3dfb077bea75013fef58975979f02041dc490",
+    "tree": "7a6ee3872b6967631fa539f4455904d00b56e4ef",
+    "branch": "codex/stockledger-prod-c13-ui-perfection-postfix-evidence-repair-v1",
+    "productSourceChanged": false
+  },
+  "r6Reference": {
+    "schema": "project-os-golden-ui-v2-task-traces-v1",
+    "request": "prod-c13-ui-perfection-postfix-verify-v1",
+    "fabricJobId": "CF-2eedc22e441bf50f8b74f4a0",
+    "traces": [
+      {
+        "task": "journal-composer",
+        "precondition": "sample Journal surface rendered",
+        "action": [
+          "focus exact New",
+          "open composer",
+          "Escape",
+          "reopen",
+          "visible Done"
+        ],
+        "visibleSemanticResult": {
+          "opened": true,
+          "dialogClosedAfterEscape": true,
+          "dialogClosedAfterDone": true
+        },
+        "focus": {
+          "initialPanelFocus": {
+            "tag": "BUTTON",
+            "name": "Done",
+            "body": false
+          },
+          "escapeReturn": {
+            "tag": "BUTTON",
+            "name": "New",
+            "body": false
+          },
+          "doneReturn": {
+            "tag": "BUTTON",
+            "name": "New",
+            "body": false
+          },
+          "bodyFocus": false
+        },
+        "persistedEffect": "no decision saved",
+        "prohibitedEffects": "no BODY focus; no accidental decision",
+        "recovery": "New remains reachable and reopens composer",
+        "nextLegitimateAction": "fill required fields before Save Decision",
+        "result": "observed",
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "httpErrors": []
+        }
+      },
+      {
+        "task": "shared-window-panel",
+        "precondition": "Today summary help invoker visible",
+        "action": [
+          "pointer activate help",
+          "Escape",
+          "pointer activate help",
+          "Done"
+        ],
+        "visibleSemanticResult": {
+          "entry": {
+            "tag": "BUTTON",
+            "name": "Done",
+            "body": false
+          },
+          "escapeClosed": true,
+          "doneClosed": true
+        },
+        "focus": {
+          "escapeReturn": {
+            "tag": "BUTTON",
+            "name": "Summary help",
+            "body": false
+          },
+          "doneReturn": {
+            "tag": "BUTTON",
+            "name": "Summary help",
+            "body": false
+          }
+        },
+        "persistedEffect": "no domain mutation",
+        "prohibitedEffects": "no BODY focus",
+        "recovery": "Today surface remains active",
+        "nextLegitimateAction": "continue with surface navigation",
+        "result": "observed"
+      },
+      {
+        "task": "explicit-pointer-precedence",
+        "precondition": "control B=Today tab focused while invoker A=Summary help is pointer activated",
+        "action": "focus B then pointer click A; close Escape",
+        "visibleSemanticResult": {
+          "panelOpened": true,
+          "panelClosed": true
+        },
+        "focus": {
+          "before": {
+            "controlB": "Today"
+          },
+          "after": {
+            "tag": "BUTTON",
+            "name": "Summary help",
+            "body": false
+          },
+          "expected": "Summary help"
+        },
+        "persistedEffect": "none",
+        "prohibitedEffects": "return to stale B or BODY",
+        "recovery": "Summary help remains actionable",
+        "nextLegitimateAction": "continue navigation",
+        "result": "observed"
+      },
+      {
+        "task": "removed-invoker-fallback",
+        "precondition": "panel open with owned invoker A; controlled harness unmounts A",
+        "action": "click Done after invoker removal",
+        "visibleSemanticResult": {
+          "closed": true
+        },
+        "focus": {
+          "fallback": {
+            "tag": "DIV",
+            "name": "Today",
+            "body": false
+          },
+          "expected": "Today"
+        },
+        "persistedEffect": "none",
+        "prohibitedEffects": "BODY focus or removed-node focus",
+        "recovery": "logical Today fallback receives focus",
+        "nextLegitimateAction": "continue navigation",
+        "result": "observed"
+      },
+      {
+        "task": "notification-opt-out-negative",
+        "precondition": "enabled notification preferences saved through supported Settings UI",
+        "action": [
+          "open opt-out confirmation",
+          "Cancel",
+          "reopen",
+          "Escape"
+        ],
+        "visibleSemanticResult": {
+          "title": "Turn off notification delivery?",
+          "cancel": 1,
+          "confirm": 1,
+          "body": "Turn off notification delivery?\nClose\nThis withdraws your consent, stops future notification delivery, and clears allowed channels. Your saved destination and other notification settings stay unchanged.\nCANCEL\nTURN OFF NOTIFICATIONS"
+        },
+        "focus": {
+          "cancel": {
+            "tag": "BODY",
+            "name": "You need to enable JavaScript to run this app.\n    \n    \n    Settings0 healthy providers!9H7SSample data is present. Moc",
+            "body": true
+          },
+          "escape": {
+            "tag": "BODY",
+            "name": "You need to enable JavaScript to run this app.\n    \n    \n    Settings0 healthy providers!9H7SSample data is present. Moc",
+            "body": true
+          }
+        },
+        "persistedEffect": {
+          "unchangedAfterCancel": true,
+          "unchangedAfterEscape": true,
+          "before": {
+            "contractVersion": "stockledger-notification-preferences-v1",
+            "revision": 1,
+            "explicitConsent": true,
+            "enabled": true,
+            "allowedChannels": [
+              "email"
+            ],
+            "destinations": {
+              "email": {
+                "address": "local@example.test"
+              }
+            },
+            "timezone": "UTC",
+            "quietHours": {
+              "enabled": false,
+              "start": "22:00",
+              "end": "07:00"
+            },
+            "deliveryMode": "immediate",
+            "digestTime": "09:00",
+            "minimumPriority": "Low",
+            "privacyMode": "minimal",
+            "accountScope": "device-local",
+            "updatedAt": "2026-09-20T04:15:40.890Z"
+          }
+        },
+        "prohibitedEffects": "no Off state, no preference mutation, no duplicate cancellation",
+        "recovery": "Disable control remains available and focused",
+        "nextLegitimateAction": "explicitly confirm only after reviewing semantic confirmation",
+        "result": "anomaly"
+      },
+      {
+        "task": "notification-korean-confirmation",
+        "precondition": "enabled notification preferences and Korean Settings",
+        "action": "open confirmation; inspect localized controls; Cancel",
+        "visibleSemanticResult": {
+          "title": "알림 전달을 끌까요?",
+          "cancel": 1,
+          "confirm": 1
+        },
+        "focus": {
+          "tag": "BODY",
+          "name": "You need to enable JavaScript to run this app.\n    \n    \n    설정정상 제공자 0개!9H7S샘플 데이터가 있습니다. 더미 가격과 결과는 앱을 둘러보기 위한 것입니다.내 ",
+          "body": true
+        },
+        "persistedEffect": "unchanged after Cancel",
+        "prohibitedEffects": "no mutation; no English-only fallback",
+        "recovery": "Korean opt-out remains actionable",
+        "nextLegitimateAction": "switch English for positive confirmation",
+        "result": "observed"
+      },
+      {
+        "task": "notification-opt-out-positive",
+        "precondition": "enabled preferences restored after negative paths",
+        "action": "open confirmation; explicit confirm once",
+        "visibleSemanticResult": {
+          "confirmationClosed": true,
+          "offVisible": true
+        },
+        "focus": {
+          "afterConfirm": {
+            "tag": "BODY",
+            "name": "You need to enable JavaScript to run this app.\n    \n    \n    Settings0 healthy providers!9H7SSample data is present. Moc",
+            "body": true
+          },
+          "expected": "Enable email delivery"
+        },
+        "persistedEffect": {
+          "explicitConsent": false,
+          "enabled": false,
+          "allowedChannels": [],
+          "destinationEmail": "local@example.test",
+          "exactExpected": true
+        },
+        "prohibitedEffects": "unrelated destination/settings preserved; no duplicate destructive mutation",
+        "recovery": "Enable control receives focus and can be used for next legitimate action",
+        "nextLegitimateAction": "explicitly re-enable through supported UI",
+        "result": "anomaly"
+      }
+    ]
+  },
+  "r7NotificationFocus": [
+    {
+      "profile": {
+        "name": "desktop-1440x900",
+        "width": 1440,
+        "height": 900,
+        "isMobile": false,
+        "hasTouch": false
+      },
+      "actions": [
+        {
+          "action": "Cancel",
+          "dialogAbsentBeforeSettledPoll": true,
+          "transientFocus": {
+            "tag": "BODY",
+            "role": null,
+            "name": "You need to enable JavaScript to run this app. Settings0 healthy providers!9H7SSample data is present. Mock prices and outcomes are for exploring the app.Your w",
+            "body": true
+          },
+          "settledFocus": {
+            "tag": "BUTTON",
+            "role": "button",
+            "name": "Opt out and cancel future delivery",
+            "body": false
+          },
+          "stateUnchanged": true,
+          "expectedSettledTarget": "Opt out and cancel future delivery"
+        },
+        {
+          "action": "Escape",
+          "dialogAbsentBeforeSettledPoll": true,
+          "transientFocus": {
+            "tag": "BODY",
+            "role": null,
+            "name": "You need to enable JavaScript to run this app. Settings0 healthy providers!9H7SSample data is present. Mock prices and outcomes are for exploring the app.Your w",
+            "body": true
+          },
+          "settledFocus": {
+            "tag": "BUTTON",
+            "role": "button",
+            "name": "Opt out and cancel future delivery",
+            "body": false
+          },
+          "stateUnchanged": true,
+          "expectedSettledTarget": "Opt out and cancel future delivery"
+        },
+        {
+          "action": "Confirm",
+          "dialogAbsentBeforeSettledPoll": true,
+          "transientFocus": {
+            "tag": "BODY",
+            "role": null,
+            "name": "You need to enable JavaScript to run this app. Settings0 healthy providers!9H7SSample data is present. Mock prices and outcomes are for exploring the app.Your w",
+            "body": true
+          },
+          "settledFocus": {
+            "tag": "BUTTON",
+            "role": "button",
+            "name": "Enable email delivery",
+            "body": false
+          },
+          "expectedSettledTarget": "Enable email delivery",
+          "mutationActionCount": 1,
+          "exactMutation": true,
+          "destinationPreserved": true,
+          "unrelatedSettingsPreserved": true
+        }
+      ],
+      "baselinePreferences": {
+        "contractVersion": "stockledger-notification-preferences-v1",
+        "revision": 1,
+        "explicitConsent": true,
+        "enabled": true,
+        "allowedChannels": [
+          "email"
+        ],
+        "destinations": {
+          "email": {
+            "address": "local@example.test"
+          }
+        },
+        "timezone": "UTC",
+        "quietHours": {
+          "enabled": false,
+          "start": "22:00",
+          "end": "07:00"
+        },
+        "deliveryMode": "immediate",
+        "digestTime": "09:00",
+        "minimumPriority": "Low",
+        "privacyMode": "minimal",
+        "accountScope": "device-local",
+        "updatedAt": "2026-09-20T15:00:59.410Z"
+      },
+      "korean": {
+        "title": "알림 전달을 끌까요?",
+        "controls": [
+          "취소",
+          "알림 끄기"
+        ],
+        "transientFocus": {
+          "tag": "BODY",
+          "role": null,
+          "name": "You need to enable JavaScript to run this app. 설정정상 제공자 0개!9H7S샘플 데이터가 있습니다. 더미 가격과 결과는 앱을 둘러보기 위한 것입니다.내 워크스페이스이 기기에 저장됩니다. 투자 메모를 안전하게 보관하려면 정기적으로 백업하세요.전체 백업",
+          "body": true
+        },
+        "settledFocus": {
+          "tag": "BUTTON",
+          "role": "button",
+          "name": "옵트아웃하고 이후 전달 취소",
+          "body": false
+        },
+        "expectedSettledTarget": "옵트아웃하고 이후 전달 취소"
+      },
+      "errors": {
+        "console": [],
+        "pageErrors": [],
+        "requestFailures": [],
+        "httpErrors": []
+      }
+    },
+    {
+      "profile": {
+        "name": "mobile-390x844",
+        "width": 390,
+        "height": 844,
+        "isMobile": true,
+        "hasTouch": true
+      },
+      "actions": [
+        {
+          "action": "Cancel",
+          "dialogAbsentBeforeSettledPoll": true,
+          "transientFocus": {
+            "tag": "BODY",
+            "role": null,
+            "name": "You need to enable JavaScript to run this app. Settings0 healthy providers!9H7SSample data is present. Mock prices and outcomes are for exploring the app.Your w",
+            "body": true
+          },
+          "settledFocus": {
+            "tag": "BUTTON",
+            "role": "button",
+            "name": "Opt out and cancel future delivery",
+            "body": false
+          },
+          "stateUnchanged": true,
+          "expectedSettledTarget": "Opt out and cancel future delivery"
+        },
+        {
+          "action": "Escape",
+          "dialogAbsentBeforeSettledPoll": true,
+          "transientFocus": {
+            "tag": "BODY",
+            "role": null,
+            "name": "You need to enable JavaScript to run this app. Settings0 healthy providers!9H7SSample data is present. Mock prices and outcomes are for exploring the app.Your w",
+            "body": true
+          },
+          "settledFocus": {
+            "tag": "BUTTON",
+            "role": "button",
+            "name": "Opt out and cancel future delivery",
+            "body": false
+          },
+          "stateUnchanged": true,
+          "expectedSettledTarget": "Opt out and cancel future delivery"
+        },
+        {
+          "action": "Confirm",
+          "dialogAbsentBeforeSettledPoll": true,
+          "transientFocus": {
+            "tag": "BODY",
+            "role": null,
+            "name": "You need to enable JavaScript to run this app. Saving…Settings0 healthy providers!9H7SSample data is present. Mock prices and outcomes are for exploring the app",
+            "body": true
+          },
+          "settledFocus": {
+            "tag": "BUTTON",
+            "role": "button",
+            "name": "Enable email delivery",
+            "body": false
+          },
+          "expectedSettledTarget": "Enable email delivery",
+          "mutationActionCount": 1,
+          "exactMutation": true,
+          "destinationPreserved": true,
+          "unrelatedSettingsPreserved": true
+        }
+      ],
+      "baselinePreferences": {
+        "contractVersion": "stockledger-notification-preferences-v1",
+        "revision": 1,
+        "explicitConsent": true,
+        "enabled": true,
+        "allowedChannels": [
+          "email"
+        ],
+        "destinations": {
+          "email": {
+            "address": "local@example.test"
+          }
+        },
+        "timezone": "UTC",
+        "quietHours": {
+          "enabled": false,
+          "start": "22:00",
+          "end": "07:00"
+        },
+        "deliveryMode": "immediate",
+        "digestTime": "09:00",
+        "minimumPriority": "Low",
+        "privacyMode": "minimal",
+        "accountScope": "device-local",
+        "updatedAt": "2026-09-20T15:01:03.783Z"
+      },
+      "korean": {
+        "title": "알림 전달을 끌까요?",
+        "controls": [
+          "취소",
+          "알림 끄기"
+        ],
+        "transientFocus": {
+          "tag": "BODY",
+          "role": null,
+          "name": "You need to enable JavaScript to run this app. 설정정상 제공자 0개!9H7S샘플 데이터가 있습니다. 더미 가격과 결과는 앱을 둘러보기 위한 것입니다.내 워크스페이스이 기기에 저장됩니다. 투자 메모를 안전하게 보관하려면 정기적으로 백업하세요.전체 백업",
+          "body": true
+        },
+        "settledFocus": {
+          "tag": "BUTTON",
+          "role": "button",
+          "name": "옵트아웃하고 이후 전달 취소",
+          "body": false
+        },
+        "expectedSettledTarget": "옵트아웃하고 이후 전달 취소"
+      },
+      "errors": {
+        "console": [],
+        "pageErrors": [],
+        "requestFailures": [],
+        "httpErrors": []
+      }
+    }
+  ],
+  "r7ScannerReview": [
+    {
+      "profile": {
+        "name": "desktop-1440x900",
+        "width": 1440,
+        "height": 900,
+        "isMobile": false,
+        "hasTouch": false
+      },
+      "fixture": {
+        "provenance": "synthetic deterministic test fixture imported through the supported Product backup restore workflow; not personal, live-market, or user data",
+        "fixtureSha256": "40f6e72b73b6f94bd2aa0a82513d8e21755a88e239c16f2972ddeeb9a2603f94",
+        "scannerSettings": {
+          "universeMode": "frozen_research_universe",
+          "fallbackToFrozenUniverse": false,
+          "providerDelayMinutesAfterClose": 45,
+          "notifyNearMatches": true,
+          "frozenUniverseBySector": {
+            "XLY": [
+              "SYNTHX"
+            ],
+            "XLI": [
+              "SYNTHX"
+            ],
+            "XLK": [
+              "SYNTHX"
+            ]
+          }
+        }
+      },
+      "scanOutcome": true,
+      "invokerCount": 1,
+      "supported": true,
+      "errors": {
+        "console": [
+          {
+            "type": "error",
+            "text": "Access to fetch at 'https://stooq.com/q/d/l/?s=xli.us&i=d&d1=20240101&d2=20260918' from origin 'http://127.0.0.1:43187' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource."
+          },
+          {
+            "type": "error",
+            "text": "Failed to load resource: net::ERR_FAILED"
+          },
+          {
+            "type": "error",
+            "text": "Access to fetch at 'https://stooq.com/q/d/l/?s=spy.us&i=d&d1=20240101&d2=20260918' from origin 'http://127.0.0.1:43187' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource."
+          },
+          {
+            "type": "error",
+            "text": "Failed to load resource: net::ERR_FAILED"
+          },
+          {
+            "type": "error",
+            "text": "Access to fetch at 'https://stooq.com/q/d/l/?s=xly.us&i=d&d1=20240101&d2=20260918' from origin 'http://127.0.0.1:43187' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource."
+          },
+          {
+            "type": "error",
+            "text": "Failed to load resource: net::ERR_FAILED"
+          },
+          {
+            "type": "error",
+            "text": "Access to fetch at 'https://stooq.com/q/d/l/?s=synthx.us&i=d&d1=20240101&d2=20260918' from origin 'http://127.0.0.1:43187' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource."
+          },
+          {
+            "type": "error",
+            "text": "Failed to load resource: net::ERR_FAILED"
+          },
+          {
+            "type": "error",
+            "text": "Access to fetch at 'https://stooq.com/q/d/l/?s=xlk.us&i=d&d1=20240101&d2=20260918' from origin 'http://127.0.0.1:43187' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource."
+          },
+          {
+            "type": "error",
+            "text": "Failed to load resource: net::ERR_FAILED"
+          }
+        ],
+        "pageErrors": [],
+        "requestFailures": [
+          {
+            "url": "https://stooq.com/q/d/l/?s=xli.us&i=d&d1=20240101&d2=20260918",
+            "method": "GET",
+            "failure": "net::ERR_FAILED"
+          },
+          {
+            "url": "https://stooq.com/q/d/l/?s=spy.us&i=d&d1=20240101&d2=20260918",
+            "method": "GET",
+            "failure": "net::ERR_FAILED"
+          },
+          {
+            "url": "https://stooq.com/q/d/l/?s=xly.us&i=d&d1=20240101&d2=20260918",
+            "method": "GET",
+            "failure": "net::ERR_FAILED"
+          },
+          {
+            "url": "https://stooq.com/q/d/l/?s=synthx.us&i=d&d1=20240101&d2=20260918",
+            "method": "GET",
+            "failure": "net::ERR_FAILED"
+          },
+          {
+            "url": "https://stooq.com/q/d/l/?s=xlk.us&i=d&d1=20240101&d2=20260918",
+            "method": "GET",
+            "failure": "net::ERR_FAILED"
+          }
+        ],
+        "httpErrors": []
+      },
+      "semantic": {
+        "title": "Signal Review Log",
+        "body": "Signal Review Log\nSYNTHX · DeepDiscount_dd_tn03-wind126_NO_VOL_REJECT-RS_IMP-RS_SPY_POS_SectorXLY_V1\nDone\nScan blocked because data is incomplete or invalid.\nREVIEW DECISION\nWATCH\nIGNORE\nBOUGHT\nSKIPPED\nSOLD\nOTHER\nMANUAL REASON\nNOTES\nCONVICTION (OPTIONAL)\nENTRY PRICE (OPTIONAL)\nEXIT PRICE (OPTIONAL)\nRESULT NOTES\nSAVE LOG",
+        "ariaSnapshot": "- dialog \"Signal Review Log\":\n  - heading \"Signal Review Log\" [level=1]\n  - text: SYNTHX · DeepDiscount_dd_tn03-wind126_NO_VOL_REJECT-RS_IMP-RS_SPY_POS_SectorXLY_V1\n  - button \"Done\"\n  - text: Scan blocked because data is incomplete or invalid. Review decision\n  - button \"watch\" [pressed]\n  - button \"ignore\"\n  - button \"bought\"\n  - button \"skipped\"\n  - button \"sold\"\n  - button \"other\"\n  - text: Manual reason\n  - textbox \"Why are you logging this review?\"\n  - text: Notes\n  - textbox \"Additional review notes\"\n  - text: Conviction (optional)\n  - textbox \"0-100\"\n  - text: Entry price (optional)\n  - textbox \"0.00\"\n  - text: Exit price (optional)\n  - textbox \"0.00\"\n  - text: Result notes\n  - textbox \"Follow-up result note\"\n  - button \"Save Log\" [disabled]",
+        "geometry": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900,
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "clipped": false
+        },
+        "initialFocus": {
+          "tag": "BUTTON",
+          "role": "button",
+          "name": "Done",
+          "body": false
+        }
+      },
+      "close": {
+        "escape": {
+          "transient": {
+            "tag": "BODY",
+            "role": null,
+            "name": "You need to enable JavaScript to run this app. RecipesBuild formulas, rules, and sets in one flow!9H7SSample data is present. Mock prices and outcomes are for e",
+            "body": true
+          },
+          "settled": {
+            "tag": "BUTTON",
+            "role": "button",
+            "name": "Log Review",
+            "body": false
+          }
+        },
+        "visible": {
+          "transient": {
+            "tag": "BODY",
+            "role": null,
+            "name": "You need to enable JavaScript to run this app. RecipesBuild formulas, rules, and sets in one flow!9H7SSample data is present. Mock prices and outcomes are for e",
+            "body": true
+          },
+          "settled": {
+            "tag": "BUTTON",
+            "role": "button",
+            "name": "Log Review",
+            "body": false
+          }
+        },
+        "expectedSettledInvoker": "Log Review"
+      },
+      "screenshot": {
+        "path": "screenshots/scanner-review--desktop-1440x900.png",
+        "bytes": 66076,
+        "sha256": "d9c2b9fdf1d974513bc1565c5432e5b1d4cd95811154169dcb7f2457656e004d",
+        "width": 1440,
+        "height": 900,
+        "signature": "89504e470d0a1a0a"
+      }
+    },
+    {
+      "profile": {
+        "name": "mobile-390x844",
+        "width": 390,
+        "height": 844,
+        "isMobile": true,
+        "hasTouch": true
+      },
+      "fixture": {
+        "provenance": "synthetic deterministic test fixture imported through the supported Product backup restore workflow; not personal, live-market, or user data",
+        "fixtureSha256": "4fff95b319b755aaec99e97e5bb085b3def8e231a3556e3b5126e78458e201aa",
+        "scannerSettings": {
+          "universeMode": "frozen_research_universe",
+          "fallbackToFrozenUniverse": false,
+          "providerDelayMinutesAfterClose": 45,
+          "notifyNearMatches": true,
+          "frozenUniverseBySector": {
+            "XLY": [
+              "SYNTHX"
+            ],
+            "XLI": [
+              "SYNTHX"
+            ],
+            "XLK": [
+              "SYNTHX"
+            ]
+          }
+        }
+      },
+      "scanOutcome": true,
+      "invokerCount": 1,
+      "supported": true,
+      "errors": {
+        "console": [
+          {
+            "type": "error",
+            "text": "Access to fetch at 'https://stooq.com/q/d/l/?s=xli.us&i=d&d1=20240101&d2=20260918' from origin 'http://127.0.0.1:43187' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource."
+          },
+          {
+            "type": "error",
+            "text": "Failed to load resource: net::ERR_FAILED"
+          },
+          {
+            "type": "error",
+            "text": "Access to fetch at 'https://stooq.com/q/d/l/?s=xly.us&i=d&d1=20240101&d2=20260918' from origin 'http://127.0.0.1:43187' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource."
+          },
+          {
+            "type": "error",
+            "text": "Failed to load resource: net::ERR_FAILED"
+          },
+          {
+            "type": "error",
+            "text": "Access to fetch at 'https://stooq.com/q/d/l/?s=spy.us&i=d&d1=20240101&d2=20260918' from origin 'http://127.0.0.1:43187' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource."
+          },
+          {
+            "type": "error",
+            "text": "Failed to load resource: net::ERR_FAILED"
+          },
+          {
+            "type": "error",
+            "text": "Access to fetch at 'https://stooq.com/q/d/l/?s=xlk.us&i=d&d1=20240101&d2=20260918' from origin 'http://127.0.0.1:43187' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource."
+          },
+          {
+            "type": "error",
+            "text": "Failed to load resource: net::ERR_FAILED"
+          },
+          {
+            "type": "error",
+            "text": "Access to fetch at 'https://stooq.com/q/d/l/?s=synthx.us&i=d&d1=20240101&d2=20260918' from origin 'http://127.0.0.1:43187' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource."
+          },
+          {
+            "type": "error",
+            "text": "Failed to load resource: net::ERR_FAILED"
+          }
+        ],
+        "pageErrors": [],
+        "requestFailures": [
+          {
+            "url": "https://stooq.com/q/d/l/?s=xli.us&i=d&d1=20240101&d2=20260918",
+            "method": "GET",
+            "failure": "net::ERR_FAILED"
+          },
+          {
+            "url": "https://stooq.com/q/d/l/?s=xly.us&i=d&d1=20240101&d2=20260918",
+            "method": "GET",
+            "failure": "net::ERR_FAILED"
+          },
+          {
+            "url": "https://stooq.com/q/d/l/?s=spy.us&i=d&d1=20240101&d2=20260918",
+            "method": "GET",
+            "failure": "net::ERR_FAILED"
+          },
+          {
+            "url": "https://stooq.com/q/d/l/?s=xlk.us&i=d&d1=20240101&d2=20260918",
+            "method": "GET",
+            "failure": "net::ERR_FAILED"
+          },
+          {
+            "url": "https://stooq.com/q/d/l/?s=synthx.us&i=d&d1=20240101&d2=20260918",
+            "method": "GET",
+            "failure": "net::ERR_FAILED"
+          }
+        ],
+        "httpErrors": []
+      },
+      "semantic": {
+        "title": "Signal Review Log",
+        "body": "Signal Review Log\nSYNTHX · DeepDiscount_dd_tn03-wind126_NO_VOL_REJECT-RS_IMP-RS_SPY_POS_SectorXLY_V1\nDone\nScan blocked because data is incomplete or invalid.\nREVIEW DECISION\nWATCH\nIGNORE\nBOUGHT\nSKIPPED\nSOLD\nOTHER\nMANUAL REASON\nNOTES\nCONVICTION (OPTIONAL)\nENTRY PRICE (OPTIONAL)\nEXIT PRICE (OPTIONAL)\nRESULT NOTES\nSAVE LOG",
+        "ariaSnapshot": "- dialog \"Signal Review Log\":\n  - heading \"Signal Review Log\" [level=1]\n  - text: SYNTHX · DeepDiscount_dd_tn03-wind126_NO_VOL_REJECT-RS_IMP-RS_SPY_POS_SectorXLY_V1\n  - button \"Done\"\n  - text: Scan blocked because data is incomplete or invalid. Review decision\n  - button \"watch\" [pressed]\n  - button \"ignore\"\n  - button \"bought\"\n  - button \"skipped\"\n  - button \"sold\"\n  - button \"other\"\n  - text: Manual reason\n  - textbox \"Why are you logging this review?\"\n  - text: Notes\n  - textbox \"Additional review notes\"\n  - text: Conviction (optional)\n  - textbox \"0-100\"\n  - text: Entry price (optional)\n  - textbox \"0.00\"\n  - text: Exit price (optional)\n  - textbox \"0.00\"\n  - text: Result notes\n  - textbox \"Follow-up result note\"\n  - button \"Save Log\" [disabled]",
+        "geometry": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 844,
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "clipped": false
+        },
+        "initialFocus": {
+          "tag": "BUTTON",
+          "role": "button",
+          "name": "Done",
+          "body": false
+        }
+      },
+      "close": {
+        "escape": {
+          "transient": {
+            "tag": "BODY",
+            "role": null,
+            "name": "You need to enable JavaScript to run this app. RecipesBuild formulas, rules, and sets in one flow!9H7SSample data is present. Mock prices and outcomes are for e",
+            "body": true
+          },
+          "settled": {
+            "tag": "BUTTON",
+            "role": "button",
+            "name": "Log Review",
+            "body": false
+          }
+        },
+        "visible": {
+          "transient": {
+            "tag": "BODY",
+            "role": null,
+            "name": "You need to enable JavaScript to run this app. RecipesBuild formulas, rules, and sets in one flow!9H7SSample data is present. Mock prices and outcomes are for e",
+            "body": true
+          },
+          "settled": {
+            "tag": "BUTTON",
+            "role": "button",
+            "name": "Log Review",
+            "body": false
+          }
+        },
+        "expectedSettledInvoker": "Log Review"
+      },
+      "screenshot": {
+        "path": "screenshots/scanner-review--mobile-390x844.png",
+        "bytes": 55080,
+        "sha256": "8880dbb45db5fd5924cea0e1b1a819e1cfb34f84c37f55a677dc6366b0302527",
+        "width": 390,
+        "height": 844,
+        "signature": "89504e470d0a1a0a"
+      }
+    }
+  ],
+  "preservedR6GoodEvidence": [
+    "journal-composer",
+    "shared-window-panel",
+    "explicit-pointer-precedence",
+    "removed-invoker-fallback",
+    "notification semantic confirmation/state behavior",
+    "Korean confirmation semantics",
+    "responsive stress/holdout",
+    "no errors on unaffected R6 paths",
+    "negative-control sensitivity"
+  ],
+  "settledFocusRule": "After close action, wait for dialog absence, then use bounded Playwright locator focus polling. BODY is transient-only and never accepted as settled focus."
+}

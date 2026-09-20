@@ -1,0 +1,3934 @@
+{
+  "schema": "stockledger-r7-runtime-diagnostics-v1",
+  "request": "prod-c13-ui-perfection-postfix-evidence-repair-v1",
+  "fabricJobId": "CF-e77c01b1337781471842a4f1",
+  "source": {
+    "sha": "26f3dfb077bea75013fef58975979f02041dc490",
+    "tree": "7a6ee3872b6967631fa539f4455904d00b56e4ef",
+    "branch": "codex/stockledger-prod-c13-ui-perfection-postfix-evidence-repair-v1",
+    "productSourceChanged": false
+  },
+  "r6Reference": {
+    "schema": "project-os-golden-ui-v2-runtime-diagnostics-v1",
+    "request": "prod-c13-ui-perfection-postfix-verify-v1",
+    "fabricJobId": "CF-2eedc22e441bf50f8b74f4a0",
+    "manifest": {
+      "schema": "project-os-visual-atlas-surface-manifest-v3",
+      "request": "prod-c13-ui-perfection-postfix-verify-v1",
+      "project": "stockledger",
+      "operation": "VERIFY",
+      "frozenAt": "2026-09-20T04:14:20.915Z",
+      "frozenBeforeCanonicalCapture": true,
+      "source": {
+        "sha": "26f3dfb077bea75013fef58975979f02041dc490",
+        "tree": "7a6ee3872b6967631fa539f4455904d00b56e4ef",
+        "branch": "codex/stockledger-prod-c13-ui-perfection-postfix-verify-v1",
+        "productSourceChanged": false
+      },
+      "fabric": {
+        "jobId": "CF-2eedc22e441bf50f8b74f4a0",
+        "request": "prod-c13-ui-perfection-postfix-verify-v1",
+        "protectedBase": "26f3dfb077bea75013fef58975979f02041dc490"
+      },
+      "discovery": {
+        "browserPath": "Playwright Chromium",
+        "initialState": "supported Explore sample workspace action",
+        "initial": {
+          "hash": "#/today",
+          "title": "StockLedger",
+          "ariaSnapshot": "- heading \"Today\" [level=1]\n- text: 0 urgent · 9 open alerts\n- button \"Alerts\": \"! 9\"\n- button \"Journal\": H 7\n- button \"Settings\": S\n- text: Sample data is present. Mock prices and outcomes are for exploring the app. Summary\n- button \"Summary help\": \"?\"\n- 'button \"Urgent: 0\" [disabled]': Urgent 0\n- 'button \"Risk: 0\" [disabled]': Risk 0\n- 'button \"Stale: 5\" [disabled]': Stale 5\n- 'button \"Alerts: 9\"': Alerts 9\n- text: Visual Triage\n- button \"Visual Triage help\": \"?\"\n- text: Today pulse Urgency constellation\n- button \"Open alerts\": Alerts\n- button \"Open logic lab\": Logic\n- button \"AMD Advanced Micro Devices\": AMD 1\n- button \"COIN Coinbase\": COIN 1\n- button \"INTC Intel\": INTC 1\n- button \"META Meta Platforms\": META 1\n- button \"MSFT Microsoft\": MSFT 1\n- button \"MU Micron\": MU 1\n- button \"NVDA NVIDIA\": NVDA 1\n- button \"SNOW Snowflake\": SNOW 1\n- button \"TSLA Tesla\": TSLA 1\n- button \"AAPL Apple\": AAPL 0\n- button \"ADBE Adobe\": ADBE 0\n- button \"AMZN Amazon\": AMZN 0\n- button \"AMD Watch\": AMD Watch 8d\n- button \"COIN Watch\": COIN Watch 13d\n- button \"INTC Watch\": INTC Watch 15d\n- button \"META Watch\": META Watch 3d\n- button \"MSFT Watch\": MSFT Watch 16d\n- button \"MU Watch\": MU Watch 2d\n- button \"NVDA Watch\": NVDA Watch 2d\n- button \"SNOW Watch\": SNOW Watch 18d\n- button \"TSLA Watch\": TSLA Watch 11d\n- button \"AAPL Watch\": AAPL Watch 9d\n- button \"ADBE Watch\": ADBE Watch 12d\n- button \"AMZN Watch\": AMZN Watch 7d\n- text: Decision Loop\n- button \"Decision Loop help\": \"?\"\n- button \"AAPL Entered\": AAPL Closed Entered 얕은 눌림과 진입 구간 근접 조합이 잘 작동했습니다.\n- button \"AMD Entered\": AMD Closed Entered 심한 낙폭과 지지 확인 조합이 유효했습니다.\n- button \"COIN Rejected\": COIN Closed Rejected 고변동 구간 회피 판단이 유효했습니다.\n- button \"INTC Rejected\": INTC Closed Rejected 구조적 위험이 크면 회복 시도 신호보다 논리 보호가 우선입니다.\n- button \"META Revised\": META Live Revised 강한 종목일수록 거래량 팽창 경고를 분리해 보는 것이 유용했습니다.\n- button \"MSFT Revised\": MSFT Closed Revised 리스크 모니터 세트는 실제 가격보다 검토 누락 방지에 유효합니다.\n- text: Monitoring Board\n- button \"Monitoring Board help\": \"?\"\n- 'button \"Review Now: 0\"': 0 Review Now\n- 'button \"Forming: 0\"': 0 Forming\n- 'button \"Risk Rising: 0\"': 0 Risk Rising\n- 'button \"Review Soon: 5\"': 5 Review Soon\n- 'button \"All: 20\"': 20 All\n- tablist \"Primary navigation\":\n  - tab \"Today\" [selected]: ◦ Today\n  - tab \"Watchlist\": ≈ Watchlist\n  - tab \"Recipes\": ƒ Recipes\n  - tab \"Journal\": • Journal",
+          "elements": [
+            {
+              "tag": "h1",
+              "role": "heading",
+              "name": "Today",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 18,
+                "y": 18,
+                "width": 1244,
+                "height": 26
+              },
+              "visible": true
+            },
+            {
+              "tag": "button",
+              "role": "button",
+              "name": "Alerts",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 1274,
+                "y": 18,
+                "width": 44,
+                "height": 44
+              },
+              "visible": true
+            },
+            {
+              "tag": "button",
+              "role": "button",
+              "name": "Journal",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 1326,
+                "y": 18,
+                "width": 44,
+                "height": 44
+              },
+              "visible": true
+            },
+            {
+              "tag": "button",
+              "role": "button",
+              "name": "Settings",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 1378,
+                "y": 18,
+                "width": 44,
+                "height": 44
+              },
+              "visible": true
+            },
+            {
+              "tag": "button",
+              "role": "button",
+              "name": "Summary help",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 1362,
+                "y": 154,
+                "width": 44,
+                "height": 44
+              },
+              "visible": true
+            },
+            {
+              "tag": "button",
+              "role": "button",
+              "name": "Urgent: 0",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": "true",
+                "controls": null
+              },
+              "rect": {
+                "x": 32,
+                "y": 204,
+                "width": 339.5,
+                "height": 67
+              },
+              "visible": true
+            },
+            {
+              "tag": "button",
+              "role": "button",
+              "name": "Risk: 0",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": "true",
+                "controls": null
+              },
+              "rect": {
+                "x": 377.5,
+                "y": 204,
+                "width": 339.5,
+                "height": 67
+              },
+              "visible": true
+            },
+            {
+              "tag": "button",
+              "role": "button",
+              "name": "Stale: 5",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": "true",
+                "controls": null
+              },
+              "rect": {
+                "x": 723,
+                "y": 204,
+                "width": 339.5,
+                "height": 67
+              },
+              "visible": true
+            },
+            {
+              "tag": "button",
+              "role": "button",
+              "name": "Alerts: 9",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 1068.5,
+                "y": 204,
+                "width": 339.5,
+                "height": 67
+              },
+              "visible": true
+            },
+            {
+              "tag": "button",
+              "role": "button",
+              "name": "Visual Triage help",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 1362,
+                "y": 281,
+                "width": 44,
+                "height": 44
+              },
+              "visible": true
+            },
+            {
+              "tag": "button",
+              "role": "button",
+              "name": "Open alerts",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 1262.11,
+                "y": 352,
+                "width": 63.73,
+                "height": 33
+              },
+              "visible": true
+            },
+            {
+              "tag": "button",
+              "role": "button",
+              "name": "Open logic lab",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 1333.84,
+                "y": 352,
+                "width": 59.16,
+                "height": 33
+              },
+              "visible": true
+            },
+            {
+              "tag": "button",
+              "role": "button",
+              "name": "AMD Advanced Micro Devices",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 269,
+                "y": 505,
+                "width": 48,
+                "height": 48
+              },
+              "visible": true
+            },
+            {
+              "tag": "button",
+              "role": "button",
+              "name": "COIN Coinbase",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 274.94,
+                "y": 534.69,
+                "width": 48,
+                "height": 48
+              },
+              "visible": true
+            },
+            {
+              "tag": "button",
+              "role": "button",
+              "name": "INTC Intel",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 251,
+                "y": 566.72,
+                "width": 48,
+                "height": 48
+              },
+              "visible": true
+            },
+            {
+              "tag": "button",
+              "role": "button",
+              "name": "META Meta Platforms",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 197,
+                "y": 588.16,
+                "width": 48,
+                "height": 48
+              },
+              "visible": true
+            },
+            {
+              "tag": "button",
+              "role": "button",
+              "name": "MSFT Microsoft",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 161,
+                "y": 546.14,
+                "width": 48,
+                "height": 48
+              },
+              "visible": true
+            },
+            {
+              "tag": "button",
+              "role": "button",
+              "name": "MU Micron",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 119.05,
+                "y": 534.69,
+                "width": 48,
+                "height": 48
+              },
+              "visible": true
+            },
+            {
+              "tag": "button",
+              "role": "button",
+              "name": "NVDA NVIDIA",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 89,
+                "y": 505,
+                "width": 48,
+                "height": 48
+              },
+              "visible": true
+            },
+            {
+              "tag": "button",
+              "role": "button",
+              "name": "SNOW Snowflake",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 87.88,
+                "y": 463.41,
+                "width": 48,
+                "height": 48
+              },
+              "visible": true
+            },
+            {
+              "tag": "button",
+              "role": "button",
+              "name": "TSLA Tesla",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 161,
+                "y": 463.84,
+                "width": 48,
+                "height": 48
+              },
+              "visible": true
+            },
+            {
+              "tag": "button",
+              "role": "button",
+              "name": "AAPL Apple",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 197,
+                "y": 445.59,
+                "width": 48,
+                "height": 48
+              },
+              "visible": true
+            },
+            {
+              "tag": "button",
+              "role": "button",
+              "name": "ADBE Adobe",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 251,
+                "y": 443.27,
+                "width": 48,
+                "height": 48
+              },
+              "visible": true
+            },
+            {
+              "tag": "button",
+              "role": "button",
+              "name": "AMZN Amazon",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 306.11,
+                "y": 463.41,
+                "width": 48,
+                "height": 48
+              },
+              "visible": true
+            },
+            {
+              "tag": "button",
+              "role": "button",
+              "name": "AMD Watch",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 47,
+                "y": 657,
+                "width": 126,
+                "height": 68
+              },
+              "visible": true
+            },
+            {
+              "tag": "button",
+              "role": "button",
+              "name": "COIN Watch",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 181,
+                "y": 657,
+                "width": 126,
+                "height": 68
+              },
+              "visible": true
+            },
+            {
+              "tag": "button",
+              "role": "button",
+              "name": "INTC Watch",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 315,
+                "y": 657,
+                "width": 126,
+                "height": 68
+              },
+              "visible": true
+            },
+            {
+              "tag": "button",
+              "role": "button",
+              "name": "META Watch",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 449,
+                "y": 657,
+                "width": 126,
+                "height": 68
+              },
+              "visible": true
+            },
+            {
+              "tag": "button",
+              "role": "button",
+              "name": "MSFT Watch",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 583,
+                "y": 657,
+                "width": 126,
+                "height": 68
+              },
+              "visible": true
+            },
+            {
+              "tag": "button",
+              "role": "button",
+              "name": "MU Watch",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 717,
+                "y": 657,
+                "width": 126,
+                "height": 68
+              },
+              "visible": true
+            },
+            {
+              "tag": "button",
+              "role": "button",
+              "name": "NVDA Watch",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 851,
+                "y": 657,
+                "width": 126,
+                "height": 68
+              },
+              "visible": true
+            },
+            {
+              "tag": "button",
+              "role": "button",
+              "name": "SNOW Watch",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 985,
+                "y": 657,
+                "width": 126,
+                "height": 68
+              },
+              "visible": true
+            },
+            {
+              "tag": "button",
+              "role": "button",
+              "name": "TSLA Watch",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 1119,
+                "y": 657,
+                "width": 126,
+                "height": 68
+              },
+              "visible": true
+            },
+            {
+              "tag": "button",
+              "role": "button",
+              "name": "AAPL Watch",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 1253,
+                "y": 657,
+                "width": 126,
+                "height": 68
+              },
+              "visible": true
+            },
+            {
+              "tag": "button",
+              "role": "button",
+              "name": "ADBE Watch",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 1387,
+                "y": 657,
+                "width": 126,
+                "height": 68
+              },
+              "visible": true
+            },
+            {
+              "tag": "button",
+              "role": "button",
+              "name": "AMZN Watch",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 1521,
+                "y": 657,
+                "width": 126,
+                "height": 68
+              },
+              "visible": true
+            },
+            {
+              "tag": "button",
+              "role": "button",
+              "name": "Decision Loop help",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 1362,
+                "y": 750,
+                "width": 44,
+                "height": 44
+              },
+              "visible": true
+            },
+            {
+              "tag": "button",
+              "role": "button",
+              "name": "AAPL Entered",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 32,
+                "y": 800,
+                "width": 160,
+                "height": 221
+              },
+              "visible": true
+            },
+            {
+              "tag": "button",
+              "role": "button",
+              "name": "AMD Entered",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 200,
+                "y": 800,
+                "width": 160,
+                "height": 221
+              },
+              "visible": true
+            },
+            {
+              "tag": "button",
+              "role": "button",
+              "name": "COIN Rejected",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 368,
+                "y": 800,
+                "width": 160,
+                "height": 221
+              },
+              "visible": true
+            },
+            {
+              "tag": "button",
+              "role": "button",
+              "name": "INTC Rejected",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 536,
+                "y": 800,
+                "width": 160,
+                "height": 221
+              },
+              "visible": true
+            },
+            {
+              "tag": "button",
+              "role": "button",
+              "name": "META Revised",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 704,
+                "y": 800,
+                "width": 160,
+                "height": 221
+              },
+              "visible": true
+            },
+            {
+              "tag": "button",
+              "role": "button",
+              "name": "MSFT Revised",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 872,
+                "y": 800,
+                "width": 160,
+                "height": 221
+              },
+              "visible": true
+            },
+            {
+              "tag": "button",
+              "role": "button",
+              "name": "Monitoring Board help",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 1362,
+                "y": 1031,
+                "width": 44,
+                "height": 44
+              },
+              "visible": true
+            },
+            {
+              "tag": "button",
+              "role": "button",
+              "name": "Review Now: 0",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 32,
+                "y": 1081,
+                "width": 131.88,
+                "height": 37
+              },
+              "visible": true
+            },
+            {
+              "tag": "button",
+              "role": "button",
+              "name": "Forming: 0",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 169.88,
+                "y": 1081,
+                "width": 108.92,
+                "height": 37
+              },
+              "visible": true
+            },
+            {
+              "tag": "button",
+              "role": "button",
+              "name": "Risk Rising: 0",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 284.8,
+                "y": 1081,
+                "width": 125.78,
+                "height": 37
+              },
+              "visible": true
+            },
+            {
+              "tag": "button",
+              "role": "button",
+              "name": "Review Soon: 5",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 416.58,
+                "y": 1081,
+                "width": 135.88,
+                "height": 37
+              },
+              "visible": true
+            },
+            {
+              "tag": "button",
+              "role": "button",
+              "name": "All: 20",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 558.45,
+                "y": 1081,
+                "width": 74.45,
+                "height": 37
+              },
+              "visible": true
+            },
+            {
+              "tag": "div",
+              "role": "tablist",
+              "name": "Primary navigation",
+              "state": {
+                "selected": null,
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 0,
+                "y": 814,
+                "width": 1440,
+                "height": 86
+              },
+              "visible": true
+            },
+            {
+              "tag": "div",
+              "role": "tab",
+              "name": "Today",
+              "state": {
+                "selected": "true",
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 8,
+                "y": 824,
+                "width": 356,
+                "height": 64
+              },
+              "visible": true
+            },
+            {
+              "tag": "div",
+              "role": "tab",
+              "name": "Watchlist",
+              "state": {
+                "selected": "false",
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 364,
+                "y": 824,
+                "width": 356,
+                "height": 64
+              },
+              "visible": true
+            },
+            {
+              "tag": "div",
+              "role": "tab",
+              "name": "Recipes",
+              "state": {
+                "selected": "false",
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 720,
+                "y": 824,
+                "width": 356,
+                "height": 64
+              },
+              "visible": true
+            },
+            {
+              "tag": "div",
+              "role": "tab",
+              "name": "Journal",
+              "state": {
+                "selected": "false",
+                "expanded": null,
+                "checked": null,
+                "pressed": null,
+                "disabled": null,
+                "controls": null
+              },
+              "rect": {
+                "x": 1076,
+                "y": 824,
+                "width": 356,
+                "height": 64
+              },
+              "visible": true
+            }
+          ],
+          "layout": {
+            "viewport": {
+              "width": 1440,
+              "height": 900,
+              "dpr": 1
+            },
+            "document": {
+              "scrollWidth": 1440,
+              "scrollHeight": 900,
+              "clientWidth": 1440,
+              "clientHeight": 900
+            },
+            "horizontalOverflow": false,
+            "verticalOverflow": false,
+            "scrollOwners": [
+              {
+                "tag": "div",
+                "role": null,
+                "text": "Sample data is present. Mock prices and outcomes are for exploring the app.Summary?Urgent0Risk0Stale",
+                "client": {
+                  "width": 1440,
+                  "height": 825
+                },
+                "scroll": {
+                  "width": 1440,
+                  "height": 1161
+                },
+                "overflowY": "auto"
+              }
+            ]
+          },
+          "focus": {
+            "tag": "body",
+            "name": "You need to enable JavaScript to run this app. Today0 urgent · 9 open alerts!9H7SSample data is present. Mock prices and",
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 1440,
+              "height": 900
+            },
+            "focusStyle": {
+              "outline": "rgb(0, 0, 0) none 3px",
+              "outlineColor": "rgb(0, 0, 0)",
+              "outlineWidth": "3px",
+              "boxShadow": "none"
+            },
+            "bodyFocus": true
+          },
+          "visibleButtons": [
+            "Alerts",
+            "Journal",
+            "Settings",
+            "Summary help",
+            "Urgent: 0",
+            "Risk: 0",
+            "Stale: 5",
+            "Alerts: 9",
+            "Visual Triage help",
+            "Open alerts",
+            "Open logic lab",
+            "AMD Advanced Micro Devices",
+            "COIN Coinbase",
+            "INTC Intel",
+            "META Meta Platforms",
+            "MSFT Microsoft",
+            "MU Micron",
+            "NVDA NVIDIA",
+            "SNOW Snowflake",
+            "TSLA Tesla",
+            "AAPL Apple",
+            "ADBE Adobe",
+            "AMZN Amazon",
+            "AMD Watch",
+            "COIN Watch",
+            "INTC Watch",
+            "META Watch",
+            "MSFT Watch",
+            "MU Watch",
+            "NVDA Watch",
+            "SNOW Watch",
+            "TSLA Watch",
+            "AAPL Watch",
+            "ADBE Watch",
+            "AMZN Watch",
+            "Decision Loop help",
+            "AAPL Entered",
+            "AMD Entered",
+            "COIN Rejected",
+            "INTC Rejected",
+            "META Revised",
+            "MSFT Revised",
+            "Monitoring Board help",
+            "Review Now: 0",
+            "Forming: 0",
+            "Risk Rising: 0",
+            "Review Soon: 5",
+            "All: 20"
+          ]
+        },
+        "observed": [
+          {
+            "key": "today",
+            "status": "observed",
+            "result": {
+              "status": "observed",
+              "hash": "#/today"
+            },
+            "hash": "#/today",
+            "title": "StockLedger",
+            "buttons": [
+              "Alerts",
+              "Journal",
+              "Settings",
+              "Summary help",
+              "Urgent: 0",
+              "Risk: 0",
+              "Stale: 5",
+              "Alerts: 9",
+              "Visual Triage help",
+              "Open alerts",
+              "Open logic lab",
+              "AMD Advanced Micro Devices",
+              "COIN Coinbase",
+              "INTC Intel",
+              "META Meta Platforms",
+              "MSFT Microsoft",
+              "MU Micron",
+              "NVDA NVIDIA",
+              "SNOW Snowflake",
+              "TSLA Tesla",
+              "AAPL Apple",
+              "ADBE Adobe",
+              "AMZN Amazon",
+              "AMD Watch",
+              "COIN Watch",
+              "INTC Watch",
+              "META Watch",
+              "MSFT Watch",
+              "MU Watch",
+              "NVDA Watch",
+              "SNOW Watch",
+              "TSLA Watch",
+              "AAPL Watch",
+              "ADBE Watch",
+              "AMZN Watch",
+              "Decision Loop help",
+              "AAPL Entered",
+              "AMD Entered",
+              "COIN Rejected",
+              "INTC Rejected",
+              "META Revised",
+              "MSFT Revised",
+              "Monitoring Board help",
+              "Review Now: 0",
+              "Forming: 0",
+              "Risk Rising: 0",
+              "Review Soon: 5",
+              "All: 20"
+            ]
+          },
+          {
+            "key": "watchlist",
+            "status": "observed",
+            "result": {
+              "status": "observed",
+              "hash": "#/watchlist"
+            },
+            "hash": "#/watchlist",
+            "title": "StockLedger",
+            "buttons": [
+              "Alerts",
+              "Journal",
+              "Settings",
+              "Add stock",
+              "Manage monitoring Eyes",
+              "Add",
+              "Open AAPL Apple",
+              "Open ADBE Adobe",
+              "Open AMD Advanced Micro Devices",
+              "Open AMZN Amazon",
+              "Open AVGO Broadcom",
+              "Open COIN Coinbase",
+              "Open CRM Salesforce",
+              "Open GOOGL Alphabet",
+              "Open INTC Intel",
+              "Open MELI MercadoLibre",
+              "Open META Meta Platforms",
+              "Open MSFT Microsoft",
+              "Open MU Micron",
+              "Open NFLX Netflix",
+              "Open NVDA NVIDIA",
+              "Open PLTR Palantir",
+              "Open PYPL PayPal",
+              "Open SNOW Snowflake",
+              "Open TSLA Tesla",
+              "Open UBER Uber Technologies"
+            ]
+          },
+          {
+            "key": "recipes-logic-lab",
+            "status": "observed",
+            "result": {
+              "status": "observed",
+              "hash": "#/recipes"
+            },
+            "hash": "#/recipes",
+            "title": "StockLedger",
+            "buttons": [
+              "Alerts",
+              "Journal",
+              "Settings",
+              "Run Scan",
+              "?"
+            ]
+          },
+          {
+            "key": "journal",
+            "status": "observed",
+            "result": {
+              "status": "observed",
+              "hash": "#/journal"
+            },
+            "hash": "#/journal",
+            "title": "StockLedger",
+            "buttons": [
+              "Alerts",
+              "Journal",
+              "Settings",
+              "All",
+              "Entered",
+              "Skipped",
+              "Risky",
+              "New",
+              "Rejected · COIN · Reset Recovery",
+              "Open",
+              "Stock",
+              "Alert",
+              "Revised · MSFT · Thesis Risk Monitor",
+              "Open",
+              "Stock",
+              "Alert",
+              "Skipped · TSLA · Reset Recovery",
+              "Open",
+              "Stock",
+              "Alert",
+              "Revised · META · Leader Pullback",
+              "Open",
+              "Stock",
+              "Alert",
+              "Rejected · INTC · Reset Recovery",
+              "Open",
+              "Stock",
+              "Alert",
+              "Revised · NVDA · Leader Pullback",
+              "Open",
+              "Stock",
+              "Alert",
+              "Entered · AMD · Temporary Bargain Sale",
+              "Open",
+              "Stock",
+              "Alert",
+              "Entered · MU · Leader Pullback",
+              "Open",
+              "Stock",
+              "Alert",
+              "Entered · AAPL · Leader Pullback",
+              "Open",
+              "Stock",
+              "Alert",
+              "Entered · PLTR · Leader Pullback",
+              "Open",
+              "Stock",
+              "Alert",
+              "Skipped · SNOW · Temporary Bargain Sale",
+              "Open",
+              "Stock",
+              "Alert",
+              "Snoozed · PYPL · Reset Recovery",
+              "Open",
+              "Stock",
+              "Alert"
+            ]
+          },
+          {
+            "key": "alerts",
+            "status": "observed",
+            "result": {
+              "status": "observed",
+              "hash": "#/alerts"
+            },
+            "hash": "#/alerts",
+            "title": "StockLedger",
+            "buttons": [
+              "Alerts",
+              "Journal",
+              "Settings",
+              "Current",
+              "History",
+              "AMD Advanced Micro Devices",
+              "Stock",
+              "Acknowledge All",
+              "Detail",
+              "COIN Coinbase",
+              "Stock",
+              "Acknowledge All",
+              "Detail",
+              "INTC Intel",
+              "Stock",
+              "Acknowledge All",
+              "Detail",
+              "META Meta Platforms",
+              "Stock",
+              "Acknowledge All",
+              "Detail",
+              "MSFT Microsoft",
+              "Stock",
+              "Acknowledge All",
+              "Detail",
+              "MU Micron",
+              "Stock",
+              "Acknowledge All",
+              "Detail",
+              "NVDA NVIDIA",
+              "Stock",
+              "Acknowledge All",
+              "Detail",
+              "SNOW Snowflake",
+              "Stock",
+              "Acknowledge All",
+              "Detail",
+              "TSLA Tesla",
+              "Stock",
+              "Acknowledge All",
+              "Detail"
+            ]
+          },
+          {
+            "key": "settings",
+            "status": "observed",
+            "result": {
+              "status": "observed",
+              "hash": "#/settings"
+            },
+            "hash": "#/settings",
+            "title": "StockLedger",
+            "buttons": [
+              "Alerts",
+              "Journal",
+              "Settings",
+              "Export complete backup",
+              "Export weekly review report",
+              "Re-evaluate saved data",
+              "Export sample notes and start a clean personal workspace",
+              "Choose backup file",
+              "Validate backup",
+              "Choose watchlist CSV",
+              "Preview watchlist import",
+              "NVDA",
+              "AMD",
+              "TSLA",
+              "MSFT",
+              "AAPL",
+              "GOOGL",
+              "AMZN",
+              "MELI",
+              "UBER",
+              "COIN",
+              "SNOW",
+              "PLTR",
+              "META",
+              "NFLX",
+              "ADBE",
+              "CRM",
+              "INTC",
+              "MU",
+              "AVGO",
+              "PYPL",
+              "Choose daily price CSV",
+              "Choose SPY CSV",
+              "Unknown",
+              "Adjusted",
+              "Unadjusted",
+              "Validate and import prices",
+              "Add starter recipes",
+              "Enable email delivery",
+              "Immediate",
+              "Digest",
+              "Hold during quiet hours",
+              "Minimal safe message",
+              "Richer explicit content",
+              "Save notification preferences",
+              "English",
+              "한국어",
+              "Check API Health",
+              "Refresh Snapshots",
+              "Daily Scan"
+            ]
+          },
+          {
+            "key": "stock-entity-detail",
+            "status": "observed",
+            "result": {
+              "status": "observed",
+              "invoker": "Open AAPL Apple",
+              "hash": "#/watchlist?stockId=stock-aapl"
+            },
+            "hash": "#/watchlist?stockId=stock-aapl",
+            "title": "StockLedger",
+            "buttons": [
+              "Alerts",
+              "Journal",
+              "Settings",
+              "Add stock",
+              "Manage monitoring Eyes",
+              "Add",
+              "Clear recent",
+              "Open AAPL Apple",
+              "Open ADBE Adobe",
+              "Open AMD Advanced Micro Devices",
+              "Open AMZN Amazon",
+              "Open AVGO Broadcom",
+              "Open COIN Coinbase",
+              "Open CRM Salesforce",
+              "Open GOOGL Alphabet",
+              "Open INTC Intel",
+              "Open MELI MercadoLibre",
+              "Open META Meta Platforms",
+              "Open MSFT Microsoft",
+              "Open MU Micron",
+              "Open NFLX Netflix",
+              "Open NVDA NVIDIA",
+              "Open PLTR Palantir",
+              "Open PYPL PayPal",
+              "Open SNOW Snowflake",
+              "Open TSLA Tesla",
+              "Open UBER Uber Technologies",
+              "Register Eye",
+              "Edit",
+              "Archive",
+              "Clear",
+              "20D",
+              "3M",
+              "6M",
+              "SPY",
+              "QQQ",
+              "Sector ETF",
+              "All",
+              "Passed",
+              "Near",
+              "Warning",
+              "Blocked",
+              "Needs Review",
+              "Pinned",
+              "Status",
+              "Family",
+              "Financial quality check",
+              "Support-zone behavior",
+              "Relative strength vs SPY",
+              "Volume and volatility cooling",
+              "Earnings event proximity",
+              "News and thesis risk",
+              "Sector context",
+              "Thesis review freshness",
+              "Debt and balance-sheet risk",
+              "Original entry zone match",
+              "Drawdown from 3M reference high",
+              "Moving-average recovery",
+              "Trend stack vs 20D / 50D / 200D",
+              "Volatility compression",
+              "Valuation discount vs own history"
+            ]
+          },
+          {
+            "key": "recipe-builder",
+            "status": "observed",
+            "result": {
+              "status": "observed",
+              "invoker": "Open Builder"
+            },
+            "hash": "#/recipes",
+            "title": "StockLedger",
+            "buttons": [
+              "Alerts",
+              "Journal",
+              "Settings",
+              "Run Scan",
+              "?",
+              "Done",
+              "Purpose",
+              "Logic",
+              "Risk & Alerts",
+              "Review & Outcome",
+              "Temporary Mispricing",
+              "Leader Pullback",
+              "Recovery Setup",
+              "Risk Monitoring",
+              "1 to 2 weeks",
+              "1 to 3 months",
+              "3 to 12 months",
+              "Multi-year",
+              "Watchlist Triage",
+              "Position Building",
+              "Thesis Protection",
+              "Next"
+            ]
+          },
+          {
+            "key": "logic-registry",
+            "status": "observed",
+            "result": {
+              "status": "observed",
+              "invoker": "Raw"
+            },
+            "hash": "#/recipes",
+            "title": "StockLedger",
+            "buttons": [
+              "Alerts",
+              "Journal",
+              "Settings",
+              "Run Scan",
+              "?",
+              "Done",
+              "?"
+            ]
+          },
+          {
+            "key": "eye-flows",
+            "status": "observed",
+            "result": {
+              "status": "observed",
+              "invoker": "Manage monitoring Eyes",
+              "hash": "#/monitoring"
+            },
+            "hash": "#/monitoring",
+            "title": "StockLedger",
+            "buttons": [
+              "Alerts",
+              "Journal",
+              "Settings",
+              "All",
+              "Needs Review",
+              "Quiet",
+              "New",
+              "AMD Temporary Bargain Sale",
+              "Stock",
+              "Detail",
+              "MELI Temporary Bargain Sale",
+              "Stock",
+              "Detail",
+              "NVDA Leader Pullback",
+              "Stock",
+              "Detail",
+              "TSLA Reset Recovery",
+              "Stock",
+              "Detail",
+              "MSFT Leader Pullback",
+              "Stock",
+              "Detail",
+              "AAPL Leader Pullback",
+              "Stock",
+              "Detail",
+              "GOOGL Leader Pullback",
+              "Stock",
+              "Detail",
+              "AMZN Leader Pullback",
+              "Stock",
+              "Detail",
+              "COIN Reset Recovery",
+              "Stock",
+              "Detail",
+              "SNOW Temporary Bargain Sale",
+              "Stock",
+              "Detail",
+              "PLTR Leader Pullback",
+              "Stock",
+              "Detail",
+              "META Leader Pullback",
+              "Stock",
+              "Detail",
+              "NFLX Leader Pullback",
+              "Stock",
+              "Detail",
+              "ADBE Leader Pullback",
+              "Stock",
+              "Detail",
+              "CRM Leader Pullback",
+              "Stock",
+              "Detail",
+              "INTC Reset Recovery",
+              "Stock",
+              "Detail",
+              "MU Leader Pullback",
+              "Stock",
+              "Detail",
+              "AVGO Leader Pullback",
+              "Stock",
+              "Detail",
+              "PYPL Reset Recovery",
+              "Stock",
+              "Detail",
+              "NVDA Thesis Risk Monitor",
+              "Stock",
+              "Detail",
+              "MSFT Thesis Risk Monitor",
+              "Stock",
+              "Detail"
+            ]
+          },
+          {
+            "key": "eye-detail",
+            "status": "observed",
+            "result": {
+              "status": "observed",
+              "invoker": "supported eye entity route",
+              "hash": "#/monitoring?stockId=stock-amd&eyeId=eye-amd"
+            },
+            "hash": "#/monitoring?stockId=stock-amd&eyeId=eye-amd",
+            "title": "StockLedger",
+            "buttons": [
+              "Alerts",
+              "Journal",
+              "Settings",
+              "All",
+              "Needs Review",
+              "Quiet",
+              "New",
+              "AMD Temporary Bargain Sale",
+              "Stock",
+              "Detail",
+              "MELI Temporary Bargain Sale",
+              "Stock",
+              "Detail",
+              "NVDA Leader Pullback",
+              "Stock",
+              "Detail",
+              "TSLA Reset Recovery",
+              "Stock",
+              "Detail",
+              "MSFT Leader Pullback",
+              "Stock",
+              "Detail",
+              "AAPL Leader Pullback",
+              "Stock",
+              "Detail",
+              "GOOGL Leader Pullback",
+              "Stock",
+              "Detail",
+              "AMZN Leader Pullback",
+              "Stock",
+              "Detail",
+              "COIN Reset Recovery",
+              "Stock",
+              "Detail",
+              "SNOW Temporary Bargain Sale",
+              "Stock",
+              "Detail",
+              "PLTR Leader Pullback",
+              "Stock",
+              "Detail",
+              "META Leader Pullback",
+              "Stock",
+              "Detail",
+              "NFLX Leader Pullback",
+              "Stock",
+              "Detail",
+              "ADBE Leader Pullback",
+              "Stock",
+              "Detail",
+              "CRM Leader Pullback",
+              "Stock",
+              "Detail",
+              "INTC Reset Recovery",
+              "Stock",
+              "Detail",
+              "MU Leader Pullback",
+              "Stock",
+              "Detail",
+              "AVGO Leader Pullback",
+              "Stock",
+              "Detail",
+              "PYPL Reset Recovery",
+              "Stock",
+              "Detail",
+              "NVDA Thesis Risk Monitor",
+              "Stock",
+              "Detail",
+              "MSFT Thesis Risk Monitor",
+              "Stock",
+              "Detail",
+              "Done",
+              "Stock",
+              "Mark Reviewed",
+              "Add Journal",
+              "Edit",
+              "Journal",
+              "Archive Eye"
+            ]
+          },
+          {
+            "key": "eye-composer",
+            "status": "observed",
+            "result": {
+              "status": "observed",
+              "invoker": "New"
+            },
+            "hash": "#/monitoring",
+            "title": "StockLedger",
+            "buttons": [
+              "Alerts",
+              "Journal",
+              "Settings",
+              "All",
+              "Needs Review",
+              "Quiet",
+              "New",
+              "AMD Temporary Bargain Sale",
+              "Stock",
+              "Detail",
+              "MELI Temporary Bargain Sale",
+              "Stock",
+              "Detail",
+              "NVDA Leader Pullback",
+              "Stock",
+              "Detail",
+              "TSLA Reset Recovery",
+              "Stock",
+              "Detail",
+              "MSFT Leader Pullback",
+              "Stock",
+              "Detail",
+              "AAPL Leader Pullback",
+              "Stock",
+              "Detail",
+              "GOOGL Leader Pullback",
+              "Stock",
+              "Detail",
+              "AMZN Leader Pullback",
+              "Stock",
+              "Detail",
+              "COIN Reset Recovery",
+              "Stock",
+              "Detail",
+              "SNOW Temporary Bargain Sale",
+              "Stock",
+              "Detail",
+              "PLTR Leader Pullback",
+              "Stock",
+              "Detail",
+              "META Leader Pullback",
+              "Stock",
+              "Detail",
+              "NFLX Leader Pullback",
+              "Stock",
+              "Detail",
+              "ADBE Leader Pullback",
+              "Stock",
+              "Detail",
+              "CRM Leader Pullback",
+              "Stock",
+              "Detail",
+              "INTC Reset Recovery",
+              "Stock",
+              "Detail",
+              "MU Leader Pullback",
+              "Stock",
+              "Detail",
+              "AVGO Leader Pullback",
+              "Stock",
+              "Detail",
+              "PYPL Reset Recovery",
+              "Stock",
+              "Detail",
+              "NVDA Thesis Risk Monitor",
+              "Stock",
+              "Detail",
+              "MSFT Thesis Risk Monitor",
+              "Stock",
+              "Detail",
+              "Done",
+              "Today",
+              "3D",
+              "7D",
+              "14D",
+              "30D",
+              "Create Eye"
+            ]
+          },
+          {
+            "key": "scanner-review",
+            "status": "anomaly",
+            "error": "No scanner signal review invoker after supported Run Scan action",
+            "buttons": [
+              "Alerts",
+              "Journal",
+              "Settings",
+              "Run Scan",
+              "?"
+            ]
+          },
+          {
+            "key": "metric-detail-sheet",
+            "status": "observed",
+            "result": {
+              "status": "observed",
+              "invoker": "Relative strength vs SPY"
+            },
+            "hash": "#/watchlist?metricId=stock-aapl-relative-strength&stockId=stock-aapl",
+            "title": "StockLedger",
+            "buttons": [
+              "Alerts",
+              "Journal",
+              "Settings",
+              "Add stock",
+              "Manage monitoring Eyes",
+              "Add",
+              "Clear recent",
+              "Open AAPL Apple",
+              "Open ADBE Adobe",
+              "Open AMD Advanced Micro Devices",
+              "Open AMZN Amazon",
+              "Open AVGO Broadcom",
+              "Open COIN Coinbase",
+              "Open CRM Salesforce",
+              "Open GOOGL Alphabet",
+              "Open INTC Intel",
+              "Open MELI MercadoLibre",
+              "Open META Meta Platforms",
+              "Open MSFT Microsoft",
+              "Open MU Micron",
+              "Open NFLX Netflix",
+              "Open NVDA NVIDIA",
+              "Open PLTR Palantir",
+              "Open PYPL PayPal",
+              "Open SNOW Snowflake",
+              "Open TSLA Tesla",
+              "Open UBER Uber Technologies",
+              "Register Eye",
+              "Edit",
+              "Archive",
+              "Clear",
+              "20D",
+              "3M",
+              "6M",
+              "SPY",
+              "QQQ",
+              "Sector ETF",
+              "All",
+              "Passed",
+              "Near",
+              "Warning",
+              "Blocked",
+              "Needs Review",
+              "Pinned",
+              "Status",
+              "Family",
+              "Financial quality check",
+              "Support-zone behavior",
+              "Relative strength vs SPY",
+              "Volume and volatility cooling",
+              "Earnings event proximity",
+              "News and thesis risk",
+              "Sector context",
+              "Thesis review freshness",
+              "Debt and balance-sheet risk",
+              "Original entry zone match",
+              "Drawdown from 3M reference high",
+              "Moving-average recovery",
+              "Trend stack vs 20D / 50D / 200D",
+              "Volatility compression",
+              "Valuation discount vs own history",
+              "Done",
+              "Select chart point 1",
+              "Select chart point 2",
+              "Select chart point 3",
+              "Select chart point 4",
+              "Select chart point 5",
+              "Select chart point 6",
+              "Select chart point 7",
+              "Select chart point 8",
+              "Select chart point 9",
+              "Select chart point 10",
+              "Select chart point 11",
+              "Select chart point 12",
+              "Select chart point 13",
+              "Select chart point 14",
+              "Select chart point 15",
+              "Select chart point 16",
+              "Previous",
+              "Pin",
+              "Next",
+              "Financial quality check",
+              "Support-zone behavior",
+              "Relative strength vs SPY",
+              "Volume and volatility cooling",
+              "Earnings event proximity",
+              "News and thesis risk",
+              "Sector context",
+              "Thesis review freshness",
+              "Debt and balance-sheet risk",
+              "Original entry zone match",
+              "Drawdown from 3M reference high",
+              "Moving-average recovery",
+              "Trend stack vs 20D / 50D / 200D",
+              "Volatility compression",
+              "Valuation discount vs own history",
+              "Show formula detail"
+            ]
+          },
+          {
+            "key": "journal-composer",
+            "status": "observed",
+            "result": {
+              "status": "observed",
+              "invoker": "New"
+            },
+            "hash": "#/journal",
+            "title": "StockLedger",
+            "buttons": [
+              "Alerts",
+              "Journal",
+              "Settings",
+              "All",
+              "Entered",
+              "Skipped",
+              "Risky",
+              "New",
+              "Rejected · COIN · Reset Recovery",
+              "Open",
+              "Stock",
+              "Alert",
+              "Revised · MSFT · Thesis Risk Monitor",
+              "Open",
+              "Stock",
+              "Alert",
+              "Skipped · TSLA · Reset Recovery",
+              "Open",
+              "Stock",
+              "Alert",
+              "Revised · META · Leader Pullback",
+              "Open",
+              "Stock",
+              "Alert",
+              "Rejected · INTC · Reset Recovery",
+              "Open",
+              "Stock",
+              "Alert",
+              "Revised · NVDA · Leader Pullback",
+              "Open",
+              "Stock",
+              "Alert",
+              "Entered · AMD · Temporary Bargain Sale",
+              "Open",
+              "Stock",
+              "Alert",
+              "Entered · MU · Leader Pullback",
+              "Open",
+              "Stock",
+              "Alert",
+              "Entered · AAPL · Leader Pullback",
+              "Open",
+              "Stock",
+              "Alert",
+              "Entered · PLTR · Leader Pullback",
+              "Open",
+              "Stock",
+              "Alert",
+              "Skipped · SNOW · Temporary Bargain Sale",
+              "Open",
+              "Stock",
+              "Alert",
+              "Snoozed · PYPL · Reset Recovery",
+              "Open",
+              "Stock",
+              "Alert",
+              "Done",
+              "Entered",
+              "Skipped",
+              "Snoozed",
+              "Revised",
+              "Rejected",
+              "Marked Thesis Broken",
+              "Yes",
+              "Partly",
+              "No",
+              "Early",
+              "On Time",
+              "Late",
+              "Save Decision"
+            ]
+          },
+          {
+            "key": "decision-detail",
+            "status": "observed",
+            "result": {
+              "status": "observed",
+              "invoker": "Entered"
+            },
+            "hash": "#/journal",
+            "title": "StockLedger",
+            "buttons": [
+              "Alerts",
+              "Journal",
+              "Settings",
+              "All",
+              "Entered",
+              "Skipped",
+              "Risky",
+              "New",
+              "Entered · AMD · Temporary Bargain Sale",
+              "Open",
+              "Stock",
+              "Alert",
+              "Entered · MU · Leader Pullback",
+              "Open",
+              "Stock",
+              "Alert",
+              "Entered · AAPL · Leader Pullback",
+              "Open",
+              "Stock",
+              "Alert",
+              "Entered · PLTR · Leader Pullback",
+              "Open",
+              "Stock",
+              "Alert"
+            ]
+          },
+          {
+            "key": "notification-confirmation",
+            "status": "observed",
+            "result": {
+              "status": "observed",
+              "invoker": "Opt out and cancel future delivery"
+            },
+            "hash": "#/settings",
+            "title": "StockLedger",
+            "buttons": [
+              "Alerts",
+              "Journal",
+              "Settings",
+              "Export complete backup",
+              "Export weekly review report",
+              "Re-evaluate saved data",
+              "Export sample notes and start a clean personal workspace",
+              "Choose backup file",
+              "Validate backup",
+              "Choose watchlist CSV",
+              "Preview watchlist import",
+              "NVDA",
+              "AMD",
+              "TSLA",
+              "MSFT",
+              "AAPL",
+              "GOOGL",
+              "AMZN",
+              "MELI",
+              "UBER",
+              "COIN",
+              "SNOW",
+              "PLTR",
+              "META",
+              "NFLX",
+              "ADBE",
+              "CRM",
+              "INTC",
+              "MU",
+              "AVGO",
+              "PYPL",
+              "Choose daily price CSV",
+              "Choose SPY CSV",
+              "Unknown",
+              "Adjusted",
+              "Unadjusted",
+              "Validate and import prices",
+              "Add starter recipes",
+              "Opt out and cancel future delivery",
+              "Immediate",
+              "Digest",
+              "Hold during quiet hours",
+              "Minimal safe message",
+              "Richer explicit content",
+              "Save notification preferences",
+              "English",
+              "한국어",
+              "Check API Health",
+              "Refresh Snapshots",
+              "Daily Scan",
+              "Close",
+              "Cancel",
+              "Turn off notifications"
+            ]
+          }
+        ],
+        "navigationButtons": [
+          "Alerts",
+          "Journal",
+          "Settings",
+          "Summary help",
+          "Urgent: 0",
+          "Risk: 0",
+          "Stale: 5",
+          "Alerts: 9",
+          "Visual Triage help",
+          "Open alerts",
+          "Open logic lab",
+          "AMD Advanced Micro Devices",
+          "COIN Coinbase",
+          "INTC Intel",
+          "META Meta Platforms",
+          "MSFT Microsoft",
+          "MU Micron",
+          "NVDA NVIDIA",
+          "SNOW Snowflake",
+          "TSLA Tesla",
+          "AAPL Apple",
+          "ADBE Adobe",
+          "AMZN Amazon",
+          "AMD Watch",
+          "COIN Watch",
+          "INTC Watch",
+          "META Watch",
+          "MSFT Watch",
+          "MU Watch",
+          "NVDA Watch",
+          "SNOW Watch",
+          "TSLA Watch",
+          "AAPL Watch",
+          "ADBE Watch",
+          "AMZN Watch",
+          "Decision Loop help",
+          "AAPL Entered",
+          "AMD Entered",
+          "COIN Rejected",
+          "INTC Rejected",
+          "META Revised",
+          "MSFT Revised",
+          "Monitoring Board help",
+          "Review Now: 0",
+          "Forming: 0",
+          "Risk Rising: 0",
+          "Review Soon: 5",
+          "All: 20"
+        ],
+        "diagnostics": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "httpErrors": []
+        },
+        "authority": "fresh runtime discovery; historical AR-31 manifest not used as authority"
+      },
+      "surfaces": [
+        {
+          "surfaceKey": "today",
+          "discoveryExpected": "/Today/i",
+          "materialStates": [
+            "empty/personal",
+            "sample/populated",
+            "loading",
+            "error/recovery",
+            "dialog/sheet/overlay",
+            "long-label/dense",
+            "language/ko",
+            "reduced-motion",
+            "keyboard",
+            "stale/mock/provider-gap"
+          ],
+          "canonicalAnchors": [
+            "desktop-1440x900",
+            "mobile-390x844"
+          ],
+          "captureRequired": true,
+          "supportedStatus": "observed",
+          "supportBoundary": "rendered and actioned in fresh runtime discovery"
+        },
+        {
+          "surfaceKey": "watchlist",
+          "discoveryExpected": "/Watchlist/i",
+          "materialStates": [
+            "empty/personal",
+            "sample/populated",
+            "loading",
+            "error/recovery",
+            "dialog/sheet/overlay",
+            "long-label/dense",
+            "language/ko",
+            "reduced-motion",
+            "keyboard",
+            "stale/mock/provider-gap"
+          ],
+          "canonicalAnchors": [
+            "desktop-1440x900",
+            "mobile-390x844"
+          ],
+          "captureRequired": true,
+          "supportedStatus": "observed",
+          "supportBoundary": "rendered and actioned in fresh runtime discovery"
+        },
+        {
+          "surfaceKey": "recipes-logic-lab",
+          "discoveryExpected": "/Recipes|Processed Features|Daily Condition Scanner/i",
+          "materialStates": [
+            "empty/personal",
+            "sample/populated",
+            "loading",
+            "error/recovery",
+            "dialog/sheet/overlay",
+            "long-label/dense",
+            "language/ko",
+            "reduced-motion",
+            "keyboard",
+            "stale/mock/provider-gap"
+          ],
+          "canonicalAnchors": [
+            "desktop-1440x900",
+            "mobile-390x844"
+          ],
+          "captureRequired": true,
+          "supportedStatus": "observed",
+          "supportBoundary": "rendered and actioned in fresh runtime discovery"
+        },
+        {
+          "surfaceKey": "journal",
+          "discoveryExpected": "/Journal/i",
+          "materialStates": [
+            "empty/personal",
+            "sample/populated",
+            "loading",
+            "error/recovery",
+            "dialog/sheet/overlay",
+            "long-label/dense",
+            "language/ko",
+            "reduced-motion",
+            "keyboard",
+            "stale/mock/provider-gap"
+          ],
+          "canonicalAnchors": [
+            "desktop-1440x900",
+            "mobile-390x844"
+          ],
+          "captureRequired": true,
+          "supportedStatus": "observed",
+          "supportBoundary": "rendered and actioned in fresh runtime discovery"
+        },
+        {
+          "surfaceKey": "alerts",
+          "discoveryExpected": "/Alerts|Current|History/i",
+          "materialStates": [
+            "empty/personal",
+            "sample/populated",
+            "loading",
+            "error/recovery",
+            "dialog/sheet/overlay",
+            "long-label/dense",
+            "language/ko",
+            "reduced-motion",
+            "keyboard",
+            "stale/mock/provider-gap"
+          ],
+          "canonicalAnchors": [
+            "desktop-1440x900",
+            "mobile-390x844"
+          ],
+          "captureRequired": true,
+          "supportedStatus": "observed",
+          "supportBoundary": "rendered and actioned in fresh runtime discovery"
+        },
+        {
+          "surfaceKey": "settings",
+          "discoveryExpected": "/Settings|Your workspace/i",
+          "materialStates": [
+            "empty/personal",
+            "sample/populated",
+            "loading",
+            "error/recovery",
+            "dialog/sheet/overlay",
+            "long-label/dense",
+            "language/ko",
+            "reduced-motion",
+            "keyboard",
+            "stale/mock/provider-gap"
+          ],
+          "canonicalAnchors": [
+            "desktop-1440x900",
+            "mobile-390x844"
+          ],
+          "captureRequired": true,
+          "supportedStatus": "observed",
+          "supportBoundary": "rendered and actioned in fresh runtime discovery"
+        },
+        {
+          "surfaceKey": "stock-entity-detail",
+          "discoveryExpected": "/Stock|AMD|NVDA|AAPL/i",
+          "materialStates": [
+            "empty/personal",
+            "sample/populated",
+            "loading",
+            "error/recovery",
+            "dialog/sheet/overlay",
+            "long-label/dense",
+            "language/ko",
+            "reduced-motion",
+            "keyboard",
+            "stale/mock/provider-gap"
+          ],
+          "canonicalAnchors": [
+            "desktop-1440x900",
+            "mobile-390x844"
+          ],
+          "captureRequired": true,
+          "supportedStatus": "observed",
+          "supportBoundary": "rendered and actioned in fresh runtime discovery"
+        },
+        {
+          "surfaceKey": "recipe-builder",
+          "discoveryExpected": "/Recipe Builder/i",
+          "materialStates": [
+            "empty/personal",
+            "sample/populated",
+            "loading",
+            "error/recovery",
+            "dialog/sheet/overlay",
+            "long-label/dense",
+            "language/ko",
+            "reduced-motion",
+            "keyboard",
+            "stale/mock/provider-gap"
+          ],
+          "canonicalAnchors": [
+            "desktop-1440x900",
+            "mobile-390x844"
+          ],
+          "captureRequired": true,
+          "supportedStatus": "observed",
+          "supportBoundary": "rendered and actioned in fresh runtime discovery"
+        },
+        {
+          "surfaceKey": "logic-registry",
+          "discoveryExpected": "/Raw Data|Raw|source/i",
+          "materialStates": [
+            "empty/personal",
+            "sample/populated",
+            "loading",
+            "error/recovery",
+            "dialog/sheet/overlay",
+            "long-label/dense",
+            "language/ko",
+            "reduced-motion",
+            "keyboard",
+            "stale/mock/provider-gap"
+          ],
+          "canonicalAnchors": [
+            "desktop-1440x900",
+            "mobile-390x844"
+          ],
+          "captureRequired": true,
+          "supportedStatus": "observed",
+          "supportBoundary": "rendered and actioned in fresh runtime discovery"
+        },
+        {
+          "surfaceKey": "eye-flows",
+          "discoveryExpected": "/Eyes|monitors|monitor/i",
+          "materialStates": [
+            "empty/personal",
+            "sample/populated",
+            "loading",
+            "error/recovery",
+            "dialog/sheet/overlay",
+            "long-label/dense",
+            "language/ko",
+            "reduced-motion",
+            "keyboard",
+            "stale/mock/provider-gap"
+          ],
+          "canonicalAnchors": [
+            "desktop-1440x900",
+            "mobile-390x844"
+          ],
+          "captureRequired": true,
+          "supportedStatus": "observed",
+          "supportBoundary": "rendered and actioned in fresh runtime discovery"
+        },
+        {
+          "surfaceKey": "eye-detail",
+          "discoveryExpected": "/Current state|Thesis snapshot|Eye/i",
+          "materialStates": [
+            "empty/personal",
+            "sample/populated",
+            "loading",
+            "error/recovery",
+            "dialog/sheet/overlay",
+            "long-label/dense",
+            "language/ko",
+            "reduced-motion",
+            "keyboard",
+            "stale/mock/provider-gap"
+          ],
+          "canonicalAnchors": [
+            "desktop-1440x900",
+            "mobile-390x844"
+          ],
+          "captureRequired": true,
+          "supportedStatus": "observed",
+          "supportBoundary": "rendered and actioned in fresh runtime discovery"
+        },
+        {
+          "surfaceKey": "eye-composer",
+          "discoveryExpected": "/Create Eye|Register|thesis/i",
+          "materialStates": [
+            "empty/personal",
+            "sample/populated",
+            "loading",
+            "error/recovery",
+            "dialog/sheet/overlay",
+            "long-label/dense",
+            "language/ko",
+            "reduced-motion",
+            "keyboard",
+            "stale/mock/provider-gap"
+          ],
+          "canonicalAnchors": [
+            "desktop-1440x900",
+            "mobile-390x844"
+          ],
+          "captureRequired": true,
+          "supportedStatus": "observed",
+          "supportBoundary": "rendered and actioned in fresh runtime discovery"
+        },
+        {
+          "surfaceKey": "scanner-review",
+          "discoveryExpected": "/Signal Review Log/i",
+          "materialStates": [
+            "empty/personal",
+            "sample/populated",
+            "loading",
+            "error/recovery",
+            "dialog/sheet/overlay",
+            "long-label/dense",
+            "language/ko",
+            "reduced-motion",
+            "keyboard",
+            "stale/mock/provider-gap"
+          ],
+          "canonicalAnchors": [
+            "desktop-1440x900",
+            "mobile-390x844"
+          ],
+          "captureRequired": false,
+          "supportedStatus": "anomaly",
+          "supportBoundary": "not exposed/actionable by supported rendered runtime; retained as anomaly"
+        },
+        {
+          "surfaceKey": "metric-detail-sheet",
+          "discoveryExpected": "/What stands out|threshold|metric/i",
+          "materialStates": [
+            "empty/personal",
+            "sample/populated",
+            "loading",
+            "error/recovery",
+            "dialog/sheet/overlay",
+            "long-label/dense",
+            "language/ko",
+            "reduced-motion",
+            "keyboard",
+            "stale/mock/provider-gap"
+          ],
+          "canonicalAnchors": [
+            "desktop-1440x900",
+            "mobile-390x844"
+          ],
+          "captureRequired": true,
+          "supportedStatus": "observed",
+          "supportBoundary": "rendered and actioned in fresh runtime discovery"
+        },
+        {
+          "surfaceKey": "journal-composer",
+          "discoveryExpected": "/Decision|Why did you|Save Decision/i",
+          "materialStates": [
+            "empty/personal",
+            "sample/populated",
+            "loading",
+            "error/recovery",
+            "dialog/sheet/overlay",
+            "long-label/dense",
+            "language/ko",
+            "reduced-motion",
+            "keyboard",
+            "stale/mock/provider-gap"
+          ],
+          "canonicalAnchors": [
+            "desktop-1440x900",
+            "mobile-390x844"
+          ],
+          "captureRequired": true,
+          "supportedStatus": "observed",
+          "supportBoundary": "rendered and actioned in fresh runtime discovery"
+        },
+        {
+          "surfaceKey": "decision-detail",
+          "discoveryExpected": "/Decision|Context|Note/i",
+          "materialStates": [
+            "empty/personal",
+            "sample/populated",
+            "loading",
+            "error/recovery",
+            "dialog/sheet/overlay",
+            "long-label/dense",
+            "language/ko",
+            "reduced-motion",
+            "keyboard",
+            "stale/mock/provider-gap"
+          ],
+          "canonicalAnchors": [
+            "desktop-1440x900",
+            "mobile-390x844"
+          ],
+          "captureRequired": true,
+          "supportedStatus": "observed",
+          "supportBoundary": "rendered and actioned in fresh runtime discovery"
+        },
+        {
+          "surfaceKey": "notification-confirmation",
+          "discoveryExpected": "/Turn off notification delivery|withdraws your consent/i",
+          "materialStates": [
+            "empty/personal",
+            "sample/populated",
+            "loading",
+            "error/recovery",
+            "dialog/sheet/overlay",
+            "long-label/dense",
+            "language/ko",
+            "reduced-motion",
+            "keyboard",
+            "stale/mock/provider-gap"
+          ],
+          "canonicalAnchors": [
+            "desktop-1440x900",
+            "mobile-390x844"
+          ],
+          "captureRequired": true,
+          "supportedStatus": "observed",
+          "supportBoundary": "rendered and actioned in fresh runtime discovery"
+        }
+      ],
+      "stateCoverage": [
+        {
+          "state": "empty/personal",
+          "method": "fresh browser context before Explore sample workspace",
+          "supported": true
+        },
+        {
+          "state": "loading",
+          "method": "fresh page immediate navigation observation",
+          "supported": true
+        },
+        {
+          "state": "error/recovery",
+          "method": "controlled IndexedDB corrupt-workspace harness then supported Restore previous saved copy",
+          "supported": true
+        },
+        {
+          "state": "stale/mock/provider-gap",
+          "method": "sample state and Settings provider status; no live provider claim",
+          "supported": true
+        },
+        {
+          "state": "denied",
+          "method": "Settings cloud sync/provider controls show not configured/missing boundary",
+          "supported": true
+        },
+        {
+          "state": "conflict",
+          "method": "not exposed by supported web UI; covered by domain tests only",
+          "supported": false,
+          "limitation": "No browser conflict surface was fabricated."
+        }
+      ]
+    },
+    "reportSummary": {
+      "canonical": 34,
+      "stateSurfaces": 5,
+      "korean": 1,
+      "stressProfiles": 5,
+      "anomalies": 2
+    },
+    "diagnostics": [
+      {
+        "surfaceKey": "today",
+        "profile": "desktop-1440x900",
+        "locale": "en-US",
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "httpErrors": []
+        },
+        "actionResult": {
+          "status": "observed",
+          "hash": "#/today"
+        }
+      },
+      {
+        "surfaceKey": "watchlist",
+        "profile": "desktop-1440x900",
+        "locale": "en-US",
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "httpErrors": []
+        },
+        "actionResult": {
+          "status": "observed",
+          "hash": "#/watchlist"
+        }
+      },
+      {
+        "surfaceKey": "recipes-logic-lab",
+        "profile": "desktop-1440x900",
+        "locale": "en-US",
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "httpErrors": []
+        },
+        "actionResult": {
+          "status": "observed",
+          "hash": "#/recipes"
+        }
+      },
+      {
+        "surfaceKey": "journal",
+        "profile": "desktop-1440x900",
+        "locale": "en-US",
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "httpErrors": []
+        },
+        "actionResult": {
+          "status": "observed",
+          "hash": "#/journal"
+        }
+      },
+      {
+        "surfaceKey": "alerts",
+        "profile": "desktop-1440x900",
+        "locale": "en-US",
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "httpErrors": []
+        },
+        "actionResult": {
+          "status": "observed",
+          "hash": "#/alerts"
+        }
+      },
+      {
+        "surfaceKey": "settings",
+        "profile": "desktop-1440x900",
+        "locale": "en-US",
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "httpErrors": []
+        },
+        "actionResult": {
+          "status": "observed",
+          "hash": "#/settings"
+        }
+      },
+      {
+        "surfaceKey": "stock-entity-detail",
+        "profile": "desktop-1440x900",
+        "locale": "en-US",
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "httpErrors": []
+        },
+        "actionResult": {
+          "status": "observed",
+          "invoker": "Open AAPL Apple",
+          "hash": "#/watchlist?stockId=stock-aapl"
+        }
+      },
+      {
+        "surfaceKey": "recipe-builder",
+        "profile": "desktop-1440x900",
+        "locale": "en-US",
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "httpErrors": []
+        },
+        "actionResult": {
+          "status": "observed",
+          "invoker": "Open Builder"
+        }
+      },
+      {
+        "surfaceKey": "logic-registry",
+        "profile": "desktop-1440x900",
+        "locale": "en-US",
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "httpErrors": []
+        },
+        "actionResult": {
+          "status": "observed",
+          "invoker": "Raw"
+        }
+      },
+      {
+        "surfaceKey": "eye-flows",
+        "profile": "desktop-1440x900",
+        "locale": "en-US",
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "httpErrors": []
+        },
+        "actionResult": {
+          "status": "observed",
+          "invoker": "Manage monitoring Eyes",
+          "hash": "#/monitoring"
+        }
+      },
+      {
+        "surfaceKey": "eye-detail",
+        "profile": "desktop-1440x900",
+        "locale": "en-US",
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "httpErrors": []
+        },
+        "actionResult": {
+          "status": "observed",
+          "invoker": "supported eye entity route",
+          "hash": "#/monitoring?stockId=stock-amd&eyeId=eye-amd"
+        }
+      },
+      {
+        "surfaceKey": "eye-composer",
+        "profile": "desktop-1440x900",
+        "locale": "en-US",
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "httpErrors": []
+        },
+        "actionResult": {
+          "status": "observed",
+          "invoker": "New"
+        }
+      },
+      {
+        "surfaceKey": "scanner-review",
+        "profile": "desktop-1440x900",
+        "locale": "en-US",
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "httpErrors": []
+        },
+        "actionResult": {
+          "status": "anomaly",
+          "error": "Error: No scanner signal review invoker after supported Run Scan action\n    at openScannerReview (file:///Users/haewonkim/.codex-fabric/worktrees/CF-2eedc22e441bf50f8b74f4a0/.local/golden-ui-v2/capture.mjs:243:22)\n    at async capturePage (file:///Users/haewonkim/.codex-fabric/worktrees/CF-2eedc22e441bf50f8b74f4a0/.local/golden-ui-v2/capture.mjs:164:24)\n    at async captureCanonical (file:///Users/haewonkim/.codex-fabric/worktrees/CF-2eedc22e441bf50f8b74f4a0/.local/golden-ui-v2/capture.mjs:340:24)\n    at async main (file:///Users/haewonkim/.codex-fabric/worktrees/CF-2eedc22e441bf50f8b74f4a0/.local/golden-ui-v2/capture.mjs:561:21)\n    at async file:///Users/haewonkim/.codex-fabric/worktrees/CF-2eedc22e441bf50f8b74f4a0/.local/golden-ui-v2/capture.mjs:598:1"
+        }
+      },
+      {
+        "surfaceKey": "metric-detail-sheet",
+        "profile": "desktop-1440x900",
+        "locale": "en-US",
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "httpErrors": []
+        },
+        "actionResult": {
+          "status": "observed",
+          "invoker": "Relative strength vs SPY"
+        }
+      },
+      {
+        "surfaceKey": "journal-composer",
+        "profile": "desktop-1440x900",
+        "locale": "en-US",
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "httpErrors": []
+        },
+        "actionResult": {
+          "status": "observed",
+          "invoker": "New"
+        }
+      },
+      {
+        "surfaceKey": "decision-detail",
+        "profile": "desktop-1440x900",
+        "locale": "en-US",
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "httpErrors": []
+        },
+        "actionResult": {
+          "status": "observed",
+          "invoker": "Entered"
+        }
+      },
+      {
+        "surfaceKey": "notification-confirmation",
+        "profile": "desktop-1440x900",
+        "locale": "en-US",
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "httpErrors": []
+        },
+        "actionResult": {
+          "status": "observed",
+          "invoker": "Opt out and cancel future delivery"
+        }
+      },
+      {
+        "surfaceKey": "today",
+        "profile": "mobile-390x844",
+        "locale": "en-US",
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "httpErrors": []
+        },
+        "actionResult": {
+          "status": "observed",
+          "hash": "#/today"
+        }
+      },
+      {
+        "surfaceKey": "watchlist",
+        "profile": "mobile-390x844",
+        "locale": "en-US",
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "httpErrors": []
+        },
+        "actionResult": {
+          "status": "observed",
+          "hash": "#/watchlist"
+        }
+      },
+      {
+        "surfaceKey": "recipes-logic-lab",
+        "profile": "mobile-390x844",
+        "locale": "en-US",
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "httpErrors": []
+        },
+        "actionResult": {
+          "status": "observed",
+          "hash": "#/recipes"
+        }
+      },
+      {
+        "surfaceKey": "journal",
+        "profile": "mobile-390x844",
+        "locale": "en-US",
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "httpErrors": []
+        },
+        "actionResult": {
+          "status": "observed",
+          "hash": "#/journal"
+        }
+      },
+      {
+        "surfaceKey": "alerts",
+        "profile": "mobile-390x844",
+        "locale": "en-US",
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "httpErrors": []
+        },
+        "actionResult": {
+          "status": "observed",
+          "hash": "#/alerts"
+        }
+      },
+      {
+        "surfaceKey": "settings",
+        "profile": "mobile-390x844",
+        "locale": "en-US",
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "httpErrors": []
+        },
+        "actionResult": {
+          "status": "observed",
+          "hash": "#/settings"
+        }
+      },
+      {
+        "surfaceKey": "stock-entity-detail",
+        "profile": "mobile-390x844",
+        "locale": "en-US",
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "httpErrors": []
+        },
+        "actionResult": {
+          "status": "observed",
+          "invoker": "Open AAPL Apple",
+          "hash": "#/watchlist?stockId=stock-aapl"
+        }
+      },
+      {
+        "surfaceKey": "recipe-builder",
+        "profile": "mobile-390x844",
+        "locale": "en-US",
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "httpErrors": []
+        },
+        "actionResult": {
+          "status": "observed",
+          "invoker": "Open Builder"
+        }
+      },
+      {
+        "surfaceKey": "logic-registry",
+        "profile": "mobile-390x844",
+        "locale": "en-US",
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "httpErrors": []
+        },
+        "actionResult": {
+          "status": "observed",
+          "invoker": "Raw"
+        }
+      },
+      {
+        "surfaceKey": "eye-flows",
+        "profile": "mobile-390x844",
+        "locale": "en-US",
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "httpErrors": []
+        },
+        "actionResult": {
+          "status": "observed",
+          "invoker": "Manage monitoring Eyes",
+          "hash": "#/monitoring"
+        }
+      },
+      {
+        "surfaceKey": "eye-detail",
+        "profile": "mobile-390x844",
+        "locale": "en-US",
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "httpErrors": []
+        },
+        "actionResult": {
+          "status": "observed",
+          "invoker": "supported eye entity route",
+          "hash": "#/monitoring?stockId=stock-amd&eyeId=eye-amd"
+        }
+      },
+      {
+        "surfaceKey": "eye-composer",
+        "profile": "mobile-390x844",
+        "locale": "en-US",
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "httpErrors": []
+        },
+        "actionResult": {
+          "status": "observed",
+          "invoker": "New"
+        }
+      },
+      {
+        "surfaceKey": "scanner-review",
+        "profile": "mobile-390x844",
+        "locale": "en-US",
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "httpErrors": []
+        },
+        "actionResult": {
+          "status": "anomaly",
+          "error": "Error: No scanner signal review invoker after supported Run Scan action\n    at openScannerReview (file:///Users/haewonkim/.codex-fabric/worktrees/CF-2eedc22e441bf50f8b74f4a0/.local/golden-ui-v2/capture.mjs:243:22)\n    at async capturePage (file:///Users/haewonkim/.codex-fabric/worktrees/CF-2eedc22e441bf50f8b74f4a0/.local/golden-ui-v2/capture.mjs:164:24)\n    at async captureCanonical (file:///Users/haewonkim/.codex-fabric/worktrees/CF-2eedc22e441bf50f8b74f4a0/.local/golden-ui-v2/capture.mjs:340:24)\n    at async main (file:///Users/haewonkim/.codex-fabric/worktrees/CF-2eedc22e441bf50f8b74f4a0/.local/golden-ui-v2/capture.mjs:561:21)\n    at async file:///Users/haewonkim/.codex-fabric/worktrees/CF-2eedc22e441bf50f8b74f4a0/.local/golden-ui-v2/capture.mjs:598:1"
+        }
+      },
+      {
+        "surfaceKey": "metric-detail-sheet",
+        "profile": "mobile-390x844",
+        "locale": "en-US",
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "httpErrors": []
+        },
+        "actionResult": {
+          "status": "observed",
+          "invoker": "Relative strength vs SPY"
+        }
+      },
+      {
+        "surfaceKey": "journal-composer",
+        "profile": "mobile-390x844",
+        "locale": "en-US",
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "httpErrors": []
+        },
+        "actionResult": {
+          "status": "observed",
+          "invoker": "New"
+        }
+      },
+      {
+        "surfaceKey": "decision-detail",
+        "profile": "mobile-390x844",
+        "locale": "en-US",
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "httpErrors": []
+        },
+        "actionResult": {
+          "status": "observed",
+          "invoker": "Entered"
+        }
+      },
+      {
+        "surfaceKey": "notification-confirmation",
+        "profile": "mobile-390x844",
+        "locale": "en-US",
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "httpErrors": []
+        },
+        "actionResult": {
+          "status": "observed",
+          "invoker": "Opt out and cancel future delivery"
+        }
+      },
+      {
+        "surfaceKey": "workspace-empty-personal",
+        "profile": "desktop-1440x900",
+        "locale": "en-US",
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "httpErrors": []
+        },
+        "actionResult": {
+          "status": "observed",
+          "condition": "fresh context before sample action"
+        }
+      },
+      {
+        "surfaceKey": "workspace-loading",
+        "profile": "desktop-1440x900",
+        "locale": "en-US",
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "httpErrors": []
+        },
+        "actionResult": {
+          "status": "observed",
+          "condition": "captured immediately after supported navigation"
+        }
+      },
+      {
+        "surfaceKey": "workspace-error-recovery",
+        "profile": "desktop-1440x900",
+        "locale": "en-US",
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "httpErrors": []
+        },
+        "actionResult": {
+          "status": "observed",
+          "condition": "controlled corrupt workspace rendered recovery actions"
+        }
+      },
+      {
+        "surfaceKey": "workspace-route-unavailable",
+        "profile": "desktop-1440x900",
+        "locale": "en-US",
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "httpErrors": []
+        },
+        "actionResult": {
+          "status": "observed",
+          "condition": "unsupported entity route rendered route recovery notice"
+        }
+      },
+      {
+        "surfaceKey": "settings-denied-provider-gap",
+        "profile": "desktop-1440x900",
+        "locale": "en-US",
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "httpErrors": []
+        },
+        "actionResult": {
+          "status": "observed",
+          "condition": "cloud/provider denied or unconfigured boundary shown"
+        }
+      },
+      {
+        "surfaceKey": "notification-confirmation-ko",
+        "profile": "mobile-390x844",
+        "locale": "ko-KR",
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "httpErrors": []
+        },
+        "actionResult": {
+          "status": "observed",
+          "title": "알림 전달을 끌까요?",
+          "cancel": 1,
+          "confirm": 1
+        }
+      }
+    ],
+    "taskOracleCount": 7,
+    "negativeControls": {
+      "layer": "synthetic harness only; not Product evidence",
+      "results": [
+        {
+          "check": "hidden-or-intercepted-control",
+          "expectedReject": true,
+          "rejected": true,
+          "reason": "overlay blocks actionability"
+        },
+        {
+          "check": "tiny-target-geometry",
+          "expectedReject": true,
+          "width": 2,
+          "height": 2,
+          "rejected": true
+        },
+        {
+          "check": "hidden-semantic-error",
+          "expectedReject": true,
+          "rejected": true
+        },
+        {
+          "check": "invisible-focus-indicator",
+          "expectedReject": true,
+          "rejected": true
+        }
+      ],
+      "allExpectedRejected": true
+    }
+  },
+  "r7Repair": {
+    "focusedEvidence": "diagnostics/r7-focused-browser-evidence.json",
+    "scannerReview": [
+      {
+        "profile": {
+          "name": "desktop-1440x900",
+          "width": 1440,
+          "height": 900,
+          "isMobile": false,
+          "hasTouch": false
+        },
+        "fixture": {
+          "provenance": "synthetic deterministic test fixture imported through the supported Product backup restore workflow; not personal, live-market, or user data",
+          "fixtureSha256": "40f6e72b73b6f94bd2aa0a82513d8e21755a88e239c16f2972ddeeb9a2603f94",
+          "scannerSettings": {
+            "universeMode": "frozen_research_universe",
+            "fallbackToFrozenUniverse": false,
+            "providerDelayMinutesAfterClose": 45,
+            "notifyNearMatches": true,
+            "frozenUniverseBySector": {
+              "XLY": [
+                "SYNTHX"
+              ],
+              "XLI": [
+                "SYNTHX"
+              ],
+              "XLK": [
+                "SYNTHX"
+              ]
+            }
+          }
+        },
+        "scanOutcome": true,
+        "invokerCount": 1,
+        "supported": true,
+        "errors": {
+          "console": [
+            {
+              "type": "error",
+              "text": "Access to fetch at 'https://stooq.com/q/d/l/?s=xli.us&i=d&d1=20240101&d2=20260918' from origin 'http://127.0.0.1:43187' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource."
+            },
+            {
+              "type": "error",
+              "text": "Failed to load resource: net::ERR_FAILED"
+            },
+            {
+              "type": "error",
+              "text": "Access to fetch at 'https://stooq.com/q/d/l/?s=spy.us&i=d&d1=20240101&d2=20260918' from origin 'http://127.0.0.1:43187' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource."
+            },
+            {
+              "type": "error",
+              "text": "Failed to load resource: net::ERR_FAILED"
+            },
+            {
+              "type": "error",
+              "text": "Access to fetch at 'https://stooq.com/q/d/l/?s=xly.us&i=d&d1=20240101&d2=20260918' from origin 'http://127.0.0.1:43187' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource."
+            },
+            {
+              "type": "error",
+              "text": "Failed to load resource: net::ERR_FAILED"
+            },
+            {
+              "type": "error",
+              "text": "Access to fetch at 'https://stooq.com/q/d/l/?s=synthx.us&i=d&d1=20240101&d2=20260918' from origin 'http://127.0.0.1:43187' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource."
+            },
+            {
+              "type": "error",
+              "text": "Failed to load resource: net::ERR_FAILED"
+            },
+            {
+              "type": "error",
+              "text": "Access to fetch at 'https://stooq.com/q/d/l/?s=xlk.us&i=d&d1=20240101&d2=20260918' from origin 'http://127.0.0.1:43187' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource."
+            },
+            {
+              "type": "error",
+              "text": "Failed to load resource: net::ERR_FAILED"
+            }
+          ],
+          "pageErrors": [],
+          "requestFailures": [
+            {
+              "url": "https://stooq.com/q/d/l/?s=xli.us&i=d&d1=20240101&d2=20260918",
+              "method": "GET",
+              "failure": "net::ERR_FAILED"
+            },
+            {
+              "url": "https://stooq.com/q/d/l/?s=spy.us&i=d&d1=20240101&d2=20260918",
+              "method": "GET",
+              "failure": "net::ERR_FAILED"
+            },
+            {
+              "url": "https://stooq.com/q/d/l/?s=xly.us&i=d&d1=20240101&d2=20260918",
+              "method": "GET",
+              "failure": "net::ERR_FAILED"
+            },
+            {
+              "url": "https://stooq.com/q/d/l/?s=synthx.us&i=d&d1=20240101&d2=20260918",
+              "method": "GET",
+              "failure": "net::ERR_FAILED"
+            },
+            {
+              "url": "https://stooq.com/q/d/l/?s=xlk.us&i=d&d1=20240101&d2=20260918",
+              "method": "GET",
+              "failure": "net::ERR_FAILED"
+            }
+          ],
+          "httpErrors": []
+        },
+        "semantic": {
+          "title": "Signal Review Log",
+          "body": "Signal Review Log\nSYNTHX · DeepDiscount_dd_tn03-wind126_NO_VOL_REJECT-RS_IMP-RS_SPY_POS_SectorXLY_V1\nDone\nScan blocked because data is incomplete or invalid.\nREVIEW DECISION\nWATCH\nIGNORE\nBOUGHT\nSKIPPED\nSOLD\nOTHER\nMANUAL REASON\nNOTES\nCONVICTION (OPTIONAL)\nENTRY PRICE (OPTIONAL)\nEXIT PRICE (OPTIONAL)\nRESULT NOTES\nSAVE LOG",
+          "ariaSnapshot": "- dialog \"Signal Review Log\":\n  - heading \"Signal Review Log\" [level=1]\n  - text: SYNTHX · DeepDiscount_dd_tn03-wind126_NO_VOL_REJECT-RS_IMP-RS_SPY_POS_SectorXLY_V1\n  - button \"Done\"\n  - text: Scan blocked because data is incomplete or invalid. Review decision\n  - button \"watch\" [pressed]\n  - button \"ignore\"\n  - button \"bought\"\n  - button \"skipped\"\n  - button \"sold\"\n  - button \"other\"\n  - text: Manual reason\n  - textbox \"Why are you logging this review?\"\n  - text: Notes\n  - textbox \"Additional review notes\"\n  - text: Conviction (optional)\n  - textbox \"0-100\"\n  - text: Entry price (optional)\n  - textbox \"0.00\"\n  - text: Exit price (optional)\n  - textbox \"0.00\"\n  - text: Result notes\n  - textbox \"Follow-up result note\"\n  - button \"Save Log\" [disabled]",
+          "geometry": {
+            "x": 0,
+            "y": 0,
+            "width": 1440,
+            "height": 900,
+            "viewport": {
+              "width": 1440,
+              "height": 900
+            },
+            "clipped": false
+          },
+          "initialFocus": {
+            "tag": "BUTTON",
+            "role": "button",
+            "name": "Done",
+            "body": false
+          }
+        },
+        "close": {
+          "escape": {
+            "transient": {
+              "tag": "BODY",
+              "role": null,
+              "name": "You need to enable JavaScript to run this app. RecipesBuild formulas, rules, and sets in one flow!9H7SSample data is present. Mock prices and outcomes are for e",
+              "body": true
+            },
+            "settled": {
+              "tag": "BUTTON",
+              "role": "button",
+              "name": "Log Review",
+              "body": false
+            }
+          },
+          "visible": {
+            "transient": {
+              "tag": "BODY",
+              "role": null,
+              "name": "You need to enable JavaScript to run this app. RecipesBuild formulas, rules, and sets in one flow!9H7SSample data is present. Mock prices and outcomes are for e",
+              "body": true
+            },
+            "settled": {
+              "tag": "BUTTON",
+              "role": "button",
+              "name": "Log Review",
+              "body": false
+            }
+          },
+          "expectedSettledInvoker": "Log Review"
+        },
+        "screenshot": {
+          "path": "screenshots/scanner-review--desktop-1440x900.png",
+          "bytes": 66076,
+          "sha256": "d9c2b9fdf1d974513bc1565c5432e5b1d4cd95811154169dcb7f2457656e004d",
+          "width": 1440,
+          "height": 900,
+          "signature": "89504e470d0a1a0a"
+        }
+      },
+      {
+        "profile": {
+          "name": "mobile-390x844",
+          "width": 390,
+          "height": 844,
+          "isMobile": true,
+          "hasTouch": true
+        },
+        "fixture": {
+          "provenance": "synthetic deterministic test fixture imported through the supported Product backup restore workflow; not personal, live-market, or user data",
+          "fixtureSha256": "4fff95b319b755aaec99e97e5bb085b3def8e231a3556e3b5126e78458e201aa",
+          "scannerSettings": {
+            "universeMode": "frozen_research_universe",
+            "fallbackToFrozenUniverse": false,
+            "providerDelayMinutesAfterClose": 45,
+            "notifyNearMatches": true,
+            "frozenUniverseBySector": {
+              "XLY": [
+                "SYNTHX"
+              ],
+              "XLI": [
+                "SYNTHX"
+              ],
+              "XLK": [
+                "SYNTHX"
+              ]
+            }
+          }
+        },
+        "scanOutcome": true,
+        "invokerCount": 1,
+        "supported": true,
+        "errors": {
+          "console": [
+            {
+              "type": "error",
+              "text": "Access to fetch at 'https://stooq.com/q/d/l/?s=xli.us&i=d&d1=20240101&d2=20260918' from origin 'http://127.0.0.1:43187' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource."
+            },
+            {
+              "type": "error",
+              "text": "Failed to load resource: net::ERR_FAILED"
+            },
+            {
+              "type": "error",
+              "text": "Access to fetch at 'https://stooq.com/q/d/l/?s=xly.us&i=d&d1=20240101&d2=20260918' from origin 'http://127.0.0.1:43187' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource."
+            },
+            {
+              "type": "error",
+              "text": "Failed to load resource: net::ERR_FAILED"
+            },
+            {
+              "type": "error",
+              "text": "Access to fetch at 'https://stooq.com/q/d/l/?s=spy.us&i=d&d1=20240101&d2=20260918' from origin 'http://127.0.0.1:43187' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource."
+            },
+            {
+              "type": "error",
+              "text": "Failed to load resource: net::ERR_FAILED"
+            },
+            {
+              "type": "error",
+              "text": "Access to fetch at 'https://stooq.com/q/d/l/?s=xlk.us&i=d&d1=20240101&d2=20260918' from origin 'http://127.0.0.1:43187' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource."
+            },
+            {
+              "type": "error",
+              "text": "Failed to load resource: net::ERR_FAILED"
+            },
+            {
+              "type": "error",
+              "text": "Access to fetch at 'https://stooq.com/q/d/l/?s=synthx.us&i=d&d1=20240101&d2=20260918' from origin 'http://127.0.0.1:43187' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource."
+            },
+            {
+              "type": "error",
+              "text": "Failed to load resource: net::ERR_FAILED"
+            }
+          ],
+          "pageErrors": [],
+          "requestFailures": [
+            {
+              "url": "https://stooq.com/q/d/l/?s=xli.us&i=d&d1=20240101&d2=20260918",
+              "method": "GET",
+              "failure": "net::ERR_FAILED"
+            },
+            {
+              "url": "https://stooq.com/q/d/l/?s=xly.us&i=d&d1=20240101&d2=20260918",
+              "method": "GET",
+              "failure": "net::ERR_FAILED"
+            },
+            {
+              "url": "https://stooq.com/q/d/l/?s=spy.us&i=d&d1=20240101&d2=20260918",
+              "method": "GET",
+              "failure": "net::ERR_FAILED"
+            },
+            {
+              "url": "https://stooq.com/q/d/l/?s=xlk.us&i=d&d1=20240101&d2=20260918",
+              "method": "GET",
+              "failure": "net::ERR_FAILED"
+            },
+            {
+              "url": "https://stooq.com/q/d/l/?s=synthx.us&i=d&d1=20240101&d2=20260918",
+              "method": "GET",
+              "failure": "net::ERR_FAILED"
+            }
+          ],
+          "httpErrors": []
+        },
+        "semantic": {
+          "title": "Signal Review Log",
+          "body": "Signal Review Log\nSYNTHX · DeepDiscount_dd_tn03-wind126_NO_VOL_REJECT-RS_IMP-RS_SPY_POS_SectorXLY_V1\nDone\nScan blocked because data is incomplete or invalid.\nREVIEW DECISION\nWATCH\nIGNORE\nBOUGHT\nSKIPPED\nSOLD\nOTHER\nMANUAL REASON\nNOTES\nCONVICTION (OPTIONAL)\nENTRY PRICE (OPTIONAL)\nEXIT PRICE (OPTIONAL)\nRESULT NOTES\nSAVE LOG",
+          "ariaSnapshot": "- dialog \"Signal Review Log\":\n  - heading \"Signal Review Log\" [level=1]\n  - text: SYNTHX · DeepDiscount_dd_tn03-wind126_NO_VOL_REJECT-RS_IMP-RS_SPY_POS_SectorXLY_V1\n  - button \"Done\"\n  - text: Scan blocked because data is incomplete or invalid. Review decision\n  - button \"watch\" [pressed]\n  - button \"ignore\"\n  - button \"bought\"\n  - button \"skipped\"\n  - button \"sold\"\n  - button \"other\"\n  - text: Manual reason\n  - textbox \"Why are you logging this review?\"\n  - text: Notes\n  - textbox \"Additional review notes\"\n  - text: Conviction (optional)\n  - textbox \"0-100\"\n  - text: Entry price (optional)\n  - textbox \"0.00\"\n  - text: Exit price (optional)\n  - textbox \"0.00\"\n  - text: Result notes\n  - textbox \"Follow-up result note\"\n  - button \"Save Log\" [disabled]",
+          "geometry": {
+            "x": 0,
+            "y": 0,
+            "width": 390,
+            "height": 844,
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "clipped": false
+          },
+          "initialFocus": {
+            "tag": "BUTTON",
+            "role": "button",
+            "name": "Done",
+            "body": false
+          }
+        },
+        "close": {
+          "escape": {
+            "transient": {
+              "tag": "BODY",
+              "role": null,
+              "name": "You need to enable JavaScript to run this app. RecipesBuild formulas, rules, and sets in one flow!9H7SSample data is present. Mock prices and outcomes are for e",
+              "body": true
+            },
+            "settled": {
+              "tag": "BUTTON",
+              "role": "button",
+              "name": "Log Review",
+              "body": false
+            }
+          },
+          "visible": {
+            "transient": {
+              "tag": "BODY",
+              "role": null,
+              "name": "You need to enable JavaScript to run this app. RecipesBuild formulas, rules, and sets in one flow!9H7SSample data is present. Mock prices and outcomes are for e",
+              "body": true
+            },
+            "settled": {
+              "tag": "BUTTON",
+              "role": "button",
+              "name": "Log Review",
+              "body": false
+            }
+          },
+          "expectedSettledInvoker": "Log Review"
+        },
+        "screenshot": {
+          "path": "screenshots/scanner-review--mobile-390x844.png",
+          "bytes": 55080,
+          "sha256": "8880dbb45db5fd5924cea0e1b1a819e1cfb34f84c37f55a677dc6366b0302527",
+          "width": 390,
+          "height": 844,
+          "signature": "89504e470d0a1a0a"
+        }
+      }
+    ],
+    "notificationFocus": [
+      {
+        "profile": {
+          "name": "desktop-1440x900",
+          "width": 1440,
+          "height": 900,
+          "isMobile": false,
+          "hasTouch": false
+        },
+        "actions": [
+          {
+            "action": "Cancel",
+            "dialogAbsentBeforeSettledPoll": true,
+            "transientFocus": {
+              "tag": "BODY",
+              "role": null,
+              "name": "You need to enable JavaScript to run this app. Settings0 healthy providers!9H7SSample data is present. Mock prices and outcomes are for exploring the app.Your w",
+              "body": true
+            },
+            "settledFocus": {
+              "tag": "BUTTON",
+              "role": "button",
+              "name": "Opt out and cancel future delivery",
+              "body": false
+            },
+            "stateUnchanged": true,
+            "expectedSettledTarget": "Opt out and cancel future delivery"
+          },
+          {
+            "action": "Escape",
+            "dialogAbsentBeforeSettledPoll": true,
+            "transientFocus": {
+              "tag": "BODY",
+              "role": null,
+              "name": "You need to enable JavaScript to run this app. Settings0 healthy providers!9H7SSample data is present. Mock prices and outcomes are for exploring the app.Your w",
+              "body": true
+            },
+            "settledFocus": {
+              "tag": "BUTTON",
+              "role": "button",
+              "name": "Opt out and cancel future delivery",
+              "body": false
+            },
+            "stateUnchanged": true,
+            "expectedSettledTarget": "Opt out and cancel future delivery"
+          },
+          {
+            "action": "Confirm",
+            "dialogAbsentBeforeSettledPoll": true,
+            "transientFocus": {
+              "tag": "BODY",
+              "role": null,
+              "name": "You need to enable JavaScript to run this app. Settings0 healthy providers!9H7SSample data is present. Mock prices and outcomes are for exploring the app.Your w",
+              "body": true
+            },
+            "settledFocus": {
+              "tag": "BUTTON",
+              "role": "button",
+              "name": "Enable email delivery",
+              "body": false
+            },
+            "expectedSettledTarget": "Enable email delivery",
+            "mutationActionCount": 1,
+            "exactMutation": true,
+            "destinationPreserved": true,
+            "unrelatedSettingsPreserved": true
+          }
+        ],
+        "baselinePreferences": {
+          "contractVersion": "stockledger-notification-preferences-v1",
+          "revision": 1,
+          "explicitConsent": true,
+          "enabled": true,
+          "allowedChannels": [
+            "email"
+          ],
+          "destinations": {
+            "email": {
+              "address": "local@example.test"
+            }
+          },
+          "timezone": "UTC",
+          "quietHours": {
+            "enabled": false,
+            "start": "22:00",
+            "end": "07:00"
+          },
+          "deliveryMode": "immediate",
+          "digestTime": "09:00",
+          "minimumPriority": "Low",
+          "privacyMode": "minimal",
+          "accountScope": "device-local",
+          "updatedAt": "2026-09-20T15:00:59.410Z"
+        },
+        "korean": {
+          "title": "알림 전달을 끌까요?",
+          "controls": [
+            "취소",
+            "알림 끄기"
+          ],
+          "transientFocus": {
+            "tag": "BODY",
+            "role": null,
+            "name": "You need to enable JavaScript to run this app. 설정정상 제공자 0개!9H7S샘플 데이터가 있습니다. 더미 가격과 결과는 앱을 둘러보기 위한 것입니다.내 워크스페이스이 기기에 저장됩니다. 투자 메모를 안전하게 보관하려면 정기적으로 백업하세요.전체 백업",
+            "body": true
+          },
+          "settledFocus": {
+            "tag": "BUTTON",
+            "role": "button",
+            "name": "옵트아웃하고 이후 전달 취소",
+            "body": false
+          },
+          "expectedSettledTarget": "옵트아웃하고 이후 전달 취소"
+        },
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "httpErrors": []
+        }
+      },
+      {
+        "profile": {
+          "name": "mobile-390x844",
+          "width": 390,
+          "height": 844,
+          "isMobile": true,
+          "hasTouch": true
+        },
+        "actions": [
+          {
+            "action": "Cancel",
+            "dialogAbsentBeforeSettledPoll": true,
+            "transientFocus": {
+              "tag": "BODY",
+              "role": null,
+              "name": "You need to enable JavaScript to run this app. Settings0 healthy providers!9H7SSample data is present. Mock prices and outcomes are for exploring the app.Your w",
+              "body": true
+            },
+            "settledFocus": {
+              "tag": "BUTTON",
+              "role": "button",
+              "name": "Opt out and cancel future delivery",
+              "body": false
+            },
+            "stateUnchanged": true,
+            "expectedSettledTarget": "Opt out and cancel future delivery"
+          },
+          {
+            "action": "Escape",
+            "dialogAbsentBeforeSettledPoll": true,
+            "transientFocus": {
+              "tag": "BODY",
+              "role": null,
+              "name": "You need to enable JavaScript to run this app. Settings0 healthy providers!9H7SSample data is present. Mock prices and outcomes are for exploring the app.Your w",
+              "body": true
+            },
+            "settledFocus": {
+              "tag": "BUTTON",
+              "role": "button",
+              "name": "Opt out and cancel future delivery",
+              "body": false
+            },
+            "stateUnchanged": true,
+            "expectedSettledTarget": "Opt out and cancel future delivery"
+          },
+          {
+            "action": "Confirm",
+            "dialogAbsentBeforeSettledPoll": true,
+            "transientFocus": {
+              "tag": "BODY",
+              "role": null,
+              "name": "You need to enable JavaScript to run this app. Saving…Settings0 healthy providers!9H7SSample data is present. Mock prices and outcomes are for exploring the app",
+              "body": true
+            },
+            "settledFocus": {
+              "tag": "BUTTON",
+              "role": "button",
+              "name": "Enable email delivery",
+              "body": false
+            },
+            "expectedSettledTarget": "Enable email delivery",
+            "mutationActionCount": 1,
+            "exactMutation": true,
+            "destinationPreserved": true,
+            "unrelatedSettingsPreserved": true
+          }
+        ],
+        "baselinePreferences": {
+          "contractVersion": "stockledger-notification-preferences-v1",
+          "revision": 1,
+          "explicitConsent": true,
+          "enabled": true,
+          "allowedChannels": [
+            "email"
+          ],
+          "destinations": {
+            "email": {
+              "address": "local@example.test"
+            }
+          },
+          "timezone": "UTC",
+          "quietHours": {
+            "enabled": false,
+            "start": "22:00",
+            "end": "07:00"
+          },
+          "deliveryMode": "immediate",
+          "digestTime": "09:00",
+          "minimumPriority": "Low",
+          "privacyMode": "minimal",
+          "accountScope": "device-local",
+          "updatedAt": "2026-09-20T15:01:03.783Z"
+        },
+        "korean": {
+          "title": "알림 전달을 끌까요?",
+          "controls": [
+            "취소",
+            "알림 끄기"
+          ],
+          "transientFocus": {
+            "tag": "BODY",
+            "role": null,
+            "name": "You need to enable JavaScript to run this app. 설정정상 제공자 0개!9H7S샘플 데이터가 있습니다. 더미 가격과 결과는 앱을 둘러보기 위한 것입니다.내 워크스페이스이 기기에 저장됩니다. 투자 메모를 안전하게 보관하려면 정기적으로 백업하세요.전체 백업",
+            "body": true
+          },
+          "settledFocus": {
+            "tag": "BUTTON",
+            "role": "button",
+            "name": "옵트아웃하고 이후 전달 취소",
+            "body": false
+          },
+          "expectedSettledTarget": "옵트아웃하고 이후 전달 취소"
+        },
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "httpErrors": []
+        }
+      }
+    ],
+    "providerBoundary": "CORS failures to Stooq are recorded from the real Product Run Scan workflow; no live data claim."
+  },
+  "browserZoom": {
+    "requested": "200% browser zoom/reflow",
+    "executed": false,
+    "reason": "headless Playwright does not expose browser UI zoom; viewport resizing was not substituted"
+  }
+}

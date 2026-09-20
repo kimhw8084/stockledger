@@ -1,0 +1,384 @@
+{
+  "schema": "stockledger-r7-reuse-manifest-v1",
+  "request": "prod-c13-ui-perfection-postfix-evidence-repair-v1",
+  "fabricJobId": "CF-e77c01b1337781471842a4f1",
+  "r6": {
+    "ref": "refs/heads/project-os-artifacts/stockledger/prod-c13-ui-perfection-postfix-verify-v1",
+    "carrierCommit": "9f9e75735c7b5c3863f1a707858ab92d6d5bd990",
+    "carrierTree": "6ea44b95e751b724ef06be89a9375974cb122e5a",
+    "payloadCommit": "a30b7099a3400be1e5ef0194b23a516833cec538",
+    "payloadTree": "c9cc0e142ea7ac5a9b39274c32cd1d6a9a817580"
+  },
+  "files": {
+    "visual-atlas/artifact-bundle.zip": {
+      "classification": "R7-regenerated",
+      "reason": "dependent deterministic bundle regenerated after repaired evidence",
+      "oldSha256": "05566dd7ab45340334dafce0dfa55e26181be59566ecf62b5ddeb9faeab89226",
+      "newSha256": "7c92471360880d3bb2681f2380c0e5b42faf2f58d054138b72df2edeaa058eea",
+      "equal": false
+    },
+    "visual-atlas/capture-report.json": {
+      "classification": "R7-regenerated",
+      "reason": "dependent canonical hashes, scanner action evidence, and repaired focus evidence",
+      "oldSha256": "56fd1d36c1488fabfed55ab474a747a0c3d254e2fd6b2078f1d136198d29e4ce",
+      "newSha256": "5acfd84c9de17ea0475a446d855a25a8647cd3b9dd40b881db54fa2dfda1d8fe",
+      "equal": false
+    },
+    "visual-atlas/diagnostics/qualification-summary.json": {
+      "classification": "R7-regenerated",
+      "reason": "R7 Node 22 qualification and explicit release:verify applicability record",
+      "oldSha256": "c43efade02274eecc819960a9191eebf7a457c32ae213dfc8a9803c190153252",
+      "newSha256": "703f67c10d3df901c1a2c5aabfff7896cec081fa4196cb161c4a2f2d829ce7c9",
+      "equal": false
+    },
+    "visual-atlas/diagnostics/r7-focused-browser-evidence.json": {
+      "classification": "R7-regenerated",
+      "reason": "new focused scanner and notification evidence",
+      "oldSha256": null,
+      "newSha256": "ce5e67743886004d2f80bac28849e1f0065ed8a07b6fdd31c8c92d46fc51b607",
+      "equal": false
+    },
+    "visual-atlas/diagnostics/runtime-diagnostics.json": {
+      "classification": "R7-regenerated",
+      "reason": "R7 runtime/provider-boundary diagnostics with R6 reference",
+      "oldSha256": "621318a8a783bee788188c33fc5952fdfe183d6aaf9bd752b70ee3112828ccf3",
+      "newSha256": "0aacd60f537b5e4b11ece40015714bd6b8e618f3c5d1059503474ed4affad4e4",
+      "equal": false
+    },
+    "visual-atlas/diagnostics/task-traces.json": {
+      "classification": "R7-regenerated",
+      "reason": "R7 settled notification focus traces with R6 reference",
+      "oldSha256": "52c37eaa81bbeaec346a88ca2363953fb99379916a79c6b85fc1640a04306c33",
+      "newSha256": "ca88f02e0f27be170bff0cc6d1b5421db38e03c387a9801bf18948db02830ccb",
+      "equal": false
+    },
+    "visual-atlas/reader-index.json": {
+      "classification": "R7-regenerated",
+      "reason": "dependent page/hash index after scanner anchor replacement",
+      "oldSha256": "b87f611574877698dc76ea9b053e40bb01e09f0f3a11371cd94ffe59ed427959",
+      "newSha256": "f23f1aefbcd9720b241fdf93428bc4126c619a83bc0d5e29785e160bfd46ca3e",
+      "equal": false
+    },
+    "visual-atlas/review-desktop.pdf": {
+      "classification": "R7-regenerated",
+      "reason": "dependent PDF includes replaced desktop scanner review page",
+      "oldSha256": "1ce7d4f21b3a7767e6b2eb4b3308ce459d3888cf116a53bce30dcb3ea5618f21",
+      "newSha256": "6cdbe44acbf78b7289c7e829ed6f1b84119e76cdc9b1724f28b7e2881abe85b0",
+      "equal": false
+    },
+    "visual-atlas/review-mobile.pdf": {
+      "classification": "R7-regenerated",
+      "reason": "dependent PDF includes replaced mobile scanner review page",
+      "oldSha256": "49163d8276ec9f91e706b117fc4262d8f6bc9c7e2f68b3d21dc41f13ecd1b9ce",
+      "newSha256": "80aac09ca351fcbe5021f6de7fed7095ac19ccb72292286ba84591901a71ccb5",
+      "equal": false
+    },
+    "visual-atlas/screenshots/alerts--desktop-1440x900.png": {
+      "classification": "R6-byte-reused",
+      "reason": "unaffected R6 artifact reused exactly",
+      "oldSha256": "31101183f27c1b072d3d1b29a59d029b1ac8cac8bfcad44ba9dc82ffe290c234",
+      "newSha256": "31101183f27c1b072d3d1b29a59d029b1ac8cac8bfcad44ba9dc82ffe290c234",
+      "equal": true
+    },
+    "visual-atlas/screenshots/alerts--mobile-390x844.png": {
+      "classification": "R6-byte-reused",
+      "reason": "unaffected R6 artifact reused exactly",
+      "oldSha256": "b0fb2c9cf5d9bfe16e9ddc4437befca3c4fb227c5920f3f396fea93b2fd11b39",
+      "newSha256": "b0fb2c9cf5d9bfe16e9ddc4437befca3c4fb227c5920f3f396fea93b2fd11b39",
+      "equal": true
+    },
+    "visual-atlas/screenshots/decision-detail--desktop-1440x900.png": {
+      "classification": "R6-byte-reused",
+      "reason": "unaffected R6 artifact reused exactly",
+      "oldSha256": "ad7849186e956736ed6bc2701952a2b3a7d8650b9617016d37fcc2ab8e3e2447",
+      "newSha256": "ad7849186e956736ed6bc2701952a2b3a7d8650b9617016d37fcc2ab8e3e2447",
+      "equal": true
+    },
+    "visual-atlas/screenshots/decision-detail--mobile-390x844.png": {
+      "classification": "R6-byte-reused",
+      "reason": "unaffected R6 artifact reused exactly",
+      "oldSha256": "b42768ef9e83481c4ca6064eac9cf44b0ebf7d448875512a04f28927dcff032a",
+      "newSha256": "b42768ef9e83481c4ca6064eac9cf44b0ebf7d448875512a04f28927dcff032a",
+      "equal": true
+    },
+    "visual-atlas/screenshots/eye-composer--desktop-1440x900.png": {
+      "classification": "R6-byte-reused",
+      "reason": "unaffected R6 artifact reused exactly",
+      "oldSha256": "464298cb83a8349065bf04d24674879c007813fc8d138a1f8cda4ba2434120d7",
+      "newSha256": "464298cb83a8349065bf04d24674879c007813fc8d138a1f8cda4ba2434120d7",
+      "equal": true
+    },
+    "visual-atlas/screenshots/eye-composer--mobile-390x844.png": {
+      "classification": "R6-byte-reused",
+      "reason": "unaffected R6 artifact reused exactly",
+      "oldSha256": "1d2f82c4259d2b6230ea90927446728793d92a7a3c4613a0a42c8007dfd4a79d",
+      "newSha256": "1d2f82c4259d2b6230ea90927446728793d92a7a3c4613a0a42c8007dfd4a79d",
+      "equal": true
+    },
+    "visual-atlas/screenshots/eye-detail--desktop-1440x900.png": {
+      "classification": "R6-byte-reused",
+      "reason": "unaffected R6 artifact reused exactly",
+      "oldSha256": "0ee858957bc32515a55086711436d7d5103406641e221d6ae3f398078145f1d5",
+      "newSha256": "0ee858957bc32515a55086711436d7d5103406641e221d6ae3f398078145f1d5",
+      "equal": true
+    },
+    "visual-atlas/screenshots/eye-detail--mobile-390x844.png": {
+      "classification": "R6-byte-reused",
+      "reason": "unaffected R6 artifact reused exactly",
+      "oldSha256": "c1438b79215400e11ad5790a30b53ae44384443451d6d4388f99fc8ef3c40042",
+      "newSha256": "c1438b79215400e11ad5790a30b53ae44384443451d6d4388f99fc8ef3c40042",
+      "equal": true
+    },
+    "visual-atlas/screenshots/eye-flows--desktop-1440x900.png": {
+      "classification": "R6-byte-reused",
+      "reason": "unaffected R6 artifact reused exactly",
+      "oldSha256": "de57dc5f49976c36e20cac32697a4dfae8af250086af78fb832fdb218034a178",
+      "newSha256": "de57dc5f49976c36e20cac32697a4dfae8af250086af78fb832fdb218034a178",
+      "equal": true
+    },
+    "visual-atlas/screenshots/eye-flows--mobile-390x844.png": {
+      "classification": "R6-byte-reused",
+      "reason": "unaffected R6 artifact reused exactly",
+      "oldSha256": "545314edbc0290146be7fbeb3129ec981a70a3a0b32525e5caf06d070c19ff71",
+      "newSha256": "545314edbc0290146be7fbeb3129ec981a70a3a0b32525e5caf06d070c19ff71",
+      "equal": true
+    },
+    "visual-atlas/screenshots/journal--desktop-1440x900.png": {
+      "classification": "R6-byte-reused",
+      "reason": "unaffected R6 artifact reused exactly",
+      "oldSha256": "ccea2bf9aa82fba3bf396566980683017f6fc43e23d529c3ee2d0d4a95637468",
+      "newSha256": "ccea2bf9aa82fba3bf396566980683017f6fc43e23d529c3ee2d0d4a95637468",
+      "equal": true
+    },
+    "visual-atlas/screenshots/journal--mobile-390x844.png": {
+      "classification": "R6-byte-reused",
+      "reason": "unaffected R6 artifact reused exactly",
+      "oldSha256": "d08d7e1b3859033eccf12ea9644c3594a2fc4fd7f77cd726aa120769a96c71ce",
+      "newSha256": "d08d7e1b3859033eccf12ea9644c3594a2fc4fd7f77cd726aa120769a96c71ce",
+      "equal": true
+    },
+    "visual-atlas/screenshots/journal-composer--desktop-1440x900.png": {
+      "classification": "R6-byte-reused",
+      "reason": "unaffected R6 artifact reused exactly",
+      "oldSha256": "7d2c710ce42eaedfee950f45aecad6941c5bf4061f8ada35b0613eca99a1030d",
+      "newSha256": "7d2c710ce42eaedfee950f45aecad6941c5bf4061f8ada35b0613eca99a1030d",
+      "equal": true
+    },
+    "visual-atlas/screenshots/journal-composer--mobile-390x844.png": {
+      "classification": "R6-byte-reused",
+      "reason": "unaffected R6 artifact reused exactly",
+      "oldSha256": "bae7cf9ef956a803ead2b2bed74250d1ec7ee00a61c62e12ad2ae4d090c9b881",
+      "newSha256": "bae7cf9ef956a803ead2b2bed74250d1ec7ee00a61c62e12ad2ae4d090c9b881",
+      "equal": true
+    },
+    "visual-atlas/screenshots/logic-registry--desktop-1440x900.png": {
+      "classification": "R6-byte-reused",
+      "reason": "unaffected R6 artifact reused exactly",
+      "oldSha256": "98aee0f4ec1034094c2c9cee55448131aaf17d8b788db719c3c4c46e4b3273eb",
+      "newSha256": "98aee0f4ec1034094c2c9cee55448131aaf17d8b788db719c3c4c46e4b3273eb",
+      "equal": true
+    },
+    "visual-atlas/screenshots/logic-registry--mobile-390x844.png": {
+      "classification": "R6-byte-reused",
+      "reason": "unaffected R6 artifact reused exactly",
+      "oldSha256": "3c6e32f485883daac063c0021750fba6ae6fbca051e7dd4961c9cabffa3b7903",
+      "newSha256": "3c6e32f485883daac063c0021750fba6ae6fbca051e7dd4961c9cabffa3b7903",
+      "equal": true
+    },
+    "visual-atlas/screenshots/metric-detail-sheet--desktop-1440x900.png": {
+      "classification": "R6-byte-reused",
+      "reason": "unaffected R6 artifact reused exactly",
+      "oldSha256": "93d9fe917222eca3b306317beb5ac8e54fc06295a47d694c59b9fea10a47a5b0",
+      "newSha256": "93d9fe917222eca3b306317beb5ac8e54fc06295a47d694c59b9fea10a47a5b0",
+      "equal": true
+    },
+    "visual-atlas/screenshots/metric-detail-sheet--mobile-390x844.png": {
+      "classification": "R6-byte-reused",
+      "reason": "unaffected R6 artifact reused exactly",
+      "oldSha256": "9080aad7ac4918c00dd03f1a6775563c4d38e47fe2f238e527d6194730a74a3d",
+      "newSha256": "9080aad7ac4918c00dd03f1a6775563c4d38e47fe2f238e527d6194730a74a3d",
+      "equal": true
+    },
+    "visual-atlas/screenshots/notification-confirmation--desktop-1440x900.png": {
+      "classification": "R6-byte-reused",
+      "reason": "unaffected R6 artifact reused exactly",
+      "oldSha256": "76c150bf07ff849600d165e159cf2354be637035e1bb263db330a27f8f0ce224",
+      "newSha256": "76c150bf07ff849600d165e159cf2354be637035e1bb263db330a27f8f0ce224",
+      "equal": true
+    },
+    "visual-atlas/screenshots/notification-confirmation--mobile-390x844.png": {
+      "classification": "R6-byte-reused",
+      "reason": "unaffected R6 artifact reused exactly",
+      "oldSha256": "ed73ce776a6b1b064e5cc298d590062c4437215daf6c6e4ff34ecef11ece70ce",
+      "newSha256": "ed73ce776a6b1b064e5cc298d590062c4437215daf6c6e4ff34ecef11ece70ce",
+      "equal": true
+    },
+    "visual-atlas/screenshots/notification-confirmation-ko--mobile-390x844--ko.png": {
+      "classification": "R6-byte-reused",
+      "reason": "unaffected R6 artifact reused exactly",
+      "oldSha256": "a8f3e4d570a7a2d78c350eb53bed9f7f15ee465638f017547408825071a380e5",
+      "newSha256": "a8f3e4d570a7a2d78c350eb53bed9f7f15ee465638f017547408825071a380e5",
+      "equal": true
+    },
+    "visual-atlas/screenshots/recipe-builder--desktop-1440x900.png": {
+      "classification": "R6-byte-reused",
+      "reason": "unaffected R6 artifact reused exactly",
+      "oldSha256": "32fe53b6a13c696b760789e183b7f825489b0e2a566aa53dc10bee5613ea7453",
+      "newSha256": "32fe53b6a13c696b760789e183b7f825489b0e2a566aa53dc10bee5613ea7453",
+      "equal": true
+    },
+    "visual-atlas/screenshots/recipe-builder--mobile-390x844.png": {
+      "classification": "R6-byte-reused",
+      "reason": "unaffected R6 artifact reused exactly",
+      "oldSha256": "14700808bfe3f5d342a3f9e53a204596aba47cd09aaa656fd15b6da305ffa465",
+      "newSha256": "14700808bfe3f5d342a3f9e53a204596aba47cd09aaa656fd15b6da305ffa465",
+      "equal": true
+    },
+    "visual-atlas/screenshots/recipes-logic-lab--desktop-1440x900.png": {
+      "classification": "R6-byte-reused",
+      "reason": "unaffected R6 artifact reused exactly",
+      "oldSha256": "7a2eb376402873ae6e0ff77cf993256be90ae32e09ec09b8e5261b28a39ccd43",
+      "newSha256": "7a2eb376402873ae6e0ff77cf993256be90ae32e09ec09b8e5261b28a39ccd43",
+      "equal": true
+    },
+    "visual-atlas/screenshots/recipes-logic-lab--mobile-390x844.png": {
+      "classification": "R6-byte-reused",
+      "reason": "unaffected R6 artifact reused exactly",
+      "oldSha256": "6e0444dd100dc0837683bcd8054379744d796d108e2ec4280cf9f31800a57fd1",
+      "newSha256": "6e0444dd100dc0837683bcd8054379744d796d108e2ec4280cf9f31800a57fd1",
+      "equal": true
+    },
+    "visual-atlas/screenshots/scanner-review--desktop-1440x900.png": {
+      "classification": "R7-regenerated",
+      "reason": "genuine review-state PNG captured after supported synthetic fixture and real Run Scan",
+      "oldSha256": "d8b2ed6ee4efa9f8c384b2bb70c361236f4d452e32517af7921239cd2ec87daf",
+      "newSha256": "d9c2b9fdf1d974513bc1565c5432e5b1d4cd95811154169dcb7f2457656e004d",
+      "equal": false
+    },
+    "visual-atlas/screenshots/scanner-review--mobile-390x844.png": {
+      "classification": "R7-regenerated",
+      "reason": "genuine review-state PNG captured after supported synthetic fixture and real Run Scan",
+      "oldSha256": "e8e8661919269567f1c4319414378dc1f5f3e56345b030393267a04a74e5c5a1",
+      "newSha256": "8880dbb45db5fd5924cea0e1b1a819e1cfb34f84c37f55a677dc6366b0302527",
+      "equal": false
+    },
+    "visual-atlas/screenshots/settings--desktop-1440x900.png": {
+      "classification": "R6-byte-reused",
+      "reason": "unaffected R6 artifact reused exactly",
+      "oldSha256": "de0a8a620d49b9836d5fc4a796fb9d807cd8440acd8d22bbd2a75284bffea4db",
+      "newSha256": "de0a8a620d49b9836d5fc4a796fb9d807cd8440acd8d22bbd2a75284bffea4db",
+      "equal": true
+    },
+    "visual-atlas/screenshots/settings--mobile-390x844.png": {
+      "classification": "R6-byte-reused",
+      "reason": "unaffected R6 artifact reused exactly",
+      "oldSha256": "a04bb6130bd01d12e18bfc71a76df1ca01a57caa2b5f856625bd65b9b3095396",
+      "newSha256": "a04bb6130bd01d12e18bfc71a76df1ca01a57caa2b5f856625bd65b9b3095396",
+      "equal": true
+    },
+    "visual-atlas/screenshots/settings-denied-provider-gap--desktop-1440x900.png": {
+      "classification": "R6-byte-reused",
+      "reason": "unaffected R6 artifact reused exactly",
+      "oldSha256": "de0a8a620d49b9836d5fc4a796fb9d807cd8440acd8d22bbd2a75284bffea4db",
+      "newSha256": "de0a8a620d49b9836d5fc4a796fb9d807cd8440acd8d22bbd2a75284bffea4db",
+      "equal": true
+    },
+    "visual-atlas/screenshots/stock-entity-detail--desktop-1440x900.png": {
+      "classification": "R6-byte-reused",
+      "reason": "unaffected R6 artifact reused exactly",
+      "oldSha256": "12798cb109517d331a1de0e1ec208f53d792de4aed43ae3eb2a8ac5d45456dd7",
+      "newSha256": "12798cb109517d331a1de0e1ec208f53d792de4aed43ae3eb2a8ac5d45456dd7",
+      "equal": true
+    },
+    "visual-atlas/screenshots/stock-entity-detail--mobile-390x844.png": {
+      "classification": "R6-byte-reused",
+      "reason": "unaffected R6 artifact reused exactly",
+      "oldSha256": "aa9e3afc95ffe9d47907b988a224806428ea97ac6b84c0d5a3a230c3e77fb5cd",
+      "newSha256": "aa9e3afc95ffe9d47907b988a224806428ea97ac6b84c0d5a3a230c3e77fb5cd",
+      "equal": true
+    },
+    "visual-atlas/screenshots/today--desktop-1440x900.png": {
+      "classification": "R6-byte-reused",
+      "reason": "unaffected R6 artifact reused exactly",
+      "oldSha256": "de3241198aeb93c7a91fbd8fd6646cc220a308d1195b090804abe2375ea071f4",
+      "newSha256": "de3241198aeb93c7a91fbd8fd6646cc220a308d1195b090804abe2375ea071f4",
+      "equal": true
+    },
+    "visual-atlas/screenshots/today--mobile-390x844.png": {
+      "classification": "R6-byte-reused",
+      "reason": "unaffected R6 artifact reused exactly",
+      "oldSha256": "56236f0f2853c6788218f897520d9b87ae137e3bf0aa42b75bf77f7afe4820c9",
+      "newSha256": "56236f0f2853c6788218f897520d9b87ae137e3bf0aa42b75bf77f7afe4820c9",
+      "equal": true
+    },
+    "visual-atlas/screenshots/watchlist--desktop-1440x900.png": {
+      "classification": "R6-byte-reused",
+      "reason": "unaffected R6 artifact reused exactly",
+      "oldSha256": "a152308a11ba2e24680fffad82a20d67f3766208e9a7d9884a01dc3bf6bd1d5b",
+      "newSha256": "a152308a11ba2e24680fffad82a20d67f3766208e9a7d9884a01dc3bf6bd1d5b",
+      "equal": true
+    },
+    "visual-atlas/screenshots/watchlist--mobile-390x844.png": {
+      "classification": "R6-byte-reused",
+      "reason": "unaffected R6 artifact reused exactly",
+      "oldSha256": "d8b9f6393e8e97c116f0e1401aaea0d1c8e2c2f087b468040df760b94a5a469e",
+      "newSha256": "d8b9f6393e8e97c116f0e1401aaea0d1c8e2c2f087b468040df760b94a5a469e",
+      "equal": true
+    },
+    "visual-atlas/screenshots/workspace-empty-personal--desktop-1440x900.png": {
+      "classification": "R6-byte-reused",
+      "reason": "unaffected R6 artifact reused exactly",
+      "oldSha256": "92688935da4dcf38bf245eeb83a08c5d3e8d504838e08a7352e86ffbe4050582",
+      "newSha256": "92688935da4dcf38bf245eeb83a08c5d3e8d504838e08a7352e86ffbe4050582",
+      "equal": true
+    },
+    "visual-atlas/screenshots/workspace-error-recovery--desktop-1440x900.png": {
+      "classification": "R6-byte-reused",
+      "reason": "unaffected R6 artifact reused exactly",
+      "oldSha256": "b2a0fbffe19e30a567c3ca631435609ed69641dc4be753d99d90ded0d1501a20",
+      "newSha256": "b2a0fbffe19e30a567c3ca631435609ed69641dc4be753d99d90ded0d1501a20",
+      "equal": true
+    },
+    "visual-atlas/screenshots/workspace-loading--desktop-1440x900.png": {
+      "classification": "R6-byte-reused",
+      "reason": "unaffected R6 artifact reused exactly",
+      "oldSha256": "92688935da4dcf38bf245eeb83a08c5d3e8d504838e08a7352e86ffbe4050582",
+      "newSha256": "92688935da4dcf38bf245eeb83a08c5d3e8d504838e08a7352e86ffbe4050582",
+      "equal": true
+    },
+    "visual-atlas/screenshots/workspace-route-unavailable--desktop-1440x900.png": {
+      "classification": "R6-byte-reused",
+      "reason": "unaffected R6 artifact reused exactly",
+      "oldSha256": "a54c9e4129d9855dde08ef0f8bcf84c86eb8c07163707e114f42202dc01fed1f",
+      "newSha256": "a54c9e4129d9855dde08ef0f8bcf84c86eb8c07163707e114f42202dc01fed1f",
+      "equal": true
+    },
+    "visual-atlas/surface-manifest.json": {
+      "classification": "R7-regenerated",
+      "reason": "scanner classification changed from R6 anomaly to supported synthetic blocked-data review evidence",
+      "oldSha256": "283fd32dfd3983c7e40fc209c84d2cff9d9656def60fae45b82a61ec9b8c2a9a",
+      "newSha256": "754083f0eee21fb34d897fd29db686f17734b19729b6b5459592f05558ee3b21",
+      "equal": false
+    },
+    "git-publish-receipt.json": {
+      "classification": "R7-regenerated",
+      "reason": "new R7 Fabric publish receipt; finalized after carrier readback",
+      "oldSha256": "0ce4a31d80d35dde6307d0d4a32dd6d8d7d2c542d309c20ecab29c9e5ed5d018",
+      "newSha256": null,
+      "equal": false,
+      "pendingFinalization": true
+    }
+  },
+  "selfHashExcluded": [
+    "visual-atlas/diagnostics/reuse-manifest.json"
+  ],
+  "receiptSelfReferenceExcluded": true,
+  "bundleSelfReferenceExcluded": true,
+  "counts": {
+    "carrierFilesBeforeReceipt": 50,
+    "r6CarrierFiles": 50,
+    "r6CarrierBytes": 15554031,
+    "r7PayloadFiles": 49,
+    "r7PayloadBytes": 11257074
+  }
+}
