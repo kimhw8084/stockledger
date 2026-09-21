@@ -17,5 +17,5 @@
   "bundle_sha256": "58a47f9a8de28fe2976de6d527565eb2f1d53ec9d062a566350d480d30e4c7bc",
   "screenshot_count": 17,
   "generated_at": "2026-09-21T13:47:22.495Z",
-  "note": "Immutable package is candidate-bound; commit identity is verified from remote ref readback. No visual GO or self-acceptance is asserted."
+  "note": "Immutable package is candidate-bound; release-verify-result.json is the parseable direct verifier result; commit identity is verified from remote ref readback. No visual GO or self-acceptance is asserted."
 }
