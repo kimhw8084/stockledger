@@ -1,0 +1,244 @@
+{
+  "contractVersion": "stockledger-release-evidence-v1",
+  "revision": 1,
+  "baseCommit": "26f3dfb077bea75013fef58975979f02041dc490",
+  "source": {
+    "commit": "83a43c84e3436e72503d33ff8d35765651d7dc53",
+    "tree": "5b0b1abf96b7b13da4443d6698ce791419f658e0",
+    "workingTree": "clean"
+  },
+  "versions": {
+    "app": "0.2.0",
+    "nodeRequirement": ">=22.23.2",
+    "nodeRuntime": "v22.23.2",
+    "workspaceExportSchema": 2,
+    "workerDatabaseSchema": 7,
+    "financialTruthEngine": "2.1.0",
+    "financialTruthContract": "financial_truth_v1",
+    "calendar": "NYSE-2026-09-15",
+    "workerJobContract": {
+      "version": "stockledger-production-job-v1",
+      "revision": 2
+    },
+    "notification": {
+      "delivery": "stockledger-notification-delivery-v1",
+      "deliveryRevision": 1,
+      "digest": "stockledger-notification-digest-v1",
+      "digestRevision": 1,
+      "preferences": "stockledger-notification-preferences-v1"
+    },
+    "ingestion": {
+      "version": "stockledger-market-data-ingestion-v1",
+      "revision": 1
+    },
+    "rights": {
+      "version": "stockledger-market-data-rights-v1",
+      "revision": 2,
+      "authorityModel": "stockledger-market-data-rights-authority-v1"
+    },
+    "sync": "stockledger-personal-sync-v1"
+  },
+  "migrations": {
+    "ordered": true,
+    "files": [
+      {
+        "path": "supabase/migrations/20260916032227_ledger_sync.sql",
+        "sha256": "a7ac814c99675b5bfd0e375da338124f5084214b593a56efd16e34846825cca4",
+        "order": 0
+      },
+      {
+        "path": "supabase/migrations/20260918000000_secure_personal_sync.sql",
+        "sha256": "1c0763164f2e1257a8cbc3cf2338f68b0170257af6f072f8a73e1e4ebfb0d3ce",
+        "order": 1
+      }
+    ]
+  },
+  "packageLock": {
+    "sha256": "81117b82120669c16680c7f92ffe34be80a438bea52d2196aa2071f7533314ec"
+  },
+  "artifacts": {
+    "generated": true,
+    "files": [
+      {
+        "path": "artifact-inventory.json",
+        "sha256": "41dcfb9b94ceaf8934533b31b9312bca67665eee58ffa9cc0c90ebe15da6be49",
+        "bytes": 5776
+      },
+      {
+        "path": "capture-report.json",
+        "sha256": "a11b740bf26d4e50cd46bbbd9c40978e525df28ac2ed3aac9fe3c97ffbe1df36",
+        "bytes": 873728
+      },
+      {
+        "path": "diagnostics/qualification-summary.json",
+        "sha256": "1af3ef2318e8a6fc347a4e660c15c0efc9ce0a48da70ac15684cd4b634e5b95c",
+        "bytes": 579
+      },
+      {
+        "path": "diagnostics/runtime-diagnostics.json",
+        "sha256": "e1351aa1e70acda4006a6ba27692c5bb1a886f6416ce376ae53f2ed9b50d9c54",
+        "bytes": 78226
+      },
+      {
+        "path": "reader-index.json",
+        "sha256": "169a90d8cd0c87a3ca864e69559421e734963ded0fda9562e50b7639a48f7247",
+        "bytes": 3548
+      },
+      {
+        "path": "review-desktop.pdf",
+        "sha256": "a2438a2b1f53a7b9a09d30fc1ac23a845751fd3ed2e2193f984a80db0277e8ec",
+        "bytes": 828423
+      },
+      {
+        "path": "review-mobile.pdf",
+        "sha256": "07944a6c2c375deecf14f99c218c6843d6f62e30f19234ac7370c9019ab93552",
+        "bytes": 534479
+      },
+      {
+        "path": "screenshots/alerts--desktop-1440x900.png",
+        "sha256": "86bcb550083b880bb0df8029a1ae74e0316f234b87a8ad6dde18fab36440229b",
+        "bytes": 97225
+      },
+      {
+        "path": "screenshots/alerts--mobile-390x844.png",
+        "sha256": "361aa9db6a106fc7a1f204a950f2ea062c2a6f2affbbd07718cc445b0b455c56",
+        "bytes": 57083
+      },
+      {
+        "path": "screenshots/journal--desktop-1440x900.png",
+        "sha256": "ad959ddab8a6e5056a08f8537406f9c8aded3433f30fa2ef9929a11400fac926",
+        "bytes": 102071
+      },
+      {
+        "path": "screenshots/journal--mobile-390x844.png",
+        "sha256": "236a5492c73a7b94e1cf940e74b9d800daf70a7170499d799f742d8c9277ea99",
+        "bytes": 59716
+      },
+      {
+        "path": "screenshots/non-happy-empty-personal--desktop-1440x900.png",
+        "sha256": "8b39b330f33b5f160741f42be7919ff83fce524dab652359f2101db507124e0e",
+        "bytes": 51607
+      },
+      {
+        "path": "screenshots/recipes--desktop-1440x900.png",
+        "sha256": "4d9a8f9974126e3923735960e957057830478fc9a4749b4be5ab88516b58dce3",
+        "bytes": 86401
+      },
+      {
+        "path": "screenshots/recipes--mobile-390x844.png",
+        "sha256": "60a89b161e8b4eb7cf42097cdded9102491f9a7e6bc56c8df0631b8d0accbb62",
+        "bytes": 65083
+      },
+      {
+        "path": "screenshots/review-evidence--desktop-1440x900.png",
+        "sha256": "800f82d247b6230b6b1c054c4e0d0af2ff897b1925921673859204c9e184118d",
+        "bytes": 93844
+      },
+      {
+        "path": "screenshots/review-evidence--mobile-390x844.png",
+        "sha256": "f586eb9a493befa846d825163c5fc006f23da285fb24202d330c90849b58600f",
+        "bytes": 76219
+      },
+      {
+        "path": "screenshots/review-evidence-actions--mobile-390x844.png",
+        "sha256": "500ea15c44e9ba58ff6f33c8aaa3f37279fda66c0200774e8bee37fbc3b6b472",
+        "bytes": 66494
+      },
+      {
+        "path": "screenshots/settings--desktop-1440x900.png",
+        "sha256": "eb12f1184a0f6ad51d504e4e85c5c379f6df0db6d0c5cd4b413c1c999481a962",
+        "bytes": 91517
+      },
+      {
+        "path": "screenshots/settings--mobile-390x844.png",
+        "sha256": "aa7b414b8c1affba4d3991b6976ba619497e42c8950d997b430da6d6d7bae4b0",
+        "bytes": 57996
+      },
+      {
+        "path": "screenshots/today--desktop-1440x900.png",
+        "sha256": "dd789dd28d3f9f293e5b044b267b953b62783fd1cb9d135c725af855ce956b75",
+        "bytes": 129794
+      },
+      {
+        "path": "screenshots/today--mobile-390x844.png",
+        "sha256": "ff52a2693e4e9bfad9780c22a4068a8617cc173e586e1175e6895d6a337d416b",
+        "bytes": 67382
+      },
+      {
+        "path": "screenshots/today-ko--desktop-1440x900.png",
+        "sha256": "94af7872bd81fd42af3e91c05ff745dbabd8cde7ce8509711981d963a94d0269",
+        "bytes": 119977
+      },
+      {
+        "path": "screenshots/today-ko--mobile-390x844.png",
+        "sha256": "13150d819de4f8122774f73e377152df5a99832868135f8238b5ef99bff7cb25",
+        "bytes": 66394
+      },
+      {
+        "path": "screenshots/watchlist--desktop-1440x900.png",
+        "sha256": "abb1e92b222fa1f17d2af7d269151e12e319a74f952af4f2bcc9632f18387895",
+        "bytes": 93823
+      },
+      {
+        "path": "screenshots/watchlist--mobile-390x844.png",
+        "sha256": "05fbf8ea4692aa07f766e299229ae87108aaab92a16d0082bfc123d8d891238d",
+        "bytes": 63213
+      },
+      {
+        "path": "surface-manifest.json",
+        "sha256": "bdf72d3cd18e5ed2695b6a78a3f3f08a232c9b13348809bd3cf5f393bf1de93a",
+        "bytes": 6851
+      }
+    ]
+  },
+  "verification": {
+    "commands": [
+      "npm ci",
+      "npm run typecheck",
+      "npm test -- --run",
+      "npm run check:release-workflow",
+      "npm run check:boundaries",
+      "npm run check:frozen",
+      "npm run export:all",
+      "npm run test:e2e",
+      "npm audit --audit-level=high",
+      "npm run test:cloud"
+    ],
+    "checks": [
+      "source-tree-match",
+      "migration-order-and-digest-match",
+      "contract-snapshot-match",
+      "package-lock-match",
+      "artifact-digest-match-when-present",
+      "rollback-compatibility"
+    ]
+  },
+  "externalGates": [
+    "hosted-scheduler",
+    "hosted-notification-transport",
+    "commercial-market-data-agreement",
+    "billing-lifecycle",
+    "production-cloud-backup",
+    "external-incident-pager",
+    "native-device-certification",
+    "real-user-load"
+  ],
+  "rollback": {
+    "policy": "additive-forward-only",
+    "safeRollback": [
+      "static-artifact-to-a-verified-compatible-build",
+      "same-schema-export-restore-to-a-new-sqlite-path"
+    ],
+    "forwardMigrationRequired": [
+      "worker-database-schema",
+      "cloud-migrations",
+      "workspace-export-schema"
+    ],
+    "incompatibleAssertions": [
+      "no-destructive-database-downgrade",
+      "no-rollback-across-unsupported-schema",
+      "no-rollback-from-changed-financial-truth-contract"
+    ]
+  },
+  "evidenceHash": "1fde67702a9b4cb89b580143cbd58f8e87c082cc2224620d271b8c2815e3b90f"
+}

@@ -1,0 +1,8 @@
+
+> stockledger@0.2.0 release:verify
+> tsx scripts/verify-release-evidence.ts --base 26f3dfb077bea75013fef58975979f02041dc490 --artifacts /Users/haewonkim/.codex-fabric/jobs/CF-9c8b4d383ed230b97e167b70.running/artifact-bridge/release-input --input /Users/haewonkim/.codex-fabric/jobs/CF-9c8b4d383ed230b97e167b70.running/artifact-bridge/release/release-evidence.json
+
+{
+  "verified": true,
+  "reasons": []
+}

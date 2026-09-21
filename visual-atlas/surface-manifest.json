@@ -1,0 +1,204 @@
+{
+  "schema": "project-os-visual-atlas-surface-manifest-v2",
+  "frozenAt": "2026-09-21T13:41:09.450Z",
+  "frozenBeforeCanonicalCapture": true,
+  "source": {
+    "sha": "83a43c84e3436e72503d33ff8d35765651d7dc53",
+    "tree": "5b0b1abf96b7b13da4443d6698ce791419f658e0",
+    "branch": "codex/stockledger-prod-c13-expo-base-today-evidence-verify-v1"
+  },
+  "discovery": {
+    "browserPath": "Playwright Chromium",
+    "sampleState": "supported Explore sample workspace action in a fresh browser context",
+    "observedNavigation": [
+      {
+        "via": "supported:Explore sample workspace",
+        "hash": "#/today"
+      },
+      {
+        "via": "tab:Watchlist",
+        "hash": "#/watchlist",
+        "text": "S StockLedger Evidence-led review Today Watchlist Recipes Journal Workspace Observe → inspect → record Watchlist Search any stock and inspect the full board 9 ADD STOCK MANAGE MONITORING EYES Sample data is present. Mock prices and outcomes are for exploring the app. ADD YOUR WATCHLIST 20 shown AAPL AAPL Apple $190.20 Dummy-backed ADBE ADBE Adobe $475.20 Dum"
+      },
+      {
+        "via": "tab:Recipes",
+        "hash": "#/recipes",
+        "text": "S StockLedger Evidence-led review Today Watchlist Recipes Journal Workspace Observe → inspect → record Recipes Build formulas, rules, and sets in one flow 9 Sample data is present. Mock prices and outcomes are for exploring the app. 1 Features 2 Rules 3 Signals Raw Daily Condition Scanner No scan run yet. RUN SCAN MATCHED 0 NEAR 0 BLOCKED 0 RULES 6 Condition"
+      },
+      {
+        "via": "tab:Journal",
+        "hash": "#/journal",
+        "text": "S StockLedger Evidence-led review Today Watchlist Recipes Journal Workspace Observe → inspect → record Journal 12 journal entries in view 9 Sample data is present. Mock prices and outcomes are for exploring the app. Decision history first. ENTRIES 12 ENTERED 4 SKIPPED 2 PENDING OUTCOMES 7 ALL ENTERED SKIPPED RISKY NEW SEP 21, 5:41 AM Rejected · COIN · Reset"
+      },
+      {
+        "via": "button:Alerts",
+        "hash": "#/alerts",
+        "text": "S StockLedger Evidence-led review Today Watchlist Recipes Journal Workspace Observe → inspect → record Alerts 9 stocks with open alerts 9 Sample data is present. Mock prices and outcomes are for exploring the app. What changed and why now. OPEN 9 GROUPED STOCKS 9 SNOOZED 1 REVIEWED 2 CURRENT HISTORY Current Alerts · 9 Alerts are grouped by stock first so rel"
+      },
+      {
+        "via": "button:Settings",
+        "hash": "#/settings",
+        "text": "S StockLedger Evidence-led review Today Watchlist Recipes Journal Workspace Observe → inspect → record Settings 0 healthy providers 9 Sample data is present. Mock prices and outcomes are for exploring the app. Your workspace Stored on this device. Export regular backups to keep your investment notes safe. EXPORT COMPLETE BACKUP EXPORT WEEKLY REVIEW REPORT RE"
+      }
+    ],
+    "semantics": {
+      "tabs": [
+        "Today",
+        "Watchlist",
+        "Recipes",
+        "Journal"
+      ],
+      "buttons": [
+        "Settings",
+        "Alerts"
+      ]
+    },
+    "errors": {
+      "console": [],
+      "pageErrors": [],
+      "requestFailures": [],
+      "responses": []
+    }
+  },
+  "surfaces": [
+    {
+      "surfaceKey": "today",
+      "canonicalRoute": "#/today",
+      "semanticRole": "tab",
+      "materialStates": [
+        "empty/personal",
+        "sample/populated",
+        "loading",
+        "error/recovery",
+        "dialog/sheet/overlay",
+        "long-label/dense",
+        "language/ko",
+        "reduced-motion",
+        "keyboard"
+      ],
+      "canonicalAnchors": [
+        "desktop-1440x900",
+        "mobile-390x844"
+      ],
+      "discoveryStatus": "runtime-confirmed-through-supported-navigation"
+    },
+    {
+      "surfaceKey": "watchlist",
+      "canonicalRoute": "#/watchlist",
+      "semanticRole": "tab",
+      "materialStates": [
+        "empty/personal",
+        "sample/populated",
+        "loading",
+        "error/recovery",
+        "dialog/sheet/overlay",
+        "long-label/dense",
+        "language/ko",
+        "reduced-motion",
+        "keyboard"
+      ],
+      "canonicalAnchors": [
+        "desktop-1440x900",
+        "mobile-390x844"
+      ],
+      "discoveryStatus": "runtime-confirmed-through-supported-navigation"
+    },
+    {
+      "surfaceKey": "recipes",
+      "canonicalRoute": "#/recipes",
+      "semanticRole": "tab",
+      "materialStates": [
+        "empty/personal",
+        "sample/populated",
+        "loading",
+        "error/recovery",
+        "dialog/sheet/overlay",
+        "long-label/dense",
+        "language/ko",
+        "reduced-motion",
+        "keyboard"
+      ],
+      "canonicalAnchors": [
+        "desktop-1440x900",
+        "mobile-390x844"
+      ],
+      "discoveryStatus": "runtime-confirmed-through-supported-navigation"
+    },
+    {
+      "surfaceKey": "journal",
+      "canonicalRoute": "#/journal",
+      "semanticRole": "tab",
+      "materialStates": [
+        "empty/personal",
+        "sample/populated",
+        "loading",
+        "error/recovery",
+        "dialog/sheet/overlay",
+        "long-label/dense",
+        "language/ko",
+        "reduced-motion",
+        "keyboard"
+      ],
+      "canonicalAnchors": [
+        "desktop-1440x900",
+        "mobile-390x844"
+      ],
+      "discoveryStatus": "runtime-confirmed-through-supported-navigation"
+    },
+    {
+      "surfaceKey": "alerts",
+      "canonicalRoute": "#/alerts",
+      "semanticRole": "button",
+      "materialStates": [
+        "empty/personal",
+        "sample/populated",
+        "loading",
+        "error/recovery",
+        "dialog/sheet/overlay",
+        "long-label/dense",
+        "language/ko",
+        "reduced-motion",
+        "keyboard"
+      ],
+      "canonicalAnchors": [
+        "desktop-1440x900",
+        "mobile-390x844"
+      ],
+      "discoveryStatus": "runtime-confirmed-through-supported-navigation"
+    },
+    {
+      "surfaceKey": "settings",
+      "canonicalRoute": "#/settings",
+      "semanticRole": "button",
+      "materialStates": [
+        "empty/personal",
+        "sample/populated",
+        "loading",
+        "error/recovery",
+        "dialog/sheet/overlay",
+        "long-label/dense",
+        "language/ko",
+        "reduced-motion",
+        "keyboard"
+      ],
+      "canonicalAnchors": [
+        "desktop-1440x900",
+        "mobile-390x844"
+      ],
+      "discoveryStatus": "runtime-confirmed-through-supported-navigation"
+    }
+  ],
+  "stressProfiles": [
+    "desktop-stress-1366x768",
+    "mobile-stress-360x800",
+    "holdout-412x915"
+  ],
+  "reservedGates": {
+    "browserZoom200": {
+      "requested": true,
+      "executed": false,
+      "status": "UNPROVEN_SEPARATE_GATE",
+      "reason": "Real browser UI zoom was not exercised; CSS viewport resizing was not substituted"
+    }
+  }
+}

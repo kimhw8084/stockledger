@@ -1,0 +1,177 @@
+{
+  "schema": "stockledger-r12-artifact-inventory-v1",
+  "source": {
+    "sha": "83a43c84e3436e72503d33ff8d35765651d7dc53",
+    "tree": "5b0b1abf96b7b13da4443d6698ce791419f658e0",
+    "branch": "codex/stockledger-prod-c13-expo-base-today-evidence-verify-v1",
+    "sourceChanged": false,
+    "candidateBound": true,
+    "protectedBase": "26f3dfb077bea75013fef58975979f02041dc490"
+  },
+  "screenshotCount": 17,
+  "screenshots": [
+    {
+      "surfaceKey": "today",
+      "viewport": "desktop-1440x900",
+      "width": 1440,
+      "height": 900,
+      "png": "screenshots/today--desktop-1440x900.png",
+      "pngSha256": "dd789dd28d3f9f293e5b044b267b953b62783fd1cb9d135c725af855ce956b75"
+    },
+    {
+      "surfaceKey": "watchlist",
+      "viewport": "desktop-1440x900",
+      "width": 1440,
+      "height": 900,
+      "png": "screenshots/watchlist--desktop-1440x900.png",
+      "pngSha256": "abb1e92b222fa1f17d2af7d269151e12e319a74f952af4f2bcc9632f18387895"
+    },
+    {
+      "surfaceKey": "recipes",
+      "viewport": "desktop-1440x900",
+      "width": 1440,
+      "height": 900,
+      "png": "screenshots/recipes--desktop-1440x900.png",
+      "pngSha256": "4d9a8f9974126e3923735960e957057830478fc9a4749b4be5ab88516b58dce3"
+    },
+    {
+      "surfaceKey": "journal",
+      "viewport": "desktop-1440x900",
+      "width": 1440,
+      "height": 900,
+      "png": "screenshots/journal--desktop-1440x900.png",
+      "pngSha256": "ad959ddab8a6e5056a08f8537406f9c8aded3433f30fa2ef9929a11400fac926"
+    },
+    {
+      "surfaceKey": "alerts",
+      "viewport": "desktop-1440x900",
+      "width": 1440,
+      "height": 900,
+      "png": "screenshots/alerts--desktop-1440x900.png",
+      "pngSha256": "86bcb550083b880bb0df8029a1ae74e0316f234b87a8ad6dde18fab36440229b"
+    },
+    {
+      "surfaceKey": "settings",
+      "viewport": "desktop-1440x900",
+      "width": 1440,
+      "height": 900,
+      "png": "screenshots/settings--desktop-1440x900.png",
+      "pngSha256": "eb12f1184a0f6ad51d504e4e85c5c379f6df0db6d0c5cd4b413c1c999481a962"
+    },
+    {
+      "surfaceKey": "today",
+      "viewport": "mobile-390x844",
+      "width": 390,
+      "height": 844,
+      "png": "screenshots/today--mobile-390x844.png",
+      "pngSha256": "ff52a2693e4e9bfad9780c22a4068a8617cc173e586e1175e6895d6a337d416b"
+    },
+    {
+      "surfaceKey": "watchlist",
+      "viewport": "mobile-390x844",
+      "width": 390,
+      "height": 844,
+      "png": "screenshots/watchlist--mobile-390x844.png",
+      "pngSha256": "05fbf8ea4692aa07f766e299229ae87108aaab92a16d0082bfc123d8d891238d"
+    },
+    {
+      "surfaceKey": "recipes",
+      "viewport": "mobile-390x844",
+      "width": 390,
+      "height": 844,
+      "png": "screenshots/recipes--mobile-390x844.png",
+      "pngSha256": "60a89b161e8b4eb7cf42097cdded9102491f9a7e6bc56c8df0631b8d0accbb62"
+    },
+    {
+      "surfaceKey": "journal",
+      "viewport": "mobile-390x844",
+      "width": 390,
+      "height": 844,
+      "png": "screenshots/journal--mobile-390x844.png",
+      "pngSha256": "236a5492c73a7b94e1cf940e74b9d800daf70a7170499d799f742d8c9277ea99"
+    },
+    {
+      "surfaceKey": "alerts",
+      "viewport": "mobile-390x844",
+      "width": 390,
+      "height": 844,
+      "png": "screenshots/alerts--mobile-390x844.png",
+      "pngSha256": "361aa9db6a106fc7a1f204a950f2ea062c2a6f2affbbd07718cc445b0b455c56"
+    },
+    {
+      "surfaceKey": "settings",
+      "viewport": "mobile-390x844",
+      "width": 390,
+      "height": 844,
+      "png": "screenshots/settings--mobile-390x844.png",
+      "pngSha256": "aa7b414b8c1affba4d3991b6976ba619497e42c8950d997b430da6d6d7bae4b0"
+    },
+    {
+      "surfaceKey": "today",
+      "viewport": "desktop-1440x900",
+      "width": 1440,
+      "height": 900,
+      "png": "screenshots/today-ko--desktop-1440x900.png",
+      "pngSha256": "94af7872bd81fd42af3e91c05ff745dbabd8cde7ce8509711981d963a94d0269"
+    },
+    {
+      "surfaceKey": "today",
+      "viewport": "mobile-390x844",
+      "width": 390,
+      "height": 844,
+      "png": "screenshots/today-ko--mobile-390x844.png",
+      "pngSha256": "13150d819de4f8122774f73e377152df5a99832868135f8238b5ef99bff7cb25"
+    },
+    {
+      "surfaceKey": "review-evidence",
+      "viewport": "desktop-1440x900",
+      "width": 1440,
+      "height": 900,
+      "png": "screenshots/review-evidence--desktop-1440x900.png",
+      "pngSha256": "800f82d247b6230b6b1c054c4e0d0af2ff897b1925921673859204c9e184118d"
+    },
+    {
+      "surfaceKey": "review-evidence",
+      "viewport": "mobile-390x844",
+      "width": 390,
+      "height": 844,
+      "png": "screenshots/review-evidence--mobile-390x844.png",
+      "pngSha256": "f586eb9a493befa846d825163c5fc006f23da285fb24202d330c90849b58600f"
+    },
+    {
+      "surfaceKey": "review-evidence-actions",
+      "viewport": "mobile-390x844",
+      "width": 390,
+      "height": 844,
+      "png": "screenshots/review-evidence-actions--mobile-390x844.png",
+      "pngSha256": "500ea15c44e9ba58ff6f33c8aaa3f37279fda66c0200774e8bee37fbc3b6b472"
+    }
+  ],
+  "reviewPdfs": {
+    "review-desktop.pdf": {
+      "sha256": "a2438a2b1f53a7b9a09d30fc1ac23a845751fd3ed2e2193f984a80db0277e8ec",
+      "bytes": 828423
+    },
+    "review-mobile.pdf": {
+      "sha256": "07944a6c2c375deecf14f99c218c6843d6f62e30f19234ac7370c9019ab93552",
+      "bytes": 534479
+    }
+  },
+  "nonHappyAuxiliary": [
+    {
+      "file": "screenshots/non-happy-empty-personal--desktop-1440x900.png",
+      "sha256": "8b39b330f33b5f160741f42be7919ff83fce524dab652359f2101db507124e0e",
+      "bytes": 51607,
+      "dimensions": {
+        "width": 1440,
+        "height": 900
+      }
+    }
+  ],
+  "reservedGates": {
+    "browserZoom200": {
+      "status": "UNPROVEN_SEPARATE_GATE",
+      "claim": "R12 does not claim real-browser 200% zoom acceptance"
+    }
+  }
+}
