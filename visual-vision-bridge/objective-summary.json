@@ -1,0 +1,2109 @@
+{
+  "authority": "R12 original lossless PNGs and R12 JSON diagnostics only; this file is bounded audit transport.",
+  "canonical": {
+    "anchorCount": 17,
+    "controlOverlapCounts": [
+      {
+        "count": 0,
+        "profile": "desktop-1440x900",
+        "surfaceKey": "today"
+      },
+      {
+        "count": 0,
+        "profile": "desktop-1440x900",
+        "surfaceKey": "watchlist"
+      },
+      {
+        "count": 0,
+        "profile": "desktop-1440x900",
+        "surfaceKey": "recipes"
+      },
+      {
+        "count": 0,
+        "profile": "desktop-1440x900",
+        "surfaceKey": "journal"
+      },
+      {
+        "count": 0,
+        "profile": "desktop-1440x900",
+        "surfaceKey": "alerts"
+      },
+      {
+        "count": 0,
+        "profile": "desktop-1440x900",
+        "surfaceKey": "settings"
+      },
+      {
+        "count": 0,
+        "profile": "mobile-390x844",
+        "surfaceKey": "today"
+      },
+      {
+        "count": 0,
+        "profile": "mobile-390x844",
+        "surfaceKey": "watchlist"
+      },
+      {
+        "count": 0,
+        "profile": "mobile-390x844",
+        "surfaceKey": "recipes"
+      },
+      {
+        "count": 0,
+        "profile": "mobile-390x844",
+        "surfaceKey": "journal"
+      },
+      {
+        "count": 0,
+        "profile": "mobile-390x844",
+        "surfaceKey": "alerts"
+      },
+      {
+        "count": 0,
+        "profile": "mobile-390x844",
+        "surfaceKey": "settings"
+      },
+      {
+        "count": 0,
+        "profile": "desktop-1440x900",
+        "surfaceKey": "today"
+      },
+      {
+        "count": 0,
+        "profile": "mobile-390x844",
+        "surfaceKey": "today"
+      },
+      {
+        "count": 0,
+        "profile": "desktop-1440x900",
+        "surfaceKey": "review-evidence"
+      },
+      {
+        "count": 0,
+        "profile": "mobile-390x844",
+        "surfaceKey": "review-evidence"
+      },
+      {
+        "count": 0,
+        "profile": "mobile-390x844",
+        "surfaceKey": "review-evidence-actions"
+      }
+    ],
+    "criticalActionReachability": [
+      {
+        "actionInViewport": true,
+        "firstReviewAction": {
+          "name": "Open review · AMD",
+          "rect": {
+            "bottom": 558,
+            "height": 44,
+            "right": 1342.96875,
+            "width": 179.96875,
+            "x": 1163,
+            "y": 514
+          }
+        },
+        "profile": "desktop-1440x900"
+      },
+      {
+        "actionInViewport": true,
+        "firstReviewAction": {
+          "name": "Open review · AMD",
+          "rect": {
+            "bottom": 702,
+            "height": 44,
+            "right": 361,
+            "width": 332,
+            "x": 29,
+            "y": 658
+          }
+        },
+        "profile": "mobile-390x844"
+      },
+      {
+        "actionInViewport": true,
+        "firstReviewAction": {
+          "name": "검토 열기 · AMD",
+          "rect": {
+            "bottom": 537,
+            "height": 44,
+            "right": 1312.640625,
+            "width": 149.640625,
+            "x": 1163,
+            "y": 493
+          }
+        },
+        "profile": "desktop-1440x900"
+      },
+      {
+        "actionInViewport": true,
+        "firstReviewAction": {
+          "name": "검토 열기 · AMD",
+          "rect": {
+            "bottom": 664,
+            "height": 44,
+            "right": 361,
+            "width": 332,
+            "x": 29,
+            "y": 620
+          }
+        },
+        "profile": "mobile-390x844"
+      }
+    ],
+    "englishTodayCount": 2,
+    "errorCounts": {
+      "console": 0,
+      "pageErrors": 0,
+      "requestFailures": 0,
+      "responses": 0
+    },
+    "hardFailCounts": {
+      "canonicalAnchors": 0,
+      "reviewOracles": 0,
+      "runtimeDiagnostics": 0,
+      "stressProfiles": 0,
+      "total": 0
+    },
+    "horizontalOverflow": [
+      {
+        "profile": "desktop-1440x900",
+        "surfaceKey": "today",
+        "value": false
+      },
+      {
+        "profile": "desktop-1440x900",
+        "surfaceKey": "watchlist",
+        "value": false
+      },
+      {
+        "profile": "desktop-1440x900",
+        "surfaceKey": "recipes",
+        "value": false
+      },
+      {
+        "profile": "desktop-1440x900",
+        "surfaceKey": "journal",
+        "value": false
+      },
+      {
+        "profile": "desktop-1440x900",
+        "surfaceKey": "alerts",
+        "value": false
+      },
+      {
+        "profile": "desktop-1440x900",
+        "surfaceKey": "settings",
+        "value": false
+      },
+      {
+        "profile": "mobile-390x844",
+        "surfaceKey": "today",
+        "value": false
+      },
+      {
+        "profile": "mobile-390x844",
+        "surfaceKey": "watchlist",
+        "value": false
+      },
+      {
+        "profile": "mobile-390x844",
+        "surfaceKey": "recipes",
+        "value": false
+      },
+      {
+        "profile": "mobile-390x844",
+        "surfaceKey": "journal",
+        "value": false
+      },
+      {
+        "profile": "mobile-390x844",
+        "surfaceKey": "alerts",
+        "value": false
+      },
+      {
+        "profile": "mobile-390x844",
+        "surfaceKey": "settings",
+        "value": false
+      },
+      {
+        "profile": "desktop-1440x900",
+        "surfaceKey": "today",
+        "value": false
+      },
+      {
+        "profile": "mobile-390x844",
+        "surfaceKey": "today",
+        "value": false
+      },
+      {
+        "profile": "desktop-1440x900",
+        "surfaceKey": "review-evidence",
+        "value": null
+      },
+      {
+        "profile": "mobile-390x844",
+        "surfaceKey": "review-evidence",
+        "value": null
+      },
+      {
+        "profile": "mobile-390x844",
+        "surfaceKey": "review-evidence-actions",
+        "value": null
+      }
+    ],
+    "koreanTodayCount": 2,
+    "languageFacts": [
+      {
+        "languageSemantics": {
+          "selectedTab": "true",
+          "settingsControl": 1
+        },
+        "locale": "ko-KR",
+        "profile": "desktop-1440x900"
+      },
+      {
+        "languageSemantics": {
+          "selectedTab": "true",
+          "settingsControl": 1
+        },
+        "locale": "ko-KR",
+        "profile": "mobile-390x844"
+      }
+    ],
+    "reviewOracleCount": 2,
+    "screenshotCount": 17
+  },
+  "readiness": {
+    "final": {
+      "hardFailPolicyStatus": "PASS",
+      "hardFails": [],
+      "releaseReasons": [],
+      "releaseVerified": true,
+      "status": "PASS"
+    },
+    "qualificationSummary": {
+      "browserZoom200": "UNPROVEN_SEPARATE_GATE",
+      "canonicalEnglish": 12,
+      "koreanToday": 2,
+      "nonHappyStates": [
+        {
+          "state": "empty/personal",
+          "status": "OBSERVED"
+        },
+        {
+          "state": "degraded/sample-evidence-limited",
+          "status": "OBSERVED"
+        },
+        {
+          "state": "loading",
+          "status": "UNPROVEN"
+        },
+        {
+          "state": "blocked",
+          "status": "UNPROVEN"
+        },
+        {
+          "state": "error/recovery",
+          "status": "UNPROVEN"
+        }
+      ],
+      "reviewPanels": 2,
+      "screenshotCount": 17,
+      "status": "PASS",
+      "stressProfiles": 3
+    },
+    "transient": {
+      "blocked": "UNPROVEN",
+      "errorRecovery": "UNPROVEN",
+      "loading": "UNPROVEN",
+      "reasonsPreservedInNonHappyFacts": true
+    }
+  },
+  "releaseVerification": {
+    "releaseEvidence": {
+      "baseCommit": "26f3dfb077bea75013fef58975979f02041dc490",
+      "contractVersion": "stockledger-release-evidence-v1",
+      "evidenceHash": "9d9e860f16423b68819ffc4bad633b14105902fa645cff2f1ca65d7bdf0a1e78",
+      "packageLock": {
+        "sha256": "81117b82120669c16680c7f92ffe34be80a438bea52d2196aa2071f7533314ec"
+      },
+      "revision": 1,
+      "source": {
+        "commit": "83a43c84e3436e72503d33ff8d35765651d7dc53",
+        "tree": "5b0b1abf96b7b13da4443d6698ce791419f658e0",
+        "workingTree": "clean"
+      }
+    },
+    "releaseVerifyResult": {
+      "reasons": [],
+      "verified": true
+    },
+    "releaseVerifyTextSha256": "7d76749342b92e607af6718f58e7c489f790c04b0543e8b37cfd7640eb0698d5"
+  },
+  "reservedGates": {
+    "browserZoom200": {
+      "claim": "R12 does not claim real-browser 200% zoom acceptance",
+      "status": "UNPROVEN_SEPARATE_GATE"
+    }
+  },
+  "runtime": {
+    "browserCaptureWasR12Only": true,
+    "errors": {
+      "console": [],
+      "pageErrors": [],
+      "requestFailures": [],
+      "responses": []
+    },
+    "runtimeDiagnosticsHardFails": []
+  },
+  "schema": "stockledger-r13-objective-summary-v1",
+  "sharedShellContinuity": [
+    {
+      "continuity": [
+        {
+          "hash": "#/today",
+          "profile": "desktop-1440x900",
+          "semantics": null,
+          "shellControls": [
+            {
+              "disabled": false,
+              "name": "Today",
+              "pressed": null,
+              "rect": {
+                "bottom": 146,
+                "height": 52,
+                "right": 207,
+                "width": 191,
+                "x": 16,
+                "y": 94
+              },
+              "role": "tab",
+              "selected": "true"
+            },
+            {
+              "disabled": false,
+              "name": "Watchlist",
+              "pressed": null,
+              "rect": {
+                "bottom": 202,
+                "height": 52,
+                "right": 207,
+                "width": 191,
+                "x": 16,
+                "y": 150
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Recipes",
+              "pressed": null,
+              "rect": {
+                "bottom": 258,
+                "height": 52,
+                "right": 207,
+                "width": 191,
+                "x": 16,
+                "y": 206
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Journal",
+              "pressed": null,
+              "rect": {
+                "bottom": 314,
+                "height": 52,
+                "right": 207,
+                "width": 191,
+                "x": 16,
+                "y": 262
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Alerts",
+              "pressed": "false",
+              "rect": {
+                "bottom": 59.5,
+                "height": 44,
+                "right": 1324.375,
+                "width": 44,
+                "x": 1280.375,
+                "y": 15.5
+              },
+              "role": "button",
+              "selected": null
+            },
+            {
+              "disabled": false,
+              "name": "Settings",
+              "pressed": "false",
+              "rect": {
+                "bottom": 59.5,
+                "height": 44,
+                "right": 1408,
+                "width": 44,
+                "x": 1364,
+                "y": 15.5
+              },
+              "role": "button",
+              "selected": null
+            }
+          ],
+          "surfaceKey": "today",
+          "tablist": "Primary navigation"
+        },
+        {
+          "hash": "#/watchlist",
+          "profile": "desktop-1440x900",
+          "semantics": {
+            "hash": "#/watchlist",
+            "name": "Watchlist",
+            "role": "tab",
+            "selected": "true"
+          },
+          "shellControls": [
+            {
+              "disabled": false,
+              "name": "Today",
+              "pressed": null,
+              "rect": {
+                "bottom": 146,
+                "height": 52,
+                "right": 207,
+                "width": 191,
+                "x": 16,
+                "y": 94
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Watchlist",
+              "pressed": null,
+              "rect": {
+                "bottom": 202,
+                "height": 52,
+                "right": 207,
+                "width": 191,
+                "x": 16,
+                "y": 150
+              },
+              "role": "tab",
+              "selected": "true"
+            },
+            {
+              "disabled": false,
+              "name": "Recipes",
+              "pressed": null,
+              "rect": {
+                "bottom": 258,
+                "height": 52,
+                "right": 207,
+                "width": 191,
+                "x": 16,
+                "y": 206
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Journal",
+              "pressed": null,
+              "rect": {
+                "bottom": 314,
+                "height": 52,
+                "right": 207,
+                "width": 191,
+                "x": 16,
+                "y": 262
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Alerts",
+              "pressed": "false",
+              "rect": {
+                "bottom": 59.5,
+                "height": 44,
+                "right": 1324.375,
+                "width": 44,
+                "x": 1280.375,
+                "y": 15.5
+              },
+              "role": "button",
+              "selected": null
+            },
+            {
+              "disabled": false,
+              "name": "Settings",
+              "pressed": "false",
+              "rect": {
+                "bottom": 59.5,
+                "height": 44,
+                "right": 1408,
+                "width": 44,
+                "x": 1364,
+                "y": 15.5
+              },
+              "role": "button",
+              "selected": null
+            }
+          ],
+          "surfaceKey": "watchlist",
+          "tablist": "Primary navigation"
+        },
+        {
+          "hash": "#/recipes",
+          "profile": "desktop-1440x900",
+          "semantics": {
+            "hash": "#/recipes",
+            "name": "Recipes",
+            "role": "tab",
+            "selected": "true"
+          },
+          "shellControls": [
+            {
+              "disabled": false,
+              "name": "Today",
+              "pressed": null,
+              "rect": {
+                "bottom": 146,
+                "height": 52,
+                "right": 207,
+                "width": 191,
+                "x": 16,
+                "y": 94
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Watchlist",
+              "pressed": null,
+              "rect": {
+                "bottom": 202,
+                "height": 52,
+                "right": 207,
+                "width": 191,
+                "x": 16,
+                "y": 150
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Recipes",
+              "pressed": null,
+              "rect": {
+                "bottom": 258,
+                "height": 52,
+                "right": 207,
+                "width": 191,
+                "x": 16,
+                "y": 206
+              },
+              "role": "tab",
+              "selected": "true"
+            },
+            {
+              "disabled": false,
+              "name": "Journal",
+              "pressed": null,
+              "rect": {
+                "bottom": 314,
+                "height": 52,
+                "right": 207,
+                "width": 191,
+                "x": 16,
+                "y": 262
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Alerts",
+              "pressed": "false",
+              "rect": {
+                "bottom": 59.5,
+                "height": 44,
+                "right": 1324.375,
+                "width": 44,
+                "x": 1280.375,
+                "y": 15.5
+              },
+              "role": "button",
+              "selected": null
+            },
+            {
+              "disabled": false,
+              "name": "Settings",
+              "pressed": "false",
+              "rect": {
+                "bottom": 59.5,
+                "height": 44,
+                "right": 1408,
+                "width": 44,
+                "x": 1364,
+                "y": 15.5
+              },
+              "role": "button",
+              "selected": null
+            }
+          ],
+          "surfaceKey": "recipes",
+          "tablist": "Primary navigation"
+        },
+        {
+          "hash": "#/journal",
+          "profile": "desktop-1440x900",
+          "semantics": {
+            "hash": "#/journal",
+            "name": "Journal",
+            "role": "tab",
+            "selected": "true"
+          },
+          "shellControls": [
+            {
+              "disabled": false,
+              "name": "Today",
+              "pressed": null,
+              "rect": {
+                "bottom": 146,
+                "height": 52,
+                "right": 207,
+                "width": 191,
+                "x": 16,
+                "y": 94
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Watchlist",
+              "pressed": null,
+              "rect": {
+                "bottom": 202,
+                "height": 52,
+                "right": 207,
+                "width": 191,
+                "x": 16,
+                "y": 150
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Recipes",
+              "pressed": null,
+              "rect": {
+                "bottom": 258,
+                "height": 52,
+                "right": 207,
+                "width": 191,
+                "x": 16,
+                "y": 206
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Journal",
+              "pressed": null,
+              "rect": {
+                "bottom": 314,
+                "height": 52,
+                "right": 207,
+                "width": 191,
+                "x": 16,
+                "y": 262
+              },
+              "role": "tab",
+              "selected": "true"
+            },
+            {
+              "disabled": false,
+              "name": "Alerts",
+              "pressed": "false",
+              "rect": {
+                "bottom": 59.5,
+                "height": 44,
+                "right": 1324.375,
+                "width": 44,
+                "x": 1280.375,
+                "y": 15.5
+              },
+              "role": "button",
+              "selected": null
+            },
+            {
+              "disabled": false,
+              "name": "Settings",
+              "pressed": "false",
+              "rect": {
+                "bottom": 59.5,
+                "height": 44,
+                "right": 1408,
+                "width": 44,
+                "x": 1364,
+                "y": 15.5
+              },
+              "role": "button",
+              "selected": null
+            }
+          ],
+          "surfaceKey": "journal",
+          "tablist": "Primary navigation"
+        },
+        {
+          "hash": "#/alerts",
+          "profile": "desktop-1440x900",
+          "semantics": {
+            "hash": "#/alerts",
+            "name": "Alerts",
+            "pressed": "true",
+            "role": "button"
+          },
+          "shellControls": [
+            {
+              "disabled": false,
+              "name": "Today",
+              "pressed": null,
+              "rect": {
+                "bottom": 146,
+                "height": 52,
+                "right": 207,
+                "width": 191,
+                "x": 16,
+                "y": 94
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Watchlist",
+              "pressed": null,
+              "rect": {
+                "bottom": 202,
+                "height": 52,
+                "right": 207,
+                "width": 191,
+                "x": 16,
+                "y": 150
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Recipes",
+              "pressed": null,
+              "rect": {
+                "bottom": 258,
+                "height": 52,
+                "right": 207,
+                "width": 191,
+                "x": 16,
+                "y": 206
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Journal",
+              "pressed": null,
+              "rect": {
+                "bottom": 314,
+                "height": 52,
+                "right": 207,
+                "width": 191,
+                "x": 16,
+                "y": 262
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Alerts",
+              "pressed": "true",
+              "rect": {
+                "bottom": 59.5,
+                "height": 44,
+                "right": 1324.375,
+                "width": 44,
+                "x": 1280.375,
+                "y": 15.5
+              },
+              "role": "button",
+              "selected": null
+            },
+            {
+              "disabled": false,
+              "name": "Settings",
+              "pressed": "false",
+              "rect": {
+                "bottom": 59.5,
+                "height": 44,
+                "right": 1408,
+                "width": 44,
+                "x": 1364,
+                "y": 15.5
+              },
+              "role": "button",
+              "selected": null
+            }
+          ],
+          "surfaceKey": "alerts",
+          "tablist": "Primary navigation"
+        },
+        {
+          "hash": "#/settings",
+          "profile": "desktop-1440x900",
+          "semantics": {
+            "hash": "#/settings",
+            "name": "Settings",
+            "pressed": "true",
+            "role": "button"
+          },
+          "shellControls": [
+            {
+              "disabled": false,
+              "name": "Today",
+              "pressed": null,
+              "rect": {
+                "bottom": 146,
+                "height": 52,
+                "right": 207,
+                "width": 191,
+                "x": 16,
+                "y": 94
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Watchlist",
+              "pressed": null,
+              "rect": {
+                "bottom": 202,
+                "height": 52,
+                "right": 207,
+                "width": 191,
+                "x": 16,
+                "y": 150
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Recipes",
+              "pressed": null,
+              "rect": {
+                "bottom": 258,
+                "height": 52,
+                "right": 207,
+                "width": 191,
+                "x": 16,
+                "y": 206
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Journal",
+              "pressed": null,
+              "rect": {
+                "bottom": 314,
+                "height": 52,
+                "right": 207,
+                "width": 191,
+                "x": 16,
+                "y": 262
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Alerts",
+              "pressed": "false",
+              "rect": {
+                "bottom": 59.5,
+                "height": 44,
+                "right": 1324.375,
+                "width": 44,
+                "x": 1280.375,
+                "y": 15.5
+              },
+              "role": "button",
+              "selected": null
+            },
+            {
+              "disabled": false,
+              "name": "Settings",
+              "pressed": "true",
+              "rect": {
+                "bottom": 59.5,
+                "height": 44,
+                "right": 1408,
+                "width": 44,
+                "x": 1364,
+                "y": 15.5
+              },
+              "role": "button",
+              "selected": null
+            }
+          ],
+          "surfaceKey": "settings",
+          "tablist": "Primary navigation"
+        }
+      ],
+      "navigationTrace": [
+        {
+          "hash": "#/today",
+          "via": "bootstrap:Explore sample workspace"
+        },
+        {
+          "hash": "#/watchlist",
+          "semantics": {
+            "hash": "#/watchlist",
+            "name": "Watchlist",
+            "role": "tab",
+            "selected": "true"
+          },
+          "via": "tab:Watchlist"
+        },
+        {
+          "hash": "#/recipes",
+          "semantics": {
+            "hash": "#/recipes",
+            "name": "Recipes",
+            "role": "tab",
+            "selected": "true"
+          },
+          "via": "tab:Recipes"
+        },
+        {
+          "hash": "#/journal",
+          "semantics": {
+            "hash": "#/journal",
+            "name": "Journal",
+            "role": "tab",
+            "selected": "true"
+          },
+          "via": "tab:Journal"
+        },
+        {
+          "hash": "#/alerts",
+          "semantics": {
+            "hash": "#/alerts",
+            "name": "Alerts",
+            "pressed": "true",
+            "role": "button"
+          },
+          "via": "button:Alerts"
+        },
+        {
+          "hash": "#/settings",
+          "semantics": {
+            "hash": "#/settings",
+            "name": "Settings",
+            "pressed": "true",
+            "role": "button"
+          },
+          "via": "button:Settings"
+        }
+      ],
+      "profile": {
+        "hasTouch": false,
+        "height": 900,
+        "isMobile": false,
+        "name": "desktop-1440x900",
+        "width": 1440
+      }
+    },
+    {
+      "continuity": [
+        {
+          "hash": "#/today",
+          "profile": "mobile-390x844",
+          "semantics": null,
+          "shellControls": [
+            {
+              "disabled": false,
+              "name": "Today",
+              "pressed": null,
+              "rect": {
+                "bottom": 836,
+                "height": 56,
+                "right": 98.5,
+                "width": 90.5,
+                "x": 8,
+                "y": 780
+              },
+              "role": "tab",
+              "selected": "true"
+            },
+            {
+              "disabled": false,
+              "name": "Watchlist",
+              "pressed": null,
+              "rect": {
+                "bottom": 836,
+                "height": 56,
+                "right": 193,
+                "width": 90.5,
+                "x": 102.5,
+                "y": 780
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Recipes",
+              "pressed": null,
+              "rect": {
+                "bottom": 836,
+                "height": 56,
+                "right": 287.5,
+                "width": 90.5,
+                "x": 197,
+                "y": 780
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Journal",
+              "pressed": null,
+              "rect": {
+                "bottom": 836,
+                "height": 56,
+                "right": 382,
+                "width": 90.5,
+                "x": 291.5,
+                "y": 780
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Alerts",
+              "pressed": "false",
+              "rect": {
+                "bottom": 59.5,
+                "height": 44,
+                "right": 290.375,
+                "width": 44,
+                "x": 246.375,
+                "y": 15.5
+              },
+              "role": "button",
+              "selected": null
+            },
+            {
+              "disabled": false,
+              "name": "Settings",
+              "pressed": "false",
+              "rect": {
+                "bottom": 59.5,
+                "height": 44,
+                "right": 374,
+                "width": 44,
+                "x": 330,
+                "y": 15.5
+              },
+              "role": "button",
+              "selected": null
+            }
+          ],
+          "surfaceKey": "today",
+          "tablist": "Primary navigation"
+        },
+        {
+          "hash": "#/watchlist",
+          "profile": "mobile-390x844",
+          "semantics": {
+            "hash": "#/watchlist",
+            "name": "Watchlist",
+            "role": "tab",
+            "selected": "true"
+          },
+          "shellControls": [
+            {
+              "disabled": false,
+              "name": "Today",
+              "pressed": null,
+              "rect": {
+                "bottom": 836,
+                "height": 56,
+                "right": 98.5,
+                "width": 90.5,
+                "x": 8,
+                "y": 780
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Watchlist",
+              "pressed": null,
+              "rect": {
+                "bottom": 836,
+                "height": 56,
+                "right": 193,
+                "width": 90.5,
+                "x": 102.5,
+                "y": 780
+              },
+              "role": "tab",
+              "selected": "true"
+            },
+            {
+              "disabled": false,
+              "name": "Recipes",
+              "pressed": null,
+              "rect": {
+                "bottom": 836,
+                "height": 56,
+                "right": 287.5,
+                "width": 90.5,
+                "x": 197,
+                "y": 780
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Journal",
+              "pressed": null,
+              "rect": {
+                "bottom": 836,
+                "height": 56,
+                "right": 382,
+                "width": 90.5,
+                "x": 291.5,
+                "y": 780
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Alerts",
+              "pressed": "false",
+              "rect": {
+                "bottom": 67,
+                "height": 44,
+                "right": 290.375,
+                "width": 44,
+                "x": 246.375,
+                "y": 23
+              },
+              "role": "button",
+              "selected": null
+            },
+            {
+              "disabled": false,
+              "name": "Settings",
+              "pressed": "false",
+              "rect": {
+                "bottom": 67,
+                "height": 44,
+                "right": 374,
+                "width": 44,
+                "x": 330,
+                "y": 23
+              },
+              "role": "button",
+              "selected": null
+            }
+          ],
+          "surfaceKey": "watchlist",
+          "tablist": "Primary navigation"
+        },
+        {
+          "hash": "#/recipes",
+          "profile": "mobile-390x844",
+          "semantics": {
+            "hash": "#/recipes",
+            "name": "Recipes",
+            "role": "tab",
+            "selected": "true"
+          },
+          "shellControls": [
+            {
+              "disabled": false,
+              "name": "Today",
+              "pressed": null,
+              "rect": {
+                "bottom": 836,
+                "height": 56,
+                "right": 98.5,
+                "width": 90.5,
+                "x": 8,
+                "y": 780
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Watchlist",
+              "pressed": null,
+              "rect": {
+                "bottom": 836,
+                "height": 56,
+                "right": 193,
+                "width": 90.5,
+                "x": 102.5,
+                "y": 780
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Recipes",
+              "pressed": null,
+              "rect": {
+                "bottom": 836,
+                "height": 56,
+                "right": 287.5,
+                "width": 90.5,
+                "x": 197,
+                "y": 780
+              },
+              "role": "tab",
+              "selected": "true"
+            },
+            {
+              "disabled": false,
+              "name": "Journal",
+              "pressed": null,
+              "rect": {
+                "bottom": 836,
+                "height": 56,
+                "right": 382,
+                "width": 90.5,
+                "x": 291.5,
+                "y": 780
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Alerts",
+              "pressed": "false",
+              "rect": {
+                "bottom": 67,
+                "height": 44,
+                "right": 290.375,
+                "width": 44,
+                "x": 246.375,
+                "y": 23
+              },
+              "role": "button",
+              "selected": null
+            },
+            {
+              "disabled": false,
+              "name": "Settings",
+              "pressed": "false",
+              "rect": {
+                "bottom": 67,
+                "height": 44,
+                "right": 374,
+                "width": 44,
+                "x": 330,
+                "y": 23
+              },
+              "role": "button",
+              "selected": null
+            }
+          ],
+          "surfaceKey": "recipes",
+          "tablist": "Primary navigation"
+        },
+        {
+          "hash": "#/journal",
+          "profile": "mobile-390x844",
+          "semantics": {
+            "hash": "#/journal",
+            "name": "Journal",
+            "role": "tab",
+            "selected": "true"
+          },
+          "shellControls": [
+            {
+              "disabled": false,
+              "name": "Today",
+              "pressed": null,
+              "rect": {
+                "bottom": 836,
+                "height": 56,
+                "right": 98.5,
+                "width": 90.5,
+                "x": 8,
+                "y": 780
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Watchlist",
+              "pressed": null,
+              "rect": {
+                "bottom": 836,
+                "height": 56,
+                "right": 193,
+                "width": 90.5,
+                "x": 102.5,
+                "y": 780
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Recipes",
+              "pressed": null,
+              "rect": {
+                "bottom": 836,
+                "height": 56,
+                "right": 287.5,
+                "width": 90.5,
+                "x": 197,
+                "y": 780
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Journal",
+              "pressed": null,
+              "rect": {
+                "bottom": 836,
+                "height": 56,
+                "right": 382,
+                "width": 90.5,
+                "x": 291.5,
+                "y": 780
+              },
+              "role": "tab",
+              "selected": "true"
+            },
+            {
+              "disabled": false,
+              "name": "Alerts",
+              "pressed": "false",
+              "rect": {
+                "bottom": 59.5,
+                "height": 44,
+                "right": 290.375,
+                "width": 44,
+                "x": 246.375,
+                "y": 15.5
+              },
+              "role": "button",
+              "selected": null
+            },
+            {
+              "disabled": false,
+              "name": "Settings",
+              "pressed": "false",
+              "rect": {
+                "bottom": 59.5,
+                "height": 44,
+                "right": 374,
+                "width": 44,
+                "x": 330,
+                "y": 15.5
+              },
+              "role": "button",
+              "selected": null
+            }
+          ],
+          "surfaceKey": "journal",
+          "tablist": "Primary navigation"
+        },
+        {
+          "hash": "#/alerts",
+          "profile": "mobile-390x844",
+          "semantics": {
+            "hash": "#/alerts",
+            "name": "Alerts",
+            "pressed": "true",
+            "role": "button"
+          },
+          "shellControls": [
+            {
+              "disabled": false,
+              "name": "Today",
+              "pressed": null,
+              "rect": {
+                "bottom": 836,
+                "height": 56,
+                "right": 98.5,
+                "width": 90.5,
+                "x": 8,
+                "y": 780
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Watchlist",
+              "pressed": null,
+              "rect": {
+                "bottom": 836,
+                "height": 56,
+                "right": 193,
+                "width": 90.5,
+                "x": 102.5,
+                "y": 780
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Recipes",
+              "pressed": null,
+              "rect": {
+                "bottom": 836,
+                "height": 56,
+                "right": 287.5,
+                "width": 90.5,
+                "x": 197,
+                "y": 780
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Journal",
+              "pressed": null,
+              "rect": {
+                "bottom": 836,
+                "height": 56,
+                "right": 382,
+                "width": 90.5,
+                "x": 291.5,
+                "y": 780
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Alerts",
+              "pressed": "true",
+              "rect": {
+                "bottom": 59.5,
+                "height": 44,
+                "right": 290.375,
+                "width": 44,
+                "x": 246.375,
+                "y": 15.5
+              },
+              "role": "button",
+              "selected": null
+            },
+            {
+              "disabled": false,
+              "name": "Settings",
+              "pressed": "false",
+              "rect": {
+                "bottom": 59.5,
+                "height": 44,
+                "right": 374,
+                "width": 44,
+                "x": 330,
+                "y": 15.5
+              },
+              "role": "button",
+              "selected": null
+            }
+          ],
+          "surfaceKey": "alerts",
+          "tablist": "Primary navigation"
+        },
+        {
+          "hash": "#/settings",
+          "profile": "mobile-390x844",
+          "semantics": {
+            "hash": "#/settings",
+            "name": "Settings",
+            "pressed": "true",
+            "role": "button"
+          },
+          "shellControls": [
+            {
+              "disabled": false,
+              "name": "Today",
+              "pressed": null,
+              "rect": {
+                "bottom": 836,
+                "height": 56,
+                "right": 98.5,
+                "width": 90.5,
+                "x": 8,
+                "y": 780
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Watchlist",
+              "pressed": null,
+              "rect": {
+                "bottom": 836,
+                "height": 56,
+                "right": 193,
+                "width": 90.5,
+                "x": 102.5,
+                "y": 780
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Recipes",
+              "pressed": null,
+              "rect": {
+                "bottom": 836,
+                "height": 56,
+                "right": 287.5,
+                "width": 90.5,
+                "x": 197,
+                "y": 780
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Journal",
+              "pressed": null,
+              "rect": {
+                "bottom": 836,
+                "height": 56,
+                "right": 382,
+                "width": 90.5,
+                "x": 291.5,
+                "y": 780
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Alerts",
+              "pressed": "false",
+              "rect": {
+                "bottom": 59.5,
+                "height": 44,
+                "right": 290.375,
+                "width": 44,
+                "x": 246.375,
+                "y": 15.5
+              },
+              "role": "button",
+              "selected": null
+            },
+            {
+              "disabled": false,
+              "name": "Settings",
+              "pressed": "true",
+              "rect": {
+                "bottom": 59.5,
+                "height": 44,
+                "right": 374,
+                "width": 44,
+                "x": 330,
+                "y": 15.5
+              },
+              "role": "button",
+              "selected": null
+            }
+          ],
+          "surfaceKey": "settings",
+          "tablist": "Primary navigation"
+        }
+      ],
+      "navigationTrace": [
+        {
+          "hash": "#/today",
+          "via": "bootstrap:Explore sample workspace"
+        },
+        {
+          "hash": "#/watchlist",
+          "semantics": {
+            "hash": "#/watchlist",
+            "name": "Watchlist",
+            "role": "tab",
+            "selected": "true"
+          },
+          "via": "tab:Watchlist"
+        },
+        {
+          "hash": "#/recipes",
+          "semantics": {
+            "hash": "#/recipes",
+            "name": "Recipes",
+            "role": "tab",
+            "selected": "true"
+          },
+          "via": "tab:Recipes"
+        },
+        {
+          "hash": "#/journal",
+          "semantics": {
+            "hash": "#/journal",
+            "name": "Journal",
+            "role": "tab",
+            "selected": "true"
+          },
+          "via": "tab:Journal"
+        },
+        {
+          "hash": "#/alerts",
+          "semantics": {
+            "hash": "#/alerts",
+            "name": "Alerts",
+            "pressed": "true",
+            "role": "button"
+          },
+          "via": "button:Alerts"
+        },
+        {
+          "hash": "#/settings",
+          "semantics": {
+            "hash": "#/settings",
+            "name": "Settings",
+            "pressed": "true",
+            "role": "button"
+          },
+          "via": "button:Settings"
+        }
+      ],
+      "profile": {
+        "hasTouch": true,
+        "height": 844,
+        "isMobile": true,
+        "name": "mobile-390x844",
+        "width": 390
+      }
+    }
+  ],
+  "source": {
+    "protectedMain": "26f3dfb077bea75013fef58975979f02041dc490",
+    "sha": "83a43c84e3436e72503d33ff8d35765651d7dc53",
+    "tree": "5b0b1abf96b7b13da4443d6698ce791419f658e0"
+  },
+  "stress": {
+    "criticalActionReachability": [
+      {
+        "firstReview": {
+          "actionBox": {
+            "height": 44,
+            "width": 179.96875,
+            "x": 1089,
+            "y": 514
+          },
+          "actionInViewport": true,
+          "actionName": "Open review · AMD",
+          "rowBox": {
+            "height": 162,
+            "width": 1062,
+            "x": 264,
+            "y": 497
+          }
+        },
+        "profile": "desktop-stress-1366x768"
+      },
+      {
+        "firstReview": {
+          "actionBox": {
+            "height": 44,
+            "width": 302,
+            "x": 29,
+            "y": 679
+          },
+          "actionInViewport": true,
+          "actionName": "Open review · AMD",
+          "rowBox": {
+            "height": 256,
+            "width": 328,
+            "x": 16,
+            "y": 666
+          }
+        },
+        "profile": "mobile-stress-360x800"
+      },
+      {
+        "firstReview": {
+          "actionBox": {
+            "height": 44,
+            "width": 354,
+            "x": 29,
+            "y": 658
+          },
+          "actionInViewport": true,
+          "actionName": "Open review · AMD",
+          "rowBox": {
+            "height": 256,
+            "width": 380,
+            "x": 16,
+            "y": 645
+          }
+        },
+        "profile": "holdout-412x915"
+      }
+    ],
+    "holdoutExecutedLast": true,
+    "holdoutProfile": "holdout-412x915",
+    "pointer": "executed through Playwright click",
+    "profiles": [
+      {
+        "controlOverlapCount": 0,
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "responses": []
+        },
+        "firstReview": {
+          "actionBox": {
+            "height": 44,
+            "width": 179.96875,
+            "x": 1089,
+            "y": 514
+          },
+          "actionInViewport": true,
+          "actionName": "Open review · AMD",
+          "rowBox": {
+            "height": 162,
+            "width": 1062,
+            "x": 264,
+            "y": 497
+          }
+        },
+        "hardFails": [],
+        "horizontalOverflow": false,
+        "profile": {
+          "hasTouch": false,
+          "height": 768,
+          "isMobile": false,
+          "name": "desktop-stress-1366x768",
+          "width": 1366
+        },
+        "retainedPngCoverage": false
+      },
+      {
+        "controlOverlapCount": 0,
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "responses": []
+        },
+        "firstReview": {
+          "actionBox": {
+            "height": 44,
+            "width": 302,
+            "x": 29,
+            "y": 679
+          },
+          "actionInViewport": true,
+          "actionName": "Open review · AMD",
+          "rowBox": {
+            "height": 256,
+            "width": 328,
+            "x": 16,
+            "y": 666
+          }
+        },
+        "hardFails": [],
+        "horizontalOverflow": false,
+        "profile": {
+          "hasTouch": true,
+          "height": 800,
+          "isMobile": true,
+          "name": "mobile-stress-360x800",
+          "width": 360
+        },
+        "retainedPngCoverage": false
+      },
+      {
+        "controlOverlapCount": 0,
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "responses": []
+        },
+        "firstReview": {
+          "actionBox": {
+            "height": 44,
+            "width": 354,
+            "x": 29,
+            "y": 658
+          },
+          "actionInViewport": true,
+          "actionName": "Open review · AMD",
+          "rowBox": {
+            "height": 256,
+            "width": 380,
+            "x": 16,
+            "y": 645
+          }
+        },
+        "hardFails": [],
+        "horizontalOverflow": false,
+        "profile": {
+          "hasTouch": true,
+          "height": 915,
+          "isMobile": true,
+          "name": "holdout-412x915",
+          "width": 412
+        },
+        "retainedPngCoverage": false
+      }
+    ],
+    "reducedMotion": true,
+    "touchEmulated": true
+  },
+  "taskOracle": [
+    {
+      "deliberateJournalAction": {
+        "copyVisible": true,
+        "opened": true,
+        "saveDecisionVisible": true
+      },
+      "errors": {
+        "console": [],
+        "pageErrors": [],
+        "requestFailures": [],
+        "responses": []
+      },
+      "hardFails": [],
+      "highestPriority": {
+        "evidence": "AMDNot Relevant1 open alertAdvanced Micro DevicesTemporary Bargain Sale v1 remains Not Relevant because the current condition mix is materially unchanged.FreshMarket · Sep 21, 8:41 AMReview freshnessReviewed 8d agoOpen review · AMD",
+        "selectedByVisibleQueueOrder": true,
+        "testId": "today-review-AMD",
+        "visibleQueue": [
+          {
+            "testId": "today-review-AMD",
+            "text": "AMDNot Relevant1 open alertAdvanced Micro DevicesTemporary Bargain Sale v1 remains Not Relevant because the current condition mix is materially unchanged.FreshMarket · Sep 21, 8:41 AMReview freshnessReviewed 8d agoOpen review · AMD"
+          },
+          {
+            "testId": "today-review-COIN",
+            "text": "COINNot Relevant1 open alertCoinbaseReset Recovery v1 remains Not Relevant because the current condition mix is materially unchanged.FreshMarket · Sep 21, 8:41 AMReview freshnessReviewed 13d agoOpen review · COIN"
+          },
+          {
+            "testId": "today-review-INTC",
+            "text": "INTCNot Relevant1 open alertIntelReset Recovery v1 remains Not Relevant because the current condition mix is materially unchanged.FreshMarket · Sep 21, 8:41 AMReview freshnessReviewed 15d agoOpen review · INTC"
+          },
+          {
+            "testId": "today-review-META",
+            "text": "METANot Relevant1 open alertMeta PlatformsLeader Pullback v1 remains Not Relevant because the current condition mix is materially unchanged.FreshMarket · Sep 21, 8:41 AMReview freshnessReviewed 3d agoOpen review · META"
+          },
+          {
+            "testId": "today-review-MSFT",
+            "text": "MSFTNot Relevant1 open alertMicrosoftLeader Pullback v1 remains Not Relevant because the current condition mix is materially unchanged.FreshMarket · Sep 21, 8:41 AMReview freshnessReviewed 16d agoOpen review · MSFT"
+          },
+          {
+            "testId": "today-review-MU",
+            "text": "MUNot Relevant1 open alertMicronLeader Pullback v1 remains Not Relevant because the current condition mix is materially unchanged.FreshMarket · Sep 21, 8:41 AMReview freshnessReviewed 2d agoOpen review · MU"
+          }
+        ]
+      },
+      "profile": {
+        "hasTouch": false,
+        "height": 900,
+        "isMobile": false,
+        "name": "desktop-1440x900",
+        "width": 1440
+      },
+      "review": {
+        "doneFocusedOnOpen": true,
+        "doneReturnFocus": {
+          "name": "Open review · AMD",
+          "tag": "BUTTON"
+        },
+        "escapeReturnFocus": {
+          "name": "Open review · AMD",
+          "tag": "BUTTON"
+        },
+        "evidenceVisible": {
+          "Data freshness": true,
+          "Evidence to inspect": true,
+          "Risk context": true,
+          "Why now": true
+        },
+        "initialFocus": {
+          "name": "Done",
+          "role": "button",
+          "tag": "BUTTON"
+        },
+        "obviousNextActions": [
+          "Open watchlist evidence",
+          "Record review",
+          "View alerts"
+        ],
+        "opened": true,
+        "panelActionScreenshot": null,
+        "panelScreenshot": {
+          "bytes": 93844,
+          "dimensions": {
+            "height": 900,
+            "width": 1440
+          },
+          "file": "screenshots/review-evidence--desktop-1440x900.png",
+          "sha256": "800f82d247b6230b6b1c054c4e0d0af2ff897b1925921673859204c9e184118d"
+        },
+        "returnedAfterDone": true,
+        "returnedAfterEscape": true
+      },
+      "sourceKind": "sample-oracle"
+    },
+    {
+      "deliberateJournalAction": {
+        "copyVisible": true,
+        "opened": true,
+        "saveDecisionVisible": true
+      },
+      "errors": {
+        "console": [],
+        "pageErrors": [],
+        "requestFailures": [],
+        "responses": []
+      },
+      "hardFails": [],
+      "highestPriority": {
+        "evidence": "AMDNot Relevant1 open alertAdvanced Micro DevicesTemporary Bargain Sale v1 remains Not Relevant because the current condition mix is materially unchanged.FreshMarket · Sep 21, 8:41 AMReview freshnessReviewed 8d agoOpen review · AMD",
+        "selectedByVisibleQueueOrder": true,
+        "testId": "today-review-AMD",
+        "visibleQueue": [
+          {
+            "testId": "today-review-AMD",
+            "text": "AMDNot Relevant1 open alertAdvanced Micro DevicesTemporary Bargain Sale v1 remains Not Relevant because the current condition mix is materially unchanged.FreshMarket · Sep 21, 8:41 AMReview freshnessReviewed 8d agoOpen review · AMD"
+          },
+          {
+            "testId": "today-review-COIN",
+            "text": "COINNot Relevant1 open alertCoinbaseReset Recovery v1 remains Not Relevant because the current condition mix is materially unchanged.FreshMarket · Sep 21, 8:41 AMReview freshnessReviewed 13d agoOpen review · COIN"
+          },
+          {
+            "testId": "today-review-INTC",
+            "text": "INTCNot Relevant1 open alertIntelReset Recovery v1 remains Not Relevant because the current condition mix is materially unchanged.FreshMarket · Sep 21, 8:41 AMReview freshnessReviewed 15d agoOpen review · INTC"
+          },
+          {
+            "testId": "today-review-META",
+            "text": "METANot Relevant1 open alertMeta PlatformsLeader Pullback v1 remains Not Relevant because the current condition mix is materially unchanged.FreshMarket · Sep 21, 8:41 AMReview freshnessReviewed 3d agoOpen review · META"
+          },
+          {
+            "testId": "today-review-MSFT",
+            "text": "MSFTNot Relevant1 open alertMicrosoftLeader Pullback v1 remains Not Relevant because the current condition mix is materially unchanged.FreshMarket · Sep 21, 8:41 AMReview freshnessReviewed 16d agoOpen review · MSFT"
+          },
+          {
+            "testId": "today-review-MU",
+            "text": "MUNot Relevant1 open alertMicronLeader Pullback v1 remains Not Relevant because the current condition mix is materially unchanged.FreshMarket · Sep 21, 8:41 AMReview freshnessReviewed 2d agoOpen review · MU"
+          }
+        ]
+      },
+      "profile": {
+        "hasTouch": true,
+        "height": 844,
+        "isMobile": true,
+        "name": "mobile-390x844",
+        "width": 390
+      },
+      "review": {
+        "doneFocusedOnOpen": true,
+        "doneReturnFocus": {
+          "name": "Open review · AMD",
+          "tag": "BUTTON"
+        },
+        "escapeReturnFocus": {
+          "name": "Open review · AMD",
+          "tag": "BUTTON"
+        },
+        "evidenceVisible": {
+          "Data freshness": true,
+          "Evidence to inspect": true,
+          "Risk context": true,
+          "Why now": true
+        },
+        "initialFocus": {
+          "name": "Done",
+          "role": "button",
+          "tag": "BUTTON"
+        },
+        "obviousNextActions": [
+          "Open watchlist evidence",
+          "Record review",
+          "View alerts"
+        ],
+        "opened": true,
+        "panelActionScreenshot": {
+          "bytes": 66494,
+          "dimensions": {
+            "height": 844,
+            "width": 390
+          },
+          "file": "screenshots/review-evidence-actions--mobile-390x844.png",
+          "sha256": "500ea15c44e9ba58ff6f33c8aaa3f37279fda66c0200774e8bee37fbc3b6b472"
+        },
+        "panelScreenshot": {
+          "bytes": 76219,
+          "dimensions": {
+            "height": 844,
+            "width": 390
+          },
+          "file": "screenshots/review-evidence--mobile-390x844.png",
+          "sha256": "f586eb9a493befa846d825163c5fc006f23da285fb24202d330c90849b58600f"
+        },
+        "returnedAfterDone": true,
+        "returnedAfterEscape": true
+      },
+      "sourceKind": "sample-oracle"
+    }
+  ]
+}

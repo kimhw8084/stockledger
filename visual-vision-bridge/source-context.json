@@ -1,0 +1,203 @@
+{
+  "files": [
+    {
+      "blobSha": "1bba77e9adc78b9fba9d488a7418e0d91e781b52",
+      "bytes": 28900,
+      "existsAtCandidate": true,
+      "facts": [
+        "visible review queue ordering",
+        "full review evidence panel",
+        "critical actions",
+        "focus return wiring",
+        "empty review queue branch",
+        "compact action ordering"
+      ],
+      "lineCount": 474,
+      "lineRanges": [
+        "118-136",
+        "144-187",
+        "199-260",
+        "263-340",
+        "416-426",
+        "452-486"
+      ],
+      "path": "src/features/today/TodayScreen.tsx",
+      "role": "R11 Today/new shell Today surface",
+      "symbols": [
+        "primaryReviewItems",
+        "ReviewRow",
+        "ReviewDetail",
+        "TodayScreen"
+      ]
+    },
+    {
+      "blobSha": "8e1857853be2a379ba4531bcfdd33b867f09ff88",
+      "bytes": 8620,
+      "existsAtCandidate": true,
+      "facts": [
+        "shared tablist",
+        "Alerts/Settings utility buttons",
+        "desktop sidebar/mobile navigation",
+        "scroll container"
+      ],
+      "lineCount": 161,
+      "lineRanges": [
+        "14-34",
+        "36-73",
+        "75-123",
+        "125-160"
+      ],
+      "path": "src/features/shell/StockLedgerShell.tsx",
+      "role": "R11 shared StockLedger shell",
+      "symbols": [
+        "navigationItems",
+        "Navigation",
+        "StockLedgerShell"
+      ]
+    },
+    {
+      "blobSha": "9e370b85f295937a72fb2983b76f1912830b9f93",
+      "bytes": 307317,
+      "existsAtCandidate": true,
+      "facts": [
+        "Home maps to Today",
+        "sample/empty onboarding action",
+        "app-level error/loading text",
+        "Today mounts only when data.stocks is non-empty"
+      ],
+      "lineCount": 6571,
+      "lineRanges": [
+        "3053-3093",
+        "3922-3959",
+        "3962-3983"
+      ],
+      "path": "src/app/StockLedgerApp.tsx",
+      "role": "R11 route composition and app-level state boundary",
+      "symbols": [
+        "tabLabels",
+        "topBarSubtitle",
+        "StockLedgerShell composition",
+        "TodayScreen mount"
+      ]
+    },
+    {
+      "blobSha": "d5d0f3683d09e2ad754bf6138d795ca4c7973a1a",
+      "bytes": 3322,
+      "existsAtCandidate": true,
+      "facts": [
+        "today/watchlist/recipes/journal/alerts/settings hashes"
+      ],
+      "lineCount": 72,
+      "lineRanges": [
+        "3-32",
+        "37-71"
+      ],
+      "path": "src/hooks/useWorkspaceNavigation.ts",
+      "role": "R11 route mapping, distinct from legacy content",
+      "symbols": [
+        "paths",
+        "parseWorkspaceRoute",
+        "workspaceHash",
+        "useWorkspaceNavigation"
+      ]
+    },
+    {
+      "blobSha": "5d7882c2da79277fcb31c93714643e6d487269a4",
+      "bytes": 482,
+      "existsAtCandidate": true,
+      "facts": [
+        "en/ko persistence"
+      ],
+      "lineCount": 18,
+      "lineRanges": [
+        "3-17"
+      ],
+      "path": "src/lib/preferences.ts",
+      "role": "R11 language selector contract",
+      "symbols": [
+        "AppLanguage",
+        "loadAppLanguage",
+        "saveAppLanguage"
+      ]
+    },
+    {
+      "blobSha": "521a18a67411d03ce8e109aeb8f2fc2456a5fd05",
+      "bytes": 3751,
+      "existsAtCandidate": true,
+      "facts": [
+        "new shell/Today uses UI facade",
+        "legacy HomeVisualDashboard and BottomNav are prohibited/absent"
+      ],
+      "lineCount": 88,
+      "lineRanges": [
+        "57-78"
+      ],
+      "path": "tests/r11-foundation-contracts.test.ts",
+      "role": "R11 boundary test",
+      "symbols": [
+        "R11 shell and Today boundaries"
+      ]
+    }
+  ],
+  "legacyRouteContent": [
+    {
+      "classification": "legacy content removed from candidate",
+      "existsAtCandidate": false,
+      "path": "src/components/HomeVisualDashboard.tsx"
+    },
+    {
+      "classification": "legacy shell removed from candidate",
+      "existsAtCandidate": false,
+      "path": "src/components/BottomNav.tsx"
+    }
+  ],
+  "readOnly": true,
+  "schema": "stockledger-r13-source-context-v1",
+  "source": {
+    "branch": "codex/stockledger-prod-c13-expo-base-today-vision-bridge-v1",
+    "sha": "83a43c84e3436e72503d33ff8d35765651d7dc53",
+    "tree": "5b0b1abf96b7b13da4443d6698ce791419f658e0"
+  },
+  "stateContext": [
+    {
+      "candidateContext": "StockLedgerApp.tsx:3953-3959",
+      "note": "The retained auxiliary is the app-level empty workspace before TodayScreen mounts; it is not a TodayScreen loading/error branch.",
+      "r12Status": "OBSERVED",
+      "separatePersistentTodayBranch": false,
+      "state": "empty/personal",
+      "supportedFixtureOrControl": "supported app onboarding before Explore sample workspace"
+    },
+    {
+      "candidateContext": "TodayScreen.tsx:314-320",
+      "note": "Today renders the bounded warning when mock or unavailable snapshot evidence is present.",
+      "r12Status": "OBSERVED",
+      "separatePersistentTodayBranch": true,
+      "state": "degraded/sample-evidence-limited",
+      "supportedFixtureOrControl": "supported sample workspace with mock/unavailable observations"
+    },
+    {
+      "candidateContext": "TodayScreen.tsx:382; StockLedgerApp.tsx:3952",
+      "note": "Source has provider checking/app saving-scanning indicators, but R12 recorded no retained loading state; remains UNPROVEN.",
+      "r12Status": "UNPROVEN",
+      "separatePersistentTodayBranch": false,
+      "state": "loading",
+      "supportedFixtureOrControl": "no supported retained transient fixture/control path in R12"
+    },
+    {
+      "candidateContext": "TodayScreen.tsx:329-340; StockLedgerApp.tsx:3950-3952",
+      "note": "No dedicated retained Today blocked branch was reached; remains UNPROVEN.",
+      "r12Status": "UNPROVEN",
+      "separatePersistentTodayBranch": false,
+      "state": "blocked",
+      "supportedFixtureOrControl": "no supported Today fixture/control path in R12"
+    },
+    {
+      "candidateContext": "StockLedgerApp.tsx:3943-3952",
+      "note": "App-level error/route notices exist, but no retained Today error/recovery state was reached; remains UNPROVEN.",
+      "r12Status": "UNPROVEN",
+      "separatePersistentTodayBranch": false,
+      "state": "error/recovery",
+      "supportedFixtureOrControl": "no supported Today fixture/control path in R12"
+    }
+  ]
+}
