@@ -149,12 +149,12 @@
   ],
   "reviewPdfs": {
     "review-desktop.pdf": {
-      "sha256": "a2438a2b1f53a7b9a09d30fc1ac23a845751fd3ed2e2193f984a80db0277e8ec",
-      "bytes": 828423
+      "sha256": "8ac84406326735fbbd24756235d29729d1cfd27d650404adf1a81ce928a5d2f1",
+      "bytes": 828497
     },
     "review-mobile.pdf": {
-      "sha256": "07944a6c2c375deecf14f99c218c6843d6f62e30f19234ac7370c9019ab93552",
-      "bytes": 534479
+      "sha256": "e5d8ec6616e9576989fd3bbba3bb344dabe07b6ae1c193411b4b03292b8fbc3b",
+      "bytes": 534560
     }
   },
   "nonHappyAuxiliary": [
