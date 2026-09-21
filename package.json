@@ -2,6 +2,9 @@
   "name": "stockledger",
   "version": "0.2.0",
   "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "start": "expo start",
@@ -31,6 +34,10 @@
     "release:verify": "tsx scripts/verify-release-evidence.ts"
   },
   "dependencies": {
+    "@expo-base/accessibility": "*",
+    "@expo-base/components": "*",
+    "@expo-base/feedback": "*",
+    "@expo-base/layouts": "*",
     "@expo/metro-runtime": "~57.0.15",
     "@noble/hashes": "2.4.0",
     "@react-native-async-storage/async-storage": "^2.1.0",
@@ -47,6 +54,11 @@
     "react-dom": "19.2.3",
     "react-native": "0.86.3",
     "react-native-safe-area-context": "~5.7.0",
+    "react-native-keyboard-controller": "1.22.4",
+    "react-native-nitro-modules": "0.36.5",
+    "react-native-svg": "15.15.4",
+    "react-native-unistyles": "3.3.0",
+    "lucide-react-native": "1.37.0",
     "react-native-url-polyfill": "2.0.0",
     "react-native-web": "^0.21.0",
     "zod": "4.6.5"

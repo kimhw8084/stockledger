@@ -1,0 +1,19 @@
+{
+  "name": "@expo-base/layouts",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "dependencies": {
+    "@expo-base/primitives": "*",
+    "@expo-base/tokens": "*",
+    "@expo-base/platform": "*"
+  },
+  "peerDependencies": {
+    "react": "19.2.3",
+    "react-native": "0.86.3",
+    "react-native-unistyles": "3.3.0",
+    "react-native-keyboard-controller": "1.22.4"
+  }
+}
