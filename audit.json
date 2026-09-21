@@ -45,5 +45,6 @@
     "claim": "R12 does not claim real-browser 200% zoom acceptance"
   },
   "scope": "R11 shell + Today qualification only",
-  "generatedAt": "2026-09-21T13:47:22.495Z"
+  "generatedAt": "2026-09-21T13:47:22.495Z",
+  "releaseVerificationResult": "release-verify-result.json"
 }

@@ -21,7 +21,8 @@
     "artifact-inventory.json",
     "qualification-summary.json",
     "release-evidence.json",
-    "release-verify.json"
+    "release-verify.json",
+    "release-verify-result.json"
   ],
   "hashes": {
     "surfaceManifest": {
