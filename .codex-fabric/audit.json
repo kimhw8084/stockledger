@@ -1,0 +1,48 @@
+{
+  "base": "26f3dfb077bea75013fef58975979f02041dc490",
+  "browserCaptureLaunched": false,
+  "claimBoundary": {
+    "noAtlasPromotion": true,
+    "noHumanAcceptance": true,
+    "noMainMutation": true,
+    "noMerge": true,
+    "noNotionCallOrWrite": true,
+    "noProductCommit": true,
+    "noProductSourceEdit": true,
+    "noRecapture": true,
+    "noReleaseChange": true,
+    "noSeverityAssignment": true,
+    "noVisualQualityVerdict": true,
+    "noZoom200Claim": true
+  },
+  "compactArtifactRef": "refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c13-expo-base-today-vision-bridge-v1",
+  "fabricJob": "CF-883af35f166bab9d152d3efd",
+  "fullArtifactRef": "refs/heads/project-os-artifacts/stockledger/stockledger-prod-c13-expo-base-today-vision-bridge-v1",
+  "notionCalled": false,
+  "operation": "VERIFY",
+  "project": "stockledger",
+  "protectedBase": "26f3dfb077bea75013fef58975979f02041dc490",
+  "r12": {
+    "artifactCommit": "ff19aa557b7f4478ae28feb0dca9103d07ffb19b",
+    "artifactRef": "refs/heads/project-os-artifacts/stockledger/stockledger-prod-c13-expo-base-today-evidence-verify-v1",
+    "bundleSha256": "d818c31df9a9912bf6e69328904d42795be9fa263b01dad7936b57053d4677a4",
+    "evidenceCommit": "1510cb86b3f54a7bd8839158033ebaea5774450f",
+    "evidenceRef": "refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c13-expo-base-today-evidence-verify-v1",
+    "fabricJob": "CF-9c8b4d383ed230b97e167b70",
+    "manifestSha256": "bdf72d3cd18e5ed2695b6a78a3f3f08a232c9b13348809bd3cf5f393bf1de93a"
+  },
+  "request": "stockledger-prod-c13-expo-base-today-vision-bridge-v1",
+  "schema": "project-os-independent-audit-handoff-v1",
+  "scope": "R13 audit transport aid only; R12 immutable lossless PNGs remain sole pixel/promotion authority.",
+  "selfAccepted": false,
+  "selfPromoted": false,
+  "source": {
+    "branch": "codex/stockledger-prod-c13-expo-base-today-vision-bridge-v1",
+    "sha": "83a43c84e3436e72503d33ff8d35765651d7dc53",
+    "sourceChanged": false,
+    "tree": "5b0b1abf96b7b13da4443d6698ce791419f658e0"
+  },
+  "transportState": "GIT_PUBLISHED_AWAITING_AUDIT",
+  "visualDecision": "AWAITING_INDEPENDENT_PIXEL_AUDIT",
+  "work_branch": "codex/stockledger-prod-c13-expo-base-today-vision-bridge-v1"
+}

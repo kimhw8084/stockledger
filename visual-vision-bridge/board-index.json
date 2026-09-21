@@ -1,0 +1,1046 @@
+{
+  "boards": [
+    {
+      "base64Length": 27116,
+      "boardId": "today-core",
+      "bytes": 20337,
+      "dimensions": {
+        "height": 1032,
+        "width": 636
+      },
+      "kind": "family",
+      "oneResponseBase64Bound": true,
+      "path": "boards/family-today-core.jpg",
+      "settings": {
+        "desktopTileWidth": 300,
+        "mobileTileWidth": 165,
+        "quality": 16,
+        "resampling": "Pillow.Image.Resampling.LANCZOS",
+        "subsampling": 2
+      },
+      "sha256": "a572a8274b2d2e7f7ac068b3d944e5c6a52edee43bcf2535d2e1f8915d094720",
+      "tiles": [
+        {
+          "coverageClass": "qualification",
+          "fullSourceVisible": true,
+          "label": "today / desktop 1440x900",
+          "labelBand": {
+            "height": 23,
+            "width": 301,
+            "x": 10,
+            "y": 10
+          },
+          "originalBytes": 129794,
+          "originalDimensions": {
+            "height": 900,
+            "width": 1440
+          },
+          "originalPng": "screenshots/today--desktop-1440x900.png",
+          "originalPngSha256": "dd789dd28d3f9f293e5b044b267b953b62783fd1cb9d135c725af855ce956b75",
+          "proportionalDownscale": true,
+          "scale": 0.20833333333333334,
+          "screenshotRect": {
+            "height": 188,
+            "width": 300,
+            "x": 10,
+            "y": 120
+          },
+          "tileDimensions": {
+            "height": 188,
+            "width": 300
+          }
+        },
+        {
+          "coverageClass": "qualification",
+          "fullSourceVisible": true,
+          "label": "today / mobile 390x844",
+          "labelBand": {
+            "height": 23,
+            "width": 301,
+            "x": 326,
+            "y": 10
+          },
+          "originalBytes": 67382,
+          "originalDimensions": {
+            "height": 844,
+            "width": 390
+          },
+          "originalPng": "screenshots/today--mobile-390x844.png",
+          "originalPngSha256": "ff52a2693e4e9bfad9780c22a4068a8617cc173e586e1175e6895d6a337d416b",
+          "proportionalDownscale": true,
+          "scale": 0.4230769230769231,
+          "screenshotRect": {
+            "height": 357,
+            "width": 165,
+            "x": 393,
+            "y": 36
+          },
+          "tileDimensions": {
+            "height": 357,
+            "width": 165
+          }
+        },
+        {
+          "coverageClass": "qualification",
+          "fullSourceVisible": true,
+          "label": "today ko / desktop 1440x900",
+          "labelBand": {
+            "height": 23,
+            "width": 301,
+            "x": 10,
+            "y": 409
+          },
+          "originalBytes": 119977,
+          "originalDimensions": {
+            "height": 900,
+            "width": 1440
+          },
+          "originalPng": "screenshots/today-ko--desktop-1440x900.png",
+          "originalPngSha256": "94af7872bd81fd42af3e91c05ff745dbabd8cde7ce8509711981d963a94d0269",
+          "proportionalDownscale": true,
+          "scale": 0.20833333333333334,
+          "screenshotRect": {
+            "height": 188,
+            "width": 300,
+            "x": 10,
+            "y": 519
+          },
+          "tileDimensions": {
+            "height": 188,
+            "width": 300
+          }
+        },
+        {
+          "coverageClass": "qualification",
+          "fullSourceVisible": true,
+          "label": "today ko / mobile 390x844",
+          "labelBand": {
+            "height": 23,
+            "width": 301,
+            "x": 326,
+            "y": 409
+          },
+          "originalBytes": 66394,
+          "originalDimensions": {
+            "height": 844,
+            "width": 390
+          },
+          "originalPng": "screenshots/today-ko--mobile-390x844.png",
+          "originalPngSha256": "13150d819de4f8122774f73e377152df5a99832868135f8238b5ef99bff7cb25",
+          "proportionalDownscale": true,
+          "scale": 0.4230769230769231,
+          "screenshotRect": {
+            "height": 357,
+            "width": 165,
+            "x": 393,
+            "y": 435
+          },
+          "tileDimensions": {
+            "height": 357,
+            "width": 165
+          }
+        },
+        {
+          "coverageClass": "auxiliary-empty-personal",
+          "fullSourceVisible": true,
+          "label": "non happy empty personal / desktop 1440x900",
+          "labelBand": {
+            "height": 23,
+            "width": 301,
+            "x": 10,
+            "y": 808
+          },
+          "originalBytes": 51607,
+          "originalDimensions": {
+            "height": 900,
+            "width": 1440
+          },
+          "originalPng": "screenshots/non-happy-empty-personal--desktop-1440x900.png",
+          "originalPngSha256": "8b39b330f33b5f160741f42be7919ff83fce524dab652359f2101db507124e0e",
+          "proportionalDownscale": true,
+          "scale": 0.20833333333333334,
+          "screenshotRect": {
+            "height": 188,
+            "width": 300,
+            "x": 10,
+            "y": 834
+          },
+          "tileDimensions": {
+            "height": 188,
+            "width": 300
+          }
+        }
+      ],
+      "under20480Bytes": true
+    },
+    {
+      "base64Length": 26388,
+      "boardId": "today-review",
+      "bytes": 19790,
+      "dimensions": {
+        "height": 944,
+        "width": 756
+      },
+      "kind": "family",
+      "oneResponseBase64Bound": true,
+      "path": "boards/family-today-review.jpg",
+      "settings": {
+        "desktopTileWidth": 360,
+        "mobileTileWidth": 198,
+        "quality": 16,
+        "resampling": "Pillow.Image.Resampling.LANCZOS",
+        "subsampling": 2
+      },
+      "sha256": "8538d10d95dca929b07923ee6b5c6b25c88cd5b28368cdf6a57a48125ecb584a",
+      "tiles": [
+        {
+          "coverageClass": "qualification",
+          "fullSourceVisible": true,
+          "label": "review evidence / desktop 1440x900",
+          "labelBand": {
+            "height": 23,
+            "width": 361,
+            "x": 10,
+            "y": 10
+          },
+          "originalBytes": 93844,
+          "originalDimensions": {
+            "height": 900,
+            "width": 1440
+          },
+          "originalPng": "screenshots/review-evidence--desktop-1440x900.png",
+          "originalPngSha256": "800f82d247b6230b6b1c054c4e0d0af2ff897b1925921673859204c9e184118d",
+          "proportionalDownscale": true,
+          "scale": 0.25,
+          "screenshotRect": {
+            "height": 225,
+            "width": 360,
+            "x": 10,
+            "y": 137
+          },
+          "tileDimensions": {
+            "height": 225,
+            "width": 360
+          }
+        },
+        {
+          "coverageClass": "qualification",
+          "fullSourceVisible": true,
+          "label": "review evidence / mobile 390x844",
+          "labelBand": {
+            "height": 23,
+            "width": 361,
+            "x": 386,
+            "y": 10
+          },
+          "originalBytes": 76219,
+          "originalDimensions": {
+            "height": 844,
+            "width": 390
+          },
+          "originalPng": "screenshots/review-evidence--mobile-390x844.png",
+          "originalPngSha256": "f586eb9a493befa846d825163c5fc006f23da285fb24202d330c90849b58600f",
+          "proportionalDownscale": true,
+          "scale": 0.5076923076923077,
+          "screenshotRect": {
+            "height": 428,
+            "width": 198,
+            "x": 467,
+            "y": 36
+          },
+          "tileDimensions": {
+            "height": 428,
+            "width": 198
+          }
+        },
+        {
+          "coverageClass": "qualification",
+          "fullSourceVisible": true,
+          "label": "review evidence actions / mobile 390x844",
+          "labelBand": {
+            "height": 23,
+            "width": 361,
+            "x": 10,
+            "y": 480
+          },
+          "originalBytes": 66494,
+          "originalDimensions": {
+            "height": 844,
+            "width": 390
+          },
+          "originalPng": "screenshots/review-evidence-actions--mobile-390x844.png",
+          "originalPngSha256": "500ea15c44e9ba58ff6f33c8aaa3f37279fda66c0200774e8bee37fbc3b6b472",
+          "proportionalDownscale": true,
+          "scale": 0.5076923076923077,
+          "screenshotRect": {
+            "height": 428,
+            "width": 198,
+            "x": 91,
+            "y": 506
+          },
+          "tileDimensions": {
+            "height": 428,
+            "width": 198
+          }
+        }
+      ],
+      "under20480Bytes": true
+    },
+    {
+      "base64Length": 26488,
+      "boardId": "shell-watch-recipes",
+      "bytes": 19864,
+      "dimensions": {
+        "height": 898,
+        "width": 716
+      },
+      "kind": "family",
+      "oneResponseBase64Bound": true,
+      "path": "boards/family-shell-watch-recipes.jpg",
+      "settings": {
+        "desktopTileWidth": 340,
+        "mobileTileWidth": 187,
+        "quality": 15,
+        "resampling": "Pillow.Image.Resampling.LANCZOS",
+        "subsampling": 2
+      },
+      "sha256": "5d394475cea788dddbc87c2876b893bbf04d2730aa11b339c453b678f3377712",
+      "tiles": [
+        {
+          "coverageClass": "qualification",
+          "fullSourceVisible": true,
+          "label": "watchlist / desktop 1440x900",
+          "labelBand": {
+            "height": 23,
+            "width": 341,
+            "x": 10,
+            "y": 10
+          },
+          "originalBytes": 93823,
+          "originalDimensions": {
+            "height": 900,
+            "width": 1440
+          },
+          "originalPng": "screenshots/watchlist--desktop-1440x900.png",
+          "originalPngSha256": "abb1e92b222fa1f17d2af7d269151e12e319a74f952af4f2bcc9632f18387895",
+          "proportionalDownscale": true,
+          "scale": 0.2361111111111111,
+          "screenshotRect": {
+            "height": 212,
+            "width": 340,
+            "x": 10,
+            "y": 132
+          },
+          "tileDimensions": {
+            "height": 212,
+            "width": 340
+          }
+        },
+        {
+          "coverageClass": "qualification",
+          "fullSourceVisible": true,
+          "label": "watchlist / mobile 390x844",
+          "labelBand": {
+            "height": 23,
+            "width": 341,
+            "x": 366,
+            "y": 10
+          },
+          "originalBytes": 63213,
+          "originalDimensions": {
+            "height": 844,
+            "width": 390
+          },
+          "originalPng": "screenshots/watchlist--mobile-390x844.png",
+          "originalPngSha256": "05fbf8ea4692aa07f766e299229ae87108aaab92a16d0082bfc123d8d891238d",
+          "proportionalDownscale": true,
+          "scale": 0.4794871794871795,
+          "screenshotRect": {
+            "height": 405,
+            "width": 187,
+            "x": 442,
+            "y": 36
+          },
+          "tileDimensions": {
+            "height": 405,
+            "width": 187
+          }
+        },
+        {
+          "coverageClass": "qualification",
+          "fullSourceVisible": true,
+          "label": "recipes / desktop 1440x900",
+          "labelBand": {
+            "height": 23,
+            "width": 341,
+            "x": 10,
+            "y": 457
+          },
+          "originalBytes": 86401,
+          "originalDimensions": {
+            "height": 900,
+            "width": 1440
+          },
+          "originalPng": "screenshots/recipes--desktop-1440x900.png",
+          "originalPngSha256": "4d9a8f9974126e3923735960e957057830478fc9a4749b4be5ab88516b58dce3",
+          "proportionalDownscale": true,
+          "scale": 0.2361111111111111,
+          "screenshotRect": {
+            "height": 212,
+            "width": 340,
+            "x": 10,
+            "y": 579
+          },
+          "tileDimensions": {
+            "height": 212,
+            "width": 340
+          }
+        },
+        {
+          "coverageClass": "qualification",
+          "fullSourceVisible": true,
+          "label": "recipes / mobile 390x844",
+          "labelBand": {
+            "height": 23,
+            "width": 341,
+            "x": 366,
+            "y": 457
+          },
+          "originalBytes": 65083,
+          "originalDimensions": {
+            "height": 844,
+            "width": 390
+          },
+          "originalPng": "screenshots/recipes--mobile-390x844.png",
+          "originalPngSha256": "60a89b161e8b4eb7cf42097cdded9102491f9a7e6bc56c8df0631b8d0accbb62",
+          "proportionalDownscale": true,
+          "scale": 0.4794871794871795,
+          "screenshotRect": {
+            "height": 405,
+            "width": 187,
+            "x": 442,
+            "y": 483
+          },
+          "tileDimensions": {
+            "height": 405,
+            "width": 187
+          }
+        }
+      ],
+      "under20480Bytes": true
+    },
+    {
+      "base64Length": 26400,
+      "boardId": "shell-journal-alerts",
+      "bytes": 19800,
+      "dimensions": {
+        "height": 898,
+        "width": 716
+      },
+      "kind": "family",
+      "oneResponseBase64Bound": true,
+      "path": "boards/family-shell-journal-alerts.jpg",
+      "settings": {
+        "desktopTileWidth": 340,
+        "mobileTileWidth": 187,
+        "quality": 16,
+        "resampling": "Pillow.Image.Resampling.LANCZOS",
+        "subsampling": 2
+      },
+      "sha256": "daeace5de2982cabe85f44f5917d8b1822f078582ff1c0cd8f8162363bb268b5",
+      "tiles": [
+        {
+          "coverageClass": "qualification",
+          "fullSourceVisible": true,
+          "label": "journal / desktop 1440x900",
+          "labelBand": {
+            "height": 23,
+            "width": 341,
+            "x": 10,
+            "y": 10
+          },
+          "originalBytes": 102071,
+          "originalDimensions": {
+            "height": 900,
+            "width": 1440
+          },
+          "originalPng": "screenshots/journal--desktop-1440x900.png",
+          "originalPngSha256": "ad959ddab8a6e5056a08f8537406f9c8aded3433f30fa2ef9929a11400fac926",
+          "proportionalDownscale": true,
+          "scale": 0.2361111111111111,
+          "screenshotRect": {
+            "height": 212,
+            "width": 340,
+            "x": 10,
+            "y": 132
+          },
+          "tileDimensions": {
+            "height": 212,
+            "width": 340
+          }
+        },
+        {
+          "coverageClass": "qualification",
+          "fullSourceVisible": true,
+          "label": "journal / mobile 390x844",
+          "labelBand": {
+            "height": 23,
+            "width": 341,
+            "x": 366,
+            "y": 10
+          },
+          "originalBytes": 59716,
+          "originalDimensions": {
+            "height": 844,
+            "width": 390
+          },
+          "originalPng": "screenshots/journal--mobile-390x844.png",
+          "originalPngSha256": "236a5492c73a7b94e1cf940e74b9d800daf70a7170499d799f742d8c9277ea99",
+          "proportionalDownscale": true,
+          "scale": 0.4794871794871795,
+          "screenshotRect": {
+            "height": 405,
+            "width": 187,
+            "x": 442,
+            "y": 36
+          },
+          "tileDimensions": {
+            "height": 405,
+            "width": 187
+          }
+        },
+        {
+          "coverageClass": "qualification",
+          "fullSourceVisible": true,
+          "label": "alerts / desktop 1440x900",
+          "labelBand": {
+            "height": 23,
+            "width": 341,
+            "x": 10,
+            "y": 457
+          },
+          "originalBytes": 97225,
+          "originalDimensions": {
+            "height": 900,
+            "width": 1440
+          },
+          "originalPng": "screenshots/alerts--desktop-1440x900.png",
+          "originalPngSha256": "86bcb550083b880bb0df8029a1ae74e0316f234b87a8ad6dde18fab36440229b",
+          "proportionalDownscale": true,
+          "scale": 0.2361111111111111,
+          "screenshotRect": {
+            "height": 212,
+            "width": 340,
+            "x": 10,
+            "y": 579
+          },
+          "tileDimensions": {
+            "height": 212,
+            "width": 340
+          }
+        },
+        {
+          "coverageClass": "qualification",
+          "fullSourceVisible": true,
+          "label": "alerts / mobile 390x844",
+          "labelBand": {
+            "height": 23,
+            "width": 341,
+            "x": 366,
+            "y": 457
+          },
+          "originalBytes": 57083,
+          "originalDimensions": {
+            "height": 844,
+            "width": 390
+          },
+          "originalPng": "screenshots/alerts--mobile-390x844.png",
+          "originalPngSha256": "361aa9db6a106fc7a1f204a950f2ea062c2a6f2affbbd07718cc445b0b455c56",
+          "proportionalDownscale": true,
+          "scale": 0.4794871794871795,
+          "screenshotRect": {
+            "height": 405,
+            "width": 187,
+            "x": 442,
+            "y": 483
+          },
+          "tileDimensions": {
+            "height": 405,
+            "width": 187
+          }
+        }
+      ],
+      "under20480Bytes": true
+    },
+    {
+      "base64Length": 27236,
+      "boardId": "shell-settings",
+      "bytes": 20425,
+      "dimensions": {
+        "height": 474,
+        "width": 756
+      },
+      "kind": "family",
+      "oneResponseBase64Bound": true,
+      "path": "boards/family-shell-settings.jpg",
+      "settings": {
+        "desktopTileWidth": 360,
+        "mobileTileWidth": 198,
+        "quality": 46,
+        "resampling": "Pillow.Image.Resampling.LANCZOS",
+        "subsampling": 2
+      },
+      "sha256": "f0a00bbe5dc8c2add06fb359086c4c558a750fb6c8dfae6cf7b62cad184eca23",
+      "tiles": [
+        {
+          "coverageClass": "qualification",
+          "fullSourceVisible": true,
+          "label": "settings / desktop 1440x900",
+          "labelBand": {
+            "height": 23,
+            "width": 361,
+            "x": 10,
+            "y": 10
+          },
+          "originalBytes": 91517,
+          "originalDimensions": {
+            "height": 900,
+            "width": 1440
+          },
+          "originalPng": "screenshots/settings--desktop-1440x900.png",
+          "originalPngSha256": "eb12f1184a0f6ad51d504e4e85c5c379f6df0db6d0c5cd4b413c1c999481a962",
+          "proportionalDownscale": true,
+          "scale": 0.25,
+          "screenshotRect": {
+            "height": 225,
+            "width": 360,
+            "x": 10,
+            "y": 137
+          },
+          "tileDimensions": {
+            "height": 225,
+            "width": 360
+          }
+        },
+        {
+          "coverageClass": "qualification",
+          "fullSourceVisible": true,
+          "label": "settings / mobile 390x844",
+          "labelBand": {
+            "height": 23,
+            "width": 361,
+            "x": 386,
+            "y": 10
+          },
+          "originalBytes": 57996,
+          "originalDimensions": {
+            "height": 844,
+            "width": 390
+          },
+          "originalPng": "screenshots/settings--mobile-390x844.png",
+          "originalPngSha256": "aa7b414b8c1affba4d3991b6976ba619497e42c8950d997b430da6d6d7bae4b0",
+          "proportionalDownscale": true,
+          "scale": 0.5076923076923077,
+          "screenshotRect": {
+            "height": 428,
+            "width": 198,
+            "x": 467,
+            "y": 36
+          },
+          "tileDimensions": {
+            "height": 428,
+            "width": 198
+          }
+        }
+      ],
+      "under20480Bytes": true
+    },
+    {
+      "base64Length": 26980,
+      "boardId": "today-en-desktop",
+      "bytes": 20233,
+      "dimensions": {
+        "height": 537,
+        "width": 808
+      },
+      "kind": "critical-detail",
+      "oneResponseBase64Bound": true,
+      "path": "details/detail-today-en-desktop.jpg",
+      "settings": {
+        "quality": 30,
+        "resampling": "Pillow.Image.Resampling.LANCZOS",
+        "subsampling": 2,
+        "targetScale": 0.55
+      },
+      "sha256": "4311f2f4a04dc43b87cccca069f33491fedb75140245b1c9e5e010952dddd9a0",
+      "tiles": [
+        {
+          "coverageClass": "qualification",
+          "fullSourceVisible": true,
+          "label": "today / desktop 1440x900",
+          "originalBytes": 129794,
+          "originalDimensions": {
+            "height": 900,
+            "width": 1440
+          },
+          "originalPng": "screenshots/today--desktop-1440x900.png",
+          "originalPngSha256": "dd789dd28d3f9f293e5b044b267b953b62783fd1cb9d135c725af855ce956b75",
+          "proportionalDownscale": true,
+          "scale": 0.55,
+          "screenshotRect": {
+            "height": 495,
+            "width": 792,
+            "x": 8,
+            "y": 34
+          },
+          "tileDimensions": {
+            "height": 495,
+            "width": 792
+          }
+        }
+      ],
+      "under20480Bytes": true
+    },
+    {
+      "base64Length": 26772,
+      "boardId": "today-en-mobile",
+      "bytes": 20079,
+      "dimensions": {
+        "height": 843,
+        "width": 386
+      },
+      "kind": "critical-detail",
+      "oneResponseBase64Bound": true,
+      "path": "details/detail-today-en-mobile.jpg",
+      "settings": {
+        "quality": 25,
+        "resampling": "Pillow.Image.Resampling.LANCZOS",
+        "subsampling": 2,
+        "targetScale": 0.95
+      },
+      "sha256": "9902091da43b2ab9a2afa340ca4ff7181b09813ed3ab908f38059b030f1bbee1",
+      "tiles": [
+        {
+          "coverageClass": "qualification",
+          "fullSourceVisible": true,
+          "label": "today / mobile 390x844",
+          "originalBytes": 67382,
+          "originalDimensions": {
+            "height": 844,
+            "width": 390
+          },
+          "originalPng": "screenshots/today--mobile-390x844.png",
+          "originalPngSha256": "ff52a2693e4e9bfad9780c22a4068a8617cc173e586e1175e6895d6a337d416b",
+          "proportionalDownscale": true,
+          "scale": 0.95,
+          "screenshotRect": {
+            "height": 801,
+            "width": 370,
+            "x": 8,
+            "y": 34
+          },
+          "tileDimensions": {
+            "height": 801,
+            "width": 370
+          }
+        }
+      ],
+      "under20480Bytes": true
+    },
+    {
+      "base64Length": 26616,
+      "boardId": "review-desktop",
+      "bytes": 19961,
+      "dimensions": {
+        "height": 582,
+        "width": 880
+      },
+      "kind": "critical-detail",
+      "oneResponseBase64Bound": true,
+      "path": "details/detail-review-desktop.jpg",
+      "settings": {
+        "quality": 29,
+        "resampling": "Pillow.Image.Resampling.LANCZOS",
+        "subsampling": 2,
+        "targetScale": 0.6
+      },
+      "sha256": "07be05f8315ab2d7e89091eeb89891a246cb7547b65c5ea44e83fefe16dcb04a",
+      "tiles": [
+        {
+          "coverageClass": "qualification",
+          "fullSourceVisible": true,
+          "label": "review evidence / desktop 1440x900",
+          "originalBytes": 93844,
+          "originalDimensions": {
+            "height": 900,
+            "width": 1440
+          },
+          "originalPng": "screenshots/review-evidence--desktop-1440x900.png",
+          "originalPngSha256": "800f82d247b6230b6b1c054c4e0d0af2ff897b1925921673859204c9e184118d",
+          "proportionalDownscale": true,
+          "scale": 0.6,
+          "screenshotRect": {
+            "height": 540,
+            "width": 864,
+            "x": 8,
+            "y": 34
+          },
+          "tileDimensions": {
+            "height": 540,
+            "width": 864
+          }
+        }
+      ],
+      "under20480Bytes": true
+    },
+    {
+      "base64Length": 27288,
+      "boardId": "review-mobile",
+      "bytes": 20464,
+      "dimensions": {
+        "height": 760,
+        "width": 348
+      },
+      "kind": "critical-detail",
+      "oneResponseBase64Bound": true,
+      "path": "details/detail-review-mobile.jpg",
+      "settings": {
+        "quality": 27,
+        "resampling": "Pillow.Image.Resampling.LANCZOS",
+        "subsampling": 2,
+        "targetScale": 0.85
+      },
+      "sha256": "e16c36c4a9ff7ce2bf18660228fb72c35fa86d7d389103673b6238b7b816d117",
+      "tiles": [
+        {
+          "coverageClass": "qualification",
+          "fullSourceVisible": true,
+          "label": "review evidence / mobile 390x844",
+          "originalBytes": 76219,
+          "originalDimensions": {
+            "height": 844,
+            "width": 390
+          },
+          "originalPng": "screenshots/review-evidence--mobile-390x844.png",
+          "originalPngSha256": "f586eb9a493befa846d825163c5fc006f23da285fb24202d330c90849b58600f",
+          "proportionalDownscale": true,
+          "scale": 0.85,
+          "screenshotRect": {
+            "height": 718,
+            "width": 332,
+            "x": 8,
+            "y": 34
+          },
+          "tileDimensions": {
+            "height": 718,
+            "width": 332
+          }
+        }
+      ],
+      "under20480Bytes": true
+    },
+    {
+      "base64Length": 26972,
+      "boardId": "review-actions-mobile",
+      "bytes": 20229,
+      "dimensions": {
+        "height": 802,
+        "width": 367
+      },
+      "kind": "critical-detail",
+      "oneResponseBase64Bound": true,
+      "path": "details/detail-review-actions-mobile.jpg",
+      "settings": {
+        "quality": 27,
+        "resampling": "Pillow.Image.Resampling.LANCZOS",
+        "subsampling": 2,
+        "targetScale": 0.9
+      },
+      "sha256": "a3a330d840c6e613f9485b267e32e314e9c2b728886e0df191453641715779fd",
+      "tiles": [
+        {
+          "coverageClass": "qualification",
+          "fullSourceVisible": true,
+          "label": "review evidence actions / mobile 390x844",
+          "originalBytes": 66494,
+          "originalDimensions": {
+            "height": 844,
+            "width": 390
+          },
+          "originalPng": "screenshots/review-evidence-actions--mobile-390x844.png",
+          "originalPngSha256": "500ea15c44e9ba58ff6f33c8aaa3f37279fda66c0200774e8bee37fbc3b6b472",
+          "proportionalDownscale": true,
+          "scale": 0.9,
+          "screenshotRect": {
+            "height": 760,
+            "width": 351,
+            "x": 8,
+            "y": 34
+          },
+          "tileDimensions": {
+            "height": 760,
+            "width": 351
+          }
+        }
+      ],
+      "under20480Bytes": true
+    },
+    {
+      "base64Length": 27180,
+      "boardId": "today-ko-desktop",
+      "bytes": 20383,
+      "dimensions": {
+        "height": 582,
+        "width": 880
+      },
+      "kind": "critical-detail",
+      "oneResponseBase64Bound": true,
+      "path": "details/detail-today-ko-desktop.jpg",
+      "settings": {
+        "quality": 29,
+        "resampling": "Pillow.Image.Resampling.LANCZOS",
+        "subsampling": 2,
+        "targetScale": 0.6
+      },
+      "sha256": "de6bff2564c4c77723dca33c3449cc93da4c5f5d89a44a9b4e47ca04c8676b40",
+      "tiles": [
+        {
+          "coverageClass": "qualification",
+          "fullSourceVisible": true,
+          "label": "today ko / desktop 1440x900",
+          "originalBytes": 119977,
+          "originalDimensions": {
+            "height": 900,
+            "width": 1440
+          },
+          "originalPng": "screenshots/today-ko--desktop-1440x900.png",
+          "originalPngSha256": "94af7872bd81fd42af3e91c05ff745dbabd8cde7ce8509711981d963a94d0269",
+          "proportionalDownscale": true,
+          "scale": 0.6,
+          "screenshotRect": {
+            "height": 540,
+            "width": 864,
+            "x": 8,
+            "y": 34
+          },
+          "tileDimensions": {
+            "height": 540,
+            "width": 864
+          }
+        }
+      ],
+      "under20480Bytes": true
+    },
+    {
+      "base64Length": 26952,
+      "boardId": "today-ko-mobile",
+      "bytes": 20212,
+      "dimensions": {
+        "height": 843,
+        "width": 386
+      },
+      "kind": "critical-detail",
+      "oneResponseBase64Bound": true,
+      "path": "details/detail-today-ko-mobile.jpg",
+      "settings": {
+        "quality": 28,
+        "resampling": "Pillow.Image.Resampling.LANCZOS",
+        "subsampling": 2,
+        "targetScale": 0.95
+      },
+      "sha256": "98877e092017620f5b16aea0ac2a9414f29ac3933b9eafc42b8490fd458aac16",
+      "tiles": [
+        {
+          "coverageClass": "qualification",
+          "fullSourceVisible": true,
+          "label": "today ko / mobile 390x844",
+          "originalBytes": 66394,
+          "originalDimensions": {
+            "height": 844,
+            "width": 390
+          },
+          "originalPng": "screenshots/today-ko--mobile-390x844.png",
+          "originalPngSha256": "13150d819de4f8122774f73e377152df5a99832868135f8238b5ef99bff7cb25",
+          "proportionalDownscale": true,
+          "scale": 0.95,
+          "screenshotRect": {
+            "height": 801,
+            "width": 370,
+            "x": 8,
+            "y": 34
+          },
+          "tileDimensions": {
+            "height": 801,
+            "width": 370
+          }
+        }
+      ],
+      "under20480Bytes": true
+    }
+  ],
+  "claimBoundary": "JPEG boards are audit transport aids only. Every source tile is fully visible and proportionally downscaled; R12 lossless PNGs remain pixel/promotion authority.",
+  "criticalDetailLineage": [
+    {
+      "boardId": "today-en-desktop",
+      "originalPng": "screenshots/today--desktop-1440x900.png",
+      "originalPngSha256": "dd789dd28d3f9f293e5b044b267b953b62783fd1cb9d135c725af855ce956b75"
+    },
+    {
+      "boardId": "today-en-mobile",
+      "originalPng": "screenshots/today--mobile-390x844.png",
+      "originalPngSha256": "ff52a2693e4e9bfad9780c22a4068a8617cc173e586e1175e6895d6a337d416b"
+    },
+    {
+      "boardId": "review-desktop",
+      "originalPng": "screenshots/review-evidence--desktop-1440x900.png",
+      "originalPngSha256": "800f82d247b6230b6b1c054c4e0d0af2ff897b1925921673859204c9e184118d"
+    },
+    {
+      "boardId": "review-mobile",
+      "originalPng": "screenshots/review-evidence--mobile-390x844.png",
+      "originalPngSha256": "f586eb9a493befa846d825163c5fc006f23da285fb24202d330c90849b58600f"
+    },
+    {
+      "boardId": "review-actions-mobile",
+      "originalPng": "screenshots/review-evidence-actions--mobile-390x844.png",
+      "originalPngSha256": "500ea15c44e9ba58ff6f33c8aaa3f37279fda66c0200774e8bee37fbc3b6b472"
+    },
+    {
+      "boardId": "today-ko-desktop",
+      "originalPng": "screenshots/today-ko--desktop-1440x900.png",
+      "originalPngSha256": "94af7872bd81fd42af3e91c05ff745dbabd8cde7ce8509711981d963a94d0269"
+    },
+    {
+      "boardId": "today-ko-mobile",
+      "originalPng": "screenshots/today-ko--mobile-390x844.png",
+      "originalPngSha256": "13150d819de4f8122774f73e377152df5a99832868135f8238b5ef99bff7cb25"
+    }
+  ],
+  "familyCoverage": {
+    "allExactlyOnce": true,
+    "auxiliaryEmptyPersonalCount": 1,
+    "countsByOriginalPng": {
+      "screenshots/alerts--desktop-1440x900.png": 1,
+      "screenshots/alerts--mobile-390x844.png": 1,
+      "screenshots/journal--desktop-1440x900.png": 1,
+      "screenshots/journal--mobile-390x844.png": 1,
+      "screenshots/non-happy-empty-personal--desktop-1440x900.png": 1,
+      "screenshots/recipes--desktop-1440x900.png": 1,
+      "screenshots/recipes--mobile-390x844.png": 1,
+      "screenshots/review-evidence--desktop-1440x900.png": 1,
+      "screenshots/review-evidence--mobile-390x844.png": 1,
+      "screenshots/review-evidence-actions--mobile-390x844.png": 1,
+      "screenshots/settings--desktop-1440x900.png": 1,
+      "screenshots/settings--mobile-390x844.png": 1,
+      "screenshots/today--desktop-1440x900.png": 1,
+      "screenshots/today--mobile-390x844.png": 1,
+      "screenshots/today-ko--desktop-1440x900.png": 1,
+      "screenshots/today-ko--mobile-390x844.png": 1,
+      "screenshots/watchlist--desktop-1440x900.png": 1,
+      "screenshots/watchlist--mobile-390x844.png": 1
+    },
+    "originalPngCount": 18,
+    "qualificationCount": 17
+  },
+  "schema": "stockledger-r13-board-index-v1"
+}

@@ -1,0 +1,2252 @@
+{
+  "criticalActionReachability": [
+    {
+      "actionInViewport": true,
+      "firstReviewAction": {
+        "name": "Open review · AMD",
+        "rect": {
+          "bottom": 558,
+          "height": 44,
+          "right": 1342.96875,
+          "width": 179.96875,
+          "x": 1163,
+          "y": 514
+        }
+      },
+      "profile": "desktop-1440x900"
+    },
+    {
+      "actionInViewport": true,
+      "firstReviewAction": {
+        "name": "Open review · AMD",
+        "rect": {
+          "bottom": 702,
+          "height": 44,
+          "right": 361,
+          "width": 332,
+          "x": 29,
+          "y": 658
+        }
+      },
+      "profile": "mobile-390x844"
+    },
+    {
+      "actionInViewport": true,
+      "firstReviewAction": {
+        "name": "검토 열기 · AMD",
+        "rect": {
+          "bottom": 537,
+          "height": 44,
+          "right": 1312.640625,
+          "width": 149.640625,
+          "x": 1163,
+          "y": 493
+        }
+      },
+      "profile": "desktop-1440x900"
+    },
+    {
+      "actionInViewport": true,
+      "firstReviewAction": {
+        "name": "검토 열기 · AMD",
+        "rect": {
+          "bottom": 664,
+          "height": 44,
+          "right": 361,
+          "width": 332,
+          "x": 29,
+          "y": 620
+        }
+      },
+      "profile": "mobile-390x844"
+    }
+  ],
+  "firstViewportPriority": [
+    {
+      "profile": "desktop-1440x900",
+      "selectedByVisibleQueueOrder": true,
+      "testId": "today-review-AMD",
+      "visibleQueue": [
+        {
+          "testId": "today-review-AMD",
+          "text": "AMDNot Relevant1 open alertAdvanced Micro DevicesTemporary Bargain Sale v1 remains Not Relevant because the current condition mix is materially unchanged.FreshMarket · Sep 21, 8:41 AMReview freshnessReviewed 8d agoOpen review · AMD"
+        },
+        {
+          "testId": "today-review-COIN",
+          "text": "COINNot Relevant1 open alertCoinbaseReset Recovery v1 remains Not Relevant because the current condition mix is materially unchanged.FreshMarket · Sep 21, 8:41 AMReview freshnessReviewed 13d agoOpen review · COIN"
+        },
+        {
+          "testId": "today-review-INTC",
+          "text": "INTCNot Relevant1 open alertIntelReset Recovery v1 remains Not Relevant because the current condition mix is materially unchanged.FreshMarket · Sep 21, 8:41 AMReview freshnessReviewed 15d agoOpen review · INTC"
+        },
+        {
+          "testId": "today-review-META",
+          "text": "METANot Relevant1 open alertMeta PlatformsLeader Pullback v1 remains Not Relevant because the current condition mix is materially unchanged.FreshMarket · Sep 21, 8:41 AMReview freshnessReviewed 3d agoOpen review · META"
+        },
+        {
+          "testId": "today-review-MSFT",
+          "text": "MSFTNot Relevant1 open alertMicrosoftLeader Pullback v1 remains Not Relevant because the current condition mix is materially unchanged.FreshMarket · Sep 21, 8:41 AMReview freshnessReviewed 16d agoOpen review · MSFT"
+        },
+        {
+          "testId": "today-review-MU",
+          "text": "MUNot Relevant1 open alertMicronLeader Pullback v1 remains Not Relevant because the current condition mix is materially unchanged.FreshMarket · Sep 21, 8:41 AMReview freshnessReviewed 2d agoOpen review · MU"
+        }
+      ]
+    },
+    {
+      "profile": "mobile-390x844",
+      "selectedByVisibleQueueOrder": true,
+      "testId": "today-review-AMD",
+      "visibleQueue": [
+        {
+          "testId": "today-review-AMD",
+          "text": "AMDNot Relevant1 open alertAdvanced Micro DevicesTemporary Bargain Sale v1 remains Not Relevant because the current condition mix is materially unchanged.FreshMarket · Sep 21, 8:41 AMReview freshnessReviewed 8d agoOpen review · AMD"
+        },
+        {
+          "testId": "today-review-COIN",
+          "text": "COINNot Relevant1 open alertCoinbaseReset Recovery v1 remains Not Relevant because the current condition mix is materially unchanged.FreshMarket · Sep 21, 8:41 AMReview freshnessReviewed 13d agoOpen review · COIN"
+        },
+        {
+          "testId": "today-review-INTC",
+          "text": "INTCNot Relevant1 open alertIntelReset Recovery v1 remains Not Relevant because the current condition mix is materially unchanged.FreshMarket · Sep 21, 8:41 AMReview freshnessReviewed 15d agoOpen review · INTC"
+        },
+        {
+          "testId": "today-review-META",
+          "text": "METANot Relevant1 open alertMeta PlatformsLeader Pullback v1 remains Not Relevant because the current condition mix is materially unchanged.FreshMarket · Sep 21, 8:41 AMReview freshnessReviewed 3d agoOpen review · META"
+        },
+        {
+          "testId": "today-review-MSFT",
+          "text": "MSFTNot Relevant1 open alertMicrosoftLeader Pullback v1 remains Not Relevant because the current condition mix is materially unchanged.FreshMarket · Sep 21, 8:41 AMReview freshnessReviewed 16d agoOpen review · MSFT"
+        },
+        {
+          "testId": "today-review-MU",
+          "text": "MUNot Relevant1 open alertMicronLeader Pullback v1 remains Not Relevant because the current condition mix is materially unchanged.FreshMarket · Sep 21, 8:41 AMReview freshnessReviewed 2d agoOpen review · MU"
+        }
+      ]
+    }
+  ],
+  "focusReturn": [
+    {
+      "doneFocusedOnOpen": true,
+      "doneReturnFocus": {
+        "name": "Open review · AMD",
+        "tag": "BUTTON"
+      },
+      "escapeReturnFocus": {
+        "name": "Open review · AMD",
+        "tag": "BUTTON"
+      },
+      "initialFocus": {
+        "name": "Done",
+        "role": "button",
+        "tag": "BUTTON"
+      },
+      "profile": "desktop-1440x900",
+      "returnedAfterDone": true,
+      "returnedAfterEscape": true
+    },
+    {
+      "doneFocusedOnOpen": true,
+      "doneReturnFocus": {
+        "name": "Open review · AMD",
+        "tag": "BUTTON"
+      },
+      "escapeReturnFocus": {
+        "name": "Open review · AMD",
+        "tag": "BUTTON"
+      },
+      "initialFocus": {
+        "name": "Done",
+        "role": "button",
+        "tag": "BUTTON"
+      },
+      "profile": "mobile-390x844",
+      "returnedAfterDone": true,
+      "returnedAfterEscape": true
+    }
+  ],
+  "korean": [
+    {
+      "errors": {
+        "console": [],
+        "pageErrors": [],
+        "requestFailures": [],
+        "responses": []
+      },
+      "geometry": {
+        "controlCount": 17,
+        "controlOverlaps": [],
+        "controls": [
+          {
+            "disabled": false,
+            "name": "오늘",
+            "pressed": null,
+            "rect": {
+              "bottom": 146,
+              "height": 52,
+              "right": 207,
+              "width": 191,
+              "x": 16,
+              "y": 94
+            },
+            "role": "tab",
+            "selected": "true"
+          },
+          {
+            "disabled": false,
+            "name": "관심 종목",
+            "pressed": null,
+            "rect": {
+              "bottom": 202,
+              "height": 52,
+              "right": 207,
+              "width": 191,
+              "x": 16,
+              "y": 150
+            },
+            "role": "tab",
+            "selected": "false"
+          },
+          {
+            "disabled": false,
+            "name": "레시피",
+            "pressed": null,
+            "rect": {
+              "bottom": 258,
+              "height": 52,
+              "right": 207,
+              "width": 191,
+              "x": 16,
+              "y": 206
+            },
+            "role": "tab",
+            "selected": "false"
+          },
+          {
+            "disabled": false,
+            "name": "기록",
+            "pressed": null,
+            "rect": {
+              "bottom": 314,
+              "height": 52,
+              "right": 207,
+              "width": 191,
+              "x": 16,
+              "y": 262
+            },
+            "role": "tab",
+            "selected": "false"
+          },
+          {
+            "disabled": false,
+            "name": "알림",
+            "pressed": "false",
+            "rect": {
+              "bottom": 59.5,
+              "height": 44,
+              "right": 1324.375,
+              "width": 44,
+              "x": 1280.375,
+              "y": 15.5
+            },
+            "role": "button",
+            "selected": null
+          },
+          {
+            "disabled": false,
+            "name": "설정",
+            "pressed": "false",
+            "rect": {
+              "bottom": 59.5,
+              "height": 44,
+              "right": 1408,
+              "width": 44,
+              "x": 1364,
+              "y": 15.5
+            },
+            "role": "button",
+            "selected": null
+          },
+          {
+            "disabled": false,
+            "name": "요약 설명",
+            "pressed": null,
+            "rect": {
+              "bottom": 197,
+              "height": 36,
+              "right": 1400,
+              "width": 96.359375,
+              "x": 1303.640625,
+              "y": 161
+            },
+            "role": "button",
+            "selected": null
+          },
+          {
+            "disabled": false,
+            "name": "검토 열기 · AMD",
+            "pressed": null,
+            "rect": {
+              "bottom": 537,
+              "height": 44,
+              "right": 1312.640625,
+              "width": 149.640625,
+              "x": 1163,
+              "y": 493
+            },
+            "role": "button",
+            "selected": null
+          },
+          {
+            "disabled": false,
+            "name": "검토 열기 · COIN",
+            "pressed": null,
+            "rect": {
+              "bottom": 707,
+              "height": 44,
+              "right": 1315.5,
+              "width": 152.5,
+              "x": 1163,
+              "y": 663
+            },
+            "role": "button",
+            "selected": null
+          },
+          {
+            "disabled": false,
+            "name": "검토 열기 · INTC",
+            "pressed": null,
+            "rect": {
+              "bottom": 877,
+              "height": 44,
+              "right": 1313.484375,
+              "width": 150.484375,
+              "x": 1163,
+              "y": 833
+            },
+            "role": "button",
+            "selected": null
+          },
+          {
+            "disabled": false,
+            "name": "검토 열기 · META",
+            "pressed": null,
+            "rect": {
+              "bottom": 1047,
+              "height": 44,
+              "right": 1318.375,
+              "width": 155.375,
+              "x": 1163,
+              "y": 1003
+            },
+            "role": "button",
+            "selected": null
+          },
+          {
+            "disabled": false,
+            "name": "검토 열기 · MSFT",
+            "pressed": null,
+            "rect": {
+              "bottom": 1217,
+              "height": 44,
+              "right": 1318.40625,
+              "width": 155.40625,
+              "x": 1163,
+              "y": 1173
+            },
+            "role": "button",
+            "selected": null
+          },
+          {
+            "disabled": false,
+            "name": "검토 열기 · MU",
+            "pressed": null,
+            "rect": {
+              "bottom": 1387,
+              "height": 44,
+              "right": 1303.609375,
+              "width": 140.609375,
+              "x": 1163,
+              "y": 1343
+            },
+            "role": "button",
+            "selected": null
+          },
+          {
+            "disabled": false,
+            "name": "Watchlist에서 더 보기",
+            "pressed": null,
+            "rect": {
+              "bottom": 1758,
+              "height": 44,
+              "right": 446.125,
+              "width": 182.125,
+              "x": 264,
+              "y": 1714
+            },
+            "role": "button",
+            "selected": null
+          },
+          {
+            "disabled": false,
+            "name": "알림 큐 열기",
+            "pressed": null,
+            "rect": {
+              "bottom": 1758,
+              "height": 44,
+              "right": 577.109375,
+              "width": 122.984375,
+              "x": 454.125,
+              "y": 1714
+            },
+            "role": "button",
+            "selected": null
+          },
+          {
+            "disabled": false,
+            "name": "레시피와 규칙 열기",
+            "pressed": null,
+            "rect": {
+              "bottom": 2065,
+              "height": 44,
+              "right": 644.296875,
+              "width": 156.71875,
+              "x": 487.578125,
+              "y": 2021
+            },
+            "role": "button",
+            "selected": null
+          },
+          {
+            "disabled": false,
+            "name": "저널에서 기록 계속하기",
+            "pressed": null,
+            "rect": {
+              "bottom": 2533,
+              "height": 44,
+              "right": 460.21875,
+              "width": 179.21875,
+              "x": 281,
+              "y": 2489
+            },
+            "role": "button",
+            "selected": null
+          }
+        ],
+        "document": {
+          "clientHeight": 900,
+          "clientWidth": 1440,
+          "scrollHeight": 900,
+          "scrollWidth": 1440
+        },
+        "horizontalOverflow": false,
+        "reviewRows": [
+          {
+            "action": {
+              "name": "검토 열기 · AMD",
+              "rect": {
+                "bottom": 537,
+                "height": 44,
+                "right": 1312.640625,
+                "width": 149.640625,
+                "x": 1163,
+                "y": 493
+              }
+            },
+            "actionInViewport": true,
+            "rect": {
+              "bottom": 638,
+              "height": 162,
+              "right": 1400,
+              "width": 1136,
+              "x": 264,
+              "y": 476
+            },
+            "testId": "today-review-AMD"
+          },
+          {
+            "action": {
+              "name": "검토 열기 · COIN",
+              "rect": {
+                "bottom": 707,
+                "height": 44,
+                "right": 1315.5,
+                "width": 152.5,
+                "x": 1163,
+                "y": 663
+              }
+            },
+            "actionInViewport": true,
+            "rect": {
+              "bottom": 808,
+              "height": 162,
+              "right": 1400,
+              "width": 1136,
+              "x": 264,
+              "y": 646
+            },
+            "testId": "today-review-COIN"
+          },
+          {
+            "action": {
+              "name": "검토 열기 · INTC",
+              "rect": {
+                "bottom": 877,
+                "height": 44,
+                "right": 1313.484375,
+                "width": 150.484375,
+                "x": 1163,
+                "y": 833
+              }
+            },
+            "actionInViewport": true,
+            "rect": {
+              "bottom": 978,
+              "height": 162,
+              "right": 1400,
+              "width": 1136,
+              "x": 264,
+              "y": 816
+            },
+            "testId": "today-review-INTC"
+          },
+          {
+            "action": {
+              "name": "검토 열기 · META",
+              "rect": {
+                "bottom": 1047,
+                "height": 44,
+                "right": 1318.375,
+                "width": 155.375,
+                "x": 1163,
+                "y": 1003
+              }
+            },
+            "actionInViewport": false,
+            "rect": {
+              "bottom": 1148,
+              "height": 162,
+              "right": 1400,
+              "width": 1136,
+              "x": 264,
+              "y": 986
+            },
+            "testId": "today-review-META"
+          },
+          {
+            "action": {
+              "name": "검토 열기 · MSFT",
+              "rect": {
+                "bottom": 1217,
+                "height": 44,
+                "right": 1318.40625,
+                "width": 155.40625,
+                "x": 1163,
+                "y": 1173
+              }
+            },
+            "actionInViewport": false,
+            "rect": {
+              "bottom": 1318,
+              "height": 162,
+              "right": 1400,
+              "width": 1136,
+              "x": 264,
+              "y": 1156
+            },
+            "testId": "today-review-MSFT"
+          },
+          {
+            "action": {
+              "name": "검토 열기 · MU",
+              "rect": {
+                "bottom": 1387,
+                "height": 44,
+                "right": 1303.609375,
+                "width": 140.609375,
+                "x": 1163,
+                "y": 1343
+              }
+            },
+            "actionInViewport": false,
+            "rect": {
+              "bottom": 1488,
+              "height": 162,
+              "right": 1400,
+              "width": 1136,
+              "x": 264,
+              "y": 1326
+            },
+            "testId": "today-review-MU"
+          }
+        ],
+        "tabSemantics": [
+          {
+            "name": "오늘",
+            "selected": "true"
+          },
+          {
+            "name": "관심 종목",
+            "selected": "false"
+          },
+          {
+            "name": "레시피",
+            "selected": "false"
+          },
+          {
+            "name": "기록",
+            "selected": "false"
+          }
+        ],
+        "viewport": {
+          "dpr": 1,
+          "height": 900,
+          "width": 1440
+        }
+      },
+      "hardFails": [],
+      "languageSemantics": {
+        "selectedTab": "true",
+        "settingsControl": 1
+      },
+      "locale": "ko-KR",
+      "profile": {
+        "hasTouch": false,
+        "height": 900,
+        "isMobile": false,
+        "name": "desktop-1440x900",
+        "width": 1440
+      },
+      "ready": {
+        "bodyText": "S\nStockLedger\n근거 중심 검토\n오늘\n관심 종목\n레시피\n기록\n작업 공간\n관찰 → 근거 → 기록\n오늘\n긴급 0개 · 열림 알림 9개\n9\n샘플 데이터가 있습니다. 더미 가격과 결과는 앱을 둘러보기 위한 것입니다.\nStockLedger · 현재 검토 맥락\n오늘\n무엇이 바뀌었는지 이해하고, 검토할 근거를 열고, 의도적인 다음 행동을 기록하세요.\n검토 대기 12개\n자동 매매 없음 · 결과 보장 없음\n요약 설명\n일부 검토 근거가 제한되어 있습니다\n더미·미사용·부분 데이터는 사실처럼 확정하지 않습니다. 각 검토 단위의 원천과 신선도를 확인하세요.\n우선순위 1\n검토 필요\n왜 지금인지가 보이는 항목부터 확인하세요.\n12개\nAMD\n해당 없음\n열린 알림 1개\nAdvanced Micro Devices\nTemporary Bargain Sale v1 remains Not Relevant because the current condition mix is materially unchanged.\n최신\nMarket · 9월 21일 오전 8:41\n검토 신선도\n8일 전 검토\n검토 열기 · AMD\nCOIN\n해당 없음\n열린 알림 1개\nCoinbase\nReset Recovery v1 remains Not Relevant because the current condition mix is materially unchanged.\n최신\nMarket · 9월 21일 오전 8:41\n검토 신선도\n13일 전 검토\n검토 열기 · COIN\nINTC\n해당 없음\n열린 알림 1개\nIntel\nReset Recovery v1 remains Not Relevant because the current condition mix is materially unchanged.\n최신\nMarket · 9월 21일 오전 8:41\n검토 신선도\n15일 전 검토\n검토 열기 · INTC\nMETA\n해당 없음\n열린 알림 1개\nMeta Platforms\nLeader Pullback v1 remains Not Relevant because the current condition mix is materially unchanged.\n최신\nMarket · 9월 21일 오전 8:41\n검토 신선도\n3일 전 검토\n검토 열기 · META\nMSFT\n해당 없음\n열린 알림 1개\nMicrosoft\nLeader Pullback v1 remains Not Relevant because the current condition mix is materially unchanged.\n최신\nMarket · 9월 21일 오전 8:41\n검토 신선도\n16일 전 검토\n검토 열기 · MSFT\nMU\n해당 없음\n열린 알림 1개\nMicron\nLeader Pullback v1 remains Not Relevant because the current condition mix is materially unchanged.\n최신\nMarket · 9월 21일 오전 8:41\n검토 신선도\n2일 전 검토\n검토 열기 · MU\n시각 트리아지\n리서치 요약\n우선순위 2 · 현재 작업 공간의 범위와 확인 가능한 원천을 짧게 확인합니다.\n관심 종목\n20\n현재 작업 공간\n즉시 검토\n0\n평가된 위험·변화\n기회 형성\n0\n추가 근거 확인 필요\n열린 알림\n9\n검토되지 않은 알림\nWatchlist에서 더 보기\n알림 큐 열기\n우선순위 3\n모니터링 보드\n변화의 출처와 데이터 제공 상태를 함께 표시합니다.\n최근 변화\n최근 상태 변화가 없습니다.\n모니터링 건강\n0/4 제공자 정상\nStooq: 미설정 · Alpha Vantage: 미설정 · Twelve Data: 미설정 · Marketaux: 미설정\n최근 스캔 기록 없음\n최신 확인 가능한 스냅샷 19개\n레시피와 규칙 열기\n결정 루프\n결정과 학습\n우선순위 4 · 검토가 실제 판단과 결과 학습으로 닫혔는지 확인합니다.\n학습 5/12\n12\n검토 큐\n12\n결정 기록\n5\n학습 완료\n학습 완료\n심한 낙폭과 지지 확인 조합이 유효했습니다.\n후속 검토 필요\n반등만으로는 아직 부족했습니다.\n학습 완료\n리스크 모니터 세트는 실제 가격보다 검토 누락 방지에 유효합니다.\n저널에서 기록 계속하기",
+        "hash": "#/today",
+        "loadingText": [],
+        "tabList": "주요 탐색",
+        "title": "StockLedger"
+      },
+      "route": "#/today",
+      "screenshot": {
+        "bytes": 119977,
+        "dimensions": {
+          "height": 900,
+          "width": 1440
+        },
+        "file": "screenshots/today-ko--desktop-1440x900.png",
+        "sha256": "94af7872bd81fd42af3e91c05ff745dbabd8cde7ce8509711981d963a94d0269"
+      },
+      "sourceKind": "sample-language-ko",
+      "surfaceKey": "today"
+    },
+    {
+      "errors": {
+        "console": [],
+        "pageErrors": [],
+        "requestFailures": [],
+        "responses": []
+      },
+      "geometry": {
+        "controlCount": 17,
+        "controlOverlaps": [],
+        "controls": [
+          {
+            "disabled": false,
+            "name": "오늘",
+            "pressed": null,
+            "rect": {
+              "bottom": 836,
+              "height": 56,
+              "right": 98.5,
+              "width": 90.5,
+              "x": 8,
+              "y": 780
+            },
+            "role": "tab",
+            "selected": "true"
+          },
+          {
+            "disabled": false,
+            "name": "관심 종목",
+            "pressed": null,
+            "rect": {
+              "bottom": 836,
+              "height": 56,
+              "right": 193,
+              "width": 90.5,
+              "x": 102.5,
+              "y": 780
+            },
+            "role": "tab",
+            "selected": "false"
+          },
+          {
+            "disabled": false,
+            "name": "레시피",
+            "pressed": null,
+            "rect": {
+              "bottom": 836,
+              "height": 56,
+              "right": 287.5,
+              "width": 90.5,
+              "x": 197,
+              "y": 780
+            },
+            "role": "tab",
+            "selected": "false"
+          },
+          {
+            "disabled": false,
+            "name": "기록",
+            "pressed": null,
+            "rect": {
+              "bottom": 836,
+              "height": 56,
+              "right": 382,
+              "width": 90.5,
+              "x": 291.5,
+              "y": 780
+            },
+            "role": "tab",
+            "selected": "false"
+          },
+          {
+            "disabled": false,
+            "name": "알림",
+            "pressed": "false",
+            "rect": {
+              "bottom": 59.5,
+              "height": 44,
+              "right": 290.375,
+              "width": 44,
+              "x": 246.375,
+              "y": 15.5
+            },
+            "role": "button",
+            "selected": null
+          },
+          {
+            "disabled": false,
+            "name": "설정",
+            "pressed": "false",
+            "rect": {
+              "bottom": 59.5,
+              "height": 44,
+              "right": 374,
+              "width": 44,
+              "x": 330,
+              "y": 15.5
+            },
+            "role": "button",
+            "selected": null
+          },
+          {
+            "disabled": false,
+            "name": "요약 설명",
+            "pressed": null,
+            "rect": {
+              "bottom": 353,
+              "height": 36,
+              "right": 374,
+              "width": 358,
+              "x": 16,
+              "y": 317
+            },
+            "role": "button",
+            "selected": null
+          },
+          {
+            "disabled": false,
+            "name": "검토 열기 · AMD",
+            "pressed": null,
+            "rect": {
+              "bottom": 664,
+              "height": 44,
+              "right": 361,
+              "width": 332,
+              "x": 29,
+              "y": 620
+            },
+            "role": "button",
+            "selected": null
+          },
+          {
+            "disabled": false,
+            "name": "검토 열기 · COIN",
+            "pressed": null,
+            "rect": {
+              "bottom": 928,
+              "height": 44,
+              "right": 361,
+              "width": 332,
+              "x": 29,
+              "y": 884
+            },
+            "role": "button",
+            "selected": null
+          },
+          {
+            "disabled": false,
+            "name": "검토 열기 · INTC",
+            "pressed": null,
+            "rect": {
+              "bottom": 1171,
+              "height": 44,
+              "right": 361,
+              "width": 332,
+              "x": 29,
+              "y": 1127
+            },
+            "role": "button",
+            "selected": null
+          },
+          {
+            "disabled": false,
+            "name": "검토 열기 · META",
+            "pressed": null,
+            "rect": {
+              "bottom": 1414,
+              "height": 44,
+              "right": 361,
+              "width": 332,
+              "x": 29,
+              "y": 1370
+            },
+            "role": "button",
+            "selected": null
+          },
+          {
+            "disabled": false,
+            "name": "검토 열기 · MSFT",
+            "pressed": null,
+            "rect": {
+              "bottom": 1657,
+              "height": 44,
+              "right": 361,
+              "width": 332,
+              "x": 29,
+              "y": 1613
+            },
+            "role": "button",
+            "selected": null
+          },
+          {
+            "disabled": false,
+            "name": "검토 열기 · MU",
+            "pressed": null,
+            "rect": {
+              "bottom": 1900,
+              "height": 44,
+              "right": 361,
+              "width": 332,
+              "x": 29,
+              "y": 1856
+            },
+            "role": "button",
+            "selected": null
+          },
+          {
+            "disabled": false,
+            "name": "Watchlist에서 더 보기",
+            "pressed": null,
+            "rect": {
+              "bottom": 2455,
+              "height": 44,
+              "right": 198.125,
+              "width": 182.125,
+              "x": 16,
+              "y": 2411
+            },
+            "role": "button",
+            "selected": null
+          },
+          {
+            "disabled": false,
+            "name": "알림 큐 열기",
+            "pressed": null,
+            "rect": {
+              "bottom": 2455,
+              "height": 44,
+              "right": 329.109375,
+              "width": 122.984375,
+              "x": 206.125,
+              "y": 2411
+            },
+            "role": "button",
+            "selected": null
+          },
+          {
+            "disabled": false,
+            "name": "레시피와 규칙 열기",
+            "pressed": null,
+            "rect": {
+              "bottom": 2861,
+              "height": 44,
+              "right": 185.71875,
+              "width": 156.71875,
+              "x": 29,
+              "y": 2817
+            },
+            "role": "button",
+            "selected": null
+          },
+          {
+            "disabled": false,
+            "name": "저널에서 기록 계속하기",
+            "pressed": null,
+            "rect": {
+              "bottom": 3376,
+              "height": 44,
+              "right": 208.21875,
+              "width": 179.21875,
+              "x": 29,
+              "y": 3332
+            },
+            "role": "button",
+            "selected": null
+          }
+        ],
+        "document": {
+          "clientHeight": 844,
+          "clientWidth": 390,
+          "scrollHeight": 844,
+          "scrollWidth": 390
+        },
+        "horizontalOverflow": false,
+        "reviewRows": [
+          {
+            "action": {
+              "name": "검토 열기 · AMD",
+              "rect": {
+                "bottom": 664,
+                "height": 44,
+                "right": 361,
+                "width": 332,
+                "x": 29,
+                "y": 620
+              }
+            },
+            "actionInViewport": true,
+            "rect": {
+              "bottom": 863,
+              "height": 256,
+              "right": 374,
+              "width": 358,
+              "x": 16,
+              "y": 607
+            },
+            "testId": "today-review-AMD"
+          },
+          {
+            "action": {
+              "name": "검토 열기 · COIN",
+              "rect": {
+                "bottom": 928,
+                "height": 44,
+                "right": 361,
+                "width": 332,
+                "x": 29,
+                "y": 884
+              }
+            },
+            "actionInViewport": false,
+            "rect": {
+              "bottom": 1106,
+              "height": 235,
+              "right": 374,
+              "width": 358,
+              "x": 16,
+              "y": 871
+            },
+            "testId": "today-review-COIN"
+          },
+          {
+            "action": {
+              "name": "검토 열기 · INTC",
+              "rect": {
+                "bottom": 1171,
+                "height": 44,
+                "right": 361,
+                "width": 332,
+                "x": 29,
+                "y": 1127
+              }
+            },
+            "actionInViewport": false,
+            "rect": {
+              "bottom": 1349,
+              "height": 235,
+              "right": 374,
+              "width": 358,
+              "x": 16,
+              "y": 1114
+            },
+            "testId": "today-review-INTC"
+          },
+          {
+            "action": {
+              "name": "검토 열기 · META",
+              "rect": {
+                "bottom": 1414,
+                "height": 44,
+                "right": 361,
+                "width": 332,
+                "x": 29,
+                "y": 1370
+              }
+            },
+            "actionInViewport": false,
+            "rect": {
+              "bottom": 1592,
+              "height": 235,
+              "right": 374,
+              "width": 358,
+              "x": 16,
+              "y": 1357
+            },
+            "testId": "today-review-META"
+          },
+          {
+            "action": {
+              "name": "검토 열기 · MSFT",
+              "rect": {
+                "bottom": 1657,
+                "height": 44,
+                "right": 361,
+                "width": 332,
+                "x": 29,
+                "y": 1613
+              }
+            },
+            "actionInViewport": false,
+            "rect": {
+              "bottom": 1835,
+              "height": 235,
+              "right": 374,
+              "width": 358,
+              "x": 16,
+              "y": 1600
+            },
+            "testId": "today-review-MSFT"
+          },
+          {
+            "action": {
+              "name": "검토 열기 · MU",
+              "rect": {
+                "bottom": 1900,
+                "height": 44,
+                "right": 361,
+                "width": 332,
+                "x": 29,
+                "y": 1856
+              }
+            },
+            "actionInViewport": false,
+            "rect": {
+              "bottom": 2078,
+              "height": 235,
+              "right": 374,
+              "width": 358,
+              "x": 16,
+              "y": 1843
+            },
+            "testId": "today-review-MU"
+          }
+        ],
+        "tabSemantics": [
+          {
+            "name": "오늘",
+            "selected": "true"
+          },
+          {
+            "name": "관심 종목",
+            "selected": "false"
+          },
+          {
+            "name": "레시피",
+            "selected": "false"
+          },
+          {
+            "name": "기록",
+            "selected": "false"
+          }
+        ],
+        "viewport": {
+          "dpr": 1,
+          "height": 844,
+          "width": 390
+        }
+      },
+      "hardFails": [],
+      "languageSemantics": {
+        "selectedTab": "true",
+        "settingsControl": 1
+      },
+      "locale": "ko-KR",
+      "profile": {
+        "hasTouch": true,
+        "height": 844,
+        "isMobile": true,
+        "name": "mobile-390x844",
+        "width": 390
+      },
+      "ready": {
+        "bodyText": "오늘\n관심 종목\n레시피\n기록\n오늘\n긴급 0개 · 열림 알림 9개\n9\n샘플 데이터가 있습니다. 더미 가격과 결과는 앱을 둘러보기 위한 것입니다.\nStockLedger · 현재 검토 맥락\n오늘\n무엇이 바뀌었는지 이해하고, 검토할 근거를 열고, 의도적인 다음 행동을 기록하세요.\n검토 대기 12개\n자동 매매 없음 · 결과 보장 없음\n요약 설명\n일부 검토 근거가 제한되어 있습니다\n더미·미사용·부분 데이터는 사실처럼 확정하지 않습니다. 각 검토 단위의 원천과 신선도를 확인하세요.\n우선순위 1\n검토 필요\n왜 지금인지가 보이는 항목부터 확인하세요.\n12개\nAMD\n해당 없음\n열린 알림 1개\nAdvanced Micro Devices\nTemporary Bargain Sale v1 remains Not Relevant because the current condition mix is materially unchanged.\n최신\nMarket · 9월 21일 오전 8:41\n검토 신선도\n8일 전 검토\n검토 열기 · AMD\nCOIN\n해당 없음\n열린 알림 1개\nCoinbase\nReset Recovery v1 remains Not Relevant because the current condition mix is materially unchanged.\n최신\nMarket · 9월 21일 오전 8:41\n검토 신선도\n13일 전 검토\n검토 열기 · COIN\nINTC\n해당 없음\n열린 알림 1개\nIntel\nReset Recovery v1 remains Not Relevant because the current condition mix is materially unchanged.\n최신\nMarket · 9월 21일 오전 8:41\n검토 신선도\n15일 전 검토\n검토 열기 · INTC\nMETA\n해당 없음\n열린 알림 1개\nMeta Platforms\nLeader Pullback v1 remains Not Relevant because the current condition mix is materially unchanged.\n최신\nMarket · 9월 21일 오전 8:41\n검토 신선도\n3일 전 검토\n검토 열기 · META\nMSFT\n해당 없음\n열린 알림 1개\nMicrosoft\nLeader Pullback v1 remains Not Relevant because the current condition mix is materially unchanged.\n최신\nMarket · 9월 21일 오전 8:41\n검토 신선도\n16일 전 검토\n검토 열기 · MSFT\nMU\n해당 없음\n열린 알림 1개\nMicron\nLeader Pullback v1 remains Not Relevant because the current condition mix is materially unchanged.\n최신\nMarket · 9월 21일 오전 8:41\n검토 신선도\n2일 전 검토\n검토 열기 · MU\n시각 트리아지\n리서치 요약\n우선순위 2 · 현재 작업 공간의 범위와 확인 가능한 원천을 짧게 확인합니다.\n관심 종목\n20\n현재 작업 공간\n즉시 검토\n0\n평가된 위험·변화\n기회 형성\n0\n추가 근거 확인 필요\n열린 알림\n9\n검토되지 않은 알림\nWatchlist에서 더 보기\n알림 큐 열기\n우선순위 3\n모니터링 보드\n변화의 출처와 데이터 제공 상태를 함께 표시합니다.\n최근 변화\n최근 상태 변화가 없습니다.\n모니터링 건강\n0/4 제공자 정상\nStooq: 미설정 · Alpha Vantage: 미설정 · Twelve Data: 미설정 · Marketaux: 미설정\n최근 스캔 기록 없음\n최신 확인 가능한 스냅샷 19개\n레시피와 규칙 열기\n결정 루프\n결정과 학습\n우선순위 4 · 검토가 실제 판단과 결과 학습으로 닫혔는지 확인합니다.\n학습 5/12\n12\n검토 큐\n12\n결정 기록\n5\n학습 완료\n학습 완료\n심한 낙폭과 지지 확인 조합이 유효했습니다.\n후속 검토 필요\n반등만으로는 아직 부족했습니다.\n학습 완료\n리스크 모니터 세트는 실제 가격보다 검토 누락 방지에 유효합니다.\n저널에서 기록 계속하기",
+        "hash": "#/today",
+        "loadingText": [],
+        "tabList": "주요 탐색",
+        "title": "StockLedger"
+      },
+      "route": "#/today",
+      "screenshot": {
+        "bytes": 66394,
+        "dimensions": {
+          "height": 844,
+          "width": 390
+        },
+        "file": "screenshots/today-ko--mobile-390x844.png",
+        "sha256": "13150d819de4f8122774f73e377152df5a99832868135f8238b5ef99bff7cb25"
+      },
+      "sourceKind": "sample-language-ko",
+      "surfaceKey": "today"
+    }
+  ],
+  "main": [
+    {
+      "errors": {
+        "console": [],
+        "pageErrors": [],
+        "requestFailures": [],
+        "responses": []
+      },
+      "geometry": {
+        "controlCount": 17,
+        "controlOverlaps": [],
+        "controls": [
+          {
+            "disabled": false,
+            "name": "Today",
+            "pressed": null,
+            "rect": {
+              "bottom": 146,
+              "height": 52,
+              "right": 207,
+              "width": 191,
+              "x": 16,
+              "y": 94
+            },
+            "role": "tab",
+            "selected": "true"
+          },
+          {
+            "disabled": false,
+            "name": "Watchlist",
+            "pressed": null,
+            "rect": {
+              "bottom": 202,
+              "height": 52,
+              "right": 207,
+              "width": 191,
+              "x": 16,
+              "y": 150
+            },
+            "role": "tab",
+            "selected": "false"
+          },
+          {
+            "disabled": false,
+            "name": "Recipes",
+            "pressed": null,
+            "rect": {
+              "bottom": 258,
+              "height": 52,
+              "right": 207,
+              "width": 191,
+              "x": 16,
+              "y": 206
+            },
+            "role": "tab",
+            "selected": "false"
+          },
+          {
+            "disabled": false,
+            "name": "Journal",
+            "pressed": null,
+            "rect": {
+              "bottom": 314,
+              "height": 52,
+              "right": 207,
+              "width": 191,
+              "x": 16,
+              "y": 262
+            },
+            "role": "tab",
+            "selected": "false"
+          },
+          {
+            "disabled": false,
+            "name": "Alerts",
+            "pressed": "false",
+            "rect": {
+              "bottom": 59.5,
+              "height": 44,
+              "right": 1324.375,
+              "width": 44,
+              "x": 1280.375,
+              "y": 15.5
+            },
+            "role": "button",
+            "selected": null
+          },
+          {
+            "disabled": false,
+            "name": "Settings",
+            "pressed": "false",
+            "rect": {
+              "bottom": 59.5,
+              "height": 44,
+              "right": 1408,
+              "width": 44,
+              "x": 1364,
+              "y": 15.5
+            },
+            "role": "button",
+            "selected": null
+          },
+          {
+            "disabled": false,
+            "name": "Summary help",
+            "pressed": null,
+            "rect": {
+              "bottom": 197,
+              "height": 36,
+              "right": 1400,
+              "width": 139,
+              "x": 1261,
+              "y": 161
+            },
+            "role": "button",
+            "selected": null
+          },
+          {
+            "disabled": false,
+            "name": "Open review · AMD",
+            "pressed": null,
+            "rect": {
+              "bottom": 558,
+              "height": 44,
+              "right": 1342.96875,
+              "width": 179.96875,
+              "x": 1163,
+              "y": 514
+            },
+            "role": "button",
+            "selected": null
+          },
+          {
+            "disabled": false,
+            "name": "Open review · COIN",
+            "pressed": null,
+            "rect": {
+              "bottom": 728,
+              "height": 44,
+              "right": 1345.84375,
+              "width": 182.84375,
+              "x": 1163,
+              "y": 684
+            },
+            "role": "button",
+            "selected": null
+          },
+          {
+            "disabled": false,
+            "name": "Open review · INTC",
+            "pressed": null,
+            "rect": {
+              "bottom": 898,
+              "height": 44,
+              "right": 1343.8125,
+              "width": 180.8125,
+              "x": 1163,
+              "y": 854
+            },
+            "role": "button",
+            "selected": null
+          },
+          {
+            "disabled": false,
+            "name": "Open review · META",
+            "pressed": null,
+            "rect": {
+              "bottom": 1068,
+              "height": 44,
+              "right": 1348.703125,
+              "width": 185.703125,
+              "x": 1163,
+              "y": 1024
+            },
+            "role": "button",
+            "selected": null
+          },
+          {
+            "disabled": false,
+            "name": "Open review · MSFT",
+            "pressed": null,
+            "rect": {
+              "bottom": 1238,
+              "height": 44,
+              "right": 1348.75,
+              "width": 185.75,
+              "x": 1163,
+              "y": 1194
+            },
+            "role": "button",
+            "selected": null
+          },
+          {
+            "disabled": false,
+            "name": "Open review · MU",
+            "pressed": null,
+            "rect": {
+              "bottom": 1408,
+              "height": 44,
+              "right": 1333.9375,
+              "width": 170.9375,
+              "x": 1163,
+              "y": 1364
+            },
+            "role": "button",
+            "selected": null
+          },
+          {
+            "disabled": false,
+            "name": "See more in watchlist",
+            "pressed": null,
+            "rect": {
+              "bottom": 1779,
+              "height": 44,
+              "right": 459.109375,
+              "width": 195.109375,
+              "x": 264,
+              "y": 1735
+            },
+            "role": "button",
+            "selected": null
+          },
+          {
+            "disabled": false,
+            "name": "Open alert queue",
+            "pressed": null,
+            "rect": {
+              "bottom": 1779,
+              "height": 44,
+              "right": 635.953125,
+              "width": 168.84375,
+              "x": 467.109375,
+              "y": 1735
+            },
+            "role": "button",
+            "selected": null
+          },
+          {
+            "disabled": false,
+            "name": "Open recipes & rules",
+            "pressed": null,
+            "rect": {
+              "bottom": 2086,
+              "height": 44,
+              "right": 757.546875,
+              "width": 191.453125,
+              "x": 566.09375,
+              "y": 2042
+            },
+            "role": "button",
+            "selected": null
+          },
+          {
+            "disabled": false,
+            "name": "Continue in Journal",
+            "pressed": null,
+            "rect": {
+              "bottom": 2554,
+              "height": 44,
+              "right": 463.6875,
+              "width": 182.6875,
+              "x": 281,
+              "y": 2510
+            },
+            "role": "button",
+            "selected": null
+          }
+        ],
+        "document": {
+          "clientHeight": 900,
+          "clientWidth": 1440,
+          "scrollHeight": 900,
+          "scrollWidth": 1440
+        },
+        "horizontalOverflow": false,
+        "reviewRows": [
+          {
+            "action": {
+              "name": "Open review · AMD",
+              "rect": {
+                "bottom": 558,
+                "height": 44,
+                "right": 1342.96875,
+                "width": 179.96875,
+                "x": 1163,
+                "y": 514
+              }
+            },
+            "actionInViewport": true,
+            "rect": {
+              "bottom": 659,
+              "height": 162,
+              "right": 1400,
+              "width": 1136,
+              "x": 264,
+              "y": 497
+            },
+            "testId": "today-review-AMD"
+          },
+          {
+            "action": {
+              "name": "Open review · COIN",
+              "rect": {
+                "bottom": 728,
+                "height": 44,
+                "right": 1345.84375,
+                "width": 182.84375,
+                "x": 1163,
+                "y": 684
+              }
+            },
+            "actionInViewport": true,
+            "rect": {
+              "bottom": 829,
+              "height": 162,
+              "right": 1400,
+              "width": 1136,
+              "x": 264,
+              "y": 667
+            },
+            "testId": "today-review-COIN"
+          },
+          {
+            "action": {
+              "name": "Open review · INTC",
+              "rect": {
+                "bottom": 898,
+                "height": 44,
+                "right": 1343.8125,
+                "width": 180.8125,
+                "x": 1163,
+                "y": 854
+              }
+            },
+            "actionInViewport": true,
+            "rect": {
+              "bottom": 999,
+              "height": 162,
+              "right": 1400,
+              "width": 1136,
+              "x": 264,
+              "y": 837
+            },
+            "testId": "today-review-INTC"
+          },
+          {
+            "action": {
+              "name": "Open review · META",
+              "rect": {
+                "bottom": 1068,
+                "height": 44,
+                "right": 1348.703125,
+                "width": 185.703125,
+                "x": 1163,
+                "y": 1024
+              }
+            },
+            "actionInViewport": false,
+            "rect": {
+              "bottom": 1169,
+              "height": 162,
+              "right": 1400,
+              "width": 1136,
+              "x": 264,
+              "y": 1007
+            },
+            "testId": "today-review-META"
+          },
+          {
+            "action": {
+              "name": "Open review · MSFT",
+              "rect": {
+                "bottom": 1238,
+                "height": 44,
+                "right": 1348.75,
+                "width": 185.75,
+                "x": 1163,
+                "y": 1194
+              }
+            },
+            "actionInViewport": false,
+            "rect": {
+              "bottom": 1339,
+              "height": 162,
+              "right": 1400,
+              "width": 1136,
+              "x": 264,
+              "y": 1177
+            },
+            "testId": "today-review-MSFT"
+          },
+          {
+            "action": {
+              "name": "Open review · MU",
+              "rect": {
+                "bottom": 1408,
+                "height": 44,
+                "right": 1333.9375,
+                "width": 170.9375,
+                "x": 1163,
+                "y": 1364
+              }
+            },
+            "actionInViewport": false,
+            "rect": {
+              "bottom": 1509,
+              "height": 162,
+              "right": 1400,
+              "width": 1136,
+              "x": 264,
+              "y": 1347
+            },
+            "testId": "today-review-MU"
+          }
+        ],
+        "tabSemantics": [
+          {
+            "name": "Today",
+            "selected": "true"
+          },
+          {
+            "name": "Watchlist",
+            "selected": "false"
+          },
+          {
+            "name": "Recipes",
+            "selected": "false"
+          },
+          {
+            "name": "Journal",
+            "selected": "false"
+          }
+        ],
+        "viewport": {
+          "dpr": 1,
+          "height": 900,
+          "width": 1440
+        }
+      },
+      "hardFails": [],
+      "profile": {
+        "hasTouch": false,
+        "height": 900,
+        "isMobile": false,
+        "name": "desktop-1440x900",
+        "width": 1440
+      },
+      "ready": {
+        "bodyText": "S\nStockLedger\nEvidence-led review\nToday\nWatchlist\nRecipes\nJournal\nWorkspace\nObserve → inspect → record\nToday\n0 urgent · 9 open alerts\n9\nSample data is present. Mock prices and outcomes are for exploring the app.\nStockLedger · Current review context\nToday\nUnderstand what changed, inspect the evidence that deserves review, and record a deliberate next action.\n12 reviews in queue\nNo auto-trading · no outcome guarantee\nSummary help\nSome review evidence is limited\nMock, unavailable, or partial observations are not treated as confirmed facts. Check source and freshness for each review unit.\nPriority 1\nNeeds review\nStart with the items whose visible evidence explains why now.\n12 items\nAMD\nNot Relevant\n1 open alert\nAdvanced Micro Devices\nTemporary Bargain Sale v1 remains Not Relevant because the current condition mix is materially unchanged.\nFresh\nMarket · Sep 21, 8:41 AM\nReview freshness\nReviewed 8d ago\nOpen review · AMD\nCOIN\nNot Relevant\n1 open alert\nCoinbase\nReset Recovery v1 remains Not Relevant because the current condition mix is materially unchanged.\nFresh\nMarket · Sep 21, 8:41 AM\nReview freshness\nReviewed 13d ago\nOpen review · COIN\nINTC\nNot Relevant\n1 open alert\nIntel\nReset Recovery v1 remains Not Relevant because the current condition mix is materially unchanged.\nFresh\nMarket · Sep 21, 8:41 AM\nReview freshness\nReviewed 15d ago\nOpen review · INTC\nMETA\nNot Relevant\n1 open alert\nMeta Platforms\nLeader Pullback v1 remains Not Relevant because the current condition mix is materially unchanged.\nFresh\nMarket · Sep 21, 8:41 AM\nReview freshness\nReviewed 3d ago\nOpen review · META\nMSFT\nNot Relevant\n1 open alert\nMicrosoft\nLeader Pullback v1 remains Not Relevant because the current condition mix is materially unchanged.\nFresh\nMarket · Sep 21, 8:41 AM\nReview freshness\nReviewed 16d ago\nOpen review · MSFT\nMU\nNot Relevant\n1 open alert\nMicron\nLeader Pullback v1 remains Not Relevant because the current condition mix is materially unchanged.\nFresh\nMarket · Sep 21, 8:41 AM\nReview freshness\nReviewed 2d ago\nOpen review · MU\nVisual triage\nResearch summary\nPriority 2 · a compact read on workspace coverage and the evidence currently available.\nWatched stocks\n20\nCurrent workspace\nReview now\n0\nEvaluated risk or change\nOpportunity forming\n0\nStill needs evidence review\nOpen alerts\n9\nNot yet reviewed\nSee more in watchlist\nOpen alert queue\nPriority 3\nMonitoring Board\nKeep change signals and monitoring health visible together.\nRecent changes\nNo state changes are recorded yet.\nMonitoring health\n0/4 providers healthy\nStooq: Unconfigured · Alpha Vantage: Unconfigured · Twelve Data: Unconfi",
+        "hash": "#/today",
+        "loadingText": [],
+        "tabList": "Primary navigation",
+        "title": "StockLedger"
+      },
+      "route": "#/today",
+      "screenshot": {
+        "bytes": 129794,
+        "dimensions": {
+          "height": 900,
+          "width": 1440
+        },
+        "file": "screenshots/today--desktop-1440x900.png",
+        "sha256": "dd789dd28d3f9f293e5b044b267b953b62783fd1cb9d135c725af855ce956b75"
+      },
+      "sourceKind": "sample",
+      "surfaceKey": "today"
+    },
+    {
+      "errors": {
+        "console": [],
+        "pageErrors": [],
+        "requestFailures": [],
+        "responses": []
+      },
+      "geometry": {
+        "controlCount": 17,
+        "controlOverlaps": [],
+        "controls": [
+          {
+            "disabled": false,
+            "name": "Today",
+            "pressed": null,
+            "rect": {
+              "bottom": 836,
+              "height": 56,
+              "right": 98.5,
+              "width": 90.5,
+              "x": 8,
+              "y": 780
+            },
+            "role": "tab",
+            "selected": "true"
+          },
+          {
+            "disabled": false,
+            "name": "Watchlist",
+            "pressed": null,
+            "rect": {
+              "bottom": 836,
+              "height": 56,
+              "right": 193,
+              "width": 90.5,
+              "x": 102.5,
+              "y": 780
+            },
+            "role": "tab",
+            "selected": "false"
+          },
+          {
+            "disabled": false,
+            "name": "Recipes",
+            "pressed": null,
+            "rect": {
+              "bottom": 836,
+              "height": 56,
+              "right": 287.5,
+              "width": 90.5,
+              "x": 197,
+              "y": 780
+            },
+            "role": "tab",
+            "selected": "false"
+          },
+          {
+            "disabled": false,
+            "name": "Journal",
+            "pressed": null,
+            "rect": {
+              "bottom": 836,
+              "height": 56,
+              "right": 382,
+              "width": 90.5,
+              "x": 291.5,
+              "y": 780
+            },
+            "role": "tab",
+            "selected": "false"
+          },
+          {
+            "disabled": false,
+            "name": "Alerts",
+            "pressed": "false",
+            "rect": {
+              "bottom": 59.5,
+              "height": 44,
+              "right": 290.375,
+              "width": 44,
+              "x": 246.375,
+              "y": 15.5
+            },
+            "role": "button",
+            "selected": null
+          },
+          {
+            "disabled": false,
+            "name": "Settings",
+            "pressed": "false",
+            "rect": {
+              "bottom": 59.5,
+              "height": 44,
+              "right": 374,
+              "width": 44,
+              "x": 330,
+              "y": 15.5
+            },
+            "role": "button",
+            "selected": null
+          },
+          {
+            "disabled": false,
+            "name": "Summary help",
+            "pressed": null,
+            "rect": {
+              "bottom": 353,
+              "height": 36,
+              "right": 374,
+              "width": 358,
+              "x": 16,
+              "y": 317
+            },
+            "role": "button",
+            "selected": null
+          },
+          {
+            "disabled": false,
+            "name": "Open review · AMD",
+            "pressed": null,
+            "rect": {
+              "bottom": 702,
+              "height": 44,
+              "right": 361,
+              "width": 332,
+              "x": 29,
+              "y": 658
+            },
+            "role": "button",
+            "selected": null
+          },
+          {
+            "disabled": false,
+            "name": "Open review · COIN",
+            "pressed": null,
+            "rect": {
+              "bottom": 966,
+              "height": 44,
+              "right": 361,
+              "width": 332,
+              "x": 29,
+              "y": 922
+            },
+            "role": "button",
+            "selected": null
+          },
+          {
+            "disabled": false,
+            "name": "Open review · INTC",
+            "pressed": null,
+            "rect": {
+              "bottom": 1209,
+              "height": 44,
+              "right": 361,
+              "width": 332,
+              "x": 29,
+              "y": 1165
+            },
+            "role": "button",
+            "selected": null
+          },
+          {
+            "disabled": false,
+            "name": "Open review · META",
+            "pressed": null,
+            "rect": {
+              "bottom": 1452,
+              "height": 44,
+              "right": 361,
+              "width": 332,
+              "x": 29,
+              "y": 1408
+            },
+            "role": "button",
+            "selected": null
+          },
+          {
+            "disabled": false,
+            "name": "Open review · MSFT",
+            "pressed": null,
+            "rect": {
+              "bottom": 1695,
+              "height": 44,
+              "right": 361,
+              "width": 332,
+              "x": 29,
+              "y": 1651
+            },
+            "role": "button",
+            "selected": null
+          },
+          {
+            "disabled": false,
+            "name": "Open review · MU",
+            "pressed": null,
+            "rect": {
+              "bottom": 1938,
+              "height": 44,
+              "right": 361,
+              "width": 332,
+              "x": 29,
+              "y": 1894
+            },
+            "role": "button",
+            "selected": null
+          },
+          {
+            "disabled": false,
+            "name": "See more in watchlist",
+            "pressed": null,
+            "rect": {
+              "bottom": 2493,
+              "height": 44,
+              "right": 211.109375,
+              "width": 195.109375,
+              "x": 16,
+              "y": 2449
+            },
+            "role": "button",
+            "selected": null
+          },
+          {
+            "disabled": false,
+            "name": "Open alert queue",
+            "pressed": null,
+            "rect": {
+              "bottom": 2545,
+              "height": 44,
+              "right": 184.84375,
+              "width": 168.84375,
+              "x": 16,
+              "y": 2501
+            },
+            "role": "button",
+            "selected": null
+          },
+          {
+            "disabled": false,
+            "name": "Open recipes & rules",
+            "pressed": null,
+            "rect": {
+              "bottom": 2972,
+              "height": 44,
+              "right": 220.453125,
+              "width": 191.453125,
+              "x": 29,
+              "y": 2928
+            },
+            "role": "button",
+            "selected": null
+          },
+          {
+            "disabled": false,
+            "name": "Continue in Journal",
+            "pressed": null,
+            "rect": {
+              "bottom": 3504,
+              "height": 44,
+              "right": 211.6875,
+              "width": 182.6875,
+              "x": 29,
+              "y": 3460
+            },
+            "role": "button",
+            "selected": null
+          }
+        ],
+        "document": {
+          "clientHeight": 844,
+          "clientWidth": 390,
+          "scrollHeight": 844,
+          "scrollWidth": 390
+        },
+        "horizontalOverflow": false,
+        "reviewRows": [
+          {
+            "action": {
+              "name": "Open review · AMD",
+              "rect": {
+                "bottom": 702,
+                "height": 44,
+                "right": 361,
+                "width": 332,
+                "x": 29,
+                "y": 658
+              }
+            },
+            "actionInViewport": true,
+            "rect": {
+              "bottom": 901,
+              "height": 256,
+              "right": 374,
+              "width": 358,
+              "x": 16,
+              "y": 645
+            },
+            "testId": "today-review-AMD"
+          },
+          {
+            "action": {
+              "name": "Open review · COIN",
+              "rect": {
+                "bottom": 966,
+                "height": 44,
+                "right": 361,
+                "width": 332,
+                "x": 29,
+                "y": 922
+              }
+            },
+            "actionInViewport": false,
+            "rect": {
+              "bottom": 1144,
+              "height": 235,
+              "right": 374,
+              "width": 358,
+              "x": 16,
+              "y": 909
+            },
+            "testId": "today-review-COIN"
+          },
+          {
+            "action": {
+              "name": "Open review · INTC",
+              "rect": {
+                "bottom": 1209,
+                "height": 44,
+                "right": 361,
+                "width": 332,
+                "x": 29,
+                "y": 1165
+              }
+            },
+            "actionInViewport": false,
+            "rect": {
+              "bottom": 1387,
+              "height": 235,
+              "right": 374,
+              "width": 358,
+              "x": 16,
+              "y": 1152
+            },
+            "testId": "today-review-INTC"
+          },
+          {
+            "action": {
+              "name": "Open review · META",
+              "rect": {
+                "bottom": 1452,
+                "height": 44,
+                "right": 361,
+                "width": 332,
+                "x": 29,
+                "y": 1408
+              }
+            },
+            "actionInViewport": false,
+            "rect": {
+              "bottom": 1630,
+              "height": 235,
+              "right": 374,
+              "width": 358,
+              "x": 16,
+              "y": 1395
+            },
+            "testId": "today-review-META"
+          },
+          {
+            "action": {
+              "name": "Open review · MSFT",
+              "rect": {
+                "bottom": 1695,
+                "height": 44,
+                "right": 361,
+                "width": 332,
+                "x": 29,
+                "y": 1651
+              }
+            },
+            "actionInViewport": false,
+            "rect": {
+              "bottom": 1873,
+              "height": 235,
+              "right": 374,
+              "width": 358,
+              "x": 16,
+              "y": 1638
+            },
+            "testId": "today-review-MSFT"
+          },
+          {
+            "action": {
+              "name": "Open review · MU",
+              "rect": {
+                "bottom": 1938,
+                "height": 44,
+                "right": 361,
+                "width": 332,
+                "x": 29,
+                "y": 1894
+              }
+            },
+            "actionInViewport": false,
+            "rect": {
+              "bottom": 2116,
+              "height": 235,
+              "right": 374,
+              "width": 358,
+              "x": 16,
+              "y": 1881
+            },
+            "testId": "today-review-MU"
+          }
+        ],
+        "tabSemantics": [
+          {
+            "name": "Today",
+            "selected": "true"
+          },
+          {
+            "name": "Watchlist",
+            "selected": "false"
+          },
+          {
+            "name": "Recipes",
+            "selected": "false"
+          },
+          {
+            "name": "Journal",
+            "selected": "false"
+          }
+        ],
+        "viewport": {
+          "dpr": 1,
+          "height": 844,
+          "width": 390
+        }
+      },
+      "hardFails": [],
+      "profile": {
+        "hasTouch": true,
+        "height": 844,
+        "isMobile": true,
+        "name": "mobile-390x844",
+        "width": 390
+      },
+      "ready": {
+        "bodyText": "Today\nWatchlist\nRecipes\nJournal\nToday\n0 urgent · 9 open alerts\n9\nSample data is present. Mock prices and outcomes are for exploring the app.\nStockLedger · Current review context\nToday\nUnderstand what changed, inspect the evidence that deserves review, and record a deliberate next action.\n12 reviews in queue\nNo auto-trading · no outcome guarantee\nSummary help\nSome review evidence is limited\nMock, unavailable, or partial observations are not treated as confirmed facts. Check source and freshness for each review unit.\nPriority 1\nNeeds review\nStart with the items whose visible evidence explains why now.\n12 items\nAMD\nNot Relevant\n1 open alert\nAdvanced Micro Devices\nTemporary Bargain Sale v1 remains Not Relevant because the current condition mix is materially unchanged.\nFresh\nMarket · Sep 21, 8:41 AM\nReview freshness\nReviewed 8d ago\nOpen review · AMD\nCOIN\nNot Relevant\n1 open alert\nCoinbase\nReset Recovery v1 remains Not Relevant because the current condition mix is materially unchanged.\nFresh\nMarket · Sep 21, 8:41 AM\nReview freshness\nReviewed 13d ago\nOpen review · COIN\nINTC\nNot Relevant\n1 open alert\nIntel\nReset Recovery v1 remains Not Relevant because the current condition mix is materially unchanged.\nFresh\nMarket · Sep 21, 8:41 AM\nReview freshness\nReviewed 15d ago\nOpen review · INTC\nMETA\nNot Relevant\n1 open alert\nMeta Platforms\nLeader Pullback v1 remains Not Relevant because the current condition mix is materially unchanged.\nFresh\nMarket · Sep 21, 8:41 AM\nReview freshness\nReviewed 3d ago\nOpen review · META\nMSFT\nNot Relevant\n1 open alert\nMicrosoft\nLeader Pullback v1 remains Not Relevant because the current condition mix is materially unchanged.\nFresh\nMarket · Sep 21, 8:41 AM\nReview freshness\nReviewed 16d ago\nOpen review · MSFT\nMU\nNot Relevant\n1 open alert\nMicron\nLeader Pullback v1 remains Not Relevant because the current condition mix is materially unchanged.\nFresh\nMarket · Sep 21, 8:41 AM\nReview freshness\nReviewed 2d ago\nOpen review · MU\nVisual triage\nResearch summary\nPriority 2 · a compact read on workspace coverage and the evidence currently available.\nWatched stocks\n20\nCurrent workspace\nReview now\n0\nEvaluated risk or change\nOpportunity forming\n0\nStill needs evidence review\nOpen alerts\n9\nNot yet reviewed\nSee more in watchlist\nOpen alert queue\nPriority 3\nMonitoring Board\nKeep change signals and monitoring health visible together.\nRecent changes\nNo state changes are recorded yet.\nMonitoring health\n0/4 providers healthy\nStooq: Unconfigured · Alpha Vantage: Unconfigured · Twelve Data: Unconfigured · Marketaux: Unconfigured\nNo scan run recorded\n19 snapshots curre",
+        "hash": "#/today",
+        "loadingText": [],
+        "tabList": "Primary navigation",
+        "title": "StockLedger"
+      },
+      "route": "#/today",
+      "screenshot": {
+        "bytes": 67382,
+        "dimensions": {
+          "height": 844,
+          "width": 390
+        },
+        "file": "screenshots/today--mobile-390x844.png",
+        "sha256": "ff52a2693e4e9bfad9780c22a4068a8617cc173e586e1175e6895d6a337d416b"
+      },
+      "sourceKind": "sample",
+      "surfaceKey": "today"
+    }
+  ],
+  "noVisualVerdict": true,
+  "reviewPanels": [
+    {
+      "deliberateJournalAction": {
+        "copyVisible": true,
+        "opened": true,
+        "saveDecisionVisible": true
+      },
+      "errors": {
+        "console": [],
+        "pageErrors": [],
+        "requestFailures": [],
+        "responses": []
+      },
+      "hardFails": [],
+      "highestPriority": {
+        "evidence": "AMDNot Relevant1 open alertAdvanced Micro DevicesTemporary Bargain Sale v1 remains Not Relevant because the current condition mix is materially unchanged.FreshMarket · Sep 21, 8:41 AMReview freshnessReviewed 8d agoOpen review · AMD",
+        "selectedByVisibleQueueOrder": true,
+        "testId": "today-review-AMD",
+        "visibleQueue": [
+          {
+            "testId": "today-review-AMD",
+            "text": "AMDNot Relevant1 open alertAdvanced Micro DevicesTemporary Bargain Sale v1 remains Not Relevant because the current condition mix is materially unchanged.FreshMarket · Sep 21, 8:41 AMReview freshnessReviewed 8d agoOpen review · AMD"
+          },
+          {
+            "testId": "today-review-COIN",
+            "text": "COINNot Relevant1 open alertCoinbaseReset Recovery v1 remains Not Relevant because the current condition mix is materially unchanged.FreshMarket · Sep 21, 8:41 AMReview freshnessReviewed 13d agoOpen review · COIN"
+          },
+          {
+            "testId": "today-review-INTC",
+            "text": "INTCNot Relevant1 open alertIntelReset Recovery v1 remains Not Relevant because the current condition mix is materially unchanged.FreshMarket · Sep 21, 8:41 AMReview freshnessReviewed 15d agoOpen review · INTC"
+          },
+          {
+            "testId": "today-review-META",
+            "text": "METANot Relevant1 open alertMeta PlatformsLeader Pullback v1 remains Not Relevant because the current condition mix is materially unchanged.FreshMarket · Sep 21, 8:41 AMReview freshnessReviewed 3d agoOpen review · META"
+          },
+          {
+            "testId": "today-review-MSFT",
+            "text": "MSFTNot Relevant1 open alertMicrosoftLeader Pullback v1 remains Not Relevant because the current condition mix is materially unchanged.FreshMarket · Sep 21, 8:41 AMReview freshnessReviewed 16d agoOpen review · MSFT"
+          },
+          {
+            "testId": "today-review-MU",
+            "text": "MUNot Relevant1 open alertMicronLeader Pullback v1 remains Not Relevant because the current condition mix is materially unchanged.FreshMarket · Sep 21, 8:41 AMReview freshnessReviewed 2d agoOpen review · MU"
+          }
+        ]
+      },
+      "profile": {
+        "hasTouch": false,
+        "height": 900,
+        "isMobile": false,
+        "name": "desktop-1440x900",
+        "width": 1440
+      },
+      "review": {
+        "doneFocusedOnOpen": true,
+        "doneReturnFocus": {
+          "name": "Open review · AMD",
+          "tag": "BUTTON"
+        },
+        "escapeReturnFocus": {
+          "name": "Open review · AMD",
+          "tag": "BUTTON"
+        },
+        "evidenceVisible": {
+          "Data freshness": true,
+          "Evidence to inspect": true,
+          "Risk context": true,
+          "Why now": true
+        },
+        "initialFocus": {
+          "name": "Done",
+          "role": "button",
+          "tag": "BUTTON"
+        },
+        "obviousNextActions": [
+          "Open watchlist evidence",
+          "Record review",
+          "View alerts"
+        ],
+        "opened": true,
+        "panelActionScreenshot": null,
+        "panelScreenshot": {
+          "bytes": 93844,
+          "dimensions": {
+            "height": 900,
+            "width": 1440
+          },
+          "file": "screenshots/review-evidence--desktop-1440x900.png",
+          "sha256": "800f82d247b6230b6b1c054c4e0d0af2ff897b1925921673859204c9e184118d"
+        },
+        "panelText": "AMD · Review evidence Advanced Micro Devices · Not Relevant · Fresh Done Why now Temporary Bargain Sale v1 remains Not Relevant because the current condition mix is materially unchanged. No immediate action. Keep monitoring. Risk context No recorded risk warning Data freshness Fresh Market · Sep 21, 8:41 AM Evidence to inspect No supporting evidence is recorded. Data coverage needs attention metric_drawdown_from_252d_high is missing data for 사용자 정의 수식. · metric_price_vs_200d_gap is missing data for 사용자 정의 수식. · metric_volatility_cooling_rate is missing data for 사용자 정의 수식. · metric_entry_center_distance is missing data for 사용자 정의 수식. · metric_event_pressure_score is missing data for 사용자 정의 수식. Open watchlist evidence Record review View alerts",
+        "returnedAfterDone": true,
+        "returnedAfterEscape": true
+      },
+      "sourceKind": "sample-oracle"
+    },
+    {
+      "deliberateJournalAction": {
+        "copyVisible": true,
+        "opened": true,
+        "saveDecisionVisible": true
+      },
+      "errors": {
+        "console": [],
+        "pageErrors": [],
+        "requestFailures": [],
+        "responses": []
+      },
+      "hardFails": [],
+      "highestPriority": {
+        "evidence": "AMDNot Relevant1 open alertAdvanced Micro DevicesTemporary Bargain Sale v1 remains Not Relevant because the current condition mix is materially unchanged.FreshMarket · Sep 21, 8:41 AMReview freshnessReviewed 8d agoOpen review · AMD",
+        "selectedByVisibleQueueOrder": true,
+        "testId": "today-review-AMD",
+        "visibleQueue": [
+          {
+            "testId": "today-review-AMD",
+            "text": "AMDNot Relevant1 open alertAdvanced Micro DevicesTemporary Bargain Sale v1 remains Not Relevant because the current condition mix is materially unchanged.FreshMarket · Sep 21, 8:41 AMReview freshnessReviewed 8d agoOpen review · AMD"
+          },
+          {
+            "testId": "today-review-COIN",
+            "text": "COINNot Relevant1 open alertCoinbaseReset Recovery v1 remains Not Relevant because the current condition mix is materially unchanged.FreshMarket · Sep 21, 8:41 AMReview freshnessReviewed 13d agoOpen review · COIN"
+          },
+          {
+            "testId": "today-review-INTC",
+            "text": "INTCNot Relevant1 open alertIntelReset Recovery v1 remains Not Relevant because the current condition mix is materially unchanged.FreshMarket · Sep 21, 8:41 AMReview freshnessReviewed 15d agoOpen review · INTC"
+          },
+          {
+            "testId": "today-review-META",
+            "text": "METANot Relevant1 open alertMeta PlatformsLeader Pullback v1 remains Not Relevant because the current condition mix is materially unchanged.FreshMarket · Sep 21, 8:41 AMReview freshnessReviewed 3d agoOpen review · META"
+          },
+          {
+            "testId": "today-review-MSFT",
+            "text": "MSFTNot Relevant1 open alertMicrosoftLeader Pullback v1 remains Not Relevant because the current condition mix is materially unchanged.FreshMarket · Sep 21, 8:41 AMReview freshnessReviewed 16d agoOpen review · MSFT"
+          },
+          {
+            "testId": "today-review-MU",
+            "text": "MUNot Relevant1 open alertMicronLeader Pullback v1 remains Not Relevant because the current condition mix is materially unchanged.FreshMarket · Sep 21, 8:41 AMReview freshnessReviewed 2d agoOpen review · MU"
+          }
+        ]
+      },
+      "profile": {
+        "hasTouch": true,
+        "height": 844,
+        "isMobile": true,
+        "name": "mobile-390x844",
+        "width": 390
+      },
+      "review": {
+        "doneFocusedOnOpen": true,
+        "doneReturnFocus": {
+          "name": "Open review · AMD",
+          "tag": "BUTTON"
+        },
+        "escapeReturnFocus": {
+          "name": "Open review · AMD",
+          "tag": "BUTTON"
+        },
+        "evidenceVisible": {
+          "Data freshness": true,
+          "Evidence to inspect": true,
+          "Risk context": true,
+          "Why now": true
+        },
+        "initialFocus": {
+          "name": "Done",
+          "role": "button",
+          "tag": "BUTTON"
+        },
+        "obviousNextActions": [
+          "Open watchlist evidence",
+          "Record review",
+          "View alerts"
+        ],
+        "opened": true,
+        "panelActionScreenshot": {
+          "bytes": 66494,
+          "dimensions": {
+            "height": 844,
+            "width": 390
+          },
+          "file": "screenshots/review-evidence-actions--mobile-390x844.png",
+          "sha256": "500ea15c44e9ba58ff6f33c8aaa3f37279fda66c0200774e8bee37fbc3b6b472"
+        },
+        "panelScreenshot": {
+          "bytes": 76219,
+          "dimensions": {
+            "height": 844,
+            "width": 390
+          },
+          "file": "screenshots/review-evidence--mobile-390x844.png",
+          "sha256": "f586eb9a493befa846d825163c5fc006f23da285fb24202d330c90849b58600f"
+        },
+        "panelText": "AMD · Review evidence Advanced Micro Devices · Not Relevant · Fresh Done Why now Temporary Bargain Sale v1 remains Not Relevant because the current condition mix is materially unchanged. No immediate action. Keep monitoring. Risk context No recorded risk warning Data freshness Fresh Market · Sep 21, 8:41 AM Evidence to inspect No supporting evidence is recorded. Data coverage needs attention metric_drawdown_from_252d_high is missing data for 사용자 정의 수식. · metric_price_vs_200d_gap is missing data for 사용자 정의 수식. · metric_volatility_cooling_rate is missing data for 사용자 정의 수식. · metric_entry_center_distance is missing data for 사용자 정의 수식. · metric_event_pressure_score is missing data for 사용자 정의 수식. Open watchlist evidence Record review View alerts",
+        "returnedAfterDone": true,
+        "returnedAfterEscape": true
+      },
+      "sourceKind": "sample-oracle"
+    }
+  ],
+  "schema": "stockledger-r13-today-facts-v1",
+  "source": {
+    "r12CaptureReport": "visual-atlas/capture-report.json",
+    "sha": "83a43c84e3436e72503d33ff8d35765651d7dc53",
+    "tree": "5b0b1abf96b7b13da4443d6698ce791419f658e0"
+  },
+  "taskOracleStatus": "OBSERVED"
+}
