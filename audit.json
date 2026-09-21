@@ -19,7 +19,7 @@
       "bytes": 6851
     },
     "captureReport": {
-      "sha256": "a11b740bf26d4e50cd46bbbd9c40978e525df28ac2ed3aac9fe3c97ffbe1df36",
+      "sha256": "7ed2726d96ace933efb029b17c372a96b7e863401aba5cac239553b1ddc6c6b0",
       "bytes": 873728
     },
     "readerIndex": {
@@ -27,16 +27,16 @@
       "bytes": 3548
     },
     "reviewDesktop": {
-      "sha256": "a2438a2b1f53a7b9a09d30fc1ac23a845751fd3ed2e2193f984a80db0277e8ec",
-      "bytes": 828423
+      "sha256": "8ac84406326735fbbd24756235d29729d1cfd27d650404adf1a81ce928a5d2f1",
+      "bytes": 828497
     },
     "reviewMobile": {
-      "sha256": "07944a6c2c375deecf14f99c218c6843d6f62e30f19234ac7370c9019ab93552",
-      "bytes": 534479
+      "sha256": "e5d8ec6616e9576989fd3bbba3bb344dabe07b6ae1c193411b4b03292b8fbc3b",
+      "bytes": 534560
     },
     "bundle": {
-      "sha256": "58a47f9a8de28fe2976de6d527565eb2f1d53ec9d062a566350d480d30e4c7bc",
-      "bytes": 2540067
+      "sha256": "d818c31df9a9912bf6e69328904d42795be9fa263b01dad7936b57053d4677a4",
+      "bytes": 2540345
     }
   },
   "screenshotCount": 17,

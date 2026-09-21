@@ -20479,7 +20479,7 @@
   "artifactValidation": {
     "surfaceManifestSha256": "bdf72d3cd18e5ed2695b6a78a3f3f08a232c9b13348809bd3cf5f393bf1de93a",
     "readerIndexSha256": "169a90d8cd0c87a3ca864e69559421e734963ded0fda9562e50b7639a48f7247",
-    "reviewDesktopSha256": "a2438a2b1f53a7b9a09d30fc1ac23a845751fd3ed2e2193f984a80db0277e8ec",
-    "reviewMobileSha256": "07944a6c2c375deecf14f99c218c6843d6f62e30f19234ac7370c9019ab93552"
+    "reviewDesktopSha256": "8ac84406326735fbbd24756235d29729d1cfd27d650404adf1a81ce928a5d2f1",
+    "reviewMobileSha256": "e5d8ec6616e9576989fd3bbba3bb344dabe07b6ae1c193411b4b03292b8fbc3b"
   }
 }
