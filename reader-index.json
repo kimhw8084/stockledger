@@ -1,0 +1,112 @@
+{
+  "schema": "project-os-visual-atlas-reader-index-v2",
+  "generatedAt": "2026-09-21T13:41:29.876Z",
+  "readers": {
+    "review-desktop.pdf": [
+      {
+        "page": 1,
+        "surfaceKey": "today",
+        "viewport": "desktop-1440x900",
+        "pngSha256": "dd789dd28d3f9f293e5b044b267b953b62783fd1cb9d135c725af855ce956b75"
+      },
+      {
+        "page": 2,
+        "surfaceKey": "watchlist",
+        "viewport": "desktop-1440x900",
+        "pngSha256": "abb1e92b222fa1f17d2af7d269151e12e319a74f952af4f2bcc9632f18387895"
+      },
+      {
+        "page": 3,
+        "surfaceKey": "recipes",
+        "viewport": "desktop-1440x900",
+        "pngSha256": "4d9a8f9974126e3923735960e957057830478fc9a4749b4be5ab88516b58dce3"
+      },
+      {
+        "page": 4,
+        "surfaceKey": "journal",
+        "viewport": "desktop-1440x900",
+        "pngSha256": "ad959ddab8a6e5056a08f8537406f9c8aded3433f30fa2ef9929a11400fac926"
+      },
+      {
+        "page": 5,
+        "surfaceKey": "alerts",
+        "viewport": "desktop-1440x900",
+        "pngSha256": "86bcb550083b880bb0df8029a1ae74e0316f234b87a8ad6dde18fab36440229b"
+      },
+      {
+        "page": 6,
+        "surfaceKey": "settings",
+        "viewport": "desktop-1440x900",
+        "pngSha256": "eb12f1184a0f6ad51d504e4e85c5c379f6df0db6d0c5cd4b413c1c999481a962"
+      },
+      {
+        "page": 7,
+        "surfaceKey": "today",
+        "viewport": "desktop-1440x900",
+        "pngSha256": "94af7872bd81fd42af3e91c05ff745dbabd8cde7ce8509711981d963a94d0269"
+      },
+      {
+        "page": 8,
+        "surfaceKey": "review-evidence",
+        "viewport": "desktop-1440x900",
+        "pngSha256": "800f82d247b6230b6b1c054c4e0d0af2ff897b1925921673859204c9e184118d"
+      }
+    ],
+    "review-mobile.pdf": [
+      {
+        "page": 1,
+        "surfaceKey": "today",
+        "viewport": "mobile-390x844",
+        "pngSha256": "ff52a2693e4e9bfad9780c22a4068a8617cc173e586e1175e6895d6a337d416b"
+      },
+      {
+        "page": 2,
+        "surfaceKey": "watchlist",
+        "viewport": "mobile-390x844",
+        "pngSha256": "05fbf8ea4692aa07f766e299229ae87108aaab92a16d0082bfc123d8d891238d"
+      },
+      {
+        "page": 3,
+        "surfaceKey": "recipes",
+        "viewport": "mobile-390x844",
+        "pngSha256": "60a89b161e8b4eb7cf42097cdded9102491f9a7e6bc56c8df0631b8d0accbb62"
+      },
+      {
+        "page": 4,
+        "surfaceKey": "journal",
+        "viewport": "mobile-390x844",
+        "pngSha256": "236a5492c73a7b94e1cf940e74b9d800daf70a7170499d799f742d8c9277ea99"
+      },
+      {
+        "page": 5,
+        "surfaceKey": "alerts",
+        "viewport": "mobile-390x844",
+        "pngSha256": "361aa9db6a106fc7a1f204a950f2ea062c2a6f2affbbd07718cc445b0b455c56"
+      },
+      {
+        "page": 6,
+        "surfaceKey": "settings",
+        "viewport": "mobile-390x844",
+        "pngSha256": "aa7b414b8c1affba4d3991b6976ba619497e42c8950d997b430da6d6d7bae4b0"
+      },
+      {
+        "page": 7,
+        "surfaceKey": "today",
+        "viewport": "mobile-390x844",
+        "pngSha256": "13150d819de4f8122774f73e377152df5a99832868135f8238b5ef99bff7cb25"
+      },
+      {
+        "page": 8,
+        "surfaceKey": "review-evidence",
+        "viewport": "mobile-390x844",
+        "pngSha256": "f586eb9a493befa846d825163c5fc006f23da285fb24202d330c90849b58600f"
+      },
+      {
+        "page": 9,
+        "surfaceKey": "review-evidence-actions",
+        "viewport": "mobile-390x844",
+        "pngSha256": "500ea15c44e9ba58ff6f33c8aaa3f37279fda66c0200774e8bee37fbc3b6b472"
+      }
+    ]
+  }
+}

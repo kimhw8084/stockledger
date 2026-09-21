@@ -1,0 +1,54 @@
+{
+  "schema": "project-os-artifact-stage-receipt-v1",
+  "project": "stockledger",
+  "request": "stockledger-prod-c13-expo-base-today-evidence-verify-v1",
+  "operation": "VERIFY",
+  "source": {
+    "sha": "83a43c84e3436e72503d33ff8d35765651d7dc53",
+    "tree": "5b0b1abf96b7b13da4443d6698ce791419f658e0",
+    "branch": "codex/stockledger-prod-c13-expo-base-today-evidence-verify-v1",
+    "protectedBase": "26f3dfb077bea75013fef58975979f02041dc490"
+  },
+  "fullArtifactRef": "refs/heads/project-os-artifacts/stockledger/stockledger-prod-c13-expo-base-today-evidence-verify-v1",
+  "compactArtifactRef": "refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c13-expo-base-today-evidence-verify-v1",
+  "artifactCommit": "resolved by remote ref readback",
+  "readerFiles": [
+    "surface-manifest.json",
+    "capture-report.json",
+    "reader-index.json",
+    "review-desktop.pdf",
+    "review-mobile.pdf",
+    "artifact-inventory.json",
+    "qualification-summary.json",
+    "release-evidence.json",
+    "release-verify.json"
+  ],
+  "hashes": {
+    "surfaceManifest": {
+      "sha256": "bdf72d3cd18e5ed2695b6a78a3f3f08a232c9b13348809bd3cf5f393bf1de93a",
+      "bytes": 6851
+    },
+    "captureReport": {
+      "sha256": "a11b740bf26d4e50cd46bbbd9c40978e525df28ac2ed3aac9fe3c97ffbe1df36",
+      "bytes": 873728
+    },
+    "readerIndex": {
+      "sha256": "169a90d8cd0c87a3ca864e69559421e734963ded0fda9562e50b7639a48f7247",
+      "bytes": 3548
+    },
+    "reviewDesktop": {
+      "sha256": "a2438a2b1f53a7b9a09d30fc1ac23a845751fd3ed2e2193f984a80db0277e8ec",
+      "bytes": 828423
+    },
+    "reviewMobile": {
+      "sha256": "07944a6c2c375deecf14f99c218c6843d6f62e30f19234ac7370c9019ab93552",
+      "bytes": 534479
+    },
+    "bundle": {
+      "sha256": "58a47f9a8de28fe2976de6d527565eb2f1d53ec9d062a566350d480d30e4c7bc",
+      "bytes": 2540067
+    }
+  },
+  "generatedAt": "2026-09-21T13:47:22.495Z",
+  "note": "Compact reader carrier retains inspectable evidence and exact transport receipt; independent Project OS audit remains pending."
+}

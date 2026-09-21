@@ -1,0 +1,31 @@
+{
+  "status": "PASS",
+  "screenshotCount": 17,
+  "canonicalEnglish": 12,
+  "koreanToday": 2,
+  "reviewPanels": 2,
+  "stressProfiles": 3,
+  "nonHappyStates": [
+    {
+      "state": "empty/personal",
+      "status": "OBSERVED"
+    },
+    {
+      "state": "degraded/sample-evidence-limited",
+      "status": "OBSERVED"
+    },
+    {
+      "state": "loading",
+      "status": "UNPROVEN"
+    },
+    {
+      "state": "blocked",
+      "status": "UNPROVEN"
+    },
+    {
+      "state": "error/recovery",
+      "status": "UNPROVEN"
+    }
+  ],
+  "browserZoom200": "UNPROVEN_SEPARATE_GATE"
+}
