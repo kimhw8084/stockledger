@@ -1,0 +1,2225 @@
+{
+  "errors": {
+    "canonical": {
+      "console": 0,
+      "pageErrors": 0,
+      "requestFailures": 0,
+      "responses": 0
+    },
+    "surfaceManifestDiscovery": {
+      "console": [],
+      "pageErrors": [],
+      "requestFailures": [],
+      "responses": []
+    }
+  },
+  "navigationRoutes": [
+    {
+      "hash": "#/today",
+      "via": "supported:Explore sample workspace"
+    },
+    {
+      "hash": "#/watchlist",
+      "textBytes": 364,
+      "textSha256": "c302b94525de51f1d0491ad06cb327c8ae19fa1204768f7f3b91fbc36a193ed7",
+      "via": "tab:Watchlist"
+    },
+    {
+      "hash": "#/recipes",
+      "textBytes": 364,
+      "textSha256": "5931ea9f8f38fb5ff5d698da98628d2976691b11b574e9ecb03f182de27dd1a8",
+      "via": "tab:Recipes"
+    },
+    {
+      "hash": "#/journal",
+      "textBytes": 365,
+      "textSha256": "3f94072272eb1528e3814e26a811ce3d90c39c38728dece75a2fa4efab9b0993",
+      "via": "tab:Journal"
+    },
+    {
+      "hash": "#/alerts",
+      "textBytes": 365,
+      "textSha256": "0d3d3f66ee23739addfa67de7e181f9e854315543fb02ebacdab9552bc04cafa",
+      "via": "button:Alerts"
+    },
+    {
+      "hash": "#/settings",
+      "textBytes": 364,
+      "textSha256": "98f50b9a289006e1c2b7a521d646165004b41211e82cfd3f048039a8d91cabaf",
+      "via": "button:Settings"
+    }
+  ],
+  "noVisualVerdict": true,
+  "schema": "stockledger-r13-shell-facts-v1",
+  "sharedShellContinuity": [
+    {
+      "continuity": [
+        {
+          "hash": "#/today",
+          "profile": "desktop-1440x900",
+          "semantics": null,
+          "shellControls": [
+            {
+              "disabled": false,
+              "name": "Today",
+              "pressed": null,
+              "rect": {
+                "bottom": 146,
+                "height": 52,
+                "right": 207,
+                "width": 191,
+                "x": 16,
+                "y": 94
+              },
+              "role": "tab",
+              "selected": "true"
+            },
+            {
+              "disabled": false,
+              "name": "Watchlist",
+              "pressed": null,
+              "rect": {
+                "bottom": 202,
+                "height": 52,
+                "right": 207,
+                "width": 191,
+                "x": 16,
+                "y": 150
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Recipes",
+              "pressed": null,
+              "rect": {
+                "bottom": 258,
+                "height": 52,
+                "right": 207,
+                "width": 191,
+                "x": 16,
+                "y": 206
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Journal",
+              "pressed": null,
+              "rect": {
+                "bottom": 314,
+                "height": 52,
+                "right": 207,
+                "width": 191,
+                "x": 16,
+                "y": 262
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Alerts",
+              "pressed": "false",
+              "rect": {
+                "bottom": 59.5,
+                "height": 44,
+                "right": 1324.375,
+                "width": 44,
+                "x": 1280.375,
+                "y": 15.5
+              },
+              "role": "button",
+              "selected": null
+            },
+            {
+              "disabled": false,
+              "name": "Settings",
+              "pressed": "false",
+              "rect": {
+                "bottom": 59.5,
+                "height": 44,
+                "right": 1408,
+                "width": 44,
+                "x": 1364,
+                "y": 15.5
+              },
+              "role": "button",
+              "selected": null
+            }
+          ],
+          "surfaceKey": "today",
+          "tablist": "Primary navigation"
+        },
+        {
+          "hash": "#/watchlist",
+          "profile": "desktop-1440x900",
+          "semantics": {
+            "hash": "#/watchlist",
+            "name": "Watchlist",
+            "role": "tab",
+            "selected": "true"
+          },
+          "shellControls": [
+            {
+              "disabled": false,
+              "name": "Today",
+              "pressed": null,
+              "rect": {
+                "bottom": 146,
+                "height": 52,
+                "right": 207,
+                "width": 191,
+                "x": 16,
+                "y": 94
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Watchlist",
+              "pressed": null,
+              "rect": {
+                "bottom": 202,
+                "height": 52,
+                "right": 207,
+                "width": 191,
+                "x": 16,
+                "y": 150
+              },
+              "role": "tab",
+              "selected": "true"
+            },
+            {
+              "disabled": false,
+              "name": "Recipes",
+              "pressed": null,
+              "rect": {
+                "bottom": 258,
+                "height": 52,
+                "right": 207,
+                "width": 191,
+                "x": 16,
+                "y": 206
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Journal",
+              "pressed": null,
+              "rect": {
+                "bottom": 314,
+                "height": 52,
+                "right": 207,
+                "width": 191,
+                "x": 16,
+                "y": 262
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Alerts",
+              "pressed": "false",
+              "rect": {
+                "bottom": 59.5,
+                "height": 44,
+                "right": 1324.375,
+                "width": 44,
+                "x": 1280.375,
+                "y": 15.5
+              },
+              "role": "button",
+              "selected": null
+            },
+            {
+              "disabled": false,
+              "name": "Settings",
+              "pressed": "false",
+              "rect": {
+                "bottom": 59.5,
+                "height": 44,
+                "right": 1408,
+                "width": 44,
+                "x": 1364,
+                "y": 15.5
+              },
+              "role": "button",
+              "selected": null
+            }
+          ],
+          "surfaceKey": "watchlist",
+          "tablist": "Primary navigation"
+        },
+        {
+          "hash": "#/recipes",
+          "profile": "desktop-1440x900",
+          "semantics": {
+            "hash": "#/recipes",
+            "name": "Recipes",
+            "role": "tab",
+            "selected": "true"
+          },
+          "shellControls": [
+            {
+              "disabled": false,
+              "name": "Today",
+              "pressed": null,
+              "rect": {
+                "bottom": 146,
+                "height": 52,
+                "right": 207,
+                "width": 191,
+                "x": 16,
+                "y": 94
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Watchlist",
+              "pressed": null,
+              "rect": {
+                "bottom": 202,
+                "height": 52,
+                "right": 207,
+                "width": 191,
+                "x": 16,
+                "y": 150
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Recipes",
+              "pressed": null,
+              "rect": {
+                "bottom": 258,
+                "height": 52,
+                "right": 207,
+                "width": 191,
+                "x": 16,
+                "y": 206
+              },
+              "role": "tab",
+              "selected": "true"
+            },
+            {
+              "disabled": false,
+              "name": "Journal",
+              "pressed": null,
+              "rect": {
+                "bottom": 314,
+                "height": 52,
+                "right": 207,
+                "width": 191,
+                "x": 16,
+                "y": 262
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Alerts",
+              "pressed": "false",
+              "rect": {
+                "bottom": 59.5,
+                "height": 44,
+                "right": 1324.375,
+                "width": 44,
+                "x": 1280.375,
+                "y": 15.5
+              },
+              "role": "button",
+              "selected": null
+            },
+            {
+              "disabled": false,
+              "name": "Settings",
+              "pressed": "false",
+              "rect": {
+                "bottom": 59.5,
+                "height": 44,
+                "right": 1408,
+                "width": 44,
+                "x": 1364,
+                "y": 15.5
+              },
+              "role": "button",
+              "selected": null
+            }
+          ],
+          "surfaceKey": "recipes",
+          "tablist": "Primary navigation"
+        },
+        {
+          "hash": "#/journal",
+          "profile": "desktop-1440x900",
+          "semantics": {
+            "hash": "#/journal",
+            "name": "Journal",
+            "role": "tab",
+            "selected": "true"
+          },
+          "shellControls": [
+            {
+              "disabled": false,
+              "name": "Today",
+              "pressed": null,
+              "rect": {
+                "bottom": 146,
+                "height": 52,
+                "right": 207,
+                "width": 191,
+                "x": 16,
+                "y": 94
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Watchlist",
+              "pressed": null,
+              "rect": {
+                "bottom": 202,
+                "height": 52,
+                "right": 207,
+                "width": 191,
+                "x": 16,
+                "y": 150
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Recipes",
+              "pressed": null,
+              "rect": {
+                "bottom": 258,
+                "height": 52,
+                "right": 207,
+                "width": 191,
+                "x": 16,
+                "y": 206
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Journal",
+              "pressed": null,
+              "rect": {
+                "bottom": 314,
+                "height": 52,
+                "right": 207,
+                "width": 191,
+                "x": 16,
+                "y": 262
+              },
+              "role": "tab",
+              "selected": "true"
+            },
+            {
+              "disabled": false,
+              "name": "Alerts",
+              "pressed": "false",
+              "rect": {
+                "bottom": 59.5,
+                "height": 44,
+                "right": 1324.375,
+                "width": 44,
+                "x": 1280.375,
+                "y": 15.5
+              },
+              "role": "button",
+              "selected": null
+            },
+            {
+              "disabled": false,
+              "name": "Settings",
+              "pressed": "false",
+              "rect": {
+                "bottom": 59.5,
+                "height": 44,
+                "right": 1408,
+                "width": 44,
+                "x": 1364,
+                "y": 15.5
+              },
+              "role": "button",
+              "selected": null
+            }
+          ],
+          "surfaceKey": "journal",
+          "tablist": "Primary navigation"
+        },
+        {
+          "hash": "#/alerts",
+          "profile": "desktop-1440x900",
+          "semantics": {
+            "hash": "#/alerts",
+            "name": "Alerts",
+            "pressed": "true",
+            "role": "button"
+          },
+          "shellControls": [
+            {
+              "disabled": false,
+              "name": "Today",
+              "pressed": null,
+              "rect": {
+                "bottom": 146,
+                "height": 52,
+                "right": 207,
+                "width": 191,
+                "x": 16,
+                "y": 94
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Watchlist",
+              "pressed": null,
+              "rect": {
+                "bottom": 202,
+                "height": 52,
+                "right": 207,
+                "width": 191,
+                "x": 16,
+                "y": 150
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Recipes",
+              "pressed": null,
+              "rect": {
+                "bottom": 258,
+                "height": 52,
+                "right": 207,
+                "width": 191,
+                "x": 16,
+                "y": 206
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Journal",
+              "pressed": null,
+              "rect": {
+                "bottom": 314,
+                "height": 52,
+                "right": 207,
+                "width": 191,
+                "x": 16,
+                "y": 262
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Alerts",
+              "pressed": "true",
+              "rect": {
+                "bottom": 59.5,
+                "height": 44,
+                "right": 1324.375,
+                "width": 44,
+                "x": 1280.375,
+                "y": 15.5
+              },
+              "role": "button",
+              "selected": null
+            },
+            {
+              "disabled": false,
+              "name": "Settings",
+              "pressed": "false",
+              "rect": {
+                "bottom": 59.5,
+                "height": 44,
+                "right": 1408,
+                "width": 44,
+                "x": 1364,
+                "y": 15.5
+              },
+              "role": "button",
+              "selected": null
+            }
+          ],
+          "surfaceKey": "alerts",
+          "tablist": "Primary navigation"
+        },
+        {
+          "hash": "#/settings",
+          "profile": "desktop-1440x900",
+          "semantics": {
+            "hash": "#/settings",
+            "name": "Settings",
+            "pressed": "true",
+            "role": "button"
+          },
+          "shellControls": [
+            {
+              "disabled": false,
+              "name": "Today",
+              "pressed": null,
+              "rect": {
+                "bottom": 146,
+                "height": 52,
+                "right": 207,
+                "width": 191,
+                "x": 16,
+                "y": 94
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Watchlist",
+              "pressed": null,
+              "rect": {
+                "bottom": 202,
+                "height": 52,
+                "right": 207,
+                "width": 191,
+                "x": 16,
+                "y": 150
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Recipes",
+              "pressed": null,
+              "rect": {
+                "bottom": 258,
+                "height": 52,
+                "right": 207,
+                "width": 191,
+                "x": 16,
+                "y": 206
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Journal",
+              "pressed": null,
+              "rect": {
+                "bottom": 314,
+                "height": 52,
+                "right": 207,
+                "width": 191,
+                "x": 16,
+                "y": 262
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Alerts",
+              "pressed": "false",
+              "rect": {
+                "bottom": 59.5,
+                "height": 44,
+                "right": 1324.375,
+                "width": 44,
+                "x": 1280.375,
+                "y": 15.5
+              },
+              "role": "button",
+              "selected": null
+            },
+            {
+              "disabled": false,
+              "name": "Settings",
+              "pressed": "true",
+              "rect": {
+                "bottom": 59.5,
+                "height": 44,
+                "right": 1408,
+                "width": 44,
+                "x": 1364,
+                "y": 15.5
+              },
+              "role": "button",
+              "selected": null
+            }
+          ],
+          "surfaceKey": "settings",
+          "tablist": "Primary navigation"
+        }
+      ],
+      "navigationTrace": [
+        {
+          "hash": "#/today",
+          "via": "bootstrap:Explore sample workspace"
+        },
+        {
+          "hash": "#/watchlist",
+          "semantics": {
+            "hash": "#/watchlist",
+            "name": "Watchlist",
+            "role": "tab",
+            "selected": "true"
+          },
+          "via": "tab:Watchlist"
+        },
+        {
+          "hash": "#/recipes",
+          "semantics": {
+            "hash": "#/recipes",
+            "name": "Recipes",
+            "role": "tab",
+            "selected": "true"
+          },
+          "via": "tab:Recipes"
+        },
+        {
+          "hash": "#/journal",
+          "semantics": {
+            "hash": "#/journal",
+            "name": "Journal",
+            "role": "tab",
+            "selected": "true"
+          },
+          "via": "tab:Journal"
+        },
+        {
+          "hash": "#/alerts",
+          "semantics": {
+            "hash": "#/alerts",
+            "name": "Alerts",
+            "pressed": "true",
+            "role": "button"
+          },
+          "via": "button:Alerts"
+        },
+        {
+          "hash": "#/settings",
+          "semantics": {
+            "hash": "#/settings",
+            "name": "Settings",
+            "pressed": "true",
+            "role": "button"
+          },
+          "via": "button:Settings"
+        }
+      ],
+      "profile": {
+        "hasTouch": false,
+        "height": 900,
+        "isMobile": false,
+        "name": "desktop-1440x900",
+        "width": 1440
+      }
+    },
+    {
+      "continuity": [
+        {
+          "hash": "#/today",
+          "profile": "mobile-390x844",
+          "semantics": null,
+          "shellControls": [
+            {
+              "disabled": false,
+              "name": "Today",
+              "pressed": null,
+              "rect": {
+                "bottom": 836,
+                "height": 56,
+                "right": 98.5,
+                "width": 90.5,
+                "x": 8,
+                "y": 780
+              },
+              "role": "tab",
+              "selected": "true"
+            },
+            {
+              "disabled": false,
+              "name": "Watchlist",
+              "pressed": null,
+              "rect": {
+                "bottom": 836,
+                "height": 56,
+                "right": 193,
+                "width": 90.5,
+                "x": 102.5,
+                "y": 780
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Recipes",
+              "pressed": null,
+              "rect": {
+                "bottom": 836,
+                "height": 56,
+                "right": 287.5,
+                "width": 90.5,
+                "x": 197,
+                "y": 780
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Journal",
+              "pressed": null,
+              "rect": {
+                "bottom": 836,
+                "height": 56,
+                "right": 382,
+                "width": 90.5,
+                "x": 291.5,
+                "y": 780
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Alerts",
+              "pressed": "false",
+              "rect": {
+                "bottom": 59.5,
+                "height": 44,
+                "right": 290.375,
+                "width": 44,
+                "x": 246.375,
+                "y": 15.5
+              },
+              "role": "button",
+              "selected": null
+            },
+            {
+              "disabled": false,
+              "name": "Settings",
+              "pressed": "false",
+              "rect": {
+                "bottom": 59.5,
+                "height": 44,
+                "right": 374,
+                "width": 44,
+                "x": 330,
+                "y": 15.5
+              },
+              "role": "button",
+              "selected": null
+            }
+          ],
+          "surfaceKey": "today",
+          "tablist": "Primary navigation"
+        },
+        {
+          "hash": "#/watchlist",
+          "profile": "mobile-390x844",
+          "semantics": {
+            "hash": "#/watchlist",
+            "name": "Watchlist",
+            "role": "tab",
+            "selected": "true"
+          },
+          "shellControls": [
+            {
+              "disabled": false,
+              "name": "Today",
+              "pressed": null,
+              "rect": {
+                "bottom": 836,
+                "height": 56,
+                "right": 98.5,
+                "width": 90.5,
+                "x": 8,
+                "y": 780
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Watchlist",
+              "pressed": null,
+              "rect": {
+                "bottom": 836,
+                "height": 56,
+                "right": 193,
+                "width": 90.5,
+                "x": 102.5,
+                "y": 780
+              },
+              "role": "tab",
+              "selected": "true"
+            },
+            {
+              "disabled": false,
+              "name": "Recipes",
+              "pressed": null,
+              "rect": {
+                "bottom": 836,
+                "height": 56,
+                "right": 287.5,
+                "width": 90.5,
+                "x": 197,
+                "y": 780
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Journal",
+              "pressed": null,
+              "rect": {
+                "bottom": 836,
+                "height": 56,
+                "right": 382,
+                "width": 90.5,
+                "x": 291.5,
+                "y": 780
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Alerts",
+              "pressed": "false",
+              "rect": {
+                "bottom": 67,
+                "height": 44,
+                "right": 290.375,
+                "width": 44,
+                "x": 246.375,
+                "y": 23
+              },
+              "role": "button",
+              "selected": null
+            },
+            {
+              "disabled": false,
+              "name": "Settings",
+              "pressed": "false",
+              "rect": {
+                "bottom": 67,
+                "height": 44,
+                "right": 374,
+                "width": 44,
+                "x": 330,
+                "y": 23
+              },
+              "role": "button",
+              "selected": null
+            }
+          ],
+          "surfaceKey": "watchlist",
+          "tablist": "Primary navigation"
+        },
+        {
+          "hash": "#/recipes",
+          "profile": "mobile-390x844",
+          "semantics": {
+            "hash": "#/recipes",
+            "name": "Recipes",
+            "role": "tab",
+            "selected": "true"
+          },
+          "shellControls": [
+            {
+              "disabled": false,
+              "name": "Today",
+              "pressed": null,
+              "rect": {
+                "bottom": 836,
+                "height": 56,
+                "right": 98.5,
+                "width": 90.5,
+                "x": 8,
+                "y": 780
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Watchlist",
+              "pressed": null,
+              "rect": {
+                "bottom": 836,
+                "height": 56,
+                "right": 193,
+                "width": 90.5,
+                "x": 102.5,
+                "y": 780
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Recipes",
+              "pressed": null,
+              "rect": {
+                "bottom": 836,
+                "height": 56,
+                "right": 287.5,
+                "width": 90.5,
+                "x": 197,
+                "y": 780
+              },
+              "role": "tab",
+              "selected": "true"
+            },
+            {
+              "disabled": false,
+              "name": "Journal",
+              "pressed": null,
+              "rect": {
+                "bottom": 836,
+                "height": 56,
+                "right": 382,
+                "width": 90.5,
+                "x": 291.5,
+                "y": 780
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Alerts",
+              "pressed": "false",
+              "rect": {
+                "bottom": 67,
+                "height": 44,
+                "right": 290.375,
+                "width": 44,
+                "x": 246.375,
+                "y": 23
+              },
+              "role": "button",
+              "selected": null
+            },
+            {
+              "disabled": false,
+              "name": "Settings",
+              "pressed": "false",
+              "rect": {
+                "bottom": 67,
+                "height": 44,
+                "right": 374,
+                "width": 44,
+                "x": 330,
+                "y": 23
+              },
+              "role": "button",
+              "selected": null
+            }
+          ],
+          "surfaceKey": "recipes",
+          "tablist": "Primary navigation"
+        },
+        {
+          "hash": "#/journal",
+          "profile": "mobile-390x844",
+          "semantics": {
+            "hash": "#/journal",
+            "name": "Journal",
+            "role": "tab",
+            "selected": "true"
+          },
+          "shellControls": [
+            {
+              "disabled": false,
+              "name": "Today",
+              "pressed": null,
+              "rect": {
+                "bottom": 836,
+                "height": 56,
+                "right": 98.5,
+                "width": 90.5,
+                "x": 8,
+                "y": 780
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Watchlist",
+              "pressed": null,
+              "rect": {
+                "bottom": 836,
+                "height": 56,
+                "right": 193,
+                "width": 90.5,
+                "x": 102.5,
+                "y": 780
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Recipes",
+              "pressed": null,
+              "rect": {
+                "bottom": 836,
+                "height": 56,
+                "right": 287.5,
+                "width": 90.5,
+                "x": 197,
+                "y": 780
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Journal",
+              "pressed": null,
+              "rect": {
+                "bottom": 836,
+                "height": 56,
+                "right": 382,
+                "width": 90.5,
+                "x": 291.5,
+                "y": 780
+              },
+              "role": "tab",
+              "selected": "true"
+            },
+            {
+              "disabled": false,
+              "name": "Alerts",
+              "pressed": "false",
+              "rect": {
+                "bottom": 59.5,
+                "height": 44,
+                "right": 290.375,
+                "width": 44,
+                "x": 246.375,
+                "y": 15.5
+              },
+              "role": "button",
+              "selected": null
+            },
+            {
+              "disabled": false,
+              "name": "Settings",
+              "pressed": "false",
+              "rect": {
+                "bottom": 59.5,
+                "height": 44,
+                "right": 374,
+                "width": 44,
+                "x": 330,
+                "y": 15.5
+              },
+              "role": "button",
+              "selected": null
+            }
+          ],
+          "surfaceKey": "journal",
+          "tablist": "Primary navigation"
+        },
+        {
+          "hash": "#/alerts",
+          "profile": "mobile-390x844",
+          "semantics": {
+            "hash": "#/alerts",
+            "name": "Alerts",
+            "pressed": "true",
+            "role": "button"
+          },
+          "shellControls": [
+            {
+              "disabled": false,
+              "name": "Today",
+              "pressed": null,
+              "rect": {
+                "bottom": 836,
+                "height": 56,
+                "right": 98.5,
+                "width": 90.5,
+                "x": 8,
+                "y": 780
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Watchlist",
+              "pressed": null,
+              "rect": {
+                "bottom": 836,
+                "height": 56,
+                "right": 193,
+                "width": 90.5,
+                "x": 102.5,
+                "y": 780
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Recipes",
+              "pressed": null,
+              "rect": {
+                "bottom": 836,
+                "height": 56,
+                "right": 287.5,
+                "width": 90.5,
+                "x": 197,
+                "y": 780
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Journal",
+              "pressed": null,
+              "rect": {
+                "bottom": 836,
+                "height": 56,
+                "right": 382,
+                "width": 90.5,
+                "x": 291.5,
+                "y": 780
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Alerts",
+              "pressed": "true",
+              "rect": {
+                "bottom": 59.5,
+                "height": 44,
+                "right": 290.375,
+                "width": 44,
+                "x": 246.375,
+                "y": 15.5
+              },
+              "role": "button",
+              "selected": null
+            },
+            {
+              "disabled": false,
+              "name": "Settings",
+              "pressed": "false",
+              "rect": {
+                "bottom": 59.5,
+                "height": 44,
+                "right": 374,
+                "width": 44,
+                "x": 330,
+                "y": 15.5
+              },
+              "role": "button",
+              "selected": null
+            }
+          ],
+          "surfaceKey": "alerts",
+          "tablist": "Primary navigation"
+        },
+        {
+          "hash": "#/settings",
+          "profile": "mobile-390x844",
+          "semantics": {
+            "hash": "#/settings",
+            "name": "Settings",
+            "pressed": "true",
+            "role": "button"
+          },
+          "shellControls": [
+            {
+              "disabled": false,
+              "name": "Today",
+              "pressed": null,
+              "rect": {
+                "bottom": 836,
+                "height": 56,
+                "right": 98.5,
+                "width": 90.5,
+                "x": 8,
+                "y": 780
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Watchlist",
+              "pressed": null,
+              "rect": {
+                "bottom": 836,
+                "height": 56,
+                "right": 193,
+                "width": 90.5,
+                "x": 102.5,
+                "y": 780
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Recipes",
+              "pressed": null,
+              "rect": {
+                "bottom": 836,
+                "height": 56,
+                "right": 287.5,
+                "width": 90.5,
+                "x": 197,
+                "y": 780
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Journal",
+              "pressed": null,
+              "rect": {
+                "bottom": 836,
+                "height": 56,
+                "right": 382,
+                "width": 90.5,
+                "x": 291.5,
+                "y": 780
+              },
+              "role": "tab",
+              "selected": "false"
+            },
+            {
+              "disabled": false,
+              "name": "Alerts",
+              "pressed": "false",
+              "rect": {
+                "bottom": 59.5,
+                "height": 44,
+                "right": 290.375,
+                "width": 44,
+                "x": 246.375,
+                "y": 15.5
+              },
+              "role": "button",
+              "selected": null
+            },
+            {
+              "disabled": false,
+              "name": "Settings",
+              "pressed": "true",
+              "rect": {
+                "bottom": 59.5,
+                "height": 44,
+                "right": 374,
+                "width": 44,
+                "x": 330,
+                "y": 15.5
+              },
+              "role": "button",
+              "selected": null
+            }
+          ],
+          "surfaceKey": "settings",
+          "tablist": "Primary navigation"
+        }
+      ],
+      "navigationTrace": [
+        {
+          "hash": "#/today",
+          "via": "bootstrap:Explore sample workspace"
+        },
+        {
+          "hash": "#/watchlist",
+          "semantics": {
+            "hash": "#/watchlist",
+            "name": "Watchlist",
+            "role": "tab",
+            "selected": "true"
+          },
+          "via": "tab:Watchlist"
+        },
+        {
+          "hash": "#/recipes",
+          "semantics": {
+            "hash": "#/recipes",
+            "name": "Recipes",
+            "role": "tab",
+            "selected": "true"
+          },
+          "via": "tab:Recipes"
+        },
+        {
+          "hash": "#/journal",
+          "semantics": {
+            "hash": "#/journal",
+            "name": "Journal",
+            "role": "tab",
+            "selected": "true"
+          },
+          "via": "tab:Journal"
+        },
+        {
+          "hash": "#/alerts",
+          "semantics": {
+            "hash": "#/alerts",
+            "name": "Alerts",
+            "pressed": "true",
+            "role": "button"
+          },
+          "via": "button:Alerts"
+        },
+        {
+          "hash": "#/settings",
+          "semantics": {
+            "hash": "#/settings",
+            "name": "Settings",
+            "pressed": "true",
+            "role": "button"
+          },
+          "via": "button:Settings"
+        }
+      ],
+      "profile": {
+        "hasTouch": true,
+        "height": 844,
+        "isMobile": true,
+        "name": "mobile-390x844",
+        "width": 390
+      }
+    }
+  ],
+  "source": {
+    "r12SurfaceManifest": "visual-atlas/surface-manifest.json",
+    "sha": "83a43c84e3436e72503d33ff8d35765651d7dc53",
+    "tree": "5b0b1abf96b7b13da4443d6698ce791419f658e0"
+  },
+  "surfaces": {
+    "alerts": [
+      {
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "responses": []
+        },
+        "geometry": {
+          "controlCount": 44,
+          "controlNamesAndStatesSource": "sharedShellContinuity[].continuity[].shellControls",
+          "controlOverlaps": [],
+          "document": {
+            "clientHeight": 900,
+            "clientWidth": 1440,
+            "scrollHeight": 900,
+            "scrollWidth": 1440
+          },
+          "horizontalOverflow": false,
+          "reviewRows": [],
+          "tabSemantics": [
+            {
+              "name": "Today",
+              "selected": "false"
+            },
+            {
+              "name": "Watchlist",
+              "selected": "false"
+            },
+            {
+              "name": "Recipes",
+              "selected": "false"
+            },
+            {
+              "name": "Journal",
+              "selected": "false"
+            }
+          ],
+          "viewport": {
+            "dpr": 1,
+            "height": 900,
+            "width": 1440
+          }
+        },
+        "hardFails": [],
+        "navigationSemantics": {
+          "hash": "#/alerts",
+          "name": "Alerts",
+          "pressed": "true",
+          "role": "button"
+        },
+        "profile": {
+          "hasTouch": false,
+          "height": 900,
+          "isMobile": false,
+          "name": "desktop-1440x900",
+          "width": 1440
+        },
+        "ready": {
+          "bodyTextBytes": 2075,
+          "bodyTextSha256": "ed4d2948e4e2c83e52107dad977f8a84e06cfee0acedefbfb59c62394ecd794f",
+          "hash": "#/alerts",
+          "loadingText": [],
+          "tabList": "Primary navigation",
+          "title": "StockLedger"
+        },
+        "route": "#/alerts",
+        "screenshot": {
+          "bytes": 97225,
+          "dimensions": {
+            "height": 900,
+            "width": 1440
+          },
+          "file": "screenshots/alerts--desktop-1440x900.png",
+          "sha256": "86bcb550083b880bb0df8029a1ae74e0316f234b87a8ad6dde18fab36440229b"
+        },
+        "sourceKind": "sample",
+        "surfaceKey": "alerts"
+      },
+      {
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "responses": []
+        },
+        "geometry": {
+          "controlCount": 44,
+          "controlNamesAndStatesSource": "sharedShellContinuity[].continuity[].shellControls",
+          "controlOverlaps": [],
+          "document": {
+            "clientHeight": 844,
+            "clientWidth": 390,
+            "scrollHeight": 844,
+            "scrollWidth": 390
+          },
+          "horizontalOverflow": false,
+          "reviewRows": [],
+          "tabSemantics": [
+            {
+              "name": "Today",
+              "selected": "false"
+            },
+            {
+              "name": "Watchlist",
+              "selected": "false"
+            },
+            {
+              "name": "Recipes",
+              "selected": "false"
+            },
+            {
+              "name": "Journal",
+              "selected": "false"
+            }
+          ],
+          "viewport": {
+            "dpr": 1,
+            "height": 844,
+            "width": 390
+          }
+        },
+        "hardFails": [],
+        "navigationSemantics": {
+          "hash": "#/alerts",
+          "name": "Alerts",
+          "pressed": "true",
+          "role": "button"
+        },
+        "profile": {
+          "hasTouch": true,
+          "height": 844,
+          "isMobile": true,
+          "name": "mobile-390x844",
+          "width": 390
+        },
+        "ready": {
+          "bodyTextBytes": 2000,
+          "bodyTextSha256": "6117a68aa3d7fd523a3a67092478306aea341a46b63ef969b9b69eb34ba32458",
+          "hash": "#/alerts",
+          "loadingText": [],
+          "tabList": "Primary navigation",
+          "title": "StockLedger"
+        },
+        "route": "#/alerts",
+        "screenshot": {
+          "bytes": 57083,
+          "dimensions": {
+            "height": 844,
+            "width": 390
+          },
+          "file": "screenshots/alerts--mobile-390x844.png",
+          "sha256": "361aa9db6a106fc7a1f204a950f2ea062c2a6f2affbbd07718cc445b0b455c56"
+        },
+        "sourceKind": "sample",
+        "surfaceKey": "alerts"
+      }
+    ],
+    "journal": [
+      {
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "responses": []
+        },
+        "geometry": {
+          "controlCount": 59,
+          "controlNamesAndStatesSource": "sharedShellContinuity[].continuity[].shellControls",
+          "controlOverlaps": [],
+          "document": {
+            "clientHeight": 900,
+            "clientWidth": 1440,
+            "scrollHeight": 900,
+            "scrollWidth": 1440
+          },
+          "horizontalOverflow": false,
+          "reviewRows": [],
+          "tabSemantics": [
+            {
+              "name": "Today",
+              "selected": "false"
+            },
+            {
+              "name": "Watchlist",
+              "selected": "false"
+            },
+            {
+              "name": "Recipes",
+              "selected": "false"
+            },
+            {
+              "name": "Journal",
+              "selected": "true"
+            }
+          ],
+          "viewport": {
+            "dpr": 1,
+            "height": 900,
+            "width": 1440
+          }
+        },
+        "hardFails": [],
+        "navigationSemantics": {
+          "hash": "#/journal",
+          "name": "Journal",
+          "role": "tab",
+          "selected": "true"
+        },
+        "profile": {
+          "hasTouch": false,
+          "height": 900,
+          "isMobile": false,
+          "name": "desktop-1440x900",
+          "width": 1440
+        },
+        "ready": {
+          "bodyTextBytes": 3967,
+          "bodyTextSha256": "d8617b600ad94e98e459c30eb777e90b5c577927adc53229e99ee303cf8863d6",
+          "hash": "#/journal",
+          "loadingText": [],
+          "tabList": "Primary navigation",
+          "title": "StockLedger"
+        },
+        "route": "#/journal",
+        "screenshot": {
+          "bytes": 102071,
+          "dimensions": {
+            "height": 900,
+            "width": 1440
+          },
+          "file": "screenshots/journal--desktop-1440x900.png",
+          "sha256": "ad959ddab8a6e5056a08f8537406f9c8aded3433f30fa2ef9929a11400fac926"
+        },
+        "sourceKind": "sample",
+        "surfaceKey": "journal"
+      },
+      {
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "responses": []
+        },
+        "geometry": {
+          "controlCount": 59,
+          "controlNamesAndStatesSource": "sharedShellContinuity[].continuity[].shellControls",
+          "controlOverlaps": [],
+          "document": {
+            "clientHeight": 844,
+            "clientWidth": 390,
+            "scrollHeight": 844,
+            "scrollWidth": 390
+          },
+          "horizontalOverflow": false,
+          "reviewRows": [],
+          "tabSemantics": [
+            {
+              "name": "Today",
+              "selected": "false"
+            },
+            {
+              "name": "Watchlist",
+              "selected": "false"
+            },
+            {
+              "name": "Recipes",
+              "selected": "false"
+            },
+            {
+              "name": "Journal",
+              "selected": "true"
+            }
+          ],
+          "viewport": {
+            "dpr": 1,
+            "height": 844,
+            "width": 390
+          }
+        },
+        "hardFails": [],
+        "navigationSemantics": {
+          "hash": "#/journal",
+          "name": "Journal",
+          "role": "tab",
+          "selected": "true"
+        },
+        "profile": {
+          "hasTouch": true,
+          "height": 844,
+          "isMobile": true,
+          "name": "mobile-390x844",
+          "width": 390
+        },
+        "ready": {
+          "bodyTextBytes": 4005,
+          "bodyTextSha256": "88530a8570e0cca934e169ab47849624ef880ef1679ff30998fcb02d146e9cb9",
+          "hash": "#/journal",
+          "loadingText": [],
+          "tabList": "Primary navigation",
+          "title": "StockLedger"
+        },
+        "route": "#/journal",
+        "screenshot": {
+          "bytes": 59716,
+          "dimensions": {
+            "height": 844,
+            "width": 390
+          },
+          "file": "screenshots/journal--mobile-390x844.png",
+          "sha256": "236a5492c73a7b94e1cf940e74b9d800daf70a7170499d799f742d8c9277ea99"
+        },
+        "sourceKind": "sample",
+        "surfaceKey": "journal"
+      }
+    ],
+    "recipes": [
+      {
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "responses": []
+        },
+        "geometry": {
+          "controlCount": 8,
+          "controlNamesAndStatesSource": "sharedShellContinuity[].continuity[].shellControls",
+          "controlOverlaps": [],
+          "document": {
+            "clientHeight": 900,
+            "clientWidth": 1440,
+            "scrollHeight": 900,
+            "scrollWidth": 1440
+          },
+          "horizontalOverflow": false,
+          "reviewRows": [],
+          "tabSemantics": [
+            {
+              "name": "Today",
+              "selected": "false"
+            },
+            {
+              "name": "Watchlist",
+              "selected": "false"
+            },
+            {
+              "name": "Recipes",
+              "selected": "true"
+            },
+            {
+              "name": "Journal",
+              "selected": "false"
+            }
+          ],
+          "viewport": {
+            "dpr": 1,
+            "height": 900,
+            "width": 1440
+          }
+        },
+        "hardFails": [],
+        "navigationSemantics": {
+          "hash": "#/recipes",
+          "name": "Recipes",
+          "role": "tab",
+          "selected": "true"
+        },
+        "profile": {
+          "hasTouch": false,
+          "height": 900,
+          "isMobile": false,
+          "name": "desktop-1440x900",
+          "width": 1440
+        },
+        "ready": {
+          "bodyTextBytes": 715,
+          "bodyTextSha256": "79b3e0bc317b646c6f061de77a725b9df6d712db5305d906f1e1165bf59346ed",
+          "hash": "#/recipes",
+          "loadingText": [],
+          "tabList": "Primary navigation",
+          "title": "StockLedger"
+        },
+        "route": "#/recipes",
+        "screenshot": {
+          "bytes": 86401,
+          "dimensions": {
+            "height": 900,
+            "width": 1440
+          },
+          "file": "screenshots/recipes--desktop-1440x900.png",
+          "sha256": "4d9a8f9974126e3923735960e957057830478fc9a4749b4be5ab88516b58dce3"
+        },
+        "sourceKind": "sample",
+        "surfaceKey": "recipes"
+      },
+      {
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "responses": []
+        },
+        "geometry": {
+          "controlCount": 8,
+          "controlNamesAndStatesSource": "sharedShellContinuity[].continuity[].shellControls",
+          "controlOverlaps": [],
+          "document": {
+            "clientHeight": 844,
+            "clientWidth": 390,
+            "scrollHeight": 844,
+            "scrollWidth": 390
+          },
+          "horizontalOverflow": false,
+          "reviewRows": [],
+          "tabSemantics": [
+            {
+              "name": "Today",
+              "selected": "false"
+            },
+            {
+              "name": "Watchlist",
+              "selected": "false"
+            },
+            {
+              "name": "Recipes",
+              "selected": "true"
+            },
+            {
+              "name": "Journal",
+              "selected": "false"
+            }
+          ],
+          "viewport": {
+            "dpr": 1,
+            "height": 844,
+            "width": 390
+          }
+        },
+        "hardFails": [],
+        "navigationSemantics": {
+          "hash": "#/recipes",
+          "name": "Recipes",
+          "role": "tab",
+          "selected": "true"
+        },
+        "profile": {
+          "hasTouch": true,
+          "height": 844,
+          "isMobile": true,
+          "name": "mobile-390x844",
+          "width": 390
+        },
+        "ready": {
+          "bodyTextBytes": 640,
+          "bodyTextSha256": "23bb0d35568efb8edf02e32fd0693b6ece3b7696726764796fcb717c34040d12",
+          "hash": "#/recipes",
+          "loadingText": [],
+          "tabList": "Primary navigation",
+          "title": "StockLedger"
+        },
+        "route": "#/recipes",
+        "screenshot": {
+          "bytes": 65083,
+          "dimensions": {
+            "height": 844,
+            "width": 390
+          },
+          "file": "screenshots/recipes--mobile-390x844.png",
+          "sha256": "60a89b161e8b4eb7cf42097cdded9102491f9a7e6bc56c8df0631b8d0accbb62"
+        },
+        "sourceKind": "sample",
+        "surfaceKey": "recipes"
+      }
+    ],
+    "settings": [
+      {
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "responses": []
+        },
+        "geometry": {
+          "controlCount": 53,
+          "controlNamesAndStatesSource": "sharedShellContinuity[].continuity[].shellControls",
+          "controlOverlaps": [],
+          "document": {
+            "clientHeight": 900,
+            "clientWidth": 1440,
+            "scrollHeight": 900,
+            "scrollWidth": 1440
+          },
+          "horizontalOverflow": false,
+          "reviewRows": [],
+          "tabSemantics": [
+            {
+              "name": "Today",
+              "selected": "false"
+            },
+            {
+              "name": "Watchlist",
+              "selected": "false"
+            },
+            {
+              "name": "Recipes",
+              "selected": "false"
+            },
+            {
+              "name": "Journal",
+              "selected": "false"
+            }
+          ],
+          "viewport": {
+            "dpr": 1,
+            "height": 900,
+            "width": 1440
+          }
+        },
+        "hardFails": [],
+        "navigationSemantics": {
+          "hash": "#/settings",
+          "name": "Settings",
+          "pressed": "true",
+          "role": "button"
+        },
+        "profile": {
+          "hasTouch": false,
+          "height": 900,
+          "isMobile": false,
+          "name": "desktop-1440x900",
+          "width": 1440
+        },
+        "ready": {
+          "bodyTextBytes": 2610,
+          "bodyTextSha256": "5b2fbe3aac832ddb80872e48be16d02924ec07c816670e4af4d2abfe1755ed8b",
+          "hash": "#/settings",
+          "loadingText": [],
+          "tabList": "Primary navigation",
+          "title": "StockLedger"
+        },
+        "route": "#/settings",
+        "screenshot": {
+          "bytes": 91517,
+          "dimensions": {
+            "height": 900,
+            "width": 1440
+          },
+          "file": "screenshots/settings--desktop-1440x900.png",
+          "sha256": "eb12f1184a0f6ad51d504e4e85c5c379f6df0db6d0c5cd4b413c1c999481a962"
+        },
+        "sourceKind": "sample",
+        "surfaceKey": "settings"
+      },
+      {
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "responses": []
+        },
+        "geometry": {
+          "controlCount": 53,
+          "controlNamesAndStatesSource": "sharedShellContinuity[].continuity[].shellControls",
+          "controlOverlaps": [],
+          "document": {
+            "clientHeight": 844,
+            "clientWidth": 390,
+            "scrollHeight": 844,
+            "scrollWidth": 390
+          },
+          "horizontalOverflow": false,
+          "reviewRows": [],
+          "tabSemantics": [
+            {
+              "name": "Today",
+              "selected": "false"
+            },
+            {
+              "name": "Watchlist",
+              "selected": "false"
+            },
+            {
+              "name": "Recipes",
+              "selected": "false"
+            },
+            {
+              "name": "Journal",
+              "selected": "false"
+            }
+          ],
+          "viewport": {
+            "dpr": 1,
+            "height": 844,
+            "width": 390
+          }
+        },
+        "hardFails": [],
+        "navigationSemantics": {
+          "hash": "#/settings",
+          "name": "Settings",
+          "pressed": "true",
+          "role": "button"
+        },
+        "profile": {
+          "hasTouch": true,
+          "height": 844,
+          "isMobile": true,
+          "name": "mobile-390x844",
+          "width": 390
+        },
+        "ready": {
+          "bodyTextBytes": 2606,
+          "bodyTextSha256": "3620216819a4a73f5b369b108a8fa6f456c67464773da1512739a40d3e67d5f3",
+          "hash": "#/settings",
+          "loadingText": [],
+          "tabList": "Primary navigation",
+          "title": "StockLedger"
+        },
+        "route": "#/settings",
+        "screenshot": {
+          "bytes": 57996,
+          "dimensions": {
+            "height": 844,
+            "width": 390
+          },
+          "file": "screenshots/settings--mobile-390x844.png",
+          "sha256": "aa7b414b8c1affba4d3991b6976ba619497e42c8950d997b430da6d6d7bae4b0"
+        },
+        "sourceKind": "sample",
+        "surfaceKey": "settings"
+      }
+    ],
+    "watchlist": [
+      {
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "responses": []
+        },
+        "geometry": {
+          "controlCount": 29,
+          "controlNamesAndStatesSource": "sharedShellContinuity[].continuity[].shellControls",
+          "controlOverlaps": [],
+          "document": {
+            "clientHeight": 900,
+            "clientWidth": 1440,
+            "scrollHeight": 900,
+            "scrollWidth": 1440
+          },
+          "horizontalOverflow": false,
+          "reviewRows": [],
+          "tabSemantics": [
+            {
+              "name": "Today",
+              "selected": "false"
+            },
+            {
+              "name": "Watchlist",
+              "selected": "true"
+            },
+            {
+              "name": "Recipes",
+              "selected": "false"
+            },
+            {
+              "name": "Journal",
+              "selected": "false"
+            }
+          ],
+          "viewport": {
+            "dpr": 1,
+            "height": 900,
+            "width": 1440
+          }
+        },
+        "hardFails": [],
+        "navigationSemantics": {
+          "hash": "#/watchlist",
+          "name": "Watchlist",
+          "role": "tab",
+          "selected": "true"
+        },
+        "profile": {
+          "hasTouch": false,
+          "height": 900,
+          "isMobile": false,
+          "name": "desktop-1440x900",
+          "width": 1440
+        },
+        "ready": {
+          "bodyTextBytes": 1219,
+          "bodyTextSha256": "0c424087fee040bd9e2f742d3a1702eaaa8c9a4a9014a73f3c8fcd81fbf1bbff",
+          "hash": "#/watchlist",
+          "loadingText": [],
+          "tabList": "Primary navigation",
+          "title": "StockLedger"
+        },
+        "route": "#/watchlist",
+        "screenshot": {
+          "bytes": 93823,
+          "dimensions": {
+            "height": 900,
+            "width": 1440
+          },
+          "file": "screenshots/watchlist--desktop-1440x900.png",
+          "sha256": "abb1e92b222fa1f17d2af7d269151e12e319a74f952af4f2bcc9632f18387895"
+        },
+        "sourceKind": "sample",
+        "surfaceKey": "watchlist"
+      },
+      {
+        "errors": {
+          "console": [],
+          "pageErrors": [],
+          "requestFailures": [],
+          "responses": []
+        },
+        "geometry": {
+          "controlCount": 29,
+          "controlNamesAndStatesSource": "sharedShellContinuity[].continuity[].shellControls",
+          "controlOverlaps": [],
+          "document": {
+            "clientHeight": 844,
+            "clientWidth": 390,
+            "scrollHeight": 844,
+            "scrollWidth": 390
+          },
+          "horizontalOverflow": false,
+          "reviewRows": [],
+          "tabSemantics": [
+            {
+              "name": "Today",
+              "selected": "false"
+            },
+            {
+              "name": "Watchlist",
+              "selected": "true"
+            },
+            {
+              "name": "Recipes",
+              "selected": "false"
+            },
+            {
+              "name": "Journal",
+              "selected": "false"
+            }
+          ],
+          "viewport": {
+            "dpr": 1,
+            "height": 844,
+            "width": 390
+          }
+        },
+        "hardFails": [],
+        "navigationSemantics": {
+          "hash": "#/watchlist",
+          "name": "Watchlist",
+          "role": "tab",
+          "selected": "true"
+        },
+        "profile": {
+          "hasTouch": true,
+          "height": 844,
+          "isMobile": true,
+          "name": "mobile-390x844",
+          "width": 390
+        },
+        "ready": {
+          "bodyTextBytes": 1144,
+          "bodyTextSha256": "20eb565b92d22c10ec392afe094f42e465cebd0dd0b252d6c021b9e673bbd340",
+          "hash": "#/watchlist",
+          "loadingText": [],
+          "tabList": "Primary navigation",
+          "title": "StockLedger"
+        },
+        "route": "#/watchlist",
+        "screenshot": {
+          "bytes": 63213,
+          "dimensions": {
+            "height": 844,
+            "width": 390
+          },
+          "file": "screenshots/watchlist--mobile-390x844.png",
+          "sha256": "05fbf8ea4692aa07f766e299229ae87108aaab92a16d0082bfc123d8d891238d"
+        },
+        "sourceKind": "sample",
+        "surfaceKey": "watchlist"
+      }
+    ]
+  }
+}
