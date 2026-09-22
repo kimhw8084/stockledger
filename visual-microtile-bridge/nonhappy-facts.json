@@ -1,0 +1,118 @@
+{
+  "auxiliaryScreenshots": [
+    {
+      "bytes": 51607,
+      "dimensions": {
+        "height": 900,
+        "width": 1440
+      },
+      "file": "screenshots/non-happy-empty-personal--desktop-1440x900.png",
+      "sha256": "8b39b330f33b5f160741f42be7919ff83fce524dab652359f2101db507124e0e"
+    }
+  ],
+  "candidateSourceContext": [
+    {
+      "candidateContext": "StockLedgerApp.tsx:3953-3959",
+      "note": "The retained auxiliary is the app-level empty workspace before TodayScreen mounts; it is not a TodayScreen loading/error branch.",
+      "r12Status": "OBSERVED",
+      "separatePersistentTodayBranch": false,
+      "state": "empty/personal",
+      "supportedFixtureOrControl": "supported app onboarding before Explore sample workspace"
+    },
+    {
+      "candidateContext": "TodayScreen.tsx:314-320",
+      "note": "Today renders the bounded warning when mock or unavailable snapshot evidence is present.",
+      "r12Status": "OBSERVED",
+      "separatePersistentTodayBranch": true,
+      "state": "degraded/sample-evidence-limited",
+      "supportedFixtureOrControl": "supported sample workspace with mock/unavailable observations"
+    },
+    {
+      "candidateContext": "TodayScreen.tsx:382; StockLedgerApp.tsx:3952",
+      "note": "Source has provider checking/app saving-scanning indicators, but R12 recorded no retained loading state; remains UNPROVEN.",
+      "r12Status": "UNPROVEN",
+      "separatePersistentTodayBranch": false,
+      "state": "loading",
+      "supportedFixtureOrControl": "no supported retained transient fixture/control path in R12"
+    },
+    {
+      "candidateContext": "TodayScreen.tsx:329-340; StockLedgerApp.tsx:3950-3952",
+      "note": "No dedicated retained Today blocked branch was reached; remains UNPROVEN.",
+      "r12Status": "UNPROVEN",
+      "separatePersistentTodayBranch": false,
+      "state": "blocked",
+      "supportedFixtureOrControl": "no supported Today fixture/control path in R12"
+    },
+    {
+      "candidateContext": "StockLedgerApp.tsx:3943-3952",
+      "note": "App-level error/route notices exist, but no retained Today error/recovery state was reached; remains UNPROVEN.",
+      "r12Status": "UNPROVEN",
+      "separatePersistentTodayBranch": false,
+      "state": "error/recovery",
+      "supportedFixtureOrControl": "no supported Today fixture/control path in R12"
+    }
+  ],
+  "interpretationBoundary": "UNPROVEN states remain UNPROVEN; source reachability notes do not convert them into PASS.",
+  "noVisualVerdict": true,
+  "observed": [
+    {
+      "bodySample": "S StockLedger Evidence-led review Today Watchlist Recipes Journal Workspace Observe → inspect → record Today 0 urgent · 0 open alerts Build your investment memory Add a stock, capture why you are watching it, then attach a recipe. Import daily prices in Settings to evaluate your evidence. ADD YOUR FIRST STOCK ADD STARTER RECIPES EXPLORE SAMPLE WORKSPACE",
+      "errors": {
+        "console": [],
+        "pageErrors": [],
+        "requestFailures": [],
+        "responses": []
+      },
+      "marker": "Explore sample workspace",
+      "path": "fresh context before supported Explore sample workspace action",
+      "retained": true,
+      "screenshot": {
+        "bytes": 51607,
+        "dimensions": {
+          "height": 900,
+          "width": 1440
+        },
+        "file": "screenshots/non-happy-empty-personal--desktop-1440x900.png",
+        "sha256": "8b39b330f33b5f160741f42be7919ff83fce524dab652359f2101db507124e0e"
+      },
+      "state": "empty/personal",
+      "status": "OBSERVED",
+      "todaySurface": true
+    },
+    {
+      "errors": {
+        "console": [],
+        "pageErrors": [],
+        "requestFailures": [],
+        "responses": []
+      },
+      "marker": "Some review evidence is limited",
+      "markerVisible": true,
+      "path": "supported Explore sample workspace action",
+      "state": "degraded/sample-evidence-limited",
+      "status": "OBSERVED"
+    }
+  ],
+  "schema": "stockledger-r13-nonhappy-facts-v1",
+  "source": {
+    "sha": "83a43c84e3436e72503d33ff8d35765651d7dc53",
+    "tree": "5b0b1abf96b7b13da4443d6698ce791419f658e0"
+  },
+  "unproven": [
+    {
+      "reason": "Transient loading is not safely retainable through an existing supported fixture/control path; no source/runtime injection used",
+      "state": "loading",
+      "status": "UNPROVEN"
+    },
+    {
+      "reason": "No supported Today control or fixture retained a blocked state during this exact-candidate run",
+      "state": "blocked",
+      "status": "UNPROVEN"
+    },
+    {
+      "reason": "No supported Today control or fixture retained an error/recovery state during this exact-candidate run",
+      "state": "error/recovery",
+      "status": "UNPROVEN"
+    }
+  ]
+}
