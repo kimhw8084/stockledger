@@ -24,7 +24,6 @@ import { useSavedStringList } from "../hooks/useSavedStringList";
 import { useWindowPanelFocus } from "../hooks/useWindowPanelFocus";
 import { appDialog as RNAlert } from "../platform/dialog";
 import { useAppModel } from "../hooks/useAppModel";
-import { BottomNav } from "../components/BottomNav";
 import { WindowPanel } from "../components/WindowPanel";
 import { MotionSwap } from "../components/MotionSwap";
 import { StockSearchPanel } from "../components/stocks/StockSearchPanel";
@@ -127,7 +126,8 @@ import { L0DataLayer } from "../components/logic/L0DataLayer";
 import { L1MetricsLayer } from "../components/logic/L1MetricsLayer";
 import { L15ConditionsLayer } from "../components/logic/L15ConditionsLayer";
 import { L2RecipesLayer } from "../components/logic/L2RecipesLayer";
-import { HomeVisualDashboard } from "../components/HomeVisualDashboard";
+import { StockLedgerShell } from "../features/shell/StockLedgerShell";
+import { TodayScreen } from "../features/today/TodayScreen";
 
 type TabKey = "Home" | "Stocks" | "Logic Lab" | "Eyes" | "Alerts" | "Journal" | "Settings";
 type AlertWorkspaceTab = "Current" | "History" | "Detail";
@@ -3059,7 +3059,6 @@ export default function App() {
     Journal: tabLabel(language, "Journal"),
     Settings: tabLabel(language, "Settings"),
   };
-  const pendingOutcomesCount = data.outcomes.filter((outcome) => outcome.status !== "Reviewed").length;
   const topBarSubtitle =
     tab === "Home"
       ? language === "ko"
@@ -3920,7 +3919,27 @@ export default function App() {
         returnFocusRef={stockEditorFocus.returnFocusRef}
         fallbackFocusRef={stockEditorFocus.fallbackFocusRef}
       /> : null}
-      <View style={styles.frame}>
+      <StockLedgerShell
+        language={language}
+        tab={tab}
+        tabLabels={tabLabels}
+        subtitle={topBarSubtitle}
+        openAlerts={openAlerts}
+        onSelect={setTab}
+        onOpenAlerts={() => {
+          setAlertWorkspaceTab("Current");
+          setTab("Alerts");
+        }}
+        onOpenSettings={() => setTab("Settings")}
+        navigationFocusRefs={{
+          Home: homeSurfaceFallbackRef,
+          Stocks: stocksSurfaceFallbackRef,
+          "Logic Lab": logicSurfaceFallbackRef,
+          Journal: journalSurfaceFallbackRef,
+        }}
+        alertsRef={alertsSurfaceFallbackRef}
+        settingsRef={settingsSurfaceFallbackRef}
+      >
         {routeNotice ? (
           <View style={styles.routeNotice} accessibilityRole="alert" accessibilityLiveRegion="assertive">
             <Text style={styles.routeNoticeTitle}>{t(language, "route.unavailableTitle")}</Text>
@@ -3931,57 +3950,6 @@ export default function App() {
         {recentError || pinError ? <Text accessibilityRole="alert" style={{ padding: 12 }}>{recentError || pinError}</Text> : null}
         {error ? <View style={{ padding: 12, backgroundColor: "#fff0ec" }}><Text accessibilityRole="alert" selectable>{error}</Text><Button label={t(language, "common.dismiss")} tone="ghost" onPress={actions.dismissError} /></View> : null}
         {saving || scanning ? <Text accessibilityLiveRegion="polite" style={{ padding: 8 }}>{saving ? t(language, "common.saving") : t(language, "common.scanning")}</Text> : null}
-        <View style={styles.topBar}>
-          <View style={styles.topBarCopy}>
-            <Text accessibilityRole="header" style={styles.topBarTitle}>{tabLabels[tab]}</Text>
-            <Text style={styles.topBarSubtitle}>{topBarSubtitle}</Text>
-          </View>
-          <View style={styles.topBarActions}>
-            <Pressable
-              ref={alertsSurfaceFallbackRef}
-              accessibilityRole="button" accessibilityLabel={t(language, "common.alerts")} accessibilityState={{ selected: tab === "Alerts" }}
-              onPress={() => {
-                setAlertWorkspaceTab("Current");
-                setTab("Alerts");
-              }}
-              style={[styles.alertBell, tab === "Alerts" ? styles.topHeaderActionActive : null]}
-            >
-              <Text style={[styles.alertBellIcon, tab === "Alerts" ? styles.topHeaderActionIconActive : null]}>!</Text>
-              {openAlerts > 0 ? (
-                <View style={styles.alertBellBadge}>
-                  <Text style={styles.alertBellBadgeText}>{openAlerts}</Text>
-                </View>
-              ) : null}
-            </Pressable>
-            <Pressable
-              ref={journalSurfaceFallbackRef}
-              accessibilityRole="button" accessibilityLabel={t(language, "common.journal")} accessibilityState={{ selected: tab === "Journal" }}
-              onPress={() => setTab("Journal")}
-              style={[styles.alertBell, tab === "Journal" ? styles.topHeaderActionActive : null]}
-            >
-              <Text style={[styles.alertBellIcon, tab === "Journal" ? styles.topHeaderActionIconActive : null]}>H</Text>
-              {pendingOutcomesCount > 0 ? (
-                <View style={styles.alertBellBadge}>
-                  <Text style={styles.alertBellBadgeText}>{pendingOutcomesCount}</Text>
-                </View>
-              ) : null}
-            </Pressable>
-            <Pressable
-              ref={settingsSurfaceFallbackRef}
-              accessibilityRole="button" accessibilityLabel={t(language, "nav.Settings")} accessibilityState={{ selected: tab === "Settings" }}
-              onPress={() => setTab("Settings")}
-              style={[styles.alertBell, tab === "Settings" ? styles.topHeaderActionActive : null]}
-            >
-              <Text style={[styles.alertBellIcon, tab === "Settings" ? styles.topHeaderActionIconActive : null]}>S</Text>
-            </Pressable>
-          </View>
-        </View>
-        <ScrollView
-          contentContainerStyle={styles.page}
-          showsVerticalScrollIndicator={false}
-          keyboardShouldPersistTaps="handled"
-          nestedScrollEnabled
-        >
           {data.stocks.length === 0 ? <Card>
             <Text style={styles.cardTitle}>{t(language, "home.onboarding.title")}</Text>
             <Text style={styles.cardBody}>{t(language, "home.onboarding.body")}</Text>
@@ -3992,7 +3960,7 @@ export default function App() {
           {tab === "Stocks" ? <View style={{ flexDirection: "row", gap: 12 }}><Button label={t(language, "stocks.action.add")} onPress={() => openStockEditor("")} /><Button label={t(language, "stocks.action.manageEyes")} tone="secondary" onPress={() => setTab("Eyes")} /></View> : null}
           {data.snapshots.some(snapshot => snapshot.isMock) ? <Text style={{ padding: 10, color: "#6d4b16", fontSize: 14 }}>{t(language, "home.sampleNotice")}</Text> : null}
           {tab === "Home" && data.stocks.length > 0 ? (
-            <HomeVisualDashboard
+            <TodayScreen
               language={language}
               stockDirectory={stockDirectory}
               urgentStocks={homeUrgentStocks}
@@ -4000,10 +3968,16 @@ export default function App() {
               staleReviewStocks={homeStaleReviewStocks}
               openAlertsCount={openAlerts}
               outcomes={data.outcomes}
+              latestScanRun={latestScanRun}
+              providerHealth={providerHealth}
+              providerHealthLoading={providerHealthLoading}
               onSelectStock={(stockId, eyeId) => openStockContext({ stockId, eyeId })}
               onOpenAlerts={() => setTab("Alerts")}
-              onOpenLogicLab={() => setTab("Logic Lab")}
-              onOpenJournal={(eyeId, alertId, invoker) => openHomeJournalComposer(eyeId, alertId, invoker)}
+              onOpenRecipes={() => setTab("Logic Lab")}
+              onOpenJournal={(eyeId, alertId) => {
+                if (eyeId) openHomeJournalComposer(eyeId, alertId);
+                else setTab("Journal");
+              }}
               fallbackFocusRef={homeSurfaceFallbackRef}
             />
           ) : null}
@@ -4826,7 +4800,6 @@ export default function App() {
               </Reveal>
             </>
           ) : null}
-        </ScrollView>
         {conditionBuilderOpen ? (
           <WindowPanel
             title={
@@ -6592,26 +6565,7 @@ export default function App() {
             </MotionSwap>
           </WindowPanel>
         ) : null}
-        <BottomNav
-          tabs={tabs}
-          currentTab={tab}
-          onSelect={setTab}
-          labels={tabLabels}
-          navigationLabel={language === "ko" ? "주요 탐색" : "Primary navigation"}
-          focusRefs={{
-            Home: homeSurfaceFallbackRef,
-            Stocks: stocksSurfaceFallbackRef,
-            "Logic Lab": logicSurfaceFallbackRef,
-            Journal: journalSurfaceFallbackRef,
-          }}
-          icons={{
-            Home: "◦",
-            Stocks: "≈",
-            "Logic Lab": "ƒ",
-            Eyes: "◎",
-          }}
-        />
-      </View>
+      </StockLedgerShell>
     </View>
   );
 }

@@ -1,0 +1,17 @@
+{
+  "name": "@expo-base/primitives",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "dependencies": {
+    "@expo-base/i18n": "*",
+    "@expo-base/tokens": "*"
+  },
+  "peerDependencies": {
+    "react": "19.2.3",
+    "react-native": "0.86.3",
+    "react-native-unistyles": "3.3.0"
+  }
+}

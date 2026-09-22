@@ -2,7 +2,7 @@ import React, { Component, type ReactNode } from "react";
 import { Text, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import StockLedgerApp from "./src/app/StockLedgerApp";
-import { Button } from "./src/components/common";
+import { Button } from "./src/ui";
 class AppBoundary extends Component<{ children: ReactNode }, { failed: boolean; attempt: number }> {
   state = { failed: false, attempt: 0 };
   static getDerivedStateFromError() { return { failed: true }; }

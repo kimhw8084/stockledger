@@ -1,0 +1,21 @@
+{
+  "name": "@expo-base/components",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "dependencies": {
+    "@expo-base/i18n": "*",
+    "@expo-base/platform": "*",
+    "@expo-base/primitives": "*",
+    "@expo-base/tokens": "*",
+    "@expo-base/icons": "*",
+    "@expo-base/media-presentation": "*"
+  },
+  "peerDependencies": {
+    "react": "19.2.3",
+    "react-native": "0.86.3",
+    "react-native-unistyles": "3.3.0"
+  }
+}
