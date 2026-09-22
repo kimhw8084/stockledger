@@ -1,0 +1,73 @@
+{
+  "accepted_at": "2026-09-22T21:29:07Z",
+  "base": "9dd9c4b0a37b804868487cf63a169faf807cdaf1",
+  "changed_files": [],
+  "checks": [
+    {
+      "name": "route-health",
+      "result": "ROUTE_HEALTH_PASS"
+    }
+  ],
+  "commits": [],
+  "diff": null,
+  "error_code": null,
+  "evidence_manifest": {
+    "count": 1,
+    "items": [
+      {
+        "path": "route-health/route-health.json",
+        "sha256": "19ea5f9e13a155d886db45a94ed53d1d7c218d53ab740d57a4f729735f8bf3b0",
+        "size_bytes": 2002
+      }
+    ],
+    "version": 1
+  },
+  "evidence_publisher_release": "1.2.4-quota-recovery-candidate",
+  "fabric_job": {
+    "base": "9dd9c4b0a37b804868487cf63a169faf807cdaf1",
+    "job_id": "CF-336bfe13f5ddfd98bf3ee429",
+    "operation": "VERIFY",
+    "project": "stockledger",
+    "request": "stockledger-prod-c01-route-health-verify-v1",
+    "work_branch": "codex/stockledger-prod-c01-route-health-verify-v1"
+  },
+  "fabric_release": "1.2.4-quota-recovery-candidate",
+  "failure_class": null,
+  "finished_at": "2026-09-22T21:39:58Z",
+  "git": {
+    "base": "9dd9c4b0a37b804868487cf63a169faf807cdaf1",
+    "changed_files": [],
+    "commits": [],
+    "head_sha": "9dd9c4b0a37b804868487cf63a169faf807cdaf1",
+    "product_changed_files": 0,
+    "product_commits": 0,
+    "source_sha": "9dd9c4b0a37b804868487cf63a169faf807cdaf1",
+    "target_branch": "main",
+    "tree_sha": "5b0b1abf96b7b13da4443d6698ce791419f658e0",
+    "work_branch": "codex/stockledger-prod-c01-route-health-verify-v1"
+  },
+  "job_id": "CF-336bfe13f5ddfd98bf3ee429",
+  "kind": "codex-fabric-audit-evidence",
+  "locator": {
+    "branch": "codex-fabric/evidence/stockledger/stockledger-prod-c01-route-health-verify-v1",
+    "path": ".codex-fabric/audit.json",
+    "ref": "refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c01-route-health-verify-v1"
+  },
+  "operation": "VERIFY",
+  "project": "stockledger",
+  "project_id": "stockledger",
+  "protected_base_at_dispatch": "9dd9c4b0a37b804868487cf63a169faf807cdaf1",
+  "protected_tree_at_dispatch": "5b0b1abf96b7b13da4443d6698ce791419f658e0",
+  "request": "stockledger-prod-c01-route-health-verify-v1",
+  "route_health": {
+    "origin_main_sha": "9dd9c4b0a37b804868487cf63a169faf807cdaf1",
+    "product_source_changed": false,
+    "route_key_count": 1,
+    "verdict": "ROUTE_HEALTH_PASS"
+  },
+  "schema_version": 1,
+  "source_sha": "9dd9c4b0a37b804868487cf63a169faf807cdaf1",
+  "status": "ROUTE_HEALTH_PASS",
+  "tree_sha": "5b0b1abf96b7b13da4443d6698ce791419f658e0",
+  "work_branch": "codex/stockledger-prod-c01-route-health-verify-v1"
+}
