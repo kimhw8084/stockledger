@@ -321,7 +321,9 @@ test("keyboard task paths operate segmented choices and restore focus after deep
   await page.keyboard.press("Escape");
   await expect(metric).toBeFocused();
   const boardControls = page.getByRole("button", { name: "Board filters and display", exact: true });
+  await boardControls.scrollIntoViewIfNeeded();
   await boardControls.focus();
+  await expect(boardControls).toBeFocused();
   await page.keyboard.press("Enter");
   await expect(boardControls).toHaveAttribute("aria-expanded", "true");
   const statusGroup = page.getByRole("radiogroup", { name: "Evidence status" });

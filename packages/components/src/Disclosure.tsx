@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { useState } from 'react';
-import { Platform, Pressable, View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { StyleSheet } from 'react-native-unistyles';
 import { Icon } from '@expo-base/icons';
 import { Text, VStack, useInteractionState } from '@expo-base/primitives';
@@ -37,14 +37,6 @@ export function Disclosure({
     if (expanded === undefined) setUncontrolledExpanded(next);
     onExpandedChange?.(next);
   };
-  const keyboardProps = Platform.OS === 'web' ? {
-    onKeyDown: (event: { key: string; preventDefault: () => void }) => {
-      if (disabled || (event.key !== 'Enter' && event.key !== ' ' && event.key !== 'Spacebar')) return;
-      event.preventDefault();
-      setExpanded(!isExpanded);
-    },
-  } : {};
-
   return (
     <View style={styles.root} testID={testID}>
       <Pressable
@@ -59,7 +51,6 @@ export function Disclosure({
         disabled={disabled}
         onPress={() => setExpanded(!isExpanded)}
         {...interactionProps}
-        {...keyboardProps}
         style={({ pressed }) => [
           styles.trigger,
           hovered && !disabled && styles.hovered,

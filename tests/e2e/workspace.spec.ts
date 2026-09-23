@@ -105,6 +105,7 @@ test("records a deliberate decision, reviews its outcome, and preserves an amend
   await page.getByRole("textbox", { name: "Why did you enter, skip, or revise?" }).fill("Regression amendment: reviewed the source.");
   await page.getByRole("button", { name: "Save Changes", exact: true }).click();
   await expect(page.getByText("Previous authored versions", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Previous authored versions", exact: true }).click();
   await expect(page.getByText(/Regression review: wait for confirmed evidence/)).toBeVisible();
 });
 

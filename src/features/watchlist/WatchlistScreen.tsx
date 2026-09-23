@@ -1,21 +1,18 @@
 import React from "react";
 import type { AppLanguage } from "../../lib/preferences";
 import {
-  Badge,
   Button,
   Card,
   Disclosure,
-  Divider,
-  HStack,
   PageHeader,
   SegmentedControl,
-  StatusIndicator,
   StyleSheet,
   Text,
   TextInput,
   VStack,
   View,
 } from "../../ui";
+import { StockEntityDetail } from "./detail/StockEntityDetail";
 
 export type WatchlistStatusFilter = "All Statuses" | "Passed" | "Near Trigger" | "Warning" | "Blocked" | "Needs Review";
 export type WatchlistBoardMode = "Pinned First" | "Status" | "Family";
@@ -62,6 +59,7 @@ export interface WatchlistSelectedStock {
   eyesCount: number;
   metricsCount: number;
   evidence: WatchlistEvidenceRow[];
+  decisions: Array<{ id: string; action: string; recordedAt: string; stateAtDecision: string; dataQuality: string; note: string; concern: string }>;
 }
 
 export interface WatchlistScreenProps {
@@ -80,10 +78,12 @@ export interface WatchlistScreenProps {
   onClearRecent: () => void;
   onAddStock: () => void;
   onEditStock: () => void;
+  onArchiveStock: () => void | Promise<void>;
   onClearSelection: () => void;
   onRegisterEye: () => void;
   onManageEyes: () => void;
-  onOpenMetric: (metricId: string) => void;
+  onOpenMetric: (metricId: string, invoker?: unknown) => void;
+  onOpenDecision: (decisionId: string, invoker?: unknown) => void;
   statusFilter: WatchlistStatusFilter;
   statusChoices: readonly WatchlistChoice<WatchlistStatusFilter>[];
   onStatusFilterChange: (value: WatchlistStatusFilter) => void;
@@ -182,6 +182,12 @@ export function WatchlistScreen(props: WatchlistScreenProps) {
   const candidates = props.candidates;
   const recentIds = new Set(recent.map((item) => item.id));
   const available = props.available.filter((item) => !recentIds.has(item.id) && item.id !== props.selected?.id);
+
+  React.useEffect(() => {
+    if (!props.selected || typeof document === "undefined") return;
+    document.getElementById("watchlist-selected-stock-detail")?.scrollIntoView({ block: "start" });
+  }, [props.selected?.id]);
+
   return (
     <View style={styles.root} nativeID="watchlist-primary-surface">
       <PageHeader
@@ -270,86 +276,36 @@ export function WatchlistScreen(props: WatchlistScreenProps) {
       </Card>
 
       {props.selected ? (
-        <VStack gap="lg">
-          <View style={styles.identity}>
-            <View style={styles.identityCopy}>
-              <HStack gap="sm" align="center">
-                <Text variant="h1" numeric direction="ltr">{props.selected.symbol}</Text>
-                <Badge label={props.selected.reviewState} tone={props.selected.reviewTone} />
-              </HStack>
-              <Text variant="bodyLg">{props.selected.name}</Text>
-              <Text tone="secondary">{props.selected.evidenceSummary}</Text>
-            </View>
-            <View style={styles.identityActions}>
-              <Button label={text.register} iconStart="eye" onPress={props.onRegisterEye} responsiveWidth="compact-full" />
-              <Button label={text.clear} variant="secondary" onPress={props.onClearSelection} responsiveWidth="compact-full" />
-              <Button label={text.edit} variant="ghost" onPress={props.onEditStock} responsiveWidth="compact-full" />
-            </View>
-          </View>
-
-          <Card variant="subtle" padding="compact">
-            <VStack gap="md">
-              <View style={styles.facts}>
-                <View style={styles.priceFact}>
-                  <Text variant="micro" tone="secondary">{props.language === "ko" ? "최근 가격" : "Latest price"}</Text>
-                  <Text variant="h2" numeric direction="ltr">{props.selected.price}</Text>
-                </View>
-                <StatusIndicator label={props.selected.freshness} description={props.selected.sourceAndTime} tone={props.selected.freshnessTone} />
+        <View nativeID="watchlist-selected-stock-detail">
+          <VStack gap="lg">
+            <StockEntityDetail
+              language={props.language}
+              stock={props.selected}
+              onManageEyes={props.onManageEyes}
+              onRegisterEye={props.onRegisterEye}
+              onEdit={props.onEditStock}
+              onArchive={props.onArchiveStock}
+              onClear={props.onClearSelection}
+              onOpenMetric={props.onOpenMetric}
+              onOpenDecision={props.onOpenDecision}
+            />
+            <Disclosure
+              id="watchlist-board-controls"
+              title={text.controls}
+              description={text.controlsDescription}
+            >
+              <View style={styles.controls}>
+                <VStack gap="lg">
+                  <StatusChoice label={text.status} value={props.statusFilter} choices={props.statusChoices} onChange={props.onStatusFilterChange} />
+                  <StatusChoice label={text.board} value={props.boardMode} choices={props.boardChoices} onChange={props.onBoardModeChange} />
+                  <StatusChoice label={text.lookback} value={props.lookback} choices={props.lookbackChoices} onChange={props.onLookbackChange} />
+                  <StatusChoice label={text.benchmark} value={props.benchmark} choices={props.benchmarkChoices} onChange={props.onBenchmarkChange} />
+                  {props.controlsDirty ? <Button label={text.reset} variant="outline" onPress={props.onResetControls} /> : null}
+                </VStack>
               </View>
-              <View style={styles.coverageRow}>
-                <Text variant="caption" tone="secondary">{props.selected.coverage}</Text>
-                {props.selected.sample ? <Badge label={text.sample} tone="warning" /> : null}
-              </View>
-              <Text variant="caption" tone="secondary">
-                {props.selected.eyesCount} {props.language === "ko" ? "관찰 항목" : "Eyes"} · {props.selected.metricsCount} {props.language === "ko" ? "근거 항목" : "evidence items"}
-              </Text>
-            </VStack>
-          </Card>
-
-          <View>
-            <PageHeader title={text.evidence} description={text.evidenceDescription} />
-            {props.selected.evidence.length === 0 ? (
-              <Card variant="subtle"><Text tone="secondary">{text.noMetrics}</Text></Card>
-            ) : (
-              <View style={styles.evidenceList}>
-                {props.selected.evidence.map((item, index) => (
-                  <React.Fragment key={item.id}>
-                    {index > 0 ? <Divider inset="start" /> : null}
-                    <View style={styles.evidenceRow}>
-                      <View style={styles.evidenceCopy}>
-                        <Text variant="micro" tone="secondary">{item.family}</Text>
-                        <HStack gap="sm" align="center">
-                          <Text variant="h3">{item.title}</Text>
-                          <Badge label={item.status} tone={item.tone} />
-                          {item.pinned ? <Badge label={props.language === "ko" ? "고정" : "Pinned"} tone="info" /> : null}
-                        </HStack>
-                        <Text>{item.summary}</Text>
-                        <Text variant="caption" tone="secondary">{item.value} · {item.context}</Text>
-                      </View>
-                      <Button label={text.inspect} iconEnd="arrowRight" variant="ghost" onPress={() => props.onOpenMetric(item.id)} responsiveWidth="compact-full" />
-                    </View>
-                  </React.Fragment>
-                ))}
-              </View>
-            )}
-          </View>
-
-          <Disclosure
-            id="watchlist-board-controls"
-            title={text.controls}
-            description={text.controlsDescription}
-          >
-            <View style={styles.controls}>
-              <VStack gap="lg">
-                <StatusChoice label={text.status} value={props.statusFilter} choices={props.statusChoices} onChange={props.onStatusFilterChange} />
-                <StatusChoice label={text.board} value={props.boardMode} choices={props.boardChoices} onChange={props.onBoardModeChange} />
-                <StatusChoice label={text.lookback} value={props.lookback} choices={props.lookbackChoices} onChange={props.onLookbackChange} />
-                <StatusChoice label={text.benchmark} value={props.benchmark} choices={props.benchmarkChoices} onChange={props.onBenchmarkChange} />
-                {props.controlsDirty ? <Button label={text.reset} variant="outline" onPress={props.onResetControls} /> : null}
-              </VStack>
-            </View>
-          </Disclosure>
-        </VStack>
+            </Disclosure>
+          </VStack>
+        </View>
       ) : (
         <Card variant="subtle">
           <VStack gap="sm">
@@ -379,15 +335,7 @@ const styles = StyleSheet.create((theme) => ({
   },
   emptyCopy: { minWidth: 0, gap: theme.spacing.sm, alignItems: "flex-start" },
   recentHeader: { minWidth: 0, flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: theme.spacing.sm },
-  stockOptions: { minWidth: 0, gap: theme.spacing.xs },
-  identity: { minWidth: 0, flexDirection: { compact: "column", medium: "row" }, alignItems: { compact: "stretch", medium: "flex-start" }, justifyContent: "space-between", gap: theme.spacing.lg },
-  identityCopy: { minWidth: 0, flex: 1, gap: theme.spacing.xs },
   identityActions: { minWidth: 0, flexDirection: { compact: "column", medium: "row" }, flexWrap: "wrap", gap: theme.spacing.xs },
-  facts: { flexWrap: "wrap", alignItems: "center" },
-  priceFact: { minWidth: 120, gap: theme.spacing.xxs },
-  coverageRow: { minWidth: 0, flexDirection: "row", alignItems: "center", flexWrap: "wrap", gap: theme.spacing.sm },
-  evidenceList: { marginTop: theme.spacing.md },
-  evidenceRow: { minWidth: 0, flexDirection: { compact: "column", medium: "row" }, alignItems: { compact: "stretch", medium: "center" }, justifyContent: "space-between", gap: theme.spacing.md, paddingVertical: theme.spacing.lg },
-  evidenceCopy: { minWidth: 0, flex: 1, gap: theme.spacing.xs },
+  stockOptions: { minWidth: 0, gap: theme.spacing.xs },
   controls: { paddingTop: theme.spacing.md },
 }));

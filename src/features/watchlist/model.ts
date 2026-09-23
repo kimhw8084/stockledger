@@ -1,7 +1,9 @@
 import type { AppLanguage } from "../../lib/preferences";
 import {
   formatLocaleDateTime,
+  formatLocaleDate,
   formatLocaleNumber,
+  localizedDecisionAction,
   localizedEyeState,
   localizedFreshness,
   localizedSourceType,
@@ -9,7 +11,7 @@ import {
   localizedSuggestionTrust,
   t,
 } from "../../lib/i18n";
-import type { Eye, EyeState, FreshnessStatus, MockSnapshot, Stock, VisualEvidenceCard } from "../../types";
+import type { Decision, Eye, EyeState, FreshnessStatus, MockSnapshot, Stock, VisualEvidenceCard } from "../../types";
 import type {
   WatchlistBoardMode,
   WatchlistBenchmark,
@@ -74,6 +76,8 @@ export const buildWatchlistModel = ({
   recentStocks,
   stockSuggestions,
   selectedStock,
+  decisions,
+  eyes,
   evidenceCards,
   pinnedMetricKeys,
 }: {
@@ -81,11 +85,13 @@ export const buildWatchlistModel = ({
   recentStocks: readonly Pick<WatchlistStockSummary, "stock" | "snapshot">[];
   stockSuggestions: readonly Pick<WatchlistStockSummary, "stock" | "snapshot">[];
   selectedStock: WatchlistStockSummary | null | undefined;
+  decisions: readonly Decision[];
+  eyes: readonly Eye[];
   evidenceCards: readonly VisualEvidenceCard[];
   pinnedMetricKeys: readonly string[];
 }): WatchlistModel => {
   const pinned = new Set(pinnedMetricKeys);
-  return build(language, recentStocks, stockSuggestions, selectedStock, evidenceCards, pinned);
+  return build(language, recentStocks, stockSuggestions, selectedStock, decisions, eyes, evidenceCards, pinned);
 };
 
 const build = (
@@ -93,6 +99,8 @@ const build = (
   recentStocks: readonly Pick<WatchlistStockSummary, "stock" | "snapshot">[],
   stockSuggestions: readonly Pick<WatchlistStockSummary, "stock" | "snapshot">[],
   selectedStock: WatchlistStockSummary | null | undefined,
+  decisions: readonly Decision[],
+  eyes: readonly Eye[],
   evidenceCards: readonly VisualEvidenceCard[],
   pinnedMetricKeys: ReadonlySet<string>,
 ): WatchlistModel => {
@@ -156,6 +164,22 @@ const build = (
         .join(" · "),
       pinned: pinnedMetricKeys.has(stockMetricPreferenceKey(selectedStock.stock.id, card.id)),
     })),
+    decisions: (() => {
+      const eyeIds = new Set(eyes.filter((eye) => eye.stockId === selectedStock.stock.id).map((eye) => eye.id));
+      return decisions
+        .filter((decision) => !decision.archivedAt && eyeIds.has(decision.eyeId))
+        .sort((left, right) => right.createdAt.localeCompare(left.createdAt))
+        .slice(0, 4)
+        .map((decision) => ({
+          id: decision.id,
+          action: localizedDecisionAction(language, decision.action),
+          recordedAt: formatLocaleDate(language, decision.createdAt),
+          stateAtDecision: decision.stateAtDecision ? localizedEyeState(language, decision.stateAtDecision) : t(language, "journal.detail.noState"),
+          dataQuality: decision.dataQuality || t(language, "journal.detail.noData"),
+          note: decision.note || t(language, "journal.detail.noNote"),
+          concern: decision.concern || t(language, "journal.detail.noConcern"),
+        }));
+    })(),
   } satisfies WatchlistSelectedStock : null;
 
   return {
