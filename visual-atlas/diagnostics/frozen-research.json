@@ -1,0 +1,11 @@
+{
+  "candidate": "b20067faf07e214635ba2299649eaf943af5cf84",
+  "status": "BLOCKED_UNVERIFIED",
+  "releaseBlocked": true,
+  "unverified": [
+    "numeric research goldens",
+    "point-in-time membership",
+    "forward proof"
+  ],
+  "classification": "pre-existing R1 limitation"
+}

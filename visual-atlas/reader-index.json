@@ -1,0 +1,34 @@
+{
+  "title": "StockLedger CHG-184 Deep Review and Detail Surfaces",
+  "candidate": "b20067faf07e214635ba2299649eaf943af5cf84",
+  "visualDecision": "AWAITING_INDEPENDENT_PIXEL_AUDIT",
+  "canonicalReaderBooks": {
+    "desktop": "review-desktop.pdf",
+    "mobile": "review-mobile.pdf"
+  },
+  "surfaceManifest": "surface-manifest.json",
+  "captureReport": "capture-report.json",
+  "canonicalDirectories": {
+    "english": "captures/canonical/en/",
+    "korean": "captures/canonical/ko/"
+  },
+  "stressDirectory": "captures/stress/",
+  "holdoutDirectory": "captures/holdout/",
+  "diagnostics": [
+    "diagnostics/task-oracle-state-coverage.json",
+    "diagnostics/release-qualification.json",
+    "diagnostics/scanner-provider-limitation.json",
+    "diagnostics/primary-route-regression.json",
+    "diagnostics/source-impact-analysis.json",
+    "diagnostics/cloud-contract.json",
+    "diagnostics/frozen-research.json"
+  ],
+  "lineage": {
+    "productCandidate": "b20067faf07e214635ba2299649eaf943af5cf84",
+    "protectedBase": "16726097e6725b6749f097a1c1f295fc85bea916",
+    "artifactCarrierSoleParentMustEqual": "b20067faf07e214635ba2299649eaf943af5cf84",
+    "nativeEvidenceSoleParentMustEqual": "b20067faf07e214635ba2299649eaf943af5cf84"
+  },
+  "request": "stockledger-prod-c15-review-detail-localization-responsive-fix-v2",
+  "operation": "FIX"
+}

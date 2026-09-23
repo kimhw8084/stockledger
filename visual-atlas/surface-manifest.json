@@ -1,0 +1,192 @@
+{
+  "project": "stockledger",
+  "change": "CHG-184",
+  "request": "stockledger-prod-c15-review-detail-localization-responsive-fix-v2",
+  "operation": "FIX",
+  "candidate": {
+    "commit": "b20067faf07e214635ba2299649eaf943af5cf84",
+    "tree": "069df263be33309551aeed478eadcb318fa5b354",
+    "base": "16726097e6725b6749f097a1c1f295fc85bea916"
+  },
+  "visualAuthority": {
+    "primaryUi": "CHG-172 integrated; AR-61 Promoted; 12 primary atlas anchors Current",
+    "lawbook": "Golden UI Engineering Lawbook v2 + Human-Centered UI Excellence Pillar + StockLedger Product Contract"
+  },
+  "logicalSurfaces": [
+    {
+      "name": "stock-entity-detail",
+      "canonicalState": "open",
+      "primaryTask": "Understand a stock identity, data authority, evidence and monitoring context, then choose an inspection or review action.",
+      "canonicalAnchors": [
+        "stockledger|surface:stock-entity-detail|canonical|open|reference-user|light|desktop-1440x900",
+        "stockledger|surface:stock-entity-detail|canonical|open|reference-user|light|mobile-390x844"
+      ]
+    },
+    {
+      "name": "metric-detail-sheet",
+      "canonicalState": "open",
+      "primaryTask": "Understand metric value, threshold context, freshness and source, then inspect adjacent evidence or pin.",
+      "canonicalAnchors": [
+        "stockledger|surface:metric-detail-sheet|canonical|open|reference-user|light|desktop-1440x900",
+        "stockledger|surface:metric-detail-sheet|canonical|open|reference-user|light|mobile-390x844"
+      ]
+    },
+    {
+      "name": "eye-flows",
+      "canonicalState": "ready",
+      "primaryTask": "Scan Eyes by review need and open one without losing filter and stock context.",
+      "canonicalAnchors": [
+        "stockledger|surface:eye-flows|canonical|ready|reference-user|light|desktop-1440x900",
+        "stockledger|surface:eye-flows|canonical|ready|reference-user|light|mobile-390x844"
+      ]
+    },
+    {
+      "name": "eye-detail",
+      "canonicalState": "open",
+      "primaryTask": "Understand monitoring state, why now, provenance, data quality and history before reviewing or navigating.",
+      "canonicalAnchors": [
+        "stockledger|surface:eye-detail|canonical|open|reference-user|light|desktop-1440x900",
+        "stockledger|surface:eye-detail|canonical|open|reference-user|light|mobile-390x844"
+      ]
+    },
+    {
+      "name": "scanner-review",
+      "canonicalState": "blocked-signal",
+      "primaryTask": "Inspect an incomplete-data scanner signal, record a human review classification and required reason.",
+      "canonicalAnchors": [
+        "stockledger|surface:scanner-review|canonical|blocked-signal|reference-user|light|desktop-1440x900",
+        "stockledger|surface:scanner-review|canonical|blocked-signal|reference-user|light|mobile-390x844"
+      ]
+    },
+    {
+      "name": "decision-detail",
+      "canonicalState": "open",
+      "primaryTask": "Recover historical decision context, notes, concern, data quality, timing and outcome.",
+      "canonicalAnchors": [
+        "stockledger|surface:decision-detail|canonical|open|reference-user|light|desktop-1440x900",
+        "stockledger|surface:decision-detail|canonical|open|reference-user|light|mobile-390x844"
+      ]
+    }
+  ],
+  "canonicalAnchors": [
+    {
+      "key": "stockledger|surface:stock-entity-detail|canonical|open|reference-user|light|desktop-1440x900",
+      "surface": "stock-entity-detail",
+      "state": "open",
+      "viewport": "desktop-1440x900",
+      "theme": "light",
+      "locale": "en",
+      "path": "captures/canonical/en/desktop-1440x900/stock-entity-detail.png"
+    },
+    {
+      "key": "stockledger|surface:stock-entity-detail|canonical|open|reference-user|light|mobile-390x844",
+      "surface": "stock-entity-detail",
+      "state": "open",
+      "viewport": "mobile-390x844",
+      "theme": "light",
+      "locale": "en",
+      "path": "captures/canonical/en/mobile-390x844/stock-entity-detail.png"
+    },
+    {
+      "key": "stockledger|surface:metric-detail-sheet|canonical|open|reference-user|light|desktop-1440x900",
+      "surface": "metric-detail-sheet",
+      "state": "open",
+      "viewport": "desktop-1440x900",
+      "theme": "light",
+      "locale": "en",
+      "path": "captures/canonical/en/desktop-1440x900/metric-detail-sheet.png"
+    },
+    {
+      "key": "stockledger|surface:metric-detail-sheet|canonical|open|reference-user|light|mobile-390x844",
+      "surface": "metric-detail-sheet",
+      "state": "open",
+      "viewport": "mobile-390x844",
+      "theme": "light",
+      "locale": "en",
+      "path": "captures/canonical/en/mobile-390x844/metric-detail-sheet.png"
+    },
+    {
+      "key": "stockledger|surface:eye-flows|canonical|ready|reference-user|light|desktop-1440x900",
+      "surface": "eye-flows",
+      "state": "ready",
+      "viewport": "desktop-1440x900",
+      "theme": "light",
+      "locale": "en",
+      "path": "captures/canonical/en/desktop-1440x900/eye-flows.png"
+    },
+    {
+      "key": "stockledger|surface:eye-flows|canonical|ready|reference-user|light|mobile-390x844",
+      "surface": "eye-flows",
+      "state": "ready",
+      "viewport": "mobile-390x844",
+      "theme": "light",
+      "locale": "en",
+      "path": "captures/canonical/en/mobile-390x844/eye-flows.png"
+    },
+    {
+      "key": "stockledger|surface:eye-detail|canonical|open|reference-user|light|desktop-1440x900",
+      "surface": "eye-detail",
+      "state": "open",
+      "viewport": "desktop-1440x900",
+      "theme": "light",
+      "locale": "en",
+      "path": "captures/canonical/en/desktop-1440x900/eye-detail.png"
+    },
+    {
+      "key": "stockledger|surface:eye-detail|canonical|open|reference-user|light|mobile-390x844",
+      "surface": "eye-detail",
+      "state": "open",
+      "viewport": "mobile-390x844",
+      "theme": "light",
+      "locale": "en",
+      "path": "captures/canonical/en/mobile-390x844/eye-detail.png"
+    },
+    {
+      "key": "stockledger|surface:scanner-review|canonical|blocked-signal|reference-user|light|desktop-1440x900",
+      "surface": "scanner-review",
+      "state": "blocked-signal",
+      "viewport": "desktop-1440x900",
+      "theme": "light",
+      "locale": "en",
+      "path": "captures/canonical/en/desktop-1440x900/scanner-review.png"
+    },
+    {
+      "key": "stockledger|surface:scanner-review|canonical|blocked-signal|reference-user|light|mobile-390x844",
+      "surface": "scanner-review",
+      "state": "blocked-signal",
+      "viewport": "mobile-390x844",
+      "theme": "light",
+      "locale": "en",
+      "path": "captures/canonical/en/mobile-390x844/scanner-review.png"
+    },
+    {
+      "key": "stockledger|surface:decision-detail|canonical|open|reference-user|light|desktop-1440x900",
+      "surface": "decision-detail",
+      "state": "open",
+      "viewport": "desktop-1440x900",
+      "theme": "light",
+      "locale": "en",
+      "path": "captures/canonical/en/desktop-1440x900/decision-detail.png"
+    },
+    {
+      "key": "stockledger|surface:decision-detail|canonical|open|reference-user|light|mobile-390x844",
+      "surface": "decision-detail",
+      "state": "open",
+      "viewport": "mobile-390x844",
+      "theme": "light",
+      "locale": "en",
+      "path": "captures/canonical/en/mobile-390x844/decision-detail.png"
+    }
+  ],
+  "deferredAuthoringSurfaces": {
+    "untouched": true,
+    "surfaces": [
+      "eye-composer",
+      "journal-composer",
+      "recipe-builder",
+      "logic-registry",
+      "notification-confirmation"
+    ]
+  },
+  "visualDecision": "AWAITING_INDEPENDENT_PIXEL_AUDIT"
+}

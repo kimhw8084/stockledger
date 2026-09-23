@@ -1,0 +1,30 @@
+{
+  "candidate": "b20067faf07e214635ba2299649eaf943af5cf84",
+  "tree": "069df263be33309551aeed478eadcb318fa5b354",
+  "base": "16726097e6725b6749f097a1c1f295fc85bea916",
+  "release_verify": "PASS",
+  "release_verify_verified": true,
+  "qualification": {
+    "npm_ci": "PASS; 639 packages",
+    "typecheck_unit": "PASS; 24 files / 196 tests",
+    "boundaries": "PASS",
+    "release_workflow": "PASS",
+    "release_base": "PASS",
+    "npm_audit_high_critical": "PASS; zero vulnerabilities",
+    "export_all": "PASS; web/iOS/Android",
+    "full_playwright": "PASS; 65 passed, 1 expected mobile keyboard skip, 0 failed",
+    "recovery": "PASS",
+    "operations": "PASS; bounded synthetic qualification",
+    "frozen_research": "BLOCKED_UNVERIFIED; pre-existing",
+    "cloud_contract": "UNAVAILABLE; local Docker/OrbStack socket unavailable"
+  },
+  "postQualificationFocusedRun": {
+    "result": "PASS",
+    "tests": 18,
+    "projects": [
+      "desktop",
+      "mobile"
+    ]
+  },
+  "visualDecision": "AWAITING_INDEPENDENT_PIXEL_AUDIT"
+}

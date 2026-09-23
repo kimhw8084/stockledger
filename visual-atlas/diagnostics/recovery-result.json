@@ -1,0 +1,49 @@
+{
+  "synthetic": true,
+  "contractVersion": "stockledger-recovery-drill-v1",
+  "revision": 1,
+  "source": {
+    "revision": 2,
+    "schemaVersion": 7,
+    "integrity": true,
+    "sourceUnchangedAfterDrill": true
+  },
+  "restored": {
+    "revision": 2,
+    "schemaVersion": 7,
+    "integrity": true,
+    "exportParsed": true
+  },
+  "elapsedMs": 75,
+  "rpo": {
+    "committedRevisionLossAtConsistentSnapshot": 0,
+    "lossSinceLastOperatorBackup": "unknown-unbounded-without-configured-cadence"
+  },
+  "rto": {
+    "engineeringQualificationBudgetMs": 30000,
+    "withinEngineeringQualificationBudget": true,
+    "evidenceOnly": true
+  },
+  "retainedStateChecks": {
+    "authoredHistory": true,
+    "evaluations": true,
+    "decisions": true,
+    "durableJobs": true,
+    "ingestionState": true,
+    "notificationState": true,
+    "sourceNotMutated": true
+  },
+  "rejectedCandidates": {
+    "corrupted": {
+      "rejected": true,
+      "classification": "corrupt-restore-rejected"
+    },
+    "incompatible": {
+      "rejected": true,
+      "classification": "incompatible-schema-rejected"
+    }
+  },
+  "failureClassification": [
+    "none"
+  ]
+}

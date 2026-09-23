@@ -1,0 +1,53 @@
+{
+  "candidate": "b20067faf07e214635ba2299649eaf943af5cf84",
+  "e2eFile": "tests/e2e/chg184-deep-review-details.spec.ts",
+  "focusedRun": {
+    "result": "PASS",
+    "tests": 18,
+    "projects": [
+      "desktop",
+      "mobile"
+    ],
+    "postQualification": true
+  },
+  "oracles": [
+    {
+      "surface": "stock-entity-detail",
+      "result": "PASS"
+    },
+    {
+      "surface": "metric-detail-sheet",
+      "result": "PASS"
+    },
+    {
+      "surface": "eye-flows",
+      "result": "PASS"
+    },
+    {
+      "surface": "eye-detail",
+      "result": "PASS"
+    },
+    {
+      "surface": "scanner-review",
+      "result": "PASS"
+    },
+    {
+      "surface": "decision-detail",
+      "result": "PASS"
+    }
+  ],
+  "assertions": {
+    "metricFullTitleAndValueENKO360": true,
+    "metricViewportProfiles": [
+      390,
+      360,
+      412,
+      1440,
+      1366
+    ],
+    "koStockNoRawGeneratedWhyNow": true,
+    "koMetricNoListedRawPhrases": true,
+    "koEyeNoListedRawPhrases": true,
+    "userAuthoredTextPreserved": true
+  }
+}

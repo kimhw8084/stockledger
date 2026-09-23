@@ -1,0 +1,12 @@
+{
+  "candidate": "b20067faf07e214635ba2299649eaf943af5cf84",
+  "suite": "CHG-172 primary-route regression",
+  "result": "PASS",
+  "passed": 17,
+  "expectedSkipped": 1,
+  "fullPlaywright": {
+    "passed": 65,
+    "expectedSkipped": 1,
+    "failed": 0
+  }
+}

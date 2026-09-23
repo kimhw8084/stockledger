@@ -1,0 +1,6 @@
+{
+  "candidate": "b20067faf07e214635ba2299649eaf943af5cf84",
+  "status": "BLOCKED_SIGNAL_RETAINED",
+  "evidence": "Supported scan generated incomplete-data signal from deterministic Stooq 503 fixture; no signal was injected.",
+  "productTruth": "A human review classification does not place an order, record a fill, or imply a return."
+}

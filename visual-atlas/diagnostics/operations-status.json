@@ -1,0 +1,5 @@
+{
+  "candidate": "b20067faf07e214635ba2299649eaf943af5cf84",
+  "status": "UNCONFIGURED",
+  "detail": "Production scheduler/workspace/release identity is not configured locally; bounded synthetic operations qualification passed."
+}

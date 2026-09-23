@@ -1,0 +1,28 @@
+{
+  "candidate": "b20067faf07e214635ba2299649eaf943af5cf84",
+  "changedProductFiles": [
+    "src/app/StockLedgerApp.tsx",
+    "src/features/watchlist/detail/StockMetricDetailSheet.tsx",
+    "src/features/watchlist/model.ts",
+    "src/lib/presentationLocalization.ts",
+    "src/lib/providerEvidence.ts",
+    "src/lib/visualEvidence.ts",
+    "tests/e2e/chg184-deep-review-details.spec.ts",
+    "tests/presentationLocalization.test.ts"
+  ],
+  "changedSurfaces": [
+    "stock-entity-detail",
+    "metric-detail-sheet",
+    "eye-flows",
+    "eye-detail"
+  ],
+  "untouchedDeferredAuthoringSurfaces": [
+    "eye-composer",
+    "journal-composer",
+    "recipe-builder",
+    "logic-registry",
+    "notification-confirmation"
+  ],
+  "scannerReviewAndDecisionDetail": "No R2 atlas screenshot was reused: these surfaces were also recaptured from the R2 candidate. The changed presentation modules do not extend into their route implementations.",
+  "capturePolicy": "All 51 atlas screenshots were captured from the exact R2 candidate after qualification. Metric Detail uses the Financial Quality specimen. KO Stock Detail, Eye Flows and Eye Detail include canonical, 360x800 stress and 412x915 holdout captures."
+}

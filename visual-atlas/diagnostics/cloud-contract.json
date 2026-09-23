@@ -1,0 +1,5 @@
+{
+  "candidate": "b20067faf07e214635ba2299649eaf943af5cf84",
+  "status": "UNAVAILABLE",
+  "detail": "Docker/OrbStack daemon socket unavailable; cloud contract lane could not run."
+}
