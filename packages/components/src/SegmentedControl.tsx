@@ -29,6 +29,13 @@ export function SegmentedControl({ label, value, options, onChange, disabled = f
   const selectedIndex = options.findIndex((option, index) => option.value === value && enabled[index]);
   const tabStopIndex = selectedIndex >= 0 ? selectedIndex : enabled.findIndex(Boolean);
   const navigate = (index: number, event: WebKeyboardEvent) => {
+    if (event.key === ' ' || event.key === 'Spacebar' || event.key === 'Enter') {
+      if (!enabled[index]) return;
+      event.preventDefault();
+      const option = options[index];
+      if (option) onChange(option.value);
+      return;
+    }
     const next = resolveRovingFocusIndex(event.key, index, enabled, { direction });
     if (next === null) return;
     event.preventDefault();
@@ -65,7 +72,7 @@ const Segment = forwardRef<ComponentRef<typeof Pressable>, { option: SegmentedCo
       onPress={onPress}
       {...keyboardProps}
       {...interactionProps}
-      style={({ pressed }) => [styles.segment, selected && styles.selected, hovered && !disabled && styles.hovered, focused && styles.focused, pressed && !disabled && styles.pressed, disabled && styles.disabled]}
+      style={({ pressed }) => [styles.segment, selected && styles.selected, hovered && !disabled && !selected && styles.hovered, focused && styles.focused, pressed && !disabled && styles.pressed, disabled && styles.disabled]}
     >
       <Text variant="label" tone={selected ? 'onPrimary' : 'primary'} numberOfLines={2} align="center">{option.label}</Text>
     </Pressable>
