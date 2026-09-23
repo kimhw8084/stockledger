@@ -13,6 +13,7 @@ import {
   VStack,
 } from "../../../ui";
 import { formatLocaleNumber, t } from "../../../lib/i18n";
+import { localizedEvidenceFamily } from "../../../lib/presentationLocalization";
 import type { AppLanguage } from "../../../lib/preferences";
 import type { VisualEvidenceCard } from "../../../types";
 
@@ -153,7 +154,7 @@ function MetricVisualHero({ card, language }: { card: VisualEvidenceCard; langua
     return (
       <Card variant="subtle" padding="compact">
         <VStack gap="sm">
-          <HeroHeading card={card} value={card.metric.currentLabel} />
+          <HeroHeading card={card} value={card.metric.currentLabel} language={language} />
           <View style={styles.checkList}>
             {(visual.items ?? []).map((item) => (
               <View key={item.label} style={styles.checkRow}>
@@ -172,7 +173,7 @@ function MetricVisualHero({ card, language }: { card: VisualEvidenceCard; langua
     return (
       <Card variant="subtle" padding="compact">
         <VStack gap="sm">
-          <HeroHeading card={card} value={visual.countdownLabel ?? card.metric.currentLabel} />
+          <HeroHeading card={card} value={visual.countdownLabel ?? card.metric.currentLabel} language={language} />
           <HStack gap="xs" align="center">
             <Text variant="h1" numeric>{visual.countdownDays ?? "--"}</Text>
             <Text tone="secondary">{t(language, "stocks.detail.days")}</Text>
@@ -191,7 +192,7 @@ function MetricVisualHero({ card, language }: { card: VisualEvidenceCard; langua
     return (
       <Card variant="subtle" padding="compact">
         <VStack gap="md">
-          <HeroHeading card={card} value={card.metric.currentLabel} />
+          <HeroHeading card={card} value={card.metric.currentLabel} language={language} />
           <View style={styles.gauge}>
             {thresholdPct === undefined ? null : <View style={[styles.gaugeMarker, { left: `${thresholdPct}%` }]} />}
             {currentPct === undefined ? null : <View style={[styles.gaugeCurrent, { left: `${currentPct}%` }]} />}
@@ -213,7 +214,7 @@ function MetricVisualHero({ card, language }: { card: VisualEvidenceCard; langua
       return (
         <Card variant="subtle" padding="compact">
           <VStack gap="sm">
-            <HeroHeading card={card} value={card.metric.currentLabel} />
+            <HeroHeading card={card} value={card.metric.currentLabel} language={language} />
             <Text tone="secondary">{language === "ko" ? "계획한 진입 구간이 기록되지 않았습니다." : "The planned entry range is not recorded."}</Text>
             <Text variant="caption" tone="secondary">{card.metric.thresholdLabel ?? t(language, "stocks.detail.plannedZone")}</Text>
           </VStack>
@@ -228,7 +229,7 @@ function MetricVisualHero({ card, language }: { card: VisualEvidenceCard; langua
     return (
       <Card variant="subtle" padding="compact">
         <VStack gap="md">
-          <HeroHeading card={card} value={card.metric.currentLabel} />
+          <HeroHeading card={card} value={card.metric.currentLabel} language={language} />
           <View style={styles.zone}>
             <View style={[styles.zoneBand, { left: `${start}%`, width: `${Math.max(6, end - start)}%` }]} />
             {marker === undefined ? null : <View style={[styles.zoneMarker, { left: `${marker}%` }]} />}
@@ -248,7 +249,7 @@ function MetricVisualHero({ card, language }: { card: VisualEvidenceCard; langua
     return (
       <Card variant="subtle" padding="compact">
         <VStack gap="sm">
-          <HeroHeading card={card} value={card.metric.currentLabel} />
+          <HeroHeading card={card} value={card.metric.currentLabel} language={language} />
           <Text tone="secondary">{language === "ko" ? "이 지표의 차트 기록을 사용할 수 없습니다." : "Chart history is unavailable for this metric."}</Text>
           <Text variant="caption" tone="secondary">{card.metric.thresholdLabel ?? t(language, "stocks.detail.context")}</Text>
         </VStack>
@@ -274,7 +275,7 @@ function MetricVisualHero({ card, language }: { card: VisualEvidenceCard; langua
       <VStack gap="sm">
         <View style={styles.chartHeading}>
           <View style={styles.flexOne}>
-            <Text variant="micro" tone="secondary">{card.family}</Text>
+            <Text variant="micro" tone="secondary">{localizedEvidenceFamily(language, card.family)}</Text>
             <Text variant="h3">{card.title}</Text>
           </View>
           <Badge label={selectedPointLabel} tone="info" />
@@ -320,11 +321,11 @@ function MetricVisualHero({ card, language }: { card: VisualEvidenceCard; langua
   );
 }
 
-function HeroHeading({ card, value }: { card: VisualEvidenceCard; value: string }) {
+function HeroHeading({ card, value, language }: { card: VisualEvidenceCard; value: string; language: AppLanguage }) {
   return (
-    <View style={styles.chartHeading}>
+    <View style={styles.heroHeading}>
       <View style={styles.flexOne}>
-        <Text variant="micro" tone="secondary">{card.family}</Text>
+        <Text variant="micro" tone="secondary">{localizedEvidenceFamily(language, card.family)}</Text>
         <Text variant="h3">{card.title}</Text>
       </View>
       <Text variant="h2">{value}</Text>
@@ -376,6 +377,7 @@ const styles = StyleSheet.create((theme) => ({
   checkList: { gap: theme.spacing.sm },
   checkRow: { minWidth: 0, flexDirection: "row", alignItems: "flex-start", gap: theme.spacing.sm },
   flexOne: { minWidth: 0, flex: 1, gap: theme.spacing.xs },
+  heroHeading: { minWidth: 0, flexDirection: { compact: "column", medium: "row" }, alignItems: { compact: "stretch", medium: "flex-start" }, justifyContent: "space-between", gap: theme.spacing.sm },
   gauge: { minWidth: 0, height: 28, borderRadius: theme.radii.full, backgroundColor: theme.colors.background.subtle, justifyContent: "center" },
   gaugeMarker: { position: "absolute", top: 0, width: 3, height: 28, backgroundColor: theme.colors.text.secondary },
   gaugeCurrent: { position: "absolute", width: 18, height: 18, borderRadius: theme.radii.full, borderWidth: 3, borderColor: theme.colors.interactive.primary, backgroundColor: theme.colors.background.surface, marginLeft: -8 },

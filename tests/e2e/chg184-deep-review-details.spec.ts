@@ -399,3 +399,133 @@ test("Korean copy preserves critical meaning across deep review surfaces", async
   await expect(decisionDetail).toHaveCount(0);
   await expect(decisionInvoker).toBeFocused();
 });
+
+test("Financial quality metric detail keeps its complete title and value across viewport profiles", async ({ page }, testInfo) => {
+  await openSampleWorkspace(page);
+  await openTab(page, "Watchlist");
+  await selectApple(page);
+
+  const openQualityDetail = async (title: string, actionName: string) => {
+    const titleInRow = page.getByText(title, { exact: true }).first();
+    const row = titleInRow.locator("xpath=ancestor::div[.//button][1]");
+    await row.getByRole("button", { name: actionName, exact: true }).click();
+    return page.getByRole("dialog");
+  };
+
+  for (const profile of [
+    { name: "canonical-mobile", width: 390, height: 844 },
+    { name: "stress-mobile", width: 360, height: 800 },
+    { name: "holdout-mobile", width: 412, height: 915 },
+    { name: "canonical-desktop", width: 1440, height: 900 },
+    { name: "stress-desktop", width: 1366, height: 768 },
+  ]) {
+    await page.setViewportSize(profile);
+    const detail = await openQualityDetail("Financial quality check", "Evidence detail");
+    const title = detail.getByRole("heading", { name: "Financial quality check", exact: true }).last();
+    const value = detail.getByText("0.0% rev / 0.0 pts margin", { exact: true }).first();
+    await expect(title).toBeVisible();
+    await expect(value).toBeVisible();
+    const titleBox = await title.boundingBox();
+    const valueBox = await value.boundingBox();
+    expect(titleBox).not.toBeNull();
+    expect(valueBox).not.toBeNull();
+    const titleLineCount = await title.evaluate((element) => {
+      const range = document.createRange();
+      range.selectNodeContents(element);
+      return range.getClientRects().length;
+    });
+    expect(titleLineCount).toBeLessThanOrEqual(3);
+    if (profile.width <= 600) {
+      expect(valueBox!.y).toBeGreaterThanOrEqual(titleBox!.y + titleBox!.height - 1);
+    }
+    await captureSurface(page, testInfo, `metric-quality-${profile.name}-${testInfo.project.name}-en.png`);
+    await page.keyboard.press("Escape");
+    await expect(detail).toHaveCount(0);
+  }
+
+  await openTab(page, "Settings");
+  await page.getByTestId("settings-language-control-ko").click();
+  await openTab(page, "관심 종목");
+  await page.getByRole("textbox", { name: "종목 검색 또는 다시 열기" }).fill("AAPL");
+  await page.getByRole("button", { name: "AAPL · Apple", exact: true }).click();
+  for (const profile of [
+    { name: "canonical-mobile", width: 390, height: 844 },
+    { name: "stress-mobile", width: 360, height: 800 },
+    { name: "holdout-mobile", width: 412, height: 915 },
+    { name: "canonical-desktop", width: 1440, height: 900 },
+    { name: "stress-desktop", width: 1366, height: 768 },
+  ]) {
+    await page.setViewportSize(profile);
+    const koreanDetail = await openQualityDetail("기초 체력 점검", "근거 상세");
+    const koreanTitle = koreanDetail.getByRole("heading", { name: "기초 체력 점검", exact: true }).last();
+    const koreanValue = koreanDetail.getByText("0.0% 매출 / 0.0포인트 마진", { exact: true }).first();
+    await expect(koreanTitle).toBeVisible();
+    await expect(koreanValue).toBeVisible();
+    const koreanTitleBox = await koreanTitle.boundingBox();
+    const koreanValueBox = await koreanValue.boundingBox();
+    expect(koreanTitleBox).not.toBeNull();
+    expect(koreanValueBox).not.toBeNull();
+    if (profile.width <= 600) {
+      expect(koreanValueBox!.y).toBeGreaterThanOrEqual(koreanTitleBox!.y + koreanTitleBox!.height - 1);
+    }
+    await expect(koreanDetail.getByText(/Revenue growth|Margin change|No active recipe condition is currently mapped to this parameter/)).toHaveCount(0);
+    await captureSurface(page, testInfo, `metric-quality-${profile.name}-${testInfo.project.name}-ko.png`);
+    await page.keyboard.press("Escape");
+    await expect(koreanDetail).toHaveCount(0);
+  }
+});
+
+test("Korean review surfaces localize generated evaluation and data-quality copy", async ({ page }, testInfo) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await openSampleWorkspace(page);
+  await openTab(page, "Settings");
+  await page.getByTestId("settings-language-control-ko").click();
+  await openTab(page, "관심 종목");
+  await page.getByRole("textbox", { name: "종목 검색 또는 다시 열기" }).fill("AAPL");
+  await page.getByRole("button", { name: "AAPL · Apple", exact: true }).click();
+
+  await expect(page.getByText(/remains Not Relevant because the current condition mix is materially unchanged/)).toHaveCount(0);
+  await expect(page.getByText("재무 건전성", { exact: true })).toBeVisible();
+  await expect(page.getByText("Financial Quality", { exact: true })).toHaveCount(0);
+  await captureSurface(page, testInfo, `stock-entity-detail-canonical-${testInfo.project.name}-ko.png`);
+  for (const profile of [
+    { name: "stress-mobile", width: 360, height: 800 },
+    { name: "holdout-mobile", width: 412, height: 915 },
+  ]) {
+    await page.setViewportSize(profile);
+    await captureSurface(page, testInfo, `stock-entity-detail-${profile.name}-${testInfo.project.name}-ko.png`);
+  }
+  await page.setViewportSize({ width: 390, height: 844 });
+  const forbiddenSystemCopy = /Mock-backed snapshot from Market|Partial confidence due to missing or stale inputs|is missing data for/;
+
+  const reviewEyes = page.getByRole("button", { name: "관찰 항목 검토", exact: true });
+  await reviewEyes.scrollIntoViewIfNeeded();
+  await reviewEyes.click();
+  await expect(page.getByText(forbiddenSystemCopy)).toHaveCount(0);
+  await captureSurface(page, testInfo, `eye-flows-canonical-${testInfo.project.name}-ko.png`);
+  for (const profile of [
+    { name: "stress-mobile", width: 360, height: 800 },
+    { name: "holdout-mobile", width: 412, height: 915 },
+  ]) {
+    await page.setViewportSize(profile);
+    await expect(page.getByText(forbiddenSystemCopy)).toHaveCount(0);
+    await captureSurface(page, testInfo, `eye-flows-${profile.name}-${testInfo.project.name}-ko.png`);
+  }
+  await page.setViewportSize({ width: 390, height: 844 });
+  const needsReview = page.getByRole("radio", { name: "검토 필요", exact: true });
+  await needsReview.click();
+  const eye = page.getByRole("button", { name: / · .* · / }).first();
+  await eye.click();
+  const eyeDetail = page.getByRole("dialog");
+  await expect(eyeDetail.getByText(forbiddenSystemCopy)).toHaveCount(0);
+  await expect(eyeDetail.getByText(/No active recipe condition is currently mapped to this parameter/)).toHaveCount(0);
+  await captureSurface(page, testInfo, `eye-detail-canonical-${testInfo.project.name}-ko.png`);
+  for (const profile of [
+    { name: "stress-mobile", width: 360, height: 800 },
+    { name: "holdout-mobile", width: 412, height: 915 },
+  ]) {
+    await page.setViewportSize(profile);
+    await expect(eyeDetail.getByText(forbiddenSystemCopy)).toHaveCount(0);
+    await captureSurface(page, testInfo, `eye-detail-${profile.name}-${testInfo.project.name}-ko.png`);
+  }
+});

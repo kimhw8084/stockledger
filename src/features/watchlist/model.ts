@@ -11,7 +11,8 @@ import {
   localizedSuggestionTrust,
   t,
 } from "../../lib/i18n";
-import type { Decision, Eye, EyeState, FreshnessStatus, MockSnapshot, Stock, VisualEvidenceCard } from "../../types";
+import { localizedEvidenceFamily, localizedEvaluationWhyNow } from "../../lib/presentationLocalization";
+import type { Decision, Eye, EyeState, FreshnessStatus, MockSnapshot, Recipe, Stock, VisualEvidenceCard } from "../../types";
 import type {
   WatchlistBoardMode,
   WatchlistBenchmark,
@@ -78,6 +79,7 @@ export const buildWatchlistModel = ({
   selectedStock,
   decisions,
   eyes,
+  recipes,
   evidenceCards,
   pinnedMetricKeys,
 }: {
@@ -87,11 +89,12 @@ export const buildWatchlistModel = ({
   selectedStock: WatchlistStockSummary | null | undefined;
   decisions: readonly Decision[];
   eyes: readonly Eye[];
+  recipes: readonly Recipe[];
   evidenceCards: readonly VisualEvidenceCard[];
   pinnedMetricKeys: readonly string[];
 }): WatchlistModel => {
   const pinned = new Set(pinnedMetricKeys);
-  return build(language, recentStocks, stockSuggestions, selectedStock, decisions, eyes, evidenceCards, pinned);
+  return build(language, recentStocks, stockSuggestions, selectedStock, decisions, eyes, recipes, evidenceCards, pinned);
 };
 
 const build = (
@@ -101,6 +104,7 @@ const build = (
   selectedStock: WatchlistStockSummary | null | undefined,
   decisions: readonly Decision[],
   eyes: readonly Eye[],
+  recipes: readonly Recipe[],
   evidenceCards: readonly VisualEvidenceCard[],
   pinnedMetricKeys: ReadonlySet<string>,
 ): WatchlistModel => {
@@ -146,14 +150,18 @@ const build = (
     price: selectedStock.snapshot
       ? formatLocaleNumber(language, selectedStock.snapshot.price, { style: "currency", currency: "USD", maximumFractionDigits: 2 })
       : t(language, "stocks.data.noData"),
-    evidenceSummary: selectedStock.dominantEye?.lastEvaluation?.whyNow ??
+    evidenceSummary: localizedEvaluationWhyNow(
+      language,
+      selectedStock.dominantEye?.lastEvaluation,
+      recipes.find((recipe) => recipe.id === selectedStock.dominantEye?.recipeId),
+    ) ||
       (language === "ko" ? "최근 평가 요약이 없습니다. 원천 데이터와 적용 가능한 근거를 확인하세요." : "No recent evaluation summary is available. Inspect the source data and applicable evidence."),
     sample: Boolean(selectedStock.snapshot?.isMock),
     eyesCount: selectedStock.eyes.length,
     metricsCount: evidenceCards.length,
     evidence: evidenceCards.map((card) => ({
       id: card.id,
-      family: card.family,
+      family: localizedEvidenceFamily(language, card.family),
       title: card.title,
       status: localizedStatus(language, card.status),
       tone: evidenceTone(card.status),

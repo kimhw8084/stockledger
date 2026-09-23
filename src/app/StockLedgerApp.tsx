@@ -92,6 +92,11 @@ import {
 } from "../types";
 import { evaluateEye } from "../lib/evaluateEye";
 import {
+  localizedEvaluationDataQuality,
+  localizedEvaluationDiagnostics,
+  localizedEvaluationWhyNow,
+} from "../lib/presentationLocalization";
+import {
   buildEvidenceGroups,
   buildStockVisualAnalysisGroups,
 } from "../lib/visualEvidence";
@@ -2612,6 +2617,7 @@ export default function App() {
   });
   const toEyeFlowRow = (eye: Eye): EyeFlowRow => {
     const state = eye.lastEvaluation?.currentState;
+    const eyeRecipe = data.recipes.find((recipe) => recipe.id === eye.recipeId);
     return {
       id: eye.id,
       stockId: eye.stockId,
@@ -2623,13 +2629,15 @@ export default function App() {
       stateTone: eyeBadgeTone(state),
       whyNow: eyeReviewCadenceElapsed(eye)
         ? t(language, "eyes.detail.cadenceElapsed")
-        : eye.lastEvaluation?.whyNow ?? t(language, "eyes.detail.noSummary"),
+        : localizedEvaluationWhyNow(language, eye.lastEvaluation, eyeRecipe) || t(language, "eyes.detail.noSummary"),
       urgency: localizedActionUrgency(language, eye.lastEvaluation?.actionUrgency ?? t(language, "eyes.meta.wait")),
       recipeVersion: eye.recipeVersionAtCreation ?? eye.lastEvaluation?.recipeVersion
         ? `v${eye.recipeVersionAtCreation ?? eye.lastEvaluation?.recipeVersion}`
         : t(language, "eyes.detail.noVersion"),
       lastReview: eye.lastReviewedAt ? formatShortDate(language, eye.lastReviewedAt) : t(language, "eyes.meta.reviewDue"),
-      dataQuality: eye.lastEvaluation?.dataQuality ?? t(language, "eyes.notEvaluated"),
+      dataQuality: eye.lastEvaluation
+        ? localizedEvaluationDataQuality(language, eye.lastEvaluation.dataQuality)
+        : t(language, "eyes.notEvaluated"),
       needsReview: eyeNeedsReview(eye),
     };
   };
@@ -2758,12 +2766,18 @@ export default function App() {
       : t(language, "eyes.detail.noVersion"),
     state: selectedEye.lastEvaluation?.currentState ? localizedEyeState(language, selectedEye.lastEvaluation.currentState) : t(language, "eyes.notEvaluated"),
     stateTone: eyeBadgeTone(selectedEye.lastEvaluation?.currentState),
-    whyNow: selectedEye.lastEvaluation?.whyNow ?? t(language, "eyes.detail.noSummary"),
+    whyNow: localizedEvaluationWhyNow(
+      language,
+      selectedEye.lastEvaluation,
+      selectedEyeRecipe,
+    ) || t(language, "eyes.detail.noSummary"),
     urgency: localizedActionUrgency(language, selectedEye.lastEvaluation?.actionUrgency ?? t(language, "eyes.meta.wait")),
     evaluatedAt: selectedEye.lastEvaluation ? formatLocaleDateTime(language, selectedEye.lastEvaluation.evaluatedAt) : t(language, "eyes.notEvaluated"),
-    dataQuality: selectedEye.lastEvaluation?.dataQuality ?? t(language, "eyes.notEvaluated"),
-    staleInputs: selectedEye.lastEvaluation?.staleData ?? [],
-    missingInputs: selectedEye.lastEvaluation?.missingData ?? [],
+    dataQuality: selectedEye.lastEvaluation
+      ? localizedEvaluationDataQuality(language, selectedEye.lastEvaluation.dataQuality)
+      : t(language, "eyes.notEvaluated"),
+    staleInputs: localizedEvaluationDiagnostics(language, selectedEye.lastEvaluation).staleData,
+    missingInputs: localizedEvaluationDiagnostics(language, selectedEye.lastEvaluation).missingData,
     lastReviewed: selectedEye.lastReviewedAt ? formatShortDate(language, selectedEye.lastReviewedAt) : t(language, "eyes.detail.due"),
     thesisSnapshot: selectedEye.thesisSnapshot,
     invalidationRule: selectedEye.invalidationRule || t(language, "eyes.detail.noInvalidation"),
@@ -3888,6 +3902,7 @@ export default function App() {
     selectedStock: selectedStockSummary,
     decisions: data.decisions,
     eyes: data.eyes,
+    recipes: data.recipes,
     evidenceCards: sortedSelectedStockAnalysisCards,
     pinnedMetricKeys,
   });

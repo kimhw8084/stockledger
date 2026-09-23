@@ -435,6 +435,7 @@ const relatedConditionForMetric = (
   metricKey: string,
   eyes: Eye[],
   recipes: Recipe[],
+  language: AppLanguage,
 ) => {
   for (const eye of eyes) {
     const recipe = recipes.find((item) => item.id === eye.recipeId);
@@ -443,7 +444,9 @@ const relatedConditionForMetric = (
       return `${recipe?.name ?? "Recipe"}: ${condition.humanDescription ?? condition.label}`;
     }
   }
-  return "No active recipe condition is currently mapped to this parameter.";
+  return language === "ko"
+    ? "현재 이 지표에 연결된 활성 레시피 조건이 없습니다."
+    : "No active recipe condition is currently mapped to this parameter.";
 };
 
 const daysSince = (isoDate?: string) => {
@@ -664,7 +667,7 @@ const localizeStockCard = ({
     return {
       ...card,
       title: "기초 체력 점검",
-      summary: `매출 성장률은 ${(snapshot.revenueGrowthYoY ?? 0).toFixed(1)}%, 마진 변화는 ${(snapshot.marginChangePct ?? 0).toFixed(1)}pt입니다.`,
+      summary: `매출 성장률은 ${(snapshot.revenueGrowthYoY ?? 0).toFixed(1)}%, 마진 변화는 ${(snapshot.marginChangePct ?? 0).toFixed(1)}포인트입니다.`,
       effect:
         (snapshot.revenueGrowthYoY ?? -99) >= 0 && (snapshot.marginChangePct ?? -99) > -3
           ? "이번 하락이 구조적 붕괴보다 일시적일 수 있다는 쪽에 무게를 실어줍니다."
@@ -674,9 +677,21 @@ const localizeStockCard = ({
       formulaDescription: "매출 흐름, 마진 변화, 애널리스트 흐름을 묶어 간단한 사업 건강도를 보여줍니다.",
       metric: {
         ...card.metric,
-        thresholdLabel: "매출 0% 이상, 마진 -3pt 초과",
+        currentLabel: `${(snapshot.revenueGrowthYoY ?? 0).toFixed(1)}% 매출 / ${(snapshot.marginChangePct ?? 0).toFixed(1)}포인트 마진`,
+        thresholdLabel: "매출 성장률 ≥ 0%, 마진 변화 > -3포인트",
         comparisonLabel: "최근 영업 흐름",
       },
+      visual: card.visual.kind === "checklist"
+        ? {
+            ...card.visual,
+            items: card.visual.items?.map((item, index) => ({
+              ...item,
+              label: index === 0
+                ? `매출 성장률 ${(snapshot.revenueGrowthYoY ?? 0).toFixed(1)}%`
+                : `마진 변화 ${(snapshot.marginChangePct ?? 0).toFixed(1)}포인트`,
+            })),
+          }
+        : card.visual,
     };
   }
 
@@ -905,7 +920,7 @@ export const buildStockVisualAnalysisGroups = ({
       whyItMatters: "Meaningful selloffs create the raw opportunity window, but only if quality and timing still hold.",
       freshness,
       sourceType: cardSource(snapshot),
-      relatedConditionLabel: relatedConditionForMetric("drawdown_from_recent_high", eyes, recipes),
+      relatedConditionLabel: relatedConditionForMetric("drawdown_from_recent_high", eyes, recipes, language),
       metric: {
         currentLabel: `${snapshot.drawdownPct.toFixed(1)}%`,
         thresholdLabel: "-25.0%",
@@ -946,7 +961,7 @@ export const buildStockVisualAnalysisGroups = ({
       whyItMatters: "Stabilization is more useful when price stops living below a falling baseline.",
       freshness,
       sourceType: cardSource(snapshot),
-      relatedConditionLabel: relatedConditionForMetric("distance_from_ma_50", eyes, recipes),
+      relatedConditionLabel: relatedConditionForMetric("distance_from_ma_50", eyes, recipes, language),
       metric: {
         currentLabel: `${(snapshot.movingAverage50DistancePct ?? 0).toFixed(1)}%`,
         thresholdLabel: "0.0%",
@@ -1035,7 +1050,7 @@ export const buildStockVisualAnalysisGroups = ({
       whyItMatters: "Improving relative strength often appears before broader confidence returns.",
       freshness,
       sourceType: cardSource(snapshot),
-      relatedConditionLabel: relatedConditionForMetric("relative_strength_vs_spy", eyes, recipes),
+      relatedConditionLabel: relatedConditionForMetric("relative_strength_vs_spy", eyes, recipes, language),
       metric: {
         currentLabel: `${(snapshot.relativeStrengthVsSpyPct ?? 0).toFixed(1)}%`,
         thresholdLabel: "0.0%",
@@ -1071,8 +1086,8 @@ export const buildStockVisualAnalysisGroups = ({
       freshness,
       sourceType: cardSource(snapshot),
       relatedConditionLabel:
-        relatedConditionForMetric("stabilization_score", eyes, recipes) ||
-        relatedConditionForMetric("volume_spike", eyes, recipes),
+        relatedConditionForMetric("stabilization_score", eyes, recipes, language) ||
+        relatedConditionForMetric("volume_spike", eyes, recipes, language),
       metric: {
         currentLabel: snapshot.volumeSpike ? "Volume spike active" : `${snapshot.stabilizationScore}/100 cooling`,
         thresholdLabel: "No spike + 60/100 cooling",
@@ -1145,7 +1160,7 @@ export const buildStockVisualAnalysisGroups = ({
       whyItMatters: "A stock should look cheaper than before if the recipe depends on temporary mispricing.",
       freshness,
       sourceType: cardSource(snapshot),
-      relatedConditionLabel: relatedConditionForMetric("valuation_discount", eyes, recipes),
+      relatedConditionLabel: relatedConditionForMetric("valuation_discount", eyes, recipes, language),
       metric: {
         currentLabel: snapshot.valuationDiscount ? "Below history" : "Near history",
         thresholdLabel: "Discount active",
@@ -1180,7 +1195,7 @@ export const buildStockVisualAnalysisGroups = ({
       freshness,
       sourceType: cardSource(snapshot),
       relatedConditionLabel:
-        `${relatedConditionForMetric("revenue_growth_yoy", eyes, recipes)} | ${relatedConditionForMetric("margin_change_pct", eyes, recipes)}`,
+        `${relatedConditionForMetric("revenue_growth_yoy", eyes, recipes, language)} | ${relatedConditionForMetric("margin_change_pct", eyes, recipes, language)}`,
       metric: {
         currentLabel: `${(snapshot.revenueGrowthYoY ?? 0).toFixed(1)}% rev / ${(snapshot.marginChangePct ?? 0).toFixed(1)} pts margin`,
         thresholdLabel: "Revenue >= 0%, margin > -3 pts",
@@ -1219,7 +1234,7 @@ export const buildStockVisualAnalysisGroups = ({
       whyItMatters: "A cheap stock can stay cheap when leverage turns a slowdown into a balance-sheet issue.",
       freshness,
       sourceType: cardSource(snapshot),
-      relatedConditionLabel: relatedConditionForMetric("debt_risk_level", eyes, recipes),
+      relatedConditionLabel: relatedConditionForMetric("debt_risk_level", eyes, recipes, language),
       metric: {
         currentLabel: snapshot.debtRiskLevel ?? "Unavailable",
         thresholdLabel: "Low to medium",
@@ -1251,7 +1266,7 @@ export const buildStockVisualAnalysisGroups = ({
       whyItMatters: "A setup can look attractive and still become harder to act on when a major event is too close.",
       freshness,
       sourceType: cardSource(snapshot),
-      relatedConditionLabel: relatedConditionForMetric("earnings_soon", eyes, recipes),
+      relatedConditionLabel: relatedConditionForMetric("earnings_soon", eyes, recipes, language),
       metric: {
         currentLabel: `${eventDays} days`,
         thresholdLabel: "More than 7 days",
@@ -1288,7 +1303,7 @@ export const buildStockVisualAnalysisGroups = ({
       whyItMatters: "Temporary overreactions are useful only if the news is not actually breaking the thesis.",
       freshness,
       sourceType: snapshot.riskFlags.length > 0 ? "Manual Input" : cardSource(snapshot),
-      relatedConditionLabel: relatedConditionForMetric("manual_flag_present", eyes, recipes),
+      relatedConditionLabel: relatedConditionForMetric("manual_flag_present", eyes, recipes, language),
       metric: {
         currentLabel: snapshot.riskFlags.length === 0 ? "No active flags" : `${snapshot.riskFlags.length} active`,
         thresholdLabel: "No hard disqualifier",
@@ -1399,7 +1414,7 @@ export const buildStockVisualAnalysisGroups = ({
       whyItMatters: "Entry discipline helps stop a useful idea from turning into a moving target.",
       freshness,
       sourceType: "Manual Input",
-      relatedConditionLabel: relatedConditionForMetric("price_inside_entry_zone", eyes, recipes),
+      relatedConditionLabel: relatedConditionForMetric("price_inside_entry_zone", eyes, recipes, language),
       metric: {
         currentLabel: `$${snapshot.price.toFixed(2)}`,
         thresholdLabel:
@@ -1443,7 +1458,7 @@ export const buildStockVisualAnalysisGroups = ({
       whyItMatters: "Even a good setup becomes less reliable if the original thesis has not been revisited recently.",
       freshness,
       sourceType: "Manual Input",
-      relatedConditionLabel: relatedConditionForMetric("days_since_last_review", eyes, recipes),
+      relatedConditionLabel: relatedConditionForMetric("days_since_last_review", eyes, recipes, language),
       metric: {
         currentLabel: thesisAge === undefined ? "Unavailable" : `${thesisAge} days`,
         thresholdLabel: "<= 14 days",
