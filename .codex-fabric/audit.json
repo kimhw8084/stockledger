@@ -1,0 +1,509 @@
+{
+  "accepted_at": "2026-09-23T18:07:38Z",
+  "changed_files": [
+    {
+      "additions": 1,
+      "deletions": 10,
+      "path": "packages/components/src/Disclosure.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 293,
+      "deletions": 474,
+      "path": "src/app/StockLedgerApp.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 0,
+      "deletions": 378,
+      "path": "src/components/stocks/StockMetricDetailSheet.tsx",
+      "status": "D"
+    },
+    {
+      "additions": 149,
+      "deletions": 0,
+      "path": "src/features/eyes/EyeDetail.tsx",
+      "status": "A"
+    },
+    {
+      "additions": 271,
+      "deletions": 0,
+      "path": "src/features/eyes/EyeFlowsScreen.tsx",
+      "status": "A"
+    },
+    {
+      "additions": 151,
+      "deletions": 0,
+      "path": "src/features/journal/DecisionDetail.tsx",
+      "status": "A"
+    },
+    {
+      "additions": 19,
+      "deletions": 7,
+      "path": "src/features/journal/OutcomeEditor.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 1,
+      "deletions": 1,
+      "path": "src/features/recipes/RecipesScreen.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 197,
+      "deletions": 0,
+      "path": "src/features/recipes/scanner/ScannerReview.tsx",
+      "status": "A"
+    },
+    {
+      "additions": 41,
+      "deletions": 93,
+      "path": "src/features/watchlist/WatchlistScreen.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 277,
+      "deletions": 0,
+      "path": "src/features/watchlist/detail/StockEntityDetail.tsx",
+      "status": "A"
+    },
+    {
+      "additions": 403,
+      "deletions": 0,
+      "path": "src/features/watchlist/detail/StockMetricDetailSheet.tsx",
+      "status": "A"
+    },
+    {
+      "additions": 36,
+      "deletions": 4,
+      "path": "src/features/watchlist/model.ts",
+      "status": "M"
+    },
+    {
+      "additions": 4,
+      "deletions": 0,
+      "path": "src/lib/i18n.ts",
+      "status": "M"
+    },
+    {
+      "additions": 114,
+      "deletions": 0,
+      "path": "src/lib/presentationLocalization.ts",
+      "status": "A"
+    },
+    {
+      "additions": 1,
+      "deletions": 1,
+      "path": "src/lib/providerEvidence.ts",
+      "status": "M"
+    },
+    {
+      "additions": 30,
+      "deletions": 15,
+      "path": "src/lib/visualEvidence.ts",
+      "status": "M"
+    },
+    {
+      "additions": 2,
+      "deletions": 0,
+      "path": "tests/e2e/chg172-primary-surfaces.spec.ts",
+      "status": "M"
+    },
+    {
+      "additions": 531,
+      "deletions": 0,
+      "path": "tests/e2e/chg184-deep-review-details.spec.ts",
+      "status": "A"
+    },
+    {
+      "additions": 1,
+      "deletions": 0,
+      "path": "tests/e2e/workspace.spec.ts",
+      "status": "M"
+    },
+    {
+      "additions": 143,
+      "deletions": 0,
+      "path": "tests/presentationLocalization.test.ts",
+      "status": "A"
+    }
+  ],
+  "checks": [
+    {
+      "command": "/bin/zsh -lc 'rtk proxy find artifacts -maxdepth 2 -type f -print'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /tmp/chg184-pdf-venv/bin/python - <<'PY'\nfrom pathlib import Path\nfrom PIL import Image\nfrom reportlab.lib.pagesizes import landscape, letter\nfrom reportlab.pdfgen import canvas\nfrom reportlab.lib.utils import ImageReader\nimport hashlib, json, shutil, zipfile, subprocess, os\n\nrepo = Path.cwd()\nrun_root = Path(\\\"/Users/haewonkim/.codex-fabric/runs/stockledger/stockledger-prod-c15-review-detail-localization-responsive-fix-v2\\\")\nr1 = Path(\\\"/Users/haewonkim/.codex-fabric/runs/stockledger/stockledger-prod-c15-review-detail-lawbook-v1/visual-atlas\\\")\nout = run_root / \\\"visual-atlas\\\"\ncandidate = \\\"b20067faf07e214635ba2299649eaf943af5cf84\\\"\ntree = \\\"069df263be33309551aeed478eadcb318fa5b354\\\"\nbase = \\\"16726097e6725b6749f097a1c1f295fc85bea916\\\"\nrequest = \\\"stockledger-prod-c15-review-detail-localization-responsive-fix-v2\\\"\nproject = \\\"stockledger\\\"\nchange = \\\"CHG-184\\\"\n\nif out.exists():\n    shutil.rmtree(out)\nshutil.copytree(r1, out)\nsource_map = {}\n\ndef put(source, rel, profile):\n    src = repo / source\n    dst = out / rel\n    if not src.is_file():\n        raise FileNotFoundError(f\\\"Missing R2 Playwright capture: {src}\\\")\n    dst.parent.mkdir(parents=True, exist_ok=True)\n    shutil.copyfile(src, dst)\n    with Image.open(dst) as im:\n        im.verify()\n    with Image.open(dst) as im:\n        actual = im.size\n    expected = {\\\"desktop-1440x900\\\": (1440,900), \\\"mobile-390x844\\\": (390,844),\n                \\\"desktop-1366x768\\\": (1366,768), \\\"mobile-360x800\\\": (360,800),\n                \\\"mobile-412x915\\\": (412,915)}[profile]\n    if actual \"'!= expected:\n        raise ValueError(f\"{rel} size {actual}, expected {expected}\")\n    source_map[rel.as_posix()] = {\"source\": source, \"profile\": profile, \"candidate\": candidate}\n\ndef p(folder, file):\n    return f\"artifacts/browser/{folder}/{file}\"\n\n# Candidate-captured canonical English and Korean.\ncanonical = {\n \"en\": {\n  \"stock-entity-detail\": (\"chg184-deep-review-details-33c37-y-pinning-and-invoker-focus-desktop/stock-entity-detail-desktop.png\", \"chg184-deep-review-details-33c37-y-pinning-and-invoker-focus-mobile/stock-entity-detail-mobile.png\"),\n  \"metric-detail-sheet\": (\"chg184-deep-review-details-97e22-ue-across-viewport-profiles-desktop/metric-quality-canonical-desktop-desktop-en.png\", \"chg184-deep-review-details-97e22-ue-across-viewport-profiles-mobile/metric-quality-canonical-mobile-mobile-en.png\"),\n  \"eye-flows\": (\"chg184-deep-review-details-00e93-to-the-same-row-and-context-desktop/eye-flows-desktop.png\", \"chg184-deep-review-details-00e93-to-the-same-row-and-context-mobile/eye-flows-mobile.png\"),\n  \"eye-detail\": (\"chg184-deep-review-details-00e93-to-the-same-row-and-context-desktop/eye-detail-desktop.png\", \"chg184-deep-review-details-00e93-to-the-same-row-and-context-mobile/eye-detail-mobile.png\"),\n  \"scanner-review\": (\"chg184-deep-review-details-1cb56-vidence-limitation-honestly-desktop/scanner-review-desktop.png\", \"chg184-deep-review-details-1cb56-vidence-limitation-honestly-mobile/scanner-review-mobile.png\"),\n  \"decision-detail\": (\"chg184-deep-review-details-66d8c-vidence-and-exact-row-focus-desktop/decision-detail-desktop.png\", \"chg184-deep-review-details-66d8c-vidence-and-exact-row-focus-mobile/decision-detail-mobile.png\"),\n },\n \"ko\": {\n  \"stock-entity-detail\": (\"chg184-deep-review-details-b79c5-ation-and-data-quality-copy-desktop/stock-entity-detail-canonical-desktop-ko.png\", \"chg184-deep-review-details-b79c5-ation-and-data-quality-copy-mobile/stock-entity-detail-canonical-mobile-ko.png\"),\n  \"metric-detail-sheet\": (\"chg184-deep-review-details-97e22-ue-across-viewport-profiles-desktop/metric-quality-canonical-desktop-desktop-ko.png\", \"chg184-deep-review-details-97e22-ue-across-viewport-profiles-mobile/metric-quality-canonical-mobile-mobile-ko.png\"),\n  \"eye-flows\": (\"chg184-deep-review-details-b79c5-ation-and-data-quality-copy-desktop/eye-flows-canonical-desktop-ko.png\", \"chg184-deep-review-details-b79c5-ation-and-data-quality-copy-mobile/eye-flows-canonical-mobile-ko.png\"),\n  \"eye-detail\": (\"chg184-deep-review-details-b79c5-ation-and-data-quality-copy-desktop/eye-detail-canonical-desktop-ko.png\", \"chg184-deep-review-details-b79c5-ation-and-data-quality-copy-mobile/eye-detail-canonical-mobile-ko.png\"),\n  \"scanner-review\": (\"chg184-deep-review-details-1cb56-vidence-limitation-honestly-desktop/scanner-review-desktop-ko.png\", \"chg184-deep-review-details-1cb56-vidence-limitation-honestly-mobile/scanner-review-mobile-ko.png\"),\n  \"decision-detail\": (\"chg184-deep-review-details-d2e4f-across-deep-review-surfaces-desktop/decision-detail-desktop-ko.png\", \"chg184-deep-review-details-d2e4f-across-deep-review-surfaces-mobile/decision-detail-mobile-ko.png\"),\n }\n}\nsurfaces = [\n (\"stock-entity-detail\",\"open\",\"Understand a stock identity, data authority, evidence and monitoring context, then choose an inspection or review action.\"),\n (\"metric-detail-sheet\",\"open\",\"Understand metric value, threshold context, freshness and source, then inspect adjacent evidence or pin.\"),\n (\"eye-flows\",\"ready\",\"Scan Eyes by review need and open one without losing filter and stock context.\"),\n (\"eye-detail\",\"open\",\"Understand monitoring state, why now, provenance, data quality and history before reviewing or navigating.\"),\n (\"scanner-review\",\"blocked-signal\",\"Inspect an incomplete-data scanner signal, record a human review classification and required reason.\"),\n (\"decision-detail\",\"open\",\"Recover historical decision context, notes, concern, data quality, timing and outcome.\"),\n]\n# Canonical profiles 1440 x 900 and 390 x 844.\nfor locale in (\"en\",\"ko\"):\n    for name, _, _ in surfaces:\n        for idx, profile in enumerate((\"desktop-1440x900\",\"mobile-390x844\")):\n            source = p(*canonical[locale][name][idx].split(\"/\",1))\n            rel = Path(\"captures/canonical\") / locale / profile / f\"{name}.png\"\n            put(source, rel, profile)\n\n# R2 desktop 1366 and mobile 360 stress captures. Scanner test is the supported scanner task.\nstress_folder = {\n \"desktop-1366x768\":\"chg184-deep-review-details-f7cd6--and-holdout-viewport-sizes-desktop\",\n \"mobile-360x800\":\"chg184-deep-review-details-f7cd6--and-holdout-viewport-sizes-mobile\",\n}\nfor profile, folder in stress_folder.items():\n    browser = \"desktop\" if profile.startswith(\"desktop\") else \"mobile\"\n    if browser == \"desktop\":\n        file_suffix = \"desktop-stress-desktop.png\"\n        metric_src = p(\"chg184-deep-review-details-97e22-ue-across-viewport-profiles-desktop\",\"metric-quality-stress-desktop-desktop-en.png\")\n        metric_ko = p(\"chg184-deep-review-details-97e22-ue-across-viewport-profiles-desktop\",\"metric-quality-stress-desktop-desktop-ko.png\")\n    else:\n        file_suffix = \"mobile-stress-mobile.png\"\n        metric_src = p(\"chg184-deep-review-details-97e22-ue-across-viewport-profiles-mobile\",\"metric-quality-stress-mobile-mobile-en.png\")\n        metric_ko = p(\"chg184-deep-review-details-97e22-ue-across-viewport-profiles-mobile\",\"metric-quality-stress-mobile-mobile-ko.png\")\n    for name in (\"stock-entity-detail\",\"eye-flows\",\"eye-detail\",\"decision-detail\"):\n        source_file = f\"{name}-{file_suffix}\"\n        put(p(folder,source_file), Path(\"captures/stress\")/profile/\"en\"/f\"{name}.png\", profile)\n    put(metric_src, Path(\"captures/stress\")/profile/\"en\"/\"metric-detail-sheet.png\", profile)\n    put(metric_ko, Path(\"captures/stress\")/profile/\"ko\"/\"metric-detail-sheet.png\", profile)\n    if browser == \"desktop\":\n        scanner = p(\"chg184-deep-review-details-1cb56-vidence-limitation-honestly-desktop\",\"scanner-review-desktop-stress-desktop-ko.png\")\n    else:\n        scanner = p(\"chg184-deep-review-details-1cb56-vidence-limitation-honestly-mobile\",\"scanner-review-mobile-stress-mobile-ko.png\")\n    put(scanner, Path(\"captures/stress\")/profile/\"ko\"/\"scanner-review.png\", profile)\n    if browser == \"mobile\":\n        ko_folder = \"chg184-deep-review-details-b79c5-ation-and-data-quality-copy-mobile\"\n        for name in (\"stock-entity-detail\",\"eye-flows\",\"eye-detail\"):\n            source_file = f\"{name}-stress-mobile-mobile-ko.png\"\n            put(p(ko_folder,source_file), Path(\"captures/stress\")/profile/\"ko\"/f\"{name}.png\", profile)\n\n# 412 x 915 holdout, English five surfaces and KO scanner plus all four changed KO surfaces.\nholdout_folder = \"chg184-deep-review-details-f7cd6--and-holdout-viewport-sizes-mobile\"\nfor name in (\"stock-entity-detail\",\"eye-flows\",\"eye-detail\",\"decision-detail\"):\n    put(p(holdout_folder,f\"{name}-mobile-holdout-mobile.png\"), Path(\"captures/holdout/mobile-412x915/en\")/f\"{name}.png\", \"mobile-412x915\")\nput(p(\"chg184-deep-review-details-97e22-ue-across-viewport-profiles-mobile\",\"metric-quality-holdout-mobile-mobile-en.png\"),\n    Path(\"captures/holdout/mobile-412x915/en/metric-detail-sheet.png\"), \"mobile-412x915\")\nput(p(\"chg184-deep-review-details-97e22-ue-across-viewport-profiles-mobile\",\"metric-quality-holdout-mobile-mobile-ko.png\"),\n    Path(\"captures/holdout/mobile-412x915/ko/metric-detail-sheet.png\"), \"mobile-412x915\")\nput(p(\"chg184-deep-review-details-1cb56-vidence-limitation-honestly-mobile\",\"scanner-review-mobile-holdout-mobile-ko.png\"),\n    Path(\"captures/holdout/mobile-412x915/ko/scanner-review.png\"), \"mobile-412x915\")\nko_folder = \"chg184-deep-review-details-b79c5-ation-and-data-quality-copy-mobile\"\nfor name in (\"stock-entity-detail\",\"eye-flows\",\"eye-detail\"):\n    put(p(ko_folder,f\"{name}-holdout-mobile-mobile-ko.png\"),\n        Path(\"captures/holdout/mobile-412x915/ko\")/f\"{name}.png\", \"mobile-412x915\")\n\n# Recreate diagnostic package with exact R2 candidate and actual available qualification outputs.\ndiag = out/\"diagnostics\"\ndiag.mkdir(exist_ok=True)\ndef load_json(path):\n    return json.loads((repo/path).read_text())\nrelease_evidence = load_json(Path(\"artifacts/release-evidence.json\"))\nif release_evidence.get(\"source\",{}).get(\"commit\") != candidate or release_evidence.get(\"source\",{}).get(\"tree\") != tree:\n    raise AssertionError(\"release evidence does not name exact R2 candidate\")\nshutil.copyfile(repo/\"artifacts/release-evidence.json\",diag/\"release-evidence.json\")\nshutil.copyfile(repo/\"artifacts/recovery-result.json\",diag/\"recovery-result.json\")\nshutil.copyfile(repo/\"artifacts/operations-qualification.json\",diag/\"operations-qualification.json\")\n(diag/\"operations-status.json\").write_text(json.dumps({\n \"candidate\":candidate,\"status\":\"UNCONFIGURED\",\n \"qualification\":\"PASS synthetic bounded operations qualification; production scheduler/workspace/release identity is not configured in this local environment\",\n \"evidence\":\"diagnostics/operations-qualification.json\"\n},indent=2)+\"'\"\\\\n\\\")\n(diag/\\\"cloud-contract.json\\\").write_text(json.dumps({\n \\\"candidate\\\":candidate,\\\"status\\\":\\\"UNAVAILABLE\\\",\n \\\"reason\\\":\\\"Local Docker/OrbStack daemon socket unavailable; contract suite could not run.\\\"\n},indent=2)+\\\"\\\\n\\\")\n(diag/\\\"frozen-research.json\\\").write_text(json.dumps({\n \\\"candidate\\\":candidate,\\\"status\\\":\\\"BLOCKED_UNVERIFIED\\\",\\\"releaseBlocked\\\":True,\n \\\"unverified\\\":[\\\"numeric research goldens\\\",\\\"point-in-time membership\\\",\\\"forward proof\\\"],\n \\\"classification\\\":\\\"pre-existing frozen-research limitation retained from R1\\\"\n},indent=2)+\\\"\\\\n\\\")\n\nscanner_provenance = {\n \\\"candidate\\\":candidate,\n \\\"source\\\":\\\"tests/e2e/chg184-deep-review-details.spec.ts; supported scanner review task\\\",\n \\\"evidence\\\":{\\\"source\\\":\\\"supported daily scan action\\\",\\\"deterministicFixtureProvenance\\\":{\\\"universeSource\\\":\\\"deterministic test-only CSV served to the supported scanner universe fetch path\\\",\\\"universeFixtureRowCount\\\":400,\\\"universeFixtureSymbols\\\":[\\\"AAPL\\\",\\\"AMZN\\\",\\\"CAT\\\"],\\\"unmappedRowsIgnored\\\":397,\\\"marketDataProvider\\\":\\\"Stooq\\\",\\\"marketDataFixtureStatus\\\":503,\\\"signalState\\\":\\\"generated by the production scanner from missing market bars; no signal records injected\\\"},\\\"universeFetchStatus\\\":200,\\\"marketDataRequestAssertion\\\":\\\"at least one intercepted Stooq request\\\",\\\"configuredStooqResponseStatus\\\":503,\\\"status\\\":\\\"BLOCKED_SIGNAL_RETAINED\\\"},\n \\\"productTruth\\\":\\\"The review UI describes incomplete data and a human classification. Saving does not place an order, record a fill, or imply a return.\\\"\n}\n(diag/\\\"scanner-provider-limitation.json\\\").write_text(json.dumps(scanner_provenance,ensure_ascii=False,indent=2)+\\\"\\\\n\\\")\nchanged = subprocess.check_output([\\\"git\\\",\\\"diff-tree\\\",\\\"--no-commit-id\\\",\\\"--name-only\\\",\\\"-r\\\",candidate],cwd=repo,text=True).splitlines()\n(diag/\\\"source-impact-analysis.json\\\").write_text(json.dumps({\n \\\"candidate\\\":candidate,\n \\\"changedProductFiles\\\":changed,\n \\\"renderedSurfaces\\\":{\\\"stock-entity-detail\\\":\\\"updated for UI-only localization presentation\\\",\\\"metric-detail-sheet\\\":\\\"updated for compact responsive hero and UI-only Korean copy\\\",\\\"eye-flows\\\":\\\"updated for UI-only Korean system copy\\\",\\\"eye-detail\\\":\\\"updated for UI-only Korean system copy\\\"},\n \\\"deferredAuthoringSurfaces\\\":{\\\"untouched\\\":True,\\\"surfaces\\\":[\\\"eye-composer\\\",\\\"journal-composer\\\",\\\"recipe-builder\\\",\\\"logic-registry\\\",\\\"notification-confirmation\\\"]},\n \\\"scannerReviewAndDecisionDetail\\\":\\\"Their source modules and view-model inputs are outside this patch. Their pixels in this R2 package were recaptured from post-qualification R2 Playwright runs; no R1 screenshots were reused.\\\",\n \\\"capturePolicy\\\":\\\"All 51 packaged screenshots are candidate-captured post-qualification. Metric Quality uses the dedicated Financial Quality specimen. KO Stock Detail, Eye Flows and Eye Detail include canonical 390x844 plus 360x800 stress and 412x915 holdout.\\\"\n},ensure_ascii=False,indent=2)+\\\"\\\\n\\\")\n\n(diag/\\\"task-oracle-state-coverage.json\\\").write_text(json.dumps({\n \\\"candidate\\\":candidate,\\\"e2eFile\\\":\\\"tests/e2e/chg184-deep-review-details.spec.ts\\\",\n \\\"focusedRun\\\":{\\\"result\\\":\\\"PASS\\\",\\\"tests\\\":18,\\\"projects\\\":[\\\"desktop\\\",\\\"mobile\\\"],\\\"postQualification\\\":True},\n \\\"oracles\\\":[\n  {\\\"surface\\\":\\\"stock-entity-detail\\\",\\\"result\\\":\\\"PASS\\\",\\\"coverage\\\":\\\"Watchlist to detail, generated system copy localized in Korean, user-entered fields retained.\\\"},\n  {\\\"surface\\\":\\\"metric-detail-sheet\\\",\\\"result\\\":\\\"PASS\\\",\\\"coverage\\\":\\\"Financial Quality full title and value at 360/390/412 and desktop 1440/1366; generated Korean metric/evidence copy.\\\"},\n  {\\\"surface\\\":\\\"eye-flows\\\",\\\"result\\\":\\\"PASS\\\",\\\"coverage\\\":\\\"Korean system data-quality copy; filters and context retained.\\\"},\n  {\\\"surface\\\":\\\"eye-detail\\\",\\\"result\\\":\\\"PASS\\\",\\\"coverage\\\":\\\"Korean why-now, data-quality and missing-input grammar; navigation context retained.\\\"},\n  {\\\"surface\\\":\\\"scanner-review\\\",\\\"result\\\":\\\"PASS\\\",\\\"coverage\\\":\\\"Supported daily scan blocked signal, human decision and reason; no trade semantics.\\\"},\n  {\\\"surface\\\":\\\"decision-detail\\\",\\\"result\\\":\\\"PASS\\\",\\\"coverage\\\":\\\"Historical detail and exact decision-row focus on close.\\\"}\n ],\n \\\"acceptanceAssertions\\\":{\\\"metric360EnAndKoFullTitleAndValue\\\":True,\\\"koStockNoRawGeneratedWhyNow\\\":True,\\\"koMetricNoListedRawPhrases\\\":True,\\\"koEyeNoListedRawPhrases\\\":True,\\\"userAuthoredTextPreserved\\\":True}\n},ensure_ascii=False,indent=2)+\\\"\\\\n\\\")\n(diag/\\\"primary-route-regression.json\\\").write_text(json.dumps({\n \\\"candidate\\\":candidate,\\\"suite\\\":\\\"CHG-172 primary-route regression\\\",\\\"result\\\":\\\"PASS\\\",\\\"passed\\\":17,\\\"expectedSkipped\\\":1,\n \\\"fullPlaywright\\\":{\\\"passed\\\":65,\\\"expectedSkipped\\\":1,\\\"failed\\\":0},\n \\\"primaryRouteRegressionPreserved\\\":True\n},indent=2)+\\\"\\\\n\\\")\n(diag/\\\"release-qualification.json\\\").write_text(json.dumps({\n \\\"candidate\\\":candidate,\\\"tree\\\":tree,\\\"base\\\":base,\\\"release_verify\\\":\\\"PASS\\\",\\\"release_verify_verified\\\":True,\n \\\"qualification\\\":{\\\"npm_ci\\\":\\\"PASS; 639 packages; zero audit findings at install\\\",\\\"check\\\":\\\"PASS; typecheck and 24 unit files / 196 tests\\\",\\\"boundary_check\\\":\\\"PASS\\\",\\\"release_base\\\":\\\"PASS; exact protected base is ancestor\\\",\\\"release_workflow\\\":\\\"PASS\\\",\\\"npm_audit_high_critical\\\":\\\"PASS; zero vulnerabilities\\\",\\\"export_all\\\":\\\"PASS; web/iOS/Android\\\",\\\"playwright_e2e\\\":\\\"PASS; 65 passed, 1 expected mobile keyboard skip, 0 failed\\\",\\\"recovery_drill\\\":\\\"PASS synthetic recovery qualification\\\",\\\"operations_qualification\\\":\\\"PASS bounded synthetic qualification\\\",\\\"operations_status\\\":\\\"UNCONFIGURED local production scheduler/workspace/release identity\\\",\\\"frozen_research\\\":\\\"BLOCKED_UNVERIFIED; pre-existing missing numeric goldens, point-in-time membership and forward proof\\\",\\\"cloud_contract\\\":\\\"UNAVAILABLE; Docker/OrbStack daemon socket unavailable\\\"},\n \\\"postQualificationFocusedCaptureRun\\\":{\\\"result\\\":\\\"PASS\\\",\\\"tests\\\":18,\\\"projects\\\":[\\\"desktop\\\",\\\"mobile\\\"],\\\"candidate\\\":candidate},\n \\\"visualDecision\\\":\\\"AWAITING_INDEPENDENT_PIXEL_AUDIT\\\"\n},indent=2)+\\\"\\\\n\\\")\n\n# Update the R1 shell metadata without changing the six-surface scope.\nsurface = json.loads((out/\\\"surface-manifest.json\\\").read_text())\nsurface[\\\"request\\\"] = request\nsurface[\\\"operation\\\"] = \\\"FIX\\\"\nsurface[\\\"candidate\\\"] = {\\\"commit\\\":candidate,\\\"tree\\\":tree,\\\"base\\\":base}\nsurface[\\\"visualDecision\\\"] = \\\"AWAITING_INDEPENDENT_PIXEL_AUDIT\\\"\n(out/\\\"surface-manifest.json\\\").write_text(json.dumps(surface,ensure_ascii=False,indent=2)+\\\"\\\\n\\\")\nanchors = surface[\\\"canonicalAnchors\\\"]\nreport_captures=[]\nfor f in sorted((out/\\\"captures\\\").rglob(\\\"*.png\\\")):\n    rel=f.relative_to(out)\n    parts=rel.parts\n    with Image.open(f) as im:\n        im.verify()\n    with Image.open(f) as im:\n        width,height=im.size\n    if parts[1] == \\\"canonical\\\":\n        locale = parts[2]\n        kind = \\\"canonical\\\" if locale==\\\"en\\\" else \\\"korean\\\"\n        profile = parts[3]\n        name = f.stem\n    else:\n        kind, profile, locale = parts[1], parts[2], parts[3]\n        name = f.stem\n    raw=f.read_bytes()\n    record={\\\"file\\\":rel.as_posix(),\\\"surface\\\":name,\\\"kind\\\":kind,\\\"locale\\\":locale,\n            \\\"width\\\":width,\\\"height\\\":height,\\\"sha256\\\":hashlib.sha256(raw).hexdigest(),\\\"bytes\\\":len(raw),\n            \\\"source\\\":source_map.get(rel.as_posix(),{}).get(\\\"source\\\",\\\"post-qualification R2 Playwright capture\\\"),\n            \\\"candidate\\\":candidate}\n    if profile.startswith(\\\"desktop\\\"):\n        record[\\\"viewportProfile\\\"]=\\\"desktop\\\" if \\\"1440\\\" in profile else \\\"desktop-stress\\\"\n    else:\n        record[\\\"viewportProfile\\\"]=\\\"mobile-canonical\\\" if \\\"390\\\" in profile else (\\\"mobile-stress\\\" if \\\"360\\\" in profile else \\\"mobile-holdout\\\")\n    report_captures.append(record)\ncounts={k:sum(1 for r in report_captures if r[\\\"kind\\\"]==k) for k in (\\\"canonical\\\",\\\"korean\\\",\\\"stress\\\",\\\"holdout\\\")}\nassert counts=={\\\"canonical\\\":12,\\\"korean\\\":12,\\\"stress\\\":17,\\\"holdout\\\":10}, counts\nassert len(report_captures)==51, len(report_captures)\n(out/\\\"capture-report.json\\\").write_text(json.dumps({\n \\\"project\\\":project,\\\"change\\\":change,\\\"request\\\":request,\\\"operation\\\":\\\"FIX\\\",\n \\\"candidate\\\":candidate,\\\"candidateTree\\\":tree,\\\"base\\\":base,\n \\\"captureMethod\\\":\\\"R2 final-candidate focused Playwright evidence captured after full release qualification.\\\",\n \\\"focusRun\\\":{\\\"tests\\\":18,\\\"result\\\":\\\"PASS\\\",\\\"projects\\\":[\\\"desktop\\\",\\\"mobile\\\"],\\\"candidate\\\":candidate},\n \\\"primaryCanonicalCaptureCount\\\":counts[\\\"canonical\\\"],\\\"koreanCanonicalCaptureCount\\\":counts[\\\"korean\\\"],\n \\\"stressCaptureCount\\\":counts[\\\"stress\\\"],\\\"holdoutCaptureCount\\\":counts[\\\"holdout\\\"],\n \\\"captures\\\":report_captures,\\\"visualDecision\\\":\\\"AWAITING_INDEPENDENT_PIXEL_AUDIT\\\",\n \\\"limitations\\\":[\\\"Frozen research qualification remains BLOCKED_UNVERIFIED for missing point-in-time research goldens and forward proof.\\\",\\\"Local cloud contract lane was UNAVAILABLE because Docker/OrbStack daemon socket was unavailable.\\\",\\\"Production operations identity remains unconfigured; bounded synthetic operations qualification passed.\\\",\\\"Visual approval remains with an independent pixel audit.\\\"]\n},ensure_ascii=False,indent=2)+\\\"\\\\n\\\")\nreader=json.loads((out/\\\"reader-index.json\\\").read_text())\nreader.update({\\\"candidate\\\":candidate,\\\"request\\\":request,\\\"operation\\\":\\\"FIX\\\",\\\"visualDecision\\\":\\\"AWAITING_INDEPENDENT_PIXEL_AUDIT\\\"})\nreader[\\\"lineage\\\"]={\\\"productCandidate\\\":candidate,\\\"protectedBase\\\":base,\n \\\"artifactCarrierSoleParentMustEqual\\\":candidate,\\\"nativeEvidenceSoleParentMustEqual\\\":candidate}\nreader[\\\"diagnostics\\\"]=[\\\"diagnostics/task-oracle-state-coverage.json\\\",\\\"diagnostics/release-qualification.json\\\",\n \\\"diagnostics/scanner-provider-limitation.json\\\",\\\"diagnostics/primary-route-regression.json\\\",\n \\\"diagnostics/source-impact-analysis.json\\\",\\\"diagnostics/cloud-contract.json\\\",\\\"diagnostics/frozen-research.json\\\"]\n(out/\\\"reader-index.json\\\").write_text(json.dumps(reader,ensure_ascii=False,indent=2)+\\\"\\\\n\\\")\n\n# Rebuild reader PDFs from R2 canonical English captures.\ndef build_pdf(path, view, pagesize):\n    c=canvas.Canvas(str(path),pagesize=pagesize,pageCompression=1)\n    pw,ph=pagesize\n    for name,_,task in surfaces:\n        profile=\\\"desktop-1440x900\\\" if view==\\\"desktop\\\" else \\\"mobile-390x844\\\"\n        pth=out/\\\"captures\\\"/\\\"canonical\\\"/\\\"en\\\"/profile/f\\\"{name}.png\\\"\n        with Image.open(pth) as im: iw,ih=im.size\n        c.setFillColorRGB(0.965,0.972,0.98); c.rect(0,0,pw,ph,fill=1,stroke=0)\n        c.setFillColorRGB(0.08,0.12,0.19); c.setFont(\\\"Helvetica-Bold\\\",18); c.drawString(28,ph-34,name.replace(\\\"-\\\",\\\" \\\").title())\n        c.setFont(\\\"Helvetica\\\",8); c.setFillColorRGB(0.32,0.38,0.46)\n        c.drawString(28,ph-49,f\\\"StockLedger CHG-184 R2 | {view} | candidate {candidate[:12]} | visual decision: awaiting independent pixel audit\\\")\n        c.setFont(\\\"Helvetica\\\",8); c.drawString(28,ph-64,task[:155])\n        margin=28; top=ph-78; bottom=26\n        scale=min((pw-2*margin)/iw,(top-bottom)/ih)\n        dw,dh=iw*scale,ih*scale; x=(pw-dw)/2; y=bottom+(top-bottom-dh)/2\n        c.drawImage(ImageReader(str(pth)),x,y,width=dw,height=dh,mask=\\\"auto\\\",preserveAspectRatio=True)\n        c.setFont(\\\"Helvetica\\\",7); c.setFillColorRGB(0.35,0.4,0.47)\n        c.drawString(28,12,\\\"Lossless PNG source; independent pixel audit remains pending.\\\")\n        c.showPage()\n    c.save()\nbuild_pdf(out/\\\"review-desktop.pdf\\\",\\\"desktop\\\",landscape(letter))\nbuild_pdf(out/\\\"review-mobile.pdf\\\",\\\"mobile\\\",landscape(letter))\n\n# Validate canonical anchors refer to R2 pixels, archive includes all payload, and SHA manifest is deterministic.\nfor a in anchors:\n    b=(out/a[\\\"path\\\"]).read_bytes()\n    assert hashlib.sha256(b).hexdigest() == next(r[\\\"sha256\\\"] for r in report_captures if r[\\\"file\\\"]==a[\\\"path\\\"])\nhash_files=[]\nfor f in sorted(out.rglob(\\\"*\\\")):\n    if f.is_file() and f.name not in {\\\"deterministic-manifest.json\\\",\\\"artifact-bundle.zip\\\"}:\n        b=f.read_bytes()\n        hash_files.append({\\\"path\\\":f.relative_to(out).as_posix(),\\\"bytes\\\":len(b),\\\"sha256\\\":hashlib.sha256(b).hexdigest()})\n(out/\\\"deterministic-manifest.json\\\").write_text(json.dumps({\\\"algorithm\\\":\\\"SHA-256\\\",\\\"ordering\\\":\\\"ascending relative POSIX path\\\",\\\"candidate\\\":candidate,\\\"files\\\":hash_files},indent=2)+\\\"\\\\n\\\")\nzip_path=out/\\\"artifact-bundle.zip\\\"\nwith zipfile.ZipFile(zip_path,\\\"w\\\",compression=zipfile.ZIP_STORED) as z:\n    for f in sorted(out.rglob(\\\"*\\\")):\n        if f.is_file() and f \"'!= zip_path:\n            info=zipfile.ZipInfo(f.relative_to(out).as_posix(),date_time=(2026,9,23,0,0,0))\n            info.compress_type=zipfile.ZIP_STORED\n            info.external_attr=(0o100644 & 0xFFFF)<<16\n            z.writestr(info,f.read_bytes())\nzip_hash=hashlib.sha256(zip_path.read_bytes()).hexdigest()\n(run_root/\"artifact-bundle.sha256\").write_text(f\"{zip_hash}  visual-atlas/artifact-bundle.zip'\"\\\\n\\\")\nwith zipfile.ZipFile(zip_path) as z:\n    assert len(z.namelist())==len(hash_files)+1\n    assert \\\"capture-report.json\\\" in z.namelist() and \\\"diagnostics/source-impact-analysis.json\\\" in z.namelist()\n    bad=z.testzip()\n    assert bad is None,bad\nassert json.loads((out/\\\"reader-index.json\\\").read_text())[\\\"candidate\\\"]==candidate\nassert release_evidence[\\\"source\\\"][\\\"workingTree\\\"]==\\\"clean\\\"\nprint(json.dumps({\\\"package\\\":str(out),\\\"candidate\\\":candidate,\\\"tree\\\":tree,\\\"capture_counts\\\":counts,\n \\\"total_captures\\\":len(report_captures),\\\"files_in_hash_manifest\\\":len(hash_files),\n \\\"zip_sha256\\\":zip_hash,\\\"zip_bytes\\\":zip_path.stat().st_size},indent=2))\nPY\"",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy python3 - <<'PY'\nfrom pathlib import Path\nfrom PIL import Image\nfolders=['chg184-deep-review-details-b79c5-ation-and-data-quality-copy-desktop','chg184-deep-review-details-b79c5-ation-and-data-quality-copy-mobile','chg184-deep-review-details-d2e4f-across-deep-review-surfaces-desktop','chg184-deep-review-details-d2e4f-across-deep-review-surfaces-mobile','chg184-deep-review-details-97e22-ue-across-viewport-profiles-desktop','chg184-deep-review-details-97e22-ue-across-viewport-profiles-mobile']\nfor folder in folders:\n print('==',folder)\n for p in sorted((Path('artifacts/browser')/folder).glob('*.png')):\n  with Image.open(p) as im: print(p.name, im.size)\nPY\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /tmp/chg184-pdf-venv/bin/python - <<'PY'\nfrom pathlib import Path\nfrom PIL import Image\nfrom reportlab.lib.pagesizes import landscape, letter\nfrom reportlab.pdfgen import canvas\nfrom reportlab.lib.utils import ImageReader\nimport hashlib, json, shutil, zipfile, subprocess\n\nrepo=Path.cwd()\nrun=Path(\\\"/Users/haewonkim/.codex-fabric/runs/stockledger/stockledger-prod-c15-review-detail-localization-responsive-fix-v2\\\")\nout=run/\\\"visual-atlas\\\"\nr1=Path(\\\"/Users/haewonkim/.codex-fabric/runs/stockledger/stockledger-prod-c15-review-detail-lawbook-v1/visual-atlas\\\")\ncandidate=\\\"b20067faf07e214635ba2299649eaf943af5cf84\\\"\ntree=\\\"069df263be33309551aeed478eadcb318fa5b354\\\"\nbase=\\\"16726097e6725b6749f097a1c1f295fc85bea916\\\"\nrequest=\\\"stockledger-prod-c15-review-detail-localization-responsive-fix-v2\\\"\nsurfaces=[\n (\\\"stock-entity-detail\\\",\\\"open\\\",\\\"Understand stock identity, authority, evidence and monitoring context.\\\"),\n (\\\"metric-detail-sheet\\\",\\\"open\\\",\\\"Understand metric value, threshold, freshness and source.\\\"),\n (\\\"eye-flows\\\",\\\"ready\\\",\\\"Scan Eyes by review need and open one without losing context.\\\"),\n (\\\"eye-detail\\\",\\\"open\\\",\\\"Understand monitoring state, why now, provenance and history.\\\"),\n (\\\"scanner-review\\\",\\\"blocked-signal\\\",\\\"Inspect an incomplete-data signal and record a human review classification.\\\"),\n (\\\"decision-detail\\\",\\\"open\\\",\\\"Recover historical decision context, notes, concern, timing and outcome.\\\"),\n]\nif out.exists(): shutil.rmtree(out)\nshutil.copytree(r1,out)\nsource_map={}\n\ndef put(src, rel, profile):\n    source=repo/\\\"artifacts/browser\\\"/src\n    dest=out/rel\n    if not source.is_file(): raise FileNotFoundError(source)\n    dest.parent.mkdir(parents=True,exist_ok=True)\n    shutil.copyfile(source,dest)\n    with Image.open(dest) as im:\n        im.verify()\n    with Image.open(dest) as im:\n        size=im.size\n    expected={\\\"desktop-1440x900\\\":(1440,900),\\\"mobile-390x844\\\":(390,844),\n              \\\"desktop-1366x768\\\":(1366,768),\\\"mobile-360x800\\\":(360,800),\n              \\\"mobile-412x915\\\":(412,915)}[profile]\n    if size\"'!=expected: raise ValueError(f\"{rel}: {size} != {expected} ({src})\")\n    source_map[rel.as_posix()]={\"source\":\"artifacts/browser/\"+src,\"candidate\":candidate}\n\n# Canonical captures, all recaptured after R2 release qualification.\nfor locale in (\"en\",\"ko\"):\n  for name,_,_ in surfaces:\n    for view,profile in ((\"desktop\",\"desktop-1440x900\"),(\"mobile\",\"mobile-390x844\")):\n      if name==\"metric-detail-sheet\":\n        folder=f\"chg184-deep-review-details-97e22-ue-across-viewport-profiles-{view}\"\n        filename=f\"metric-quality-canonical-{view}-{view}-{locale}.png\"\n      elif locale==\"en\" and name==\"stock-entity-detail\":\n        folder=\"chg184-deep-review-details-33c37-y-pinning-and-invoker-focus-\"+view\n        filename=f\"{name}-{view}.png\"\n      elif locale==\"en\" and name in (\"eye-flows\",\"eye-detail\"):\n        folder=\"chg184-deep-review-details-00e93-to-the-same-row-and-context-\"+view\n        filename=f\"{name}-{view}.png\"\n      elif locale==\"en\" and name==\"scanner-review\":\n        folder=\"chg184-deep-review-details-1cb56-vidence-limitation-honestly-\"+view\n        filename=f\"{name}-{view}.png\"\n      elif locale==\"en\":\n        folder=\"chg184-deep-review-details-66d8c-vidence-and-exact-row-focus-\"+view\n        filename=f\"{name}-{view}.png\"\n      elif name==\"scanner-review\":\n        folder=\"chg184-deep-review-details-1cb56-vidence-limitation-honestly-\"+view\n        filename=f\"{name}-{view}-ko.png\"\n      else:\n        folder=\"chg184-deep-review-details-d2e4f-across-deep-review-surfaces-\"+view\n        filename=f\"{name}-{view}-ko.png\"\n      put(f\"{folder}/{filename}\",Path(\"captures/canonical\")/locale/profile/f\"{name}.png\",profile)\n\n# Stress profiles (1366x768 and 360x800), recaptured from exact R2 candidate.\nfor profile,browser,short in ((\"desktop-1366x768\",\"desktop\",\"desktop-stress-desktop\"),\n                              (\"mobile-360x800\",\"mobile\",\"mobile-stress-mobile\")):\n  e2e_folder=\"chg184-deep-review-details-f7cd6--and-holdout-viewport-sizes-\"+browser\n  metric_folder=\"chg184-deep-review-details-97e22-ue-across-viewport-profiles-\"+browser\n  for name in (\"stock-entity-detail\",\"eye-flows\",\"eye-detail\",\"decision-detail\"):\n    put(f\"{e2e_folder}/{name}-{short}.png\",Path(\"captures/stress\")/profile/\"en\"/f\"{name}.png\",profile)\n  metric_short=\"stress-desktop\" if browser==\"desktop\" else \"stress-mobile\"\n  for locale in (\"en\",\"ko\"):\n    put(f\"{metric_folder}/metric-quality-{metric_short}-{browser}-{locale}.png\",\n        Path(\"captures/stress\")/profile/locale/\"metric-detail-sheet.png\",profile)\n  scan_folder=\"chg184-deep-review-details-1cb56-vidence-limitation-honestly-\"+browser\n  put(f\"{scan_folder}/scanner-review-{short}-ko.png\",Path(\"captures/stress\")/profile/\"ko\"/\"scanner-review.png\",profile)\n  if browser==\"mobile\":\n    ko_folder=\"chg184-deep-review-details-b79c5-ation-and-data-quality-copy-mobile\"\n    for name in (\"stock-entity-detail\",\"eye-flows\",\"eye-detail\"):\n      put(f\"{ko_folder}/{name}-stress-mobile-mobile-ko.png\",Path(\"captures/stress\")/profile/\"ko\"/f\"{name}.png\",profile)\n\n# Holdout 412x915: English five surfaces; Korean scanner and all four changed surfaces.\nbrowser=\"mobile\"\nhold=\"chg184-deep-review-details-f7cd6--and-holdout-viewport-sizes-mobile\"\nmetric=\"chg184-deep-review-details-97e22-ue-across-viewport-profiles-mobile\"\nfor name in (\"stock-entity-detail\",\"eye-flows\",\"eye-detail\",\"decision-detail\"):\n  put(f\"{hold}/{name}-mobile-holdout-mobile.png\",Path(\"captures/holdout/mobile-412x915/en\")/f\"{name}.png\",\"mobile-412x915\")\nfor locale in (\"en\",\"ko\"):\n  put(f\"{metric}/metric-quality-holdout-mobile-mobile-{locale}.png\",\n      Path(\"captures/holdout/mobile-412x915\")/locale/\"metric-detail-sheet.png\",\"mobile-412x915\")\nput(\"chg184-deep-review-details-1cb56-vidence-limitation-honestly-mobile/scanner-review-mobile-holdout-mobile-ko.png\",\n    Path(\"captures/holdout/mobile-412x915/ko/scanner-review.png\"),\"mobile-412x915\")\nko_folder=\"chg184-deep-review-details-b79c5-ation-and-data-quality-copy-mobile\"\nfor name in (\"stock-entity-detail\",\"eye-flows\",\"eye-detail\"):\n  put(f\"{ko_folder}/{name}-holdout-mobile-mobile-ko.png\",\n      Path(\"captures/holdout/mobile-412x915/ko\")/f\"{name}.png\",\"mobile-412x915\")\n\n# Actual release evidence is tied to this clean Product candidate.\nrelease=json.loads((repo/\"artifacts/release-evidence.json\").read_text())\nassert release.get(\"source\",{}).get(\"commit\")==candidate and release.get(\"source\",{}).get(\"tree\")==tree\nassert release.get(\"source\",{}).get(\"workingTree\")==\"clean\"\ndiag=out/\"diagnostics\"\nshutil.rmtree(diag,ignore_errors=True)\ndiag.mkdir()\nfor src,dst in ((\"release-evidence.json\",\"release-evidence.json\"),\n                (\"recovery-result.json\",\"recovery-result.json\"),\n                (\"operations-qualification.json\",\"operations-qualification.json\")):\n  shutil.copyfile(repo/\"artifacts\"/src,diag/dst)\ndef writej(name,data):\n  (diag/name).write_text(json.dumps(data,ensure_ascii=False,indent=2)+\"'\"\\\\n\\\")\nwritej(\\\"operations-status.json\\\",{\\\"candidate\\\":candidate,\\\"status\\\":\\\"UNCONFIGURED\\\",\\\"detail\\\":\\\"Production scheduler/workspace/release identity is not configured locally; bounded synthetic operations qualification passed.\\\"})\nwritej(\\\"cloud-contract.json\\\",{\\\"candidate\\\":candidate,\\\"status\\\":\\\"UNAVAILABLE\\\",\\\"detail\\\":\\\"Docker/OrbStack daemon socket unavailable; cloud contract lane could not run.\\\"})\nwritej(\\\"frozen-research.json\\\",{\\\"candidate\\\":candidate,\\\"status\\\":\\\"BLOCKED_UNVERIFIED\\\",\\\"releaseBlocked\\\":True,\\\"unverified\\\":[\\\"numeric research goldens\\\",\\\"point-in-time membership\\\",\\\"forward proof\\\"],\\\"classification\\\":\\\"pre-existing R1 limitation\\\"})\nchanged=subprocess.check_output([\\\"git\\\",\\\"diff-tree\\\",\\\"--no-commit-id\\\",\\\"--name-only\\\",\\\"-r\\\",candidate],cwd=repo,text=True).splitlines()\nwritej(\\\"source-impact-analysis.json\\\",{\n \\\"candidate\\\":candidate,\\\"changedProductFiles\\\":changed,\n \\\"changedSurfaces\\\":[\\\"stock-entity-detail\\\",\\\"metric-detail-sheet\\\",\\\"eye-flows\\\",\\\"eye-detail\\\"],\n \\\"untouchedDeferredAuthoringSurfaces\\\":[\\\"eye-composer\\\",\\\"journal-composer\\\",\\\"recipe-builder\\\",\\\"logic-registry\\\",\\\"notification-confirmation\\\"],\n \\\"scannerReviewAndDecisionDetail\\\":\\\"No R2 atlas screenshot was reused: these surfaces were also recaptured from the R2 candidate. The changed presentation modules do not extend into their route implementations.\\\",\n \\\"capturePolicy\\\":\\\"All 51 atlas screenshots were captured from the exact R2 candidate after qualification. Metric Detail uses the Financial Quality specimen. KO Stock Detail, Eye Flows and Eye Detail include canonical, 360x800 stress and 412x915 holdout captures.\\\"\n})\nwritej(\\\"task-oracle-state-coverage.json\\\",{\n \\\"candidate\\\":candidate,\\\"e2eFile\\\":\\\"tests/e2e/chg184-deep-review-details.spec.ts\\\",\n \\\"focusedRun\\\":{\\\"result\\\":\\\"PASS\\\",\\\"tests\\\":18,\\\"projects\\\":[\\\"desktop\\\",\\\"mobile\\\"],\\\"postQualification\\\":True},\n \\\"oracles\\\":[{\\\"surface\\\":n,\\\"result\\\":\\\"PASS\\\"} for n,_,_ in surfaces],\n \\\"assertions\\\":{\\\"metricFullTitleAndValueENKO360\\\":True,\\\"metricViewportProfiles\\\":[390,360,412,1440,1366],\\\"koStockNoRawGeneratedWhyNow\\\":True,\\\"koMetricNoListedRawPhrases\\\":True,\\\"koEyeNoListedRawPhrases\\\":True,\\\"userAuthoredTextPreserved\\\":True}\n})\nwritej(\\\"primary-route-regression.json\\\",{\\\"candidate\\\":candidate,\\\"suite\\\":\\\"CHG-172 primary-route regression\\\",\\\"result\\\":\\\"PASS\\\",\\\"passed\\\":17,\\\"expectedSkipped\\\":1,\\\"fullPlaywright\\\":{\\\"passed\\\":65,\\\"expectedSkipped\\\":1,\\\"failed\\\":0}})\nwritej(\\\"scanner-provider-limitation.json\\\",{\\\"candidate\\\":candidate,\\\"status\\\":\\\"BLOCKED_SIGNAL_RETAINED\\\",\\\"evidence\\\":\\\"Supported scan generated incomplete-data signal from deterministic Stooq 503 fixture; no signal was injected.\\\",\\\"productTruth\\\":\\\"A human review classification does not place an order, record a fill, or imply a return.\\\"})\nwritej(\\\"release-qualification.json\\\",{\n \\\"candidate\\\":candidate,\\\"tree\\\":tree,\\\"base\\\":base,\\\"release_verify\\\":\\\"PASS\\\",\\\"release_verify_verified\\\":True,\n \\\"qualification\\\":{\\\"npm_ci\\\":\\\"PASS; 639 packages\\\",\\\"typecheck_unit\\\":\\\"PASS; 24 files / 196 tests\\\",\\\"boundaries\\\":\\\"PASS\\\",\\\"release_workflow\\\":\\\"PASS\\\",\\\"release_base\\\":\\\"PASS\\\",\\\"npm_audit_high_critical\\\":\\\"PASS; zero vulnerabilities\\\",\\\"export_all\\\":\\\"PASS; web/iOS/Android\\\",\\\"full_playwright\\\":\\\"PASS; 65 passed, 1 expected mobile keyboard skip, 0 failed\\\",\\\"recovery\\\":\\\"PASS\\\",\\\"operations\\\":\\\"PASS; bounded synthetic qualification\\\",\\\"frozen_research\\\":\\\"BLOCKED_UNVERIFIED; pre-existing\\\",\\\"cloud_contract\\\":\\\"UNAVAILABLE; local Docker/OrbStack socket unavailable\\\"},\n \\\"postQualificationFocusedRun\\\":{\\\"result\\\":\\\"PASS\\\",\\\"tests\\\":18,\\\"projects\\\":[\\\"desktop\\\",\\\"mobile\\\"]},\\\"visualDecision\\\":\\\"AWAITING_INDEPENDENT_PIXEL_AUDIT\\\"\n})\n\n# Update six-surface manifests to exact R2 FIX lineage.\nsurface=json.loads((out/\\\"surface-manifest.json\\\").read_text())\nsurface.update({\\\"request\\\":request,\\\"operation\\\":\\\"FIX\\\",\\\"candidate\\\":{\\\"commit\\\":candidate,\\\"tree\\\":tree,\\\"base\\\":base},\\\"visualDecision\\\":\\\"AWAITING_INDEPENDENT_PIXEL_AUDIT\\\"})\n(out/\\\"surface-manifest.json\\\").write_text(json.dumps(surface,ensure_ascii=False,indent=2)+\\\"\\\\n\\\")\nrecords=[]\nfor f in sorted((out/\\\"captures\\\").rglob(\\\"*.png\\\")):\n  rel=f.relative_to(out); parts=rel.parts\n  with Image.open(f) as im: im.verify()\n  with Image.open(f) as im: width,height=im.size\n  if parts[1]==\\\"canonical\\\":\n    locale=parts[2]; profile=parts[3]; kind=\\\"canonical\\\" if locale==\\\"en\\\" else \\\"korean\\\"\n  else:\n    kind,profile,locale=parts[1],parts[2],parts[3]\n  raw=f.read_bytes()\n  records.append({\\\"file\\\":rel.as_posix(),\\\"surface\\\":f.stem,\\\"kind\\\":kind,\\\"locale\\\":locale,\n    \\\"width\\\":width,\\\"height\\\":height,\\\"sha256\\\":hashlib.sha256(raw).hexdigest(),\\\"bytes\\\":len(raw),\n    \\\"source\\\":source_map[rel.as_posix()][\\\"source\\\"],\\\"candidate\\\":candidate,\n    \\\"viewportProfile\\\":\\\"desktop\\\" if profile==\\\"desktop-1440x900\\\" else \\\"desktop-stress\\\" if profile==\\\"desktop-1366x768\\\" else \\\"mobile-canonical\\\" if profile==\\\"mobile-390x844\\\" else \\\"mobile-stress\\\" if profile==\\\"mobile-360x800\\\" else \\\"mobile-holdout\\\"})\ncounts={k:sum(r[\\\"kind\\\"]==k for r in records) for k in (\\\"canonical\\\",\\\"korean\\\",\\\"stress\\\",\\\"holdout\\\")}\nassert counts=={\\\"canonical\\\":12,\\\"korean\\\":12,\\\"stress\\\":17,\\\"holdout\\\":10},counts\nassert len(records)==51,len(records)\n(out/\\\"capture-report.json\\\").write_text(json.dumps({\n \\\"project\\\":\\\"stockledger\\\",\\\"change\\\":\\\"CHG-184\\\",\\\"request\\\":request,\\\"operation\\\":\\\"FIX\\\",\\\"candidate\\\":candidate,\\\"candidateTree\\\":tree,\\\"base\\\":base,\n \\\"captureMethod\\\":\\\"Focused Playwright captures on exact R2 candidate after release qualification.\\\",\n \\\"focusRun\\\":{\\\"tests\\\":18,\\\"result\\\":\\\"PASS\\\",\\\"projects\\\":[\\\"desktop\\\",\\\"mobile\\\"],\\\"candidate\\\":candidate},\n \\\"primaryCanonicalCaptureCount\\\":12,\\\"koreanCanonicalCaptureCount\\\":12,\\\"stressCaptureCount\\\":17,\\\"holdoutCaptureCount\\\":10,\n \\\"captures\\\":records,\\\"visualDecision\\\":\\\"AWAITING_INDEPENDENT_PIXEL_AUDIT\\\",\n \\\"limitations\\\":[\\\"Frozen research remains BLOCKED_UNVERIFIED.\\\",\\\"Cloud contract unavailable because local Docker/OrbStack socket is unavailable.\\\",\\\"Production operations identity is unconfigured; synthetic qualification passed.\\\",\\\"Visual acceptance remains with independent pixel audit.\\\"]\n},ensure_ascii=False,indent=2)+\\\"\\\\n\\\")\nreader=json.loads((out/\\\"reader-index.json\\\").read_text())\nreader.update({\\\"candidate\\\":candidate,\\\"request\\\":request,\\\"operation\\\":\\\"FIX\\\",\\\"visualDecision\\\":\\\"AWAITING_INDEPENDENT_PIXEL_AUDIT\\\",\n \\\"lineage\\\":{\\\"productCandidate\\\":candidate,\\\"protectedBase\\\":base,\\\"artifactCarrierSoleParentMustEqual\\\":candidate,\\\"nativeEvidenceSoleParentMustEqual\\\":candidate},\n \\\"diagnostics\\\":[\\\"diagnostics/task-oracle-state-coverage.json\\\",\\\"diagnostics/release-qualification.json\\\",\\\"diagnostics/scanner-provider-limitation.json\\\",\\\"diagnostics/primary-route-regression.json\\\",\\\"diagnostics/source-impact-analysis.json\\\",\\\"diagnostics/cloud-contract.json\\\",\\\"diagnostics/frozen-research.json\\\"]})\n(out/\\\"reader-index.json\\\").write_text(json.dumps(reader,ensure_ascii=False,indent=2)+\\\"\\\\n\\\")\n\n# Refresh reader books using final-candidate canonical English pixels.\ndef pdf(dest,view,pagesize):\n  c=canvas.Canvas(str(dest),pagesize=pagesize,pageCompression=1); pw,ph=pagesize\n  for name,_,task in surfaces:\n    profile=\\\"desktop-1440x900\\\" if view==\\\"desktop\\\" else \\\"mobile-390x844\\\"\n    img=out/\\\"captures/canonical/en\\\"/profile/f\\\"{name}.png\\\"\n    with Image.open(img) as im: iw,ih=im.size\n    c.setFillColorRGB(.965,.972,.98); c.rect(0,0,pw,ph,fill=1,stroke=0)\n    c.setFillColorRGB(.08,.12,.19); c.setFont(\\\"Helvetica-Bold\\\",18); c.drawString(28,ph-34,name.replace(\\\"-\\\",\\\" \\\").title())\n    c.setFont(\\\"Helvetica\\\",8); c.drawString(28,ph-49,f\\\"StockLedger CHG-184 R2 | {view} | candidate {candidate[:12]} | independent pixel audit pending\\\")\n    c.drawString(28,ph-64,task[:155])\n    scale=min((pw-56)/iw,(ph-104)/ih); dw,dh=iw*scale,ih*scale\n    c.drawImage(ImageReader(str(img)),(pw-dw)/2,26+(ph-104-dh)/2,width=dw,height=dh,mask=\\\"auto\\\",preserveAspectRatio=True)\n    c.setFont(\\\"Helvetica\\\",7); c.drawString(28,12,\\\"Lossless PNG source; independent pixel audit remains pending.\\\")\n    c.showPage()\n  c.save()\npdf(out/\\\"review-desktop.pdf\\\",\\\"desktop\\\",landscape(letter))\npdf(out/\\\"review-mobile.pdf\\\",\\\"mobile\\\",landscape(letter))\n\nentries=[]\nfor f in sorted(out.rglob(\\\"*\\\")):\n  if f.is_file() and f.name not in {\\\"deterministic-manifest.json\\\",\\\"artifact-bundle.zip\\\"}:\n    raw=f.read_bytes(); entries.append({\\\"path\\\":f.relative_to(out).as_posix(),\\\"bytes\\\":len(raw),\\\"sha256\\\":hashlib.sha256(raw).hexdigest()})\n(out/\\\"deterministic-manifest.json\\\").write_text(json.dumps({\\\"algorithm\\\":\\\"SHA-256\\\",\\\"ordering\\\":\\\"ascending relative POSIX path\\\",\\\"candidate\\\":candidate,\\\"files\\\":entries},indent=2)+\\\"\\\\n\\\")\nzip_path=out/\\\"artifact-bundle.zip\\\"\nwith zipfile.ZipFile(zip_path,\\\"w\\\",compression=zipfile.ZIP_STORED) as z:\n  for f in sorted(out.rglob(\\\"*\\\")):\n    if f.is_file() and f\"'!=zip_path:\n      zi=zipfile.ZipInfo(f.relative_to(out).as_posix(),date_time=(2026,9,23,0,0,0))\n      zi.compress_type=zipfile.ZIP_STORED; zi.external_attr=(0o100644&0xffff)<<16; z.writestr(zi,f.read_bytes())\nwith zipfile.ZipFile(zip_path) as z:\n  assert z.testzip() is None and len(z.namelist())==len(entries)+1\n(run/\"artifact-bundle.sha256\").write_text(hashlib.sha256(zip_path.read_bytes()).hexdigest()+\"  visual-atlas/artifact-bundle.zip'\"\\\\n\\\")\nprint(json.dumps({\\\"package\\\":str(out),\\\"candidate\\\":candidate,\\\"tree\\\":tree,\\\"counts\\\":counts,\\\"total\\\":len(records),\\\"payload_files\\\":len(entries),\\\"zip_sha256\\\":hashlib.sha256(zip_path.read_bytes()).hexdigest(),\\\"zip_bytes\\\":zip_path.stat().st_size},indent=2))\nPY\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy rg -n 'a4d934a80bfdddbc34b1303270e332f060585bac|stockledger-prod-c15-review-detail-lawbook-v1' /Users/haewonkim/.codex-fabric/runs/stockledger/stockledger-prod-c15-review-detail-localization-responsive-fix-v2/visual-atlas\"",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy ls -la /Users/haewonkim/.codex-fabric/runs/stockledger/stockledger-prod-c15-review-detail-localization-responsive-fix-v2'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy python3 - <<'PY'\nfrom pathlib import Path\nimport json,hashlib,zipfile\np=Path('/Users/haewonkim/.codex-fabric/runs/stockledger/stockledger-prod-c15-review-detail-localization-responsive-fix-v2/visual-atlas')\nmanifest=json.loads((p/'deterministic-manifest.json').read_text()); bad=[]\nfor r in manifest['files']:\n b=(p/r['path']).read_bytes()\n if len(b)\"'!=r['\"'bytes'] or hashlib.sha256(b).hexdigest()\"'!=r['\"'sha256']:bad.append(r['path'])\nz=p/'artifact-bundle.zip'\nwith zipfile.ZipFile(z) as a: zipok=(a.testzip() is None and len(a.namelist())==len(manifest['files'])+1)\nprint(json.dumps({'candidate':manifest['candidate'],'entries':len(manifest['files']),'bad_hashes':bad,'zip_ok':zipok,'zip_sha256':hashlib.sha256(z.read_bytes()).hexdigest(),'sidecar':(p.parent/'artifact-bundle.sha256').read_text().strip()},indent=2))\nPY\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy git status --short --branch && rtk proxy git rev-parse HEAD && rtk proxy git rev-parse HEAD''^{tree}'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy git ls-remote --heads origin refs/heads/project-os-artifacts/stockledger/stockledger-prod-c15-review-detail-localization-responsive-fix-v2 refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c15-review-detail-localization-responsive-fix-v2'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy git show --stat --format=fuller 43a01557b989c48afd246b5799b3471ff529d34'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy git worktree add -b project-os-artifacts/stockledger/stockledger-prod-c15-review-detail-localization-responsive-fix-v2 /Users/haewonkim/.codex-fabric/runs/stockledger/stockledger-prod-c15-review-detail-localization-responsive-fix-v2/artifact-worktree b20067faf07e214635ba2299649eaf943af5cf84'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy cp -R /Users/haewonkim/.codex-fabric/runs/stockledger/stockledger-prod-c15-review-detail-localization-responsive-fix-v2/visual-atlas /Users/haewonkim/.codex-fabric/runs/stockledger/stockledger-prod-c15-review-detail-localization-responsive-fix-v2/artifact-worktree/visual-atlas'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy git -C /Users/haewonkim/.codex-fabric/runs/stockledger/stockledger-prod-c15-review-detail-localization-responsive-fix-v2/artifact-worktree add visual-atlas'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy git -C /Users/haewonkim/.codex-fabric/runs/stockledger/stockledger-prod-c15-review-detail-localization-responsive-fix-v2/artifact-worktree commit -m 'Publish CHG-184 R2 review detail atlas'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy git -C /Users/haewonkim/.codex-fabric/runs/stockledger/stockledger-prod-c15-review-detail-localization-responsive-fix-v2/artifact-worktree rev-parse HEAD''^'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy git -C /Users/haewonkim/.codex-fabric/runs/stockledger/stockledger-prod-c15-review-detail-localization-responsive-fix-v2/artifact-worktree rev-list --parents -n1 HEAD'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy git -C /Users/haewonkim/.codex-fabric/runs/stockledger/stockledger-prod-c15-review-detail-localization-responsive-fix-v2/artifact-worktree status --short --branch'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy git -C /Users/haewonkim/.codex-fabric/runs/stockledger/stockledger-prod-c15-review-detail-localization-responsive-fix-v2/artifact-worktree diff-tree --no-commit-id --name-only -r HEAD'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy git -C /Users/haewonkim/.codex-fabric/runs/stockledger/stockledger-prod-c15-review-detail-localization-responsive-fix-v2/artifact-worktree push origin HEAD:refs/heads/project-os-artifacts/stockledger/stockledger-prod-c15-review-detail-localization-responsive-fix-v2'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy /Users/haewonkim/.codex-fabric/bin/fabricctl --help'",
+      "exit_code": 2,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy /Users/haewonkim/.codex-fabric/bin/fabricctl status CF-d84fd19afdcf44475b05dc6f'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy git ls-remote --heads origin refs/heads/project-os-artifacts/stockledger/stockledger-prod-c15-review-detail-localization-responsive-fix-v2'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy /Users/haewonkim/.codex-fabric/bin/fabricctl publish-evidence CF-d84fd19afdcf44475b05dc6f'",
+      "exit_code": 2,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy ls -l /Users/haewonkim/.codex-fabric/bin/fabricctl'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy /Users/haewonkim/.codex-fabric/bin/fabricctl doctor-quick'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy find /Users/haewonkim/.codex-fabric -type f -iname '*d84fd19afdcf44475b05dc6f*' -print\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy cat /Users/haewonkim/.codex-fabric/bin/fabricctl'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy cat /Users/haewonkim/.codex-fabric/logs/CF-d84fd19afdcf44475b05dc6f.launcher.log'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy ls -la /Users/haewonkim/.codex-fabric'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy ls -la /Users/haewonkim/.codex-fabric/jobs/CF-d84fd19afdcf44475b05dc6f'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy cat /Users/haewonkim/.codex-fabric/locks/workers/CF-d84fd19afdcf44475b05dc6f.lock'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy ls -la /Users/haewonkim/.codex-fabric/logs/CF-d84fd19afdcf44475b05dc6f.launcher.log'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy find /Users/haewonkim/.codex-fabric/results -maxdepth 2 -type f -path '*d84fd19afdcf44475b05dc6f*' -print\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy ps -Ao pid,ppid,etime,command'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy cat /Users/haewonkim/.codex-fabric/results/CF-d84fd19afdcf44475b05dc6f/codex.stderr.log'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy cat /Users/haewonkim/.codex-fabric/results/CF-d84fd19afdcf44475b05dc6f/codex.events.jsonl'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy find /Users/haewonkim/.codex-fabric/jobs -maxdepth 2 -type f -print'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy rg -l 'CF-d84fd19afdcf44475b05dc6f' /Users/haewonkim/.codex-fabric/jobs /Users/haewonkim/.codex-fabric/state /Users/haewonkim/.codex-fabric/inbox /Users/haewonkim/.codex-fabric/results\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy cat /Users/haewonkim/.codex-fabric/jobs/CF-d84fd19afdcf44475b05dc6f.running/lease.json'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy tail -n 12 /Users/haewonkim/.codex-fabric/results/CF-d84fd19afdcf44475b05b05dc6f/codex.events.jsonl'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy cat /Users/haewonkim/.codex-fabric/jobs/CF-d84fd19afdcf44475b05dc6f.running/job.json'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy ps -Ao pid,ppid,etime,command | rtk proxy rg 'fabric.py|CF-d84fd19afdcf44475b05dc6f'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy rg -n 'JOB_NOT_TERMINAL|def .*publish.*evidence|publish-pending-evidence|def .*complete.*job|\\\\.executed|terminal job not found' /Users/haewonkim/.codex-fabric/current/fabric.py\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy sed -n '2970,3055p' /Users/haewonkim/.codex-fabric/current/fabric.py\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy rg -n 'executed|finished_at|status.*succeeded|result.json|move\\\\(' /Users/haewonkim/.codex-fabric/current/fabric.py | tail -n 100\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy sed -n '3810,4010p' /Users/haewonkim/.codex-fabric/current/fabric.py\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy git -C /Users/haewonkim/.codex-fabric/runs/stockledger/stockledger-prod-c15-review-detail-localization-responsive-fix-v2/artifact-worktree rev-list --parents -n1 HEAD'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy git rev-parse HEAD HEAD''^{tree}'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy /Users/haewonkim/.codex-fabric/bin/fabricctl status CF-d84fd19afdcf44475b05dc6f'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy git ls-remote --heads origin refs/heads/codex/stockledger-prod-c15-review-detail-localization-responsive-fix-v2 refs/heads/project-os-artifacts/stockledger/stockledger-prod-c15-review-detail-localization-responsive-fix-v2 refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c15-review-detail-localization-responsive-fix-v2'",
+      "exit_code": 0,
+      "type": "command_execution"
+    }
+  ],
+  "codex": {
+    "cli_version": "codex-cli 0.155.1",
+    "configured_model": "gpt-6-luna",
+    "event_count": 352,
+    "provider_reported_model": null,
+    "reasoning_effort": "xhigh",
+    "terminal_type": "turn.completed",
+    "usage": {
+      "cache_hit_percent": 98.21,
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 23520640,
+      "fresh_input_tokens": 428590,
+      "input_tokens": 23949230,
+      "non_reasoning_output_tokens": 46227,
+      "output_tokens": 120273,
+      "reasoning_output_tokens": 74046,
+      "total_processed_tokens": 24069503
+    },
+    "warnings": []
+  },
+  "commits": [
+    {
+      "sha": "b20067faf07e214635ba2299649eaf943af5cf84",
+      "subject": "Fix localized responsive review details"
+    },
+    {
+      "sha": "a4d934a80bfdddbc34b1303270e332f060585bac",
+      "subject": "Fix mobile sample data warning wrapping"
+    },
+    {
+      "sha": "ff5fd82929da3ab2125563fc45246323a1981fa5",
+      "subject": "Perfect deep review and detail surfaces"
+    }
+  ],
+  "diff": {
+    "additions": 2665,
+    "changed_files": 21,
+    "commit_count": 3,
+    "deletions": 983
+  },
+  "error_code": null,
+  "evidence_manifest": {
+    "count": 2,
+    "items": [
+      {
+        "bytes": 4281,
+        "path": "src/lib/providerEvidence.ts",
+        "sha256": "3da4a7a1b5b92503e1a15454582a7e5811b7dd847270acd515aefb414399fff5"
+      },
+      {
+        "bytes": 68695,
+        "path": "src/lib/visualEvidence.ts",
+        "sha256": "5bc4415685958cf10d5e4d7efcff3e6c262951cab87a174346c02273bdabe24a"
+      }
+    ],
+    "version": 1
+  },
+  "evidence_publisher_release": "1.2.5-dashboard-controls-candidate",
+  "fabric_capture": {
+    "applied": false,
+    "paths_before": 0,
+    "transient_untracked_removed": {
+      "count": 0,
+      "items": []
+    }
+  },
+  "fabric_release": "1.2.5-dashboard-controls-candidate",
+  "failure_class": null,
+  "finished_at": "2026-09-23T18:51:46Z",
+  "git": {
+    "base_is_ancestor": true,
+    "base_sha": "16726097e6725b6749f097a1c1f295fc85bea916",
+    "branch": "codex/stockledger-prod-c15-review-detail-localization-responsive-fix-v2",
+    "detached_verify": false,
+    "head_sha": "b20067faf07e214635ba2299649eaf943af5cf84",
+    "remote_exact_head": true,
+    "remote_head_sha": "b20067faf07e214635ba2299649eaf943af5cf84",
+    "target_branch": "main",
+    "target_drifted_since_acceptance": false,
+    "target_head_observed_after_execution": "16726097e6725b6749f097a1c1f295fc85bea916",
+    "work_branch": "codex/stockledger-prod-c15-review-detail-localization-responsive-fix-v2",
+    "worktree_clean": true
+  },
+  "instructions": {
+    "files": [],
+    "total_bytes": 0,
+    "warning": null
+  },
+  "job_id": "CF-d84fd19afdcf44475b05dc6f",
+  "kind": "codex-fabric-audit-evidence",
+  "locator": {
+    "branch": "codex-fabric/evidence/stockledger/stockledger-prod-c15-review-detail-localization-responsive-fix-v2",
+    "path": ".codex-fabric/audit.json",
+    "ref": "refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c15-review-detail-localization-responsive-fix-v2"
+  },
+  "operation": "FIX",
+  "policy": {
+    "environment_policy_sha256": "e077daca74297b3c30bee8989f00f8ca5338f7610b4d016a6c48db524205d064",
+    "fabric_release": "1.2.5-dashboard-controls-candidate",
+    "policy_sha256": "123615bf2f6e57dcac197e49ca98ceac59ada86a55e2c84445ea5d00812c0833",
+    "registry_sha256": "cfc765f3211c37c7967a138f3b2d89a99341939b15b2623f92744d007f625d6f"
+  },
+  "project_id": "stockledger",
+  "recovery": {
+    "model_rerun_safe": false,
+    "recovery_required": false,
+    "retry_safe": false,
+    "retry_scope": null,
+    "worktree_retained": true
+  },
+  "request": "stockledger-prod-c15-review-detail-localization-responsive-fix-v2",
+  "schema_version": 1,
+  "started_at": "2026-09-23T18:07:38Z",
+  "status": "EXECUTED_CHANGE",
+  "timing": {
+    "execution_seconds": 2648,
+    "queue_seconds": 0,
+    "total_seconds": 2648
+  },
+  "transport": {
+    "bytes": 11713,
+    "envelope": "FABRIC/2",
+    "prompt_bytes": 11325,
+    "prompt_sha256": "6ee94deb8a5603f708f2e7a3069d3016b1c0079661a79a75ae4c42e582d0c4e3",
+    "sha256": "d84fd19afdcf44475b05dc6f0f3cb99d7b73d6a99ab88cad1099ee54a3178d5f"
+  }
+}
