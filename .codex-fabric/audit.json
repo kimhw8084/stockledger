@@ -1,0 +1,470 @@
+{
+  "accepted_at": "2026-09-23T13:46:15Z",
+  "changed_files": [
+    {
+      "additions": 1,
+      "deletions": 10,
+      "path": "packages/components/src/Disclosure.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 278,
+      "deletions": 474,
+      "path": "src/app/StockLedgerApp.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 0,
+      "deletions": 378,
+      "path": "src/components/stocks/StockMetricDetailSheet.tsx",
+      "status": "D"
+    },
+    {
+      "additions": 149,
+      "deletions": 0,
+      "path": "src/features/eyes/EyeDetail.tsx",
+      "status": "A"
+    },
+    {
+      "additions": 271,
+      "deletions": 0,
+      "path": "src/features/eyes/EyeFlowsScreen.tsx",
+      "status": "A"
+    },
+    {
+      "additions": 151,
+      "deletions": 0,
+      "path": "src/features/journal/DecisionDetail.tsx",
+      "status": "A"
+    },
+    {
+      "additions": 19,
+      "deletions": 7,
+      "path": "src/features/journal/OutcomeEditor.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 1,
+      "deletions": 1,
+      "path": "src/features/recipes/RecipesScreen.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 197,
+      "deletions": 0,
+      "path": "src/features/recipes/scanner/ScannerReview.tsx",
+      "status": "A"
+    },
+    {
+      "additions": 41,
+      "deletions": 93,
+      "path": "src/features/watchlist/WatchlistScreen.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 277,
+      "deletions": 0,
+      "path": "src/features/watchlist/detail/StockEntityDetail.tsx",
+      "status": "A"
+    },
+    {
+      "additions": 401,
+      "deletions": 0,
+      "path": "src/features/watchlist/detail/StockMetricDetailSheet.tsx",
+      "status": "A"
+    },
+    {
+      "additions": 26,
+      "deletions": 2,
+      "path": "src/features/watchlist/model.ts",
+      "status": "M"
+    },
+    {
+      "additions": 4,
+      "deletions": 0,
+      "path": "src/lib/i18n.ts",
+      "status": "M"
+    },
+    {
+      "additions": 2,
+      "deletions": 0,
+      "path": "tests/e2e/chg172-primary-surfaces.spec.ts",
+      "status": "M"
+    },
+    {
+      "additions": 401,
+      "deletions": 0,
+      "path": "tests/e2e/chg184-deep-review-details.spec.ts",
+      "status": "A"
+    },
+    {
+      "additions": 1,
+      "deletions": 0,
+      "path": "tests/e2e/workspace.spec.ts",
+      "status": "M"
+    }
+  ],
+  "checks": [
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc 'rg --files src/ui && rg -n \\\"Badge\\\" src/ui'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc 'cat src/ui/index.ts && rg -n \\\"const Badge|function Badge|Badge =|badge\\\" src/components src/app/styles.ts src -g \\\"*.tsx\\\" -g \\\"*.ts\\\" | head -100'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc 'sed -n \\\"200,320p\\\" src/features/watchlist/detail/StockEntityDetail.tsx && rg -n \\\"coverageRow|sample\\\" src/features/watchlist/detail/StockEntityDetail.tsx tests/e2e/chg184-deep-review-details.spec.ts'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc 'rg -n \\\"InlineMessage|Badge\\\" node_modules/@expo-base -g \\\"*.d.ts\\\" -g \\\"*.tsx\\\" -g \\\"*.js\\\" | head -120'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc 'rg --files node_modules | rg \\\"expo-base.*(feedback|components)\\\" | head -50 && rg -n \\\"export function InlineMessage|function InlineMessage|InlineMessage\\\" node_modules -g \\\"*.d.ts\\\" | head -80'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc 'rg --files | rg \\\"(feedback|components).*(tsx|ts)\"'$\" | head -120 && cat tsconfig.json | head -120'\"'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc 'cat packages/components/src/Badge.tsx && cat packages/feedback/src/index.ts && cat packages/feedback/src/AlertBanner.tsx && cat packages/components/src/StatusIndicator.tsx'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc 'sed -n \\\"1,115p\\\" src/features/watchlist/detail/StockEntityDetail.tsx && sed -n \\\"1,70p\\\" tests/e2e/chg184-deep-review-details.spec.ts'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc 'source /Users/haewonkim/.nvm/nvm.sh && nvm use 22.23.2 >/dev/null && npm run test:e2e -- tests/e2e/chg184-deep-review-details.spec.ts --project=desktop --project=mobile'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc 'sed -n \\\"1,18p\\\" src/features/watchlist/detail/StockEntityDetail.tsx && sed -n \\\"135,148p\\\" src/features/watchlist/detail/StockEntityDetail.tsx && git diff --stat && git diff -- src/features/watchlist/detail/StockEntityDetail.tsx tests/e2e/chg184-deep-review-details.spec.ts'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc 'rg -n \\\"webServer|reuseExistingServer|port|test:e2e\\\" playwright.config.ts package.json && lsof -nP -iTCP -sTCP:LISTEN | rg \\\"node|expo|metro|vite\\\" | head -40 && stat -f \\\"%Sm %z %N\\\" artifacts/browser/chg184-deep-review-details-33c37-y-pinning-and-invoker-focus-mobile/stock-entity-detail-mobile.png'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc 'cat scripts/serve-preview.mjs'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc 'source /Users/haewonkim/.nvm/nvm.sh && nvm use 22.23.2 >/dev/null && npm run export:web'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc 'source /Users/haewonkim/.nvm/nvm.sh && nvm use 22.23.2 >/dev/null && npm run test:e2e -- tests/e2e/chg184-deep-review-details.spec.ts --project=desktop --project=mobile'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc 'git add src/features/watchlist/detail/StockEntityDetail.tsx tests/e2e/chg184-deep-review-details.spec.ts && git commit -m \\\"Fix mobile sample data warning wrapping\\\" && git rev-parse HEAD && git diff --stat 16726097e6725b6749f097a1c1f295fc85bea916..HEAD && git status --short --branch'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc 'source /Users/haewonkim/.nvm/nvm.sh && nvm use 22.23.2 >/dev/null && npm ci'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc 'source /Users/haewonkim/.nvm/nvm.sh && nvm use 22.23.2 >/dev/null && npm run check:release-workflow'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc 'source /Users/haewonkim/.nvm/nvm.sh && nvm use 22.23.2 >/dev/null && npm run check:boundaries'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc 'source /Users/haewonkim/.nvm/nvm.sh && nvm use 22.23.2 >/dev/null && STOCKLEDGER_PROTECTED_BASE=16726097e6725b6749f097a1c1f295fc85bea916 npm run check:release-base'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc 'source /Users/haewonkim/.nvm/nvm.sh && nvm use 22.23.2 >/dev/null && npm audit --audit-level=high'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc 'source /Users/haewonkim/.nvm/nvm.sh && nvm use 22.23.2 >/dev/null && npm run check'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc 'source /Users/haewonkim/.nvm/nvm.sh && nvm use 22.23.2 >/dev/null && npm run export:all'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc 'source /Users/haewonkim/.nvm/nvm.sh && nvm use 22.23.2 >/dev/null && npm run test:e2e'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc 'node -e \\\"const p=require(\\\\\\\"./package.json\\\\\\\"); console.log(JSON.stringify(Object.fromEntries(Object.entries(p.scripts).filter(([k,v])=>/cloud|contract|recovery|operations|frozen/.test(k+v))),null,2))\\\"'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc 'source /Users/haewonkim/.nvm/nvm.sh && nvm use 22.23.2 >/dev/null && npm run check:frozen'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc 'source /Users/haewonkim/.nvm/nvm.sh && nvm use 22.23.2 >/dev/null && npm run operations:status'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc 'source /Users/haewonkim/.nvm/nvm.sh && nvm use 22.23.2 >/dev/null && npm run recovery:drill -- --output artifacts/recovery-result.json'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc 'source /Users/haewonkim/.nvm/nvm.sh && nvm use 22.23.2 >/dev/null && npm run operations:qualify -- --output artifacts/operations-qualification.json'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc 'sed -n \\\"1,240p\\\" tests/integration/cloud.integration.ts && rg -n \\\"npm run test:cloud|supabase start|cloud.integration\\\" README.md docs .github scripts -g \\\"*.md\\\" -g \\\"*.yml\\\" -g \\\"*.mjs\\\" -g \\\"*.ts\\\" | head -80'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc 'source /Users/haewonkim/.nvm/nvm.sh && nvm use 22.23.2 >/dev/null && npx supabase start -x studio,edge-runtime,logflare,vector,supavisor,imgproxy,realtime,storage-api'\"",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc 'source /Users/haewonkim/.nvm/nvm.sh && nvm use 22.23.2 >/dev/null && npm run test:cloud'\"",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc 'source /Users/haewonkim/.nvm/nvm.sh && nvm use 22.23.2 >/dev/null && npm run release:evidence -- --output artifacts/release-evidence.json --base 16726097e6725b6749f097a1c1f295fc85bea916 && npm run release:verify -- --input artifacts/release-evidence.json --base 16726097e6725b6749f097a1c1f295fc85bea916'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc 'source /Users/haewonkim/.nvm/nvm.sh && nvm use 22.23.2 >/dev/null && npm run test:e2e -- tests/e2e/chg184-deep-review-details.spec.ts --project=desktop --project=mobile'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc 'source /Users/haewonkim/.nvm/nvm.sh && nvm use 22.23.2 >/dev/null && npm run operations:status > artifacts/operations-status.json && /tmp/chg184-pdf-venv/bin/python /tmp/build_chg184_atlas.py'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc 'mkdir -p /tmp/chg184-pdf-render-final && pdftoppm -png -r 55 /Users/haewonkim/.codex-fabric/runs/stockledger/stockledger-prod-c15-review-detail-lawbook-v1/visual-atlas/review-desktop.pdf /tmp/chg184-pdf-render-final/desktop >/dev/null 2>&1 && pdftoppm -png -r 55 /Users/haewonkim/.codex-fabric/runs/stockledger/stockledger-prod-c15-review-detail-lawbook-v1/visual-atlas/review-mobile.pdf /tmp/chg184-pdf-render-final/mobile >/dev/null 2>&1 && /tmp/chg184-pdf-venv/bin/python - <<\\\"PY\\\"\nfrom PIL import Image,ImageOps,ImageDraw\nfrom pathlib import Path\nroot=Path(\\\"/Users/haewonkim/.codex-fabric/runs/stockledger/stockledger-prod-c15-review-detail-lawbook-v1/visual-atlas/captures/canonical/en\\\")\nnames=[\\\"stock-entity-detail\\\",\\\"metric-detail-sheet\\\",\\\"eye-flows\\\",\\\"eye-detail\\\",\\\"scanner-review\\\",\\\"decision-detail\\\"]\nfor kind,folder in [(\\\"desktop\\\",\\\"desktop-1440x900\\\"),(\\\"mobile\\\",\\\"mobile-390x844\\\")]:\n imgs=[]\n for name in names:\n  p=root/folder/f\\\"{name}.png\\\"\n  im=Image.open(p).convert(\\\"RGB\\\")\n  im.thumbnail((480,650) if kind==\\\"mobile\\\" else (480,300))\n  tile=Image.new(\\\"RGB\\\",(500,680 if kind==\\\"mobile\\\" else 330),\\\"white\\\")\n  tile.paste(im,((500-im.width)//2,24))\n  ImageDraw.Draw(tile).text((10,5),name,fill=\\\"black\\\")\n  imgs.append(tile)\n sheet=Image.new(\\\"RGB\\\",(1500,1360 if kind==\\\"mobile\\\" else 660),\\\"#ddd\\\")\n for i,im in enumerate(imgs): sheet.paste(im,((i%3)*500,(i//3)* (680 if kind==\\\"mobile\\\" else 330)))\n out=Path(f\\\"/tmp/chg184-pdf-render-final/{kind}-sheet.png\\\")\n sheet.save(out)\n print(out)\nfrom pypdf import PdfReader\nfor name in [\\\"review-desktop.pdf\\\",\\\"review-mobile.pdf\\\"]:\n r=PdfReader(Path(\\\"/Users/haewonkim/.codex-fabric/runs/stockledger/stockledger-prod-c15-review-detail-lawbook-v1/visual-atlas\\\")/name)\n assert len(r.pages)==6\n text=\\\"\\\\n\\\".join(p.extract_text() or \\\"\\\" for p in r.pages)\n for title in [\\\"Stock Entity Detail\\\",\\\"Metric Detail Sheet\\\",\\\"Eye Flows\\\",\\\"Eye Detail\\\",\\\"Scanner Review\\\",\\\"Decision Detail\\\"]: assert title in text,title\n print(name,\\\"pages\\\",len(r.pages),\\\"text_chars\\\",len(text))\nPY\npdfinfo /Users/haewonkim/.codex-fabric/runs/stockledger/stockledger-prod-c15-review-detail-lawbook-v1/visual-atlas/review-desktop.pdf | rg \\\"Pages:|Page size:|File size:\\\" && pdfinfo /Users/haewonkim/.codex-fabric/runs/stockledger/stockledger-prod-c15-review-detail-lawbook-v1/visual-atlas/review-mobile.pdf | rg \\\"Pages:|Page size:|File size:\\\"'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc 'git status --short --branch && git rev-parse HEAD HEAD\"'^{tree} && git show -s --format=%P HEAD && git push origin HEAD:refs/heads/codex/stockledger-prod-c15-review-detail-lawbook-v1 && git ls-remote origin refs/heads/codex/stockledger-prod-c15-review-detail-lawbook-v1 refs/heads/main'\"'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc 'git worktree add -b project-os-artifacts/stockledger/stockledger-prod-c15-review-detail-lawbook-v1 /Users/haewonkim/.codex-fabric/runs/stockledger/stockledger-prod-c15-review-detail-lawbook-v1/artifact-worktree a4d934a80bfdddbc34b1303270e332f060585bac && cp -R /Users/haewonkim/.codex-fabric/runs/stockledger/stockledger-prod-c15-review-detail-lawbook-v1/visual-atlas /Users/haewonkim/.codex-fabric/runs/stockledger/stockledger-prod-c15-review-detail-lawbook-v1/artifact-worktree/visual-atlas && git -C /Users/haewonkim/.codex-fabric/runs/stockledger/stockledger-prod-c15-review-detail-lawbook-v1/artifact-worktree add visual-atlas && git -C /Users/haewonkim/.codex-fabric/runs/stockledger/stockledger-prod-c15-review-detail-lawbook-v1/artifact-worktree status --short && git -C /Users/haewonkim/.codex-fabric/runs/stockledger/stockledger-prod-c15-review-detail-lawbook-v1/artifact-worktree commit -m \\\"Publish CHG-184 review detail atlas\\\" && git -C /Users/haewonkim/.codex-fabric/runs/stockledger/stockledger-prod-c15-review-detail-lawbook-v1/artifact-worktree rev-parse HEAD && git -C /Users/haewonkim/.codex-fabric/runs/stockledger/stockledger-prod-c15-review-detail-lawbook-v1/artifact-worktree show -s --format=%P HEAD'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc 'git -C /Users/haewonkim/.codex-fabric/runs/stockledger/stockledger-prod-c15-review-detail-lawbook-v1/artifact-worktree push origin HEAD:refs/heads/project-os-artifacts/stockledger/stockledger-prod-c15-review-detail-lawbook-v1 && git ls-remote origin refs/heads/project-os-artifacts/stockledger/stockledger-prod-c15-review-detail-lawbook-v1 && git -C /Users/haewonkim/.codex-fabric/runs/stockledger/stockledger-prod-c15-review-detail-lawbook-v1/artifact-worktree rev-parse HEAD\"'^ HEAD'\"'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc '/Users/haewonkim/.codex-fabric/bin/fabricctl status CF-5eda248fda3917746fd12135'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc '/Users/haewonkim/.codex-fabric/bin/fabricctl --help'\"",
+      "exit_code": 2,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc 'git status --short --branch && git rev-parse HEAD HEAD\"'^{tree} && git show -s --format=%P HEAD && git ls-remote origin refs/heads/codex/stockledger-prod-c15-review-detail-lawbook-v1 refs/heads/main'\"'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc '/Users/haewonkim/.codex-fabric/bin/fabricctl publish-evidence CF-5eda248fda3917746fd12135'\"",
+      "exit_code": 2,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc 'file /Users/haewonkim/.codex-fabric/bin/fabricctl && sed -n \\\"1,200p\\\" /Users/haewonkim/.codex-fabric/bin/fabricctl && rg -n \\\"JOB_NOT_TERMINAL|publish-evidence|terminal job not found\\\" /Users/haewonkim/.codex-fabric -g \\\"*.py\\\" -g \\\"*.js\\\" -g \\\"*.ts\\\" -g \\\"*.sh\\\" -g \\\"*.md\\\" | head -100'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc 'find /Users/haewonkim/.codex-fabric/jobs/CF-5eda248fda3917746fd12135 -maxdepth 2 -type f -print 2>/dev/null | sort && sed -n \\\"2960,3035p\\\" /Users/haewonkim/.codex-fabric/current/fabric.py && sed -n \\\"4600,4705p\\\" /Users/haewonkim/.codex-fabric/current/fabric.py'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc 'find /Users/haewonkim/.codex-fabric/jobs -maxdepth 1 -type d -name \\\"CF-5eda248fda3917746fd12135*\\\" -print && find /Users/haewonkim/.codex-fabric/results/CF-5eda248fda3917746fd12135 -maxdepth 1 -type f -print 2>/dev/null | sort && /Users/haewonkim/.codex-fabric/bin/fabricctl health'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc 'find /Users/haewonkim/.codex-fabric/jobs/CF-5eda248fda3917746fd12135.running -maxdepth 2 -type f -print | sort && cat /Users/haewonkim/.codex-fabric/jobs/CF-5eda248fda3917746fd12135.running/job.json && tail -40 /Users/haewonkim/.codex-fabric/results/CF-5eda248fda3917746fd12135/codex.events.jsonl'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc '/tmp/chg184-pdf-venv/bin/python - <<\\\"PY\\\"\nfrom pathlib import Path\nimport hashlib,json,zipfile\np=Path(\\\"/Users/haewonkim/.codex-fabric/runs/stockledger/stockledger-prod-c15-review-detail-lawbook-v1/artifact-worktree/visual-atlas\\\")\nm=json.loads((p/\\\"deterministic-manifest.json\\\").read_text())\nfor f in m[\\\"files\\\"]:\n q=p/f[\\\"path\\\"]\n assert q.is_file() and q.stat().st_size==f[\\\"bytes\\\"], f[\\\"path\\\"]\n assert hashlib.sha256(q.read_bytes()).hexdigest()==f[\\\"sha256\\\"], f[\\\"path\\\"]\nwith zipfile.ZipFile(p/\\\"artifact-bundle.zip\\\") as z:\n assert z.testzip() is None\n assert len(z.namelist())==len(m[\\\"files\\\"])+1\ns=json.loads((p/\\\"surface-manifest.json\\\").read_text())\nr=json.loads((p/\\\"capture-report.json\\\").read_text())\nassert len(s[\\\"logicalSurfaces\\\"])==6 and len(s[\\\"canonicalAnchors\\\"])==12\nassert r[\\\"candidate\\\"]==\\\"a4d934a80bfdddbc34b1303270e332f060585bac\\\"\nassert r[\\\"canonicalCanonicalCaptureCount\\\"] if \\\"canonicalCanonicalCaptureCount\\\" in r else r[\\\"primaryCanonicalCaptureCount\\\"]==12\nprint(json.dumps({\\\"files_hashed\\\":len(m[\\\"files\\\"]),\\\"surfaces\\\":len(s[\\\"logicalSurfaces\\\"]),\\\"anchors\\\":len(s[\\\"canonicalAnchors\\\"]),\\\"canonical\\\":r[\\\"primaryCanonicalCaptureCount\\\"],\\\"korean\\\":r[\\\"koreanCanonicalCaptureCount\\\"],\\\"stress\\\":r[\\\"stressCaptureCount\\\"],\\\"holdout\\\":r[\\\"holdoutCaptureCount\\\"],\\\"zip_sha256\\\":hashlib.sha256((p/\\\"artifact-bundle.zip\\\").read_bytes()).hexdigest()},indent=2))\nPY'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc '/Users/haewonkim/.codex-fabric/bin/fabricctl status CF-5eda248fda3917746fd12135 && /Users/haewonkim/.codex-fabric/bin/fabricctl publish-evidence CF-5eda248fda3917746fd12135'\"",
+      "exit_code": 2,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc 'git -C /Users/haewonkim/.codex-fabric/runs/stockledger/stockledger-prod-c15-review-detail-lawbook-v1/artifact-worktree status --short --branch && git -C /Users/haewonkim/.codex-fabric/runs/stockledger/stockledger-prod-c15-review-detail-lawbook-v1/artifact-worktree rev-list --parents -n 1 HEAD && git ls-remote origin refs/heads/project-os-artifacts/stockledger/stockledger-prod-c15-review-detail-lawbook-v1 refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c15-review-detail-lawbook-v1'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -lc 'git status --short --branch && git rev-parse HEAD HEAD\"'^{tree} && git rev-list --count 16726097e6725b6749f097a1c1f295fc85bea916..HEAD && git diff --name-only 16726097e6725b6749f097a1c1f295fc85bea916..HEAD | wc -l && git show -s --format=%P HEAD && git ls-remote origin refs/heads/codex/stockledger-prod-c15-review-detail-lawbook-v1 refs/heads/main'\"'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    }
+  ],
+  "codex": {
+    "cli_version": "codex-cli 0.155.1",
+    "configured_model": "gpt-6-luna",
+    "event_count": 1296,
+    "provider_reported_model": null,
+    "reasoning_effort": "xhigh",
+    "terminal_type": "turn.completed",
+    "usage": {
+      "cache_hit_percent": 98.39,
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 93009152,
+      "fresh_input_tokens": 1518326,
+      "input_tokens": 94527478,
+      "non_reasoning_output_tokens": 152583,
+      "output_tokens": 377235,
+      "reasoning_output_tokens": 224652,
+      "total_processed_tokens": 94904713
+    },
+    "warnings": []
+  },
+  "commits": [
+    {
+      "sha": "a4d934a80bfdddbc34b1303270e332f060585bac",
+      "subject": "Fix mobile sample data warning wrapping"
+    },
+    {
+      "sha": "ff5fd82929da3ab2125563fc45246323a1981fa5",
+      "subject": "Perfect deep review and detail surfaces"
+    }
+  ],
+  "diff": {
+    "additions": 2220,
+    "changed_files": 17,
+    "commit_count": 2,
+    "deletions": 965
+  },
+  "error_code": null,
+  "evidence_manifest": {
+    "count": 0,
+    "items": [],
+    "version": 1
+  },
+  "evidence_publisher_release": "1.2.5-dashboard-controls-candidate",
+  "fabric_capture": {
+    "applied": false,
+    "paths_before": 0,
+    "transient_untracked_removed": {
+      "count": 0,
+      "items": []
+    }
+  },
+  "fabric_release": "1.2.5-dashboard-controls-candidate",
+  "failure_class": null,
+  "finished_at": "2026-09-23T16:41:10Z",
+  "git": {
+    "base_is_ancestor": true,
+    "base_sha": "16726097e6725b6749f097a1c1f295fc85bea916",
+    "branch": "codex/stockledger-prod-c15-review-detail-lawbook-v1",
+    "detached_verify": false,
+    "head_sha": "a4d934a80bfdddbc34b1303270e332f060585bac",
+    "remote_exact_head": true,
+    "remote_head_sha": "a4d934a80bfdddbc34b1303270e332f060585bac",
+    "target_branch": "main",
+    "target_drifted_since_acceptance": false,
+    "target_head_observed_after_execution": "16726097e6725b6749f097a1c1f295fc85bea916",
+    "work_branch": "codex/stockledger-prod-c15-review-detail-lawbook-v1",
+    "worktree_clean": true
+  },
+  "instructions": {
+    "files": [],
+    "total_bytes": 0,
+    "warning": null
+  },
+  "job_id": "CF-5eda248fda3917746fd12135",
+  "kind": "codex-fabric-audit-evidence",
+  "locator": {
+    "branch": "codex-fabric/evidence/stockledger/stockledger-prod-c15-review-detail-lawbook-v1",
+    "path": ".codex-fabric/audit.json",
+    "ref": "refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c15-review-detail-lawbook-v1"
+  },
+  "operation": "BUILD",
+  "policy": {
+    "environment_policy_sha256": "e077daca74297b3c30bee8989f00f8ca5338f7610b4d016a6c48db524205d064",
+    "fabric_release": "1.2.5-dashboard-controls-candidate",
+    "policy_sha256": "123615bf2f6e57dcac197e49ca98ceac59ada86a55e2c84445ea5d00812c0833",
+    "registry_sha256": "cfc765f3211c37c7967a138f3b2d89a99341939b15b2623f92744d007f625d6f"
+  },
+  "project_id": "stockledger",
+  "recovery": {
+    "model_rerun_safe": false,
+    "recovery_required": false,
+    "retry_safe": false,
+    "retry_scope": null,
+    "worktree_retained": true
+  },
+  "request": "stockledger-prod-c15-review-detail-lawbook-v1",
+  "schema_version": 1,
+  "started_at": "2026-09-23T13:46:15Z",
+  "status": "EXECUTED_CHANGE",
+  "timing": {
+    "execution_seconds": 10495,
+    "queue_seconds": 0,
+    "total_seconds": 10495
+  },
+  "transport": {
+    "bytes": 15792,
+    "envelope": "FABRIC/2",
+    "prompt_bytes": 15442,
+    "prompt_sha256": "e2b20645cfaba4c4d50e9fb7a5fc3f97a09b8fa6af4a932e4577a301be2420e3",
+    "sha256": "5eda248fda3917746fd121355af3762046ddb5f2859db7155998762b524cf23f"
+  }
+}
