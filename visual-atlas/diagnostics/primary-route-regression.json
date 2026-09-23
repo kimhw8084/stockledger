@@ -1,0 +1,9 @@
+{
+  "candidate": "a4d934a80bfdddbc34b1303270e332f060585bac",
+  "primaryRouteRegressionPreserved": true,
+  "sharedImpactAnalysis": {
+    "watchlist": "selected-stock detail is rendered within the Watchlist task context; the canonical stock-entity-detail captures are full Watchlist route views and document the changed shared-impact pixels.",
+    "todayRecipesAlertsJournalSettings": "no deep-review module is their primary surface; full release E2E suite passed (61 passed, one expected skip). No separate primary-route screenshots were regenerated."
+  },
+  "authority": "CHG-172 integrated primary UI; AR-61 Promoted; 12 primary atlas anchors Current"
+}

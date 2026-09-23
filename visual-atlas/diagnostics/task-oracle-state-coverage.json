@@ -1,0 +1,56 @@
+{
+  "candidate": "a4d934a80bfdddbc34b1303270e332f060585bac",
+  "e2eFile": "tests/e2e/chg184-deep-review-details.spec.ts",
+  "focusedRun": {
+    "result": "PASS",
+    "tests": 14,
+    "projects": [
+      "desktop",
+      "mobile"
+    ],
+    "captureRunsAfterReleaseQualification": true
+  },
+  "oracles": [
+    {
+      "surface": "stock-entity-detail",
+      "result": "PASS",
+      "coverage": "Watchlist to stock detail, data authority and monitoring context, bounded follow-up, Escape close and invoker focus."
+    },
+    {
+      "surface": "metric-detail-sheet",
+      "result": "PASS",
+      "coverage": "Watchlist to metric detail, evidence chart/context, freshness/source hierarchy, adjacent evidence or pin, and exact invoker focus."
+    },
+    {
+      "surface": "eye-flows",
+      "result": "PASS",
+      "coverage": "Needs Review filter to Eye and return to the same row and context."
+    },
+    {
+      "surface": "eye-detail",
+      "result": "PASS",
+      "coverage": "Current Eye review action, stock/journal context and same Watchlist context on return."
+    },
+    {
+      "surface": "scanner-review",
+      "result": "PASS",
+      "coverage": "Supported daily scan blocked signal; human decision and required manual reason; review log carries no order/fill/return semantics."
+    },
+    {
+      "surface": "decision-detail",
+      "result": "PASS",
+      "coverage": "Journal historical detail and exact decision-row focus on close."
+    }
+  ],
+  "stateCoverage": {
+    "sampleDegradedOrStaleStock": "retained in supported sample workspace and detail evidence",
+    "metricSourceAndFreshnessLimitation": "shown in metric detail",
+    "eyesNeedsReview": "captured and verified",
+    "eyesQuietAndNoResult": "supported existing states; not used as canonical screenshot fixtures",
+    "eyePartialOrStaleEvaluation": "retained where supported; not fabricated for capture",
+    "scannerBlockedIncompleteData": "captured with production-generated signal from deterministic provider failure; provenance recorded",
+    "decisionMissingNoteConcernOrOutcome": "existing detail handles missing evidence; canonical capture shows supported historical decision",
+    "loadingErrorDeniedConflict": "UNPROVEN_OR_NOT_APPLICABLE where not safely retained"
+  },
+  "accessibility": "E2E checks keyboard Escape close, invoker restoration, filters/context and interactive action semantics. No screen-reader certification claim."
+}
