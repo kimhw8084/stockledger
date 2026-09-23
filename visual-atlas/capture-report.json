@@ -1,0 +1,1417 @@
+{
+  "schema": "stockledger-capture-report-v1",
+  "project": "stockledger",
+  "change": "CHG-172",
+  "request": "stockledger-prod-c14-primary-surfaces-lawbook-v1",
+  "operation": "BUILD",
+  "fabric_job": "CF-15fa2f1fc9122e348b846af6",
+  "source": {
+    "sha": "949695c79753990080309907502e33cd29eb00e1",
+    "tree": "6eed4a44bbe2680a856159ff4716da7183a018b7",
+    "working_tree_clean_before_capture": true
+  },
+  "runtime": {
+    "app": "Expo static web export from exact candidate",
+    "base_url": "http://127.0.0.1:43187",
+    "app_runtime_sha256": "7e5d07da2cdfe1f89e645292a7bfee2ab6840492b12f388d100f95a88f72bc07",
+    "browser": "Chromium",
+    "browser_version": "153.0.8010.12",
+    "timezone": "America/Chicago",
+    "color_scheme": "light",
+    "reduced_motion": "reduce",
+    "device_scale_factor": 1,
+    "profiles": {
+      "desktop": {
+        "width": 1440,
+        "height": 900,
+        "isMobile": false,
+        "hasTouch": false
+      },
+      "mobile": {
+        "width": 390,
+        "height": 844,
+        "isMobile": true,
+        "hasTouch": true
+      },
+      "stressDesktop": {
+        "width": 1366,
+        "height": 768,
+        "isMobile": false,
+        "hasTouch": false
+      },
+      "stressMobile": {
+        "width": 360,
+        "height": 800,
+        "isMobile": true,
+        "hasTouch": true
+      },
+      "holdout": {
+        "width": 412,
+        "height": 915,
+        "isMobile": true,
+        "hasTouch": true
+      }
+    },
+    "locale_capture": [
+      "en-US",
+      "ko-KR"
+    ]
+  },
+  "capture_method": {
+    "full_page": false,
+    "lossless_png": true,
+    "screenshot_dimensions_verified": true,
+    "document_horizontal_overflow": "none observed",
+    "dom_mutation": false,
+    "css_zoom": false,
+    "browser_zoom_200_percent": "UNPROVEN: runner cannot control browser chrome; no viewport or device scale factor substitution used"
+  },
+  "screenshot_count": 47,
+  "canonical_screenshot_count": 12,
+  "screenshots": [
+    {
+      "path": "screenshots/today--desktop-1440x900.png",
+      "surface_key": "today",
+      "locale": "en",
+      "viewport": "1440x900",
+      "dpr": 1,
+      "image": {
+        "width": 1440,
+        "height": 900
+      },
+      "sha256": "a00eb704b8c013f6ab4268fcf35f0f62c36eba96f1dafe253a313ae1e5bba2f3",
+      "bytes": 131240,
+      "runtime_ready": true,
+      "document_width": 1440,
+      "document_height": 900,
+      "primary_action": {
+        "visible": true,
+        "bounds": {
+          "x": 1163,
+          "y": 514,
+          "width": 179.96875,
+          "height": 44
+        },
+        "intersects_viewport": true,
+        "fully_within_viewport": true,
+        "unobscured_by_primary_navigation": true
+      }
+    },
+    {
+      "path": "screenshots/watchlist--desktop-1440x900.png",
+      "surface_key": "watchlist",
+      "locale": "en",
+      "viewport": "1440x900",
+      "dpr": 1,
+      "image": {
+        "width": 1440,
+        "height": 900
+      },
+      "sha256": "31b5f4a448d68a98cefa55b46ff3ddd414abd748f8d34f5d4d540709b8d126e6",
+      "bytes": 121630,
+      "runtime_ready": true,
+      "document_width": 1440,
+      "document_height": 900,
+      "primary_action": {
+        "visible": true,
+        "bounds": {
+          "x": 1027.6875,
+          "y": 410,
+          "width": 138.890625,
+          "height": 44
+        },
+        "intersects_viewport": true,
+        "fully_within_viewport": true,
+        "unobscured_by_primary_navigation": true
+      }
+    },
+    {
+      "path": "screenshots/recipes--desktop-1440x900.png",
+      "surface_key": "recipes",
+      "locale": "en",
+      "viewport": "1440x900",
+      "dpr": 1,
+      "image": {
+        "width": 1440,
+        "height": 900
+      },
+      "sha256": "e7c12af98e1e2bb7baa9a5d19042ce36c4e3e918faa0a4b0d6dbbfded5bba670",
+      "bytes": 124144,
+      "runtime_ready": true,
+      "document_width": 1440,
+      "document_height": 900,
+      "primary_action": {
+        "visible": true,
+        "bounds": {
+          "x": 1153.15625,
+          "y": 454,
+          "width": 121.6875,
+          "height": 36
+        },
+        "intersects_viewport": true,
+        "fully_within_viewport": true,
+        "unobscured_by_primary_navigation": true
+      }
+    },
+    {
+      "path": "screenshots/alerts--desktop-1440x900.png",
+      "surface_key": "alerts",
+      "locale": "en",
+      "viewport": "1440x900",
+      "dpr": 1,
+      "image": {
+        "width": 1440,
+        "height": 900
+      },
+      "sha256": "e5b2c9719bbeaa649d5c876e795677d252cb991369343e5c33ca0e83dabf23b7",
+      "bytes": 106227,
+      "runtime_ready": true,
+      "document_width": 1440,
+      "document_height": 900,
+      "primary_action": {
+        "visible": true,
+        "bounds": {
+          "x": 1147,
+          "y": 455,
+          "width": 167.609375,
+          "height": 44
+        },
+        "intersects_viewport": true,
+        "fully_within_viewport": true,
+        "unobscured_by_primary_navigation": true
+      }
+    },
+    {
+      "path": "screenshots/alerts--diagnostic-snoozed-history.png",
+      "surface_key": "alerts",
+      "locale": "en",
+      "viewport": "1440x900",
+      "dpr": 1,
+      "image": {
+        "width": 1440,
+        "height": 900
+      },
+      "sha256": "bf71290b7023d1b1f374e4eebe3d0e2f53ab20e061c1aea634e1b95145660ef8",
+      "bytes": 154723,
+      "runtime_ready": true,
+      "document_width": 1440,
+      "document_height": 900,
+      "primary_action": {
+        "visible": true,
+        "bounds": {
+          "x": 1164,
+          "y": 328,
+          "width": 141.609375,
+          "height": 44
+        },
+        "intersects_viewport": true,
+        "fully_within_viewport": true,
+        "unobscured_by_primary_navigation": true
+      }
+    },
+    {
+      "path": "screenshots/journal--desktop-1440x900.png",
+      "surface_key": "journal",
+      "locale": "en",
+      "viewport": "1440x900",
+      "dpr": 1,
+      "image": {
+        "width": 1440,
+        "height": 900
+      },
+      "sha256": "d16239305042f80d8c134f7334898596e376c74503be5025c7b01b3d8bd27316",
+      "bytes": 136040,
+      "runtime_ready": true,
+      "document_width": 1440,
+      "document_height": 900,
+      "primary_action": {
+        "visible": true,
+        "bounds": {
+          "x": 1312.0625,
+          "y": 238,
+          "width": 87.9375,
+          "height": 44
+        },
+        "intersects_viewport": true,
+        "fully_within_viewport": true,
+        "unobscured_by_primary_navigation": true
+      }
+    },
+    {
+      "path": "screenshots/settings--desktop-1440x900.png",
+      "surface_key": "settings",
+      "locale": "en",
+      "viewport": "1440x900",
+      "dpr": 1,
+      "image": {
+        "width": 1440,
+        "height": 900
+      },
+      "sha256": "1818841210ec03d9d733e84a8ee996f94ab5bcdc43a6e606e1f33b2cee39966b",
+      "bytes": 128489,
+      "runtime_ready": true,
+      "document_width": 1440,
+      "document_height": 900,
+      "primary_action": {
+        "visible": true,
+        "bounds": {
+          "x": 840,
+          "y": 402,
+          "width": 218.34375,
+          "height": 44
+        },
+        "intersects_viewport": true,
+        "fully_within_viewport": true,
+        "unobscured_by_primary_navigation": true
+      }
+    },
+    {
+      "path": "screenshots/today--mobile-390x844.png",
+      "surface_key": "today",
+      "locale": "en",
+      "viewport": "390x844",
+      "dpr": 1,
+      "image": {
+        "width": 390,
+        "height": 844
+      },
+      "sha256": "ff52a2693e4e9bfad9780c22a4068a8617cc173e586e1175e6895d6a337d416b",
+      "bytes": 67382,
+      "runtime_ready": true,
+      "document_width": 390,
+      "document_height": 844,
+      "primary_action": {
+        "visible": true,
+        "bounds": {
+          "x": 29,
+          "y": 658,
+          "width": 332,
+          "height": 44
+        },
+        "intersects_viewport": true,
+        "fully_within_viewport": true,
+        "unobscured_by_primary_navigation": true
+      }
+    },
+    {
+      "path": "screenshots/watchlist--mobile-390x844.png",
+      "surface_key": "watchlist",
+      "locale": "en",
+      "viewport": "390x844",
+      "dpr": 1,
+      "image": {
+        "width": 390,
+        "height": 844
+      },
+      "sha256": "1c032a3713b82100d610c293c9da677f097ce25cdaf5d13b28fda05146f5da01",
+      "bytes": 55367,
+      "runtime_ready": true,
+      "document_width": 390,
+      "document_height": 844,
+      "primary_action": {
+        "visible": true,
+        "bounds": {
+          "x": 16,
+          "y": 654,
+          "width": 358,
+          "height": 44
+        },
+        "intersects_viewport": true,
+        "fully_within_viewport": true,
+        "unobscured_by_primary_navigation": true
+      }
+    },
+    {
+      "path": "screenshots/recipes--mobile-390x844.png",
+      "surface_key": "recipes",
+      "locale": "en",
+      "viewport": "390x844",
+      "dpr": 1,
+      "image": {
+        "width": 390,
+        "height": 844
+      },
+      "sha256": "48f4a56cf9090bb3ac867505b47509b835a7614da2d26d9e198b0eea0acf4874",
+      "bytes": 64318,
+      "runtime_ready": true,
+      "document_width": 390,
+      "document_height": 844,
+      "primary_action": {
+        "visible": true,
+        "bounds": {
+          "x": 16,
+          "y": 682,
+          "width": 358,
+          "height": 36
+        },
+        "intersects_viewport": true,
+        "fully_within_viewport": true,
+        "unobscured_by_primary_navigation": true
+      }
+    },
+    {
+      "path": "screenshots/alerts--mobile-390x844.png",
+      "surface_key": "alerts",
+      "locale": "en",
+      "viewport": "390x844",
+      "dpr": 1,
+      "image": {
+        "width": 390,
+        "height": 844
+      },
+      "sha256": "ad3ae8a7939feb75e17c8b6ea3d0ba853f389012d6587309593dfeea3a8f38de",
+      "bytes": 67499,
+      "runtime_ready": true,
+      "document_width": 390,
+      "document_height": 844,
+      "primary_action": {
+        "visible": true,
+        "bounds": {
+          "x": 29,
+          "y": 667,
+          "width": 332,
+          "height": 44
+        },
+        "intersects_viewport": true,
+        "fully_within_viewport": true,
+        "unobscured_by_primary_navigation": true
+      }
+    },
+    {
+      "path": "screenshots/journal--mobile-390x844.png",
+      "surface_key": "journal",
+      "locale": "en",
+      "viewport": "390x844",
+      "dpr": 1,
+      "image": {
+        "width": 390,
+        "height": 844
+      },
+      "sha256": "ebdf4a0f1078821cb1696fa84dd4a3dd1bc8e6898e4e53bdcd63799f679b80cf",
+      "bytes": 68366,
+      "runtime_ready": true,
+      "document_width": 390,
+      "document_height": 844,
+      "primary_action": {
+        "visible": true,
+        "bounds": {
+          "x": 16,
+          "y": 327,
+          "width": 358,
+          "height": 44
+        },
+        "intersects_viewport": true,
+        "fully_within_viewport": true,
+        "unobscured_by_primary_navigation": true
+      }
+    },
+    {
+      "path": "screenshots/settings--mobile-390x844.png",
+      "surface_key": "settings",
+      "locale": "en",
+      "viewport": "390x844",
+      "dpr": 1,
+      "image": {
+        "width": 390,
+        "height": 844
+      },
+      "sha256": "9f9e76b45f831ea98d3bc8630a37ab4f840f15f4a65ddcee2cd17cdfed62d6db",
+      "bytes": 69346,
+      "runtime_ready": true,
+      "document_width": 390,
+      "document_height": 844,
+      "primary_action": {
+        "visible": true,
+        "bounds": {
+          "x": 33,
+          "y": 572,
+          "width": 324,
+          "height": 44
+        },
+        "intersects_viewport": true,
+        "fully_within_viewport": true,
+        "unobscured_by_primary_navigation": true
+      }
+    },
+    {
+      "path": "screenshots/watchlist--ko--desktop-1440x900.png",
+      "surface_key": "watchlist",
+      "locale": "ko",
+      "viewport": "1440x900",
+      "dpr": 1,
+      "image": {
+        "width": 1440,
+        "height": 900
+      },
+      "sha256": "300c443bbcce098d2f285b9fec16b173748a1703a6cc9f981d286d1d0eebb958",
+      "bytes": 110542,
+      "runtime_ready": true,
+      "document_width": 1440,
+      "document_height": 900,
+      "primary_action": {
+        "visible": true,
+        "bounds": {
+          "x": 1093.046875,
+          "y": 410,
+          "width": 134.234375,
+          "height": 44
+        },
+        "intersects_viewport": true,
+        "fully_within_viewport": true,
+        "unobscured_by_primary_navigation": true
+      }
+    },
+    {
+      "path": "screenshots/recipes--ko--desktop-1440x900.png",
+      "surface_key": "recipes",
+      "locale": "ko",
+      "viewport": "1440x900",
+      "dpr": 1,
+      "image": {
+        "width": 1440,
+        "height": 900
+      },
+      "sha256": "1f0f98961f0aec70748f8fc93acbc99f5367f900dacffb23bbce966c4e25b85d",
+      "bytes": 109181,
+      "runtime_ready": true,
+      "document_width": 1440,
+      "document_height": 900,
+      "primary_action": {
+        "visible": true,
+        "bounds": {
+          "x": 1221.40625,
+          "y": 454,
+          "width": 100.234375,
+          "height": 36
+        },
+        "intersects_viewport": true,
+        "fully_within_viewport": true,
+        "unobscured_by_primary_navigation": true
+      }
+    },
+    {
+      "path": "screenshots/alerts--ko--desktop-1440x900.png",
+      "surface_key": "alerts",
+      "locale": "ko",
+      "viewport": "1440x900",
+      "dpr": 1,
+      "image": {
+        "width": 1440,
+        "height": 900
+      },
+      "sha256": "5a460e084ee2da0a4c36deb8df19ff484ec9835b25b29ae418fba90e8b0bcd0c",
+      "bytes": 93672,
+      "runtime_ready": true,
+      "document_width": 1440,
+      "document_height": 900,
+      "primary_action": {
+        "visible": true,
+        "bounds": {
+          "x": 1147,
+          "y": 455,
+          "width": 108.359375,
+          "height": 44
+        },
+        "intersects_viewport": true,
+        "fully_within_viewport": true,
+        "unobscured_by_primary_navigation": true
+      }
+    },
+    {
+      "path": "screenshots/journal--ko--desktop-1440x900.png",
+      "surface_key": "journal",
+      "locale": "ko",
+      "viewport": "1440x900",
+      "dpr": 1,
+      "image": {
+        "width": 1440,
+        "height": 900
+      },
+      "sha256": "2209ca28c0a343799535cd8e1c9a430b8a9a0a6b906d486958c75b54478bcba1",
+      "bytes": 116355,
+      "runtime_ready": true,
+      "document_width": 1440,
+      "document_height": 900,
+      "primary_action": {
+        "visible": true,
+        "bounds": {
+          "x": 1302.875,
+          "y": 238,
+          "width": 97.125,
+          "height": 44
+        },
+        "intersects_viewport": true,
+        "fully_within_viewport": true,
+        "unobscured_by_primary_navigation": true
+      }
+    },
+    {
+      "path": "screenshots/settings--ko--desktop-1440x900.png",
+      "surface_key": "settings",
+      "locale": "ko",
+      "viewport": "1440x900",
+      "dpr": 1,
+      "image": {
+        "width": 1440,
+        "height": 900
+      },
+      "sha256": "c85195e320f1d068883a3dc6fcbd55f63ea758aae20dd03324f2e0a8a7a68d71",
+      "bytes": 123780,
+      "runtime_ready": true,
+      "document_width": 1440,
+      "document_height": 900,
+      "primary_action": {
+        "visible": true,
+        "bounds": {
+          "x": 840,
+          "y": 402,
+          "width": 119.484375,
+          "height": 44
+        },
+        "intersects_viewport": true,
+        "fully_within_viewport": true,
+        "unobscured_by_primary_navigation": true
+      }
+    },
+    {
+      "path": "screenshots/watchlist--ko--mobile-390x844.png",
+      "surface_key": "watchlist",
+      "locale": "ko",
+      "viewport": "390x844",
+      "dpr": 1,
+      "image": {
+        "width": 390,
+        "height": 844
+      },
+      "sha256": "bbe161b70022c216f313e98fe5d7733a16ca2642c625c1a4a814b16380787cc9",
+      "bytes": 51480,
+      "runtime_ready": true,
+      "document_width": 390,
+      "document_height": 844,
+      "primary_action": {
+        "visible": true,
+        "bounds": {
+          "x": 16,
+          "y": 654,
+          "width": 358,
+          "height": 44
+        },
+        "intersects_viewport": true,
+        "fully_within_viewport": true,
+        "unobscured_by_primary_navigation": true
+      }
+    },
+    {
+      "path": "screenshots/recipes--ko--mobile-390x844.png",
+      "surface_key": "recipes",
+      "locale": "ko",
+      "viewport": "390x844",
+      "dpr": 1,
+      "image": {
+        "width": 390,
+        "height": 844
+      },
+      "sha256": "6e3ba95448cf2d3c67563aa63b394ee99c1c674ee68bc8fddb045d3debf90f27",
+      "bytes": 58705,
+      "runtime_ready": true,
+      "document_width": 390,
+      "document_height": 844,
+      "primary_action": {
+        "visible": true,
+        "bounds": {
+          "x": 16,
+          "y": 667,
+          "width": 358,
+          "height": 36
+        },
+        "intersects_viewport": true,
+        "fully_within_viewport": true,
+        "unobscured_by_primary_navigation": true
+      }
+    },
+    {
+      "path": "screenshots/alerts--ko--mobile-390x844.png",
+      "surface_key": "alerts",
+      "locale": "ko",
+      "viewport": "390x844",
+      "dpr": 1,
+      "image": {
+        "width": 390,
+        "height": 844
+      },
+      "sha256": "6c4223f7feec42af947a35e4dc06c0c12a8cb87f147b4a4f3cac3704a9f5c307",
+      "bytes": 62527,
+      "runtime_ready": true,
+      "document_width": 390,
+      "document_height": 844,
+      "primary_action": {
+        "visible": true,
+        "bounds": {
+          "x": 29,
+          "y": 667,
+          "width": 332,
+          "height": 44
+        },
+        "intersects_viewport": true,
+        "fully_within_viewport": true,
+        "unobscured_by_primary_navigation": true
+      }
+    },
+    {
+      "path": "screenshots/journal--ko--mobile-390x844.png",
+      "surface_key": "journal",
+      "locale": "ko",
+      "viewport": "390x844",
+      "dpr": 1,
+      "image": {
+        "width": 390,
+        "height": 844
+      },
+      "sha256": "06f6951f1d1cb9bd99cf8dc7e973b9c33e2d239ccfc76e188adde97b49b46ed6",
+      "bytes": 61104,
+      "runtime_ready": true,
+      "document_width": 390,
+      "document_height": 844,
+      "primary_action": {
+        "visible": true,
+        "bounds": {
+          "x": 16,
+          "y": 306,
+          "width": 358,
+          "height": 44
+        },
+        "intersects_viewport": true,
+        "fully_within_viewport": true,
+        "unobscured_by_primary_navigation": true
+      }
+    },
+    {
+      "path": "screenshots/settings--ko--mobile-390x844.png",
+      "surface_key": "settings",
+      "locale": "ko",
+      "viewport": "390x844",
+      "dpr": 1,
+      "image": {
+        "width": 390,
+        "height": 844
+      },
+      "sha256": "68f4e347ebc9e6779a800a1b616b4d20c117894618d8f78dabb3edfcb3cdc050",
+      "bytes": 66204,
+      "runtime_ready": true,
+      "document_width": 390,
+      "document_height": 844,
+      "primary_action": {
+        "visible": true,
+        "bounds": {
+          "x": 33,
+          "y": 534,
+          "width": 324,
+          "height": 44
+        },
+        "intersects_viewport": true,
+        "fully_within_viewport": true,
+        "unobscured_by_primary_navigation": true
+      }
+    },
+    {
+      "path": "screenshots/watchlist--desktop-stress-1366x768.png",
+      "surface_key": "watchlist",
+      "locale": "en",
+      "viewport": "1366x768",
+      "dpr": 1,
+      "image": {
+        "width": 1366,
+        "height": 768
+      },
+      "sha256": "d9d0640b408572fd50dd20de78d96e755044879264346702e8d6e6047c3f8c2b",
+      "bytes": 97263,
+      "runtime_ready": true,
+      "document_width": 1366,
+      "document_height": 768,
+      "primary_action": {
+        "visible": true,
+        "bounds": {
+          "x": 953.6875,
+          "y": 410,
+          "width": 138.890625,
+          "height": 44
+        },
+        "intersects_viewport": true,
+        "fully_within_viewport": true,
+        "unobscured_by_primary_navigation": true
+      }
+    },
+    {
+      "path": "screenshots/recipes--desktop-stress-1366x768.png",
+      "surface_key": "recipes",
+      "locale": "en",
+      "viewport": "1366x768",
+      "dpr": 1,
+      "image": {
+        "width": 1366,
+        "height": 768
+      },
+      "sha256": "ff9b29b35d2a7b715394591604e7e1104eb00e5b3edf12c703145346617e67a5",
+      "bytes": 100580,
+      "runtime_ready": true,
+      "document_width": 1366,
+      "document_height": 768,
+      "primary_action": {
+        "visible": true,
+        "bounds": {
+          "x": 1079.15625,
+          "y": 454,
+          "width": 121.6875,
+          "height": 36
+        },
+        "intersects_viewport": true,
+        "fully_within_viewport": true,
+        "unobscured_by_primary_navigation": true
+      }
+    },
+    {
+      "path": "screenshots/alerts--desktop-stress-1366x768.png",
+      "surface_key": "alerts",
+      "locale": "en",
+      "viewport": "1366x768",
+      "dpr": 1,
+      "image": {
+        "width": 1366,
+        "height": 768
+      },
+      "sha256": "9f5c98db876ec8f8ea9aeff73e4f72c955a37653f1889297f6e85176626fd8f1",
+      "bytes": 96495,
+      "runtime_ready": true,
+      "document_width": 1366,
+      "document_height": 768,
+      "primary_action": {
+        "visible": true,
+        "bounds": {
+          "x": 1073,
+          "y": 455,
+          "width": 167.609375,
+          "height": 44
+        },
+        "intersects_viewport": true,
+        "fully_within_viewport": true,
+        "unobscured_by_primary_navigation": true
+      }
+    },
+    {
+      "path": "screenshots/journal--desktop-stress-1366x768.png",
+      "surface_key": "journal",
+      "locale": "en",
+      "viewport": "1366x768",
+      "dpr": 1,
+      "image": {
+        "width": 1366,
+        "height": 768
+      },
+      "sha256": "1379f0541716cd4eb679ef53737a984e5a944c7a4e5b9f1a3e557380fc9fc320",
+      "bytes": 107314,
+      "runtime_ready": true,
+      "document_width": 1366,
+      "document_height": 768,
+      "primary_action": {
+        "visible": true,
+        "bounds": {
+          "x": 1238.0625,
+          "y": 238,
+          "width": 87.9375,
+          "height": 44
+        },
+        "intersects_viewport": true,
+        "fully_within_viewport": true,
+        "unobscured_by_primary_navigation": true
+      }
+    },
+    {
+      "path": "screenshots/settings--desktop-stress-1366x768.png",
+      "surface_key": "settings",
+      "locale": "en",
+      "viewport": "1366x768",
+      "dpr": 1,
+      "image": {
+        "width": 1366,
+        "height": 768
+      },
+      "sha256": "5bfa3bd2f14c820f8c383ed57c21259d688b7e358ed8ac9e8f1a039b299923b7",
+      "bytes": 109834,
+      "runtime_ready": true,
+      "document_width": 1366,
+      "document_height": 768,
+      "primary_action": {
+        "visible": true,
+        "bounds": {
+          "x": 803,
+          "y": 402,
+          "width": 218.34375,
+          "height": 44
+        },
+        "intersects_viewport": true,
+        "fully_within_viewport": true,
+        "unobscured_by_primary_navigation": true
+      }
+    },
+    {
+      "path": "screenshots/watchlist--mobile-stress-360x800.png",
+      "surface_key": "watchlist",
+      "locale": "en",
+      "viewport": "360x800",
+      "dpr": 1,
+      "image": {
+        "width": 360,
+        "height": 800
+      },
+      "sha256": "cebdc780f3db8c191030eecfb07ed6d054d630bc30ab60d36ba24678fb66ee67",
+      "bytes": 54475,
+      "runtime_ready": true,
+      "document_width": 360,
+      "document_height": 800,
+      "primary_action": {
+        "visible": true,
+        "bounds": {
+          "x": 16,
+          "y": 654,
+          "width": 328,
+          "height": 44
+        },
+        "intersects_viewport": true,
+        "fully_within_viewport": true,
+        "unobscured_by_primary_navigation": true
+      }
+    },
+    {
+      "path": "screenshots/recipes--mobile-stress-360x800.png",
+      "surface_key": "recipes",
+      "locale": "en",
+      "viewport": "360x800",
+      "dpr": 1,
+      "image": {
+        "width": 360,
+        "height": 800
+      },
+      "sha256": "f8cf1efd7477fa6ff6412af69be151df6df09efe325e5face1e3c3abbe3b047a",
+      "bytes": 62795,
+      "runtime_ready": true,
+      "document_width": 360,
+      "document_height": 800,
+      "primary_action": {
+        "visible": true,
+        "bounds": {
+          "x": 16,
+          "y": 682,
+          "width": 328,
+          "height": 36
+        },
+        "intersects_viewport": true,
+        "fully_within_viewport": true,
+        "unobscured_by_primary_navigation": true
+      }
+    },
+    {
+      "path": "screenshots/alerts--mobile-stress-360x800.png",
+      "surface_key": "alerts",
+      "locale": "en",
+      "viewport": "360x800",
+      "dpr": 1,
+      "image": {
+        "width": 360,
+        "height": 800
+      },
+      "sha256": "21fd38c7109f06d61b6c7407da8a0870cfebfbc9676aa328debd5fcaa86a3f28",
+      "bytes": 65203,
+      "runtime_ready": true,
+      "document_width": 360,
+      "document_height": 800,
+      "primary_action": {
+        "visible": true,
+        "bounds": {
+          "x": 29,
+          "y": 667,
+          "width": 302,
+          "height": 44
+        },
+        "intersects_viewport": true,
+        "fully_within_viewport": true,
+        "unobscured_by_primary_navigation": true
+      }
+    },
+    {
+      "path": "screenshots/journal--mobile-stress-360x800.png",
+      "surface_key": "journal",
+      "locale": "en",
+      "viewport": "360x800",
+      "dpr": 1,
+      "image": {
+        "width": 360,
+        "height": 800
+      },
+      "sha256": "a52307b7d8b4f9439de367e99e009d7c3dfa996be5804e6887126d482c550cbb",
+      "bytes": 63786,
+      "runtime_ready": true,
+      "document_width": 360,
+      "document_height": 800,
+      "primary_action": {
+        "visible": true,
+        "bounds": {
+          "x": 16,
+          "y": 327,
+          "width": 328,
+          "height": 44
+        },
+        "intersects_viewport": true,
+        "fully_within_viewport": true,
+        "unobscured_by_primary_navigation": true
+      }
+    },
+    {
+      "path": "screenshots/settings--mobile-stress-360x800.png",
+      "surface_key": "settings",
+      "locale": "en",
+      "viewport": "360x800",
+      "dpr": 1,
+      "image": {
+        "width": 360,
+        "height": 800
+      },
+      "sha256": "7312067fcabe6fa2021b079ee0f95e14562289152bf4e209dc46f6e9d7ad2904",
+      "bytes": 66831,
+      "runtime_ready": true,
+      "document_width": 360,
+      "document_height": 800,
+      "primary_action": {
+        "visible": true,
+        "bounds": {
+          "x": 33,
+          "y": 572,
+          "width": 294,
+          "height": 44
+        },
+        "intersects_viewport": true,
+        "fully_within_viewport": true,
+        "unobscured_by_primary_navigation": true
+      }
+    },
+    {
+      "path": "screenshots/watchlist--holdout-412x915.png",
+      "surface_key": "watchlist",
+      "locale": "en",
+      "viewport": "412x915",
+      "dpr": 1,
+      "image": {
+        "width": 412,
+        "height": 915
+      },
+      "sha256": "2085810fd27b0679226bd51dd6d5c2e5563664ce440133cae6fb23a85c05a6ab",
+      "bytes": 57722,
+      "runtime_ready": true,
+      "document_width": 412,
+      "document_height": 915,
+      "primary_action": {
+        "visible": true,
+        "bounds": {
+          "x": 16,
+          "y": 654,
+          "width": 380,
+          "height": 44
+        },
+        "intersects_viewport": true,
+        "fully_within_viewport": true,
+        "unobscured_by_primary_navigation": true
+      }
+    },
+    {
+      "path": "screenshots/recipes--holdout-412x915.png",
+      "surface_key": "recipes",
+      "locale": "en",
+      "viewport": "412x915",
+      "dpr": 1,
+      "image": {
+        "width": 412,
+        "height": 915
+      },
+      "sha256": "2043e1133648e18fc293a3d2589708bb70af29b3a8fbca082da3c501215a75ad",
+      "bytes": 67786,
+      "runtime_ready": true,
+      "document_width": 412,
+      "document_height": 915,
+      "primary_action": {
+        "visible": true,
+        "bounds": {
+          "x": 16,
+          "y": 682,
+          "width": 380,
+          "height": 36
+        },
+        "intersects_viewport": true,
+        "fully_within_viewport": true,
+        "unobscured_by_primary_navigation": true
+      }
+    },
+    {
+      "path": "screenshots/alerts--holdout-412x915.png",
+      "surface_key": "alerts",
+      "locale": "en",
+      "viewport": "412x915",
+      "dpr": 1,
+      "image": {
+        "width": 412,
+        "height": 915
+      },
+      "sha256": "1b7f2977271f75fc98df3af028888a73f967765888cc91044ef2f85feedff45d",
+      "bytes": 73553,
+      "runtime_ready": true,
+      "document_width": 412,
+      "document_height": 915,
+      "primary_action": {
+        "visible": true,
+        "bounds": {
+          "x": 29,
+          "y": 641,
+          "width": 354,
+          "height": 44
+        },
+        "intersects_viewport": true,
+        "fully_within_viewport": true,
+        "unobscured_by_primary_navigation": true
+      }
+    },
+    {
+      "path": "screenshots/journal--holdout-412x915.png",
+      "surface_key": "journal",
+      "locale": "en",
+      "viewport": "412x915",
+      "dpr": 1,
+      "image": {
+        "width": 412,
+        "height": 915
+      },
+      "sha256": "8f66342b9c20fc09d71ce2f6abe7bc445fc17bac4287cc0dd34f055c4eeb69fd",
+      "bytes": 78699,
+      "runtime_ready": true,
+      "document_width": 412,
+      "document_height": 915,
+      "primary_action": {
+        "visible": true,
+        "bounds": {
+          "x": 16,
+          "y": 327,
+          "width": 380,
+          "height": 44
+        },
+        "intersects_viewport": true,
+        "fully_within_viewport": true,
+        "unobscured_by_primary_navigation": true
+      }
+    },
+    {
+      "path": "screenshots/settings--holdout-412x915.png",
+      "surface_key": "settings",
+      "locale": "en",
+      "viewport": "412x915",
+      "dpr": 1,
+      "image": {
+        "width": 412,
+        "height": 915
+      },
+      "sha256": "5a69f40eb372eb7de60e29c1b6e74586654dc4eb7d0e5b0ed112b79db1f815f3",
+      "bytes": 81153,
+      "runtime_ready": true,
+      "document_width": 412,
+      "document_height": 915,
+      "primary_action": {
+        "visible": true,
+        "bounds": {
+          "x": 33,
+          "y": 551,
+          "width": 346,
+          "height": 44
+        },
+        "intersects_viewport": true,
+        "fully_within_viewport": true,
+        "unobscured_by_primary_navigation": true
+      }
+    },
+    {
+      "path": "screenshots/watchlist--diagnostic-no-selection.png",
+      "surface_key": "watchlist",
+      "locale": "en",
+      "viewport": "1440x900",
+      "dpr": 1,
+      "image": {
+        "width": 1440,
+        "height": 900
+      },
+      "sha256": "1a16277c8710ae51c8dbd9034c97ba386837889e7f0383224b332b51dff29381",
+      "bytes": 89223,
+      "runtime_ready": true,
+      "document_width": 1440,
+      "document_height": 900,
+      "primary_action": {
+        "visible": true,
+        "bounds": {
+          "x": 289,
+          "y": 491,
+          "width": 1086,
+          "height": 52
+        },
+        "intersects_viewport": true,
+        "fully_within_viewport": true,
+        "unobscured_by_primary_navigation": true
+      }
+    },
+    {
+      "path": "screenshots/watchlist--diagnostic-no-results.png",
+      "surface_key": "watchlist",
+      "locale": "en",
+      "viewport": "1440x900",
+      "dpr": 1,
+      "image": {
+        "width": 1440,
+        "height": 900
+      },
+      "sha256": "f9e4c7df7303340f996ddd8c8ab3b735c9d06669d1fc63c4bb80100ef14368c7",
+      "bytes": 97419,
+      "runtime_ready": true,
+      "document_width": 1440,
+      "document_height": 900,
+      "primary_action": {
+        "visible": true,
+        "bounds": {
+          "x": 289,
+          "y": 491,
+          "width": 1086,
+          "height": 52
+        },
+        "intersects_viewport": true,
+        "fully_within_viewport": true,
+        "unobscured_by_primary_navigation": true
+      }
+    },
+    {
+      "path": "screenshots/recipes--diagnostic-no-compatible-set.png",
+      "surface_key": "recipes",
+      "locale": "en",
+      "viewport": "1440x900",
+      "dpr": 1,
+      "image": {
+        "width": 1440,
+        "height": 900
+      },
+      "sha256": "1ef5ac38e527a7d273cfa6a4c074ab8610199081c208adb188b156d0725a71c2",
+      "bytes": 96877,
+      "runtime_ready": true,
+      "document_width": 1440,
+      "document_height": 900,
+      "primary_action": {
+        "visible": false,
+        "reason": "surface action selector unavailable for this subview"
+      }
+    },
+    {
+      "path": "screenshots/alerts--diagnostic-no-current.png",
+      "surface_key": "alerts",
+      "locale": "en",
+      "viewport": "1440x900",
+      "dpr": 1,
+      "image": {
+        "width": 1440,
+        "height": 900
+      },
+      "sha256": "3d78f3a935342d4f1ca9ad0b03ffdffe277bfe84c4b17c32d20cbea8c28aa5a5",
+      "bytes": 73546,
+      "runtime_ready": true,
+      "document_width": 1440,
+      "document_height": 900,
+      "primary_action": {
+        "visible": false,
+        "reason": "surface action selector unavailable for this subview"
+      }
+    },
+    {
+      "path": "screenshots/alerts--diagnostic-empty-history.png",
+      "surface_key": "alerts",
+      "locale": "en",
+      "viewport": "1440x900",
+      "dpr": 1,
+      "image": {
+        "width": 1440,
+        "height": 900
+      },
+      "sha256": "6a7de1bde934253737c651030770bb2601f5056467001d34198f978b39eb7427",
+      "bytes": 69108,
+      "runtime_ready": true,
+      "document_width": 1440,
+      "document_height": 900,
+      "primary_action": {
+        "visible": false,
+        "reason": "surface action selector unavailable for this subview"
+      }
+    },
+    {
+      "path": "screenshots/journal--diagnostic-empty-history.png",
+      "surface_key": "journal",
+      "locale": "en",
+      "viewport": "1440x900",
+      "dpr": 1,
+      "image": {
+        "width": 1440,
+        "height": 900
+      },
+      "sha256": "66c16e721319353ad384a6e4236738c7b31ffeff55146c69d4b1ae2b445bb9da",
+      "bytes": 91526,
+      "runtime_ready": true,
+      "document_width": 1440,
+      "document_height": 900,
+      "primary_action": {
+        "visible": true,
+        "bounds": {
+          "x": 1312.0625,
+          "y": 420,
+          "width": 87.9375,
+          "height": 44
+        },
+        "intersects_viewport": true,
+        "fully_within_viewport": true,
+        "unobscured_by_primary_navigation": true
+      }
+    },
+    {
+      "path": "screenshots/settings--diagnostic-no-stock-unconfigured.png",
+      "surface_key": "settings",
+      "locale": "en",
+      "viewport": "1440x900",
+      "dpr": 1,
+      "image": {
+        "width": 1440,
+        "height": 900
+      },
+      "sha256": "46897a810bc369481d5de6a5ff39bd2a5b22ae5b224cc868011a4591d8473206",
+      "bytes": 130598,
+      "runtime_ready": true,
+      "document_width": 1440,
+      "document_height": 900,
+      "primary_action": {
+        "visible": true,
+        "bounds": {
+          "x": 840,
+          "y": 584,
+          "width": 218.34375,
+          "height": 44
+        },
+        "intersects_viewport": true,
+        "fully_within_viewport": true,
+        "unobscured_by_primary_navigation": true
+      }
+    },
+    {
+      "path": "screenshots/settings--diagnostic-refresh-pending.png",
+      "surface_key": "settings",
+      "locale": "en",
+      "viewport": "1440x900",
+      "dpr": 1,
+      "image": {
+        "width": 1440,
+        "height": 900
+      },
+      "sha256": "80628bf150bfb3b417d850bcc6d58058affc585cffce403aadf09e6973e641a6",
+      "bytes": 130191,
+      "runtime_ready": true,
+      "document_width": 1440,
+      "document_height": 900,
+      "primary_action": {
+        "visible": true,
+        "bounds": {
+          "x": 840,
+          "y": 349,
+          "width": 218.34375,
+          "height": 44
+        },
+        "intersects_viewport": true,
+        "fully_within_viewport": true,
+        "unobscured_by_primary_navigation": true
+      }
+    },
+    {
+      "path": "screenshots/settings--diagnostic-refresh-error.png",
+      "surface_key": "settings",
+      "locale": "en",
+      "viewport": "1440x900",
+      "dpr": 1,
+      "image": {
+        "width": 1440,
+        "height": 900
+      },
+      "sha256": "64a5dfa0de7478d6d91556a32698a20da341a37ee691668d26f49f87cc20b98d",
+      "bytes": 127842,
+      "runtime_ready": true,
+      "document_width": 1440,
+      "document_height": 900,
+      "primary_action": {
+        "visible": true,
+        "bounds": {
+          "x": 840,
+          "y": 450,
+          "width": 218.34375,
+          "height": 44
+        },
+        "intersects_viewport": true,
+        "fully_within_viewport": true,
+        "unobscured_by_primary_navigation": true
+      }
+    }
+  ],
+  "browser_diagnostics": {
+    "runtime_failures": [
+      {
+        "context": "settings-refresh-pending-and-error",
+        "kind": "requestfailed",
+        "origin": "https://stooq.com",
+        "path": "/q/d/l/",
+        "resourceType": "fetch",
+        "error": "net::ERR_FAILED"
+      },
+      {
+        "context": "settings-refresh-pending-and-error",
+        "kind": "console",
+        "message": "Failed to load resource: net::ERR_FAILED"
+      },
+      {
+        "context": "settings-refresh-pending-and-error",
+        "kind": "requestfailed",
+        "origin": "https://stooq.com",
+        "path": "/q/d/l/",
+        "resourceType": "fetch",
+        "error": "net::ERR_FAILED"
+      },
+      {
+        "context": "settings-refresh-pending-and-error",
+        "kind": "console",
+        "message": "Failed to load resource: net::ERR_FAILED"
+      }
+    ],
+    "external_requests": [
+      {
+        "context": "settings-refresh-pending-and-error",
+        "origin": "https://stooq.com",
+        "path": "/q/d/l/",
+        "resourceType": "fetch"
+      },
+      {
+        "context": "settings-refresh-pending-and-error",
+        "origin": "https://stooq.com",
+        "path": "/q/d/l/",
+        "resourceType": "fetch"
+      }
+    ],
+    "settings_refresh_route": "Stooq requests held 1.2s then aborted to retain a real pending state and a truthful network failure; no DOM fixture was injected",
+    "held_requests": 2
+  },
+  "release_verify": {
+    "verified": true,
+    "reasons": []
+  },
+  "non_happy_state_capture_count": 10,
+  "visualDecision": "AWAITING_INDEPENDENT_PIXEL_AUDIT"
+}

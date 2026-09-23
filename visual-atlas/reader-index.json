@@ -1,0 +1,225 @@
+{
+  "schema": "stockledger-reader-index-v1",
+  "project": "stockledger",
+  "change": "CHG-172",
+  "request": "stockledger-prod-c14-primary-surfaces-lawbook-v1",
+  "operation": "BUILD",
+  "fabric_job": "CF-15fa2f1fc9122e348b846af6",
+  "source_sha": "949695c79753990080309907502e33cd29eb00e1",
+  "source_tree": "6eed4a44bbe2680a856159ff4716da7183a018b7",
+  "visualDecision": "AWAITING_INDEPENDENT_PIXEL_AUDIT",
+  "review_pdfs": {
+    "desktop": {
+      "path": "review-desktop.pdf",
+      "sha256": "475a9cb186ccc2e68b3d79e529b63573a2891486eaf053967463239c6f2ceb5b",
+      "page_count": 6,
+      "pages": [
+        {
+          "page_number": 1,
+          "surface_key": "today",
+          "locale": "en",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "png_path": "screenshots/today--desktop-1440x900.png",
+          "png_sha256": "a00eb704b8c013f6ab4268fcf35f0f62c36eba96f1dafe253a313ae1e5bba2f3",
+          "pdf_path": "review-desktop.pdf#page=1",
+          "pdf_page_size_points": {
+            "width": 1050.0,
+            "height": 740.0
+          }
+        },
+        {
+          "page_number": 2,
+          "surface_key": "watchlist",
+          "locale": "en",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "png_path": "screenshots/watchlist--desktop-1440x900.png",
+          "png_sha256": "31b5f4a448d68a98cefa55b46ff3ddd414abd748f8d34f5d4d540709b8d126e6",
+          "pdf_path": "review-desktop.pdf#page=2",
+          "pdf_page_size_points": {
+            "width": 1050.0,
+            "height": 740.0
+          }
+        },
+        {
+          "page_number": 3,
+          "surface_key": "recipes",
+          "locale": "en",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "png_path": "screenshots/recipes--desktop-1440x900.png",
+          "png_sha256": "e7c12af98e1e2bb7baa9a5d19042ce36c4e3e918faa0a4b0d6dbbfded5bba670",
+          "pdf_path": "review-desktop.pdf#page=3",
+          "pdf_page_size_points": {
+            "width": 1050.0,
+            "height": 740.0
+          }
+        },
+        {
+          "page_number": 4,
+          "surface_key": "alerts",
+          "locale": "en",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "png_path": "screenshots/alerts--desktop-1440x900.png",
+          "png_sha256": "e5b2c9719bbeaa649d5c876e795677d252cb991369343e5c33ca0e83dabf23b7",
+          "pdf_path": "review-desktop.pdf#page=4",
+          "pdf_page_size_points": {
+            "width": 1050.0,
+            "height": 740.0
+          }
+        },
+        {
+          "page_number": 5,
+          "surface_key": "journal",
+          "locale": "en",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "png_path": "screenshots/journal--desktop-1440x900.png",
+          "png_sha256": "d16239305042f80d8c134f7334898596e376c74503be5025c7b01b3d8bd27316",
+          "pdf_path": "review-desktop.pdf#page=5",
+          "pdf_page_size_points": {
+            "width": 1050.0,
+            "height": 740.0
+          }
+        },
+        {
+          "page_number": 6,
+          "surface_key": "settings",
+          "locale": "en",
+          "viewport": {
+            "width": 1440,
+            "height": 900
+          },
+          "png_path": "screenshots/settings--desktop-1440x900.png",
+          "png_sha256": "1818841210ec03d9d733e84a8ee996f94ab5bcdc43a6e606e1f33b2cee39966b",
+          "pdf_path": "review-desktop.pdf#page=6",
+          "pdf_page_size_points": {
+            "width": 1050.0,
+            "height": 740.0
+          }
+        }
+      ]
+    },
+    "mobile": {
+      "path": "review-mobile.pdf",
+      "sha256": "6ed37636d28c66f7d35e5bea6b129bbc76198c0862141c80f4f0abc2176468d5",
+      "page_count": 6,
+      "pages": [
+        {
+          "page_number": 1,
+          "surface_key": "today",
+          "locale": "en",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "png_path": "screenshots/today--mobile-390x844.png",
+          "png_sha256": "ff52a2693e4e9bfad9780c22a4068a8617cc173e586e1175e6895d6a337d416b",
+          "pdf_path": "review-mobile.pdf#page=1",
+          "pdf_page_size_points": {
+            "width": 480.0,
+            "height": 1030.0
+          }
+        },
+        {
+          "page_number": 2,
+          "surface_key": "watchlist",
+          "locale": "en",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "png_path": "screenshots/watchlist--mobile-390x844.png",
+          "png_sha256": "1c032a3713b82100d610c293c9da677f097ce25cdaf5d13b28fda05146f5da01",
+          "pdf_path": "review-mobile.pdf#page=2",
+          "pdf_page_size_points": {
+            "width": 480.0,
+            "height": 1030.0
+          }
+        },
+        {
+          "page_number": 3,
+          "surface_key": "recipes",
+          "locale": "en",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "png_path": "screenshots/recipes--mobile-390x844.png",
+          "png_sha256": "48f4a56cf9090bb3ac867505b47509b835a7614da2d26d9e198b0eea0acf4874",
+          "pdf_path": "review-mobile.pdf#page=3",
+          "pdf_page_size_points": {
+            "width": 480.0,
+            "height": 1030.0
+          }
+        },
+        {
+          "page_number": 4,
+          "surface_key": "alerts",
+          "locale": "en",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "png_path": "screenshots/alerts--mobile-390x844.png",
+          "png_sha256": "ad3ae8a7939feb75e17c8b6ea3d0ba853f389012d6587309593dfeea3a8f38de",
+          "pdf_path": "review-mobile.pdf#page=4",
+          "pdf_page_size_points": {
+            "width": 480.0,
+            "height": 1030.0
+          }
+        },
+        {
+          "page_number": 5,
+          "surface_key": "journal",
+          "locale": "en",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "png_path": "screenshots/journal--mobile-390x844.png",
+          "png_sha256": "ebdf4a0f1078821cb1696fa84dd4a3dd1bc8e6898e4e53bdcd63799f679b80cf",
+          "pdf_path": "review-mobile.pdf#page=5",
+          "pdf_page_size_points": {
+            "width": 480.0,
+            "height": 1030.0
+          }
+        },
+        {
+          "page_number": 6,
+          "surface_key": "settings",
+          "locale": "en",
+          "viewport": {
+            "width": 390,
+            "height": 844
+          },
+          "png_path": "screenshots/settings--mobile-390x844.png",
+          "png_sha256": "9f9e76b45f831ea98d3bc8630a37ab4f840f15f4a65ddcee2cd17cdfed62d6db",
+          "pdf_path": "review-mobile.pdf#page=6",
+          "pdf_page_size_points": {
+            "width": 480.0,
+            "height": 1030.0
+          }
+        }
+      ]
+    }
+  },
+  "capture_sets": {
+    "canonical_pngs": "12 English screenshots across six primary surfaces at desktop 1440×900 and mobile 390×844",
+    "korean_pngs": "10 changed-primary screenshots at both canonical anchors",
+    "stress_and_holdout_pngs": "15 changed-primary screenshots at 1366×768, 360×800, and 412×915",
+    "non_happy_diagnostics": "10 supported sample, empty, no-results, pending, and request-error states"
+  }
+}

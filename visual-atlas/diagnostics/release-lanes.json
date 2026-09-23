@@ -1,0 +1,45 @@
+{
+  "schema": "stockledger-chg172-release-lanes-v1",
+  "project": "stockledger",
+  "change": "CHG-172",
+  "request": "stockledger-prod-c14-primary-surfaces-lawbook-v1",
+  "fabric_job": "CF-15fa2f1fc9122e348b846af6",
+  "source_sha": "949695c79753990080309907502e33cd29eb00e1",
+  "source_tree": "6eed4a44bbe2680a856159ff4716da7183a018b7",
+  "protected_base": "9dd9c4b0a37b804868487cf63a169faf807cdaf1",
+  "lanes": {
+    "npm_ci": { "status": "PASS", "result": "639 packages installed; 0 audit vulnerabilities" },
+    "release_base": { "status": "PASS", "base_commit_is_ancestor": true },
+    "typecheck_and_unit": { "status": "PASS", "test_files": 23, "tests": 191 },
+    "boundaries": { "status": "PASS" },
+    "release_workflow": { "status": "PASS" },
+    "frozen_research": {
+      "status": "BLOCKED_UNVERIFIED_EXISTING_PRODUCT_LIMITATION",
+      "release_blocked": true,
+      "limitations": [
+        "research_numeric_golden_outputs_not_included_in_repository",
+        "current_constituents_survivorship_biased",
+        "point_in_time_membership_unavailable",
+        "forward_proof_required"
+      ]
+    },
+    "npm_audit": { "status": "PASS", "high_or_critical_vulnerabilities": 0 },
+    "export_all": { "status": "PASS", "platforms": ["web", "ios", "android"] },
+    "playwright": {
+      "status": "PASS_WITH_SUPPORTED_SKIP",
+      "total": 48,
+      "passed": 47,
+      "skipped": 1,
+      "failed": 0,
+      "skip_reason": "The mobile touch-emulator project has no connected hardware keyboard; the keyboard task path passed on desktop Chromium."
+    },
+    "recovery_drill": { "status": "PASS", "synthetic_evidence_only": true },
+    "operations_qualification": { "status": "PASS", "synthetic_evidence_only": true },
+    "cloud_integration": {
+      "status": "ENVIRONMENT_BLOCKED",
+      "reason": "OrbStack Docker socket is absent at unix:///Users/haewonkim/.orbstack/run/docker.sock; Supabase CLI could not inspect container health."
+    },
+    "release_verify": { "status": "PASS", "verified": true, "reasons": [] }
+  },
+  "visualDecision": "AWAITING_INDEPENDENT_PIXEL_AUDIT"
+}
