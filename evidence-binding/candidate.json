@@ -1,0 +1,22 @@
+{
+  "accepted_candidate": {
+    "sha": "949695c79753990080309907502e33cd29eb00e1",
+    "tree": "6eed4a44bbe2680a856159ff4716da7183a018b7"
+  },
+  "candidate_preserved": true,
+  "change": "CHG-172",
+  "operation": "VERIFY",
+  "product_changed_files": 0,
+  "product_commits": 0,
+  "project": "stockledger",
+  "protected_base": {
+    "sha": "9dd9c4b0a37b804868487cf63a169faf807cdaf1",
+    "tree": "5b0b1abf96b7b13da4443d6698ce791419f658e0"
+  },
+  "repository": "kimhw8084/stockledger",
+  "request": "stockledger-prod-c14-primary-surfaces-evidence-bind-verify-v1",
+  "schema": "stockledger-project-os-candidate-binding-v1",
+  "source_changed": false,
+  "target_branch": "main",
+  "work_branch": "codex/stockledger-prod-c14-primary-surfaces-evidence-bind-verify-v1"
+}

@@ -1,0 +1,51 @@
+{
+  "artifact": {
+    "package_root": "evidence-binding",
+    "ref": "refs/heads/project-os-artifacts/stockledger/stockledger-prod-c14-primary-surfaces-evidence-bind-verify-v1",
+    "required_sole_parent": "949695c79753990080309907502e33cd29eb00e1"
+  },
+  "candidate": {
+    "source_changed": false,
+    "source_sha": "949695c79753990080309907502e33cd29eb00e1",
+    "tree_sha": "6eed4a44bbe2680a856159ff4716da7183a018b7"
+  },
+  "change": "CHG-172",
+  "fabric_job": "CF-f550fec3e9b67cbeee01d4e1",
+  "native_evidence": {
+    "path": ".codex-fabric/audit.json",
+    "publisher": "Codex Fabric normal deterministic evidence publisher",
+    "ref": "refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c14-primary-surfaces-evidence-bind-verify-v1",
+    "required_binding": {
+      "base_is_ancestor": true,
+      "base_sha": "9dd9c4b0a37b804868487cf63a169faf807cdaf1",
+      "head_sha": "949695c79753990080309907502e33cd29eb00e1",
+      "job_id": "CF-f550fec3e9b67cbeee01d4e1",
+      "operation": "VERIFY",
+      "project_id": "stockledger",
+      "remote_exact_head": true,
+      "request": "stockledger-prod-c14-primary-surfaces-evidence-bind-verify-v1",
+      "source_changed": false,
+      "source_sha": "949695c79753990080309907502e33cd29eb00e1",
+      "target_branch": "main",
+      "tree_sha": "6eed4a44bbe2680a856159ff4716da7183a018b7",
+      "work_branch": "codex/stockledger-prod-c14-primary-surfaces-evidence-bind-verify-v1",
+      "worktree_clean": true
+    },
+    "required_commit_lineage": {
+      "schema": "standard native git commit",
+      "sole_parent": "949695c79753990080309907502e33cd29eb00e1"
+    }
+  },
+  "operation": "VERIFY",
+  "project": "stockledger",
+  "promotion_state": "awaiting independent Project OS audit; this request does not integrate or promote the candidate",
+  "repository": "kimhw8084/stockledger",
+  "request": "stockledger-prod-c14-primary-surfaces-evidence-bind-verify-v1",
+  "route": {
+    "protected_base_sha": "9dd9c4b0a37b804868487cf63a169faf807cdaf1",
+    "remote": "origin",
+    "target_branch": "main",
+    "work_branch": "codex/stockledger-prod-c14-primary-surfaces-evidence-bind-verify-v1"
+  },
+  "schema": "stockledger-project-os-native-evidence-promotion-binding-v1"
+}
