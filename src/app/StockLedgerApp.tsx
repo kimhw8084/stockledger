@@ -17,6 +17,11 @@ import { RecoveryPanel, StockEditor } from "../features/workspace/WorkspacePanel
 import { CloudSyncPanel } from "../features/sync/CloudSyncPanel";
 import { NotificationSettingsPanel } from "../features/notifications/NotificationSettingsPanel";
 import { OutcomeEditor } from "../features/journal/OutcomeEditor";
+import { DecisionDetail } from "../features/journal/DecisionDetail";
+import { EyeDetail, type EyeDetailViewModel } from "../features/eyes/EyeDetail";
+import { EyeFlowsScreen, type EyeFlowsFilter, type EyeFlowRow } from "../features/eyes/EyeFlowsScreen";
+import { ScannerReview, type ScannerReviewForm } from "../features/recipes/scanner/ScannerReview";
+import { StockMetricDetailSheet } from "../features/watchlist/detail/StockMetricDetailSheet";
 import { optionalPositiveNumber, validateEntryRange } from "../domain/inputValidation";
 import { createId as createLocalId } from "../platform/identity";
 import { useWorkspaceNavigation } from "../hooks/useWorkspaceNavigation";
@@ -26,7 +31,6 @@ import { appDialog as RNAlert } from "../platform/dialog";
 import { useAppModel } from "../hooks/useAppModel";
 import { WindowPanel } from "../components/WindowPanel";
 import { MotionSwap } from "../components/MotionSwap";
-import { StockMetricDetailSheet } from "../components/stocks/StockMetricDetailSheet";
 import {
   localizedAlertPriority,
   localizedAlertUsefulness,
@@ -88,6 +92,11 @@ import {
 } from "../types";
 import { evaluateEye } from "../lib/evaluateEye";
 import {
+  localizedEvaluationDataQuality,
+  localizedEvaluationDiagnostics,
+  localizedEvaluationWhyNow,
+} from "../lib/presentationLocalization";
+import {
   buildEvidenceGroups,
   buildStockVisualAnalysisGroups,
 } from "../lib/visualEvidence";
@@ -147,7 +156,7 @@ type AnalysisStatusFilter = WatchlistStatusFilter;
 type StockBoardMode = WatchlistBoardMode;
 type HomeBucket = "All" | "Review Now" | "Forming" | "Review Soon";
 type RecipeShelfFilter = "All" | "Starter" | "Custom" | "Recent";
-type EyesShelfFilter = "All" | "Needs Review" | "Quiet";
+type EyesShelfFilter = EyeFlowsFilter;
 type JournalFilter = "All" | "Entered" | "Skipped" | "Risky";
 type LogicLabLayer = RecipeLayer;
 type LogicInfoTarget = "Raw Data" | "Processed Features" | "Frozen Rules" | "Signals";
@@ -855,6 +864,18 @@ const stateTone = (state?: string) => {
       return [styles.statusBadge, styles.statusNear];
     default:
       return [styles.statusBadge, styles.statusFailed];
+  }
+};
+
+const eyeBadgeTone = (state?: EyeState): EyeFlowRow["stateTone"] => {
+  switch (state) {
+    case "Opportunity Zone Forming": return "positive";
+    case "Attention Needed":
+    case "Thesis Risk Rising": return "warning";
+    case "Thesis Broken": return "negative";
+    case "Watch Closely":
+    case "Becoming Interesting": return "info";
+    default: return "neutral";
   }
 };
 
@@ -1914,8 +1935,8 @@ export default function App() {
   const settingsSurfaceFallbackRef = useRef<any>(null);
   const [alertDetailOpen, setAlertDetailOpen] = useState(false);
   const [scannerSignalReviewId, setScannerSignalReviewId] = useState("");
-  const [scannerReviewForm, setScannerReviewForm] = useState({
-    userDecision: "watch" as "watch" | "ignore" | "bought" | "skipped" | "sold" | "other",
+  const [scannerReviewForm, setScannerReviewForm] = useState<ScannerReviewForm>({
+    userDecision: "",
     manualReason: "",
     convictionScoreOptional: "",
     notes: "",
@@ -1941,6 +1962,7 @@ export default function App() {
   const alertDetailFocus = useWindowPanelFocus(alertsSurfaceFallbackRef);
   const journalComposerFocus = useWindowPanelFocus(journalSurfaceFallbackRef);
   const decisionDetailFocus = useWindowPanelFocus(journalSurfaceFallbackRef);
+  const decisionReturnRouteRef = useRef<{ tab: "Journal" | "Eyes" | "Stocks"; params: Record<string, string> }>({ tab: "Journal", params: {} });
   const scannerReviewFocus = useWindowPanelFocus(logicSurfaceFallbackRef);
   const metricDetailFocus = useWindowPanelFocus(stocksSurfaceFallbackRef);
   const deferredStockSearch = useDeferredValue(stockSearch);
@@ -2567,19 +2589,25 @@ export default function App() {
     analysisStatusFilter !== defaultAnalysisStatusFilter ||
     stockBoardMode !== defaultStockBoardMode;
 
-  const activeEyesInventory = eyesSorted.filter(
-    (eye) => !["Not Relevant", "Thesis Broken"].includes(eye.lastEvaluation?.currentState ?? "Not Relevant"),
-  );
-  const inactiveEyesInventory = eyesSorted.filter(
-    (eye) => ["Not Relevant", "Thesis Broken"].includes(eye.lastEvaluation?.currentState ?? "Not Relevant"),
-  );
+  const eyeReviewCadenceElapsed = (eye: Eye) => {
+    if (!eye.lastReviewedAt) return false;
+    const reviewedAt = new Date(eye.lastReviewedAt).getTime();
+    const cadenceDays = data.recipes.find((recipe) => recipe.id === eye.recipeId)?.reviewConfig?.cadenceDays;
+    return typeof cadenceDays === "number" && Number.isFinite(reviewedAt) && Date.now() - reviewedAt >= cadenceDays * 24 * 60 * 60 * 1000;
+  };
+  const eyeNeedsReview = (eye: Eye) => {
+    const stateNeedsReview = !eye.lastEvaluation || ["Attention Needed", "Opportunity Zone Forming", "Watch Closely"].includes(eye.lastEvaluation.currentState);
+    if (stateNeedsReview) return true;
+    if (!eye.lastReviewedAt) return true;
+    if (!Number.isFinite(new Date(eye.lastReviewedAt).getTime())) return true;
+    return eyeReviewCadenceElapsed(eye);
+  };
+  const eyeIsQuiet = (eye: Eye) => Boolean(eye.lastEvaluation && ["Not Relevant", "Thesis Broken"].includes(eye.lastEvaluation.currentState));
+  const activeEyesInventory = eyesSorted.filter((eye) => !eyeIsQuiet(eye) || eyeNeedsReview(eye));
+  const inactiveEyesInventory = eyesSorted.filter((eye) => eyeIsQuiet(eye) && !eyeNeedsReview(eye));
   const filteredActiveEyesInventory = activeEyesInventory.filter((eye) => {
     if (eyesShelfFilter === "All") return true;
-    if (eyesShelfFilter === "Needs Review") {
-      return ["Attention Needed", "Opportunity Zone Forming", "Watch Closely"].includes(
-        eye.lastEvaluation?.currentState ?? "",
-      );
-    }
+    if (eyesShelfFilter === "Needs Review") return eyeNeedsReview(eye);
     return eye.lastEvaluation?.currentState === "Not Relevant" || eye.lastEvaluation?.currentState === "Thesis Broken";
   });
   const filteredInactiveEyesInventory = inactiveEyesInventory.filter((eye) => {
@@ -2587,6 +2615,34 @@ export default function App() {
     if (eyesShelfFilter === "Quiet") return true;
     return false;
   });
+  const toEyeFlowRow = (eye: Eye): EyeFlowRow => {
+    const state = eye.lastEvaluation?.currentState;
+    const eyeRecipe = data.recipes.find((recipe) => recipe.id === eye.recipeId);
+    return {
+      id: eye.id,
+      stockId: eye.stockId,
+      recipeId: eye.recipeId,
+      stockLabel: stockLabel(data.stocks, eye.stockId),
+      recipeLabel: recipeLabel(data.recipes, eye.recipeId),
+      thesisSnapshot: eye.thesisSnapshot,
+      currentState: state ? localizedEyeState(language, state) : t(language, "eyes.notEvaluated"),
+      stateTone: eyeBadgeTone(state),
+      whyNow: eyeReviewCadenceElapsed(eye)
+        ? t(language, "eyes.detail.cadenceElapsed")
+        : localizedEvaluationWhyNow(language, eye.lastEvaluation, eyeRecipe) || t(language, "eyes.detail.noSummary"),
+      urgency: localizedActionUrgency(language, eye.lastEvaluation?.actionUrgency ?? t(language, "eyes.meta.wait")),
+      recipeVersion: eye.recipeVersionAtCreation ?? eye.lastEvaluation?.recipeVersion
+        ? `v${eye.recipeVersionAtCreation ?? eye.lastEvaluation?.recipeVersion}`
+        : t(language, "eyes.detail.noVersion"),
+      lastReview: eye.lastReviewedAt ? formatShortDate(language, eye.lastReviewedAt) : t(language, "eyes.meta.reviewDue"),
+      dataQuality: eye.lastEvaluation
+        ? localizedEvaluationDataQuality(language, eye.lastEvaluation.dataQuality)
+        : t(language, "eyes.notEvaluated"),
+      needsReview: eyeNeedsReview(eye),
+    };
+  };
+  const activeEyeFlowRows = filteredActiveEyesInventory.map(toEyeFlowRow);
+  const quietEyeFlowRows = filteredInactiveEyesInventory.map(toEyeFlowRow);
   const selectedRecipe = data.recipes.find((recipe) => recipe.id === recipeDetailId);
   const selectedRecipeLinkedEyes = selectedRecipe
     ? data.eyes.filter((eye) => eye.recipeId === selectedRecipe.id)
@@ -2625,6 +2681,32 @@ export default function App() {
   const selectedDecisionOutcome = selectedDecision
     ? data.outcomes.find((outcome) => outcome.decisionId === selectedDecision.id)
     : undefined;
+  const selectedDecisionDetail = selectedDecision ? {
+    action: localizedDecisionAction(language, selectedDecision.action),
+    linkedContext: decisionTitle(selectedDecision.eyeId, data.eyes, data.stocks, data.recipes),
+    recordedAt: formatLocaleDateTime(language, selectedDecision.createdAt),
+    recordedState: selectedDecision.stateAtDecision ? localizedEyeState(language, selectedDecision.stateAtDecision) : t(language, "journal.detail.noState"),
+    dataQuality: selectedDecision.dataQuality || t(language, "journal.detail.noData"),
+    thesisTiming: t(language, "journal.detail.thesisTiming", {
+      thesis: localizedThesisValidity(language, selectedDecision.thesisValid),
+      timing: localizedTiming(language, selectedDecision.timing),
+    }),
+    note: selectedDecision.note || t(language, "journal.detail.noNote"),
+    concern: selectedDecision.concern || t(language, "journal.detail.noConcern"),
+    outcome: selectedDecisionOutcome ? {
+      status: localizedOutcomeStatus(language, selectedDecisionOutcome.status ?? "Pending"),
+      isReviewed: selectedDecisionOutcome.status === "Reviewed",
+      lesson: selectedDecisionOutcome.lesson,
+      recipeSuggestion: selectedDecisionOutcome.recipeSuggestion,
+      reviewWindow: selectedDecisionOutcome.reviewWindow,
+      priceChangeNote: selectedDecisionOutcome.priceChangeNote,
+    } : undefined,
+    amendments: selectedDecision.amendments?.map((amendment) => ({
+      amendedAt: formatLocaleDateTime(language, amendment.amendedAt),
+      action: localizedDecisionAction(language, amendment.action),
+      note: amendment.note,
+    })) ?? [],
+  } : null;
 
   const groupedAlertQueue = stockDirectory
     .map((item) => ({
@@ -2675,6 +2757,38 @@ export default function App() {
   const selectedEyeLinkedDecisions = selectedEye
     ? data.decisions.filter((decision) => decision.eyeId === selectedEye.id)
     : [];
+  const selectedEyeDetail: EyeDetailViewModel | null = selectedEye ? {
+    stockLabel: stockLabel(data.stocks, selectedEye.stockId),
+    stockSymbol: selectedEyeStock?.symbol,
+    recipeLabel: selectedEyeRecipe?.name ?? t(language, "eyes.detail.unknownRecipe"),
+    recipeVersion: selectedEye.recipeVersionAtCreation ?? selectedEye.lastEvaluation?.recipeVersion
+      ? `v${selectedEye.recipeVersionAtCreation ?? selectedEye.lastEvaluation?.recipeVersion}`
+      : t(language, "eyes.detail.noVersion"),
+    state: selectedEye.lastEvaluation?.currentState ? localizedEyeState(language, selectedEye.lastEvaluation.currentState) : t(language, "eyes.notEvaluated"),
+    stateTone: eyeBadgeTone(selectedEye.lastEvaluation?.currentState),
+    whyNow: localizedEvaluationWhyNow(
+      language,
+      selectedEye.lastEvaluation,
+      selectedEyeRecipe,
+    ) || t(language, "eyes.detail.noSummary"),
+    urgency: localizedActionUrgency(language, selectedEye.lastEvaluation?.actionUrgency ?? t(language, "eyes.meta.wait")),
+    evaluatedAt: selectedEye.lastEvaluation ? formatLocaleDateTime(language, selectedEye.lastEvaluation.evaluatedAt) : t(language, "eyes.notEvaluated"),
+    dataQuality: selectedEye.lastEvaluation
+      ? localizedEvaluationDataQuality(language, selectedEye.lastEvaluation.dataQuality)
+      : t(language, "eyes.notEvaluated"),
+    staleInputs: localizedEvaluationDiagnostics(language, selectedEye.lastEvaluation).staleData,
+    missingInputs: localizedEvaluationDiagnostics(language, selectedEye.lastEvaluation).missingData,
+    lastReviewed: selectedEye.lastReviewedAt ? formatShortDate(language, selectedEye.lastReviewedAt) : t(language, "eyes.detail.due"),
+    thesisSnapshot: selectedEye.thesisSnapshot,
+    invalidationRule: selectedEye.invalidationRule || t(language, "eyes.detail.noInvalidation"),
+    entryLow: selectedEye.plannedEntryLow ? `$${formatLocaleNumber(language, selectedEye.plannedEntryLow, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : t(language, "eyes.detail.unset"),
+    entryHigh: selectedEye.plannedEntryHigh ? `$${formatLocaleNumber(language, selectedEye.plannedEntryHigh, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : t(language, "eyes.detail.unset"),
+    alertCount: `${selectedEyeLinkedAlerts.length}`,
+    decisionCount: `${selectedEyeLinkedDecisions.length}`,
+    lastDecision: selectedEyeLinkedDecisions[0]
+      ? `${localizedDecisionAction(language, selectedEyeLinkedDecisions[0].action)} · ${formatShortDate(language, selectedEyeLinkedDecisions[0].createdAt)}`
+      : undefined,
+  } : null;
   const logicLabConditionCount = data.logicRules.length;
   const logicLabRuleLibrary = data.logicRules
     .map((rule) => {
@@ -3024,9 +3138,14 @@ export default function App() {
     setTab("Alerts", { alertId });
   };
 
-  const openDecisionDetail = (decisionId: string, invoker?: unknown) => {
+  const openDecisionDetail = (
+    decisionId: string,
+    invoker?: unknown,
+    returnRoute: { tab: "Journal" | "Eyes" | "Stocks"; params: Record<string, string> } = { tab: "Journal", params: {} },
+  ) => {
     const decision = data?.decisions.find((item) => item.id === decisionId);
     if (!decision) return;
+    decisionReturnRouteRef.current = returnRoute;
     decisionDetailFocus.captureInvoker(invoker);
     setSelectedDecisionId(decisionId);
     setTab("Journal", { decisionId });
@@ -3048,6 +3167,12 @@ export default function App() {
 
   const closeEntityRoute = (destination: "Stocks" | "Eyes" | "Alerts" | "Journal" | "Logic Lab") => {
     setTab(destination, {}, { replace: true });
+  };
+
+  const closeDecisionDetail = () => {
+    const returnRoute = decisionReturnRouteRef.current;
+    decisionReturnRouteRef.current = { tab: "Journal", params: {} };
+    setTab(returnRoute.tab, returnRoute.params, { replace: true });
   };
 
   const cycleEvidenceCard = (direction: 1 | -1) => {
@@ -3413,12 +3538,15 @@ export default function App() {
   const selectedScannerSignal = scannerSignalReviewId
     ? data?.scanSignals.find((signal) => signal.signalId === scannerSignalReviewId)
     : undefined;
+  const selectedScannerRun = selectedScannerSignal
+    ? data?.scanRuns.find((run) => run.id === selectedScannerSignal.scanRunId)
+    : undefined;
 
   const openScannerReview = (signal: ScanSignal, invoker?: unknown) => {
     scannerReviewFocus.captureInvoker(invoker);
     setScannerSignalReviewId(signal.signalId);
     setScannerReviewForm({
-      userDecision: "watch",
+      userDecision: "",
       manualReason: "",
       convictionScoreOptional: "",
       notes: "",
@@ -3428,8 +3556,8 @@ export default function App() {
     });
   };
 
-  const submitScannerReview = async () => {
-    if (!selectedScannerSignal || !scannerReviewForm.manualReason.trim()) return;
+  const submitScannerReview = async (close: () => void) => {
+    if (!selectedScannerSignal || !scannerReviewForm.userDecision || !scannerReviewForm.manualReason.trim()) return;
     await actions.addSignalReviewLog({
       signalId: selectedScannerSignal.signalId,
       userDecision: scannerReviewForm.userDecision,
@@ -3449,7 +3577,7 @@ export default function App() {
           : undefined,
       resultNotes: scannerReviewForm.resultNotes.trim() || undefined,
     });
-    setScannerSignalReviewId("");
+    close();
   };
 
   const saveLogicRule = async () => {
@@ -3772,6 +3900,9 @@ export default function App() {
     recentStocks,
     stockSuggestions,
     selectedStock: selectedStockSummary,
+    decisions: data.decisions,
+    eyes: data.eyes,
+    recipes: data.recipes,
     evidenceCards: sortedSelectedStockAnalysisCards,
     pinnedMetricKeys,
   });
@@ -3906,6 +4037,12 @@ export default function App() {
               onClearRecent={() => setRecentStockIds([])}
               onAddStock={() => openStockEditor("")}
               onEditStock={() => openStockEditor(selectedStockSummary?.stock.id ?? "")}
+              onArchiveStock={async () => {
+                if (!selectedStockSummary) return;
+                await actions.archiveStock(selectedStockSummary.stock.id);
+                setSelectedStockId("");
+                closeEntityRoute("Stocks");
+              }}
               onClearSelection={() => {
                 setSelectedStockId("");
                 setStockSearch("");
@@ -3916,11 +4053,18 @@ export default function App() {
                 setEyeForm((current) => ({ ...current, stockId: selectedStockSummary.stock.id }));
                 openEyeComposer();
               }}
-              onManageEyes={() => setTab("Eyes")}
-              onOpenMetric={(metricId) => {
+              onManageEyes={() => selectedStockSummary
+                ? openStockContext({ stockId: selectedStockSummary.stock.id, target: "Eyes" })
+                : setTab("Eyes")}
+              onOpenMetric={(metricId, invoker) => {
                 const card = sortedSelectedStockAnalysisCards.find((item) => item.id === metricId);
-                if (card) openMetricDetail(card);
+                if (card) openMetricDetail(card, invoker);
               }}
+              onOpenDecision={(decisionId, invoker) => selectedStockSummary && openDecisionDetail(
+                decisionId,
+                invoker,
+                { tab: "Stocks", params: { stockId: selectedStockSummary.stock.id } },
+              )}
               statusFilter={analysisStatusFilter}
               statusChoices={watchlistModel.statusChoices}
               onStatusFilterChange={setAnalysisStatusFilter}
@@ -3980,143 +4124,23 @@ export default function App() {
           ) : null}
 
           {tab === "Eyes" ? (
-            <>
-              <Reveal>
-                <SectionHeader note={subtitleLabel(language, "Eyes")} />
-                <View style={styles.homeSummaryStrip}>
-                  <DenseStat label={t(language, "eyes.summary.active")} value={`${activeEyesInventory.length}`} tone="strong" />
-                  <DenseStat label={t(language, "eyes.summary.inactive")} value={`${inactiveEyesInventory.length}`} />
-                  <DenseStat label={t(language, "eyes.summary.attention")} value={`${data.eyes.filter((eye) => eye.lastEvaluation?.currentState === "Attention Needed").length}`} tone="risk" />
-                  <DenseStat label={t(language, "eyes.summary.broken")} value={`${data.eyes.filter((eye) => eye.lastEvaluation?.currentState === "Thesis Broken").length}`} />
-                </View>
-                <HorizontalChoice options={eyesShelfFilters} value={eyesShelfFilter} onSelect={(filter: EyesShelfFilter) => setEyesShelfFilter(filter)} labelForOption={(filter: EyesShelfFilter) => eyesShelfFilterLabel(language, filter)} />
-                <View style={styles.actionRow}>
-                  <Button
-                    ref={eyesSurfaceFallbackRef}
-                    label={t(language, "common.new")}
-                    onPress={() => {
-                      resetEyeComposerDraft();
-                      openEyeComposer();
-                    }}
-                  />
-                </View>
-              </Reveal>
-
-              <Reveal delay={40}>
-                <SectionHeader title={t(language, "eyes.active.title", { count: filteredActiveEyesInventory.length })} note={t(language, "eyes.active.note")} />
-                <View style={styles.stack}>
-                  {filteredActiveEyesInventory.length === 0 ? (
-                    <Card>
-                      <Text style={styles.cardBody}>{t(language, "eyes.active.empty")}</Text>
-                    </Card>
-                  ) : (
-                    filteredActiveEyesInventory.map((eye) => (
-                      <Pressable
-                        key={eye.id}
-                        accessibilityRole="button"
-                        accessibilityLabel={`${stockLabel(data.stocks, eye.stockId)} ${recipeLabel(data.recipes, eye.recipeId)}`}
-                        accessibilityState={{ selected: selectedEye?.id === eye.id }}
-                        onPress={(event) => {
-                          openEyeDetail(eye.id, event);
-                        }}
-                        style={({ pressed }) => [styles.pressableCardWrap, pressed ? styles.pressableCardWrapPressed : null]}
-                      >
-                      <Card highlighted={selectedEye?.id === eye.id}>
-                        <View style={styles.inlineBetween}>
-                          <View style={styles.flexOne}>
-                            <Text style={styles.cardEyebrow}>{recipeLabel(data.recipes, eye.recipeId)}</Text>
-                            <Text style={styles.alertTitle}>{stockLabel(data.stocks, eye.stockId)}</Text>
-                            <Text style={styles.cardBody} numberOfLines={2}>{eye.thesisSnapshot}</Text>
-                          </View>
-                          <Text style={stateTone(eye.lastEvaluation?.currentState)}>
-                            {eye.lastEvaluation?.currentState
-                              ? localizedEyeState(language, eye.lastEvaluation.currentState)
-                              : t(language, "eyes.notEvaluated")}
-                          </Text>
-                        </View>
-                        <View style={styles.compactMetricRow}>
-                          <Text style={styles.compactMetricText}>{eye.lastEvaluation?.whyNow ?? t(language, "eyes.waiting")}</Text>
-                        </View>
-                        <View style={styles.metaRow}>
-                          <MetaPill label={localizedActionUrgency(language, eye.lastEvaluation?.actionUrgency ?? t(language, "eyes.meta.wait"))} />
-                          <MetaPill label={`v${eye.recipeVersionAtCreation ?? eye.lastEvaluation?.recipeVersion ?? 1}`} />
-                          <MetaPill label={eye.lastReviewedAt ? formatShortDate(language, eye.lastReviewedAt) : t(language, "eyes.meta.reviewDue")} />
-                        </View>
-                        <View style={styles.analysisActionRow}>
-                          <Button label={t(language, "eyes.action.stock")} onPress={() => openStockContext({ stockId: eye.stockId, eyeId: eye.id })} />
-                          <Button
-                            label={t(language, "eyes.action.review")}
-                            tone="secondary"
-                            onPress={() => actions.markEyesReviewed({ stockId: eye.stockId, recipeId: eye.recipeId })}
-                          />
-                          <Button
-                            label={t(language, "eyes.action.detail")}
-                            tone="ghost"
-                            onPress={(event) => {
-                              openEyeDetail(eye.id, event);
-                            }}
-                          />
-                        </View>
-                      </Card>
-                      </Pressable>
-                    ))
-                  )}
-                </View>
-              </Reveal>
-
-              <Reveal delay={60}>
-                <SectionHeader title={t(language, "eyes.inactive.title", { count: filteredInactiveEyesInventory.length })} note={t(language, "eyes.inactive.note")} />
-                <View style={styles.stack}>
-                  {filteredInactiveEyesInventory.length === 0 ? (
-                    <Card>
-                      <Text style={styles.cardBody}>{t(language, "eyes.inactive.empty")}</Text>
-                    </Card>
-                  ) : (
-                    filteredInactiveEyesInventory.map((eye) => (
-                      <Pressable
-                        key={`inactive-${eye.id}`}
-                        accessibilityRole="button"
-                        accessibilityLabel={`${stockLabel(data.stocks, eye.stockId)} ${recipeLabel(data.recipes, eye.recipeId)}`}
-                        accessibilityState={{ selected: selectedEye?.id === eye.id }}
-                        onPress={(event) => {
-                          openEyeDetail(eye.id, event);
-                        }}
-                        style={({ pressed }) => [styles.pressableCardWrap, pressed ? styles.pressableCardWrapPressed : null]}
-                      >
-                      <Card>
-                        <View style={styles.inlineBetween}>
-                          <View style={styles.flexOne}>
-                            <Text style={styles.cardEyebrow}>{recipeLabel(data.recipes, eye.recipeId)}</Text>
-                            <Text style={styles.alertTitle}>{stockLabel(data.stocks, eye.stockId)}</Text>
-                            <Text style={styles.cardBody} numberOfLines={2}>{eye.thesisSnapshot}</Text>
-                          </View>
-                          <Text style={stateTone(eye.lastEvaluation?.currentState)}>
-                            {eye.lastEvaluation?.currentState
-                              ? localizedEyeState(language, eye.lastEvaluation.currentState)
-                              : t(language, "eyes.notEvaluated")}
-                          </Text>
-                        </View>
-                        <View style={styles.metaRow}>
-                          <MetaPill label={localizedActionUrgency(language, eye.lastEvaluation?.actionUrgency ?? t(language, "eyes.meta.wait"))} />
-                          <MetaPill label={eye.lastReviewedAt ? formatShortDate(language, eye.lastReviewedAt) : t(language, "eyes.meta.reviewDue")} />
-                        </View>
-                        <View style={styles.analysisActionRow}>
-                          <Button label={t(language, "eyes.action.stock")} onPress={() => openStockContext({ stockId: eye.stockId, eyeId: eye.id })} />
-                          <Button
-                            label={t(language, "eyes.action.detail")}
-                            tone="secondary"
-                            onPress={(event) => {
-                              openEyeDetail(eye.id, event);
-                            }}
-                          />
-                        </View>
-                      </Card>
-                      </Pressable>
-                    ))
-                  )}
-                </View>
-              </Reveal>
-            </>
+            <EyeFlowsScreen
+              language={language}
+              filter={eyesShelfFilter}
+              onFilterChange={setEyesShelfFilter}
+              activeRows={activeEyeFlowRows}
+              quietRows={quietEyeFlowRows}
+              activeCount={activeEyesInventory.length}
+              quietCount={inactiveEyesInventory.length}
+              selectedEyeId={selectedEye?.id}
+              focusRestoreRef={eyeDetailFocus.returnFocusRef}
+              fallbackFocusRef={eyesSurfaceFallbackRef}
+              onCreate={() => {
+                resetEyeComposerDraft();
+                openEyeComposer();
+              }}
+              onOpenEye={(eyeId, invoker) => openEyeDetail(eyeId, invoker)}
+            />
           ) : null}
 
           {tab === "Alerts" ? (
@@ -5402,116 +5426,52 @@ export default function App() {
           </WindowPanel>
         ) : null}
 
-        {eyeDetailOpen && selectedEye ? (
+        {eyeDetailOpen && selectedEye && selectedEyeDetail ? (
           <WindowPanel
-            title={stockLabel(data.stocks, selectedEye.stockId)}
-            subtitle={`${recipeLabel(data.recipes, selectedEye.recipeId)} · ${selectedEye.lastEvaluation?.currentState ? localizedEyeState(language, selectedEye.lastEvaluation.currentState) : t(language, "eyes.notEvaluated")}`}
+            title={selectedEyeDetail.stockLabel}
+            subtitle={`${selectedEyeDetail.recipeLabel} · ${selectedEyeDetail.state}`}
             onClose={() => closeEntityRoute("Eyes")}
             closeLabel={t(language, "common.done")}
             returnFocusRef={eyeDetailFocus.returnFocusRef}
             fallbackFocusRef={eyeDetailFocus.fallbackFocusRef}
           >
-            <WhyNowPanel
-              title={t(language, "eyes.detail.currentState")}
-              body={
-                selectedEye.lastEvaluation?.whyNow ??
-                t(language, "eyes.detail.noSummary")
-              }
-              state={selectedEye.lastEvaluation?.currentState ?? "Not Relevant"}
-              recipeVersion={`${selectedEyeRecipe?.name ?? t(language, "eyes.detail.unknownRecipe")} v${selectedEye.recipeVersionAtCreation ?? selectedEye.lastEvaluation?.recipeVersion ?? 1}`}
+            <EyeDetail
               language={language}
+              eye={selectedEyeDetail}
+              onOpenStock={() => openStockContext({ stockId: selectedEye.stockId, eyeId: selectedEye.id })}
+              onMarkReviewed={() => actions.markEyesReviewed({ stockId: selectedEye.stockId, recipeId: selectedEye.recipeId })}
+              onAddJournal={() => {
+                resetJournalComposerDraft();
+                setDecisionForm((current) => ({ ...current, eyeId: selectedEye.id }));
+                closeEntityRoute("Eyes");
+                openJournalComposer();
+              }}
+              onEdit={() => {
+                setEyeComposerEditingId(selectedEye.id);
+                setEyeForm({
+                  stockId: selectedEye.stockId,
+                  recipeId: selectedEye.recipeId,
+                  thesisSnapshot: selectedEye.thesisSnapshot,
+                  plannedEntryLow: selectedEye.plannedEntryLow ? selectedEye.plannedEntryLow.toFixed(2) : "",
+                  plannedEntryHigh: selectedEye.plannedEntryHigh ? selectedEye.plannedEntryHigh.toFixed(2) : "",
+                  invalidationRule: selectedEye.invalidationRule ?? "",
+                  lastReviewedDaysAgo: selectedEye.lastReviewedAt
+                    ? Math.max(0, Math.round((Date.now() - new Date(selectedEye.lastReviewedAt).getTime()) / (1000 * 60 * 60 * 24)))
+                    : reviewDateOptions[2].daysAgo,
+                });
+                closeEntityRoute("Eyes");
+                openEyeComposer();
+              }}
+              onOpenDecision={selectedEyeLinkedDecisions[0] ? (invoker) => openDecisionDetail(
+                selectedEyeLinkedDecisions[0].id,
+                invoker,
+                { tab: "Eyes", params: { eyeId: selectedEye.id } },
+              ) : undefined}
+              onArchive={async () => {
+                await actions.deleteEye(selectedEye.id);
+                closeEntityRoute("Eyes");
+              }}
             />
-            <View style={styles.dualDenseGrid}>
-              <DenseStat label={t(language, "eyes.detail.urgency")} value={localizedActionUrgency(language, selectedEye.lastEvaluation?.actionUrgency ?? t(language, "eyes.meta.wait"))} tone="strong" />
-              <DenseStat label={t(language, "eyes.detail.review")} value={selectedEye.lastReviewedAt ? formatShortDate(language, selectedEye.lastReviewedAt) : t(language, "eyes.detail.due")} />
-              <DenseStat label={t(language, "eyes.detail.entryLow")} value={selectedEye.plannedEntryLow ? `$${formatLocaleNumber(language, selectedEye.plannedEntryLow, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : t(language, "eyes.detail.unset")} />
-              <DenseStat label={t(language, "eyes.detail.entryHigh")} value={selectedEye.plannedEntryHigh ? `$${formatLocaleNumber(language, selectedEye.plannedEntryHigh, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : t(language, "eyes.detail.unset")} />
-              <DenseStat label={t(language, "eyes.detail.alerts")} value={`${selectedEyeLinkedAlerts.length}`} />
-              <DenseStat label={t(language, "eyes.detail.journal")} value={`${selectedEyeLinkedDecisions.length}`} />
-            </View>
-            <View style={styles.detailCallout}>
-              <Text style={styles.detailCalloutLabel}>{t(language, "eyes.detail.thesisSnapshot")}</Text>
-              <Text style={styles.detailCalloutBody}>{selectedEye.thesisSnapshot}</Text>
-            </View>
-            <View style={styles.detailCallout}>
-              <Text style={styles.detailCalloutLabel}>{t(language, "eyes.detail.invalidationRule")}</Text>
-              <Text style={styles.detailCalloutBody}>{selectedEye.invalidationRule || t(language, "eyes.detail.noInvalidation")}</Text>
-            </View>
-            {selectedEyeLinkedDecisions[0] ? (
-              <View style={styles.detailCallout}>
-                <Text style={styles.detailCalloutLabel}>{t(language, "eyes.detail.lastDecision")}</Text>
-                <Text style={styles.detailCalloutBody}>
-                  {localizedDecisionAction(language, selectedEyeLinkedDecisions[0].action)} · {formatShortDate(language, selectedEyeLinkedDecisions[0].createdAt)}
-                </Text>
-              </View>
-            ) : null}
-            <View style={styles.actionRow}>
-              <Button
-                label={t(language, "eyes.action.stock")}
-                onPress={() => {
-                  closeEntityRoute("Eyes");
-                  openStockContext({ stockId: selectedEye.stockId, eyeId: selectedEye.id });
-                }}
-              />
-              <Button
-                label={t(language, "eyes.action.markReviewed")}
-                tone="secondary"
-                onPress={() => actions.markEyesReviewed({ stockId: selectedEye.stockId, recipeId: selectedEye.recipeId })}
-              />
-              <Button
-                label={t(language, "eyes.action.addJournal")}
-                tone="secondary"
-                onPress={() => {
-                  resetJournalComposerDraft();
-                  setDecisionForm((current) => ({ ...current, eyeId: selectedEye.id }));
-                  closeEntityRoute("Eyes");
-                  openJournalComposer();
-                }}
-              />
-              <Button
-                label={language === "ko" ? "수정" : "Edit"}
-                tone="ghost"
-                onPress={() => {
-                  setEyeComposerEditingId(selectedEye.id);
-                  setEyeForm({
-                    stockId: selectedEye.stockId,
-                    recipeId: selectedEye.recipeId,
-                    thesisSnapshot: selectedEye.thesisSnapshot,
-                    plannedEntryLow: selectedEye.plannedEntryLow ? selectedEye.plannedEntryLow.toFixed(2) : "",
-                    plannedEntryHigh: selectedEye.plannedEntryHigh ? selectedEye.plannedEntryHigh.toFixed(2) : "",
-                    invalidationRule: selectedEye.invalidationRule ?? "",
-                    lastReviewedDaysAgo: selectedEye.lastReviewedAt
-                      ? Math.max(0, Math.round((Date.now() - new Date(selectedEye.lastReviewedAt).getTime()) / (1000 * 60 * 60 * 24)))
-                      : reviewDateOptions[2].daysAgo,
-                  });
-                  closeEntityRoute("Eyes");
-                  openEyeComposer();
-                }}
-              />
-              {selectedEyeLinkedDecisions[0] ? (
-                <Button
-                  label={t(language, "common.journal")}
-                  tone="ghost"
-                  onPress={() => {
-                    setSelectedDecisionId(selectedEyeLinkedDecisions[0].id);
-                    openDecisionDetail(selectedEyeLinkedDecisions[0].id);
-                  }}
-                />
-              ) : null}
-              <Button
-                label={language === "ko" ? "보관" : "Archive Eye"}
-                tone="ghost"
-                onPress={async () => {
-                  await actions.deleteEye(selectedEye.id);
-                  closeEntityRoute("Eyes");
-                }}
-              />
-            </View>
-            <View style={styles.metaRow}>
-              {selectedEyeStock ? <MetaPill label={selectedEyeStock.symbol} /> : null}
-              {selectedEyeRecipe ? <MetaPill label={localizedTimeHorizon(language, selectedEyeRecipe.timeHorizon || t(language, "eyes.detail.unsetHorizon"))} /> : null}
-              {selectedEye.lastEvaluation?.dataQuality ? <MetaPill label={selectedEye.lastEvaluation.dataQuality} /> : null}
-            </View>
           </WindowPanel>
         ) : null}
 
@@ -5682,107 +5642,55 @@ export default function App() {
           </WindowPanel>
         ) : null}
 
-        {selectedDecision ? (
+        {selectedDecision && selectedDecisionDetail ? (
           <WindowPanel
-            title={localizedDecisionAction(language, selectedDecision.action)}
-            subtitle={decisionTitle(selectedDecision.eyeId, data.eyes, data.stocks, data.recipes)}
-            onClose={() => closeEntityRoute("Journal")}
+            title={selectedDecisionDetail.action}
+            subtitle={selectedDecisionDetail.linkedContext}
+            onClose={closeDecisionDetail}
             closeLabel={t(language, "common.done")}
             returnFocusRef={decisionDetailFocus.returnFocusRef}
-            fallbackFocusRef={decisionDetailFocus.fallbackFocusRef}
+            fallbackFocusRef={decisionReturnRouteRef.current.tab === "Stocks"
+              ? stocksSurfaceFallbackRef
+              : decisionReturnRouteRef.current.tab === "Eyes"
+                ? eyesSurfaceFallbackRef
+                : journalSurfaceFallbackRef}
           >
-            <WhatChangedPanel
-              title={t(language, "journal.detail.context")}
-              items={[
-                selectedDecision.stateAtDecision ?? t(language, "journal.detail.noState"),
-                selectedDecision.dataQuality ?? t(language, "journal.detail.noData"),
-                t(language, "journal.detail.thesisTiming", {
-                  thesis: localizedThesisValidity(language, selectedDecision.thesisValid),
-                  timing: localizedTiming(language, selectedDecision.timing),
-                }),
-              ]}
+            <DecisionDetail
+              language={language}
+              decision={selectedDecisionDetail}
+              outcomeEditor={selectedDecisionOutcome ? <OutcomeEditor key={selectedDecisionOutcome.id} outcome={selectedDecisionOutcome} actions={actions} language={language} /> : undefined}
+              onOpenStock={data.eyes.some((eye) => eye.id === selectedDecision.eyeId) ? () => {
+                const linkedEye = data.eyes.find((eye) => eye.id === selectedDecision.eyeId);
+                if (!linkedEye) return;
+                openStockContext({ stockId: linkedEye.stockId, eyeId: linkedEye.id });
+              } : undefined}
+              onOpenAlert={selectedDecision.alertId ? () => {
+                setSelectedAlertId(selectedDecision.alertId ?? "");
+                openAlertDetail(selectedDecision.alertId ?? "");
+              } : undefined}
+              onEdit={() => {
+                setJournalComposerEditingId(selectedDecision.id);
+                setDecisionForm({
+                  eyeId: selectedDecision.eyeId,
+                  alertId: selectedDecision.alertId ?? "",
+                  action: selectedDecision.action,
+                  note: selectedDecision.note,
+                  concern: selectedDecision.concern,
+                  thesisValid: selectedDecision.thesisValid,
+                  timing: selectedDecision.timing,
+                });
+                closeEntityRoute("Journal");
+                openJournalComposer();
+              }}
+              onArchive={async () => {
+                await actions.deleteDecision(selectedDecision.id);
+                closeEntityRoute("Journal");
+              }}
+              onToggleOutcome={selectedDecisionOutcome ? () => actions.setOutcomeStatus(
+                selectedDecisionOutcome.id,
+                selectedDecisionOutcome.status === "Reviewed" ? "Pending" : "Reviewed",
+              ) : undefined}
             />
-            <View style={styles.detailCallout}>
-              <Text style={styles.detailCalloutLabel}>{t(language, "journal.detail.note")}</Text>
-              <Text style={styles.detailCalloutBody}>{selectedDecision.note || t(language, "journal.detail.noNote")}</Text>
-            </View>
-            <View style={styles.detailCallout}>
-              <Text style={styles.detailCalloutLabel}>{t(language, "journal.detail.concern")}</Text>
-              <Text style={styles.detailCalloutBody}>{selectedDecision.concern || t(language, "journal.detail.noConcern")}</Text>
-            </View>
-            <View style={styles.actionRow}>
-              <Button
-                label={t(language, "common.stock")}
-                onPress={() => {
-                  const linkedEye = data.eyes.find((eye) => eye.id === selectedDecision.eyeId);
-                  if (!linkedEye) return;
-                  openStockContext({ stockId: linkedEye.stockId, eyeId: linkedEye.id });
-                }}
-              />
-              {selectedDecision.alertId ? (
-                <Button
-                  label={t(language, "journal.action.alert")}
-                  tone="secondary"
-                  onPress={() => {
-                    setSelectedAlertId(selectedDecision.alertId ?? "");
-                    openAlertDetail(selectedDecision.alertId ?? "");
-                  }}
-                />
-              ) : null}
-              <Button
-                label={t(language, "journal.action.edit")}
-                tone="ghost"
-                onPress={() => {
-                  setJournalComposerEditingId(selectedDecision.id);
-                  setDecisionForm({
-                    eyeId: selectedDecision.eyeId,
-                    alertId: selectedDecision.alertId ?? "",
-                    action: selectedDecision.action,
-                    note: selectedDecision.note,
-                    concern: selectedDecision.concern,
-                    thesisValid: selectedDecision.thesisValid,
-                    timing: selectedDecision.timing,
-                  });
-                  closeEntityRoute("Journal");
-                  openJournalComposer();
-                }}
-              />
-              <Button
-                label={t(language, "journal.action.archive")}
-                tone="ghost"
-                  onPress={async () => {
-                  await actions.deleteDecision(selectedDecision.id);
-                  closeEntityRoute("Journal");
-                }}
-              />
-              {selectedDecisionOutcome ? (
-                <Button
-                  label={selectedDecisionOutcome.status === "Reviewed" ? t(language, "journal.action.outcomeDone") : t(language, "journal.action.markOutcome")}
-                  tone="secondary"
-                  onPress={() =>
-                    actions.setOutcomeStatus(
-                      selectedDecisionOutcome.id,
-                      selectedDecisionOutcome.status === "Reviewed" ? "Pending" : "Reviewed",
-                    )
-                  }
-                />
-              ) : null}
-            </View>
-            {selectedDecisionOutcome ? (
-              <View style={styles.formulaPanel}>
-                <OutcomeEditor key={selectedDecisionOutcome.id} outcome={selectedDecisionOutcome} actions={actions} language={language} />
-                <Text style={styles.formulaTitle}>
-                  {t(language, "journal.detail.outcome", { status: localizedOutcomeStatus(language, selectedDecisionOutcome.status ?? "Pending") })}
-                </Text>
-                <Text style={styles.formulaBody}>{selectedDecisionOutcome.lesson}</Text>
-                <Text style={styles.formulaMeta}>{selectedDecisionOutcome.recipeSuggestion}</Text>
-                <View style={styles.metaRow}>
-                  <MetaPill label={selectedDecisionOutcome.reviewWindow} />
-                  <MetaPill label={selectedDecisionOutcome.priceChangeNote} />
-                </View>
-              </View>
-            ) : null}
-            {selectedDecision.amendments?.length ? <View style={{ gap: 8 }}><Text accessibilityRole="header">{t(language, "journal.detail.previousVersions")}</Text>{selectedDecision.amendments.map((amendment, index) => <Text selectable key={`${amendment.amendedAt}-${index}`}>{amendment.amendedAt} · {amendment.action}: {amendment.note}</Text>)}</View> : null}
           </WindowPanel>
         ) : null}
 
@@ -5795,117 +5703,33 @@ export default function App() {
             returnFocusRef={scannerReviewFocus.returnFocusRef}
             fallbackFocusRef={scannerReviewFocus.fallbackFocusRef}
           >
-            <Card>
-              <Text style={styles.cardBody}>
-                {localizedScannerDescription(language, selectedScannerSignal.status) || t(language, "logic.scanner.incompleteBody")}
-              </Text>
-              <View style={styles.stack}>
-                <View style={styles.stockControlGroup}>
-                  <Text style={styles.stockControlGroupLabel}>
-                    {t(language, "logic.scanner.reviewDecision")}
-                  </Text>
-                  <HorizontalChoice
-                    options={["watch", "ignore", "bought", "skipped", "sold", "other"] as const}
-                    value={scannerReviewForm.userDecision}
-                    onSelect={(value) =>
-                      setScannerReviewForm((current) => ({
-                        ...current,
-                        userDecision: value,
-                      }))
-                    }
-                    variant="segmented"
-                    labelForOption={(option) => option}
-                  />
-                </View>
-                <View style={styles.stockControlGroup}>
-                  <Text style={styles.stockControlGroupLabel}>
-                    {t(language, "logic.scanner.manualReason")}
-                  </Text>
-                  <Input
-                    value={scannerReviewForm.manualReason}
-                    onChangeText={(value) =>
-                      setScannerReviewForm((current) => ({ ...current, manualReason: value }))
-                    }
-                    placeholder={t(language, "logic.scanner.manualReasonPlaceholder")}
-                  />
-                </View>
-                <View style={styles.stockControlGroup}>
-                  <Text style={styles.stockControlGroupLabel}>
-                    {t(language, "logic.scanner.notes")}
-                  </Text>
-                  <Input
-                    value={scannerReviewForm.notes}
-                    onChangeText={(value) =>
-                      setScannerReviewForm((current) => ({ ...current, notes: value }))
-                    }
-                    placeholder={t(language, "logic.scanner.notesPlaceholder")}
-                    multiline
-                  />
-                </View>
-                <View style={styles.twoColumnGrid}>
-                  <View style={styles.flexOne}>
-                    <Text style={styles.stockControlGroupLabel}>
-                      {t(language, "logic.scanner.conviction")}
-                    </Text>
-                    <Input
-                      value={scannerReviewForm.convictionScoreOptional}
-                      onChangeText={(value) =>
-                        setScannerReviewForm((current) => ({ ...current, convictionScoreOptional: value }))
-                      }
-                      keyboardType="numeric"
-                      placeholder="0-100"
-                    />
-                  </View>
-                  <View style={styles.flexOne}>
-                    <Text style={styles.stockControlGroupLabel}>
-                      {t(language, "logic.scanner.entryPrice")}
-                    </Text>
-                    <Input
-                      value={scannerReviewForm.entryPriceOptional}
-                      onChangeText={(value) =>
-                        setScannerReviewForm((current) => ({ ...current, entryPriceOptional: value }))
-                      }
-                      keyboardType="numeric"
-                      placeholder="0.00"
-                    />
-                  </View>
-                </View>
-                <View style={styles.twoColumnGrid}>
-                  <View style={styles.flexOne}>
-                    <Text style={styles.stockControlGroupLabel}>
-                      {t(language, "logic.scanner.exitPrice")}
-                    </Text>
-                    <Input
-                      value={scannerReviewForm.exitPriceOptional}
-                      onChangeText={(value) =>
-                        setScannerReviewForm((current) => ({ ...current, exitPriceOptional: value }))
-                      }
-                      keyboardType="numeric"
-                      placeholder="0.00"
-                    />
-                  </View>
-                  <View style={styles.flexOne}>
-                    <Text style={styles.stockControlGroupLabel}>
-                      {t(language, "logic.scanner.resultNotes")}
-                    </Text>
-                    <Input
-                      value={scannerReviewForm.resultNotes}
-                      onChangeText={(value) =>
-                        setScannerReviewForm((current) => ({ ...current, resultNotes: value }))
-                      }
-                      placeholder={t(language, "logic.scanner.resultNotesPlaceholder")}
-                    />
-                  </View>
-                </View>
-                <View style={styles.actionRow}>
-                  <Button
-                    label={t(language, "logic.scanner.saveLog")}
-                    onPress={() => submitScannerReview()}
-                    disabled={!scannerReviewForm.manualReason.trim()}
-                  />
-                </View>
-              </View>
-            </Card>
+            {(close) => (
+              <ScannerReview
+                language={language}
+                signal={{
+                  ticker: selectedScannerSignal.ticker,
+                  ruleId: selectedScannerSignal.ruleId,
+                  status: localizedScannerStatus(language, selectedScannerSignal.status),
+                  blocked: selectedScannerSignal.status === "BLOCKED_OR_INCOMPLETE_DATA",
+                  reason: localizedScannerDescription(language, selectedScannerSignal.status) || t(language, "logic.scanner.incompleteBody"),
+                  signalDate: formatLocaleDate(language, selectedScannerSignal.signalDate),
+                  scanDate: formatLocaleDate(language, selectedScannerSignal.scanDate),
+                  sourceContext: selectedScannerSignal.universeMode === "dynamic_current_universe"
+                    ? language === "ko" ? "현재 동적 종목 범위" : "Dynamic current-universe scan"
+                    : language === "ko" ? "고정 연구 종목 범위" : "Frozen research-universe scan",
+                  providerName: selectedScannerRun?.providerName ?? (language === "ko" ? "제공자 기록 없음" : "Provider not recorded"),
+                  runStatus: selectedScannerRun
+                    ? localizedScanRunStatus(language, selectedScannerRun.status)
+                    : language === "ko" ? "실행 상태 미기록" : "Run status not recorded",
+                  matchedConditions: selectedScannerSignal.matchedConditionsJson,
+                  missingConditions: selectedScannerSignal.missingConditionsJson,
+                  failedConditions: selectedScannerSignal.failedConditionsJson,
+                }}
+                form={scannerReviewForm}
+                onFormChange={setScannerReviewForm}
+                onSave={() => { void submitScannerReview(close); }}
+              />
+            )}
           </WindowPanel>
         ) : null}
 
@@ -5937,11 +5761,6 @@ export default function App() {
               selectedEvidenceIndex={selectedEvidenceIndex}
               total={sortedSelectedStockAnalysisCards.length}
               sortedCards={sortedSelectedStockAnalysisCards}
-              compactLayout={isCompactPhone}
-              styles={styles}
-              MetaPill={MetaPill}
-              DenseStat={DenseStat}
-              Button={Button}
               isPinned={
                 !!selectedStockSummary &&
                 pinnedMetricKeys.includes(stockMetricPreferenceKey(selectedStockSummary.stock.id, selectedEvidenceCard.id))

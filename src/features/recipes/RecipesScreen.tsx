@@ -339,7 +339,7 @@ export function RecipesScreen(props: RecipesScreenProps) {
                 </React.Fragment>
               ))}
             </View>
-          ) : null}
+          ) : <Card variant="subtle" padding="compact"><Text variant="caption" tone="secondary">{text.noSignals}</Text></Card>}
         </VStack>
       </Card>
     </View>

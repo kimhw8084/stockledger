@@ -27,7 +27,7 @@ export function providerEvidence(stock: Stock, snapshot: MockSnapshot, language:
     metric("volume", `Volume > ${threshold("volume_spike", "spikeMultiple")} × prior ${getMetricContract("volume_spike")?.warmupSessions! - 1}-session mean`, "Volume & Volatility", snapshot.volumeSpike, "", snapshot.volumeHistorySeries),
     metric("range", `${sessions("average_range_pct")}-session mean high/low range`, "Volume & Volatility", snapshot.averageRangePct, "%", snapshot.volatilityHistorySeries),
     metric("valuation", "Valuation discount", "Valuation", snapshot.valuationDiscount),
-    metric("revenue", "Revenue growth", "Financial Quality", snapshot.revenueGrowthYoY),
+    metric("revenue", ko ? "매출 성장률" : "Revenue growth", "Financial Quality", snapshot.revenueGrowthYoY),
     metric("earnings", "Days until earnings", "Earnings & Events", snapshot.daysUntilEarnings, " days"),
   ];
   return [...new Set(cards.map(card => card.family))].map(family => ({ key: family, title: family, note: `${snapshot.sourceName} · ${snapshot.provenance?.observedDate ?? "Unverified legacy data"}`, cards: cards.filter(card => card.family === family) }));
