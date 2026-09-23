@@ -1,0 +1,114 @@
+{
+  "schema": "stockledger-chg172-state-coverage-v1",
+  "source_sha": "949695c79753990080309907502e33cd29eb00e1",
+  "source_tree": "6eed4a44bbe2680a856159ff4716da7183a018b7",
+  "captured_non_happy_states": [
+    {
+      "surface": "watchlist",
+      "state": "no selection",
+      "result": "PASS",
+      "artifact": "screenshots/watchlist--diagnostic-no-selection.png"
+    },
+    {
+      "surface": "watchlist",
+      "state": "no results",
+      "result": "PASS",
+      "artifact": "screenshots/watchlist--diagnostic-no-results.png"
+    },
+    {
+      "surface": "watchlist",
+      "state": "sample/degraded evidence",
+      "result": "PASS",
+      "artifact": "screenshots/watchlist--desktop-1440x900.png",
+      "truth": "The page marks this as sample data; values are not live observations."
+    },
+    {
+      "surface": "recipes",
+      "state": "no compatible set/data-limited",
+      "result": "PASS",
+      "artifact": "screenshots/recipes--diagnostic-no-compatible-set.png"
+    },
+    {
+      "surface": "alerts",
+      "state": "no current alerts",
+      "result": "PASS",
+      "artifact": "screenshots/alerts--diagnostic-no-current.png"
+    },
+    {
+      "surface": "alerts",
+      "state": "empty history",
+      "result": "PASS",
+      "artifact": "screenshots/alerts--diagnostic-empty-history.png"
+    },
+    {
+      "surface": "alerts",
+      "state": "snoozed history",
+      "result": "PASS",
+      "artifact": "screenshots/alerts--diagnostic-snoozed-history.png"
+    },
+    {
+      "surface": "journal",
+      "state": "empty history",
+      "result": "PASS",
+      "artifact": "screenshots/journal--diagnostic-empty-history.png"
+    },
+    {
+      "surface": "settings",
+      "state": "unconfigured providers/no stock",
+      "result": "PASS",
+      "artifact": "screenshots/settings--diagnostic-no-stock-unconfigured.png"
+    },
+    {
+      "surface": "settings",
+      "state": "refresh pending",
+      "result": "PASS",
+      "artifact": "screenshots/settings--diagnostic-refresh-pending.png",
+      "truth": "Supported request held at its real external source boundary; captured while pending, then released as a failed request."
+    },
+    {
+      "surface": "settings",
+      "state": "refresh source error",
+      "result": "PASS",
+      "artifact": "screenshots/settings--diagnostic-refresh-error.png",
+      "truth": "Request failure is visible; saved data remains the authority."
+    }
+  ],
+  "source_contract_not_retainable": [
+    {
+      "surface": "settings",
+      "state": "provider limited",
+      "result": "NOT_APPLICABLE",
+      "reason": "src/lib/providerHealth.ts returns only the four configured-as-false Unconfigured entries; there is no current supported account/configuration fixture for Plan Limited."
+    },
+    {
+      "surface": "settings",
+      "state": "provider unavailable/error",
+      "result": "NOT_APPLICABLE_AS_PROVIDER_STATUS",
+      "reason": "The current provider status list is local configuration metadata and does not make a live health call. A real source request failure is separately exercised and reported without rewriting provider status."
+    },
+    {
+      "surface": "settings",
+      "state": "provider loading",
+      "result": "UNPROVEN_NON_APPLICABLE",
+      "reason": "getProviderHealth is a local async metadata function that resolves immediately; no supported delayed provider-health control exists, and no artificial UI fixture was injected."
+    },
+    {
+      "surface": "all",
+      "state": "permission denied/authenticated provider",
+      "result": "NOT_APPLICABLE",
+      "reason": "The supported Product contract has no provider credentials or authenticated hosted provider session in this app."
+    },
+    {
+      "surface": "all",
+      "state": "conflict state",
+      "result": "NOT_APPLICABLE_TO_PRIMARY_SURFACES",
+      "reason": "Conflict resolution is owned by deferred/deeper sync workflows; no settings primary-surface conflict action exists."
+    },
+    {
+      "surface": "all",
+      "state": "genuine browser zoom 200 percent",
+      "result": "UNPROVEN",
+      "reason": "The runner does not control browser chrome; no viewport, DPR, or CSS zoom substitution was used."
+    }
+  ]
+}
