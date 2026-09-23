@@ -1,0 +1,235 @@
+{
+  "project": "stockledger",
+  "change": "CHG-199",
+  "candidate": "48aef5d8be21e83a95d299a78da7ab61557006ec",
+  "status": "AWAITING_INDEPENDENT_PIXEL_AUDIT",
+  "surfaces": [
+    {
+      "name": "eye-composer",
+      "canonicalState": "open",
+      "primaryTask": "Choose a stock, recipe, and thesis; optionally record range, invalidation, and last-review context; save or amend monitoring intent deliberately.",
+      "canonicalAnchors": [
+        "stockledger|surface:eye-composer|canonical|open|reference-user|light|desktop-1440x900",
+        "stockledger|surface:eye-composer|canonical|open|reference-user|light|mobile-390x844"
+      ],
+      "canonicalEn": [
+        "captures/canonical/en/desktop-1440x900/eye-composer.png",
+        "captures/canonical/en/mobile-390x844/eye-composer.png"
+      ],
+      "canonicalKo": [
+        "captures/canonical/ko/desktop-1440x900/eye-composer.png",
+        "captures/canonical/ko/mobile-390x844/eye-composer.png"
+      ],
+      "responsive": [
+        "captures/stress/en/desktop-1366x768/eye-composer.png",
+        "captures/stress/en/mobile-360x800/eye-composer.png",
+        "captures/holdout/en/mobile-412x915/eye-composer.png",
+        "captures/stress/ko/desktop-1366x768/eye-composer.png",
+        "captures/stress/ko/mobile-360x800/eye-composer.png",
+        "captures/holdout/ko/mobile-412x915/eye-composer.png"
+      ]
+    },
+    {
+      "name": "journal-composer",
+      "canonicalState": "open",
+      "primaryTask": "Link an Eye, choose the recorded action, explain why, assess thesis validity and timing, then save or amend the human decision.",
+      "canonicalAnchors": [
+        "stockledger|surface:journal-composer|canonical|open|reference-user|light|desktop-1440x900",
+        "stockledger|surface:journal-composer|canonical|open|reference-user|light|mobile-390x844"
+      ],
+      "canonicalEn": [
+        "captures/canonical/en/desktop-1440x900/journal-composer.png",
+        "captures/canonical/en/mobile-390x844/journal-composer.png"
+      ],
+      "canonicalKo": [
+        "captures/canonical/ko/desktop-1440x900/journal-composer.png",
+        "captures/canonical/ko/mobile-390x844/journal-composer.png"
+      ],
+      "responsive": [
+        "captures/stress/en/desktop-1366x768/journal-composer.png",
+        "captures/stress/en/mobile-360x800/journal-composer.png",
+        "captures/holdout/en/mobile-412x915/journal-composer.png",
+        "captures/stress/ko/desktop-1366x768/journal-composer.png",
+        "captures/stress/ko/mobile-360x800/journal-composer.png",
+        "captures/holdout/ko/mobile-412x915/journal-composer.png"
+      ]
+    },
+    {
+      "name": "recipe-builder",
+      "canonicalState": "open",
+      "primaryTask": "Define monitoring purpose, supported logic, risk and review rules, inspect the result, then save a version deliberately.",
+      "canonicalAnchors": [
+        "stockledger|surface:recipe-builder|canonical|open|reference-user|light|desktop-1440x900",
+        "stockledger|surface:recipe-builder|canonical|open|reference-user|light|mobile-390x844"
+      ],
+      "canonicalEn": [
+        "captures/canonical/en/desktop-1440x900/recipe-builder.png",
+        "captures/canonical/en/mobile-390x844/recipe-builder.png"
+      ],
+      "canonicalKo": [
+        "captures/canonical/ko/desktop-1440x900/recipe-builder.png",
+        "captures/canonical/ko/mobile-390x844/recipe-builder.png"
+      ],
+      "responsive": [
+        "captures/stress/en/desktop-1366x768/recipe-builder.png",
+        "captures/stress/en/mobile-360x800/recipe-builder.png",
+        "captures/holdout/en/mobile-412x915/recipe-builder.png",
+        "captures/stress/ko/desktop-1366x768/recipe-builder.png",
+        "captures/stress/ko/mobile-360x800/recipe-builder.png",
+        "captures/holdout/ko/mobile-412x915/recipe-builder.png"
+      ]
+    },
+    {
+      "name": "logic-registry",
+      "canonicalState": "ready",
+      "primaryTask": "Inspect raw field identifiers, human meaning, importance, declared source and coverage, and downstream processing.",
+      "canonicalAnchors": [
+        "stockledger|surface:logic-registry|canonical|ready|reference-user|light|desktop-1440x900",
+        "stockledger|surface:logic-registry|canonical|ready|reference-user|light|mobile-390x844"
+      ],
+      "canonicalEn": [
+        "captures/canonical/en/desktop-1440x900/logic-registry.png",
+        "captures/canonical/en/mobile-390x844/logic-registry.png"
+      ],
+      "canonicalKo": [
+        "captures/canonical/ko/desktop-1440x900/logic-registry.png",
+        "captures/canonical/ko/mobile-390x844/logic-registry.png"
+      ],
+      "responsive": [
+        "captures/stress/en/desktop-1366x768/logic-registry.png",
+        "captures/stress/en/mobile-360x800/logic-registry.png",
+        "captures/holdout/en/mobile-412x915/logic-registry.png",
+        "captures/stress/ko/desktop-1366x768/logic-registry.png",
+        "captures/stress/ko/mobile-360x800/logic-registry.png",
+        "captures/holdout/ko/mobile-412x915/logic-registry.png"
+      ]
+    },
+    {
+      "name": "notification-confirmation",
+      "canonicalState": "confirmation",
+      "primaryTask": "Understand the saved preference change, then cancel or confirm disabling notification delivery.",
+      "canonicalAnchors": [
+        "stockledger|surface:notification-confirmation|canonical|confirmation|reference-user|light|desktop-1440x900",
+        "stockledger|surface:notification-confirmation|canonical|confirmation|reference-user|light|mobile-390x844"
+      ],
+      "canonicalEn": [
+        "captures/canonical/en/desktop-1440x900/notification-confirmation.png",
+        "captures/canonical/en/mobile-390x844/notification-confirmation.png"
+      ],
+      "canonicalKo": [
+        "captures/canonical/ko/desktop-1440x900/notification-confirmation.png",
+        "captures/canonical/ko/mobile-390x844/notification-confirmation.png"
+      ],
+      "responsive": [
+        "captures/stress/en/desktop-1366x768/notification-confirmation.png",
+        "captures/stress/en/mobile-360x800/notification-confirmation.png",
+        "captures/holdout/en/mobile-412x915/notification-confirmation.png",
+        "captures/stress/ko/desktop-1366x768/notification-confirmation.png",
+        "captures/stress/ko/mobile-360x800/notification-confirmation.png",
+        "captures/holdout/ko/mobile-412x915/notification-confirmation.png"
+      ]
+    }
+  ],
+  "stateEvidence": [
+    {
+      "name": "eye-blank-validation",
+      "path": "captures/states/eye-blank-validation.png",
+      "note": "Required stock, recipe, and thesis errors adjacent to their fields."
+    },
+    {
+      "name": "eye-invalid-range",
+      "path": "captures/states/eye-invalid-range.png",
+      "note": "Reversed optional range shows actionable errors and keeps the entered values."
+    },
+    {
+      "name": "eye-edit",
+      "path": "captures/states/eye-edit.png",
+      "note": "Edit mode restores the exact authored thesis and invalidation rule."
+    },
+    {
+      "name": "journal-required-validation",
+      "path": "captures/states/journal-required-validation.png",
+      "note": "The current required Journal context is identified without surfacing future errors."
+    },
+    {
+      "name": "journal-amend",
+      "path": "captures/states/journal-amend.png",
+      "note": "Amend mode preserves the authored note and optional concern."
+    },
+    {
+      "name": "recipe-purpose-validation",
+      "path": "captures/states/recipe-purpose-validation.png",
+      "note": "The Purpose step names only the information required for that step."
+    },
+    {
+      "name": "recipe-logic-validation",
+      "path": "captures/states/recipe-logic-validation.png",
+      "note": "The Logic step asks for at least one supported condition."
+    },
+    {
+      "name": "recipe-final-review",
+      "path": "captures/states/recipe-final-review.png",
+      "note": "The final step reviews purpose, supported logic, risk notes, and review cadence before saving."
+    },
+    {
+      "name": "recipe-version-context",
+      "path": "captures/states/recipe-version-context.png",
+      "note": "Saved Recipe detail exposes its version context and persisted monitoring intent."
+    },
+    {
+      "name": "registry-field-detail",
+      "path": "captures/states/registry-field-detail.png",
+      "note": "The identifier, meaning, importance, expected source and coverage, and downstream links are visible together."
+    },
+    {
+      "name": "registry-help",
+      "path": "captures/states/registry-help.png",
+      "note": "Supported help explains how to read registry metadata without equating it with live provider health."
+    },
+    {
+      "name": "notification-confirmation-cancel",
+      "path": "captures/states/notification-confirmation-cancel.png",
+      "note": "Confirmation presents the preference change and keeps cancel separate from the destructive action."
+    },
+    {
+      "name": "notification-canceled",
+      "path": "captures/states/notification-canceled.png",
+      "note": "Cancel returns to the still-enabled preference state without changing it."
+    },
+    {
+      "name": "notification-save-error",
+      "path": "captures/states/notification-save-error.png",
+      "note": "Injected local persistence failure retains the confirmation, actionable error, and Enabled preference for retry."
+    },
+    {
+      "name": "notification-save-success",
+      "path": "captures/states/notification-save-success.png",
+      "note": "The confirmation closes only after the saved preference is Off."
+    },
+    {
+      "name": "notification-pending",
+      "path": "captures/states/notification-pending.png",
+      "note": "The preference save remains pending until the delayed local storage acknowledgement returns in this capture fixture."
+    }
+  ],
+  "diagnostics": [
+    "diagnostics/release-qualification.json",
+    "diagnostics/release-evidence.json",
+    "diagnostics/release-verify.json",
+    "diagnostics/task-oracle-state-coverage.json",
+    "diagnostics/source-impact-analysis.json",
+    "diagnostics/primary-route-regression.json",
+    "diagnostics/deep-review-regression.json",
+    "diagnostics/operations-qualification.json",
+    "diagnostics/operations-status.json",
+    "diagnostics/recovery-drill.json",
+    "diagnostics/frozen-research-status.json",
+    "diagnostics/cloud-contract-status.json",
+    "diagnostics/artifact-capture-runtime.json",
+    "diagnostics/review-pdf-qa.json"
+  ],
+  "reviews": [
+    "review-desktop.pdf",
+    "review-mobile.pdf"
+  ]
+}

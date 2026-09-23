@@ -1,0 +1,349 @@
+{
+  "candidate": "48aef5d8be21e83a95d299a78da7ab61557006ec",
+  "tree": "3c71b82219068c3aec4e620e19f786ae50a580f2",
+  "reducedMotion": "reduce",
+  "states": [
+    {
+      "name": "eye-blank-validation",
+      "path": "captures/states/eye-blank-validation.png",
+      "sha256": "c18836d83bd044af5a4889ca589ac5c8882a85bc244b40ac7005d7f1addf91e7",
+      "bytes": 57026,
+      "note": "Required stock, recipe, and thesis errors adjacent to their fields.",
+      "geometry": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        }
+      }
+    },
+    {
+      "name": "eye-invalid-range",
+      "path": "captures/states/eye-invalid-range.png",
+      "sha256": "69df9c544032b60ac19589f6f4eb439635df6115c69419ceeac307ef88ae7013",
+      "bytes": 58710,
+      "note": "Reversed optional range shows actionable errors and keeps the entered values.",
+      "geometry": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        }
+      }
+    },
+    {
+      "name": "eye-edit",
+      "path": "captures/states/eye-edit.png",
+      "sha256": "61ed517e4a418e778eb122e5091ae61fe766a15fb416eab98e87f125271ba3fc",
+      "bytes": 73034,
+      "note": "Edit mode restores the exact authored thesis and invalidation rule.",
+      "geometry": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        }
+      }
+    },
+    {
+      "name": "journal-required-validation",
+      "path": "captures/states/journal-required-validation.png",
+      "sha256": "98d80c23b23e4a5084812cac12e41d2bfb5d190bc355b90487f4c8b64b89ceb5",
+      "bytes": 51649,
+      "note": "The current required Journal context is identified without surfacing future errors.",
+      "geometry": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        }
+      }
+    },
+    {
+      "name": "journal-amend",
+      "path": "captures/states/journal-amend.png",
+      "sha256": "e0f248b688a8ab07036001209f7ed060b96be556885b72f23a95df28903eca1a",
+      "bytes": 68316,
+      "note": "Amend mode preserves the authored note and optional concern.",
+      "geometry": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        }
+      }
+    },
+    {
+      "name": "recipe-purpose-validation",
+      "path": "captures/states/recipe-purpose-validation.png",
+      "sha256": "a70f05be22da65263f9bd034b100368ec801a8c852b74879ff16a5defbce376a",
+      "bytes": 61469,
+      "note": "The Purpose step names only the information required for that step.",
+      "geometry": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        }
+      }
+    },
+    {
+      "name": "recipe-logic-validation",
+      "path": "captures/states/recipe-logic-validation.png",
+      "sha256": "01d88fd8a303230f564ff45a2c50fe9c6a29bc422a988d8eabf11ee1f33cc29d",
+      "bytes": 59398,
+      "note": "The Logic step asks for at least one supported condition.",
+      "geometry": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        }
+      }
+    },
+    {
+      "name": "recipe-final-review",
+      "path": "captures/states/recipe-final-review.png",
+      "sha256": "5b6e84e839cb632343fd70a212ed7ba4ae322ee0b89f69917a292bf040e81912",
+      "bytes": 75167,
+      "note": "The final step reviews purpose, supported logic, risk notes, and review cadence before saving.",
+      "geometry": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        }
+      }
+    },
+    {
+      "name": "recipe-version-context",
+      "path": "captures/states/recipe-version-context.png",
+      "sha256": "38db682f2913fca305098197b95fe431bccbab8066ad1e794082c70927788903",
+      "bytes": 68278,
+      "note": "Saved Recipe detail exposes its version context and persisted monitoring intent.",
+      "geometry": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        }
+      }
+    },
+    {
+      "name": "registry-field-detail",
+      "path": "captures/states/registry-field-detail.png",
+      "sha256": "aacaef0887c30965b2ba88e5b4e448bb17779f0d922c3f48e4d06c00de1cdd0e",
+      "bytes": 102961,
+      "note": "The identifier, meaning, importance, expected source and coverage, and downstream links are visible together.",
+      "geometry": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        }
+      }
+    },
+    {
+      "name": "registry-help",
+      "path": "captures/states/registry-help.png",
+      "sha256": "1341de283ca92d639ba6d2f533e170bbf85d1fd5cb2008d85764e81946420546",
+      "bytes": 105604,
+      "note": "Supported help explains how to read registry metadata without equating it with live provider health.",
+      "geometry": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        }
+      }
+    },
+    {
+      "name": "notification-confirmation-cancel",
+      "path": "captures/states/notification-confirmation-cancel.png",
+      "sha256": "e557223303d83a5592c688b425c77c198c0bed80403bbb825bcaa4297bb51602",
+      "bytes": 46123,
+      "note": "Confirmation presents the preference change and keeps cancel separate from the destructive action.",
+      "geometry": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        }
+      }
+    },
+    {
+      "name": "notification-canceled",
+      "path": "captures/states/notification-canceled.png",
+      "sha256": "f6df783c736c83459013d36028852bf3c392929a407179cda76d72256f97a4ee",
+      "bytes": 95759,
+      "note": "Cancel returns to the still-enabled preference state without changing it.",
+      "geometry": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": null
+      }
+    },
+    {
+      "name": "notification-save-error",
+      "path": "captures/states/notification-save-error.png",
+      "sha256": "07a7f0503781a2d4e6d85a6bcba95826a2de84740590b12b8def4f121aad000d",
+      "bytes": 54717,
+      "note": "Injected local persistence failure retains the confirmation, actionable error, and Enabled preference for retry.",
+      "geometry": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        }
+      }
+    },
+    {
+      "name": "notification-save-success",
+      "path": "captures/states/notification-save-success.png",
+      "sha256": "d4303fe27356840942459f9d1b00e8b46ddbdc8c7c16158b665a6da324f6d82f",
+      "bytes": 95003,
+      "note": "The confirmation closes only after the saved preference is Off.",
+      "geometry": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": null
+      }
+    },
+    {
+      "name": "notification-pending",
+      "path": "captures/states/notification-pending.png",
+      "sha256": "6cf8c0f816e916faa55b9f1c51974a6a8254fdd974579b8072043376f94a4512",
+      "bytes": 44824,
+      "note": "The preference save remains pending until the delayed local storage acknowledgement returns in this capture fixture.",
+      "geometry": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        }
+      }
+    }
+  ]
+}

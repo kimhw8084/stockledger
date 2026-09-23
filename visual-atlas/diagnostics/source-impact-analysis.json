@@ -1,0 +1,45 @@
+{
+  "candidate": {
+    "commit": "48aef5d8be21e83a95d299a78da7ab61557006ec",
+    "tree": "3c71b82219068c3aec4e620e19f786ae50a580f2",
+    "base": "40e035da9940805a2971b1006488007dcef665e0"
+  },
+  "productCommitCount": 1,
+  "productChangedFiles": 14,
+  "changedPaths": [
+    "src/app/StockLedgerApp.tsx",
+    "src/components/WindowPanel.tsx",
+    "src/domain/inputValidation.ts",
+    "src/features/eyes/EyeComposer.tsx",
+    "src/features/journal/JournalComposer.tsx",
+    "src/features/notifications/NotificationSettingsPanel.tsx",
+    "src/features/recipes/RecipesScreen.tsx",
+    "src/features/recipes/builder/RecipeBuilder.tsx",
+    "src/features/recipes/logic/RawDataRegistry.tsx",
+    "src/features/shared/AuthoringFields.tsx",
+    "src/lib/i18n.ts",
+    "tests/e2e/chg172-primary-surfaces.spec.ts",
+    "tests/e2e/chg199-authoring-config.spec.ts",
+    "tests/e2e/workspace.spec.ts"
+  ],
+  "featureOwnership": {
+    "eyeComposer": "moved to src/features/eyes/EyeComposer.tsx; StockLedgerApp now retains draft/action orchestration",
+    "journalComposer": "moved to src/features/journal/JournalComposer.tsx; authored amendment/history semantics remain in domain orchestration",
+    "recipeBuilder": "moved to src/features/recipes/builder/RecipeBuilder.tsx; current Recipe/Condition model and version semantics remain unchanged",
+    "logicRegistry": "migrated from src/components/logic/L0DataLayer.tsx to src/features/recipes/logic/RawDataRegistry.tsx; no injected legacy component props",
+    "notificationConfirmation": "retained in NotificationSettingsPanel; only pending/success/error retry presentation and success-only close are refined"
+  },
+  "architectureChecks": {
+    "newFeatureModulesImportLegacyStyles": false,
+    "newFeatureModulesImportComponentsCommon": false,
+    "rawDataRegistryAcceptsInjectedLegacyComponents": false,
+    "stockLedgerAppOwnsAuthoringOrchestration": true,
+    "financialCalculationsOrDomainTransitionsChanged": false,
+    "persistenceSchemaOrProviderWorkerContractChanged": false
+  },
+  "sharedPrimitiveImpact": {
+    "windowPanel": "bounded closeDisabled and closeAfterCommit support for a confirmation whose save is in flight; existing focus/Escape/inert/safe-area/reduced-motion behavior exercised by release browser suite",
+    "primaryRouteRegression": "PASS",
+    "deepReviewDetailRegression": "PASS, including metric layout and Korean generated-system localization"
+  }
+}

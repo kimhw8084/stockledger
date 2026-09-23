@@ -1,0 +1,17 @@
+{
+  "suite": "tests/e2e/chg172-primary-surfaces.spec.ts + tests/e2e/r11-today.spec.ts",
+  "result": "PASS",
+  "candidate": "48aef5d8be21e83a95d299a78da7ab61557006ec",
+  "fullPlaywright": {
+    "passed": 75,
+    "skipped": 1,
+    "failed": 0
+  },
+  "facts": [
+    "primary route tasks",
+    "responsive stress and holdout profiles",
+    "Korean critical copy",
+    "keyboard navigation and exact focus restoration",
+    "today task flow"
+  ]
+}

@@ -1,0 +1,282 @@
+{
+  "project": "stockledger",
+  "change": "CHG-199",
+  "request": "stockledger-prod-c16-authoring-config-lawbook-v1",
+  "operation": "BUILD",
+  "candidate": {
+    "commit": "48aef5d8be21e83a95d299a78da7ab61557006ec",
+    "tree": "3c71b82219068c3aec4e620e19f786ae50a580f2",
+    "base": "40e035da9940805a2971b1006488007dcef665e0"
+  },
+  "visualAuthority": {
+    "primaryUi": "CHG-143 shell + Today; CHG-172 primary surfaces; CHG-184 deep review/detail surfaces; AR-61 primary atlas + AR-64 deep review/detail atlas",
+    "lawbook": "Project OS Golden UI Engineering Lawbook v2 + Human-Centered UI Excellence Pillar + StockLedger Product Contract"
+  },
+  "logicalSurfaces": [
+    {
+      "name": "eye-composer",
+      "canonicalState": "open",
+      "primaryTask": "Choose a stock, recipe, and thesis; optionally record range, invalidation, and last-review context; save or amend monitoring intent deliberately.",
+      "canonicalAnchors": [
+        "stockledger|surface:eye-composer|canonical|open|reference-user|light|desktop-1440x900",
+        "stockledger|surface:eye-composer|canonical|open|reference-user|light|mobile-390x844"
+      ]
+    },
+    {
+      "name": "journal-composer",
+      "canonicalState": "open",
+      "primaryTask": "Link an Eye, choose the recorded action, explain why, assess thesis validity and timing, then save or amend the human decision.",
+      "canonicalAnchors": [
+        "stockledger|surface:journal-composer|canonical|open|reference-user|light|desktop-1440x900",
+        "stockledger|surface:journal-composer|canonical|open|reference-user|light|mobile-390x844"
+      ]
+    },
+    {
+      "name": "recipe-builder",
+      "canonicalState": "open",
+      "primaryTask": "Define monitoring purpose, supported logic, risk and review rules, inspect the result, then save a version deliberately.",
+      "canonicalAnchors": [
+        "stockledger|surface:recipe-builder|canonical|open|reference-user|light|desktop-1440x900",
+        "stockledger|surface:recipe-builder|canonical|open|reference-user|light|mobile-390x844"
+      ]
+    },
+    {
+      "name": "logic-registry",
+      "canonicalState": "ready",
+      "primaryTask": "Inspect raw field identifiers, human meaning, importance, declared source and coverage, and downstream processing.",
+      "canonicalAnchors": [
+        "stockledger|surface:logic-registry|canonical|ready|reference-user|light|desktop-1440x900",
+        "stockledger|surface:logic-registry|canonical|ready|reference-user|light|mobile-390x844"
+      ]
+    },
+    {
+      "name": "notification-confirmation",
+      "canonicalState": "confirmation",
+      "primaryTask": "Understand the saved preference change, then cancel or confirm disabling notification delivery.",
+      "canonicalAnchors": [
+        "stockledger|surface:notification-confirmation|canonical|confirmation|reference-user|light|desktop-1440x900",
+        "stockledger|surface:notification-confirmation|canonical|confirmation|reference-user|light|mobile-390x844"
+      ]
+    }
+  ],
+  "canonicalAnchors": [
+    {
+      "key": "stockledger|surface:eye-composer|canonical|open|reference-user|light|desktop-1440x900",
+      "surface": "eye-composer",
+      "state": "open",
+      "viewport": "desktop-1440x900",
+      "locale": "en",
+      "theme": "light",
+      "path": "captures/canonical/en/desktop-1440x900/eye-composer.png",
+      "sha256": "5dd31cea18f19d7fcbf1da9a3a289de0a8468bbf120f48c2bfff3b0593e271df"
+    },
+    {
+      "key": "stockledger|surface:journal-composer|canonical|open|reference-user|light|desktop-1440x900",
+      "surface": "journal-composer",
+      "state": "open",
+      "viewport": "desktop-1440x900",
+      "locale": "en",
+      "theme": "light",
+      "path": "captures/canonical/en/desktop-1440x900/journal-composer.png",
+      "sha256": "70f6cfff35dfc1b115d87bdae86cf4139cd7f3335cdef78ed7f5b9590df82656"
+    },
+    {
+      "key": "stockledger|surface:recipe-builder|canonical|open|reference-user|light|desktop-1440x900",
+      "surface": "recipe-builder",
+      "state": "open",
+      "viewport": "desktop-1440x900",
+      "locale": "en",
+      "theme": "light",
+      "path": "captures/canonical/en/desktop-1440x900/recipe-builder.png",
+      "sha256": "0a7b0fd26bd58edc1a3b28cefcc51d3be570b7bd7f8c555864ffb0c78c4e8f18"
+    },
+    {
+      "key": "stockledger|surface:logic-registry|canonical|ready|reference-user|light|desktop-1440x900",
+      "surface": "logic-registry",
+      "state": "ready",
+      "viewport": "desktop-1440x900",
+      "locale": "en",
+      "theme": "light",
+      "path": "captures/canonical/en/desktop-1440x900/logic-registry.png",
+      "sha256": "1439bffcfc2798c2aa58425351a055f7aafe39b90592b4157c09bf6b58299d45"
+    },
+    {
+      "key": "stockledger|surface:notification-confirmation|canonical|confirmation|reference-user|light|desktop-1440x900",
+      "surface": "notification-confirmation",
+      "state": "confirmation",
+      "viewport": "desktop-1440x900",
+      "locale": "en",
+      "theme": "light",
+      "path": "captures/canonical/en/desktop-1440x900/notification-confirmation.png",
+      "sha256": "b506aece4f03ce34124f02c6717ea866ef25a70e39d092aa1d4efe1818aaca5b"
+    },
+    {
+      "key": "stockledger|surface:eye-composer|canonical|open|reference-user|light|mobile-390x844",
+      "surface": "eye-composer",
+      "state": "open",
+      "viewport": "mobile-390x844",
+      "locale": "en",
+      "theme": "light",
+      "path": "captures/canonical/en/mobile-390x844/eye-composer.png",
+      "sha256": "a6d879599a87dbe6369bac90113d3b46fe8e61bf3f21c4f15e08392a241bd045"
+    },
+    {
+      "key": "stockledger|surface:journal-composer|canonical|open|reference-user|light|mobile-390x844",
+      "surface": "journal-composer",
+      "state": "open",
+      "viewport": "mobile-390x844",
+      "locale": "en",
+      "theme": "light",
+      "path": "captures/canonical/en/mobile-390x844/journal-composer.png",
+      "sha256": "dc651e136e8479d300e3acfe7aa9c12e120cbcc6800d66e295384b3595e2a84d"
+    },
+    {
+      "key": "stockledger|surface:recipe-builder|canonical|open|reference-user|light|mobile-390x844",
+      "surface": "recipe-builder",
+      "state": "open",
+      "viewport": "mobile-390x844",
+      "locale": "en",
+      "theme": "light",
+      "path": "captures/canonical/en/mobile-390x844/recipe-builder.png",
+      "sha256": "17897a2887d9a1043e4b33c89b54dffbfde08ee2a93e4dfac3dcaed7ce9c96b1"
+    },
+    {
+      "key": "stockledger|surface:logic-registry|canonical|ready|reference-user|light|mobile-390x844",
+      "surface": "logic-registry",
+      "state": "ready",
+      "viewport": "mobile-390x844",
+      "locale": "en",
+      "theme": "light",
+      "path": "captures/canonical/en/mobile-390x844/logic-registry.png",
+      "sha256": "8a0573708857e44cdb995a39ab7b48c018d95c27a4a4d9d0df1886bdac1323b5"
+    },
+    {
+      "key": "stockledger|surface:notification-confirmation|canonical|confirmation|reference-user|light|mobile-390x844",
+      "surface": "notification-confirmation",
+      "state": "confirmation",
+      "viewport": "mobile-390x844",
+      "locale": "en",
+      "theme": "light",
+      "path": "captures/canonical/en/mobile-390x844/notification-confirmation.png",
+      "sha256": "f11fc1cc8c757acf0f9dc101e89f24ff70401661676b0d50f21fe8d01dfa55a3"
+    }
+  ],
+  "localizedCanonicalVariants": [
+    {
+      "key": "stockledger|surface:eye-composer|canonical|open|reference-user|light|desktop-1440x900",
+      "surface": "eye-composer",
+      "state": "open",
+      "viewport": "desktop-1440x900",
+      "locale": "ko",
+      "theme": "light",
+      "path": "captures/canonical/ko/desktop-1440x900/eye-composer.png",
+      "sha256": "87f10619d25a348f273abffe2dd6871c3f52e66ebadf080b56567fd92b47cc14"
+    },
+    {
+      "key": "stockledger|surface:journal-composer|canonical|open|reference-user|light|desktop-1440x900",
+      "surface": "journal-composer",
+      "state": "open",
+      "viewport": "desktop-1440x900",
+      "locale": "ko",
+      "theme": "light",
+      "path": "captures/canonical/ko/desktop-1440x900/journal-composer.png",
+      "sha256": "459ed0fd4237e5b72150c74399615c90ae10c50183439f197c3a66e26ee63332"
+    },
+    {
+      "key": "stockledger|surface:recipe-builder|canonical|open|reference-user|light|desktop-1440x900",
+      "surface": "recipe-builder",
+      "state": "open",
+      "viewport": "desktop-1440x900",
+      "locale": "ko",
+      "theme": "light",
+      "path": "captures/canonical/ko/desktop-1440x900/recipe-builder.png",
+      "sha256": "48a7f7620dcb37484cfc9e97b9e6f378fd0d13ff7a08f8071822d530592cb772"
+    },
+    {
+      "key": "stockledger|surface:logic-registry|canonical|ready|reference-user|light|desktop-1440x900",
+      "surface": "logic-registry",
+      "state": "ready",
+      "viewport": "desktop-1440x900",
+      "locale": "ko",
+      "theme": "light",
+      "path": "captures/canonical/ko/desktop-1440x900/logic-registry.png",
+      "sha256": "d0c585b1d733ec9b81c7eab42e38620d546d8e9aed0a75862df974e74e07b576"
+    },
+    {
+      "key": "stockledger|surface:notification-confirmation|canonical|confirmation|reference-user|light|desktop-1440x900",
+      "surface": "notification-confirmation",
+      "state": "confirmation",
+      "viewport": "desktop-1440x900",
+      "locale": "ko",
+      "theme": "light",
+      "path": "captures/canonical/ko/desktop-1440x900/notification-confirmation.png",
+      "sha256": "d4828a34ab9afaa348d01159f2fbb2cbbfec40a2ea46d82d13beaf54bf974ba8"
+    },
+    {
+      "key": "stockledger|surface:eye-composer|canonical|open|reference-user|light|mobile-390x844",
+      "surface": "eye-composer",
+      "state": "open",
+      "viewport": "mobile-390x844",
+      "locale": "ko",
+      "theme": "light",
+      "path": "captures/canonical/ko/mobile-390x844/eye-composer.png",
+      "sha256": "4bc3ced628cc2355ab24f83edf500aa9b6e1bed311231af88671c5f4f1a995d8"
+    },
+    {
+      "key": "stockledger|surface:journal-composer|canonical|open|reference-user|light|mobile-390x844",
+      "surface": "journal-composer",
+      "state": "open",
+      "viewport": "mobile-390x844",
+      "locale": "ko",
+      "theme": "light",
+      "path": "captures/canonical/ko/mobile-390x844/journal-composer.png",
+      "sha256": "3efff8514eb24457c99319d73b86cbee68df2fa21344097af7e5e25b98e8333a"
+    },
+    {
+      "key": "stockledger|surface:recipe-builder|canonical|open|reference-user|light|mobile-390x844",
+      "surface": "recipe-builder",
+      "state": "open",
+      "viewport": "mobile-390x844",
+      "locale": "ko",
+      "theme": "light",
+      "path": "captures/canonical/ko/mobile-390x844/recipe-builder.png",
+      "sha256": "41130e6bdf5f11d04f85d041748b2780a2df4d2c072c0e9b3f40cc4a9ee6849b"
+    },
+    {
+      "key": "stockledger|surface:logic-registry|canonical|ready|reference-user|light|mobile-390x844",
+      "surface": "logic-registry",
+      "state": "ready",
+      "viewport": "mobile-390x844",
+      "locale": "ko",
+      "theme": "light",
+      "path": "captures/canonical/ko/mobile-390x844/logic-registry.png",
+      "sha256": "39a8d5e0fa372288331a9907398dd249e0379a10eb65a32a3c55fb65e1965875"
+    },
+    {
+      "key": "stockledger|surface:notification-confirmation|canonical|confirmation|reference-user|light|mobile-390x844",
+      "surface": "notification-confirmation",
+      "state": "confirmation",
+      "viewport": "mobile-390x844",
+      "locale": "ko",
+      "theme": "light",
+      "path": "captures/canonical/ko/mobile-390x844/notification-confirmation.png",
+      "sha256": "dc754ffc35afb4b84f7bff0e03bf54457038a4a9b860dba83340a29761d35804"
+    }
+  ],
+  "responsiveProfiles": {
+    "canonical": [
+      "desktop-1440x900",
+      "mobile-390x844"
+    ],
+    "stress": [
+      "desktop-1366x768",
+      "mobile-360x800"
+    ],
+    "holdout": [
+      "mobile-412x915"
+    ]
+  },
+  "visualDecision": "AWAITING_INDEPENDENT_PIXEL_AUDIT",
+  "independentAcceptance": false,
+  "zoom200Evidence": "SEPARATE_GATE_NOT_PART_OF_THIS_BUILD"
+}

@@ -1,0 +1,6 @@
+{
+  "result": "UNAVAILABLE",
+  "gate": "Local Supabase/cloud contract is conditional on local cloud service availability.",
+  "detail": "supabase status -o json failed because the Docker API socket /Users/haewonkim/.orbstack/run/docker.sock is absent.",
+  "externalCredentialsOrHostedCloudWereNotAvailable": true
+}

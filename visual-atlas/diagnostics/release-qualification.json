@@ -1,0 +1,41 @@
+{
+  "candidate": "48aef5d8be21e83a95d299a78da7ab61557006ec",
+  "tree": "3c71b82219068c3aec4e620e19f786ae50a580f2",
+  "base": "40e035da9940805a2971b1006488007dcef665e0",
+  "release_verify": "PASS",
+  "qualification": {
+    "npm_ci": "PASS; 639 packages installed; zero vulnerabilities at install",
+    "typecheck": "PASS",
+    "unit": "PASS; 24 files / 196 tests",
+    "boundary_check": "PASS",
+    "release_base": "PASS; exact protected base is ancestor of candidate",
+    "release_workflow": "PASS",
+    "npm_audit_high_critical": "PASS; zero vulnerabilities",
+    "export_all": "PASS; web/iOS/Android",
+    "playwright_e2e": "PASS; 75 passed, 1 existing mobile hardware-keyboard skip, 0 failed",
+    "recovery_drill": "PASS; synthetic restore, integrity, history, and source-not-mutated checks; no failure classification",
+    "operations_qualification": "PASS; synthetic workload within bounded engineering budgets; not an SLA or production capacity claim",
+    "operations_status": "UNCONFIGURED; release identity unavailable, scheduler stopped, workspace missing; external services unavailable",
+    "frozen_research": "BLOCKED_UNVERIFIED; six rules checked; numeric golden outputs absent, current constituents survivorship-biased, point-in-time membership unavailable, forward proof required",
+    "cloud_contract": "UNAVAILABLE; local Supabase check could not connect to missing OrbStack Docker API socket"
+  },
+  "regressions": {
+    "primaryRoute": "PASS",
+    "deepReviewDetail": "PASS"
+  },
+  "captures": {
+    "candidateExact": true,
+    "canonicalEn": 10,
+    "canonicalKo": 10,
+    "stressAndHoldout": 30,
+    "stateEvidence": 16
+  },
+  "outOfScope": [
+    "authentic browser 200% zoom/reflow evidence remains a separate gate"
+  ],
+  "visualDecision": "AWAITING_INDEPENDENT_PIXEL_AUDIT",
+  "release_verify_verified": true,
+  "release_evidence": "PASS; generated for the exact protected base/candidate/tree and 86 hashed external capture and release-input files",
+  "artifactBundle": "PASS; the sealed ZIP passed integrity and deterministic-manifest readback.",
+  "package_verified": true
+}

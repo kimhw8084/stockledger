@@ -1,0 +1,19 @@
+{
+  "suite": "tests/e2e/chg184-deep-review-details.spec.ts",
+  "result": "PASS",
+  "candidate": "48aef5d8be21e83a95d299a78da7ab61557006ec",
+  "fullPlaywright": {
+    "passed": 75,
+    "skipped": 1,
+    "failed": 0
+  },
+  "facts": [
+    "stock and metric detail hierarchy",
+    "Eyes review filter and focus return",
+    "Journal history detail",
+    "scanner limitation",
+    "stress/holdout layouts",
+    "metric 360/390/412 hierarchy",
+    "Korean generated-system localization"
+  ]
+}

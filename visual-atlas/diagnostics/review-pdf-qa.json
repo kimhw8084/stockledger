@@ -1,0 +1,20 @@
+{
+  "result": "PASS",
+  "candidate": "48aef5d8be21e83a95d299a78da7ab61557006ec",
+  "reviewDesktop": {
+    "file": "review-desktop.pdf",
+    "pages": 10,
+    "pageSizePoints": [1560, 1000],
+    "representativePagesVerified": [1, 5, 6, 10],
+    "oneScreenshotImagePerPage": true
+  },
+  "reviewMobile": {
+    "file": "review-mobile.pdf",
+    "pages": 10,
+    "pageSizePoints": [470, 940],
+    "representativePagesVerified": [1, 5, 6, 10],
+    "oneScreenshotImagePerPage": true
+  },
+  "renderInspection": "Page 1 of each PDF was rendered through the system PDF renderer and visually inspected; screenshot frames preserve the original lossless captures.",
+  "visualDecision": "AWAITING_INDEPENDENT_PIXEL_AUDIT"
+}
