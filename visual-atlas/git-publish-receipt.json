@@ -1,0 +1,26 @@
+{
+  "schema": "stockledger-git-publish-receipt-v1",
+  "project": "stockledger",
+  "change": "CHG-172",
+  "request": "stockledger-prod-c14-primary-surfaces-lawbook-v1",
+  "operation": "BUILD",
+  "fabric_job": "CF-15fa2f1fc9122e348b846af6",
+  "source_sha": "949695c79753990080309907502e33cd29eb00e1",
+  "source_tree": "6eed4a44bbe2680a856159ff4716da7183a018b7",
+  "protected_base": "9dd9c4b0a37b804868487cf63a169faf807cdaf1",
+  "artifact_ref": "refs/heads/project-os-artifacts/stockledger/stockledger-prod-c14-primary-surfaces-lawbook-v1",
+  "evidence_ref": "refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c14-primary-surfaces-lawbook-v1",
+  "payload_status": "GIT_PAYLOAD_READY_FOR_IMMUTABLE_PUBLICATION",
+  "publication_commit_binding": "The exact artifact ref commit and remote readback result are recorded by artifact-stage-receipt.json in the compact evidence ref after publication.",
+  "package_content": {
+    "canonical_pngs": 12,
+    "korean_pngs": 10,
+    "stress_and_holdout_pngs": 15,
+    "non_happy_pngs": 10,
+    "review_pdfs": [
+      "review-desktop.pdf",
+      "review-mobile.pdf"
+    ],
+    "visual_decision": "AWAITING_INDEPENDENT_PIXEL_AUDIT"
+  }
+}

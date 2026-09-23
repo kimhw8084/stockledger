@@ -1,0 +1,84 @@
+{
+  "schema": "stockledger-chg172-task-oracles-v1",
+  "source_sha": "949695c79753990080309907502e33cd29eb00e1",
+  "source_tree": "6eed4a44bbe2680a856159ff4716da7183a018b7",
+  "full_playwright_run": {
+    "command": "npm run test:e2e",
+    "total": 48,
+    "passed": 47,
+    "skipped": 1,
+    "failed": 0
+  },
+  "keyboard_mobile": {
+    "status": "UNPROVEN_NON_APPLICABLE",
+    "reason": "The mobile Playwright project emulates touch and has no connected hardware keyboard; the complete keyboard task ran and passed on desktop Chromium."
+  },
+  "tasks": [
+    {
+      "surface": "watchlist",
+      "test": "Watchlist task: search, identify sample evidence, inspect, and return to the same stock",
+      "result": "PASS",
+      "proof": [
+        "no-results copy",
+        "AAPL selected",
+        "sample provenance visible",
+        "evidence detail opened",
+        "Escape restored invoking control and AAPL context"
+      ]
+    },
+    {
+      "surface": "recipes",
+      "test": "Recipes task: choose a layer, read set purpose/version, open detail, and return with focus",
+      "result": "PASS",
+      "proof": [
+        "Sets layer selected",
+        "purpose, version, cadence visible",
+        "existing set detail opened",
+        "Escape restored focus and Sets layer"
+      ]
+    },
+    {
+      "surface": "alerts",
+      "test": "Alerts task: inspect the leading current alert, snooze it, and verify its truthful history state",
+      "result": "PASS",
+      "proof": [
+        "high-priority visible evidence",
+        "source/freshness and uncertainty visible",
+        "detail opened and returned",
+        "snooze visible as Snoozed in History"
+      ]
+    },
+    {
+      "surface": "journal",
+      "test": "Journal task: filter and inspect a past decision, then open and close New without saving",
+      "result": "PASS",
+      "proof": [
+        "Entered filter selected",
+        "decision evidence opened",
+        "Escape returned focus",
+        "New composer opened then closed without save and focus returned"
+      ]
+    },
+    {
+      "surface": "settings",
+      "test": "Settings task: inspect local provider state, refresh one stock, and distinguish request result from service health",
+      "result": "PASS_WITH_EXTERNAL_SOURCE_LIMITATION",
+      "proof": [
+        "four providers truthfully Unconfigured",
+        "refresh request pending semantics observed where retained",
+        "source request result/error shown without claiming provider health",
+        "Stooq CORS failure recorded"
+      ]
+    },
+    {
+      "surface": "today",
+      "test": "Today regression task oracle preserves evidence context and opens a deliberate journal action",
+      "result": "PASS",
+      "proof": [
+        "review detail context",
+        "focus return",
+        "journal composer invocation"
+      ]
+    }
+  ]
+}

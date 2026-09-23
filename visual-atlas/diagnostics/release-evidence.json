@@ -1,0 +1,113 @@
+{
+  "contractVersion": "stockledger-release-evidence-v1",
+  "revision": 1,
+  "baseCommit": "9dd9c4b0a37b804868487cf63a169faf807cdaf1",
+  "source": {
+    "commit": "949695c79753990080309907502e33cd29eb00e1",
+    "tree": "6eed4a44bbe2680a856159ff4716da7183a018b7",
+    "workingTree": "clean"
+  },
+  "versions": {
+    "app": "0.2.0",
+    "nodeRequirement": ">=22.23.2",
+    "nodeRuntime": "v22.23.2",
+    "workspaceExportSchema": 2,
+    "workerDatabaseSchema": 7,
+    "financialTruthEngine": "2.1.0",
+    "financialTruthContract": "financial_truth_v1",
+    "calendar": "NYSE-2026-09-15",
+    "workerJobContract": {
+      "version": "stockledger-production-job-v1",
+      "revision": 2
+    },
+    "notification": {
+      "delivery": "stockledger-notification-delivery-v1",
+      "deliveryRevision": 1,
+      "digest": "stockledger-notification-digest-v1",
+      "digestRevision": 1,
+      "preferences": "stockledger-notification-preferences-v1"
+    },
+    "ingestion": {
+      "version": "stockledger-market-data-ingestion-v1",
+      "revision": 1
+    },
+    "rights": {
+      "version": "stockledger-market-data-rights-v1",
+      "revision": 2,
+      "authorityModel": "stockledger-market-data-rights-authority-v1"
+    },
+    "sync": "stockledger-personal-sync-v1"
+  },
+  "migrations": {
+    "ordered": true,
+    "files": [
+      {
+        "path": "supabase/migrations/20260916032227_ledger_sync.sql",
+        "sha256": "a7ac814c99675b5bfd0e375da338124f5084214b593a56efd16e34846825cca4",
+        "order": 0
+      },
+      {
+        "path": "supabase/migrations/20260918000000_secure_personal_sync.sql",
+        "sha256": "1c0763164f2e1257a8cbc3cf2338f68b0170257af6f072f8a73e1e4ebfb0d3ce",
+        "order": 1
+      }
+    ]
+  },
+  "packageLock": {
+    "sha256": "81117b82120669c16680c7f92ffe34be80a438bea52d2196aa2071f7533314ec"
+  },
+  "artifacts": {
+    "generated": false,
+    "files": []
+  },
+  "verification": {
+    "commands": [
+      "npm ci",
+      "npm run typecheck",
+      "npm test -- --run",
+      "npm run check:release-workflow",
+      "npm run check:boundaries",
+      "npm run check:frozen",
+      "npm run export:all",
+      "npm run test:e2e",
+      "npm audit --audit-level=high",
+      "npm run test:cloud"
+    ],
+    "checks": [
+      "source-tree-match",
+      "migration-order-and-digest-match",
+      "contract-snapshot-match",
+      "package-lock-match",
+      "artifact-digest-match-when-present",
+      "rollback-compatibility"
+    ]
+  },
+  "externalGates": [
+    "hosted-scheduler",
+    "hosted-notification-transport",
+    "commercial-market-data-agreement",
+    "billing-lifecycle",
+    "production-cloud-backup",
+    "external-incident-pager",
+    "native-device-certification",
+    "real-user-load"
+  ],
+  "rollback": {
+    "policy": "additive-forward-only",
+    "safeRollback": [
+      "static-artifact-to-a-verified-compatible-build",
+      "same-schema-export-restore-to-a-new-sqlite-path"
+    ],
+    "forwardMigrationRequired": [
+      "worker-database-schema",
+      "cloud-migrations",
+      "workspace-export-schema"
+    ],
+    "incompatibleAssertions": [
+      "no-destructive-database-downgrade",
+      "no-rollback-across-unsupported-schema",
+      "no-rollback-from-changed-financial-truth-contract"
+    ]
+  },
+  "evidenceHash": "2e1c53ff8f8f28d9dd1b4cb751ff36215e27e4eb958f51d3eb8bcd429bb3bb4c"
+}
