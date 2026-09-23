@@ -1,0 +1,110 @@
+{
+  "source": {
+    "sha": "949695c79753990080309907502e33cd29eb00e1",
+    "tree": "6eed4a44bbe2680a856159ff4716da7183a018b7",
+    "working_tree_clean_before_capture": true
+  },
+  "runtime": {
+    "app": "Expo static web export from exact candidate",
+    "base_url": "http://127.0.0.1:43187",
+    "app_runtime_sha256": "7e5d07da2cdfe1f89e645292a7bfee2ab6840492b12f388d100f95a88f72bc07",
+    "browser": "Chromium",
+    "browser_version": "153.0.8010.12",
+    "timezone": "America/Chicago",
+    "color_scheme": "light",
+    "reduced_motion": "reduce",
+    "device_scale_factor": 1,
+    "profiles": {
+      "desktop": {
+        "width": 1440,
+        "height": 900,
+        "isMobile": false,
+        "hasTouch": false
+      },
+      "mobile": {
+        "width": 390,
+        "height": 844,
+        "isMobile": true,
+        "hasTouch": true
+      },
+      "stressDesktop": {
+        "width": 1366,
+        "height": 768,
+        "isMobile": false,
+        "hasTouch": false
+      },
+      "stressMobile": {
+        "width": 360,
+        "height": 800,
+        "isMobile": true,
+        "hasTouch": true
+      },
+      "holdout": {
+        "width": 412,
+        "height": 915,
+        "isMobile": true,
+        "hasTouch": true
+      }
+    },
+    "locale_capture": [
+      "en-US",
+      "ko-KR"
+    ]
+  },
+  "capture_method": {
+    "full_page": false,
+    "lossless_png": true,
+    "screenshot_dimensions_verified": true,
+    "document_horizontal_overflow": "none observed",
+    "dom_mutation": false,
+    "css_zoom": false,
+    "browser_zoom_200_percent": "UNPROVEN: runner cannot control browser chrome; no viewport or device scale factor substitution used"
+  },
+  "browser_diagnostics": {
+    "runtime_failures": [
+      {
+        "context": "settings-refresh-pending-and-error",
+        "kind": "requestfailed",
+        "origin": "https://stooq.com",
+        "path": "/q/d/l/",
+        "resourceType": "fetch",
+        "error": "net::ERR_FAILED"
+      },
+      {
+        "context": "settings-refresh-pending-and-error",
+        "kind": "console",
+        "message": "Failed to load resource: net::ERR_FAILED"
+      },
+      {
+        "context": "settings-refresh-pending-and-error",
+        "kind": "requestfailed",
+        "origin": "https://stooq.com",
+        "path": "/q/d/l/",
+        "resourceType": "fetch",
+        "error": "net::ERR_FAILED"
+      },
+      {
+        "context": "settings-refresh-pending-and-error",
+        "kind": "console",
+        "message": "Failed to load resource: net::ERR_FAILED"
+      }
+    ],
+    "external_requests": [
+      {
+        "context": "settings-refresh-pending-and-error",
+        "origin": "https://stooq.com",
+        "path": "/q/d/l/",
+        "resourceType": "fetch"
+      },
+      {
+        "context": "settings-refresh-pending-and-error",
+        "origin": "https://stooq.com",
+        "path": "/q/d/l/",
+        "resourceType": "fetch"
+      }
+    ],
+    "settings_refresh_route": "Stooq requests held 1.2s then aborted to retain a real pending state and a truthful network failure; no DOM fixture was injected",
+    "held_requests": 2
+  },
+  "visualDecision": "AWAITING_INDEPENDENT_PIXEL_AUDIT"
+}
