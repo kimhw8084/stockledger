@@ -266,9 +266,16 @@ test("critical changed-surface meaning stays visible in Korean", async ({ page }
   await expect(page.getByText("여러 규칙을 목적, 사용 범위, 검토 주기에 맞춰 함께 사용합니다.", { exact: true }).first()).toBeVisible();
 
   await openTab(page, "알림");
-  await expect(page.locator("#alerts-primary-surface").getByRole("heading", { name: "알림", exact: true })).toBeVisible();
-  await expect(page.getByText("지금 검토가 필요한 알림을 먼저 확인하고, 근거와 데이터 한계를 읽은 뒤 의도적으로 처리합니다.", { exact: true })).toBeVisible();
-  await expect(page.getByRole("button", { name: "근거 확인", exact: true }).first()).toBeVisible();
+  await expect(page.locator("#alerts-primary-surface").getByRole("heading", { name: "현재 검토 대기", exact: true })).toBeVisible();
+  await expect(page.getByText("불확실성 및 누락:", { exact: false }).first()).toBeVisible();
+  const inspectEvidence = page.getByRole("button", { name: "근거 확인", exact: true }).first();
+  await expect(inspectEvidence).toBeVisible();
+  const inspectBounds = await inspectEvidence.boundingBox();
+  const primaryNavigation = await page.getByRole("tablist", { name: "주요 탐색", exact: true }).boundingBox();
+  expect(inspectBounds).not.toBeNull();
+  expect(primaryNavigation).not.toBeNull();
+  expect(inspectBounds!.y + inspectBounds!.height).toBeLessThanOrEqual(page.viewportSize()!.height);
+  expect(inspectBounds!.y + inspectBounds!.height).toBeLessThanOrEqual(primaryNavigation!.y);
 
   await openTab(page, "기록");
   await expect(page.locator("#journal-primary-surface").getByRole("heading", { name: "기록", exact: true })).toBeVisible();
