@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import {
+  AlertBanner,
   Badge,
   Button,
   Card,
@@ -139,8 +140,8 @@ export function StockEntityDetail({ language, stock, onManageEyes, onRegisterEye
           </View>
           <View style={styles.coverageRow}>
             <Text variant="caption" tone="secondary">{stock.coverage}</Text>
-            {stock.sample ? <Badge label={text.sample} tone="warning" /> : null}
           </View>
+          {stock.sample ? <AlertBanner tone="warning" title={text.sample} /> : null}
         </VStack>
       </Card>
 

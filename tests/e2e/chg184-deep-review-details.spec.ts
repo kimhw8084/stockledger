@@ -35,8 +35,10 @@ test("Stock and metric detail retain evidence hierarchy, pinning, and invoker fo
   await selectApple(page);
 
   await expect(page.getByText("Stock identity and data authority", { exact: true })).toBeVisible();
-  await expect(page.getByText("Sample data. Do not treat these values as live market observations.", { exact: true })).toBeVisible();
+  const sampleNotice = page.getByText("Sample data. Do not treat these values as live market observations.", { exact: true });
+  await expect(sampleNotice).toBeVisible();
   await expect(page.getByText("Monitoring context", { exact: true })).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(page.viewportSize()!.width);
   await captureSurface(page, testInfo, `stock-entity-detail-${testInfo.project.name}.png`);
   const inspect = page.getByRole("button", { name: "Evidence detail", exact: true }).first();
   await inspect.scrollIntoViewIfNeeded();
