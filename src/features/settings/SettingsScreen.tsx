@@ -181,6 +181,13 @@ export function SettingsScreen(props: SettingsScreenProps) {
               <Text variant="label">{copy.providers}</Text>
               <Text>{copy.healthy} {props.healthyCount} · {copy.limited} {props.limitedCount} · {copy.unconfigured} {props.unconfiguredCount} · {copy.unavailable} {props.unavailableCount}</Text>
               <Text variant="caption" tone="secondary">{copy.providerNote}</Text>
+              <Button
+                label={props.providerCheckPending ? copy.checking : copy.check}
+                onPress={props.onCheckProviders}
+                loading={props.providerCheckPending}
+                disabled={props.providerCheckPending}
+                responsiveWidth="compact-full"
+              />
             </View>
             <View style={styles.stateBlock}>
               <Text variant="label">{copy.stocks}</Text>
@@ -202,13 +209,6 @@ export function SettingsScreen(props: SettingsScreenProps) {
           </View>
 
           <View style={styles.operations}>
-            <Button
-              label={props.providerCheckPending ? copy.checking : copy.check}
-              onPress={props.onCheckProviders}
-              loading={props.providerCheckPending}
-              disabled={props.providerCheckPending}
-              responsiveWidth="compact-full"
-            />
             <Button
               label={refreshPending ? copy.refreshing : copy.refresh}
               onPress={() => { void runRefresh(); }}
@@ -294,8 +294,8 @@ export function SettingsScreen(props: SettingsScreenProps) {
 
 const styles = StyleSheet.create((theme) => ({
   root: { minWidth: 0, gap: theme.spacing.xl },
-  stateGrid: { minWidth: 0, flexDirection: { compact: "column", medium: "row" }, flexWrap: "wrap", gap: theme.spacing.lg },
-  stateBlock: { minWidth: 0, flex: 1, flexBasis: { compact: "100%", medium: "42%" }, gap: theme.spacing.xs },
+  stateGrid: { minWidth: 0, flexDirection: { compact: "column", medium: "row" }, flexWrap: { compact: "nowrap", medium: "wrap" }, gap: theme.spacing.lg },
+  stateBlock: { minWidth: 0, flexGrow: { compact: 0, medium: 1 }, flexBasis: { compact: "auto", medium: "42%" }, gap: theme.spacing.xs },
   operations: { minWidth: 0, flexDirection: { compact: "column", medium: "row" }, flexWrap: "wrap", gap: theme.spacing.sm, paddingTop: theme.spacing.sm, borderTopWidth: theme.strokeWidths.standard, borderTopColor: theme.colors.border.subtle },
   providerList: { minWidth: 0, gap: theme.spacing.sm },
   providerRow: { minWidth: 0, flexDirection: { compact: "column", medium: "row" }, alignItems: "flex-start", gap: theme.spacing.md, paddingVertical: theme.spacing.md },

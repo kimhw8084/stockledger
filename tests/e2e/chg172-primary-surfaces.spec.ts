@@ -29,6 +29,11 @@ test("Watchlist task: search, identify sample evidence, inspect, and return to t
   await search.fill("AAPL");
   await page.getByRole("button", { name: "AAPL · Apple", exact: true }).click();
   await expect(page.getByRole("heading", { name: "AAPL", exact: true })).toBeVisible();
+  const registerEye = page.getByRole("button", { name: "Register Eye", exact: true });
+  const registerBounds = await registerEye.boundingBox();
+  expect(registerBounds).not.toBeNull();
+  expect(registerBounds!.y).toBeGreaterThanOrEqual(0);
+  expect(registerBounds!.y + registerBounds!.height).toBeLessThanOrEqual(await page.evaluate(() => innerHeight));
   await expect(page.getByText("Sample data. Do not treat these values as live market observations.", { exact: true })).toBeVisible();
   await expect(page.getByText("Latest price", { exact: true })).toBeVisible();
   await expect(page.getByText("Current evidence", { exact: true })).toBeVisible();
@@ -50,12 +55,24 @@ test("Recipes task: choose a layer, read set purpose/version, open detail, and r
   const setsLayer = page.getByTestId("recipe-layer-control-Sets");
   await setsLayer.click();
   await expect(setsLayer).toHaveAttribute("aria-checked", "true");
+  const selectedLayerAppearance = await setsLayer.evaluate((element) => ({
+    text: element.textContent?.trim() ?? "",
+    background: getComputedStyle(element).backgroundColor,
+    labelColor: getComputedStyle(element.firstElementChild!).color,
+  }));
+  expect(selectedLayerAppearance.text).toContain("Set");
+  expect(selectedLayerAppearance.background).not.toBe("rgb(255, 255, 255)");
+  expect(selectedLayerAppearance.labelColor).not.toBe(selectedLayerAppearance.background);
   await expect(page.getByText("Use related rules together with an explicit purpose, scope, and review cadence.", { exact: true }).first()).toBeVisible();
   await expect(page.getByText("Intended use:", { exact: false }).first()).toBeVisible();
   await expect(page.getByText("Review cadence:", { exact: false }).first()).toBeVisible();
   await expect(page.getByText(/^v\d+$/).first()).toBeVisible();
 
   const openSet = page.getByRole("button", { name: "Open set detail", exact: true }).first();
+  const setActionBounds = await openSet.boundingBox();
+  expect(setActionBounds).not.toBeNull();
+  expect(setActionBounds!.y).toBeGreaterThanOrEqual(0);
+  expect(setActionBounds!.y + setActionBounds!.height).toBeLessThanOrEqual(await page.evaluate(() => innerHeight));
   await openSet.click();
   const detail = page.getByRole("dialog");
   await expect(detail).toBeVisible();
@@ -215,12 +232,14 @@ test("all five primary surfaces fit canonical, stress, and holdout viewports", a
     await page.setViewportSize(profile);
     for (const surface of surfaces) {
       await openTab(page, surface.tab);
+      await page.evaluate(() => window.scrollTo(0, 0));
       const action = surface.action();
-      await action.scrollIntoViewIfNeeded();
       const bounds = await action.boundingBox();
       expect(bounds, `${surface.tab} action should have measurable bounds at ${profile.width}x${profile.height}`).not.toBeNull();
       expect(bounds!.x).toBeGreaterThanOrEqual(0);
       expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(profile.width);
+      expect(bounds!.y, `${surface.tab} primary action should be visible without scrolling at ${profile.width}x${profile.height}`).toBeGreaterThanOrEqual(0);
+      expect(bounds!.y + bounds!.height, `${surface.tab} primary action should fit the initial viewport at ${profile.width}x${profile.height}`).toBeLessThanOrEqual(profile.height);
       const documentWidth = await page.evaluate(() => document.documentElement.scrollWidth);
       expect(documentWidth, `${surface.tab} document should not overflow at ${profile.width}x${profile.height}`).toBeLessThanOrEqual(profile.width);
     }
@@ -237,7 +256,6 @@ test("critical changed-surface meaning stays visible in Korean", async ({ page }
 
   await openTab(page, "레시피");
   await expect(page.locator("#recipes-primary-surface").getByRole("heading", { name: "레시피", exact: true })).toBeVisible();
-  await expect(page.getByText("원천 데이터에서 수식, 규칙, 모니터링 세트까지 연결을 살펴봅니다.", { exact: true })).toBeVisible();
   await expect(page.getByText("여러 규칙을 목적, 사용 범위, 검토 주기에 맞춰 함께 사용합니다.", { exact: true }).first()).toBeVisible();
 
   await openTab(page, "알림");
@@ -335,11 +353,9 @@ test("keyboard task paths operate segmented choices and restore focus after deep
   await settingsTab.focus();
   await page.keyboard.press("Enter");
   const providerCheck = page.getByRole("button", { name: "Check provider configuration", exact: true });
-  await providerCheck.focus();
-  await page.keyboard.press("Enter");
+  await providerCheck.press("Enter");
   await expect(page.getByText("Stooq", { exact: true })).toBeVisible();
   const workspaceSection = page.getByRole("button", { name: "Workspace and data", exact: true });
-  await workspaceSection.focus();
-  await page.keyboard.press("Space");
+  await workspaceSection.press("Space");
   await expect(workspaceSection).toHaveAttribute("aria-expanded", "true");
 });

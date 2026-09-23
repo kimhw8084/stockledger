@@ -72,7 +72,7 @@ const Segment = forwardRef<ComponentRef<typeof Pressable>, { option: SegmentedCo
       onPress={onPress}
       {...keyboardProps}
       {...interactionProps}
-      style={({ pressed }) => [styles.segment, selected && styles.selected, hovered && !disabled && styles.hovered, focused && styles.focused, pressed && !disabled && styles.pressed, disabled && styles.disabled]}
+      style={({ pressed }) => [styles.segment, selected && styles.selected, hovered && !disabled && !selected && styles.hovered, focused && styles.focused, pressed && !disabled && styles.pressed, disabled && styles.disabled]}
     >
       <Text variant="label" tone={selected ? 'onPrimary' : 'primary'} numberOfLines={2} align="center">{option.label}</Text>
     </Pressable>

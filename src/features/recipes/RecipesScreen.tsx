@@ -104,7 +104,6 @@ export interface RecipesScreenProps {
 }
 
 const labels = (language: AppLanguage) => language === "ko" ? {
-  description: "원천 데이터에서 수식, 규칙, 모니터링 세트까지 연결을 살펴봅니다.",
   layer: "논리 계층",
   raw: "L0 원천 데이터",
   formulas: "L1 수식",
@@ -148,7 +147,6 @@ const labels = (language: AppLanguage) => language === "ko" ? {
   notLogged: "검토 기록 없음",
   noData: "필수 입력의 가용성 또는 최신성이 제한될 수 있습니다.",
 } : {
-  description: "Follow the library from source data through formulas and rules to complete monitoring sets.",
   layer: "Logic layer",
   raw: "L0 Raw data",
   formulas: "L1 Formulas",
@@ -208,47 +206,7 @@ export function RecipesScreen(props: RecipesScreenProps) {
   const layerTitle = props.layerChoices.find((choice) => choice.value === props.layer)?.label ?? text.layer;
   return (
     <View style={styles.root} nativeID="recipes-primary-surface">
-      <PageHeader title={props.language === "ko" ? "레시피" : "Recipes"} description={text.description} />
-
-      <Card variant="subtle" padding="compact">
-        <VStack gap="md">
-          <View style={styles.scanHeader}>
-            <View style={styles.flexOne}>
-              <Text variant="h3">{text.scanner}</Text>
-              <Text tone="secondary">{props.scanner.lastRun || text.noScan}</Text>
-            </View>
-            <Button label={text.runScan} onPress={props.onRunScanner} loading={props.scanner.running} disabled={props.scanner.running} responsiveWidth="compact-full" />
-          </View>
-          <View style={styles.scanStats}>
-            <View style={styles.stat}><Text variant="micro" tone="secondary">{text.matched}</Text><Text variant="h3" numeric>{props.scanner.matched}</Text></View>
-            <View style={styles.stat}><Text variant="micro" tone="secondary">{text.near}</Text><Text variant="h3" numeric>{props.scanner.near}</Text></View>
-            <View style={styles.stat}><Text variant="micro" tone="secondary">{text.blocked}</Text><Text variant="h3" numeric>{props.scanner.blocked}</Text></View>
-            <View style={styles.stat}><Text variant="micro" tone="secondary">{text.rulesCount}</Text><Text variant="h3" numeric>{props.scanner.ruleCount}</Text></View>
-          </View>
-          {props.signals.length > 0 ? (
-            <View>
-              <Text variant="label">{text.signals}</Text>
-              {props.signals.slice(0, 5).map((signal, index) => (
-                <React.Fragment key={signal.id}>
-                  {index > 0 ? <Divider inset="start" /> : null}
-                  <View style={styles.signalRow}>
-                    <View style={styles.flexOne}>
-                      <HStack gap="sm" align="center">
-                        <Text variant="label" numeric direction="ltr">{signal.ticker}</Text>
-                        <Badge label={signal.status} tone={signal.status.toLowerCase().includes("blocked") || signal.status.toLowerCase().includes("불완전") ? "warning" : "info"} />
-                        {signal.reviewLogged ? <Badge label={text.logged} tone="positive" /> : null}
-                      </HStack>
-                      <Text variant="caption" tone="secondary">{signal.rule} · {signal.sector}</Text>
-                      <Text>{signal.evidenceSummary}</Text>
-                    </View>
-                    <Button label={text.reviewSignal} variant="secondary" size="sm" onPress={() => props.onOpenSignalReview(signal.id)} responsiveWidth="compact-full" />
-                  </View>
-                </React.Fragment>
-              ))}
-            </View>
-          ) : null}
-        </VStack>
-      </Card>
+      <PageHeader title={props.language === "ko" ? "레시피" : "Recipes"} />
 
       <Card variant="elevated">
         <VStack gap="md">
@@ -322,7 +280,7 @@ export function RecipesScreen(props: RecipesScreenProps) {
 
       {props.layer === "Sets" ? (
         <VStack gap="md">
-          <PageHeader title={text.setsTitle} description={text.setMeaning} actions={<Button label={text.createSet} onPress={props.onCreateSet} responsiveWidth="compact-full" />} />
+          <PageHeader title={text.setsTitle} actions={<Button label={text.createSet} onPress={props.onCreateSet} responsiveWidth="compact-full" />} />
           {props.sets.length ? props.sets.map((set, index) => (
             <React.Fragment key={set.id}>
               {index > 0 ? <Divider inset="start" /> : null}
@@ -335,7 +293,7 @@ export function RecipesScreen(props: RecipesScreenProps) {
                   <Text>{set.purpose}</Text>
                   <Text variant="caption" tone="secondary">{text.intendedUse}: {set.intendedUse} · {set.timeHorizon}</Text>
                   <Text variant="caption" tone="secondary">{text.cadence}: {set.cadence} · {text.ruleCount}: {set.ruleCount}</Text>
-                  <StatusIndicator label={set.scannerState} description={set.ruleCount === 0 ? text.noData : text.ruleMeaning} tone={set.ruleCount === 0 ? "warning" : "neutral"} />
+                  <Text variant="caption" tone="secondary">{text.scanner}: {set.scannerState}{set.ruleCount === 0 ? ` · ${text.noData}` : ""}</Text>
                 </View>
                 <View style={styles.setActions}>
                   <Button label={text.openSet} variant="secondary" size="sm" onPress={() => props.onOpenSet(set.id)} responsiveWidth="compact-full" />
@@ -346,6 +304,46 @@ export function RecipesScreen(props: RecipesScreenProps) {
           )) : <Card variant="subtle"><Text tone="secondary">{text.noSets}</Text></Card>}
         </VStack>
       ) : null}
+
+      <Card variant="subtle" padding="compact">
+        <VStack gap="md">
+          <View style={styles.scanHeader}>
+            <View style={styles.flexOne}>
+              <Text variant="h3">{text.scanner}</Text>
+              <Text tone="secondary">{props.scanner.lastRun || text.noScan}</Text>
+            </View>
+            <Button label={text.runScan} onPress={props.onRunScanner} loading={props.scanner.running} disabled={props.scanner.running} responsiveWidth="compact-full" />
+          </View>
+          <View style={styles.scanStats}>
+            <View style={styles.stat}><Text variant="micro" tone="secondary">{text.matched}</Text><Text variant="h3" numeric>{props.scanner.matched}</Text></View>
+            <View style={styles.stat}><Text variant="micro" tone="secondary">{text.near}</Text><Text variant="h3" numeric>{props.scanner.near}</Text></View>
+            <View style={styles.stat}><Text variant="micro" tone="secondary">{text.blocked}</Text><Text variant="h3" numeric>{props.scanner.blocked}</Text></View>
+            <View style={styles.stat}><Text variant="micro" tone="secondary">{text.rulesCount}</Text><Text variant="h3" numeric>{props.scanner.ruleCount}</Text></View>
+          </View>
+          {props.signals.length > 0 ? (
+            <View>
+              <Text variant="label">{text.signals}</Text>
+              {props.signals.slice(0, 5).map((signal, index) => (
+                <React.Fragment key={signal.id}>
+                  {index > 0 ? <Divider inset="start" /> : null}
+                  <View style={styles.signalRow}>
+                    <View style={styles.flexOne}>
+                      <HStack gap="sm" align="center">
+                        <Text variant="label" numeric direction="ltr">{signal.ticker}</Text>
+                        <Badge label={signal.status} tone={signal.status.toLowerCase().includes("blocked") || signal.status.toLowerCase().includes("불완전") ? "warning" : "info"} />
+                        {signal.reviewLogged ? <Badge label={text.logged} tone="positive" /> : null}
+                      </HStack>
+                      <Text variant="caption" tone="secondary">{signal.rule} · {signal.sector}</Text>
+                      <Text>{signal.evidenceSummary}</Text>
+                    </View>
+                    <Button label={text.reviewSignal} variant="secondary" size="sm" onPress={() => props.onOpenSignalReview(signal.id)} responsiveWidth="compact-full" />
+                  </View>
+                </React.Fragment>
+              ))}
+            </View>
+          ) : null}
+        </VStack>
+      </Card>
     </View>
   );
 }

@@ -228,12 +228,12 @@ export function WatchlistScreen(props: WatchlistScreenProps) {
                 <Button label={text.addStock} iconStart="plus" onPress={props.onAddStock} responsiveWidth="compact-full" />
               </View>
             )
-          ) : (
+          ) : !props.selected || recent.length > 0 ? (
             <View style={styles.recentHeader}>
               <Text variant="label">{text.recent}</Text>
               {recent.length > 0 ? <Button label={text.clearRecent} variant="ghost" size="sm" onPress={props.onClearRecent} /> : null}
             </View>
-          )}
+          ) : null}
           {!props.searchHasQuery && recent.length > 0 ? (
             <View style={styles.stockOptions}>
               {recent.slice(0, 5).map((stock) => (
@@ -248,7 +248,7 @@ export function WatchlistScreen(props: WatchlistScreenProps) {
               ))}
             </View>
           ) : null}
-          {!props.searchHasQuery && available.length > 0 ? (
+          {!props.searchHasQuery && !props.selected && available.length > 0 ? (
             <VStack gap="xs">
               <Text variant="label">{text.allStocks}</Text>
               <View style={styles.stockOptions}>
