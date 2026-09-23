@@ -1,5 +1,10 @@
 import { test, expect } from "@playwright/test";
 import { readFile } from "node:fs/promises";
+const openSettingsSection = async (page: import("@playwright/test").Page, title: string) => {
+  const section = page.getByRole("button", { name: title, exact: true });
+  if (await section.getAttribute("aria-expanded") !== "true") await section.click();
+  await expect(section).toHaveAttribute("aria-expanded", "true");
+};
 test("create a real watchlist, reload it, and restore a validated file backup", async ({ page }, testInfo) => {
   const errors: string[] = [];
   page.on("pageerror", error => errors.push(error.message));
@@ -17,13 +22,15 @@ test("create a real watchlist, reload it, and restore a validated file backup", 
   await page.reload();
   await expect(page.getByRole("button", { name: "Add your first stock" })).toHaveCount(0);
   await page.getByRole("tab", { name: "Watchlist", exact: true }).click();
-  await expect(page.getByRole("button", { name: "Open AAPL Apple" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "AAPL", exact: true })).toBeVisible();
+  await expect(page.getByText("Apple", { exact: true })).toBeVisible();
   // Header actions must stay inside the viewport, including with Linux fonts.
   const settingsBounds = await page.getByRole("button", { name: "Settings", exact: true }).boundingBox();
   expect(settingsBounds).not.toBeNull();
   expect(settingsBounds!.x + settingsBounds!.width).toBeLessThanOrEqual(page.viewportSize()!.width);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await page.getByRole("button", { name: "Settings", exact: true }).click();
+  await openSettingsSection(page, "Workspace and data");
   await expect(page.getByText("Your workspace", { exact: true })).toBeVisible();
   const downloadPromise = page.waitForEvent("download");
   await page.getByRole("button", { name: "Export complete backup" }).click();
@@ -104,9 +111,11 @@ test("records a deliberate decision, reviews its outcome, and preserves an amend
 test("keeps cloud optional and exposes the localized local-first account boundary", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "Settings", exact: true }).click();
+  await openSettingsSection(page, "Sync and account state");
   await expect(page.getByRole("heading", { name: "Optional personal cloud sync" })).toBeVisible();
   await expect(page.getByText("Cloud sync is not configured for this build.", { exact: false })).toBeVisible();
-  await page.getByRole("button", { name: "한국어", exact: true }).click();
+  await page.getByRole("radio", { name: "한국어", exact: true }).click();
+  await openSettingsSection(page, "동기화 및 계정 상태");
   await expect(page.getByText("선택적 개인 클라우드 동기화", { exact: true })).toBeVisible();
   await expect(page.getByText("이 빌드에는 클라우드 동기화가 설정되지 않았습니다.", { exact: false })).toBeVisible();
   await expect(page.getByRole("button", { name: "전체 클라우드 데이터 내보내기", exact: true })).toHaveCount(0);
@@ -115,12 +124,14 @@ test("keeps cloud optional and exposes the localized local-first account boundar
 test("keeps notification consent explicit and exposes device-local delivery status", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "Settings", exact: true }).click();
+  await openSettingsSection(page, "Notification settings and delivery state");
   await expect(page.getByRole("heading", { name: "Notification delivery", exact: true })).toBeVisible();
-  await page.getByRole("textbox", { name: "name@example.com", exact: true }).fill("local@example.test");
+  await page.getByRole("textbox", { name: "Email destination", exact: true }).fill("local@example.test");
   await page.getByRole("button", { name: "Enable email delivery", exact: true }).click();
   await page.getByRole("button", { name: "Save notification preferences", exact: true }).click();
   await expect(page.getByText("Email destination saved", { exact: true })).toBeVisible();
   await expect(page.getByText(/server-only local worker/)).toBeVisible();
+  await openSettingsSection(page, "Workspace and data");
   const downloadPromise = page.waitForEvent("download");
   await page.getByRole("button", { name: "Export complete backup", exact: true }).click();
   const download = await downloadPromise;
@@ -144,12 +155,13 @@ test("keeps notification consent explicit and exposes device-local delivery stat
   expect(canceledExported.data.notificationPreferences).toEqual(exported.data.notificationPreferences);
 
   await disable.click();
+  await expect(page.getByRole("button", { name: "Close", exact: true })).toBeFocused();
   await page.keyboard.press("Escape");
   await expect(confirmation).toHaveCount(0);
   await expect(disable).toBeFocused();
   await expect(page.getByText("Enabled", { exact: true })).toBeVisible();
 
-  await page.getByRole("button", { name: "한국어", exact: true }).click();
+  await page.getByRole("radio", { name: "한국어", exact: true }).click();
   const koreanDisable = page.getByRole("button", { name: "옵트아웃하고 이후 전달 취소", exact: true });
   await koreanDisable.click();
   const koreanConfirmation = page.getByRole("dialog");
@@ -159,7 +171,7 @@ test("keeps notification consent explicit and exposes device-local delivery stat
   await koreanConfirmation.getByRole("button", { name: "취소", exact: true }).click();
   await expect(koreanConfirmation).toHaveCount(0);
   await expect(koreanDisable).toBeFocused();
-  await page.getByRole("button", { name: "English", exact: true }).click();
+  await page.getByRole("radio", { name: "English", exact: true }).click();
 
   const englishDisable = page.getByRole("button", { name: "Opt out and cancel future delivery", exact: true });
   await englishDisable.click();
@@ -182,6 +194,8 @@ test("keeps notification consent explicit and exposes device-local delivery stat
 test("shows imported last-known worker state and pending preference handoff", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "Settings", exact: true }).click();
+  await openSettingsSection(page, "Workspace and data");
+  await openSettingsSection(page, "Notification settings and delivery state");
   const downloadPromise = page.waitForEvent("download");
   await page.getByRole("button", { name: "Export complete backup", exact: true }).click();
   const download = await downloadPromise;
@@ -211,9 +225,10 @@ test("shows imported last-known worker state and pending preference handoff", as
   await expect(page.getByText(/Backup validated/)).toBeVisible();
   await page.getByRole("button", { name: "Export current data and restore this backup" }).click();
   await expect(page.getByText(/Last-known worker state \(not live monitoring\): Canceled \/ disabled/)).toBeVisible();
-  await page.getByRole("textbox", { name: "name@example.com", exact: true }).fill("handoff@example.test");
+  await page.getByRole("textbox", { name: "Email destination", exact: true }).fill("handoff@example.test");
   await page.getByRole("button", { name: "Enable email delivery", exact: true }).click();
-  await expect(page.getByText(/Pending worker handoff/)).toBeVisible();
+  await expect(page.getByText("Pending worker handoff", { exact: true })).toBeVisible();
+  await expect(page.getByText(/this app preference is new/)).toBeVisible();
 });
 
 test("resolves entity links, fails safely, and preserves language preference", async ({ page }) => {
@@ -277,7 +292,7 @@ test("resolves entity links, fails safely, and preserves language preference", a
   await expect(page.getByText("Search any stock and inspect the full board", { exact: true })).toBeVisible();
 
   await page.getByRole("button", { name: "Settings", exact: true }).click();
-  await page.getByRole("button", { name: "한국어", exact: true }).click();
+  await page.getByRole("radio", { name: "한국어", exact: true }).click();
   await expect(page.getByRole("tab", { name: "관심 종목", exact: true })).toBeVisible();
   await page.getByRole("tab", { name: "오늘", exact: true }).click();
   await expect(page.getByText("시각 트리아지", { exact: true })).toBeVisible();
@@ -290,7 +305,8 @@ test("resolves entity links, fails safely, and preserves language preference", a
   await page.getByRole("tab", { name: "오늘", exact: true }).click();
   await expect(page.getByText("결정 루프", { exact: true })).toBeVisible();
   await page.getByRole("tab", { name: "관심 종목", exact: true }).click();
-  await expect(page.getByText("AMD", { exact: true }).first()).toBeVisible();
+  await page.getByRole("button", { name: "AMD · Advanced Micro Devices", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "AMD", exact: true })).toBeVisible();
   await expect(page.getByText("Advanced Micro Devices", { exact: true }).first()).toBeVisible();
   await page.goto("/#/monitoring?stockId=stock-amd&eyeId=eye-amd");
   await expect(page.getByText("Deep discount logic.", { exact: true }).first()).toBeVisible();

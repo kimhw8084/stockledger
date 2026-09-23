@@ -1,4 +1,4 @@
-import { createElement, type MouseEvent as ReactMouseEvent } from 'react';
+import { createElement, useState, type KeyboardEvent as ReactKeyboardEvent, type MouseEvent as ReactMouseEvent } from 'react';
 import { ActivityIndicator, Platform, Pressable, View } from 'react-native';
 import { StyleSheet, useUnistyles } from 'react-native-unistyles';
 import { Icon, type IconName, type IconTone } from '@expo-base/icons';
@@ -26,6 +26,7 @@ export interface ButtonProps {
 
 export function Button({ label, onPress, type = 'button', variant = 'primary', size = 'md', disabled = false, loading = false, iconStart, iconEnd, accessibilityLabel, testID, fullWidth = false, responsiveWidth = 'auto' }: ButtonProps) {
   const unavailable = disabled || loading;
+  const [pressed, setPressed] = useState(false);
   const { theme, rt } = useUnistyles();
   const { hovered, focused, interactionProps } = useInteractionState();
   const iconTone: IconTone = variant === 'primary' || variant === 'danger' ? 'onPrimary' : 'primary';
@@ -34,6 +35,7 @@ export function Button({ label, onPress, type = 'button', variant = 'primary', s
     styles.base, fullWidth && styles.fullWidth, responsiveWidth === 'compact-full' && styles.compactFull, styles[size], styles[variant],
     hovered && !unavailable && styles[`${variant}Hover`],
     focused && styles.focused,
+    pressed && !unavailable && styles[`${variant}Pressed`],
     unavailable && styles.disabled,
   ];
   const content = (
@@ -47,10 +49,10 @@ export function Button({ label, onPress, type = 'button', variant = 'primary', s
     </View>
   );
 
-  if (Platform.OS === 'web' && type === 'submit') {
+  if (Platform.OS === 'web') {
     const fillsWebWidth = fullWidth || (responsiveWidth === 'compact-full' && rt.breakpoint === 'compact');
     return createElement('button', {
-      type: 'submit',
+      type,
       disabled: unavailable,
       tabIndex: 0,
       role: 'button',
@@ -59,10 +61,14 @@ export function Button({ label, onPress, type = 'button', variant = 'primary', s
       'aria-busy': loading,
       'data-testid': testID,
       onMouseEnter: interactionProps.onHoverIn,
-      onMouseLeave: interactionProps.onHoverOut,
+      onMouseLeave: () => { setPressed(false); interactionProps.onHoverOut?.(); },
+      onMouseDown: () => setPressed(true),
+      onMouseUp: () => setPressed(false),
       onFocus: interactionProps.onFocus,
-      onBlur: interactionProps.onBlur,
-      onClick: (event: ReactMouseEvent<HTMLButtonElement>) => { if (!event.currentTarget.form) onPress(); },
+      onBlur: () => { setPressed(false); interactionProps.onBlur?.(); },
+      onKeyDown: (event: ReactKeyboardEvent<HTMLButtonElement>) => { if (!unavailable && (event.key === 'Enter' || event.key === ' ')) setPressed(true); },
+      onKeyUp: (event: ReactKeyboardEvent<HTMLButtonElement>) => { if (event.key === 'Enter' || event.key === ' ') setPressed(false); },
+      onClick: (event: ReactMouseEvent<HTMLButtonElement>) => { setPressed(false); if (type === 'button' || !event.currentTarget.form) onPress(); },
       style: { all: 'unset', display: fillsWebWidth ? 'flex' : 'inline-flex', width: fillsWebWidth ? '100%' : 'auto', maxWidth: '100%', alignSelf: fillsWebWidth ? 'stretch' : 'flex-start', cursor: unavailable ? 'default' : 'pointer' },
     }, <View style={[buttonStyle, styles.pointerEventsNone]}>{content}</View>);
   }

@@ -13,7 +13,7 @@ import {
 } from "react-native";
 
 import { buildChartData } from "../domain/chartSeries";
-import { RecoveryPanel, StockEditor, WorkspacePanel } from "../features/workspace/WorkspacePanel";
+import { RecoveryPanel, StockEditor } from "../features/workspace/WorkspacePanel";
 import { CloudSyncPanel } from "../features/sync/CloudSyncPanel";
 import { NotificationSettingsPanel } from "../features/notifications/NotificationSettingsPanel";
 import { OutcomeEditor } from "../features/journal/OutcomeEditor";
@@ -26,8 +26,6 @@ import { appDialog as RNAlert } from "../platform/dialog";
 import { useAppModel } from "../hooks/useAppModel";
 import { WindowPanel } from "../components/WindowPanel";
 import { MotionSwap } from "../components/MotionSwap";
-import { StockSearchPanel } from "../components/stocks/StockSearchPanel";
-import { StockTrendHero } from "../components/stocks/StockTrendHero";
 import { StockMetricDetailSheet } from "../components/stocks/StockMetricDetailSheet";
 import {
   localizedAlertPriority,
@@ -57,7 +55,6 @@ import {
   localizedSnapshotMode,
   localizedSourceType,
   localizedStatus,
-  localizedSuggestionTrust,
   localizedThesisValidity,
   localizedTimeHorizon,
   localizedTiming,
@@ -128,25 +125,31 @@ import { L15ConditionsLayer } from "../components/logic/L15ConditionsLayer";
 import { L2RecipesLayer } from "../components/logic/L2RecipesLayer";
 import { StockLedgerShell } from "../features/shell/StockLedgerShell";
 import { TodayScreen } from "../features/today/TodayScreen";
+import { WatchlistScreen, type WatchlistBoardMode, type WatchlistBenchmark, type WatchlistLookback, type WatchlistStatusFilter } from "../features/watchlist/WatchlistScreen";
+import { buildWatchlistModel, stockMetricPreferenceKey } from "../features/watchlist/model";
+import { RecipesScreen, type RecipeLayer } from "../features/recipes/RecipesScreen";
+import { buildRecipesModel } from "../features/recipes/model";
+import { AlertsScreen, type AlertsView } from "../features/alerts/AlertsScreen";
+import { buildAlertsModel } from "../features/alerts/model";
+import { JournalScreen } from "../features/journal/JournalScreen";
+import { buildJournalEntries } from "../features/journal/model";
+import { SettingsScreen } from "../features/settings/SettingsScreen";
+import { buildSettingsModel } from "../features/settings/model";
+import { WorkspaceSettingsPanel } from "../features/settings/WorkspaceSettingsPanel";
+import { cloud } from "../features/sync/client";
 
 type TabKey = "Home" | "Stocks" | "Logic Lab" | "Eyes" | "Alerts" | "Journal" | "Settings";
 type AlertWorkspaceTab = "Current" | "History" | "Detail";
 type ConditionKind = RecipeCondition["kind"];
-type AnalysisBenchmark = "SPY" | "QQQ" | "Sector ETF";
-type AnalysisLookback = "20D" | "3M" | "6M";
-type AnalysisStatusFilter =
-  | "All Statuses"
-  | "Passed"
-  | "Near Trigger"
-  | "Warning"
-  | "Blocked"
-  | "Needs Review";
-type StockBoardMode = "Pinned First" | "Status" | "Family";
+type AnalysisBenchmark = WatchlistBenchmark;
+type AnalysisLookback = WatchlistLookback;
+type AnalysisStatusFilter = WatchlistStatusFilter;
+type StockBoardMode = WatchlistBoardMode;
 type HomeBucket = "All" | "Review Now" | "Forming" | "Review Soon";
 type RecipeShelfFilter = "All" | "Starter" | "Custom" | "Recent";
 type EyesShelfFilter = "All" | "Needs Review" | "Quiet";
 type JournalFilter = "All" | "Entered" | "Skipped" | "Risky";
-type LogicLabLayer = "Processed Features" | "Frozen Rules" | "Signals";
+type LogicLabLayer = RecipeLayer;
 type LogicInfoTarget = "Raw Data" | "Processed Features" | "Frozen Rules" | "Signals";
 
 type StockRouteTarget = "Stocks" | "Alerts" | "Eyes" | "Journal";
@@ -219,7 +222,6 @@ const homeBuckets: HomeBucket[] = ["All", "Review Now", "Forming", "Review Soon"
 const recipeShelfFilters: RecipeShelfFilter[] = ["All", "Starter", "Custom", "Recent"];
 const eyesShelfFilters: EyesShelfFilter[] = ["All", "Needs Review", "Quiet"];
 const journalFilters: JournalFilter[] = ["All", "Entered", "Skipped", "Risky"];
-const logicLabLayers: LogicLabLayer[] = ["Processed Features", "Frozen Rules", "Signals"];
 const languageOptions: AppLanguage[] = ["en", "ko"];
 const starterRecipeNames = [
   "Temporary Bargain Sale",
@@ -588,8 +590,6 @@ const stockSearchScore = (query: string, item: { stock: Stock }) => {
   if (thesis.includes(normalizedQuery)) return 10;
   return 0;
 };
-
-const stockMetricPreferenceKey = (stockId: string, cardId: string) => `${stockId}:${cardId}`;
 
 const stockMetricFamilyOrder = [
   "Price Damage",
@@ -1031,11 +1031,6 @@ const sourceTypeLabel = (language: AppLanguage, sourceType: VisualEvidenceCard["
 
 const stockSnapshotModeLabel = (language: AppLanguage, snapshot?: { isMock: boolean } | null) =>
   localizedSnapshotMode(language, snapshot?.isMock);
-
-const stockSuggestionTrustLabel = (
-  language: AppLanguage,
-  snapshot?: { isMock: boolean; freshness: FreshnessStatus } | null,
-) => localizedSuggestionTrust(language, snapshot);
 
 const ThresholdBar = ({ card, language = "en" }: { card: VisualEvidenceCard; language?: AppLanguage }) => {
   const { visual } = card;
@@ -1796,141 +1791,6 @@ const StockTriageCard = ({
   );
 };
 
-const AlertClusterCard = ({
-  group,
-  selectedStockId,
-  onOpenStock,
-  onOpenDetail,
-  onQuickDecision,
-  onSnooze,
-  onReviewed,
-  onAcknowledgeAll,
-  language = "en",
-}: {
-  group: {
-    stock: Stock;
-    eyes: Eye[];
-    openAlerts: Alert[];
-    dominantEye?: Eye;
-    groupedAlerts: Record<string, Alert[]>;
-    highestPriority: "High" | "Medium";
-  };
-  selectedStockId: string;
-  onOpenStock: () => void;
-  onOpenDetail: (alertId: string, invoker?: unknown) => void;
-  onQuickDecision: (alert: Alert, action: DecisionAction) => void;
-  onSnooze: (alertId: string) => void;
-  onReviewed: (alertId: string) => void;
-  onAcknowledgeAll: () => void;
-  language?: AppLanguage;
-}) => {
-  const [expanded, setExpanded] = useState(false);
-  const leadAlert = group.openAlerts[0];
-  const nextAlert = group.openAlerts[1];
-  const supportLine = group.dominantEye?.lastEvaluation?.whyNow ?? leadAlert?.whyNow ?? t(language, "alerts.cluster.groupHint");
-
-  return (
-    <Card highlighted={selectedStockId === group.stock.id}>
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel={`${group.stock.symbol} ${group.stock.name}`}
-        accessibilityState={{ expanded }}
-        onPress={() => setExpanded((current) => !current)}
-        style={styles.alertClusterHeader}
-      >
-        <View style={styles.inlineBetween}>
-          <View style={styles.flexOne}>
-            <Text style={styles.cardEyebrow}>{group.stock.name}</Text>
-            <View style={styles.stockTriageTitleRow}>
-              <Text style={styles.cardTitle}>{group.stock.symbol}</Text>
-              <Text style={styles.stockTriageToggle}>{expanded ? t(language, "common.hide") : t(language, "common.open")}</Text>
-            </View>
-          </View>
-          <View style={styles.priorityStack}>
-            <View style={priorityTone(group.highestPriority)}>
-              <Text style={styles.priorityBadgeText}>{localizedAlertPriority(language, group.highestPriority)}</Text>
-            </View>
-            <Text style={styles.timestampText}>{group.openAlerts.length} {t(language, "common.alerts")}</Text>
-          </View>
-        </View>
-
-        <View style={styles.metaRow}>
-          {Object.entries(group.groupedAlerts)
-            .slice(0, expanded ? undefined : 2)
-            .map(([recipeName, alerts]) => (
-              <MetaPill key={`${group.stock.id}-${recipeName}`} label={`${recipeName} · ${alerts.length}`} />
-            ))}
-        </View>
-
-        <Text style={styles.stockGroupSummary} numberOfLines={expanded ? 3 : 1}>
-          {supportLine}
-        </Text>
-
-        {!expanded && nextAlert ? (
-          <Text style={styles.alertClusterPreview} numberOfLines={1}>
-            {t(language, "alerts.cluster.next")}: {nextAlert.title}
-          </Text>
-        ) : null}
-      </Pressable>
-
-      {expanded ? (
-        <View style={styles.stack}>
-          {group.openAlerts.map((alert) => (
-            <Pressable
-              key={alert.id}
-              accessibilityRole="button"
-              accessibilityLabel={alert.title}
-              onPress={(event) => onOpenDetail(alert.id, event)}
-              style={styles.alertClusterItem}
-            >
-              <View style={styles.inlineBetween}>
-                <View style={styles.flexOne}>
-                  <Text style={styles.alertMiniTitle}>{alert.title}</Text>
-                  <Text style={styles.alertMiniBody} numberOfLines={2}>{alert.whyNow}</Text>
-                </View>
-                <View style={styles.priorityStack}>
-                  <View style={priorityTone(alert.priority)}>
-                    <Text style={styles.priorityBadgeText}>{localizedAlertPriority(language, alert.priority)}</Text>
-                  </View>
-                  <Text style={styles.timestampText}>{formatDate(language, alert.createdAt)}</Text>
-                </View>
-              </View>
-              <View style={styles.alertClusterActions}>
-                <Button label={t(language, "alerts.action.entered")} onPress={() => onQuickDecision(alert, "Entered")} />
-                <Button label={t(language, "alerts.action.skip")} tone="secondary" onPress={() => onQuickDecision(alert, "Skipped")} />
-                <Button label={t(language, "alerts.action.snooze")} tone="secondary" onPress={() => onSnooze(alert.id)} />
-                <Button label={t(language, "common.done")} tone="ghost" onPress={() => onReviewed(alert.id)} />
-              </View>
-            </Pressable>
-          ))}
-        </View>
-      ) : null}
-
-      <View style={styles.analysisActionRow}>
-        <Button label={t(language, "common.stock")} onPress={onOpenStock} />
-        <Button label={t(language, "alerts.action.acknowledgeAll")} tone="ghost" onPress={onAcknowledgeAll} />
-        {leadAlert ? (
-          <Button label={t(language, "common.detail")} tone="secondary" onPress={() => onOpenDetail(leadAlert.id)} />
-        ) : null}
-      </View>
-    </Card>
-  );
-};
-
-const logicLabLayerLabel = (language: AppLanguage, layer: LogicLabLayer) => {
-  switch (layer) {
-    case "Processed Features":
-      return language === "ko" ? "처리 피처" : "Features";
-    case "Frozen Rules":
-      return language === "ko" ? "고정 규칙" : "Rules";
-    case "Signals":
-      return language === "ko" ? "신호" : "Signals";
-    default:
-      return layer;
-  }
-};
-
-
 
 interface RecipeDraftForm {
   name: string;
@@ -1969,7 +1829,7 @@ export default function App() {
   const [recipeShelfFilter, setRecipeShelfFilter] = useState<RecipeShelfFilter>("All");
   const [eyesShelfFilter, setEyesShelfFilter] = useState<EyesShelfFilter>("All");
   const [journalFilter, setJournalFilter] = useState<JournalFilter>("All");
-  const [logicLabLayer, setLogicLabLayer] = useState<LogicLabLayer>("Processed Features");
+  const [logicLabLayer, setLogicLabLayer] = useState<LogicLabLayer>("Sets");
 
   const [recipeForm, setRecipeForm] = useState<RecipeDraftForm>(defaultRecipeDraftForm());
   const [metricForm, setMetricForm] = useState<MetricDraftForm>(defaultMetricDraftForm());
@@ -3907,6 +3767,54 @@ export default function App() {
     }
   };
 
+  const watchlistModel = buildWatchlistModel({
+    language,
+    recentStocks,
+    stockSuggestions,
+    selectedStock: selectedStockSummary,
+    evidenceCards: sortedSelectedStockAnalysisCards,
+    pinnedMetricKeys,
+  });
+  const recipesModel = buildRecipesModel({
+    language,
+    sources: logicLabDataSources,
+    metrics: logicLabMetricCatalog,
+    rules: logicLabRuleLibrary,
+    sets: logicLabRecipes,
+    signals: [...matchedScannerSignals, ...nearScannerSignals, ...blockedScannerSignals],
+    reviewLogsBySignal: scannerReviewLogsBySignal,
+    latestScanRun,
+    matchedCount: matchedScannerSignals.length,
+    nearCount: nearScannerSignals.length,
+    blockedCount: blockedScannerSignals.length,
+    scannerRuleCount: frozenScannerRules.length,
+    scannerRunning: scanning,
+    rawFieldLabel: rawLogicFieldLabel,
+  });
+  const alertsModel = buildAlertsModel({
+    language,
+    groups: groupedAlertQueue,
+    history: alertHistory,
+    stockSnapshots: stockDirectory,
+    eyes: data.eyes,
+    decisions: data.decisions,
+  });
+  const journalEntryViews = buildJournalEntries({
+    language,
+    decisions: filteredJournalHistory,
+    eyes: data.eyes,
+    outcomes: data.outcomes,
+    stocks: data.stocks,
+    recipes: data.recipes,
+    instrumentLabel: (eyeId) => decisionTitle(eyeId, data.eyes, data.stocks, data.recipes),
+  });
+  const settingsModel = buildSettingsModel({
+    language,
+    data,
+    providerHealth,
+    cloudConfigured: Boolean(cloud),
+  });
+
   return (
     <View nativeID="stockledger-root" style={styles.screen}>
       <StatusBar style="dark" />
@@ -3957,7 +3865,6 @@ export default function App() {
             <Button label={t(language, "home.onboarding.addRecipes")} tone="secondary" onPress={() => actions.addStarterRecipes()} />
             <Button label={t(language, "home.onboarding.exploreSample")} tone="ghost" onPress={() => actions.resetToSeed()} />
           </Card> : null}
-          {tab === "Stocks" ? <View style={{ flexDirection: "row", gap: 12 }}><Button label={t(language, "stocks.action.add")} onPress={() => openStockEditor("")} /><Button label={t(language, "stocks.action.manageEyes")} tone="secondary" onPress={() => setTab("Eyes")} /></View> : null}
           {data.snapshots.some(snapshot => snapshot.isMock) ? <Text style={{ padding: 10, color: "#6d4b16", fontSize: 14 }}>{t(language, "home.sampleNotice")}</Text> : null}
           {tab === "Home" && data.stocks.length > 0 ? (
             <TodayScreen
@@ -3983,412 +3890,93 @@ export default function App() {
           ) : null}
 
           {tab === "Stocks" ? (
-            <>
-              <Reveal>
-                <StockSearchPanel
-                  styles={styles}
-                  stockSearch={stockSearch}
-                  setStockSearch={setStockSearch}
-                  topSuggestionId={topSuggestionId}
-                  openStockContext={({ stockId }) => openStockContext({ stockId })}
-                  hasStockQuery={hasStockQuery}
-                  stockSuggestions={stockSuggestions}
-                  selectedStockId={selectedStockSummary?.stock.id ?? ""}
-                  deferredStockSearch={deferredStockSearch}
-                  recentStocksCount={recentStocks.length}
-                  setRecentStockIds={setRecentStockIds}
-                  onAddStock={(invoker) => openStockEditor("", invoker)}
-                  isCompactPhone={isCompactPhone}
-                  isVeryCompactPhone={isVeryCompactPhone}
-                  Input={Input}
-                  Button={Button}
-                  stockSuggestionTrustLabel={(snapshot) => stockSuggestionTrustLabel(language, snapshot)}
-                  language={language}
-                />
-                {stockCandidates.length > visibleStocks ? <Button label={t(language, "stocks.search.showMore", { count: stockCandidates.length - visibleStocks })} tone="secondary" onPress={() => setVisibleStocks(count => count + 24)} /> : null}
-              </Reveal>
-
-              {selectedStockSummary ? (
-                <Reveal delay={40} key={`stock-hero-${selectedStockSummary.stock.id}`}>
-                   <View style={styles.stockBoardHeaderPolished}>
-                      <View style={styles.flexOne}>
-                        <Text style={styles.stockSymbolBig}>{selectedStockSummary.stock.symbol}</Text>
-                        <Text style={styles.stockNameBig}>{selectedStockSummary.stock.name}</Text>
-                      </View>
-                      <Button
-                        label={t(language, "common.registerEye")}
-                        onPress={() => {
-                          setEyeForm((current) => ({ ...current, stockId: selectedStockSummary.stock.id }));
-                          openEyeComposer();
-                        }}
-                      />
-                   </View>
-
-                   <Card highlighted style={styles.heroCardPolished}>
-                    <StockTrendHero
-                      styles={styles}
-                      stock={selectedStockSummary.stock}
-                      snapshot={selectedStockSummary.snapshot}
-                      eyesCount={selectedStockSummary.eyes.length}
-                      pinnedCount={pinnedCountForSelectedStock}
-                      metricCount={sortedSelectedStockAnalysisCards.length}
-                      analysisLookback={analysisLookback}
-                      analysisBenchmark={analysisBenchmark}
-                      selectedHeroPrice={selectedHeroPrice}
-                      selectedHeroPointLabel={selectedHeroPointLabel}
-                      selectedHeroBenchmarkDelta={selectedHeroBenchmarkDelta}
-                      selectedStockHeroRange={selectedStockHeroRange}
-                      selectedStockTrendDisplaySeries={selectedStockTrendDisplaySeries}
-                      selectedStockBenchmarkDisplaySeries={selectedStockBenchmarkDisplaySeries}
-                      safeSelectedHeroPointIndex={safeSelectedHeroPointIndex}
-                      setSelectedHeroPointIndex={setSelectedHeroPointIndex}
-                      isCompactPhone={isCompactPhone}
-                      freshnessTone={freshnessTone}
-                      stockSnapshotModeLabel={(snapshot) => stockSnapshotModeLabel(language, snapshot)}
-                      Button={Button}
-                      language={language}
-                      onClearStock={() => {
-                        setSelectedStockId("");
-                        setStockSearch("");
-                        closeEntityRoute("Stocks");
-                      }}
-                      onEditStock={(invoker) => openStockEditor(selectedStockSummary.stock.id, invoker)}
-                      onDeleteStock={async () => { await actions.archiveStock(selectedStockSummary.stock.id); setSelectedStockId(""); closeEntityRoute("Stocks"); }}
-                      lookbackControl={
-                        <HorizontalChoice
-                          options={analysisLookbacks}
-                          value={analysisLookback}
-                          onSelect={setAnalysisLookback}
-                          variant="segmented"
-                        />
-                      }
-                      benchmarkControl={
-                        <HorizontalChoice
-                          options={analysisBenchmarks}
-                          value={analysisBenchmark}
-                          onSelect={setAnalysisBenchmark}
-                          variant="segmented"
-                        />
-                      }
-                    />
-                    <MotionSwap
-                      swapKey={`controls-${selectedStockSummary.stock.id}-${analysisStatusFilter}-${stockBoardMode}`}
-                      y={8}
-                      scaleFrom={0.994}
-                      duration={180}
-                    >
-                    <View style={[styles.stockControlsPanel, isCompactPhone ? styles.stockControlsPanelCompact : null]}>
-                      <View style={styles.stockControlsHeader}>
-                        <View style={styles.flexOne}>
-                          <Text style={styles.stockControlsTitle}>{t(language, "stocks.hero.boardControls")}</Text>
-                          <Text style={styles.stockControlsMeta}>
-                            {t(language, "stocks.hero.showing", {
-                              shown: sortedSelectedStockAnalysisCards.length,
-                              total: selectedStockAnalysisCards.length,
-                            })}
-                          </Text>
-                        </View>
-                        {stockControlsDirty ? (
-                          <Pressable
-                            onPress={() => {
-                              setAnalysisBenchmark(defaultAnalysisBenchmark);
-                              setAnalysisLookback(defaultAnalysisLookback);
-                              setAnalysisStatusFilter(defaultAnalysisStatusFilter);
-                              setStockBoardMode(defaultStockBoardMode);
-                            }}
-                            style={({ pressed }) => [pressed ? styles.choiceChipPressed : null]}
-                          >
-                            <Text style={styles.stockControlsReset}>{t(language, "common.reset")}</Text>
-                          </Pressable>
-                        ) : null}
-                      </View>
-                      <View style={styles.stockControlGroup}>
-                        <Text style={styles.stockControlGroupLabel}>{t(language, "stocks.hero.status")}</Text>
-                        <HorizontalChoice
-                          options={analysisStatusFilters}
-                          value={analysisStatusFilter}
-                          onSelect={setAnalysisStatusFilter}
-                          labelForOption={analysisStatusFilterLabel}
-                        />
-                      </View>
-                      <View style={styles.stockControlGroup}>
-                        <Text style={styles.stockControlGroupLabel}>{t(language, "stocks.hero.board")}</Text>
-                        <HorizontalChoice
-                          options={stockBoardModes}
-                          value={stockBoardMode}
-                          onSelect={setStockBoardMode}
-                          variant="segmented"
-                          labelForOption={stockBoardModeLabel}
-                        />
-                      </View>
-                    </View>
-                    </MotionSwap>
-                  </Card>
-
-                  <MotionSwap
-                    swapKey={`grid-${selectedStockSummary.stock.id}-${analysisStatusFilter}-${stockBoardMode}-${pinnedCountForSelectedStock}-${sortedSelectedStockAnalysisCards
-                      .map((card) => card.id)
-                      .join("|")}`}
-                    y={10}
-                    scaleFrom={0.992}
-                  >
-                  <View style={[styles.analysisGrid, isCompactPhone ? styles.analysisGridCompact : null]}>
-                    {sortedSelectedStockAnalysisCards.length > 0 ? (
-                      sortedSelectedStockAnalysisCards.map((card) => (
-                        <View
-                          key={`stock-card-${card.id}`}
-                          style={[
-                            styles.analysisGridItem,
-                            isCompactPhone ? styles.analysisGridItemCompact : null,
-                            isVeryCompactPhone ? styles.analysisGridItemVeryCompact : null,
-                          ]}
-                        >
-                          <EvidenceCardView
-                            card={card}
-                            compact={true}
-                            dense={isCompactPhone}
-                            pinned={Boolean(
-                              selectedStockSummary &&
-                                pinnedMetricKeys.includes(
-                                  stockMetricPreferenceKey(selectedStockSummary.stock.id, card.id),
-                                ),
-                            )}
-                            onOpen={() => openMetricDetail(card)}
-                            language={language}
-                          />
-                        </View>
-                      ))
-                    ) : (
-                      <Card>
-                        <Text style={styles.cardBody}>{t(language, "stocks.hero.noParameters")}</Text>
-                      </Card>
-                    )}
-                  </View>
-                  </MotionSwap>
-                </Reveal>
-              ) : (
-                <Reveal delay={40}>
-                  <Card>
-                    <Text style={styles.emptySearchTitle}>{t(language, "stocks.hero.noStockTitle")}</Text>
-                    <Text style={styles.emptySearchBody}>{t(language, "stocks.hero.noStockBody")}</Text>
-                  </Card>
-                </Reveal>
-              )}
-            </>
+            <WatchlistScreen
+              language={language}
+              query={stockSearch}
+              onQueryChange={setStockSearch}
+              candidates={watchlistModel.candidates}
+              recent={watchlistModel.recent}
+              available={watchlistModel.available}
+              hasMore={stockCandidates.length > visibleStocks}
+              onShowMore={() => setVisibleStocks((count) => count + 24)}
+              selected={watchlistModel.selected}
+              queryHasResults={stockSuggestions.length > 0}
+              searchHasQuery={hasStockQuery}
+              onSelectStock={(stockId) => openStockContext({ stockId })}
+              onClearRecent={() => setRecentStockIds([])}
+              onAddStock={() => openStockEditor("")}
+              onEditStock={() => openStockEditor(selectedStockSummary?.stock.id ?? "")}
+              onClearSelection={() => {
+                setSelectedStockId("");
+                setStockSearch("");
+                closeEntityRoute("Stocks");
+              }}
+              onRegisterEye={() => {
+                if (!selectedStockSummary) return;
+                setEyeForm((current) => ({ ...current, stockId: selectedStockSummary.stock.id }));
+                openEyeComposer();
+              }}
+              onManageEyes={() => setTab("Eyes")}
+              onOpenMetric={(metricId) => {
+                const card = sortedSelectedStockAnalysisCards.find((item) => item.id === metricId);
+                if (card) openMetricDetail(card);
+              }}
+              statusFilter={analysisStatusFilter}
+              statusChoices={watchlistModel.statusChoices}
+              onStatusFilterChange={setAnalysisStatusFilter}
+              boardMode={stockBoardMode}
+              boardChoices={watchlistModel.boardChoices}
+              onBoardModeChange={setStockBoardMode}
+              lookback={analysisLookback}
+              lookbackChoices={watchlistModel.lookbackChoices}
+              onLookbackChange={setAnalysisLookback}
+              benchmark={analysisBenchmark}
+              benchmarkChoices={watchlistModel.benchmarkChoices}
+              onBenchmarkChange={setAnalysisBenchmark}
+              controlsDirty={stockControlsDirty}
+              onResetControls={() => {
+                setAnalysisBenchmark(defaultAnalysisBenchmark);
+                setAnalysisLookback(defaultAnalysisLookback);
+                setAnalysisStatusFilter(defaultAnalysisStatusFilter);
+                setStockBoardMode(defaultStockBoardMode);
+              }}
+            />
           ) : null}
 
           {tab === "Logic Lab" ? (
-            <>
-              <Reveal>
-                <View style={styles.logicLayerRailWrap}>
-                  <View style={styles.logicLayerTopRow}>
-                    <View style={styles.logicLayerRail}>
-                      {logicLabLayers.map((layer, index) => {
-                        const active = logicLabLayer === layer;
-                        const completed = logicLabLayers.indexOf(logicLabLayer) > index;
-                        return (
-                          <React.Fragment key={`logic-layer-tab-${layer}`}>
-                            <Pressable
-                              onPress={() => setLogicLabLayer(layer)}
-                              style={({ pressed }) => [
-                                styles.logicLayerStep,
-                                pressed ? styles.logicLayerChipPressed : null,
-                              ]}
-                            >
-                              <View
-                                style={[
-                                  styles.logicLayerStepDot,
-                                  completed ? styles.logicLayerStepDotCompleted : null,
-                                  active ? styles.logicLayerStepDotActive : null,
-                                ]}
-                              >
-                                <Text
-                                  style={[
-                                    styles.logicLayerStepDotText,
-                                    completed || active ? styles.logicLayerStepDotTextActive : null,
-                                  ]}
-                                >
-                                  {index + 1}
-                                </Text>
-                              </View>
-                              <Text
-                                style={[
-                                  styles.logicLayerStepLabel,
-                                  active ? styles.logicLayerStepLabelActive : null,
-                                ]}
-                                numberOfLines={1}
-                              >
-                                {logicLabLayerLabel(language, layer)}
-                              </Text>
-                            </Pressable>
-                            {index < logicLabLayers.length - 1 ? (
-                              <View
-                                style={[
-                                  styles.logicLayerStepConnector,
-                                  logicLabLayers.indexOf(logicLabLayer) > index
-                                    ? styles.logicLayerStepConnectorActive
-                                    : null,
-                                ]}
-                              />
-                            ) : null}
-                          </React.Fragment>
-                        );
-                      })}
-                    </View>
-                    <Pressable
-                      onPress={(event) => openLogicRegistry(event)}
-                      style={({ pressed }) => [
-                        styles.logicL0Button,
-                        pressed ? styles.logicLayerChipPressed : null,
-                      ]}
-                    >
-                      <Text style={styles.logicL0ButtonText}>{language === "ko" ? "원천" : "Raw"}</Text>
-                    </Pressable>
-                  </View>
-                </View>
-              </Reveal>
-
-              <Reveal delay={40} key={`logic-layer-${logicLabLayer}`}>
-                <View style={styles.layerContentContainer}>
-                  <Card style={styles.scannerSummaryCard}>
-                    <View style={styles.scannerSummaryTopRow}>
-                      <View style={styles.scannerSummaryTitleWrap}>
-                        <Text style={styles.cardTitle}>
-                          {t(language, "logic.scanner.title")}
-                        </Text>
-                        <Text style={styles.scannerMetaText}>
-                          {latestScanRun
-                            ? `${latestScanRun.scanDate}${language === "ko" ? " 기준" : ""} · ${localizedScanRunStatus(language, latestScanRun.status)}`
-                            : t(language, "logic.scanner.noRun")}
-                        </Text>
-                      </View>
-                      <Button
-                        label={t(language, "logic.scanner.run")}
-                        onPress={() => actions.runDailyScanner()}
-                      />
-                    </View>
-                    <View style={styles.homeSummaryStrip}>
-                      <DenseStat
-                        label={t(language, "logic.scanner.matched")}
-                        value={`${matchedScannerSignals.length}`}
-                        tone="strong"
-                      />
-                      <DenseStat
-                        label={t(language, "logic.scanner.near")}
-                        value={`${nearScannerSignals.length}`}
-                      />
-                      <DenseStat
-                        label={t(language, "logic.scanner.blocked")}
-                        value={`${blockedScannerSignals.length}`}
-                        tone="risk"
-                      />
-                      <DenseStat
-                        label={t(language, "logic.scanner.rules")}
-                        value={`${frozenScannerRules.length}`}
-                      />
-                    </View>
-                    <Text style={styles.cardBody}>
-                      {`${t(language, "logic.scanner.matchedBody")} ${t(language, "logic.scanner.nearBody")}`}
-                    </Text>
-                    {(matchedScannerSignals.length > 0 ||
-                      nearScannerSignals.length > 0 ||
-                      blockedScannerSignals.length > 0) ? (
-                      <View style={styles.stack}>
-                        {[...matchedScannerSignals, ...nearScannerSignals, ...blockedScannerSignals]
-                          .slice(0, 8)
-                          .map((signal) => {
-                            const review = scannerReviewLogsBySignal.get(signal.signalId);
-                            return (
-                              <Card key={signal.signalId} style={styles.scannerSignalCard}>
-                                <View style={styles.scannerSignalTopRow}>
-                                  <View style={styles.scannerSignalTitleWrap}>
-                                    <Text style={styles.cardTitle}>
-                                      {signal.ticker} · {localizedScannerStatus(language, signal.status)}
-                                    </Text>
-                                    <Text style={styles.scannerMetaText}>
-                                      {signal.ruleId}
-                                    </Text>
-                                  </View>
-                                  <MetaPill label={signal.sector} tone="neutral" />
-                                </View>
-                                <Text style={styles.cardBody}>
-                                  {localizedScannerDescription(language, signal.status)}
-                                </Text>
-                                <View style={styles.metaRow}>
-                                  <MetaPill
-                                    label={t(language, "logic.scanner.countPassed", { count: signal.matchedConditionsJson.length })}
-                                    tone="success"
-                                  />
-                                  {signal.failedConditionsJson.length > 0 ? (
-                                    <MetaPill
-                                      label={t(language, "logic.scanner.countFailed", { count: signal.failedConditionsJson.length })}
-                                      tone="info"
-                                    />
-                                  ) : null}
-                                  {signal.missingConditionsJson.length > 0 ? (
-                                    <MetaPill
-                                      label={t(language, "logic.scanner.countMissing", { count: signal.missingConditionsJson.length })}
-                                      tone="risk"
-                                    />
-                                  ) : null}
-                                  {review ? (
-                                    <MetaPill
-                                      label={t(language, "logic.scanner.reviewLogged")}
-                                      tone="info"
-                                    />
-                                  ) : null}
-                                </View>
-                                <View style={styles.actionRow}>
-                                  <Button
-                                    label={t(language, "logic.scanner.logReview")}
-                                    tone="secondary"
-                                    onPress={() => openScannerReview(signal)}
-                                  />
-                                </View>
-                              </Card>
-                            );
-                          })}
-                      </View>
-                    ) : null}
-                  </Card>
-                  {logicLabLayer === "Processed Features" && (
-                    <L1MetricsLayer
-                      language={language}
-                      processedFeatures={latestProcessedFeatures}
-                      latestScanDate={latestProcessedFeatureDate || undefined}
-                      rules={frozenScannerRules}
-                      MetaPill={MetaPill}
-                      SectionHeader={SectionHeader}
-                      Button={Button}
-                      onOpenHelp={(invoker) => openLogicInfo("Processed Features", invoker)}
-                    />
-                  )}
-                  {logicLabLayer === "Frozen Rules" && (
-                    <L2RecipesLayer
-                      language={language}
-                      rules={frozenScannerRules}
-                      SectionHeader={SectionHeader}
-                      Button={Button}
-                      MetaPill={MetaPill}
-                      onOpenHelp={(invoker) => openLogicInfo("Frozen Rules", invoker)}
-                    />
-                  )}
-                  {logicLabLayer === "Signals" && (
-                    <L15ConditionsLayer
-                      language={language}
-                      signals={[...matchedScannerSignals, ...nearScannerSignals, ...blockedScannerSignals]}
-                      rules={frozenScannerRules}
-                      reviewLogsBySignal={scannerReviewLogsBySignal}
-                      MetaPill={MetaPill}
-                      SectionHeader={SectionHeader}
-                      Button={Button}
-                      onOpenHelp={(invoker) => openLogicInfo("Signals", invoker)}
-                      onOpenReview={openScannerReview}
-                    />
-                  )}
-                </View>
-              </Reveal>
-            </>
+            <RecipesScreen
+              language={language}
+              layer={logicLabLayer}
+              layerChoices={recipesModel.layerChoices}
+              onLayerChange={setLogicLabLayer}
+              rawSources={recipesModel.rawSources}
+              formulas={recipesModel.formulas}
+              rules={recipesModel.rules}
+              sets={recipesModel.sets}
+              signals={recipesModel.signals}
+              scanner={recipesModel.scanner}
+              onRunScanner={() => { void actions.runDailyScanner(); }}
+              onOpenRawRegistry={() => openLogicRegistry()}
+              onOpenFormula={(metricId) => {
+                const metric = logicLabMetricCatalog.find((item) => item.key === metricId);
+                if (metric) openMetricBuilder(metric);
+              }}
+              onCreateFormula={() => openMetricBuilder()}
+              onOpenRule={(recipeId, ruleId) => {
+                const row = logicLabRuleLibrary.find((item) => item.recipeId === recipeId && item.condition.id === ruleId);
+                if (row) openConditionBuilder(row);
+              }}
+              onOpenSet={(recipeId) => openRecipeDetail(recipeId)}
+              onOpenSetVersions={(recipeId) => {
+                logicVersionFocus.captureInvoker();
+                setLogicVersionsRecipeId(recipeId);
+              }}
+              onCreateSet={() => openLogicSetBuilder()}
+              onOpenSignalReview={(signalId) => {
+                const signal = latestScanSignals.find((item) => item.signalId === signalId);
+                if (signal) openScannerReview(signal);
+              }}
+            />
           ) : null}
 
           {tab === "Eyes" ? (
@@ -4532,273 +4120,77 @@ export default function App() {
           ) : null}
 
           {tab === "Alerts" ? (
-            <>
-              <Reveal>
-                <SectionHeader note={subtitleLabel(language, "Alerts")} />
-                <View style={styles.homeSummaryStrip}>
-                  <DenseStat label={t(language, "alerts.summary.open")} value={`${groupedAlertQueue.reduce((sum, item) => sum + item.openAlerts.length, 0)}`} tone="risk" />
-                  <DenseStat label={t(language, "alerts.summary.groupedStocks")} value={`${groupedAlertQueue.length}`} />
-                  <DenseStat label={t(language, "alerts.summary.snoozed")} value={`${snoozedAlerts.length}`} />
-                  <DenseStat label={t(language, "alerts.summary.reviewed")} value={`${reviewedAlerts.length}`} />
-                </View>
-                <HorizontalChoice
-                  options={["Current", "History"] as const}
-                  value={alertWorkspaceTab}
-                  onSelect={(value: "Current" | "History") => setAlertWorkspaceTab(value)}
-                  labelForOption={(value: "Current" | "History") => t(language, value === "Current" ? "alerts.tab.current" : "alerts.tab.history")}
-                />
-              </Reveal>
-
-              {alertWorkspaceTab === "Current" ? (
-                <Reveal delay={40}>
-                  <SectionHeader title={t(language, "alerts.current.title", { count: groupedAlertQueue.length })} note={t(language, "alerts.current.note")} />
-                  <View style={styles.stack}>
-                    {groupedAlertQueue.length === 0 ? (
-                      <Card>
-                        <Text style={styles.cardBody}>{t(language, "alerts.current.empty")}</Text>
-                      </Card>
-                  ) : (
-                      groupedAlertQueue.map((group) => (
-                        <AlertClusterCard
-                          key={`alert-group-${group.stock.id}`}
-                          group={group}
-                          language={language}
-                          selectedStockId={selectedStockId}
-                          onOpenStock={() => openStockContext({ stockId: group.stock.id })}
-                          onOpenDetail={(alertId, invoker) => {
-                            openAlertDetail(alertId, invoker);
-                          }}
-                          onQuickDecision={(alert, action) => quickDecision(alert, action)}
-                          onSnooze={(alertId) => actions.snoozeAlert(alertId, 24)}
-                          onReviewed={(alertId) => actions.markAlertReviewed(alertId)}
-                          onAcknowledgeAll={() => acknowledgeAlertGroup(group.openAlerts)}
-                        />
-                      ))
-                    )}
-                  </View>
-                </Reveal>
-              ) : null}
-
-              {alertWorkspaceTab === "History" ? (
-                <Reveal delay={40}>
-                  <SectionHeader title={t(language, "alerts.history.title", { count: alertHistory.length })} note={t(language, "alerts.history.note")} />
-                  <View style={styles.stack}>
-                    {alertHistory.length === 0 ? (
-                      <Card>
-                        <Text style={styles.cardBody}>{t(language, "alerts.history.empty")}</Text>
-                      </Card>
-                    ) : (
-                      alertHistory.map((alert) => {
-                        const eye = data.eyes.find((item) => item.id === alert.eyeId);
-                        const linkedDecision = data.decisions.find((decision) => decision.alertId === alert.id);
-                        return (
-                          <Card key={`history-${alert.id}`}>
-                            <View style={styles.inlineBetween}>
-                              <Text style={styles.cardEyebrow}>{stockLabel(data.stocks, eye?.stockId ?? "")}</Text>
-                              <Text style={styles.inventoryRowMeta}>{formatDate(language, alert.createdAt)}</Text>
-                            </View>
-                            <Text style={styles.alertTitle}>{alert.title}</Text>
-                            <Text style={styles.cardBody} numberOfLines={2}>{alert.whyNow}</Text>
-                            <View style={styles.metaRow}>
-                              <MetaPill label={alert.reviewed ? t(language, "alerts.history.acknowledged") : t(language, "alerts.history.snoozedUntil", { date: alert.snoozedUntil ? formatDate(language, alert.snoozedUntil) : t(language, "alerts.history.snoozedUnknown") })} />
-                              <MetaPill label={localizedAlertPriority(language, alert.priority)} />
-                              {alert.usefulness ? <MetaPill label={localizedAlertUsefulness(language, alert.usefulness)} /> : null}
-                              {linkedDecision ? <MetaPill label={t(language, "alerts.history.journalAction", { action: localizedDecisionAction(language, linkedDecision.action) })} /> : null}
-                            </View>
-                            <View style={styles.analysisActionRow}>
-                              <Button label={t(language, "common.detail")} onPress={() => {
-                                openAlertDetail(alert.id);
-                              }} />
-                              {!alert.reviewed ? <Button label={t(language, "alerts.action.unsnooze")} tone="secondary" onPress={() => actions.snoozeAlert(alert.id, -1)} /> : null}
-                              {eye ? <Button label={t(language, "common.stock")} tone="secondary" onPress={() => openStockContext({ stockId: eye.stockId, eyeId: eye.id, alertId: alert.id, target: "Alerts" })} /> : null}
-                              {linkedDecision ? (
-                                <Button
-                                  label={t(language, "common.journal")}
-                                  tone="ghost"
-                                  onPress={() => { if (linkedDecision) openDecisionDetail(linkedDecision.id); }}
-                                />
-                              ) : null}
-                            </View>
-                          </Card>
-                        );
-                      })
-                    )}
-                  </View>
-                </Reveal>
-              ) : null}
-            </>
+            <AlertsScreen
+              language={language}
+              view={alertWorkspaceTab as AlertsView}
+              onViewChange={(view) => setAlertWorkspaceTab(view)}
+              groups={alertsModel.groups}
+              history={alertsModel.history}
+              snoozedCount={snoozedAlerts.length}
+              reviewedCount={reviewedAlerts.length}
+              onOpenDetail={(alertId) => openAlertDetail(alertId)}
+              onOpenStock={(stockId, alertId) => {
+                if (alertId) openStockContext({ stockId, alertId, target: "Alerts" });
+                else openStockContext({ stockId });
+              }}
+              onQuickDecision={(alertId, action) => {
+                const alert = data.alerts.find((item) => item.id === alertId);
+                if (alert) quickDecision(alert, action);
+              }}
+              onSnooze={(alertId) => { void actions.snoozeAlert(alertId, 24); }}
+              onUnsnooze={(alertId) => { void actions.snoozeAlert(alertId, -1); }}
+              onReviewed={(alertId) => { void actions.markAlertReviewed(alertId); }}
+              onAcknowledgeGroup={(stockId) => {
+                const group = groupedAlertQueue.find((item) => item.stock.id === stockId);
+                if (group) void acknowledgeAlertGroup(group.openAlerts);
+              }}
+            />
           ) : null}
 
           {tab === "Journal" ? (
-            <>
-              <Reveal>
-                <SectionHeader note={subtitleLabel(language, "Journal")} />
-                <View style={styles.homeSummaryStrip}>
-                  <DenseStat label={t(language, "journal.summary.entries")} value={`${data.decisions.length}`} tone="strong" />
-                  <DenseStat label={t(language, "journal.summary.entered")} value={`${data.decisions.filter((decision) => decision.action === "Entered").length}`} />
-                  <DenseStat label={t(language, "journal.summary.skipped")} value={`${data.decisions.filter((decision) => decision.action === "Skipped").length}`} />
-                  <DenseStat label={t(language, "journal.summary.pendingOutcomes")} value={`${data.outcomes.filter((outcome) => outcome.status === "Pending").length}`} />
-                </View>
-                <HorizontalChoice options={journalFilters} value={journalFilter} onSelect={(filter: JournalFilter) => setJournalFilter(filter)} labelForOption={(filter: JournalFilter) => journalFilterLabel(language, filter)} />
-                <View style={styles.actionRow}>
-                  <Button ref={journalComposerNewButtonRef} label={t(language, "common.new")} onPress={() => openJournalComposer(journalComposerNewButtonRef.current)} />
-                </View>
-              </Reveal>
-
-              <Reveal delay={40}>
-                <View style={styles.stack}>
-                  {filteredJournalHistory.length === 0 ? (
-                    <Card>
-                      <Text style={styles.cardBody}>{t(language, "journal.empty")}</Text>
-                    </Card>
-                  ) : filteredJournalHistory.map((decision) => {
-                    const linkedEye = data.eyes.find((eye) => eye.id === decision.eyeId);
-                    const linkedOutcome = data.outcomes.find((outcome) => outcome.decisionId === decision.id);
-                    return (
-                      <Pressable
-                        key={decision.id}
-                        accessibilityRole="button"
-                        accessibilityLabel={`${localizedDecisionAction(language, decision.action)} · ${decisionTitle(decision.eyeId, data.eyes, data.stocks, data.recipes)}`}
-                        accessibilityState={{ selected: selectedDecision?.id === decision.id }}
-                        onPress={(event) => openDecisionDetail(decision.id, event)}
-                        style={({ pressed }) => [styles.pressableCardWrap, pressed ? styles.pressableCardWrapPressed : null]}
-                      >
-                      <Card>
-                        <Text style={styles.cardEyebrow}>{formatDate(language, decision.createdAt)}</Text>
-                        <Text style={styles.alertTitle}>{localizedDecisionAction(language, decision.action)} · {decisionTitle(decision.eyeId, data.eyes, data.stocks, data.recipes)}</Text>
-                        <Text style={styles.cardBody} numberOfLines={2}>{decision.note}</Text>
-                        <View style={styles.metaRow}>
-                          <MetaPill label={decision.stateAtDecision ?? t(language, "journal.meta.noState")} />
-                          <MetaPill label={decision.dataQuality ?? t(language, "journal.meta.noData")} />
-                          <MetaPill label={t(language, "journal.meta.thesis", { value: localizedThesisValidity(language, decision.thesisValid) })} />
-                          <MetaPill label={localizedTiming(language, decision.timing)} />
-                        </View>
-                        <Text style={styles.metaLine}>{t(language, "journal.meta.concern", { value: decision.concern || t(language, "journal.meta.notCaptured") })}</Text>
-                        <View style={styles.analysisActionRow}>
-                          <Button label={t(language, "journal.action.open")} tone="secondary" onPress={() => openDecisionDetail(decision.id)} />
-                          {linkedEye ? (
-                            <Button
-                              label={t(language, "common.stock")}
-                              onPress={() => openStockContext({ stockId: linkedEye.stockId, eyeId: linkedEye.id })}
-                            />
-                          ) : null}
-                          {decision.alertId ? (
-                            <Button
-                              label={t(language, "journal.action.alert")}
-                              tone="ghost"
-                              onPress={() => openAlertDetail(decision.alertId ?? "")}
-                            />
-                          ) : null}
-                        </View>
-                        {linkedOutcome ? (
-                          <View style={styles.formulaPanel}>
-                            <Text style={styles.formulaTitle}>{t(language, "journal.detail.outcome", { status: localizedOutcomeStatus(language, linkedOutcome.status) })}</Text>
-                            <Text style={styles.formulaBody}>{linkedOutcome.lesson}</Text>
-                            <Text style={styles.formulaMeta}>{linkedOutcome.recipeSuggestion}</Text>
-                          </View>
-                        ) : null}
-                      </Card>
-                      </Pressable>
-                    );
-                  })}
-                </View>
-              </Reveal>
-            </>
+            <JournalScreen
+              language={language}
+              entries={journalEntryViews}
+              totalCount={journalHistory.length}
+              pendingOutcomeCount={data.outcomes.filter((outcome) => outcome.status === "Pending").length}
+              filter={journalFilter}
+              filterChoices={journalFilters.map((filter) => ({ value: filter, label: localizedJournalFilter(language, filter) }))}
+              onFilterChange={setJournalFilter}
+              onOpenDecision={(decisionId) => openDecisionDetail(decisionId)}
+              onOpenStock={(stockId, eyeId) => openStockContext({ stockId, eyeId })}
+              onOpenAlert={(alertId) => openAlertDetail(alertId)}
+              onNew={() => openJournalComposer()}
+            />
           ) : null}
 
           {tab === "Settings" ? (
-            <>
-              <WorkspacePanel data={data} actions={actions} language={language} />
-              <NotificationSettingsPanel data={data} actions={actions} language={language} fallbackFocusRef={settingsSurfaceFallbackRef} />
-              <CloudSyncPanel data={data} actions={actions} language={language} />
-              <Reveal>
-                <SectionHeader note={subtitleLabel(language, "Settings")} />
-                <View style={styles.homeSummaryStrip}>
-                  <DenseStat
-                    label={t(language, "settings.providers.summaryHealthy")}
-                    value={`${providerHealth.filter((entry) => entry.status === "Healthy").length}`}
-                    tone="strong"
-                  />
-                  <DenseStat
-                    label={t(language, "settings.providers.summaryLimited")}
-                    value={`${providerHealth.filter((entry) => entry.status === "Plan Limited").length}`}
-                    tone="risk"
-                  />
-                  <DenseStat
-                    label={t(language, "settings.providers.summaryUnconfigured")}
-                    value={`${providerHealth.filter((entry) => entry.status === "Unconfigured").length}`}
-                  />
-                  <DenseStat label={t(language, "settings.providers.summaryTrackedStocks")} value={`${data.stocks.length}`} />
-                </View>
-                <View style={styles.stockControlGroup}>
-                  <Text style={styles.stockControlGroupLabel}>{t(language, "settings.language.title")}</Text>
-                  <Text style={styles.cardBody}>{t(language, "settings.language.note")}</Text>
-                  <HorizontalChoice
-                    options={languageOptions}
-                    value={language}
-                    onSelect={(next) => {
-                      setLanguage(next);
-                      void saveAppLanguage(next);
-                    }}
-                    variant="segmented"
-                    labelForOption={(option) =>
-                      option === "en"
-                        ? t(language, "settings.language.english")
-                        : t(language, "settings.language.korean")
-                    }
-                  />
-                </View>
-                <View style={styles.actionRow}>
-                  <Button
-                    label={providerHealthLoading ? t(language, "settings.providers.checking") : t(language, "settings.providers.check")}
-                    onPress={() => actions.refreshProviderHealth()}
-                    disabled={providerHealthLoading}
-                  />
-                  <Button label={t(language, "settings.providers.refresh")} tone="secondary" onPress={() => actions.refreshMarketData()} />
-                  <Button
-                    label={scanning ? "Scanning…" : language === "ko" ? "일일 스캔" : "Daily Scan"}
-                    disabled={scanning || saving}
-                    tone="secondary"
-                    onPress={() => actions.runDailyScanner()}
-                  />
-                </View>
-              </Reveal>
-
-              <Reveal delay={40}>
-                <Card>
-                  <Text style={styles.cardTitle}>{t(language, "settings.providers.title")}</Text>
-                  <Text style={styles.cardBody}>{t(language, "settings.providers.note")}</Text>
-                </Card>
-              </Reveal>
-
-              <Reveal delay={80}>
-                <View style={styles.stack}>
-                  {providerHealth.map((entry) => (
-                    <Card key={entry.provider} highlighted={entry.status !== "Healthy"}>
-                      <View style={styles.inlineBetween}>
-                        <View style={styles.flexOne}>
-                          <Text style={styles.cardEyebrow}>
-                            {entry.mode === "Background"
-                              ? t(language, "settings.providers.modeBackground")
-                              : entry.mode === "On Demand"
-                                ? t(language, "settings.providers.modeOnDemand")
-                                : t(language, "settings.providers.modeDisabled")}
-                          </Text>
-                          <Text style={styles.alertTitle}>{entry.provider}</Text>
-                        </View>
-                        <Text style={providerHealthTone(entry)}>{localizedProviderStatus(language, entry.status)}</Text>
-                      </View>
-                      <Text style={styles.cardBody}>{entry.note}</Text>
-                      <View style={styles.metaRow}>
-                        <MetaPill label={entry.configured ? t(language, "settings.providers.configured") : t(language, "settings.providers.missingKey")} />
-                        {entry.endpoint ? <MetaPill label={entry.endpoint} /> : null}
-                        {entry.lastCheckedAt ? <MetaPill label={formatDate(language, entry.lastCheckedAt)} /> : null}
-                      </View>
-                    </Card>
-                  ))}
-                </View>
-              </Reveal>
-            </>
+            <SettingsScreen
+              language={language}
+              providers={settingsModel.providers}
+              healthyCount={settingsModel.healthyCount}
+              limitedCount={settingsModel.limitedCount}
+              unconfiguredCount={settingsModel.unconfiguredCount}
+              unavailableCount={settingsModel.unavailableCount}
+              trackedStocks={data.stocks.filter((stock) => !stock.archivedAt).length}
+              sampleData={data.snapshots.some((snapshot) => snapshot.isMock)}
+              lastSnapshotUpdate={settingsModel.lastSnapshotUpdate}
+              notificationSummary={settingsModel.notificationSummary}
+              notificationTone={settingsModel.notificationTone}
+              syncSummary={settingsModel.syncSummary}
+              providerCheckPending={providerHealthLoading}
+              scanPending={scanning}
+              cloudConfigured={Boolean(cloud)}
+              workspacePanel={<WorkspaceSettingsPanel data={data} actions={actions} language={language} />}
+              notificationPanel={<NotificationSettingsPanel data={data} actions={actions} language={language} fallbackFocusRef={settingsSurfaceFallbackRef} />}
+              syncPanel={<CloudSyncPanel data={data} actions={actions} language={language} />}
+              onLanguageChange={(next) => {
+                setLanguage(next);
+                void saveAppLanguage(next);
+              }}
+              onCheckProviders={() => { void actions.refreshProviderHealth(); }}
+              onRefreshSnapshots={() => actions.refreshMarketData()}
+              onRunScan={() => actions.runDailyScanner()}
+            />
           ) : null}
         {conditionBuilderOpen ? (
           <WindowPanel
