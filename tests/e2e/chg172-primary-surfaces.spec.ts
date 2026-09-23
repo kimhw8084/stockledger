@@ -273,8 +273,8 @@ test("keyboard task paths operate segmented choices and restore focus after deep
   await search.focus();
   await search.pressSequentially("AAPL");
   const apple = page.getByRole("button", { name: "AAPL · Apple", exact: true });
-  await apple.focus();
-  await page.keyboard.press("Enter");
+  await apple.press("Enter");
+  await expect(page.getByRole("heading", { name: "AAPL", exact: true })).toBeVisible();
   const metric = page.getByRole("button", { name: "Evidence detail", exact: true }).first();
   await metric.focus();
   await page.keyboard.press("Enter");
