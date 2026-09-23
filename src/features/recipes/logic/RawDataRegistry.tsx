@@ -1,18 +1,25 @@
-import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { useMemo, useRef, useState } from "react";
+import { Button, Card, Pressable, StyleSheet, Text, TextInput, View } from "../../../ui";
+import { scannerTokenRawDataMap, type FrozenScannerRule } from "../../../lib/frozenScannerRules";
+import type { AppLanguage } from "../../../lib/preferences";
 
-import { FrozenScannerRule, scannerTokenRawDataMap } from "../../lib/frozenScannerRules";
-import { AppLanguage } from "../../lib/i18n";
-import { LogicLevelCard } from "./LogicLevelCard";
-
-interface L0DataLayerProps {
+interface RawDataRegistryProps {
   language: AppLanguage;
-  dataSources: readonly any[];
-  rules: FrozenScannerRule[];
-  MetaPill: React.FC<any>;
-  SectionHeader: React.FC<any>;
-  Button: React.FC<any>;
-  onOpenHelp: (invoker?: unknown) => void;
+  dataSources: readonly RawDataSource[];
+  rules: readonly FrozenScannerRule[];
+}
+
+interface RawDataSource {
+  key: string;
+  title: string;
+  status: string;
+  freshnessLabel: string;
+  reliability: string;
+  mode: string;
+  provider: string;
+  api?: string;
+  fields: readonly string[];
+  metrics: readonly { name: string }[];
 }
 
 type L0FieldDefinition = {
@@ -233,206 +240,167 @@ const humanRuleTitle = (language: AppLanguage, rule: FrozenScannerRule) => {
   return language === "ko" ? `${rule.sector} 실패한 하향 이탈 회복` : `${rule.sector} Failed Breakdown Recovery`;
 };
 
-export const L0DataLayer: React.FC<L0DataLayerProps> = ({
-  language,
-  dataSources,
-  rules,
-  MetaPill,
-  SectionHeader,
-  Button,
-  onOpenHelp,
-}) => {
-  const sourceByField = new Map<string, any[]>();
-  dataSources.forEach((source) => {
-    source.fields.forEach((field: string) => {
-      sourceByField.set(field, [...(sourceByField.get(field) ?? []), source]);
-    });
-  });
+export function RawDataRegistry({ language, dataSources, rules }: RawDataRegistryProps) {
+  const [query, setQuery] = useState("");
+  const [expandedKey, setExpandedKey] = useState("");
+  const [helpOpen, setHelpOpen] = useState(false);
+  const helpButtonRef = useRef<any>(null);
+  const closeHelp = () => {
+    setHelpOpen(false);
+    setTimeout(() => helpButtonRef.current?.focus?.(), 0);
+  };
+  const fields = useMemo(() => {
+    const normalized = query.trim().toLocaleLowerCase();
+    if (!normalized) return fieldRegistry(language);
+    return fieldRegistry(language).filter((field) =>
+      [field.key, field.title, field.meaning, field.definition, field.importance, field.reference]
+        .some((value) => value.toLocaleLowerCase().includes(normalized)),
+    );
+  }, [language, query]);
+  const sourceByField = useMemo(() => {
+    const result = new Map<string, RawDataSource[]>();
+    dataSources.forEach((source) => source.fields.forEach((field) => {
+      result.set(field, [...(result.get(field) ?? []), source]);
+    }));
+    return result;
+  }, [dataSources]);
 
   return (
-    <View style={styles.container}>
-      <SectionHeader
-        title={language === "ko" ? "원천 데이터" : "RAW DATA"}
-        action={
-          <Button
-            label="?"
-            tone="ghost"
-            onPress={onOpenHelp}
-            style={styles.helpButton}
-          />
-        }
-        compact
-      />
-      <View style={styles.stack}>
-        {fieldRegistry(language).map((field) => {
-          const sources = sourceByField.get(field.key) ?? [];
-          const dependentMetrics = Array.from(
-            new Set(
-              sources.flatMap((source) =>
-                (source.metrics ?? []).map((metric: any) => metric.name),
-              ),
-            ),
-          );
-          const linkedRules = rules.filter((rule) =>
-            rule.activeConditions.some((token) => (scannerTokenRawDataMap[token] ?? []).includes(field.key)),
-          );
-
-          return (
-            <LogicLevelCard
-              key={`l0-field-${field.key}`}
-              title={field.title}
-              pills={
-                <>
-                  <MetaPill label={field.meaning} tone="info" />
-                  <MetaPill
-                    label={
-                      language === "ko"
-                        ? `피처 ${dependentMetrics.length} · 규칙 ${linkedRules.length}`
-                        : `${dependentMetrics.length} features · ${linkedRules.length} rules`
-                    }
-                  />
-                  {sources[0]?.mode ? <MetaPill label={sources[0].mode} /> : null}
-                </>
-              }
-            >
-              <View style={styles.detailGroup}>
-                <Text style={styles.label}>{language === "ko" ? "정의" : "Definition"}</Text>
-                <Text style={styles.value}>{field.definition}</Text>
-              </View>
-              <View style={styles.detailGroup}>
-                <Text style={styles.label}>{language === "ko" ? "왜 중요한가" : "Why it matters"}</Text>
-                <Text style={styles.value}>{field.importance}</Text>
-              </View>
-              <View style={styles.detailGroup}>
-                <Text style={styles.label}>{language === "ko" ? "예시 형식" : "Example format"}</Text>
-                <Text style={styles.valueMono}>{field.exampleFormat}</Text>
-              </View>
-              <View style={styles.detailGroup}>
-                <Text style={styles.label}>{language === "ko" ? "참조 / 소스" : "Reference / source"}</Text>
-                <Text style={styles.value}>{field.reference}</Text>
-                <View style={styles.pillRow}>
-                  {sources.map((source) => (
-                    <MetaPill key={`${field.key}-${source.key}`} label={source.title} />
-                  ))}
-                </View>
-              </View>
-              <View style={styles.detailGroup}>
-                <Text style={styles.label}>{language === "ko" ? "프로바이더 / API" : "Provider / API"}</Text>
-                <View style={styles.providerStack}>
-                  {sources.map((source) => (
-                    <View key={`${field.key}-${source.key}-provider`} style={styles.providerCard}>
-                      <Text style={styles.providerTitle}>{source.provider}</Text>
-                      {source.api ? <Text style={styles.providerMeta}>{source.api}</Text> : null}
-                      <Text style={styles.providerMeta}>
-                        {source.mode} · {source.freshnessLabel} · {source.status}
-                      </Text>
-                    </View>
-                  ))}
-                </View>
-              </View>
-              <View style={styles.detailGroup}>
-                <Text style={styles.label}>{language === "ko" ? "연결된 처리 피처" : "Dependent processed features"}</Text>
-                <View style={styles.pillRow}>
-                  {dependentMetrics.length > 0 ? (
-                    dependentMetrics.map((metricName) => (
-                      <MetaPill key={`${field.key}-${metricName}`} label={metricName} tone="info" />
-                    ))
-                  ) : (
-                    <Text style={styles.emptyText}>
-                      {language === "ko" ? "아직 연결된 처리 피처가 없습니다." : "No dependent processed features yet."}
-                    </Text>
-                  )}
-                </View>
-              </View>
-              <View style={styles.detailGroup}>
-                <Text style={styles.label}>{language === "ko" ? "이 원천을 쓰는 고정 규칙" : "Frozen rules fed by this raw data"}</Text>
-                <View style={styles.pillRow}>
-                  {linkedRules.length > 0 ? (
-                    linkedRules.map((rule) => (
-                      <MetaPill key={`${field.key}-${rule.ruleId}`} label={humanRuleTitle(language, rule)} tone="info" />
-                    ))
-                  ) : (
-                    <Text style={styles.emptyText}>
-                      {language === "ko" ? "아직 직접 연결된 고정 규칙이 없습니다." : "No frozen rule depends directly on this raw field yet."}
-                    </Text>
-                  )}
-                </View>
-              </View>
-            </LogicLevelCard>
-          );
-        })}
+    <View style={styles.stack}>
+      <View style={styles.header}>
+        <View style={styles.headerCopy}>
+          <Text variant="h3">{language === "ko" ? "원천 데이터" : "Raw input registry"}</Text>
+          <Text variant="caption" tone="secondary">{language === "ko"
+            ? "정의된 소스 정보이며 현재 프로바이더 가용성이나 상태를 나타내지 않습니다."
+            : "Declared source metadata only; this view does not show current provider availability or health."}</Text>
+        </View>
+        <Pressable
+          ref={helpButtonRef}
+          accessibilityRole="button"
+          accessibilityLabel={language === "ko" ? "레지스트리 도움말" : "Registry help"}
+          accessibilityState={{ expanded: helpOpen }}
+          aria-expanded={helpOpen}
+          onPress={() => setHelpOpen((current) => !current)}
+          style={({ focused }: any) => [styles.helpButton, focused && styles.focused]}
+        >
+          <Text variant="label" tone="accent">{language === "ko" ? "레지스트리 도움말" : "Registry help"}</Text>
+        </Pressable>
       </View>
+      {helpOpen ? (
+        <Card variant="subtle">
+          <View style={styles.helpCopy}>
+            <Text variant="h3">{language === "ko" ? "레지스트리 읽는 방법" : "How to read this registry"}</Text>
+            <Text variant="body">{language === "ko"
+              ? "각 항목은 정의된 입력과 의미, 기대되는 소스·API, 선언된 커버리지, 갱신 기대, 연결된 처리 피처와 규칙을 설명합니다. 선언된 범위는 현재 프로바이더의 설정·연결·상태를 나타내지 않습니다."
+              : "Each row describes an input, its meaning, expected source or API, declared coverage, refresh expectation, and linked features or rules. Declared scope does not report current provider configuration, reachability, or health."}</Text>
+            <Button label={language === "ko" ? "도움말 닫기" : "Close help"} onPress={closeHelp} variant="secondary" />
+          </View>
+        </Card>
+      ) : null}
+      <View style={styles.searchField}>
+        <Text variant="label">{language === "ko" ? "필드 검색" : "Search fields"}</Text>
+        <TextInput
+          accessibilityLabel={language === "ko" ? "필드 검색" : "Search fields"}
+          onChangeText={setQuery}
+          placeholder={language === "ko" ? "식별자, 의미, 소스 검색" : "Search identifier, meaning, or source"}
+          placeholderTextColor="#64748b"
+          value={query}
+          style={styles.searchInput}
+        />
+      </View>
+      {fields.length === 0 ? (
+        <Card variant="subtle"><Text variant="body">{language === "ko" ? "일치하는 필드 정의가 없습니다. 검색어를 바꿔 보세요." : "No field definitions match. Change the search term and try again."}</Text></Card>
+      ) : fields.map((field) => {
+        const sources = sourceByField.get(field.key) ?? [];
+        const expanded = expandedKey === field.key;
+        const dependentMetrics = Array.from(new Set(sources.flatMap((source) => source.metrics.map((metric) => metric.name))));
+        const linkedRules = rules.filter((rule) => rule.activeConditions.some((token) => (scannerTokenRawDataMap[token] ?? []).includes(field.key)));
+        return (
+          <Card key={`raw-field-${field.key}`} variant="surface">
+            <View style={styles.fieldCard}>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={`${field.title}, ${field.key}`}
+                accessibilityState={{ expanded }}
+                aria-expanded={expanded}
+                onPress={() => setExpandedKey((current) => current === field.key ? "" : field.key)}
+                style={({ focused }: any) => [styles.fieldHeader, focused && styles.focused]}
+              >
+                <View style={styles.fieldTitle}>
+                  <Text variant="h3">{field.title}</Text>
+                  <Text selectable variant="code">{field.key}</Text>
+                  <Text variant="body">{field.meaning}</Text>
+                </View>
+                <Text variant="label" tone="accent">{expanded ? "−" : "+"}</Text>
+              </Pressable>
+              <View style={styles.sourceSummary}>
+                <Text variant="label">{language === "ko" ? "정의된 소스와 커버리지" : "Declared source and coverage"}</Text>
+                <Text variant="body">{field.reference}</Text>
+                {sources.length ? sources.map((source) => (
+                  <View key={`${field.key}-${source.key}`} style={styles.sourceLine}>
+                    <Text variant="body">{source.provider} · {source.title}</Text>
+                    {source.api ? <Text selectable variant="caption" tone="secondary">{source.api}</Text> : null}
+                    <Text variant="caption" tone="secondary">
+                      {(language === "ko" ? "선언된 범위" : "Declared coverage")}: {source.status} · {source.freshnessLabel} · {source.mode}
+                    </Text>
+                    <Text variant="caption" tone="secondary">{source.reliability}</Text>
+                  </View>
+                )) : (
+                  <Text variant="caption" tone="secondary">{language === "ko"
+                    ? "레지스트리에 프로바이더 매핑이 없습니다. 실제 데이터 사용 가능 여부는 여기서 판단할 수 없습니다."
+                    : "No provider mapping is declared in the registry. Actual data availability is not determined here."}</Text>
+                )}
+              </View>
+              {expanded ? (
+                <View style={styles.details}>
+                  <View style={styles.detailGroup}>
+                    <Text variant="label">{language === "ko" ? "정의" : "Meaning"}</Text>
+                    <Text variant="body">{field.definition}</Text>
+                  </View>
+                  <View style={styles.detailGroup}>
+                    <Text variant="label">{language === "ko" ? "왜 중요한가" : "Why it matters"}</Text>
+                    <Text variant="body">{field.importance}</Text>
+                  </View>
+                  <View style={styles.detailGroup}>
+                    <Text variant="label">{language === "ko" ? "예시 형식" : "Example format"}</Text>
+                    <Text selectable variant="code">{field.exampleFormat}</Text>
+                  </View>
+                  <View style={styles.detailGroup}>
+                    <Text variant="label">{language === "ko" ? "연결된 처리 피처" : "Downstream processed features"}</Text>
+                    {dependentMetrics.length ? dependentMetrics.map((metricName) => (
+                      <Text key={`${field.key}-${metricName}`} selectable variant="body">{metricName}</Text>
+                    )) : <Text variant="caption" tone="secondary">{language === "ko" ? "직접 연결된 처리 피처가 없습니다." : "No processed features are linked directly."}</Text>}
+                  </View>
+                  <View style={styles.detailGroup}>
+                    <Text variant="label">{language === "ko" ? "연결된 고정 규칙" : "Downstream frozen rules"}</Text>
+                    {linkedRules.length ? linkedRules.map((rule) => (
+                      <Text key={`${field.key}-${rule.ruleId}`} variant="body">{humanRuleTitle(language, rule)}</Text>
+                    )) : <Text variant="caption" tone="secondary">{language === "ko" ? "직접 연결된 고정 규칙이 없습니다." : "No frozen rules depend directly on this field."}</Text>}
+                  </View>
+                </View>
+              ) : null}
+            </View>
+          </Card>
+        );
+      })}
     </View>
   );
-};
+}
 
-const styles = StyleSheet.create({
-  container: {
-    paddingBottom: 14,
-  },
-  stack: {
-    gap: 10,
-  },
-  helpButton: {
-    minWidth: 38,
-    height: 38,
-    paddingHorizontal: 0,
-  },
-  detailGroup: {
-    gap: 4,
-  },
-  label: {
-    fontSize: 10,
-    fontWeight: "900",
-    color: "#64748b",
-    textTransform: "uppercase",
-    letterSpacing: 0.8,
-  },
-  value: {
-    fontSize: 13,
-    lineHeight: 19,
-    color: "#334155",
-    fontWeight: "600",
-  },
-  valueMono: {
-    fontSize: 12,
-    lineHeight: 18,
-    color: "#0f172a",
-    fontWeight: "700",
-  },
-  pillRow: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 6,
-    marginTop: 2,
-  },
-  emptyText: {
-    fontSize: 12,
-    color: "#64748b",
-    fontWeight: "600",
-    lineHeight: 18,
-  },
-  providerStack: {
-    gap: 8,
-  },
-  providerCard: {
-    borderRadius: 14,
-    backgroundColor: "#f8fafc",
-    borderWidth: 1,
-    borderColor: "#e2e8f0",
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    gap: 3,
-  },
-  providerTitle: {
-    fontSize: 12,
-    fontWeight: "800",
-    color: "#0f172a",
-  },
-  providerMeta: {
-    fontSize: 11,
-    fontWeight: "700",
-    color: "#64748b",
-    lineHeight: 16,
-  },
-});
+const styles = StyleSheet.create((theme) => ({
+  stack: { minWidth: 0, gap: theme.spacing.md, paddingBottom: theme.spacing.md },
+  header: { minWidth: 0, flexDirection: { compact: "column", medium: "row" }, alignItems: { compact: "stretch", medium: "center" }, justifyContent: "space-between", gap: theme.spacing.md },
+  headerCopy: { minWidth: 0, flex: 1, gap: theme.spacing.xs },
+  helpButton: { minWidth: 44, minHeight: 44, alignItems: "center", justifyContent: "center", paddingHorizontal: theme.spacing.md, borderRadius: theme.radii.sm, borderWidth: theme.strokeWidths.standard, borderColor: theme.colors.border.default, backgroundColor: theme.colors.background.surface },
+  helpCopy: { minWidth: 0, gap: theme.spacing.md },
+  searchField: { minWidth: 0, gap: theme.spacing.xs },
+  searchInput: { width: "100%", minHeight: theme.controlHeights.md, borderWidth: theme.strokeWidths.standard, borderColor: theme.colors.border.default, borderRadius: theme.radii.sm, backgroundColor: theme.colors.background.surface, color: theme.colors.text.primary, paddingHorizontal: theme.spacing.md, paddingVertical: theme.spacing.sm, fontSize: theme.typography.body.fontSize },
+  fieldCard: { minWidth: 0, gap: theme.spacing.md },
+  fieldHeader: { minWidth: 0, flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between", gap: theme.spacing.md },
+  fieldTitle: { minWidth: 0, flex: 1, gap: theme.spacing.xs },
+  sourceSummary: { minWidth: 0, gap: theme.spacing.xs, padding: theme.spacing.md, borderRadius: theme.radii.md, backgroundColor: theme.colors.background.subtle },
+  sourceLine: { minWidth: 0, gap: theme.spacing.xs, borderTopWidth: theme.strokeWidths.standard, borderTopColor: theme.colors.border.subtle, paddingTop: theme.spacing.sm },
+  details: { minWidth: 0, gap: theme.spacing.md, paddingTop: theme.spacing.xs },
+  detailGroup: { minWidth: 0, gap: theme.spacing.xs },
+  focused: { borderWidth: theme.strokeWidths.emphasis, borderColor: theme.colors.border.focus, borderRadius: theme.radii.sm },
+}));

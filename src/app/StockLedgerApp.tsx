@@ -17,12 +17,16 @@ import { RecoveryPanel, StockEditor } from "../features/workspace/WorkspacePanel
 import { CloudSyncPanel } from "../features/sync/CloudSyncPanel";
 import { NotificationSettingsPanel } from "../features/notifications/NotificationSettingsPanel";
 import { OutcomeEditor } from "../features/journal/OutcomeEditor";
+import { JournalComposer, type JournalValidationSection } from "../features/journal/JournalComposer";
 import { DecisionDetail } from "../features/journal/DecisionDetail";
 import { EyeDetail, type EyeDetailViewModel } from "../features/eyes/EyeDetail";
+import { EyeComposer } from "../features/eyes/EyeComposer";
 import { EyeFlowsScreen, type EyeFlowsFilter, type EyeFlowRow } from "../features/eyes/EyeFlowsScreen";
+import { RecipeBuilder, type RecipeBuilderModel, type RecipeBuilderStep } from "../features/recipes/builder/RecipeBuilder";
+import { RawDataRegistry } from "../features/recipes/logic/RawDataRegistry";
 import { ScannerReview, type ScannerReviewForm } from "../features/recipes/scanner/ScannerReview";
 import { StockMetricDetailSheet } from "../features/watchlist/detail/StockMetricDetailSheet";
-import { optionalPositiveNumber, validateEntryRange } from "../domain/inputValidation";
+import { entryRangeFieldErrors, optionalPositiveNumber, validateEntryRange } from "../domain/inputValidation";
 import { createId as createLocalId } from "../platform/identity";
 import { useWorkspaceNavigation } from "../hooks/useWorkspaceNavigation";
 import { useSavedStringList } from "../hooks/useSavedStringList";
@@ -48,8 +52,6 @@ import {
   localizedOpportunityType,
   localizedRecipeOptionValue,
   localizedProviderStatus,
-  localizedRecipeBuilderPrompt,
-  localizedRecipeBuilderStep,
   localizedRecipeShelfFilter,
   localizedReviewDateOption,
   localizedScanRunStatus,
@@ -124,11 +126,9 @@ import {
   SectionHeader,
   LogicBlock,
   SearchableSelect,
-  Reveal,
 } from "../components/common";
 import { logicRoleStateEffect, logicRoleWeight } from "../lib/logicHelpers";
 import { frozenScannerRules, scannerFeatureRegistry } from "../lib/frozenScannerRules";
-import { L0DataLayer } from "../components/logic/L0DataLayer";
 import { L1MetricsLayer } from "../components/logic/L1MetricsLayer";
 import { L15ConditionsLayer } from "../components/logic/L15ConditionsLayer";
 import { L2RecipesLayer } from "../components/logic/L2RecipesLayer";
@@ -162,7 +162,6 @@ type LogicLabLayer = RecipeLayer;
 type LogicInfoTarget = "Raw Data" | "Processed Features" | "Frozen Rules" | "Signals";
 
 type StockRouteTarget = "Stocks" | "Alerts" | "Eyes" | "Journal";
-type RecipeBuilderStep = "Purpose" | "Logic" | "Risk & Alerts" | "Review & Outcome";
 type MetricDraftForm = {
   name: string;
   humanMeaning: string;
@@ -773,9 +772,6 @@ const homeBucketLabel = (language: AppLanguage, bucket: HomeBucket) => {
 const recipeShelfFilterLabel = (language: AppLanguage, filter: RecipeShelfFilter) =>
   localizedRecipeShelfFilter(language, filter);
 
-const recipeBuilderStepLabel = (language: AppLanguage, step: RecipeBuilderStep) =>
-  localizedRecipeBuilderStep(language, step);
-
 const eyesShelfFilterLabel = (language: AppLanguage, filter: EyesShelfFilter) =>
   localizedEyesShelfFilter(language, filter);
 
@@ -936,64 +932,6 @@ const normalizeSeries = (series: number[], bounds?: { min: number; max: number }
   const max = bounds?.max ?? Math.max(...series);
   const range = Math.max(max - min, 1);
   return series.map((value) => ((value - min) / range) * 100);
-};
-
-const StepFlow = ({
-  steps,
-  current,
-  onSelect,
-  labelForStep,
-}: {
-  steps: readonly RecipeBuilderStep[];
-  current: RecipeBuilderStep;
-  onSelect: (step: RecipeBuilderStep) => void;
-  labelForStep?: (step: RecipeBuilderStep) => string;
-}) => {
-  const currentIndex = steps.indexOf(current);
-
-  return (
-    <View style={styles.stepFlow}>
-      {steps.map((step, index) => {
-        const active = step === current;
-        const complete = index < currentIndex;
-
-        return (
-          <React.Fragment key={step}>
-            {index > 0 ? (
-              <View style={[styles.stepConnector, complete ? styles.stepConnectorActive : null]} />
-            ) : null}
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={labelForStep ? labelForStep(step) : step}
-              accessibilityState={{ selected: active }}
-              onPress={() => onSelect(step)}
-              style={styles.stepNode}
-            >
-              <View
-                style={[
-                  styles.stepDot,
-                  active ? styles.stepDotActive : null,
-                  complete ? styles.stepDotComplete : null,
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.stepDotText,
-                    active || complete ? styles.stepDotTextActive : null,
-                  ]}
-                >
-                  {index + 1}
-                </Text>
-              </View>
-              <Text style={[styles.stepLabel, active ? styles.stepLabelActive : null]} numberOfLines={1}>
-                {labelForStep ? labelForStep(step) : step}
-              </Text>
-            </Pressable>
-          </React.Fragment>
-        );
-      })}
-    </View>
-  );
 };
 
 const statusTone = (status: VisualEvidenceCard["status"]) => {
@@ -1816,9 +1754,9 @@ const StockTriageCard = ({
 interface RecipeDraftForm {
   name: string;
   purpose: string;
-  opportunityType: (typeof opportunityTypes)[number];
-  timeHorizon: (typeof timeHorizons)[number];
-  intendedUseCase: (typeof useCaseOptions)[number];
+  opportunityType: string;
+  timeHorizon: string;
+  intendedUseCase: string;
   notes: string;
   reviewCadenceDays: number;
   alertCooldownHours: number;
@@ -1841,6 +1779,7 @@ export default function App() {
   const [tab, setTab, route] = useWorkspaceNavigation();
   const [routeNotice, setRouteNotice] = useState("");
   const [recipeBuilderStep, setRecipeBuilderStep] = useState<RecipeBuilderStep>("Purpose");
+  const [recipeValidationStep, setRecipeValidationStep] = useState<RecipeBuilderStep | "">("");
   const [alertWorkspaceTab, setAlertWorkspaceTab] = useState<Exclude<AlertWorkspaceTab, "Detail">>("Current");
   const [analysisBenchmark, setAnalysisBenchmark] = useState<AnalysisBenchmark>(defaultAnalysisBenchmark);
   const [analysisLookback, setAnalysisLookback] = useState<AnalysisLookback>(defaultAnalysisLookback);
@@ -1866,7 +1805,7 @@ export default function App() {
   const [decisionForm, setDecisionForm] = useState({
     eyeId: "",
     alertId: "",
-    action: "Entered" as DecisionAction,
+    action: "" as DecisionAction | "",
     note: "",
     concern: "",
     thesisValid: "" as "" | (typeof thesisValidityOptions)[number],
@@ -1944,10 +1883,9 @@ export default function App() {
     exitPriceOptional: "",
     resultNotes: "",
   });
-  const [recipeFormAttempted, setRecipeFormAttempted] = useState(false);
   const [metricFormAttempted, setMetricFormAttempted] = useState(false);
   const [eyeFormAttempted, setEyeFormAttempted] = useState(false);
-  const [journalFormAttempted, setJournalFormAttempted] = useState(false);
+  const [journalValidationSection, setJournalValidationSection] = useState<JournalValidationSection>("");
   const stockEditorFocus = useWindowPanelFocus(stocksSurfaceFallbackRef);
   const conditionBuilderFocus = useWindowPanelFocus(logicSurfaceFallbackRef);
   const logicRegistryFocus = useWindowPanelFocus(logicSurfaceFallbackRef);
@@ -2997,33 +2935,51 @@ export default function App() {
           new Date(previewSnapshot.updatedAt),
         )
       : undefined;
-  const recipeStepPrompt = localizedRecipeBuilderPrompt(language, recipeBuilderStep);
-  const canAdvanceRecipeStep =
-    recipeBuilderStep === "Purpose"
-      ? recipeForm.name.trim().length > 0 && recipeForm.purpose.trim().length > 0
-      : recipeBuilderStep === "Logic"
-        ? draftConditions.length > 0
-        : recipeBuilderStep === "Risk & Alerts"
-          ? recipeForm.alertCooldownHours > 0
-          : recipeForm.reviewCadenceDays > 0 && draftConditions.length > 0;
   const recipeStepReadiness = [
     {
-      step: "Purpose",
+      step: "Purpose" as const,
       ready: recipeForm.name.trim().length > 0 && recipeForm.purpose.trim().length > 0,
     },
     {
-      step: "Logic",
+      step: "Logic" as const,
       ready: draftConditions.length > 0,
     },
     {
-      step: "Risk & Alerts",
+      step: "Risk & Alerts" as const,
       ready: recipeForm.alertCooldownHours > 0,
     },
     {
-      step: "Review & Outcome",
+      step: "Review & Outcome" as const,
       ready: recipeForm.reviewCadenceDays > 0 && draftConditions.length > 0,
     },
-  ] as const;
+  ];
+  const recipeBuilderModel: RecipeBuilderModel = {
+    step: recipeBuilderStep,
+    validationStep: recipeValidationStep,
+    form: recipeForm,
+    conditionDraft: conditionBuilder,
+    opportunityTypes,
+    timeHorizons,
+    useCases: useCaseOptions,
+    reviewCadences: reviewCadenceOptions,
+    cooldowns: alertCooldownOptions,
+    metrics: logicLabMetricCatalog.map((metric) => ({ key: metric.key, name: metric.name, meaning: metric.humanMeaning })),
+    conditionRoles: conditionRoleOptions.map((value) => ({ value, label: localizedConditionRole(language, value) })),
+    operators: selectedOperatorOptions,
+    thresholdControl: selectedConditionControl,
+    selectedMetric: selectedConditionMetric ? { name: selectedConditionMetric.name, meaning: selectedConditionMetric.humanMeaning } : undefined,
+    conditionPreview: `${selectedConditionMetric?.name ?? "--"} ${conditionBuilder.operator} ${formatMetricThreshold(selectedConditionMetric, conditionBuilder.threshold, language, selectedConditionFormula)}`,
+    conditions: draftConditions.map((condition) => ({ id: condition.id, kindLabel: localizedConditionKind(language, condition.kind), label: condition.label })),
+    riskRuleCount: draftConditions.filter((condition) => condition.kind === "negative" || condition.kind === "disqualifier").length,
+    readiness: recipeStepReadiness,
+    previewStocks: data.stocks.map((stock) => ({ id: stock.id, symbol: stock.symbol, name: stock.name })),
+    previewStockId,
+    preview: previewRecipe && previewEvaluation && previewStock ? {
+      body: localizedEvaluationWhyNow(language, previewEvaluation, previewRecipe) || previewEvaluation.whyNow,
+      state: localizedEyeState(language, previewEvaluation.currentState),
+      recipeVersion: `${previewRecipe.name} v${previewRecipe.version}`,
+    } : undefined,
+  };
   const tabLabels: Record<TabKey, string> = {
     Home: language === "ko" ? "오늘" : "Today",
     Stocks: language === "ko" ? "관심 종목" : "Watchlist",
@@ -3195,6 +3151,7 @@ export default function App() {
   };
 
   const openJournalComposer = (invoker?: unknown) => {
+    setJournalValidationSection("");
     journalComposerFocus.captureInvoker(invoker);
     setJournalComposerOpen(true);
   };
@@ -3211,6 +3168,7 @@ export default function App() {
   };
 
   const openRecipeBuilder = (invoker?: unknown) => {
+    setRecipeValidationStep("");
     recipeBuilderFocus.captureInvoker(invoker);
     setRecipeBuilderOpen(true);
   };
@@ -3227,7 +3185,7 @@ export default function App() {
 
   const quickDecision = (alert: Alert, action: DecisionAction, invoker?: unknown) => {
     setDecisionForm({ eyeId: alert.eyeId, alertId: alert.id, action, note: "", concern: "", thesisValid: "", timing: "" });
-    setJournalComposerEditingId(""); setJournalFormAttempted(false); openJournalComposer(invoker);
+    setJournalComposerEditingId(""); setJournalValidationSection(""); openJournalComposer(invoker);
   };
 
   const acknowledgeAlertGroup = async (alerts: Alert[]) => {
@@ -3274,7 +3232,7 @@ export default function App() {
     setDraftConditions([]);
     setRecipeBuilderStep("Purpose");
     setRecipeBuilderEditingId("");
-    setRecipeFormAttempted(false);
+    setRecipeValidationStep("");
     setConditionBuilder({
       metricKey: metricCatalog[0].key,
       role: "Eligibility Filter",
@@ -3327,14 +3285,14 @@ export default function App() {
     setDecisionForm({
       eyeId: "",
       alertId: "",
-      action: "Entered",
+      action: "",
       note: "",
       concern: "",
       thesisValid: "",
       timing: "",
     });
     setJournalComposerEditingId("");
-    setJournalFormAttempted(false);
+    setJournalValidationSection("");
   };
 
   const resetLogicRuleBuilderDraft = () => {
@@ -3531,7 +3489,7 @@ export default function App() {
       timing: "",
     });
     setJournalComposerEditingId("");
-    setJournalFormAttempted(false);
+    setJournalValidationSection("");
     openJournalComposer(invoker);
   };
 
@@ -3824,13 +3782,32 @@ export default function App() {
   };
 
   const saveRecipe = async () => {
-    setRecipeFormAttempted(true);
-    if (!recipeForm.name.trim() || !recipeForm.purpose.trim() || draftConditions.length === 0) return;
+    if (!recipeForm.name.trim() || !recipeForm.purpose.trim()) {
+      setRecipeBuilderStep("Purpose");
+      setRecipeValidationStep("Purpose");
+      return;
+    }
+    if (draftConditions.length === 0) {
+      setRecipeBuilderStep("Logic");
+      setRecipeValidationStep("Logic");
+      return;
+    }
+    if (recipeForm.alertCooldownHours <= 0) {
+      setRecipeBuilderStep("Risk & Alerts");
+      setRecipeValidationStep("Risk & Alerts");
+      return;
+    }
+    if (recipeForm.reviewCadenceDays <= 0) {
+      setRecipeBuilderStep("Review & Outcome");
+      setRecipeValidationStep("Review & Outcome");
+      return;
+    }
+    let savedRecipeId = "";
     if (recipeBuilderEditingId) {
-      await actions.updateRecipe(recipeBuilderEditingId, {
+      savedRecipeId = (await actions.updateRecipe(recipeBuilderEditingId, {
         ...recipeForm,
         conditions: draftConditions,
-      });
+      })) ?? "";
     } else {
       await actions.addRecipe({
         ...recipeForm,
@@ -3839,11 +3816,37 @@ export default function App() {
     }
     resetRecipeBuilderDraft();
     setRecipeBuilderOpen(false);
+    if (savedRecipeId) {
+      setRecipeDetailId(savedRecipeId);
+      setTab("Logic Lab", { recipeId: savedRecipeId });
+    }
+  };
+
+  const continueRecipeBuilder = () => {
+    const ready = recipeBuilderStep === "Purpose"
+      ? Boolean(recipeForm.name.trim() && recipeForm.purpose.trim())
+      : recipeBuilderStep === "Logic"
+        ? draftConditions.length > 0
+        : recipeBuilderStep === "Risk & Alerts"
+          ? recipeForm.alertCooldownHours > 0
+          : recipeForm.reviewCadenceDays > 0 && draftConditions.length > 0;
+    if (!ready) {
+      setRecipeValidationStep(recipeBuilderStep);
+      return;
+    }
+    setRecipeValidationStep("");
+    setRecipeBuilderStep(recipeBuilderSteps[Math.min(recipeBuilderSteps.indexOf(recipeBuilderStep) + 1, recipeBuilderSteps.length - 1)]);
+  };
+
+  const previousRecipeBuilderStep = () => {
+    setRecipeValidationStep("");
+    setRecipeBuilderStep(recipeBuilderSteps[Math.max(recipeBuilderSteps.indexOf(recipeBuilderStep) - 1, 0)]);
   };
 
   const saveEye = async () => {
     setEyeFormAttempted(true);
     if (!eyeForm.stockId || !eyeForm.recipeId || !eyeForm.thesisSnapshot.trim()) return;
+    if (Object.keys(entryRangeFieldErrors(eyeForm.plannedEntryLow, eyeForm.plannedEntryHigh)).length > 0) return;
 
     const stock = data?.stocks.find(s => s.id === eyeForm.stockId);
     if (!stock) return;
@@ -3877,9 +3880,13 @@ export default function App() {
   };
 
   const saveDecision = async () => {
-    setJournalFormAttempted(true);
-    if (!decisionForm.eyeId || !decisionForm.note.trim() || !decisionForm.thesisValid || !decisionForm.timing) return;
-    const input = { ...decisionForm, thesisValid: decisionForm.thesisValid, timing: decisionForm.timing };
+    if (!decisionForm.eyeId) { setJournalValidationSection("context"); return; }
+    if (!decisionForm.action) { setJournalValidationSection("action"); return; }
+    if (!decisionForm.note.trim()) { setJournalValidationSection("note"); return; }
+    if (!decisionForm.thesisValid) { setJournalValidationSection("thesis"); return; }
+    if (!decisionForm.timing) { setJournalValidationSection("timing"); return; }
+    setJournalValidationSection("");
+    const input = { ...decisionForm, action: decisionForm.action as DecisionAction, thesisValid: decisionForm.thesisValid, timing: decisionForm.timing };
     let savedDecisionId = journalComposerEditingId;
     if (journalComposerEditingId) {
       await actions.updateDecision(journalComposerEditingId, input);
@@ -4114,6 +4121,10 @@ export default function App() {
               onOpenSetVersions={(recipeId) => {
                 logicVersionFocus.captureInvoker();
                 setLogicVersionsRecipeId(recipeId);
+              }}
+              onCreateRecipe={() => {
+                resetRecipeBuilderDraft();
+                openRecipeBuilder();
               }}
               onCreateSet={() => openLogicSetBuilder()}
               onOpenSignalReview={(signalId) => {
@@ -4371,14 +4382,10 @@ export default function App() {
             returnFocusRef={logicRegistryFocus.returnFocusRef}
             fallbackFocusRef={logicRegistryFocus.fallbackFocusRef}
           >
-            <L0DataLayer
+            <RawDataRegistry
               language={language}
               dataSources={logicLabDataSources}
               rules={frozenScannerRules}
-              MetaPill={MetaPill}
-              SectionHeader={SectionHeader}
-              Button={Button}
-              onOpenHelp={(invoker) => openLogicInfo("Raw Data", invoker)}
             />
           </WindowPanel>
         ) : null}
@@ -5121,218 +5128,6 @@ export default function App() {
           </WindowPanel>
         ) : null}
 
-        {recipeBuilderOpen ? (
-          <WindowPanel
-            title={recipeBuilderEditingId ? (language === "ko" ? "레시피 수정" : "Edit Recipe") : t(language, "recipes.builder.title")}
-            subtitle={recipeBuilderEditingId ? (language === "ko" ? "기존 레시피 버전 안에서 조건과 검토 규칙을 바로 수정합니다." : "Update conditions and review rules inside the current recipe version.") : t(language, "recipes.builder.subtitle")}
-            onClose={() => {
-              setRecipeBuilderOpen(false);
-              resetRecipeBuilderDraft();
-            }}
-            closeLabel={t(language, "common.done")}
-            returnFocusRef={recipeBuilderFocus.returnFocusRef}
-            fallbackFocusRef={recipeBuilderFocus.fallbackFocusRef}
-          >
-            <StepFlow
-              steps={recipeBuilderSteps}
-              current={recipeBuilderStep}
-              onSelect={setRecipeBuilderStep}
-              labelForStep={(step) => recipeBuilderStepLabel(language, step)}
-            />
-            <View style={styles.previewCard}>
-              <Text style={styles.previewLabel}>{recipeBuilderStepLabel(language, recipeBuilderStep)}</Text>
-              <Text style={styles.previewText}>{recipeStepPrompt}</Text>
-            </View>
-            <View style={styles.homeSummaryStrip}>
-              <DenseStat label={t(language, "recipes.builder.stat.conditions")} value={`${draftConditions.length}`} tone={draftConditions.length > 0 ? "strong" : "neutral"} />
-              <DenseStat label={t(language, "recipes.builder.stat.riskRules")} value={`${draftConditions.filter((condition) => condition.kind === "negative" || condition.kind === "disqualifier").length}`} />
-              <DenseStat label={t(language, "recipes.builder.stat.cadence")} value={`${recipeForm.reviewCadenceDays}d`} />
-              <DenseStat label={t(language, "recipes.builder.stat.cooldown")} value={`${recipeForm.alertCooldownHours}h`} />
-            </View>
-            <View style={styles.metaRow}>
-              {recipeStepReadiness.map((item) => (
-                <MetaPill
-                  key={`recipe-step-${item.step}`}
-                  label={`${recipeBuilderStepLabel(language, item.step)} · ${item.ready ? t(language, "recipes.builder.ready") : t(language, "recipes.builder.needsInput")}`}
-                />
-              ))}
-            </View>
-
-            <Reveal key={`builder-step-${recipeBuilderStep}`}>
-              {recipeBuilderStep === "Purpose" ? (
-                <>
-                <Text style={styles.inputLabel}>{t(language, "recipes.builder.field.recipeName")}</Text>
-                <Input value={recipeForm.name} onChangeText={(name) => setRecipeForm((current) => ({ ...current, name }))} placeholder={t(language, "recipes.builder.placeholder.recipeName")} invalid={recipeFormAttempted && !recipeForm.name.trim()} />
-                {recipeFormAttempted && !recipeForm.name.trim() ? <Text style={styles.validationText}>{t(language, "recipes.builder.validation.recipeNameRequired")}</Text> : null}
-                <Text style={styles.inputLabel}>{t(language, "recipes.builder.field.opportunityType")}</Text>
-                <HorizontalChoice options={opportunityTypes} value={recipeForm.opportunityType} onSelect={(opportunityType) => setRecipeForm((current) => ({ ...current, opportunityType }))} labelForOption={(value) => localizedOpportunityType(language, value)} />
-                <Text style={styles.inputLabel}>{t(language, "recipes.builder.field.timeHorizon")}</Text>
-                <HorizontalChoice options={timeHorizons} value={recipeForm.timeHorizon} onSelect={(timeHorizon) => setRecipeForm((current) => ({ ...current, timeHorizon }))} labelForOption={(value) => localizedTimeHorizon(language, value)} />
-                <Text style={styles.inputLabel}>{t(language, "recipes.builder.field.primaryUseCase")}</Text>
-                <HorizontalChoice options={useCaseOptions} value={recipeForm.intendedUseCase} onSelect={(intendedUseCase) => setRecipeForm((current) => ({ ...current, intendedUseCase }))} labelForOption={(value) => localizedUseCase(language, value)} />
-                <Text style={styles.inputLabel}>{t(language, "recipes.builder.field.purpose")}</Text>
-                <Input value={recipeForm.purpose} onChangeText={(purpose) => setRecipeForm((current) => ({ ...current, purpose }))} placeholder={t(language, "recipes.builder.placeholder.purpose")} multiline invalid={recipeFormAttempted && !recipeForm.purpose.trim()} />
-                {recipeFormAttempted && !recipeForm.purpose.trim() ? <Text style={styles.validationText}>{t(language, "recipes.builder.validation.purposeRequired")}</Text> : null}
-                </>
-              ) : null}
-
-              {recipeBuilderStep === "Logic" ? (
-                <>
-                <Text style={styles.inputLabel}>{language === "ko" ? "L1 지표" : "L1 Metric"}</Text>
-                <HorizontalChoice
-                  options={logicLabMetricCatalog.map((metric) => metric.key)}
-                  value={conditionBuilder.metricKey}
-                  onSelect={(metricKey) => setConditionBuilder((current) => ({ ...current, metricKey }))}
-                  labelForOption={(metricKey) => logicLabMetricCatalog.find((metric) => metric.key === metricKey)?.name ?? metricKey}
-                />
-                {selectedConditionMetric ? (
-                  <View style={styles.previewCard}>
-                    <Text style={styles.previewLabel}>{language === "ko" ? "선택된 L1 지표" : "Selected L1 metric"}</Text>
-                    <Text style={styles.previewText}>{selectedConditionMetric.name}</Text>
-                    <Text style={styles.previewDisclosure}>
-                      {selectedConditionMetric.humanMeaning}
-                    </Text>
-                  </View>
-                ) : null}
-                <Text style={styles.inputLabel}>{language === "ko" ? "조건 역할" : "Condition role"}</Text>
-                <HorizontalChoice
-                  options={conditionRoleOptions as readonly string[]}
-                  value={conditionBuilder.role}
-                  onSelect={(role: string) => setConditionBuilder((current) => ({ ...current, role: role as NonNullable<RecipeCondition["role"]> }))}
-                  labelForOption={(role: string) => localizedConditionRole(language, role)}
-                />
-                <Text style={styles.inputLabel}>{t(language, "recipes.builder.field.operator")}</Text>
-                <HorizontalChoice options={selectedOperatorOptions} value={conditionBuilder.operator} onSelect={(operator) => setConditionBuilder((current) => ({ ...current, operator }))} />
-                <Text style={styles.inputLabel}>{t(language, "recipes.builder.field.threshold")}</Text>
-                {selectedConditionControl.type === "number" ? (
-                  <NumberStepper
-                    label={language === "ko" ? "기준값 설정" : "Threshold"}
-                    value={Number(conditionBuilder.threshold)}
-                    onChange={(next) => setConditionBuilder((current) => ({ ...current, threshold: String(next) }))}
-                    step={selectedConditionControl.step}
-                    min={selectedConditionControl.min}
-                    max={selectedConditionControl.max}
-                    unit={selectedConditionControl.unit}
-                  />
-                ) : (
-                  <HorizontalChoice
-                    options={selectedConditionControl.options}
-                    value={conditionBuilder.threshold}
-                    onSelect={(threshold) => setConditionBuilder((current) => ({ ...current, threshold }))}
-                    labelForOption={(value) => localizedRecipeOptionValue(language, value)}
-                  />
-                )}
-                <Text style={styles.inputLabel}>{t(language, "recipes.builder.field.whyMatters")}</Text>
-                <Input value={conditionBuilder.note} onChangeText={(note) => setConditionBuilder((current) => ({ ...current, note }))} placeholder={t(language, "recipes.builder.placeholder.whyMatters")} multiline />
-                <View style={styles.previewCard}>
-                  <Text style={styles.previewLabel}>{t(language, "recipes.builder.preview.condition")}</Text>
-                  <Text style={styles.previewText}>
-                    {selectedConditionMetric?.name ?? "--"} {conditionBuilder.operator} {formatMetricThreshold(selectedConditionMetric, conditionBuilder.threshold, language, selectedConditionFormula)}
-                  </Text>
-                </View>
-                <View style={styles.actionRow}>
-                  <Button label={t(language, "recipes.builder.action.addCondition")} onPress={addDraftCondition} />
-                  <Button label={t(language, "recipes.builder.action.clearDraft")} tone="ghost" onPress={() => setDraftConditions([])} />
-                </View>
-                {draftConditions.length > 0 ? (
-                  <View style={styles.stack}>
-                    {draftConditions.map((condition) => (
-                      <Card key={condition.id}>
-                        <View style={styles.inlineBetween}>
-                          <View style={styles.flexOne}>
-                            <Text style={[styles.kindPill, conditionKindTone(condition.kind)]}>{localizedConditionKind(language, condition.kind)}</Text>
-                            <Text style={styles.cardBody}>{condition.label}</Text>
-                          </View>
-                          <Button label={t(language, "recipes.builder.action.remove")} tone="ghost" onPress={() => setDraftConditions((current) => current.filter((item) => item.id !== condition.id))} />
-                        </View>
-                      </Card>
-                    ))}
-                  </View>
-                ) : null}
-                {recipeFormAttempted && draftConditions.length === 0 ? <Text style={styles.validationText}>{t(language, "recipes.builder.validation.conditionRequired")}</Text> : null}
-                </>
-              ) : null}
-
-              {recipeBuilderStep === "Risk & Alerts" ? (
-                <>
-                <View style={styles.dualDenseGrid}>
-                  <DenseStat label={t(language, "recipes.builder.field.alertCooldown")} value={`${recipeForm.alertCooldownHours}h`} tone="strong" />
-                  <DenseStat label={t(language, "recipes.builder.stat.riskRules")} value={`${draftConditions.filter((condition) => condition.kind === "negative" || condition.kind === "disqualifier").length}`} />
-                </View>
-                <Text style={styles.inputLabel}>{t(language, "recipes.builder.field.alertCooldown")}</Text>
-                <HorizontalChoice options={alertCooldownOptions.map(String)} value={String(recipeForm.alertCooldownHours)} onSelect={(value) => setRecipeForm((current) => ({ ...current, alertCooldownHours: Number(value) }))} />
-                <Text style={styles.inputLabel}>{t(language, "recipes.builder.field.notes")}</Text>
-                <Input value={recipeForm.notes} onChangeText={(notes) => setRecipeForm((current) => ({ ...current, notes }))} placeholder={t(language, "recipes.builder.placeholder.notes")} multiline />
-                </>
-              ) : null}
-
-              {recipeBuilderStep === "Review & Outcome" ? (
-                <>
-                <View style={styles.dualDenseGrid}>
-                  <DenseStat label={t(language, "recipes.builder.field.reviewCadence")} value={`${recipeForm.reviewCadenceDays}d`} tone="strong" />
-                  <DenseStat label={t(language, "recipes.builder.stat.conditions")} value={`${draftConditions.length}`} />
-                </View>
-                <Text style={styles.inputLabel}>{t(language, "recipes.builder.field.reviewCadence")}</Text>
-                <HorizontalChoice options={reviewCadenceOptions.map(String)} value={String(recipeForm.reviewCadenceDays)} onSelect={(value) => setRecipeForm((current) => ({ ...current, reviewCadenceDays: Number(value) }))} />
-                {previewRecipe && previewEvaluation && previewStock ? (
-                  <>
-                    <Text style={styles.inputLabel}>{t(language, "recipes.builder.field.previewStock")}</Text>
-                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.choiceRow}>
-                      {data.stocks.map((stock) => (
-                        <Pressable key={stock.id} onPress={() => setPreviewStockId(stock.id)} style={[styles.selectChip, previewStockId === stock.id ? styles.selectChipActive : null]}>
-                          <Text style={[styles.selectChipTitle, previewStockId === stock.id ? styles.selectChipTitleActive : null]} numberOfLines={1}>{stock.symbol}</Text>
-                          <Text style={[styles.selectChipSubtitle, previewStockId === stock.id ? styles.selectChipSubtitleActive : null]} numberOfLines={1}>{stock.name}</Text>
-                        </Pressable>
-                      ))}
-                    </ScrollView>
-                    <WhyNowPanel language={language} title={t(language, "recipes.builder.preview.result")} body={previewEvaluation.whyNow} state={previewEvaluation.currentState} recipeVersion={`${previewRecipe.name} v${previewRecipe.version}`} />
-                    <Text style={styles.previewDisclosure}>{t(language, "recipes.builder.preview.disclosure")}</Text>
-                  </>
-                ) : (
-                  <Text style={styles.cardBody}>{t(language, "recipes.builder.preview.locked")}</Text>
-                )}
-                <View style={styles.formulaPanel}>
-                  <Text style={styles.formulaTitle}>{t(language, "recipes.builder.summary.title")}</Text>
-                  <Text style={styles.formulaBody}>
-                    {t(language, "recipes.builder.summary.body", {
-                      name: recipeForm.name.trim() || (language === "ko" ? "이름 없는 레시피" : "Untitled Recipe"),
-                      opportunityType: localizedOpportunityType(language, recipeForm.opportunityType),
-                      count: draftConditions.length,
-                      cadence: recipeForm.reviewCadenceDays,
-                      cooldown: recipeForm.alertCooldownHours,
-                    })}
-                  </Text>
-                  <Text style={styles.formulaMeta}>{t(language, "recipes.builder.summary.meta")}</Text>
-                </View>
-                </>
-              ) : null}
-            </Reveal>
-
-            <View style={styles.actionRow}>
-              {recipeBuilderStep !== "Purpose" ? (
-                <Button
-                  label={t(language, "recipes.builder.action.back")}
-                  tone="secondary"
-                  onPress={() =>
-                    setRecipeBuilderStep(recipeBuilderSteps[Math.max(recipeBuilderSteps.indexOf(recipeBuilderStep) - 1, 0)])
-                  }
-                />
-              ) : null}
-              {recipeBuilderStep !== "Review & Outcome" ? (
-                <Button
-                  label={t(language, "recipes.builder.action.next")}
-                  disabled={!canAdvanceRecipeStep}
-                  onPress={() =>
-                    setRecipeBuilderStep(recipeBuilderSteps[Math.min(recipeBuilderSteps.indexOf(recipeBuilderStep) + 1, recipeBuilderSteps.length - 1)])
-                  }
-                />
-              ) : (
-                <Button label={t(language, "recipes.builder.action.save")} disabled={!canAdvanceRecipeStep} onPress={() => saveRecipe()} />
-              )}
-            </View>
-          </WindowPanel>
-        ) : null}
-
         {selectedRecipe ? (
           <WindowPanel
             title={selectedRecipe.name}
@@ -5370,8 +5165,7 @@ export default function App() {
               <Button
                 label={t(language, "recipes.detail.useForEye")}
                 onPress={() => {
-                  setEyeForm((current) => ({ ...current, recipeId: selectedRecipe.id }));
-                  closeEntityRoute("Logic Lab");
+                setEyeForm((current) => ({ ...current, recipeId: selectedRecipe.id }));
                   openEyeComposer();
                 }}
               />
@@ -5403,7 +5197,6 @@ export default function App() {
                     alertCooldownHours: selectedRecipe.alertConfig?.cooldownHours ?? alertCooldownOptions[2],
                   });
                   setDraftConditions(selectedRecipe.conditions);
-                  closeEntityRoute("Logic Lab");
                   setRecipeBuilderStep("Purpose");
                   openRecipeBuilder();
                 }}
@@ -5426,6 +5219,36 @@ export default function App() {
           </WindowPanel>
         ) : null}
 
+        {recipeBuilderOpen ? (
+          <RecipeBuilder
+            language={language}
+            editing={Boolean(recipeBuilderEditingId)}
+            model={recipeBuilderModel}
+            saving={saving}
+            onFormChange={(change) => setRecipeForm((current) => ({
+              ...current,
+              ...change,
+              opportunityType: change.opportunityType ? change.opportunityType as typeof current.opportunityType : current.opportunityType,
+              timeHorizon: change.timeHorizon ? change.timeHorizon as typeof current.timeHorizon : current.timeHorizon,
+              intendedUseCase: change.intendedUseCase ? change.intendedUseCase as typeof current.intendedUseCase : current.intendedUseCase,
+            }))}
+            onConditionChange={(change) => setConditionBuilder((current) => ({ ...current, ...change }))}
+            onAddCondition={addDraftCondition}
+            onClearConditions={() => setDraftConditions([])}
+            onRemoveCondition={(conditionId) => setDraftConditions((current) => current.filter((condition) => condition.id !== conditionId))}
+            onPreviewStock={setPreviewStockId}
+            onContinue={continueRecipeBuilder}
+            onBack={previousRecipeBuilderStep}
+            onSave={() => void saveRecipe()}
+            onCancel={() => {
+              setRecipeBuilderOpen(false);
+              resetRecipeBuilderDraft();
+            }}
+            returnFocusRef={recipeBuilderFocus.returnFocusRef}
+            fallbackFocusRef={recipeBuilderFocus.fallbackFocusRef}
+          />
+        ) : null}
+
         {eyeDetailOpen && selectedEye && selectedEyeDetail ? (
           <WindowPanel
             title={selectedEyeDetail.stockLabel}
@@ -5443,7 +5266,6 @@ export default function App() {
               onAddJournal={() => {
                 resetJournalComposerDraft();
                 setDecisionForm((current) => ({ ...current, eyeId: selectedEye.id }));
-                closeEntityRoute("Eyes");
                 openJournalComposer();
               }}
               onEdit={() => {
@@ -5459,7 +5281,6 @@ export default function App() {
                     ? Math.max(0, Math.round((Date.now() - new Date(selectedEye.lastReviewedAt).getTime()) / (1000 * 60 * 60 * 24)))
                     : reviewDateOptions[2].daysAgo,
                 });
-                closeEntityRoute("Eyes");
                 openEyeComposer();
               }}
               onOpenDecision={selectedEyeLinkedDecisions[0] ? (invoker) => openDecisionDetail(
@@ -5476,59 +5297,24 @@ export default function App() {
         ) : null}
 
         {eyeComposerOpen ? (
-          <WindowPanel
-            title={eyeComposerEditingId ? t(language, "eyes.create.editTitle") : t(language, "eyes.create.title")}
-            subtitle={eyeComposerEditingId ? t(language, "eyes.create.editSubtitle") : t(language, "eyes.create.subtitle")}
-            onClose={() => {
+          <EyeComposer
+            language={language}
+            editing={Boolean(eyeComposerEditingId)}
+            draft={eyeForm}
+            stocks={data.stocks}
+            recipes={data.recipes}
+            reviewDates={reviewDateOptions}
+            attempted={eyeFormAttempted}
+            saving={saving}
+            onChange={(change) => setEyeForm((current) => ({ ...current, ...change }))}
+            onSave={() => void saveEye()}
+            onCancel={() => {
               setEyeComposerOpen(false);
               resetEyeComposerDraft();
             }}
-            closeLabel={t(language, "common.done")}
             returnFocusRef={eyeComposerFocus.returnFocusRef}
             fallbackFocusRef={eyeComposerFallbackRef}
-          >
-            <SearchableSelect
-              language={language}
-              label={t(language, "eyes.create.stock")}
-              options={data.stocks.map(s => ({ id: s.id, label: s.symbol, sublabel: s.name }))}
-              value={eyeForm.stockId}
-              onSelect={(opt: any) => setEyeForm((current) => ({ ...current, stockId: opt.id }))}
-              placeholder={t(language, "eyes.create.selectStock")}
-            />
-            {eyeFormAttempted && !eyeForm.stockId ? <Text style={styles.validationText}>{t(language, "eyes.create.selectStock")}</Text> : null}
-
-            <SearchableSelect
-              language={language}
-              label={t(language, "eyes.create.recipe")}
-              options={data.recipes.map(r => ({ id: r.id, label: r.name, sublabel: localizedTimeHorizon(language, r.timeHorizon) }))}
-              value={eyeForm.recipeId}
-              onSelect={(opt: any) => setEyeForm((current) => ({ ...current, recipeId: opt.id }))}
-              placeholder={t(language, "eyes.create.selectRecipe")}
-            />
-            {eyeFormAttempted && !eyeForm.recipeId ? <Text style={styles.validationText}>{t(language, "eyes.create.selectRecipe")}</Text> : null}
-            <Text style={styles.inputLabel}>{t(language, "eyes.create.thesis")}</Text>
-            <Input value={eyeForm.thesisSnapshot} onChangeText={(thesisSnapshot) => setEyeForm((current) => ({ ...current, thesisSnapshot }))} placeholder={t(language, "eyes.create.thesisPlaceholder")} multiline invalid={eyeFormAttempted && !eyeForm.thesisSnapshot.trim()} />
-            {eyeFormAttempted && !eyeForm.thesisSnapshot.trim() ? <Text style={styles.validationText}>{t(language, "eyes.create.thesisRequired")}</Text> : null}
-            <View style={styles.dualDenseGrid}>
-              <Input placeholder={t(language, "eyes.create.entryLowPlaceholder")} keyboardType="decimal-pad" value={eyeForm.plannedEntryLow} onChangeText={plannedEntryLow => setEyeForm(current => ({ ...current, plannedEntryLow }))} />
-              <Input placeholder={t(language, "eyes.create.entryHighPlaceholder")} keyboardType="decimal-pad" value={eyeForm.plannedEntryHigh} onChangeText={plannedEntryHigh => setEyeForm(current => ({ ...current, plannedEntryHigh }))} />
-            </View>
-            <Text style={styles.inputLabel}>{t(language, "eyes.create.lastReview")}</Text>
-            <HorizontalChoice
-              options={reviewDateOptions.map((item) => item.label)}
-              value={reviewDateOptions.find((item) => item.daysAgo === eyeForm.lastReviewedDaysAgo)?.label ?? reviewDateOptions[2].label}
-              labelForOption={(label) => localizedReviewDateOption(language, label)}
-              onSelect={(label) =>
-                setEyeForm((current) => ({
-                  ...current,
-                  lastReviewedDaysAgo: reviewDateOptions.find((item) => item.label === label)?.daysAgo ?? reviewDateOptions[2].daysAgo,
-                }))
-              }
-            />
-            <Text style={styles.inputLabel}>{t(language, "eyes.create.invalidation")}</Text>
-            <Input value={eyeForm.invalidationRule} onChangeText={(invalidationRule) => setEyeForm((current) => ({ ...current, invalidationRule }))} placeholder={t(language, "eyes.create.invalidationPlaceholder")} multiline />
-            <Button label={eyeComposerEditingId ? t(language, "common.saveChanges") : t(language, "eyes.create.submit")} onPress={() => saveEye()} />
-          </WindowPanel>
+          />
         ) : null}
 
         {alertDetailOpen && selectedAlert && selectedAlertEye && selectedAlertRecipe ? (
@@ -5600,48 +5386,6 @@ export default function App() {
           </WindowPanel>
         ) : null}
 
-        {journalComposerOpen ? (
-          <WindowPanel
-            title={t(language, "journal.composer.title")}
-            subtitle={t(language, "journal.composer.subtitle")}
-            onClose={() => {
-              setJournalComposerOpen(false);
-              resetJournalComposerDraft();
-            }}
-            closeLabel={t(language, "common.done")}
-            returnFocusRef={journalComposerFocus.returnFocusRef}
-            fallbackFocusRef={journalComposerFocus.fallbackFocusRef}
-          >
-            <SearchableSelect
-              language={language}
-              label={t(language, "journal.composer.eye")}
-              disabled={Boolean(journalComposerEditingId)}
-              options={data.eyes.map(e => ({ id: e.id, label: stockLabel(data.stocks, e.stockId), sublabel: recipeLabel(data.recipes, e.recipeId) }))}
-              value={decisionForm.eyeId}
-              onSelect={(opt: any) => setDecisionForm((current) => ({ ...current, eyeId: opt.id, alertId: "" }))}
-              placeholder={t(language, "journal.composer.searchPlaceholder")}
-            />
-            {journalFormAttempted && !decisionForm.eyeId ? <Text style={styles.validationText}>{t(language, "journal.composer.selectEye")}</Text> : null}
-            <Text style={styles.inputLabel}>{t(language, "journal.composer.action")}</Text>
-            <HorizontalChoice options={decisionActions} value={decisionForm.action} onSelect={(action) => setDecisionForm((current) => ({ ...current, action }))} labelForOption={(value) => localizedDecisionAction(language, value)} />
-            <Text style={styles.inputLabel}>{t(language, "journal.composer.why")}</Text>
-            <Input value={decisionForm.note} onChangeText={(note) => setDecisionForm((current) => ({ ...current, note }))} placeholder={t(language, "journal.composer.notePlaceholder")} multiline invalid={journalFormAttempted && !decisionForm.note.trim()} />
-            {journalFormAttempted && !decisionForm.note.trim() ? <Text style={styles.validationText}>{t(language, "journal.composer.noteRequired")}</Text> : null}
-            <Text style={styles.inputLabel}>{t(language, "journal.composer.concern")}</Text>
-            <Input value={decisionForm.concern} onChangeText={(concern) => setDecisionForm((current) => ({ ...current, concern }))} placeholder={t(language, "journal.composer.concernPlaceholder")} multiline />
-            <Text style={styles.inputLabel}>{t(language, "journal.composer.thesisValidity")}</Text>
-            {journalFormAttempted && !decisionForm.thesisValid ? <Text accessibilityRole="alert" style={styles.validationText}>{t(language, "journal.validation.thesisRequired")}</Text> : null}
-            <HorizontalChoice options={thesisValidityOptions} value={decisionForm.thesisValid} onSelect={(thesisValid) => setDecisionForm((current) => ({ ...current, thesisValid }))} labelForOption={(value) => localizedThesisValidity(language, value)} />
-            <Text style={styles.inputLabel}>{t(language, "journal.composer.timing")}</Text>
-            {journalFormAttempted && !decisionForm.timing ? <Text accessibilityRole="alert" style={styles.validationText}>{t(language, "journal.validation.timingRequired")}</Text> : null}
-            <HorizontalChoice options={timingOptions} value={decisionForm.timing} onSelect={(timing) => setDecisionForm((current) => ({ ...current, timing }))} labelForOption={(value) => localizedTiming(language, value)} />
-            <Button
-              label={journalComposerEditingId ? t(language, "common.saveChanges") : t(language, "journal.action.save")}
-              onPress={() => saveDecision()}
-            />
-          </WindowPanel>
-        ) : null}
-
         {selectedDecision && selectedDecisionDetail ? (
           <WindowPanel
             title={selectedDecisionDetail.action}
@@ -5679,7 +5423,6 @@ export default function App() {
                   thesisValid: selectedDecision.thesisValid,
                   timing: selectedDecision.timing,
                 });
-                closeEntityRoute("Journal");
                 openJournalComposer();
               }}
               onArchive={async () => {
@@ -5692,6 +5435,32 @@ export default function App() {
               ) : undefined}
             />
           </WindowPanel>
+        ) : null}
+
+        {journalComposerOpen ? (
+          <JournalComposer
+            language={language}
+            editing={Boolean(journalComposerEditingId)}
+            draft={decisionForm}
+            eyes={data.eyes.map((eye) => ({
+              id: eye.id,
+              label: stockLabel(data.stocks, eye.stockId),
+              detail: recipeLabel(data.recipes, eye.recipeId),
+            }))}
+            actionOptions={decisionActions}
+            thesisOptions={thesisValidityOptions}
+            timingOptions={timingOptions}
+            validationSection={journalValidationSection}
+            saving={saving}
+            onChange={(change) => setDecisionForm((current) => ({ ...current, ...change }))}
+            onSave={() => void saveDecision()}
+            onCancel={() => {
+              setJournalComposerOpen(false);
+              resetJournalComposerDraft();
+            }}
+            returnFocusRef={journalComposerFocus.returnFocusRef}
+            fallbackFocusRef={journalComposerFocus.fallbackFocusRef}
+          />
         ) : null}
 
         {selectedScannerSignal ? (

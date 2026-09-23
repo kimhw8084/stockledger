@@ -368,6 +368,7 @@ test("keyboard task paths operate segmented choices and restore focus after deep
   await page.keyboard.press("Enter");
   const composer = page.getByRole("dialog");
   await expect(composer).toBeVisible();
+  await expect(composer.getByRole("button", { name: "Done", exact: true })).toBeFocused();
   await page.keyboard.press("Escape");
   await expect(newRecord).toBeFocused();
 

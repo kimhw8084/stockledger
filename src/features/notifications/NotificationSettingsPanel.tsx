@@ -163,16 +163,24 @@ export function NotificationSettingsPanel({
       <WindowPanel
         title={t(language, "settings.notifications.disableConfirmTitle")}
         onClose={() => setDisableConfirmationOpen(false)}
+        closeDisabled={saving}
         closeLabel={t(language, "common.close")}
         returnFocusRef={disableConfirmationFocus.returnFocusRef}
         fallbackFocusRef={disableConfirmationFocus.fallbackFocusRef}
       >
-        {(close) => (
+        {(close, closeAfterCommit) => (
           <VStack gap="lg">
             <Text>{t(language, "settings.notifications.disableConfirmBody")}</Text>
+            <Text variant="caption" tone="secondary">{t(language, "settings.notifications.disableConfirmStatusNote")}</Text>
+            {error ? (
+              <View style={styles.confirmError}>
+                <AlertBanner tone="negative" title={error} />
+                <Text variant="caption" tone="secondary">{t(language, "settings.notifications.disableSaveFailed")}</Text>
+              </View>
+            ) : null}
             <View style={styles.confirmActions}>
-              <Button label={t(language, "settings.notifications.disableConfirmCancel")} variant="secondary" onPress={close} responsiveWidth="compact-full" />
-              <Button label={t(language, "settings.notifications.disableConfirmConfirm")} variant="danger" disabled={saving} loading={saving} onPress={() => { void disableNotifications(close); }} responsiveWidth="compact-full" />
+              <Button label={t(language, "settings.notifications.disableConfirmCancel")} variant="secondary" disabled={saving} onPress={close} responsiveWidth="compact-full" />
+              <Button label={t(language, "settings.notifications.disableConfirmConfirm")} variant="danger" disabled={saving} loading={saving} onPress={() => { void disableNotifications(closeAfterCommit); }} responsiveWidth="compact-full" />
             </View>
           </VStack>
         )}
@@ -186,4 +194,5 @@ const styles = StyleSheet.create((theme) => ({
   copy: { minWidth: 0, flex: 1, gap: theme.spacing.xs },
   deliveryStatus: { minWidth: 0, gap: theme.spacing.sm, paddingTop: theme.spacing.md, borderTopWidth: theme.strokeWidths.standard, borderTopColor: theme.colors.border.subtle },
   confirmActions: { minWidth: 0, flexDirection: { compact: "column", medium: "row" }, flexWrap: "wrap", gap: theme.spacing.sm },
+  confirmError: { minWidth: 0, gap: theme.spacing.xs },
 }));
