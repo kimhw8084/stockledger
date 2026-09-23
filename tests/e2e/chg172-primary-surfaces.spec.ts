@@ -223,7 +223,7 @@ test("all five primary surfaces fit canonical, stress, and holdout viewports", a
   const surfaces = [
     { tab: "Watchlist", action: () => page.getByRole("textbox", { name: "Search or resume a stock" }) },
     { tab: "Recipes", action: () => page.getByTestId("recipe-layer-control") },
-    { tab: "Alerts", action: () => page.getByTestId("alerts-view-control") },
+    { tab: "Alerts", action: () => page.getByRole("button", { name: "Inspect evidence", exact: true }).first() },
     { tab: "Journal", action: () => page.getByRole("button", { name: "New", exact: true }) },
     { tab: "Settings", action: () => page.getByRole("button", { name: "Check provider configuration", exact: true }) },
   ];
@@ -240,6 +240,13 @@ test("all five primary surfaces fit canonical, stress, and holdout viewports", a
       expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(profile.width);
       expect(bounds!.y, `${surface.tab} primary action should be visible without scrolling at ${profile.width}x${profile.height}`).toBeGreaterThanOrEqual(0);
       expect(bounds!.y + bounds!.height, `${surface.tab} primary action should fit the initial viewport at ${profile.width}x${profile.height}`).toBeLessThanOrEqual(profile.height);
+      const navigationBounds = await page.getByRole("tablist", { name: "Primary navigation", exact: true }).boundingBox();
+      expect(navigationBounds, "primary navigation should expose measurable bounds").not.toBeNull();
+      const overlapsNavigation = bounds!.x < navigationBounds!.x + navigationBounds!.width
+        && bounds!.x + bounds!.width > navigationBounds!.x
+        && bounds!.y < navigationBounds!.y + navigationBounds!.height
+        && bounds!.y + bounds!.height > navigationBounds!.y;
+      expect(overlapsNavigation, `${surface.tab} primary action should stay unobscured by primary navigation at ${profile.width}x${profile.height}`).toBe(false);
       const documentWidth = await page.evaluate(() => document.documentElement.scrollWidth);
       expect(documentWidth, `${surface.tab} document should not overflow at ${profile.width}x${profile.height}`).toBeLessThanOrEqual(profile.width);
     }

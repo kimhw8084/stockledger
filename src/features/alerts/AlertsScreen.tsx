@@ -70,7 +70,6 @@ export interface AlertsScreenProps {
 }
 
 const labels = (language: AppLanguage) => language === "ko" ? {
-  description: "지금 검토가 필요한 알림을 먼저 확인하고, 근거와 데이터 한계를 읽은 뒤 의도적으로 처리합니다.",
   current: "현재",
   history: "기록",
   currentQueue: "현재 검토 대기",
@@ -103,7 +102,6 @@ const labels = (language: AppLanguage) => language === "ko" ? {
   medium: "보통",
   low: "낮음",
 } : {
-  description: "Start with alerts that need attention now, inspect evidence and data limits, then choose a deliberate action.",
   current: "Current",
   history: "History",
   currentQueue: "Actionable now",
@@ -142,7 +140,6 @@ export function AlertsScreen(props: AlertsScreenProps) {
   const currentCount = props.groups.reduce((total, group) => total + group.alerts.length, 0);
   return (
     <View style={styles.root} nativeID="alerts-primary-surface">
-      <PageHeader title={props.language === "ko" ? "알림" : "Alerts"} description={text.description} />
       <SegmentedControl
         label={props.language === "ko" ? "알림 보기" : "Alert view"}
         value={props.view}
