@@ -206,8 +206,6 @@ export function RecipesScreen(props: RecipesScreenProps) {
   const layerTitle = props.layerChoices.find((choice) => choice.value === props.layer)?.label ?? text.layer;
   return (
     <View style={styles.root} nativeID="recipes-primary-surface">
-      <PageHeader title={props.language === "ko" ? "레시피" : "Recipes"} />
-
       <Card variant="elevated">
         <VStack gap="md">
           <Text variant="label">{text.layer}</Text>

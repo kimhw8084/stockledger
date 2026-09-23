@@ -68,11 +68,16 @@ test("Recipes task: choose a layer, read set purpose/version, open detail, and r
   await expect(page.getByText("Review cadence:", { exact: false }).first()).toBeVisible();
   await expect(page.getByText(/^v\d+$/).first()).toBeVisible();
 
+  await page.setViewportSize({ width: 360, height: 800 });
+  await page.evaluate(() => window.scrollTo(0, 0));
   const openSet = page.getByRole("button", { name: "Open set detail", exact: true }).first();
   const setActionBounds = await openSet.boundingBox();
+  const primaryNavigation = await page.getByRole("tablist", { name: "Primary navigation", exact: true }).boundingBox();
   expect(setActionBounds).not.toBeNull();
+  expect(primaryNavigation).not.toBeNull();
   expect(setActionBounds!.y).toBeGreaterThanOrEqual(0);
-  expect(setActionBounds!.y + setActionBounds!.height).toBeLessThanOrEqual(await page.evaluate(() => innerHeight));
+  expect(setActionBounds!.y + setActionBounds!.height).toBeLessThanOrEqual(800);
+  expect(setActionBounds!.y + setActionBounds!.height).toBeLessThanOrEqual(primaryNavigation!.y);
   await openSet.click();
   const detail = page.getByRole("dialog");
   await expect(detail).toBeVisible();
@@ -262,7 +267,8 @@ test("critical changed-surface meaning stays visible in Korean", async ({ page }
   await expect(page.getByText("종목을 찾고 데이터 상태와 근거를 확인한 뒤 다음 검토를 선택합니다.", { exact: true })).toBeVisible();
 
   await openTab(page, "레시피");
-  await expect(page.locator("#recipes-primary-surface").getByRole("heading", { name: "레시피", exact: true })).toBeVisible();
+  const selectedSetLayer = page.getByTestId("recipe-layer-control-Sets");
+  await expect(selectedSetLayer).toHaveAttribute("aria-checked", "true");
   await expect(page.getByText("여러 규칙을 목적, 사용 범위, 검토 주기에 맞춰 함께 사용합니다.", { exact: true }).first()).toBeVisible();
 
   await openTab(page, "알림");
