@@ -1,0 +1,682 @@
+{
+  "candidate": "ed377bb173387ebf56a4919ac4282d136c56e21d",
+  "tree": "dc99438cdcf8e2f737e5de87d6afc550d4008f24",
+  "rows": [
+    {
+      "surface": "today",
+      "owner": "surface owner in src/features/today",
+      "states": {
+        "idleOrPopulated": {
+          "status": "SUPPORTED",
+          "authority": "sample workspace canonical capture / current E2E"
+        },
+        "loading": {
+          "status": "SUPPORTED",
+          "reason": "real workspace/provider read or request state exists"
+        },
+        "emptyNoResults": {
+          "status": "UNPROVEN",
+          "authority": "existing empty workspace/no-results E2E only where applicable"
+        },
+        "error": {
+          "status": "UNPROVEN",
+          "authority": "validation/storage/provider-safe error fixtures where existing tests provide them"
+        },
+        "staleOfflinePartial": {
+          "status": "UNPROVEN",
+          "authority": "explicit source freshness/missing provenance/provider configured states; no fabricated provider data"
+        },
+        "denied": {
+          "status": "NOT_APPLICABLE",
+          "reason": "no authorization-denied state in local single-workspace fixture"
+        },
+        "savingSaved": {
+          "status": "NOT_APPLICABLE",
+          "authority": "local persistence acknowledgement only"
+        },
+        "conflict": {
+          "status": "NOT_APPLICABLE",
+          "reason": "no object-level conflict state"
+        }
+      },
+      "qualification": "State captures accepted v2 are comparators; current v3-specific state evidence is limited to listed current runs."
+    },
+    {
+      "surface": "watchlist",
+      "owner": "surface owner in src/features/watchlist",
+      "states": {
+        "idleOrPopulated": {
+          "status": "SUPPORTED",
+          "authority": "sample workspace canonical capture / current E2E"
+        },
+        "loading": {
+          "status": "SUPPORTED",
+          "reason": "real workspace/provider read or request state exists"
+        },
+        "emptyNoResults": {
+          "status": "SUPPORTED",
+          "authority": "existing empty workspace/no-results E2E only where applicable"
+        },
+        "error": {
+          "status": "UNPROVEN",
+          "authority": "validation/storage/provider-safe error fixtures where existing tests provide them"
+        },
+        "staleOfflinePartial": {
+          "status": "SUPPORTED",
+          "authority": "explicit source freshness/missing provenance/provider configured states; no fabricated provider data"
+        },
+        "denied": {
+          "status": "NOT_APPLICABLE",
+          "reason": "no authorization-denied state in local single-workspace fixture"
+        },
+        "savingSaved": {
+          "status": "NOT_APPLICABLE",
+          "authority": "local persistence acknowledgement only"
+        },
+        "conflict": {
+          "status": "NOT_APPLICABLE",
+          "reason": "no object-level conflict state"
+        }
+      },
+      "qualification": "State captures accepted v2 are comparators; current v3-specific state evidence is limited to listed current runs."
+    },
+    {
+      "surface": "recipes",
+      "owner": "surface owner in src/features/recipes",
+      "states": {
+        "idleOrPopulated": {
+          "status": "SUPPORTED",
+          "authority": "sample workspace canonical capture / current E2E"
+        },
+        "loading": {
+          "status": "NOT_APPLICABLE",
+          "reason": "surface is synchronous local presentation or not backed by a load state"
+        },
+        "emptyNoResults": {
+          "status": "SUPPORTED",
+          "authority": "existing empty workspace/no-results E2E only where applicable"
+        },
+        "error": {
+          "status": "UNPROVEN",
+          "authority": "validation/storage/provider-safe error fixtures where existing tests provide them"
+        },
+        "staleOfflinePartial": {
+          "status": "UNPROVEN",
+          "authority": "explicit source freshness/missing provenance/provider configured states; no fabricated provider data"
+        },
+        "denied": {
+          "status": "NOT_APPLICABLE",
+          "reason": "no authorization-denied state in local single-workspace fixture"
+        },
+        "savingSaved": {
+          "status": "NOT_APPLICABLE",
+          "authority": "local persistence acknowledgement only"
+        },
+        "conflict": {
+          "status": "NOT_APPLICABLE",
+          "reason": "no object-level conflict state"
+        }
+      },
+      "qualification": "State captures accepted v2 are comparators; current v3-specific state evidence is limited to listed current runs."
+    },
+    {
+      "surface": "alerts",
+      "owner": "surface owner in src/features/alerts",
+      "states": {
+        "idleOrPopulated": {
+          "status": "SUPPORTED",
+          "authority": "sample workspace canonical capture / current E2E"
+        },
+        "loading": {
+          "status": "SUPPORTED",
+          "reason": "real workspace/provider read or request state exists"
+        },
+        "emptyNoResults": {
+          "status": "SUPPORTED",
+          "authority": "existing empty workspace/no-results E2E only where applicable"
+        },
+        "error": {
+          "status": "UNPROVEN",
+          "authority": "validation/storage/provider-safe error fixtures where existing tests provide them"
+        },
+        "staleOfflinePartial": {
+          "status": "UNPROVEN",
+          "authority": "explicit source freshness/missing provenance/provider configured states; no fabricated provider data"
+        },
+        "denied": {
+          "status": "NOT_APPLICABLE",
+          "reason": "no authorization-denied state in local single-workspace fixture"
+        },
+        "savingSaved": {
+          "status": "NOT_APPLICABLE",
+          "authority": "local persistence acknowledgement only"
+        },
+        "conflict": {
+          "status": "NOT_APPLICABLE",
+          "reason": "no object-level conflict state"
+        }
+      },
+      "qualification": "State captures accepted v2 are comparators; current v3-specific state evidence is limited to listed current runs."
+    },
+    {
+      "surface": "journal",
+      "owner": "surface owner in src/features/journal",
+      "states": {
+        "idleOrPopulated": {
+          "status": "SUPPORTED",
+          "authority": "sample workspace canonical capture / current E2E"
+        },
+        "loading": {
+          "status": "NOT_APPLICABLE",
+          "reason": "surface is synchronous local presentation or not backed by a load state"
+        },
+        "emptyNoResults": {
+          "status": "SUPPORTED",
+          "authority": "existing empty workspace/no-results E2E only where applicable"
+        },
+        "error": {
+          "status": "UNPROVEN",
+          "authority": "validation/storage/provider-safe error fixtures where existing tests provide them"
+        },
+        "staleOfflinePartial": {
+          "status": "UNPROVEN",
+          "authority": "explicit source freshness/missing provenance/provider configured states; no fabricated provider data"
+        },
+        "denied": {
+          "status": "NOT_APPLICABLE",
+          "reason": "no authorization-denied state in local single-workspace fixture"
+        },
+        "savingSaved": {
+          "status": "NOT_APPLICABLE",
+          "authority": "local persistence acknowledgement only"
+        },
+        "conflict": {
+          "status": "NOT_APPLICABLE",
+          "reason": "no object-level conflict state"
+        }
+      },
+      "qualification": "State captures accepted v2 are comparators; current v3-specific state evidence is limited to listed current runs."
+    },
+    {
+      "surface": "settings",
+      "owner": "surface owner in src/features/settings",
+      "states": {
+        "idleOrPopulated": {
+          "status": "SUPPORTED",
+          "authority": "sample workspace canonical capture / current E2E"
+        },
+        "loading": {
+          "status": "SUPPORTED",
+          "reason": "real workspace/provider read or request state exists"
+        },
+        "emptyNoResults": {
+          "status": "UNPROVEN",
+          "authority": "existing empty workspace/no-results E2E only where applicable"
+        },
+        "error": {
+          "status": "SUPPORTED",
+          "authority": "validation/storage/provider-safe error fixtures where existing tests provide them"
+        },
+        "staleOfflinePartial": {
+          "status": "SUPPORTED",
+          "authority": "explicit source freshness/missing provenance/provider configured states; no fabricated provider data"
+        },
+        "denied": {
+          "status": "NOT_APPLICABLE",
+          "reason": "no authorization-denied state in local single-workspace fixture"
+        },
+        "savingSaved": {
+          "status": "NOT_APPLICABLE",
+          "authority": "local persistence acknowledgement only"
+        },
+        "conflict": {
+          "status": "SUPPORTED",
+          "reason": "cloud sync expected-hash conflict is modeled; cloud contract unavailable in this environment"
+        }
+      },
+      "qualification": "State captures accepted v2 are comparators; current v3-specific state evidence is limited to listed current runs."
+    },
+    {
+      "surface": "stock-entity-detail",
+      "owner": "StockLedgerApp route + detail component",
+      "states": {
+        "idleOrPopulated": {
+          "status": "SUPPORTED",
+          "authority": "sample workspace canonical capture / current E2E"
+        },
+        "loading": {
+          "status": "NOT_APPLICABLE",
+          "reason": "surface is synchronous local presentation or not backed by a load state"
+        },
+        "emptyNoResults": {
+          "status": "UNPROVEN",
+          "authority": "existing empty workspace/no-results E2E only where applicable"
+        },
+        "error": {
+          "status": "UNPROVEN",
+          "authority": "validation/storage/provider-safe error fixtures where existing tests provide them"
+        },
+        "staleOfflinePartial": {
+          "status": "SUPPORTED",
+          "authority": "explicit source freshness/missing provenance/provider configured states; no fabricated provider data"
+        },
+        "denied": {
+          "status": "NOT_APPLICABLE",
+          "reason": "no authorization-denied state in local single-workspace fixture"
+        },
+        "savingSaved": {
+          "status": "NOT_APPLICABLE",
+          "authority": "local persistence acknowledgement only"
+        },
+        "conflict": {
+          "status": "NOT_APPLICABLE",
+          "reason": "no object-level conflict state"
+        }
+      },
+      "qualification": "State captures accepted v2 are comparators; current v3-specific state evidence is limited to listed current runs."
+    },
+    {
+      "surface": "metric-detail-sheet",
+      "owner": "StockLedgerApp route + detail component",
+      "states": {
+        "idleOrPopulated": {
+          "status": "SUPPORTED",
+          "authority": "sample workspace canonical capture / current E2E"
+        },
+        "loading": {
+          "status": "NOT_APPLICABLE",
+          "reason": "surface is synchronous local presentation or not backed by a load state"
+        },
+        "emptyNoResults": {
+          "status": "UNPROVEN",
+          "authority": "existing empty workspace/no-results E2E only where applicable"
+        },
+        "error": {
+          "status": "UNPROVEN",
+          "authority": "validation/storage/provider-safe error fixtures where existing tests provide them"
+        },
+        "staleOfflinePartial": {
+          "status": "SUPPORTED",
+          "authority": "explicit source freshness/missing provenance/provider configured states; no fabricated provider data"
+        },
+        "denied": {
+          "status": "NOT_APPLICABLE",
+          "reason": "no authorization-denied state in local single-workspace fixture"
+        },
+        "savingSaved": {
+          "status": "NOT_APPLICABLE",
+          "authority": "local persistence acknowledgement only"
+        },
+        "conflict": {
+          "status": "NOT_APPLICABLE",
+          "reason": "no object-level conflict state"
+        }
+      },
+      "qualification": "State captures accepted v2 are comparators; current v3-specific state evidence is limited to listed current runs."
+    },
+    {
+      "surface": "eye-flows",
+      "owner": "StockLedgerApp route + detail component",
+      "states": {
+        "idleOrPopulated": {
+          "status": "SUPPORTED",
+          "authority": "sample workspace canonical capture / current E2E"
+        },
+        "loading": {
+          "status": "NOT_APPLICABLE",
+          "reason": "surface is synchronous local presentation or not backed by a load state"
+        },
+        "emptyNoResults": {
+          "status": "UNPROVEN",
+          "authority": "existing empty workspace/no-results E2E only where applicable"
+        },
+        "error": {
+          "status": "UNPROVEN",
+          "authority": "validation/storage/provider-safe error fixtures where existing tests provide them"
+        },
+        "staleOfflinePartial": {
+          "status": "UNPROVEN",
+          "authority": "explicit source freshness/missing provenance/provider configured states; no fabricated provider data"
+        },
+        "denied": {
+          "status": "NOT_APPLICABLE",
+          "reason": "no authorization-denied state in local single-workspace fixture"
+        },
+        "savingSaved": {
+          "status": "NOT_APPLICABLE",
+          "authority": "local persistence acknowledgement only"
+        },
+        "conflict": {
+          "status": "NOT_APPLICABLE",
+          "reason": "no object-level conflict state"
+        }
+      },
+      "qualification": "State captures accepted v2 are comparators; current v3-specific state evidence is limited to listed current runs."
+    },
+    {
+      "surface": "eye-detail",
+      "owner": "StockLedgerApp route + detail component",
+      "states": {
+        "idleOrPopulated": {
+          "status": "SUPPORTED",
+          "authority": "sample workspace canonical capture / current E2E"
+        },
+        "loading": {
+          "status": "NOT_APPLICABLE",
+          "reason": "surface is synchronous local presentation or not backed by a load state"
+        },
+        "emptyNoResults": {
+          "status": "UNPROVEN",
+          "authority": "existing empty workspace/no-results E2E only where applicable"
+        },
+        "error": {
+          "status": "UNPROVEN",
+          "authority": "validation/storage/provider-safe error fixtures where existing tests provide them"
+        },
+        "staleOfflinePartial": {
+          "status": "UNPROVEN",
+          "authority": "explicit source freshness/missing provenance/provider configured states; no fabricated provider data"
+        },
+        "denied": {
+          "status": "NOT_APPLICABLE",
+          "reason": "no authorization-denied state in local single-workspace fixture"
+        },
+        "savingSaved": {
+          "status": "NOT_APPLICABLE",
+          "authority": "local persistence acknowledgement only"
+        },
+        "conflict": {
+          "status": "NOT_APPLICABLE",
+          "reason": "no object-level conflict state"
+        }
+      },
+      "qualification": "State captures accepted v2 are comparators; current v3-specific state evidence is limited to listed current runs."
+    },
+    {
+      "surface": "scanner-review",
+      "owner": "StockLedgerApp route + detail component",
+      "states": {
+        "idleOrPopulated": {
+          "status": "SUPPORTED",
+          "authority": "sample workspace canonical capture / current E2E"
+        },
+        "loading": {
+          "status": "NOT_APPLICABLE",
+          "reason": "surface is synchronous local presentation or not backed by a load state"
+        },
+        "emptyNoResults": {
+          "status": "UNPROVEN",
+          "authority": "existing empty workspace/no-results E2E only where applicable"
+        },
+        "error": {
+          "status": "SUPPORTED",
+          "authority": "validation/storage/provider-safe error fixtures where existing tests provide them"
+        },
+        "staleOfflinePartial": {
+          "status": "SUPPORTED",
+          "authority": "explicit source freshness/missing provenance/provider configured states; no fabricated provider data"
+        },
+        "denied": {
+          "status": "NOT_APPLICABLE",
+          "reason": "no authorization-denied state in local single-workspace fixture"
+        },
+        "savingSaved": {
+          "status": "NOT_APPLICABLE",
+          "authority": "local persistence acknowledgement only"
+        },
+        "conflict": {
+          "status": "NOT_APPLICABLE",
+          "reason": "no object-level conflict state"
+        }
+      },
+      "qualification": "State captures accepted v2 are comparators; current v3-specific state evidence is limited to listed current runs."
+    },
+    {
+      "surface": "decision-detail",
+      "owner": "StockLedgerApp route + detail component",
+      "states": {
+        "idleOrPopulated": {
+          "status": "SUPPORTED",
+          "authority": "sample workspace canonical capture / current E2E"
+        },
+        "loading": {
+          "status": "NOT_APPLICABLE",
+          "reason": "surface is synchronous local presentation or not backed by a load state"
+        },
+        "emptyNoResults": {
+          "status": "UNPROVEN",
+          "authority": "existing empty workspace/no-results E2E only where applicable"
+        },
+        "error": {
+          "status": "UNPROVEN",
+          "authority": "validation/storage/provider-safe error fixtures where existing tests provide them"
+        },
+        "staleOfflinePartial": {
+          "status": "UNPROVEN",
+          "authority": "explicit source freshness/missing provenance/provider configured states; no fabricated provider data"
+        },
+        "denied": {
+          "status": "NOT_APPLICABLE",
+          "reason": "no authorization-denied state in local single-workspace fixture"
+        },
+        "savingSaved": {
+          "status": "NOT_APPLICABLE",
+          "authority": "local persistence acknowledgement only"
+        },
+        "conflict": {
+          "status": "NOT_APPLICABLE",
+          "reason": "no object-level conflict state"
+        }
+      },
+      "qualification": "State captures accepted v2 are comparators; current v3-specific state evidence is limited to listed current runs."
+    },
+    {
+      "surface": "eye-composer",
+      "owner": "corresponding composer/config component",
+      "states": {
+        "idleOrPopulated": {
+          "status": "SUPPORTED",
+          "authority": "sample workspace canonical capture / current E2E"
+        },
+        "loading": {
+          "status": "NOT_APPLICABLE",
+          "reason": "surface is synchronous local presentation or not backed by a load state"
+        },
+        "emptyNoResults": {
+          "status": "UNPROVEN",
+          "authority": "existing empty workspace/no-results E2E only where applicable"
+        },
+        "error": {
+          "status": "SUPPORTED",
+          "authority": "validation/storage/provider-safe error fixtures where existing tests provide them"
+        },
+        "staleOfflinePartial": {
+          "status": "UNPROVEN",
+          "authority": "explicit source freshness/missing provenance/provider configured states; no fabricated provider data"
+        },
+        "denied": {
+          "status": "NOT_APPLICABLE",
+          "reason": "no authorization-denied state in local single-workspace fixture"
+        },
+        "savingSaved": {
+          "status": "SUPPORTED",
+          "authority": "local persistence acknowledgement only"
+        },
+        "conflict": {
+          "status": "NOT_APPLICABLE",
+          "reason": "no object-level conflict state"
+        }
+      },
+      "qualification": "State captures accepted v2 are comparators; current v3-specific state evidence is limited to listed current runs."
+    },
+    {
+      "surface": "journal-composer",
+      "owner": "corresponding composer/config component",
+      "states": {
+        "idleOrPopulated": {
+          "status": "SUPPORTED",
+          "authority": "sample workspace canonical capture / current E2E"
+        },
+        "loading": {
+          "status": "NOT_APPLICABLE",
+          "reason": "surface is synchronous local presentation or not backed by a load state"
+        },
+        "emptyNoResults": {
+          "status": "UNPROVEN",
+          "authority": "existing empty workspace/no-results E2E only where applicable"
+        },
+        "error": {
+          "status": "SUPPORTED",
+          "authority": "validation/storage/provider-safe error fixtures where existing tests provide them"
+        },
+        "staleOfflinePartial": {
+          "status": "UNPROVEN",
+          "authority": "explicit source freshness/missing provenance/provider configured states; no fabricated provider data"
+        },
+        "denied": {
+          "status": "NOT_APPLICABLE",
+          "reason": "no authorization-denied state in local single-workspace fixture"
+        },
+        "savingSaved": {
+          "status": "SUPPORTED",
+          "authority": "local persistence acknowledgement only"
+        },
+        "conflict": {
+          "status": "NOT_APPLICABLE",
+          "reason": "no object-level conflict state"
+        }
+      },
+      "qualification": "State captures accepted v2 are comparators; current v3-specific state evidence is limited to listed current runs."
+    },
+    {
+      "surface": "recipe-builder",
+      "owner": "corresponding composer/config component",
+      "states": {
+        "idleOrPopulated": {
+          "status": "SUPPORTED",
+          "authority": "sample workspace canonical capture / current E2E"
+        },
+        "loading": {
+          "status": "NOT_APPLICABLE",
+          "reason": "surface is synchronous local presentation or not backed by a load state"
+        },
+        "emptyNoResults": {
+          "status": "UNPROVEN",
+          "authority": "existing empty workspace/no-results E2E only where applicable"
+        },
+        "error": {
+          "status": "SUPPORTED",
+          "authority": "validation/storage/provider-safe error fixtures where existing tests provide them"
+        },
+        "staleOfflinePartial": {
+          "status": "UNPROVEN",
+          "authority": "explicit source freshness/missing provenance/provider configured states; no fabricated provider data"
+        },
+        "denied": {
+          "status": "NOT_APPLICABLE",
+          "reason": "no authorization-denied state in local single-workspace fixture"
+        },
+        "savingSaved": {
+          "status": "SUPPORTED",
+          "authority": "local persistence acknowledgement only"
+        },
+        "conflict": {
+          "status": "NOT_APPLICABLE",
+          "reason": "no object-level conflict state"
+        }
+      },
+      "qualification": "State captures accepted v2 are comparators; current v3-specific state evidence is limited to listed current runs."
+    },
+    {
+      "surface": "logic-registry",
+      "owner": "corresponding composer/config component",
+      "states": {
+        "idleOrPopulated": {
+          "status": "SUPPORTED",
+          "authority": "sample workspace canonical capture / current E2E"
+        },
+        "loading": {
+          "status": "NOT_APPLICABLE",
+          "reason": "surface is synchronous local presentation or not backed by a load state"
+        },
+        "emptyNoResults": {
+          "status": "UNPROVEN",
+          "authority": "existing empty workspace/no-results E2E only where applicable"
+        },
+        "error": {
+          "status": "UNPROVEN",
+          "authority": "validation/storage/provider-safe error fixtures where existing tests provide them"
+        },
+        "staleOfflinePartial": {
+          "status": "UNPROVEN",
+          "authority": "explicit source freshness/missing provenance/provider configured states; no fabricated provider data"
+        },
+        "denied": {
+          "status": "NOT_APPLICABLE",
+          "reason": "no authorization-denied state in local single-workspace fixture"
+        },
+        "savingSaved": {
+          "status": "NOT_APPLICABLE",
+          "authority": "local persistence acknowledgement only"
+        },
+        "conflict": {
+          "status": "NOT_APPLICABLE",
+          "reason": "no object-level conflict state"
+        }
+      },
+      "qualification": "State captures accepted v2 are comparators; current v3-specific state evidence is limited to listed current runs."
+    },
+    {
+      "surface": "notification-confirmation",
+      "owner": "corresponding composer/config component",
+      "states": {
+        "idleOrPopulated": {
+          "status": "SUPPORTED",
+          "authority": "sample workspace canonical capture / current E2E"
+        },
+        "loading": {
+          "status": "NOT_APPLICABLE",
+          "reason": "surface is synchronous local presentation or not backed by a load state"
+        },
+        "emptyNoResults": {
+          "status": "UNPROVEN",
+          "authority": "existing empty workspace/no-results E2E only where applicable"
+        },
+        "error": {
+          "status": "SUPPORTED",
+          "authority": "validation/storage/provider-safe error fixtures where existing tests provide them"
+        },
+        "staleOfflinePartial": {
+          "status": "UNPROVEN",
+          "authority": "explicit source freshness/missing provenance/provider configured states; no fabricated provider data"
+        },
+        "denied": {
+          "status": "NOT_APPLICABLE",
+          "reason": "no authorization-denied state in local single-workspace fixture"
+        },
+        "savingSaved": {
+          "status": "SUPPORTED",
+          "authority": "local persistence acknowledgement only"
+        },
+        "conflict": {
+          "status": "NOT_APPLICABLE",
+          "reason": "no object-level conflict state"
+        }
+      },
+      "qualification": "State captures accepted v2 are comparators; current v3-specific state evidence is limited to listed current runs."
+    }
+  ],
+  "globalAuthorities": {
+    "sampleData": "mock prices and outcomes are explicitly labeled",
+    "provider": "local unconfigured/configured status is distinct from worker delivery",
+    "errors": "validation and persistence failure preserve prior record truth where existing tests cover them",
+    "unavailable": "production denied/offline/provider/scheduler states are not fabricated; unavailable environment is UNPROVEN"
+  },
+  "unknownStates": [
+    "real user-owned production dataset variations",
+    "authorization denial",
+    "native offline behavior",
+    "production provider delivery",
+    "device conflict/recovery states outside local synthetic drill"
+  ]
+}

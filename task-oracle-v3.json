@@ -1,0 +1,224 @@
+{
+  "candidate": "ed377bb173387ebf56a4919ac4282d136c56e21d",
+  "tree": "dc99438cdcf8e2f737e5de87d6afc550d4008f24",
+  "taskCount": 13,
+  "result": "FAIL",
+  "oracles": [
+    {
+      "id": "today-why-now",
+      "precondition": "Sample or populated workspace with review queue.",
+      "goal": "Inspect why a stock merits attention, then deliberately continue or dismiss.",
+      "supportedRealInput": "Open the first review row; inspect Why now, risk, and freshness; optionally choose Record review.",
+      "visibleOutcome": "Review panel labels evidence/freshness and offers explicit next action.",
+      "semanticOutcome": "Opening detail is read-only; a review decision occurs only after deliberate save.",
+      "correctRecordOrObjectEffect": "Only selected review/decision object may change after acknowledgement.",
+      "prohibitedEffects": "No order, provider delivery, or outcome claim.",
+      "recoveryAndRepeatPath": "Done/Escape returns to same row; open it again.",
+      "nextLegitimateAction": "Record a review or continue another item.",
+      "status": "PARTIAL",
+      "evidence": "200% screenshot and r11 Today task; action geometry below initial viewport at stress profiles."
+    },
+    {
+      "id": "watchlist-stock-metric-return",
+      "precondition": "Sample workspace and a selected stock.",
+      "goal": "Inspect a stock and a metric, then return to exact stock context.",
+      "supportedRealInput": "Search/select AAPL; activate Evidence detail; Escape/Done.",
+      "visibleOutcome": "Stock detail and metric sheet show source/freshness/missing data and selected ticker.",
+      "semanticOutcome": "Read-only drilldown; exact same stock remains selected on close.",
+      "correctRecordOrObjectEffect": "No record mutation.",
+      "prohibitedEffects": "No live price or financial truth inferred from mock data.",
+      "recoveryAndRepeatPath": "Close detail and reopen same metric.",
+      "nextLegitimateAction": "Inspect an evidence-backed review or register an Eye.",
+      "status": "PASS_AT_STANDARD_PROFILE_ZOOM_UNPROVEN",
+      "evidence": "CHG-172/184 E2E task path; 200% sequence stopped after a locator detached during AAPL option selection; no product-fault inference from harness retry."
+    },
+    {
+      "id": "recipes-logic-scanner",
+      "precondition": "Sample workspace with recipe and scanner evidence.",
+      "goal": "Review recipe purpose, supported logic, and scanner evidence.",
+      "supportedRealInput": "Select set/rule; open detail/registry/scanner review.",
+      "visibleOutcome": "Version, purpose, source coverage, status, and limitations are visible.",
+      "semanticOutcome": "Read-only until user saves a recipe version or review log.",
+      "correctRecordOrObjectEffect": "Only explicit recipe version or scanner review log after save.",
+      "prohibitedEffects": "No opportunity certainty from missing/stale/partial evidence; no trading effect.",
+      "recoveryAndRepeatPath": "Close detail/help, reopen row, retry with explicit reason.",
+      "nextLegitimateAction": "Inspect a supported rule or record a deliberate review.",
+      "status": "PARTIAL",
+      "evidence": "Existing CHG-172/184/199 tests; current mobile 360 open-set action bottom y866 is outside initial 800px viewport."
+    },
+    {
+      "id": "eyes-flow-detail-reviewed",
+      "precondition": "Sample Eyes with review-needed row.",
+      "goal": "Open a flow, inspect an Eye, optionally mark reviewed or edit/journal.",
+      "supportedRealInput": "Select Review Eyes; open one row; choose Mark Reviewed/Edit/Journal.",
+      "visibleOutcome": "Selected stock, recipe, status, thesis and next action stay paired.",
+      "semanticOutcome": "Read-only open; mark reviewed/effect occurs on explicit action acknowledgement.",
+      "correctRecordOrObjectEffect": "Only selected Eye review timestamp/state or explicitly saved edit/journal.",
+      "prohibitedEffects": "No provider action, trading execution, or fabricated review result.",
+      "recoveryAndRepeatPath": "Close to same row; reopen.",
+      "nextLegitimateAction": "Review another Eye or record a journal entry.",
+      "status": "PASS_AT_STANDARD_PROFILE_GEOMETRY_STRESS_FAIL",
+      "evidence": "CHG-184 deep flows; scroll stress records nav outside viewport while task controls remain scroll reachable."
+    },
+    {
+      "id": "journal-detail-amend-history",
+      "precondition": "Journal entry exists.",
+      "goal": "Inspect a decision, amend it, and review history.",
+      "supportedRealInput": "Open decision evidence; choose Edit; change text; Save; open previous versions.",
+      "visibleOutcome": "Detail shows original context, updated record and amendment history.",
+      "semanticOutcome": "Only saved user decision text/history changes after repository acknowledgement.",
+      "correctRecordOrObjectEffect": "No inference of investment return or execution.",
+      "prohibitedEffects": "Cancel/Escape; reopen saved record and compare history.",
+      "recoveryAndRepeatPath": "Continue reviewing the saved decision.",
+      "nextLegitimateAction": "PASS_AT_STANDARD_PROFILE",
+      "status": "CHG-199 authoring tests on exact same source tree and CHG-172 task coverage."
+    },
+    {
+      "id": "eye-composer-create-edit-cancel",
+      "precondition": "Sample stock and active recipe.",
+      "goal": "Validate, create, edit, and cancel an Eye.",
+      "supportedRealInput": "Open Register Eye; submit missing fields; choose stock/recipe; enter thesis; save; edit; cancel/Escape.",
+      "visibleOutcome": "Errors point to current field and preserve entered work; saved detail reflects text.",
+      "semanticOutcome": "Save closes only after local repository acknowledgement.",
+      "correctRecordOrObjectEffect": "No brokerage or provider outcome.",
+      "prohibitedEffects": "Cancel preserves prior count; reopen saved record; Escape edit returns to detail.",
+      "recoveryAndRepeatPath": "Review the created Eye or attach a Journal entry.",
+      "nextLegitimateAction": "PASS_AT_STANDARD_PROFILE_ZOOM_UNPROVEN",
+      "status": "CHG-199/AR-68 exact-tree tests; 200% capture reached Today/Recipe/Journal/Notification but Eye path was not reached after earlier stock locator detached."
+    },
+    {
+      "id": "journal-composer-save-amend",
+      "precondition": "Existing Eye for journal context.",
+      "goal": "Progressively validate required selections, save, amend, and inspect history.",
+      "supportedRealInput": "Open New; attempt save; choose Eye/action/thesis/timing; fill note; save; edit.",
+      "visibleOutcome": "Required correction updates step by step; detail and history show committed values.",
+      "semanticOutcome": "Only user-authored decision/amendment persists after ack.",
+      "correctRecordOrObjectEffect": "No result/outcome or market execution.",
+      "prohibitedEffects": "Cancel/Escape retains prior record count; reopen existing entry.",
+      "recoveryAndRepeatPath": "Review history or next open decision.",
+      "nextLegitimateAction": "PASS_AT_STANDARD_PROFILE_ZOOM_UNPROVEN",
+      "status": "CHG-199 authoring tests; 200% required-error capture reached."
+    },
+    {
+      "id": "recipe-builder-version-save",
+      "precondition": "Recipe catalog and supported condition source.",
+      "goal": "Validate by step, add supported condition, review final state, save a version.",
+      "supportedRealInput": "New Recipe; complete purpose; select supported condition; set cadence/cooldown; review; save.",
+      "visibleOutcome": "Step-specific validation, selected condition meaning, final review/version are visible.",
+      "semanticOutcome": "Only recipe definition/version changes after save acknowledgement.",
+      "correctRecordOrObjectEffect": "No claim of alert execution or performance outcome.",
+      "prohibitedEffects": "Back/Cancel preserves existing version; reopen detail/history.",
+      "recoveryAndRepeatPath": "Review the saved version and downstream declared coverage.",
+      "nextLegitimateAction": "PASS_AT_STANDARD_PROFILE_ZOOM_UNPROVEN",
+      "status": "CHG-199 accepted exact-tree task tests; current 200% builder screenshot captured."
+    },
+    {
+      "id": "logic-registry-help",
+      "precondition": "Recipe/logic view available.",
+      "goal": "Inspect raw field ID, meaning, source, coverage, downstream use, help, close.",
+      "supportedRealInput": "Open raw data registry; select field; open/close Help; close registry.",
+      "visibleOutcome": "Raw source, processing feature, coverage, and limitations are textual and distinct.",
+      "semanticOutcome": "Read-only.",
+      "correctRecordOrObjectEffect": "No claim that raw source is live or complete.",
+      "prohibitedEffects": "Close help then registry; focus returns to eligible invoker or fallback.",
+      "recoveryAndRepeatPath": "Return to recipe review.",
+      "nextLegitimateAction": "PASS_AT_STANDARD_PROFILE_ZOOM_UNPROVEN",
+      "status": "CHG-199 E2E and c16 exact-tree states; 200% registry path was not completed after earlier sequence invalidation."
+    },
+    {
+      "id": "notification-confirmation-local-preference",
+      "precondition": "Notification option present; local state is available.",
+      "goal": "Cancel/no-op, observe pending, safe failure/retry, then persist disable.",
+      "supportedRealInput": "Open settings; enable locally if needed; opt out; cancel or confirm; retry after injected storage fault.",
+      "visibleOutcome": "Dialog distinguishes saved preference and worker handoff; pending/safe error visible.",
+      "semanticOutcome": "Only local preference changes after repository acknowledgement; worker/provider delivery remains separate.",
+      "correctRecordOrObjectEffect": "No claim of send cancellation or delivery receipt unless worker evidence says so.",
+      "prohibitedEffects": "Cancel preserves setting; retry after failure; confirm success closes only after local save.",
+      "recoveryAndRepeatPath": "Review local preference status and external handoff status separately.",
+      "nextLegitimateAction": "PASS_AT_STANDARD_PROFILE_ZOOM_ZOOM_CANCEL_UNPROVEN",
+      "status": "CHG-199 existing success/failure tests and 200% confirmation screenshot; 200% cancellation status capture remains incomplete."
+    },
+    {
+      "id": "stale-ack-a-to-b-to-a-negative-control",
+      "precondition": "Async scanner/market refresh source path exists; controlled workspace fixture required.",
+      "goal": "Prove late result for context A cannot mutate newer A after A→B→A.",
+      "supportedRealInput": "Defer result, save newer operation, switch A→B→A, release stale result.",
+      "visibleOutcome": "Current-object identity and pending/saved/error state remain correct.",
+      "semanticOutcome": "Only result owned by current workspace generation/operation may publish.",
+      "correctRecordOrObjectEffect": "No stale scan/snapshot overwrite in a different current context.",
+      "prohibitedEffects": "Repeat with reversed completion order.",
+      "recoveryAndRepeatPath": "Continue only after fresh current-context evidence.",
+      "nextLegitimateAction": "UNPROVEN",
+      "status": "No executable adversarial control in current fixture; source ownership sinks documented in relationship-closure.json."
+    },
+    {
+      "id": "rapid-duplicate-and-internal-exception-negative-controls",
+      "precondition": "Consequential save and injected repository failure fixture.",
+      "goal": "Demonstrate duplicate action cannot duplicate effect and exception preserves prior truth.",
+      "supportedRealInput": "Rapidly activate save twice; then inject failure in separate run.",
+      "visibleOutcome": "Single pending state; safe error preserves entered work and old saved record.",
+      "semanticOutcome": "One committed effect maximum; failed commit publishes no new state.",
+      "correctRecordOrObjectEffect": "No duplicate Eye/Journal/Recipe or preference effect.",
+      "prohibitedEffects": "No fabricated saved success.",
+      "recoveryAndRepeatPath": "Retry once after failure; verify one record.",
+      "nextLegitimateAction": "Proceed to next legitimate task after acknowledged save.",
+      "status": "PARTIAL",
+      "evidence": "Existing loading/disabled save guards and notification safe-failure retry tests; broad duplicate/error injector matrix not run for every consequential task."
+    },
+    {
+      "id": "evidence-negative-control",
+      "precondition": "Sample data with missing/stale/partial inputs.",
+      "goal": "Verify limitations never become confident opportunity claims.",
+      "supportedRealInput": "Open scanner/evidence review; inspect source coverage, stale/missing fields; submit explicit review reason.",
+      "visibleOutcome": "Missing/stale/provider-unavailable labels stay explicit.",
+      "semanticOutcome": "Review log reflects user decision only.",
+      "correctRecordOrObjectEffect": "No generated success/outcome from incomplete evidence.",
+      "prohibitedEffects": "Retry with fresh source data or leave unresolved.",
+      "recoveryAndRepeatPath": "Return to evidence collection.",
+      "nextLegitimateAction": "PASS_AT_STANDARD_PROFILE",
+      "status": "CHG-184 scanner review path; exact-source test surfaced provider-limited signals and explicit manual reason; geometry assertion then failed."
+    }
+  ],
+  "negativeControls": [
+    {
+      "id": "hidden-semantic-invoker",
+      "status": "FAIL_DEMONSTRATED",
+      "evidence": "pw-focus-negative-ancestor test: assertion expected focus outside aria-hidden ancestor; got true"
+    },
+    {
+      "id": "stale-ack-newer-save",
+      "status": "UNPROVEN",
+      "reason": "not run"
+    },
+    {
+      "id": "context-A-B-A",
+      "status": "UNPROVEN",
+      "reason": "not run"
+    },
+    {
+      "id": "nested-reopen",
+      "status": "PARTIAL",
+      "reason": "registry help/notification confirmation open-close coverage exists; repeated reopen stress not independently isolated"
+    },
+    {
+      "id": "rapid-duplicate-consequential-input",
+      "status": "PARTIAL",
+      "reason": "button saving guards and selected tests; no full task matrix control"
+    },
+    {
+      "id": "injected-internal-exception-preserves-truth",
+      "status": "PARTIAL",
+      "reason": "notification persistence failure/retry tested; not every repository/task sink"
+    },
+    {
+      "id": "missing-stale-partial-evidence",
+      "status": "PASS",
+      "evidence": "scanner/evidence tests retain limitations and manual review requirement"
+    },
+    {
+      "id": "invalid-required-preserves-draft-and-correction",
+      "status": "PASS_AT_STANDARD_PROFILE",
+      "evidence": "Eye/Journal/Recipe authoring E2E"
+    }
+  ]
+}

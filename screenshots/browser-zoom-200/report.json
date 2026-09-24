@@ -1,0 +1,826 @@
+{
+  "candidate": "ed377bb173387ebf56a4919ac4282d136c56e21d",
+  "browser": "Google Chrome, native default zoom setting",
+  "zoom": {
+    "zoom": 2,
+    "error": null
+  },
+  "observations": [
+    {
+      "name": "01-today",
+      "innerWidth": 720,
+      "innerHeight": 450,
+      "devicePixelRatio": 2,
+      "visualViewport": {
+        "width": 720,
+        "height": 450,
+        "scale": 1
+      },
+      "documentWidth": 720,
+      "documentHeight": 3195,
+      "horizontalOverflow": false,
+      "scrollY": 106,
+      "visibleControls": 17,
+      "controlsFullyInViewport": 4,
+      "dialog": null,
+      "headings": [
+        "Today",
+        "Today",
+        "Needs review",
+        "AMD",
+        "COIN",
+        "INTC",
+        "META",
+        "MSFT",
+        "MU",
+        "Research summary"
+      ],
+      "screenshot": "01-today.png"
+    },
+    {
+      "name": "02-today-review-dialog",
+      "innerWidth": 720,
+      "innerHeight": 450,
+      "devicePixelRatio": 2,
+      "visualViewport": {
+        "width": 720,
+        "height": 450,
+        "scale": 1
+      },
+      "documentWidth": 720,
+      "documentHeight": 3195,
+      "horizontalOverflow": false,
+      "scrollY": 717.5,
+      "visibleControls": 21,
+      "controlsFullyInViewport": 3,
+      "dialog": {
+        "scrollHeight": 450,
+        "clientHeight": 450,
+        "overflowY": "visible",
+        "rect": {
+          "top": 0,
+          "bottom": 450,
+          "left": 0,
+          "right": 720
+        }
+      },
+      "headings": [
+        "Today",
+        "Today",
+        "Needs review",
+        "AMD",
+        "COIN",
+        "INTC",
+        "META",
+        "MSFT",
+        "MU",
+        "Research summary"
+      ],
+      "screenshot": "02-today-review-dialog.png"
+    },
+    {
+      "name": "03-watchlist",
+      "innerWidth": 720,
+      "innerHeight": 450,
+      "devicePixelRatio": 2,
+      "visualViewport": {
+        "width": 720,
+        "height": 450,
+        "scale": 1
+      },
+      "documentWidth": 720,
+      "documentHeight": 1689,
+      "horizontalOverflow": false,
+      "scrollY": 0,
+      "visibleControls": 29,
+      "controlsFullyInViewport": 6,
+      "dialog": null,
+      "headings": [
+        "Watchlist",
+        "Watchlist",
+        "Search or resume a stock",
+        "Choose a stock to review"
+      ],
+      "screenshot": "03-watchlist.png"
+    },
+    {
+      "name": "04-stock-detail-error",
+      "innerWidth": 720,
+      "innerHeight": 450,
+      "devicePixelRatio": 2,
+      "visualViewport": {
+        "width": 720,
+        "height": 450,
+        "scale": 1
+      },
+      "documentWidth": 720,
+      "documentHeight": 776,
+      "horizontalOverflow": false,
+      "scrollY": 164,
+      "visibleControls": 10,
+      "controlsFullyInViewport": 5,
+      "dialog": null,
+      "headings": [
+        "Watchlist",
+        "Watchlist",
+        "Search or resume a stock",
+        "Choose a stock to review"
+      ],
+      "screenshot": "04-stock-detail-error.png"
+    },
+    {
+      "name": "05-metric-detail-error",
+      "innerWidth": 720,
+      "innerHeight": 450,
+      "devicePixelRatio": 2,
+      "visualViewport": {
+        "width": 720,
+        "height": 450,
+        "scale": 1
+      },
+      "documentWidth": 720,
+      "documentHeight": 776,
+      "horizontalOverflow": false,
+      "scrollY": 164,
+      "visibleControls": 10,
+      "controlsFullyInViewport": 5,
+      "dialog": null,
+      "headings": [
+        "Watchlist",
+        "Watchlist",
+        "Search or resume a stock",
+        "Choose a stock to review"
+      ],
+      "screenshot": "05-metric-detail-error.png"
+    },
+    {
+      "name": "06-eye-composer-error",
+      "innerWidth": 720,
+      "innerHeight": 450,
+      "devicePixelRatio": 2,
+      "visualViewport": {
+        "width": 720,
+        "height": 450,
+        "scale": 1
+      },
+      "documentWidth": 720,
+      "documentHeight": 776,
+      "horizontalOverflow": false,
+      "scrollY": 164,
+      "visibleControls": 10,
+      "controlsFullyInViewport": 5,
+      "dialog": null,
+      "headings": [
+        "Watchlist",
+        "Watchlist",
+        "Search or resume a stock",
+        "Choose a stock to review"
+      ],
+      "screenshot": "06-eye-composer-error.png"
+    },
+    {
+      "name": "07-eye-invalid-required-error",
+      "innerWidth": 720,
+      "innerHeight": 450,
+      "devicePixelRatio": 2,
+      "visualViewport": {
+        "width": 720,
+        "height": 450,
+        "scale": 1
+      },
+      "documentWidth": 720,
+      "documentHeight": 776,
+      "horizontalOverflow": false,
+      "scrollY": 164,
+      "visibleControls": 10,
+      "controlsFullyInViewport": 5,
+      "dialog": null,
+      "headings": [
+        "Watchlist",
+        "Watchlist",
+        "Search or resume a stock",
+        "Choose a stock to review"
+      ],
+      "screenshot": "07-eye-invalid-required-error.png"
+    },
+    {
+      "name": "08-eye-cancel-error",
+      "innerWidth": 720,
+      "innerHeight": 450,
+      "devicePixelRatio": 2,
+      "visualViewport": {
+        "width": 720,
+        "height": 450,
+        "scale": 1
+      },
+      "documentWidth": 720,
+      "documentHeight": 776,
+      "horizontalOverflow": false,
+      "scrollY": 164,
+      "visibleControls": 10,
+      "controlsFullyInViewport": 5,
+      "dialog": null,
+      "headings": [
+        "Watchlist",
+        "Watchlist",
+        "Search or resume a stock",
+        "Choose a stock to review"
+      ],
+      "screenshot": "08-eye-cancel-error.png"
+    },
+    {
+      "name": "09-recipes",
+      "innerWidth": 720,
+      "innerHeight": 450,
+      "devicePixelRatio": 2,
+      "visualViewport": {
+        "width": 720,
+        "height": 450,
+        "scale": 1
+      },
+      "documentWidth": 720,
+      "documentHeight": 1850,
+      "horizontalOverflow": false,
+      "scrollY": 0,
+      "visibleControls": 17,
+      "controlsFullyInViewport": 6,
+      "dialog": null,
+      "headings": [
+        "Recipes",
+        "Set · L2",
+        "Monitoring sets",
+        "Temporary Bargain Sale",
+        "Leader Pullback",
+        "Reset Recovery",
+        "Thesis Risk Monitor",
+        "Scanner state",
+        "0",
+        "0"
+      ],
+      "screenshot": "09-recipes.png"
+    },
+    {
+      "name": "10-recipe-builder",
+      "innerWidth": 720,
+      "innerHeight": 450,
+      "devicePixelRatio": 2,
+      "visualViewport": {
+        "width": 720,
+        "height": 450,
+        "scale": 1
+      },
+      "documentWidth": 720,
+      "documentHeight": 1850,
+      "horizontalOverflow": false,
+      "scrollY": 415.5,
+      "visibleControls": 22,
+      "controlsFullyInViewport": 5,
+      "dialog": {
+        "scrollHeight": 450,
+        "clientHeight": 450,
+        "overflowY": "visible",
+        "rect": {
+          "top": 0,
+          "bottom": 450,
+          "left": 0,
+          "right": 720
+        }
+      },
+      "headings": [
+        "Recipes",
+        "Set · L2",
+        "Monitoring sets",
+        "Temporary Bargain Sale",
+        "Leader Pullback",
+        "Reset Recovery",
+        "Thesis Risk Monitor",
+        "Scanner state",
+        "0",
+        "0"
+      ],
+      "screenshot": "10-recipe-builder.png"
+    },
+    {
+      "name": "11-builder-cancel",
+      "innerWidth": 720,
+      "innerHeight": 450,
+      "devicePixelRatio": 2,
+      "visualViewport": {
+        "width": 720,
+        "height": 450,
+        "scale": 1
+      },
+      "documentWidth": 720,
+      "documentHeight": 1850,
+      "horizontalOverflow": false,
+      "scrollY": 415.5,
+      "visibleControls": 17,
+      "controlsFullyInViewport": 3,
+      "dialog": null,
+      "headings": [
+        "Recipes",
+        "Set · L2",
+        "Monitoring sets",
+        "Temporary Bargain Sale",
+        "Leader Pullback",
+        "Reset Recovery",
+        "Thesis Risk Monitor",
+        "Scanner state",
+        "0",
+        "0"
+      ],
+      "screenshot": "11-builder-cancel.png"
+    },
+    {
+      "name": "12-registry-error",
+      "innerWidth": 720,
+      "innerHeight": 450,
+      "devicePixelRatio": 2,
+      "visualViewport": {
+        "width": 720,
+        "height": 450,
+        "scale": 1
+      },
+      "documentWidth": 720,
+      "documentHeight": 1850,
+      "horizontalOverflow": false,
+      "scrollY": 415.5,
+      "visibleControls": 17,
+      "controlsFullyInViewport": 3,
+      "dialog": null,
+      "headings": [
+        "Recipes",
+        "Set · L2",
+        "Monitoring sets",
+        "Temporary Bargain Sale",
+        "Leader Pullback",
+        "Reset Recovery",
+        "Thesis Risk Monitor",
+        "Scanner state",
+        "0",
+        "0"
+      ],
+      "screenshot": "12-registry-error.png"
+    },
+    {
+      "name": "13-registry-help-error",
+      "innerWidth": 720,
+      "innerHeight": 450,
+      "devicePixelRatio": 2,
+      "visualViewport": {
+        "width": 720,
+        "height": 450,
+        "scale": 1
+      },
+      "documentWidth": 720,
+      "documentHeight": 1850,
+      "horizontalOverflow": false,
+      "scrollY": 415.5,
+      "visibleControls": 17,
+      "controlsFullyInViewport": 3,
+      "dialog": null,
+      "headings": [
+        "Recipes",
+        "Set · L2",
+        "Monitoring sets",
+        "Temporary Bargain Sale",
+        "Leader Pullback",
+        "Reset Recovery",
+        "Thesis Risk Monitor",
+        "Scanner state",
+        "0",
+        "0"
+      ],
+      "screenshot": "13-registry-help-error.png"
+    },
+    {
+      "name": "14-registry-close",
+      "innerWidth": 720,
+      "innerHeight": 450,
+      "devicePixelRatio": 2,
+      "visualViewport": {
+        "width": 720,
+        "height": 450,
+        "scale": 1
+      },
+      "documentWidth": 720,
+      "documentHeight": 1850,
+      "horizontalOverflow": false,
+      "scrollY": 415.5,
+      "visibleControls": 17,
+      "controlsFullyInViewport": 3,
+      "dialog": null,
+      "headings": [
+        "Recipes",
+        "Set · L2",
+        "Monitoring sets",
+        "Temporary Bargain Sale",
+        "Leader Pullback",
+        "Reset Recovery",
+        "Thesis Risk Monitor",
+        "Scanner state",
+        "0",
+        "0"
+      ],
+      "screenshot": "14-registry-close.png"
+    },
+    {
+      "name": "15-eyes-flow-error",
+      "innerWidth": 720,
+      "innerHeight": 450,
+      "devicePixelRatio": 2,
+      "visualViewport": {
+        "width": 720,
+        "height": 450,
+        "scale": 1
+      },
+      "documentWidth": 720,
+      "documentHeight": 1850,
+      "horizontalOverflow": false,
+      "scrollY": 415.5,
+      "visibleControls": 17,
+      "controlsFullyInViewport": 3,
+      "dialog": null,
+      "headings": [
+        "Recipes",
+        "Set · L2",
+        "Monitoring sets",
+        "Temporary Bargain Sale",
+        "Leader Pullback",
+        "Reset Recovery",
+        "Thesis Risk Monitor",
+        "Scanner state",
+        "0",
+        "0"
+      ],
+      "screenshot": "15-eyes-flow-error.png"
+    },
+    {
+      "name": "16-eye-detail-error",
+      "innerWidth": 720,
+      "innerHeight": 450,
+      "devicePixelRatio": 2,
+      "visualViewport": {
+        "width": 720,
+        "height": 450,
+        "scale": 1
+      },
+      "documentWidth": 720,
+      "documentHeight": 1850,
+      "horizontalOverflow": false,
+      "scrollY": 415.5,
+      "visibleControls": 17,
+      "controlsFullyInViewport": 3,
+      "dialog": null,
+      "headings": [
+        "Recipes",
+        "Set · L2",
+        "Monitoring sets",
+        "Temporary Bargain Sale",
+        "Leader Pullback",
+        "Reset Recovery",
+        "Thesis Risk Monitor",
+        "Scanner state",
+        "0",
+        "0"
+      ],
+      "screenshot": "16-eye-detail-error.png"
+    },
+    {
+      "name": "17-journal",
+      "innerWidth": 720,
+      "innerHeight": 450,
+      "devicePixelRatio": 2,
+      "visualViewport": {
+        "width": 720,
+        "height": 450,
+        "scale": 1
+      },
+      "documentWidth": 720,
+      "documentHeight": 4511,
+      "horizontalOverflow": false,
+      "scrollY": 0,
+      "visibleControls": 43,
+      "controlsFullyInViewport": 6,
+      "dialog": null,
+      "headings": [
+        "Journal",
+        "Journal",
+        "Decision history",
+        "Rejected · COIN · Reset Recovery",
+        "Revised · MSFT · Thesis Risk Monitor",
+        "Skipped · TSLA · Reset Recovery",
+        "Revised · META · Leader Pullback",
+        "Rejected · INTC · Reset Recovery",
+        "Revised · NVDA · Leader Pullback",
+        "Entered · AMD · Temporary Bargain Sale"
+      ],
+      "screenshot": "17-journal.png"
+    },
+    {
+      "name": "18-journal-composer",
+      "innerWidth": 720,
+      "innerHeight": 450,
+      "devicePixelRatio": 2,
+      "visualViewport": {
+        "width": 720,
+        "height": 450,
+        "scale": 1
+      },
+      "documentWidth": 720,
+      "documentHeight": 4511,
+      "horizontalOverflow": false,
+      "scrollY": 282.5,
+      "visibleControls": 49,
+      "controlsFullyInViewport": 4,
+      "dialog": {
+        "scrollHeight": 450,
+        "clientHeight": 450,
+        "overflowY": "visible",
+        "rect": {
+          "top": 0,
+          "bottom": 450,
+          "left": 0,
+          "right": 720
+        }
+      },
+      "headings": [
+        "Journal",
+        "Journal",
+        "Decision history",
+        "Rejected · COIN · Reset Recovery",
+        "Revised · MSFT · Thesis Risk Monitor",
+        "Skipped · TSLA · Reset Recovery",
+        "Revised · META · Leader Pullback",
+        "Rejected · INTC · Reset Recovery",
+        "Revised · NVDA · Leader Pullback",
+        "Entered · AMD · Temporary Bargain Sale"
+      ],
+      "screenshot": "18-journal-composer.png"
+    },
+    {
+      "name": "19-journal-invalid-required",
+      "innerWidth": 720,
+      "innerHeight": 450,
+      "devicePixelRatio": 2,
+      "visualViewport": {
+        "width": 720,
+        "height": 450,
+        "scale": 1
+      },
+      "documentWidth": 720,
+      "documentHeight": 4511,
+      "horizontalOverflow": false,
+      "scrollY": 282.5,
+      "visibleControls": 49,
+      "controlsFullyInViewport": 6,
+      "dialog": {
+        "scrollHeight": 450,
+        "clientHeight": 450,
+        "overflowY": "visible",
+        "rect": {
+          "top": 0,
+          "bottom": 450,
+          "left": 0,
+          "right": 720
+        }
+      },
+      "headings": [
+        "Journal",
+        "Journal",
+        "Decision history",
+        "Rejected · COIN · Reset Recovery",
+        "Revised · MSFT · Thesis Risk Monitor",
+        "Skipped · TSLA · Reset Recovery",
+        "Revised · META · Leader Pullback",
+        "Rejected · INTC · Reset Recovery",
+        "Revised · NVDA · Leader Pullback",
+        "Entered · AMD · Temporary Bargain Sale"
+      ],
+      "screenshot": "19-journal-invalid-required.png"
+    },
+    {
+      "name": "20-journal-cancel",
+      "innerWidth": 720,
+      "innerHeight": 450,
+      "devicePixelRatio": 2,
+      "visualViewport": {
+        "width": 720,
+        "height": 450,
+        "scale": 1
+      },
+      "documentWidth": 720,
+      "documentHeight": 4511,
+      "horizontalOverflow": false,
+      "scrollY": 282.5,
+      "visibleControls": 43,
+      "controlsFullyInViewport": 2,
+      "dialog": null,
+      "headings": [
+        "Journal",
+        "Journal",
+        "Decision history",
+        "Rejected · COIN · Reset Recovery",
+        "Revised · MSFT · Thesis Risk Monitor",
+        "Skipped · TSLA · Reset Recovery",
+        "Revised · META · Leader Pullback",
+        "Rejected · INTC · Reset Recovery",
+        "Revised · NVDA · Leader Pullback",
+        "Entered · AMD · Temporary Bargain Sale"
+      ],
+      "screenshot": "20-journal-cancel.png"
+    },
+    {
+      "name": "21-settings",
+      "innerWidth": 720,
+      "innerHeight": 450,
+      "devicePixelRatio": 2,
+      "visualViewport": {
+        "width": 720,
+        "height": 450,
+        "scale": 1
+      },
+      "documentWidth": 720,
+      "documentHeight": 1544,
+      "horizontalOverflow": false,
+      "scrollY": 282.5,
+      "visibleControls": 12,
+      "controlsFullyInViewport": 2,
+      "dialog": null,
+      "headings": [
+        "Settings",
+        "Settings",
+        "Operating state",
+        "20",
+        "Stooq",
+        "Alpha Vantage",
+        "Twelve Data",
+        "Marketaux",
+        "Language"
+      ],
+      "screenshot": "21-settings.png"
+    },
+    {
+      "name": "22-notification-confirm",
+      "innerWidth": 720,
+      "innerHeight": 450,
+      "devicePixelRatio": 2,
+      "visualViewport": {
+        "width": 720,
+        "height": 450,
+        "scale": 1
+      },
+      "documentWidth": 720,
+      "documentHeight": 2359,
+      "horizontalOverflow": false,
+      "scrollY": 1475,
+      "visibleControls": 21,
+      "controlsFullyInViewport": 7,
+      "dialog": {
+        "scrollHeight": 450,
+        "clientHeight": 450,
+        "overflowY": "visible",
+        "rect": {
+          "top": 0,
+          "bottom": 450,
+          "left": 0,
+          "right": 720
+        }
+      },
+      "headings": [
+        "Settings",
+        "Settings",
+        "Operating state",
+        "20",
+        "Stooq",
+        "Alpha Vantage",
+        "Twelve Data",
+        "Marketaux",
+        "Language",
+        "Notification delivery"
+      ],
+      "screenshot": "22-notification-confirm.png"
+    },
+    {
+      "name": "23-notification-cancel",
+      "innerWidth": 720,
+      "innerHeight": 450,
+      "devicePixelRatio": 2,
+      "visualViewport": {
+        "width": 720,
+        "height": 450,
+        "scale": 1
+      },
+      "documentWidth": 720,
+      "documentHeight": 2359,
+      "horizontalOverflow": false,
+      "scrollY": 1475,
+      "visibleControls": 21,
+      "controlsFullyInViewport": 7,
+      "dialog": {
+        "scrollHeight": 464,
+        "clientHeight": 450,
+        "overflowY": "visible",
+        "rect": {
+          "top": 0,
+          "bottom": 450,
+          "left": 0,
+          "right": 720
+        }
+      },
+      "headings": [
+        "Settings",
+        "Settings",
+        "Operating state",
+        "20",
+        "Stooq",
+        "Alpha Vantage",
+        "Twelve Data",
+        "Marketaux",
+        "Language",
+        "Notification delivery"
+      ],
+      "screenshot": "23-notification-cancel.png"
+    },
+    {
+      "name": "24-text-spacing-stress",
+      "innerWidth": 720,
+      "innerHeight": 450,
+      "devicePixelRatio": 2,
+      "visualViewport": {
+        "width": 720,
+        "height": 450,
+        "scale": 1
+      },
+      "documentWidth": 720,
+      "documentHeight": 2662,
+      "horizontalOverflow": false,
+      "scrollY": 1708.5,
+      "visibleControls": 18,
+      "controlsFullyInViewport": 4,
+      "dialog": null,
+      "headings": [
+        "Settings",
+        "Settings",
+        "Operating state",
+        "20",
+        "Stooq",
+        "Alpha Vantage",
+        "Twelve Data",
+        "Marketaux",
+        "Language",
+        "Notification delivery"
+      ],
+      "screenshot": "24-text-spacing-stress.png"
+    }
+  ],
+  "errors": [
+    {
+      "name": "04-stock-detail",
+      "error": "Error: locator.scrollIntoViewIfNeeded: Element is not attached to the DOM\nCall log:\n\u001b[2m  - attempting scroll into view action\u001b[22m\n\u001b[2m    - waiting for element to be stable\u001b[22m\n"
+    },
+    {
+      "name": "05-metric-detail",
+      "error": "TimeoutError: locator.scrollIntoViewIfNeeded: Timeout 4500ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Evidence detail', exact: true }).first()\u001b[22m\n"
+    },
+    {
+      "name": "06-eye-composer",
+      "error": "TimeoutError: locator.scrollIntoViewIfNeeded: Timeout 4500ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Register Eye', exact: true })\u001b[22m\n"
+    },
+    {
+      "name": "07-eye-invalid-required",
+      "error": "TimeoutError: locator.scrollIntoViewIfNeeded: Timeout 4500ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByTestId('eye-save')\u001b[22m\n"
+    },
+    {
+      "name": "08-eye-cancel",
+      "error": "TimeoutError: locator.scrollIntoViewIfNeeded: Timeout 4500ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Cancel', exact: true })\u001b[22m\n"
+    },
+    {
+      "name": "12-registry",
+      "error": "TimeoutError: locator.scrollIntoViewIfNeeded: Timeout 4500ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Open raw data registry', exact: true })\u001b[22m\n"
+    },
+    {
+      "name": "13-registry-help",
+      "error": "TimeoutError: locator.scrollIntoViewIfNeeded: Timeout 4500ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Registry help', exact: true })\u001b[22m\n"
+    },
+    {
+      "name": "15-eyes-flow",
+      "error": "TimeoutError: locator.scrollIntoViewIfNeeded: Timeout 4500ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('tab', { name: 'Eyes', exact: true })\u001b[22m\n"
+    },
+    {
+      "name": "16-eye-detail",
+      "error": "TimeoutError: locator.scrollIntoViewIfNeeded: Timeout 4500ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: 'Review Eyes', exact: true })\u001b[22m\n"
+    }
+  ],
+  "authenticZoomResult": {
+    "zoomMetric": {
+      "innerWidth": 720,
+      "innerHeight": 450,
+      "devicePixelRatio": 2,
+      "visualViewportScale": 1,
+      "htmlZoom": "1",
+      "bodyZoom": "1"
+    }
+  },
+  "textSpacingInjectedOnlyForStressTest": true
+}

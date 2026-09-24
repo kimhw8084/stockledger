@@ -1,0 +1,101 @@
+{
+  "candidate": "ed377bb173387ebf56a4919ac4282d136c56e21d",
+  "tree": "dc99438cdcf8e2f737e5de87d6afc550d4008f24",
+  "productChangedFiles": 0,
+  "sourceImmutable": true,
+  "gates": [
+    {
+      "name": "clean exact candidate/base",
+      "status": "PASS",
+      "detail": "HEAD and tree match exact target; protected remote main matches candidate; initial and final worktree clean."
+    },
+    {
+      "name": "npm ci",
+      "status": "PASS",
+      "runtime": "Node v22.23.2"
+    },
+    {
+      "name": "typecheck + unit",
+      "status": "PASS",
+      "detail": "npm run check: typecheck and 196 unit tests across 24 files."
+    },
+    {
+      "name": "boundary checks",
+      "status": "PASS",
+      "command": "npm run check:boundaries"
+    },
+    {
+      "name": "npm audit high/critical",
+      "status": "PASS",
+      "detail": "0 vulnerabilities."
+    },
+    {
+      "name": "web/iOS/Android export",
+      "status": "PASS",
+      "detail": "export:web and export:all on isolated exact-target archive."
+    },
+    {
+      "name": "full Playwright",
+      "status": "FAIL",
+      "detail": "78 total: 58 passed, 19 failed, 1 skipped. Failures include objective viewport action/nav geometry and one 45s keyboard locator timeout (timeout excluded as standalone product defect)."
+    },
+    {
+      "name": "release evidence + release:verify",
+      "status": "PASS",
+      "detail": "release-evidence source commit/tree exact; release:verify verified true with no reasons."
+    },
+    {
+      "name": "recovery drill",
+      "status": "PASS",
+      "detail": "synthetic local evidence, source unchanged; RPO since operator backup unknown/unbounded."
+    },
+    {
+      "name": "operations qualification/status",
+      "status": "PARTIAL",
+      "detail": "Synthetic qualification passed; operations status returned unconfigured (scheduler stopped/workspace missing; provider/scheduler/notifications unconfigured)."
+    },
+    {
+      "name": "frozen research",
+      "status": "BLOCKED_UNVERIFIED",
+      "detail": "releaseBlocked true; numeric golden outputs, PIT membership, survivorship and forward proof incomplete."
+    },
+    {
+      "name": "cloud contract",
+      "status": "UNAVAILABLE",
+      "detail": "local Supabase status could not reach OrbStack Docker socket; no service fabricated."
+    },
+    {
+      "name": "source immutability",
+      "status": "PASS",
+      "detail": "exact commit/tree at start/end, clean Product worktree, zero changed files."
+    }
+  ],
+  "playwrightFailureClasses": [
+    {
+      "class": "primary action outside initial viewport",
+      "cases": [
+        "Today desktop1366x768 action bottom879",
+        "Today mobile360x800 action bottom868",
+        "Today mobile390x844 action bottom868",
+        "Today holdout412x915 action bottom1029",
+        "Alerts mobile390x844 inspect bottom867",
+        "Korean Alerts desktop1280x720 inspect bottom805",
+        "Korean Alerts mobile390x844 inspect bottom867",
+        "Recipes mobile360x800 open-set bottom866"
+      ]
+    },
+    {
+      "class": "navigation scroll scope",
+      "cases": [
+        "scanner save y697 while navigation y-1321 desktop and y-1514 mobile",
+        "selected stock action y503 while navigation y-612"
+      ]
+    },
+    {
+      "class": "harness timeout",
+      "cases": [
+        "one long keyboard multi-surface locator focus timeout; short route control passed, not counted as a defect finding"
+      ]
+    }
+  ]
+}

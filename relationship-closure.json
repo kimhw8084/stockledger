@@ -1,0 +1,190 @@
+{
+  "candidate": "ed377bb173387ebf56a4919ac4282d136c56e21d",
+  "tree": "dc99438cdcf8e2f737e5de87d6afc550d4008f24",
+  "closureResult": "FAIL",
+  "edges": [
+    {
+      "type": "modal_stack",
+      "status": "FAIL",
+      "owner": "src/components/WindowPanel.tsx + per-surface useWindowPanelFocus refs",
+      "components": [
+        "WindowPanel",
+        "useWindowPanelFocus",
+        "StockLedgerApp inline callers",
+        "TodayScreen review/summary panels",
+        "EyeComposer",
+        "JournalComposer",
+        "RecipeBuilder",
+        "WorkspacePanel",
+        "NotificationSettingsPanel"
+      ],
+      "consumers": [
+        "condition builder",
+        "raw data registry",
+        "logic version history",
+        "logic info",
+        "metric builder",
+        "logic set builder",
+        "recipe detail",
+        "eye detail",
+        "alert detail",
+        "decision detail",
+        "scanner review",
+        "metric detail",
+        "Today review",
+        "Today summary help",
+        "Eye Composer",
+        "Journal Composer",
+        "Recipe Builder",
+        "stock editor",
+        "notification confirmation"
+      ],
+      "nestedOverlays": [
+        "Raw Data Registry help inside registry WindowPanel",
+        "notification confirmation inside notification settings panel"
+      ],
+      "focusAndRestoration": "WindowPanel focuses close control on open; Escape closes unless closeDisabled; finishClose tries saved invoker then fallback. Web eligibility checks element node/connectivity/disabled/aria-disabled/tabindex only and does not inspect ancestor inert, hidden, aria-hidden, visibility, or layout.",
+      "scrollOwnership": "WindowPanel sheet ScrollView owns dialog body scrolling; nested authoring pickers can own inner list scrolling; app page ScrollView remains behind overlay.",
+      "evidence": "The adversarial hidden-ancestor modal-close test failed as intended: focus restored into an aria-hidden ancestor. See screenshots/findings/hidden-invoker-not-eligible.png and source references.",
+      "finding": "A semantically hidden invoker remains eligible for focus restoration. Root cause bounded to missing ancestor-scope eligibility in WindowPanel.canRestoreFocus and useWindowPanelFocus.isFocusableWebElement."
+    },
+    {
+      "type": "shared_consumer",
+      "status": "PASS_WITH_FINDING",
+      "owner": "StockLedgerShell + WindowPanel + approved src/ui exports and @expo-base primitives",
+      "components": [
+        "StockLedgerShell",
+        "WindowPanel",
+        "Button",
+        "Card",
+        "StatusIndicator",
+        "FormField",
+        "Text",
+        "Pressable",
+        "ScrollView",
+        "SegmentedControl",
+        "LiveRegion",
+        "StateView"
+      ],
+      "consumers": [
+        "all 17 current surfaces",
+        "12 StockLedgerApp inline WindowPanel consumers",
+        "shared form and status consumers"
+      ],
+      "evidence": "Source imports and call sites enumerated; behavior exercised by CHG-172/184/199 E2E run. Repeated geometry regression appears at multiple consumers of shell; no added manager/framework."
+    },
+    {
+      "type": "presentation_state",
+      "status": "PARTIAL",
+      "owner": "StockLedgerApp route state + each composer local draft state",
+      "components": [
+        "StockLedgerShell",
+        "StockLedgerApp",
+        "EyeComposer",
+        "JournalComposer",
+        "RecipeBuilder",
+        "RawDataRegistry",
+        "detail surfaces"
+      ],
+      "consumers": [
+        "route/tab changes",
+        "selected stock/Eye/recipe/metric/decision changes",
+        "create/edit transitions",
+        "locale setting",
+        "responsive reflow"
+      ],
+      "preserve": "Same-object reflow/localized chrome should preserve editable values; authoring E2E proves validation, cancel, edit reload and history at standard browser profile.",
+      "reset": "Create/edit mode transitions intentionally initialize/reset local draft; selecting a different object changes detail context.",
+      "discard": "Cancel/Escape closes local draft without saved data mutation in authoring tests.",
+      "unproven": "Locale change and route change while dirty drafts are open were not directly tested at v3 zoom profile."
+    },
+    {
+      "type": "task_effect",
+      "status": "PARTIAL",
+      "owner": "StockLedgerApp save handlers -> useAppModel action -> serialized local repository commit/publish",
+      "components": [
+        "saveEye",
+        "saveJournal/addDecision/updateDecision",
+        "saveRecipe",
+        "NotificationSettingsPanel update",
+        "EyeDetail mark reviewed",
+        "Alerts actions",
+        "scanner review logging"
+      ],
+      "effects": [
+        "Eye create/update only after validation and repository acknowledgement",
+        "Journal create/amendment/history after commit",
+        "Recipe create/version after commit",
+        "Notification preference local persistence only; worker/provider handoff reported separately",
+        "Review/ack actions update local records",
+        "Scanner review log persists user-entered review only"
+      ],
+      "prohibited": [
+        "market order/execution",
+        "provider delivery success",
+        "financial outcome",
+        "background completion without acknowledgement"
+      ],
+      "evidence": "CHG-199 existing task tests and release local fixture checks; notification disable closes only after update succeeds. Async ownership negative controls incomplete."
+    },
+    {
+      "type": "geometry_action",
+      "status": "FAIL",
+      "owner": "StockLedgerShell navigation/content geometry + surface ScrollView/action layout",
+      "components": [
+        "StockLedgerShell",
+        "TodayScreen",
+        "RecipesScreen",
+        "AlertsScreen",
+        "StockEntityDetail",
+        "ScannerReview"
+      ],
+      "consumers": [
+        "Today primary review action",
+        "Recipes open-set detail action",
+        "Alerts inspect action",
+        "deep detail critical action controls"
+      ],
+      "evidence": "Full Playwright run measured current primary actions below initial viewport at desktop1366x768 (Today y879), mobile360x800 (Today y868; Recipes action bottom866), mobile390x844 (Today y868; Alerts inspect bottom867), holdout412x915 (Today y1029), and Korean Alerts desktop1280x720 (action bottom805). Deep tests recorded nav y=-1321/-1514 while scanner save remained y697 and selected-stock action y503 while nav y=-612.",
+      "finding": "Critical next actions fall below the initial viewport in exercised compact/short profiles. The E2E geometry checks fail. The task remains scroll-reachable; impact is delayed access/poor first-task composition, not a claim of permanent inaccessibility.",
+      "rootCause": "Current shell uses absolute-positioned navigation plus compact content bottom padding; long content scrolls the navigation out of view and surface content places primary actions below initial short viewport."
+    },
+    {
+      "type": "async_scope",
+      "status": "UNPROVEN",
+      "owner": "useAppModel -> WorkspaceApplicationService -> repository publish / provider status state sinks",
+      "components": [
+        "load effect",
+        "runDailyScanner",
+        "refreshMarketData",
+        "refreshProviderHealth",
+        "notification preference update",
+        "cloud sync expectedHash commit"
+      ],
+      "scope": "Scanner captures current workspace before awaited scan then commits results by merging into latest prev; refreshMarketData captures current stocks and later writes results by stockId; provider health resolves to component state with no effect cleanup/generation token; load has active cleanup. Cloud apply checks contentHash at commit. commandTail serializes persistence but is not a workspace/request generation guard.",
+      "ownershipKey": "Existing ownership is workspace data or stockId/result IDs only; no explicit workspace generation + operation sequence key is present for scanner/market refresh/provider health.",
+      "sinks": [
+        "applicationService.runDailyScanner -> commit -> repository.save -> publish",
+        "refreshMarketData -> commit(snapshot map by stockId) -> repository.save -> publish",
+        "initial provider health .then(setProviderHealth)",
+        "refreshProviderHealth setProviderHealth/setProviderHealthLoading"
+      ],
+      "negativeControls": "Stale acknowledgement during newer save and A→B→A context sequence were not executed; mark UNPROVEN. Do not infer a defect from an unrun control.",
+      "basis": "src/application/workspaceApplicationService.ts:27-65; src/hooks/useAppModel.ts:116-145,257-267,650-667,736-750"
+    }
+  ],
+  "omittedTypes": [
+    {
+      "type": "authorization_scope",
+      "reason": "No multi-user authorization boundary is exposed by current local workspace fixture; no permission scope fabricated."
+    },
+    {
+      "type": "native_back",
+      "reason": "Web is primary qualification profile; native system Back not exercised on a device."
+    },
+    {
+      "type": "provider_delivery",
+      "reason": "Preference persistence is local; external worker/provider delivery cannot be proven by browser fixture."
+    }
+  ]
+}
