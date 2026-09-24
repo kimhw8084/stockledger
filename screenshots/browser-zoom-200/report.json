@@ -1,0 +1,1411 @@
+{
+  "candidate": "92b64a20c620da38422c22e73664eba395b58f17",
+  "tree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+  "browser": "Google Chrome native default zoom setting",
+  "nativeZoom": {
+    "configured": true,
+    "setting": "chrome.settingsPrivate.setDefaultZoom(2)",
+    "zoomApi": {
+      "getDefaultZoom": "function",
+      "setDefaultZoom": "function"
+    },
+    "cssViewport": {
+      "innerWidth": 720,
+      "innerHeight": 450,
+      "devicePixelRatio": 2,
+      "visualViewport": {
+        "width": 720,
+        "height": 450,
+        "scale": 1
+      },
+      "htmlZoom": "1",
+      "bodyZoom": "1"
+    },
+    "proof": "1440x900 physical browser window became 720x450 CSS viewport; DPR 2; visualViewport.scale 1; CSS zoom 1"
+  },
+  "tasks": [
+    {
+      "name": "today_review_path",
+      "status": "PASS",
+      "evidencePreserved": true,
+      "canceledDraftHadNoRecordEffect": true
+    },
+    {
+      "name": "watchlist_stock_metric_return",
+      "status": "PASS",
+      "stockContext": "AAPL",
+      "metricDetailOpened": true,
+      "returnedToSameStock": true,
+      "sampleLimitationVisible": true
+    },
+    {
+      "name": "recipe_set_and_logic_path",
+      "status": "PASS",
+      "purposeVersionContextPreserved": true,
+      "registryAuthorityAndDownstreamLinksVisible": true
+    },
+    {
+      "name": "alerts_inspect_path",
+      "status": "PASS",
+      "prioritySourceFreshnessAndUncertaintyPreserved": true,
+      "alertTitle": "Deep drawdown still holding support"
+    },
+    {
+      "name": "journal_detail_amend",
+      "status": "PASS",
+      "recordUpdated": true,
+      "amendedNoteVisible": true,
+      "priorVersionRetained": true
+    },
+    {
+      "name": "eye_composer_invalid_input",
+      "status": "PASS",
+      "correctionShown": true,
+      "draftPreserved": true,
+      "noCommitAfterInvalidInput": true
+    },
+    {
+      "name": "journal_create_duplicate_control",
+      "status": "PASS",
+      "uniqueRecordEffectCount": 1,
+      "visibleTextOccurrencesAfterDetailOpened": 2,
+      "linkedEyeLabel": "AMD",
+      "draftClosedAfterCommit": true
+    },
+    {
+      "name": "recipe_builder_create",
+      "status": "PASS",
+      "recipeName": "CHG-202 Native Zoom Review Recipe",
+      "version": 1,
+      "purposeVisible": true,
+      "logicConditionSaved": true,
+      "uniqueRecordEffectCount": 1
+    },
+    {
+      "name": "notification_confirmation_cancel_error_success",
+      "status": "PASS",
+      "cancelPreservedEnabledState": true,
+      "faultPreservedPriorTruth": true,
+      "exceptionLocalized": true,
+      "retryCommittedOff": true
+    }
+  ],
+  "overlays": [
+    {
+      "name": "today-review-detail",
+      "state": {
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "right": 720,
+          "bottom": 450
+        },
+        "scrollContainers": [
+          {
+            "tag": "div",
+            "testId": null,
+            "clientHeight": 273,
+            "scrollHeight": 552,
+            "overflowY": "auto",
+            "hasOverflow": true
+          }
+        ]
+      },
+      "closeBounds": {
+        "label": "today-review-detail close",
+        "bounds": {
+          "x": 638.88671875,
+          "y": 100,
+          "width": 65.11328125,
+          "height": 44
+        },
+        "dialogBounds": {
+          "x": 0,
+          "y": 0,
+          "width": 720,
+          "height": 450
+        }
+      },
+      "viewport": {
+        "width": 720,
+        "height": 450
+      }
+    },
+    {
+      "name": "today-journal-composer",
+      "state": {
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "right": 720,
+          "bottom": 450
+        },
+        "scrollContainers": [
+          {
+            "tag": "div",
+            "testId": null,
+            "clientHeight": 273,
+            "scrollHeight": 1379,
+            "overflowY": "auto",
+            "hasOverflow": true
+          },
+          {
+            "tag": "textarea",
+            "testId": "journal-note",
+            "clientHeight": 98,
+            "scrollHeight": 98,
+            "overflowY": "auto",
+            "hasOverflow": false
+          },
+          {
+            "tag": "textarea",
+            "testId": "journal-concern",
+            "clientHeight": 98,
+            "scrollHeight": 98,
+            "overflowY": "auto",
+            "hasOverflow": false
+          }
+        ]
+      },
+      "closeBounds": {
+        "label": "today-journal-composer close",
+        "bounds": {
+          "x": 638.88671875,
+          "y": 100,
+          "width": 65.11328125,
+          "height": 44
+        },
+        "dialogBounds": {
+          "x": 0,
+          "y": 0,
+          "width": 720,
+          "height": 450
+        }
+      },
+      "viewport": {
+        "width": 720,
+        "height": 450
+      }
+    },
+    {
+      "name": "watchlist-metric-detail",
+      "state": {
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "right": 720,
+          "bottom": 450
+        },
+        "scrollContainers": [
+          {
+            "tag": "div",
+            "testId": null,
+            "clientHeight": 273,
+            "scrollHeight": 676,
+            "overflowY": "auto",
+            "hasOverflow": true
+          }
+        ]
+      },
+      "closeBounds": {
+        "label": "watchlist-metric-detail close",
+        "bounds": {
+          "x": 638.88671875,
+          "y": 100,
+          "width": 65.11328125,
+          "height": 44
+        },
+        "dialogBounds": {
+          "x": 0,
+          "y": 0,
+          "width": 720,
+          "height": 450
+        }
+      },
+      "viewport": {
+        "width": 720,
+        "height": 450
+      }
+    },
+    {
+      "name": "recipe-set-detail",
+      "state": {
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "right": 720,
+          "bottom": 450
+        },
+        "scrollContainers": [
+          {
+            "tag": "div",
+            "testId": null,
+            "clientHeight": 273,
+            "scrollHeight": 917,
+            "overflowY": "auto",
+            "hasOverflow": true
+          }
+        ]
+      },
+      "closeBounds": {
+        "label": "recipe-set-detail close",
+        "bounds": {
+          "x": 638.88671875,
+          "y": 100,
+          "width": 65.11328125,
+          "height": 44
+        },
+        "dialogBounds": {
+          "x": 0,
+          "y": 0,
+          "width": 720,
+          "height": 450
+        }
+      },
+      "viewport": {
+        "width": 720,
+        "height": 450
+      }
+    },
+    {
+      "name": "logic-registry",
+      "state": {
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "right": 720,
+          "bottom": 450
+        },
+        "scrollContainers": [
+          {
+            "tag": "div",
+            "testId": null,
+            "clientHeight": 254,
+            "scrollHeight": 6699,
+            "overflowY": "auto",
+            "hasOverflow": true
+          }
+        ]
+      },
+      "closeBounds": {
+        "label": "logic-registry close",
+        "bounds": {
+          "x": 638.88671875,
+          "y": 100,
+          "width": 65.11328125,
+          "height": 44
+        },
+        "dialogBounds": {
+          "x": 0,
+          "y": 0,
+          "width": 720,
+          "height": 450
+        }
+      },
+      "viewport": {
+        "width": 720,
+        "height": 450
+      }
+    },
+    {
+      "name": "alert-inspect-detail",
+      "state": {
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "right": 720,
+          "bottom": 450
+        },
+        "scrollContainers": [
+          {
+            "tag": "div",
+            "testId": null,
+            "clientHeight": 273,
+            "scrollHeight": 578,
+            "overflowY": "auto",
+            "hasOverflow": true
+          }
+        ]
+      },
+      "closeBounds": {
+        "label": "alert-inspect-detail close",
+        "bounds": {
+          "x": 638.88671875,
+          "y": 100,
+          "width": 65.11328125,
+          "height": 44
+        },
+        "dialogBounds": {
+          "x": 0,
+          "y": 0,
+          "width": 720,
+          "height": 450
+        }
+      },
+      "viewport": {
+        "width": 720,
+        "height": 450
+      }
+    },
+    {
+      "name": "journal-decision-detail",
+      "state": {
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "right": 720,
+          "bottom": 450
+        },
+        "scrollContainers": [
+          {
+            "tag": "div",
+            "testId": null,
+            "clientHeight": 273,
+            "scrollHeight": 1429,
+            "overflowY": "auto",
+            "hasOverflow": true
+          },
+          {
+            "tag": "textarea",
+            "testId": null,
+            "clientHeight": 57,
+            "scrollHeight": 57,
+            "overflowY": "auto",
+            "hasOverflow": false
+          },
+          {
+            "tag": "textarea",
+            "testId": null,
+            "clientHeight": 57,
+            "scrollHeight": 57,
+            "overflowY": "auto",
+            "hasOverflow": false
+          },
+          {
+            "tag": "textarea",
+            "testId": null,
+            "clientHeight": 57,
+            "scrollHeight": 57,
+            "overflowY": "auto",
+            "hasOverflow": false
+          },
+          {
+            "tag": "textarea",
+            "testId": null,
+            "clientHeight": 57,
+            "scrollHeight": 57,
+            "overflowY": "auto",
+            "hasOverflow": false
+          },
+          {
+            "tag": "textarea",
+            "testId": null,
+            "clientHeight": 57,
+            "scrollHeight": 57,
+            "overflowY": "auto",
+            "hasOverflow": false
+          },
+          {
+            "tag": "textarea",
+            "testId": null,
+            "clientHeight": 57,
+            "scrollHeight": 57,
+            "overflowY": "auto",
+            "hasOverflow": false
+          }
+        ]
+      },
+      "closeBounds": {
+        "label": "journal-decision-detail close",
+        "bounds": {
+          "x": 638.88671875,
+          "y": 100,
+          "width": 65.11328125,
+          "height": 44
+        },
+        "dialogBounds": {
+          "x": 0,
+          "y": 0,
+          "width": 720,
+          "height": 450
+        }
+      },
+      "viewport": {
+        "width": 720,
+        "height": 450
+      }
+    },
+    {
+      "name": "eye-composer",
+      "state": {
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "right": 720,
+          "bottom": 450
+        },
+        "scrollContainers": [
+          {
+            "tag": "div",
+            "testId": null,
+            "clientHeight": 273,
+            "scrollHeight": 1153,
+            "overflowY": "auto",
+            "hasOverflow": true
+          },
+          {
+            "tag": "textarea",
+            "testId": "eye-thesis",
+            "clientHeight": 98,
+            "scrollHeight": 98,
+            "overflowY": "auto",
+            "hasOverflow": false
+          },
+          {
+            "tag": "textarea",
+            "testId": "eye-invalidation",
+            "clientHeight": 98,
+            "scrollHeight": 98,
+            "overflowY": "auto",
+            "hasOverflow": false
+          }
+        ]
+      },
+      "closeBounds": {
+        "label": "eye-composer close",
+        "bounds": {
+          "x": 638.88671875,
+          "y": 100,
+          "width": 65.11328125,
+          "height": 44
+        },
+        "dialogBounds": {
+          "x": 0,
+          "y": 0,
+          "width": 720,
+          "height": 450
+        }
+      },
+      "viewport": {
+        "width": 720,
+        "height": 450
+      }
+    },
+    {
+      "name": "journal-composer",
+      "state": {
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "right": 720,
+          "bottom": 450
+        },
+        "scrollContainers": [
+          {
+            "tag": "div",
+            "testId": null,
+            "clientHeight": 273,
+            "scrollHeight": 1358,
+            "overflowY": "auto",
+            "hasOverflow": true
+          },
+          {
+            "tag": "textarea",
+            "testId": "journal-note",
+            "clientHeight": 98,
+            "scrollHeight": 98,
+            "overflowY": "auto",
+            "hasOverflow": false
+          },
+          {
+            "tag": "textarea",
+            "testId": "journal-concern",
+            "clientHeight": 98,
+            "scrollHeight": 98,
+            "overflowY": "auto",
+            "hasOverflow": false
+          }
+        ]
+      },
+      "closeBounds": {
+        "label": "journal-composer close",
+        "bounds": {
+          "x": 638.88671875,
+          "y": 100,
+          "width": 65.11328125,
+          "height": 44
+        },
+        "dialogBounds": {
+          "x": 0,
+          "y": 0,
+          "width": 720,
+          "height": 450
+        }
+      },
+      "viewport": {
+        "width": 720,
+        "height": 450
+      }
+    },
+    {
+      "name": "recipe-builder-purpose",
+      "state": {
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "right": 720,
+          "bottom": 450
+        },
+        "scrollContainers": [
+          {
+            "tag": "div",
+            "testId": null,
+            "clientHeight": 273,
+            "scrollHeight": 1172,
+            "overflowY": "auto",
+            "hasOverflow": true
+          },
+          {
+            "tag": "textarea",
+            "testId": "recipe-purpose",
+            "clientHeight": 98,
+            "scrollHeight": 98,
+            "overflowY": "auto",
+            "hasOverflow": false
+          }
+        ]
+      },
+      "closeBounds": {
+        "label": "recipe-builder-purpose close",
+        "bounds": {
+          "x": 638.88671875,
+          "y": 100,
+          "width": 65.11328125,
+          "height": 44
+        },
+        "dialogBounds": {
+          "x": 0,
+          "y": 0,
+          "width": 720,
+          "height": 450
+        }
+      },
+      "viewport": {
+        "width": 720,
+        "height": 450
+      }
+    },
+    {
+      "name": "notification-confirmation",
+      "state": {
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "right": 720,
+          "bottom": 450
+        },
+        "scrollContainers": [
+          {
+            "tag": "div",
+            "testId": null,
+            "clientHeight": 280,
+            "scrollHeight": 280,
+            "overflowY": "auto",
+            "hasOverflow": false
+          }
+        ]
+      },
+      "closeBounds": {
+        "label": "notification-confirmation close",
+        "bounds": {
+          "x": 637.3359375,
+          "y": 100,
+          "width": 66.6640625,
+          "height": 44
+        },
+        "dialogBounds": {
+          "x": 0,
+          "y": 0,
+          "width": 720,
+          "height": 450
+        }
+      },
+      "viewport": {
+        "width": 720,
+        "height": 450
+      }
+    },
+    {
+      "name": "notification-confirmation-error-test",
+      "state": {
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "right": 720,
+          "bottom": 450
+        },
+        "scrollContainers": [
+          {
+            "tag": "div",
+            "testId": null,
+            "clientHeight": 280,
+            "scrollHeight": 280,
+            "overflowY": "auto",
+            "hasOverflow": false
+          }
+        ]
+      },
+      "closeBounds": {
+        "label": "notification-confirmation-error-test close",
+        "bounds": {
+          "x": 637.3359375,
+          "y": 100,
+          "width": 66.6640625,
+          "height": 44
+        },
+        "dialogBounds": {
+          "x": 0,
+          "y": 0,
+          "width": 720,
+          "height": 450
+        }
+      },
+      "viewport": {
+        "width": 720,
+        "height": 450
+      }
+    }
+  ],
+  "reachableActions": [
+    {
+      "label": "Today review action",
+      "bounds": {
+        "x": 37,
+        "y": 198,
+        "width": 179.96875,
+        "height": 44
+      },
+      "dialogBounds": null
+    },
+    {
+      "label": "today-review-detail close",
+      "bounds": {
+        "x": 638.88671875,
+        "y": 100,
+        "width": 65.11328125,
+        "height": 44
+      },
+      "dialogBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 720,
+        "height": 450
+      }
+    },
+    {
+      "label": "Today next action Record review",
+      "bounds": {
+        "x": 238.97265625,
+        "y": 362,
+        "width": 149.8046875,
+        "height": 44
+      },
+      "dialogBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 720,
+        "height": 450
+      }
+    },
+    {
+      "label": "today-journal-composer close",
+      "bounds": {
+        "x": 638.88671875,
+        "y": 100,
+        "width": 65.11328125,
+        "height": 44
+      },
+      "dialogBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 720,
+        "height": 450
+      }
+    },
+    {
+      "label": "Today Journal Composer cancel",
+      "bounds": {
+        "x": 16,
+        "y": 362,
+        "width": 77.38671875,
+        "height": 44
+      },
+      "dialogBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 720,
+        "height": 450
+      }
+    },
+    {
+      "label": "Navigate Watchlist",
+      "bounds": {
+        "x": 185,
+        "y": 386,
+        "width": 173,
+        "height": 56
+      },
+      "dialogBounds": null
+    },
+    {
+      "label": "Watchlist search",
+      "bounds": {
+        "x": 41,
+        "y": 312,
+        "width": 638,
+        "height": 52
+      },
+      "dialogBounds": null
+    },
+    {
+      "label": "Watchlist stock selection AAPL",
+      "bounds": {
+        "x": 41,
+        "y": 198,
+        "width": 638,
+        "height": 44
+      },
+      "dialogBounds": null
+    },
+    {
+      "label": "Stock metric detail action",
+      "bounds": {
+        "x": 573.93359375,
+        "y": 198,
+        "width": 122.06640625,
+        "height": 44
+      },
+      "dialogBounds": null
+    },
+    {
+      "label": "watchlist-metric-detail close",
+      "bounds": {
+        "x": 638.88671875,
+        "y": 100,
+        "width": 65.11328125,
+        "height": 44
+      },
+      "dialogBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 720,
+        "height": 450
+      }
+    },
+    {
+      "label": "Navigate Recipes",
+      "bounds": {
+        "x": 362,
+        "y": 386,
+        "width": 173,
+        "height": 56
+      },
+      "dialogBounds": null
+    },
+    {
+      "label": "Recipes Sets layer",
+      "bounds": {
+        "x": 520,
+        "y": 204.5,
+        "width": 154,
+        "height": 44
+      },
+      "dialogBounds": null
+    },
+    {
+      "label": "Recipe set primary action",
+      "bounds": {
+        "x": 449.171875,
+        "y": 202,
+        "width": 121.6796875,
+        "height": 36
+      },
+      "dialogBounds": null
+    },
+    {
+      "label": "recipe-set-detail close",
+      "bounds": {
+        "x": 638.88671875,
+        "y": 100,
+        "width": 65.11328125,
+        "height": 44
+      },
+      "dialogBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 720,
+        "height": 450
+      }
+    },
+    {
+      "label": "Logic Registry open action",
+      "bounds": {
+        "x": 24,
+        "y": 198,
+        "width": 178.55078125,
+        "height": 44
+      },
+      "dialogBounds": null
+    },
+    {
+      "label": "logic-registry close",
+      "bounds": {
+        "x": 638.88671875,
+        "y": 100,
+        "width": 65.11328125,
+        "height": 44
+      },
+      "dialogBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 720,
+        "height": 450
+      }
+    },
+    {
+      "label": "Logic Registry search",
+      "bounds": {
+        "x": 16,
+        "y": 261,
+        "width": 688,
+        "height": 44
+      },
+      "dialogBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 720,
+        "height": 450
+      }
+    },
+    {
+      "label": "Logic Registry field",
+      "bounds": {
+        "x": 33,
+        "y": 334,
+        "width": 654,
+        "height": 75
+      },
+      "dialogBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 720,
+        "height": 450
+      }
+    },
+    {
+      "label": "Alert Inspect evidence",
+      "bounds": {
+        "x": 447,
+        "y": 198,
+        "width": 167.60546875,
+        "height": 44
+      },
+      "dialogBounds": null
+    },
+    {
+      "label": "alert-inspect-detail close",
+      "bounds": {
+        "x": 638.88671875,
+        "y": 100,
+        "width": 65.11328125,
+        "height": 44
+      },
+      "dialogBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 720,
+        "height": 450
+      }
+    },
+    {
+      "label": "Navigate Journal",
+      "bounds": {
+        "x": 539,
+        "y": 386,
+        "width": 173,
+        "height": 56
+      },
+      "dialogBounds": null
+    },
+    {
+      "label": "Journal decision detail action",
+      "bounds": {
+        "x": 480,
+        "y": 198,
+        "width": 184.61328125,
+        "height": 44
+      },
+      "dialogBounds": null
+    },
+    {
+      "label": "journal-decision-detail close",
+      "bounds": {
+        "x": 638.88671875,
+        "y": 100,
+        "width": 65.11328125,
+        "height": 44
+      },
+      "dialogBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 720,
+        "height": 450
+      }
+    },
+    {
+      "label": "Journal amend action",
+      "bounds": {
+        "x": 502.94140625,
+        "y": 362,
+        "width": 58.6875,
+        "height": 44
+      },
+      "dialogBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 720,
+        "height": 450
+      }
+    },
+    {
+      "label": "Journal amendment save",
+      "bounds": {
+        "x": 101.38671875,
+        "y": 362,
+        "width": 123.30859375,
+        "height": 44
+      },
+      "dialogBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 720,
+        "height": 450
+      }
+    },
+    {
+      "label": "Navigate Watchlist",
+      "bounds": {
+        "x": 185,
+        "y": 386,
+        "width": 173,
+        "height": 56
+      },
+      "dialogBounds": null
+    },
+    {
+      "label": "Eye Composer open action",
+      "bounds": {
+        "x": 544.1171875,
+        "y": 198,
+        "width": 138.8828125,
+        "height": 44
+      },
+      "dialogBounds": null
+    },
+    {
+      "label": "eye-composer close",
+      "bounds": {
+        "x": 638.88671875,
+        "y": 100,
+        "width": 65.11328125,
+        "height": 44
+      },
+      "dialogBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 720,
+        "height": 450
+      }
+    },
+    {
+      "label": "Eye Composer invalid save",
+      "bounds": {
+        "x": 101.38671875,
+        "y": 362,
+        "width": 102.328125,
+        "height": 44
+      },
+      "dialogBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 720,
+        "height": 450
+      }
+    },
+    {
+      "label": "Eye Composer cancel",
+      "bounds": {
+        "x": 16,
+        "y": 362,
+        "width": 77.38671875,
+        "height": 44
+      },
+      "dialogBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 720,
+        "height": 450
+      }
+    },
+    {
+      "label": "Navigate Journal",
+      "bounds": {
+        "x": 539,
+        "y": 386,
+        "width": 173,
+        "height": 56
+      },
+      "dialogBounds": null
+    },
+    {
+      "label": "Journal New action",
+      "bounds": {
+        "x": 608.0625,
+        "y": 229.5,
+        "width": 87.9375,
+        "height": 44
+      },
+      "dialogBounds": null
+    },
+    {
+      "label": "journal-composer close",
+      "bounds": {
+        "x": 638.88671875,
+        "y": 100,
+        "width": 65.11328125,
+        "height": 44
+      },
+      "dialogBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 720,
+        "height": 450
+      }
+    },
+    {
+      "label": "Journal Eye context selector",
+      "bounds": {
+        "x": 33,
+        "y": 271,
+        "width": 654,
+        "height": 44
+      },
+      "dialogBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 720,
+        "height": 450
+      }
+    },
+    {
+      "label": "Journal linked Eye option",
+      "bounds": {
+        "x": 38,
+        "y": 324,
+        "width": 636.5,
+        "height": 44
+      },
+      "dialogBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 720,
+        "height": 450
+      }
+    },
+    {
+      "label": "Journal Composer save",
+      "bounds": {
+        "x": 101.38671875,
+        "y": 362,
+        "width": 122.12890625,
+        "height": 44
+      },
+      "dialogBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 720,
+        "height": 450
+      }
+    },
+    {
+      "label": "Navigate Recipes",
+      "bounds": {
+        "x": 362,
+        "y": 386,
+        "width": 173,
+        "height": 56
+      },
+      "dialogBounds": null
+    },
+    {
+      "label": "Recipe Builder open action",
+      "bounds": {
+        "x": 24,
+        "y": 198,
+        "width": 108.18359375,
+        "height": 44
+      },
+      "dialogBounds": null
+    },
+    {
+      "label": "recipe-builder-purpose close",
+      "bounds": {
+        "x": 638.88671875,
+        "y": 100,
+        "width": 65.11328125,
+        "height": 44
+      },
+      "dialogBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 720,
+        "height": 450
+      }
+    },
+    {
+      "label": "Recipe Builder purpose continue",
+      "bounds": {
+        "x": 16,
+        "y": 390,
+        "width": 63.42578125,
+        "height": 44
+      },
+      "dialogBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 720,
+        "height": 450
+      }
+    },
+    {
+      "label": "Recipe Builder add logic condition",
+      "bounds": {
+        "x": 33,
+        "y": 313,
+        "width": 123.8671875,
+        "height": 44
+      },
+      "dialogBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 720,
+        "height": 450
+      }
+    },
+    {
+      "label": "Recipe Builder step 2 continue",
+      "bounds": {
+        "x": 89.13671875,
+        "y": 362,
+        "width": 63.42578125,
+        "height": 44
+      },
+      "dialogBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 720,
+        "height": 450
+      }
+    },
+    {
+      "label": "Recipe Builder step 3 continue",
+      "bounds": {
+        "x": 89.13671875,
+        "y": 362,
+        "width": 63.42578125,
+        "height": 44
+      },
+      "dialogBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 720,
+        "height": 450
+      }
+    },
+    {
+      "label": "Recipe Builder save",
+      "bounds": {
+        "x": 89.13671875,
+        "y": 362,
+        "width": 110.59375,
+        "height": 44
+      },
+      "dialogBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 720,
+        "height": 450
+      }
+    },
+    {
+      "label": "Enable email delivery",
+      "bounds": {
+        "x": 54,
+        "y": 198,
+        "width": 167.69921875,
+        "height": 44
+      },
+      "dialogBounds": null
+    },
+    {
+      "label": "notification-confirmation close",
+      "bounds": {
+        "x": 637.3359375,
+        "y": 100,
+        "width": 66.6640625,
+        "height": 44
+      },
+      "dialogBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 720,
+        "height": 450
+      }
+    },
+    {
+      "label": "Notification confirmation cancel",
+      "bounds": {
+        "x": 16,
+        "y": 245,
+        "width": 77.38671875,
+        "height": 44
+      },
+      "dialogBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 720,
+        "height": 450
+      }
+    },
+    {
+      "label": "notification-confirmation-error-test close",
+      "bounds": {
+        "x": 637.3359375,
+        "y": 100,
+        "width": 66.6640625,
+        "height": 44
+      },
+      "dialogBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 720,
+        "height": 450
+      }
+    },
+    {
+      "label": "Notification confirmation commit with fault injected",
+      "bounds": {
+        "x": 101.38671875,
+        "y": 245,
+        "width": 166.625,
+        "height": 44
+      },
+      "dialogBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 720,
+        "height": 450
+      }
+    },
+    {
+      "label": "Notification confirmation cancel after error",
+      "bounds": {
+        "x": 16,
+        "y": 336,
+        "width": 77.38671875,
+        "height": 44
+      },
+      "dialogBounds": {
+        "x": 0,
+        "y": 0,
+        "width": 720,
+        "height": 450
+      }
+    }
+  ],
+  "screenshots": [
+    {
+      "name": "00-sample-today",
+      "path": "00-sample-today.png"
+    },
+    {
+      "name": "01-today-review-detail",
+      "path": "01-today-review-detail.png"
+    },
+    {
+      "name": "02-watchlist-stock-detail",
+      "path": "02-watchlist-stock-detail.png"
+    },
+    {
+      "name": "03-metric-detail-sheet",
+      "path": "03-metric-detail-sheet.png"
+    },
+    {
+      "name": "04-recipe-set-detail",
+      "path": "04-recipe-set-detail.png"
+    },
+    {
+      "name": "05-logic-registry-field",
+      "path": "05-logic-registry-field.png"
+    },
+    {
+      "name": "06-alerts-current",
+      "path": "06-alerts-current.png"
+    },
+    {
+      "name": "07-alert-inspect-detail",
+      "path": "07-alert-inspect-detail.png"
+    },
+    {
+      "name": "08-journal-decision-detail",
+      "path": "08-journal-decision-detail.png"
+    },
+    {
+      "name": "09-journal-amend-composer",
+      "path": "09-journal-amend-composer.png"
+    },
+    {
+      "name": "10-eye-composer-draft",
+      "path": "10-eye-composer-draft.png"
+    },
+    {
+      "name": "11-journal-composer-ready",
+      "path": "11-journal-composer-ready.png"
+    },
+    {
+      "name": "12-journal-record-committed",
+      "path": "12-journal-record-committed.png"
+    },
+    {
+      "name": "13-recipe-builder-logic",
+      "path": "13-recipe-builder-logic.png"
+    },
+    {
+      "name": "14-recipe-builder-final-review",
+      "path": "14-recipe-builder-final-review.png"
+    },
+    {
+      "name": "15-notification-confirmation",
+      "path": "15-notification-confirmation.png"
+    },
+    {
+      "name": "16-notification-confirmation-error",
+      "path": "16-notification-confirmation-error.png"
+    }
+  ],
+  "pageErrors": [],
+  "faultInjectionPageErrors": [
+    "Uncaught exception in event handler."
+  ],
+  "nativeTextScaling": "not exercised; separate from browser default zoom"
+}

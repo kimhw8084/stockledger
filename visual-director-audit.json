@@ -1,0 +1,20 @@
+{
+  "schema": "golden-ui-v3-visual-director-audit",
+  "candidate": "92b64a20c620da38422c22e73664eba395b58f17",
+  "tree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+  "status": "AWAITING_INDEPENDENT_AUDIT",
+  "selfAccepted": false,
+  "identity": "accepted StockLedger product identity preserved",
+  "baseline": {
+    "primary": "AR-61",
+    "deep": "AR-64",
+    "authoringConfig": "AR-68"
+  },
+  "reviewScope": {
+    "canonicalAnchors": 34,
+    "logicalSurfaces": 17,
+    "affectedSharedShellAndFocusSurfaces": "recaptured",
+    "supplementalProfiles": "EN/KO geometry and stress; native browser 200%; focus, forced-colors and text-spacing diagnostics"
+  },
+  "automatedVisualConclusion": "evidence packaged for independent visual review; no self-acceptance"
+}

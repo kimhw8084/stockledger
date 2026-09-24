@@ -1,0 +1,802 @@
+{
+  "candidate": "92b64a20c620da38422c22e73664eba395b58f17",
+  "tree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+  "captures": [
+    {
+      "surface": "today",
+      "locale": "en",
+      "viewport": "desktop-1440x900",
+      "path": "canonical/en/desktop-1440x900/today.png",
+      "sha256": "3f4b6e8b330d0e9ecb8d3b009f3058643d64721193e7d1c867ac363751222939",
+      "bytes": 130231,
+      "dimensions": {
+        "width": 1440,
+        "height": 900
+      },
+      "cssMetrics": {
+        "cssWidth": 1440,
+        "cssHeight": 900,
+        "documentWidth": 1440,
+        "bodyWidth": 1440
+      }
+    },
+    {
+      "surface": "watchlist",
+      "locale": "en",
+      "viewport": "desktop-1440x900",
+      "path": "canonical/en/desktop-1440x900/watchlist.png",
+      "sha256": "de8ac3cb2f6c72c251257ffeba29d46b8f9a1b29ce6cd63979f513e17f1e285a",
+      "bytes": 84907,
+      "dimensions": {
+        "width": 1440,
+        "height": 900
+      },
+      "cssMetrics": {
+        "cssWidth": 1440,
+        "cssHeight": 900,
+        "documentWidth": 1440,
+        "bodyWidth": 1440
+      }
+    },
+    {
+      "surface": "recipes",
+      "locale": "en",
+      "viewport": "desktop-1440x900",
+      "path": "canonical/en/desktop-1440x900/recipes.png",
+      "sha256": "3093fe4e4752922946a0d63e0b5e653e776a64d65d0e7e2b991b64d2fb9e1a61",
+      "bytes": 124330,
+      "dimensions": {
+        "width": 1440,
+        "height": 900
+      },
+      "cssMetrics": {
+        "cssWidth": 1440,
+        "cssHeight": 900,
+        "documentWidth": 1440,
+        "bodyWidth": 1440
+      }
+    },
+    {
+      "surface": "alerts",
+      "locale": "en",
+      "viewport": "desktop-1440x900",
+      "path": "canonical/en/desktop-1440x900/alerts.png",
+      "sha256": "9d2c9cbb72d3f650414ca8040b8f81503e7d7a953f0ff21398641944f77771d6",
+      "bytes": 106250,
+      "dimensions": {
+        "width": 1440,
+        "height": 900
+      },
+      "cssMetrics": {
+        "cssWidth": 1440,
+        "cssHeight": 900,
+        "documentWidth": 1440,
+        "bodyWidth": 1440
+      }
+    },
+    {
+      "surface": "journal",
+      "locale": "en",
+      "viewport": "desktop-1440x900",
+      "path": "canonical/en/desktop-1440x900/journal.png",
+      "sha256": "e568ca6feb0aaf5d50c6986bb9eb952a25864265d4085a1d845c006bd98d077b",
+      "bytes": 131285,
+      "dimensions": {
+        "width": 1440,
+        "height": 900
+      },
+      "cssMetrics": {
+        "cssWidth": 1440,
+        "cssHeight": 900,
+        "documentWidth": 1440,
+        "bodyWidth": 1440
+      }
+    },
+    {
+      "surface": "settings",
+      "locale": "en",
+      "viewport": "desktop-1440x900",
+      "path": "canonical/en/desktop-1440x900/settings.png",
+      "sha256": "938fe4bbcffb21cafbd0c410f8659ebafe7cc2b5bb8fa7d73b55f62cba8f9301",
+      "bytes": 128201,
+      "dimensions": {
+        "width": 1440,
+        "height": 900
+      },
+      "cssMetrics": {
+        "cssWidth": 1440,
+        "cssHeight": 900,
+        "documentWidth": 1440,
+        "bodyWidth": 1440
+      }
+    },
+    {
+      "surface": "stock-entity-detail",
+      "locale": "en",
+      "viewport": "desktop-1440x900",
+      "path": "canonical/en/desktop-1440x900/stock-entity-detail.png",
+      "sha256": "56a1827ddf0aec6495af65daef4ac6d9b271259aebb74d2d2bee7218064e20ea",
+      "bytes": 146929,
+      "dimensions": {
+        "width": 1440,
+        "height": 900
+      },
+      "cssMetrics": {
+        "cssWidth": 1440,
+        "cssHeight": 900,
+        "documentWidth": 1440,
+        "bodyWidth": 1440
+      }
+    },
+    {
+      "surface": "metric-detail-sheet",
+      "locale": "en",
+      "viewport": "desktop-1440x900",
+      "path": "canonical/en/desktop-1440x900/metric-detail-sheet.png",
+      "sha256": "e6dad1a7f540e61c81088daead3c9279ed9efe625b9442b8e483696b75e99336",
+      "bytes": 109024,
+      "dimensions": {
+        "width": 1440,
+        "height": 900
+      },
+      "cssMetrics": {
+        "cssWidth": 1440,
+        "cssHeight": 900,
+        "documentWidth": 1440,
+        "bodyWidth": 1440
+      }
+    },
+    {
+      "surface": "eye-flows",
+      "locale": "en",
+      "viewport": "desktop-1440x900",
+      "path": "canonical/en/desktop-1440x900/eye-flows.png",
+      "sha256": "5c3755bb9c8c59ea69957bf3ba97aed23a9be22d79eea284a18801298af86ac6",
+      "bytes": 101357,
+      "dimensions": {
+        "width": 1440,
+        "height": 900
+      },
+      "cssMetrics": {
+        "cssWidth": 1440,
+        "cssHeight": 900,
+        "documentWidth": 1440,
+        "bodyWidth": 1440
+      }
+    },
+    {
+      "surface": "eye-detail",
+      "locale": "en",
+      "viewport": "desktop-1440x900",
+      "path": "canonical/en/desktop-1440x900/eye-detail.png",
+      "sha256": "e04bdfc3b5a91c0667a5a7792c93f8f1a7674573873d2bc9acedebc3706ce905",
+      "bytes": 104282,
+      "dimensions": {
+        "width": 1440,
+        "height": 900
+      },
+      "cssMetrics": {
+        "cssWidth": 1440,
+        "cssHeight": 900,
+        "documentWidth": 1440,
+        "bodyWidth": 1440
+      }
+    },
+    {
+      "surface": "decision-detail",
+      "locale": "en",
+      "viewport": "desktop-1440x900",
+      "path": "canonical/en/desktop-1440x900/decision-detail.png",
+      "sha256": "30aa881d746fd6bdb09d98330e2f5f75d2cdbe15906b7ababdf1d6d253b312be",
+      "bytes": 74676,
+      "dimensions": {
+        "width": 1440,
+        "height": 900
+      },
+      "cssMetrics": {
+        "cssWidth": 1440,
+        "cssHeight": 900,
+        "documentWidth": 1440,
+        "bodyWidth": 1440
+      }
+    },
+    {
+      "surface": "eye-composer",
+      "locale": "en",
+      "viewport": "desktop-1440x900",
+      "path": "canonical/en/desktop-1440x900/eye-composer.png",
+      "sha256": "c2432834a85c51766daf20fdfc950a6fa973c6faf276c3528fde0ddbfd1ddf14",
+      "bytes": 79051,
+      "dimensions": {
+        "width": 1440,
+        "height": 900
+      },
+      "cssMetrics": {
+        "cssWidth": 1440,
+        "cssHeight": 900,
+        "documentWidth": 1440,
+        "bodyWidth": 1440
+      }
+    },
+    {
+      "surface": "journal-composer",
+      "locale": "en",
+      "viewport": "desktop-1440x900",
+      "path": "canonical/en/desktop-1440x900/journal-composer.png",
+      "sha256": "5ab85eb3e1f3ce2589d2e5aa8d2fc66398598ef52ffc3dabde110e33ee167d0f",
+      "bytes": 67156,
+      "dimensions": {
+        "width": 1440,
+        "height": 900
+      },
+      "cssMetrics": {
+        "cssWidth": 1440,
+        "cssHeight": 900,
+        "documentWidth": 1440,
+        "bodyWidth": 1440
+      }
+    },
+    {
+      "surface": "recipe-builder",
+      "locale": "en",
+      "viewport": "desktop-1440x900",
+      "path": "canonical/en/desktop-1440x900/recipe-builder.png",
+      "sha256": "34b814c406f80540094c6615b41adac620b2c7d25f52a95b7445712dcbaa0f1b",
+      "bytes": 75659,
+      "dimensions": {
+        "width": 1440,
+        "height": 900
+      },
+      "cssMetrics": {
+        "cssWidth": 1440,
+        "cssHeight": 900,
+        "documentWidth": 1440,
+        "bodyWidth": 1440
+      }
+    },
+    {
+      "surface": "logic-registry",
+      "locale": "en",
+      "viewport": "desktop-1440x900",
+      "path": "canonical/en/desktop-1440x900/logic-registry.png",
+      "sha256": "8547451017afce5ed7498ac49bdaf0fd5d7fafae86f41b1758e65ac53a371c3c",
+      "bytes": 102634,
+      "dimensions": {
+        "width": 1440,
+        "height": 900
+      },
+      "cssMetrics": {
+        "cssWidth": 1440,
+        "cssHeight": 900,
+        "documentWidth": 1440,
+        "bodyWidth": 1440
+      }
+    },
+    {
+      "surface": "notification-confirmation",
+      "locale": "en",
+      "viewport": "desktop-1440x900",
+      "path": "canonical/en/desktop-1440x900/notification-confirmation.png",
+      "sha256": "815d8fd1cf87577f7f904bec241af2c346519ab216179ab24489434da530e18c",
+      "bytes": 46624,
+      "dimensions": {
+        "width": 1440,
+        "height": 900
+      },
+      "cssMetrics": {
+        "cssWidth": 1440,
+        "cssHeight": 900,
+        "documentWidth": 1440,
+        "bodyWidth": 1440
+      }
+    },
+    {
+      "surface": "today",
+      "locale": "en",
+      "viewport": "mobile-390x844",
+      "path": "canonical/en/mobile-390x844/today.png",
+      "sha256": "6314cf2668a779c42b4a2d92078b4dd761445442f35002a9beec46a87c29aec3",
+      "bytes": 70938,
+      "dimensions": {
+        "width": 390,
+        "height": 844
+      },
+      "cssMetrics": {
+        "cssWidth": 390,
+        "cssHeight": 844,
+        "documentWidth": 390,
+        "bodyWidth": 390
+      }
+    },
+    {
+      "surface": "watchlist",
+      "locale": "en",
+      "viewport": "mobile-390x844",
+      "path": "canonical/en/mobile-390x844/watchlist.png",
+      "sha256": "7c250a8f8b6624cad7596035cf778444476e14109f03cc7c754370b0d1afc93b",
+      "bytes": 54981,
+      "dimensions": {
+        "width": 390,
+        "height": 844
+      },
+      "cssMetrics": {
+        "cssWidth": 390,
+        "cssHeight": 844,
+        "documentWidth": 390,
+        "bodyWidth": 390
+      }
+    },
+    {
+      "surface": "recipes",
+      "locale": "en",
+      "viewport": "mobile-390x844",
+      "path": "canonical/en/mobile-390x844/recipes.png",
+      "sha256": "34f9381a568e76a0feb19cb73bfe33e6c8b3690c49aef70472814d2eccb245be",
+      "bytes": 64449,
+      "dimensions": {
+        "width": 390,
+        "height": 844
+      },
+      "cssMetrics": {
+        "cssWidth": 390,
+        "cssHeight": 844,
+        "documentWidth": 390,
+        "bodyWidth": 390
+      }
+    },
+    {
+      "surface": "alerts",
+      "locale": "en",
+      "viewport": "mobile-390x844",
+      "path": "canonical/en/mobile-390x844/alerts.png",
+      "sha256": "b6c2c16171e33919bdf02ae4478ef26d9b4aa57078673d89dab0d53095948673",
+      "bytes": 67375,
+      "dimensions": {
+        "width": 390,
+        "height": 844
+      },
+      "cssMetrics": {
+        "cssWidth": 390,
+        "cssHeight": 844,
+        "documentWidth": 390,
+        "bodyWidth": 390
+      }
+    },
+    {
+      "surface": "journal",
+      "locale": "en",
+      "viewport": "mobile-390x844",
+      "path": "canonical/en/mobile-390x844/journal.png",
+      "sha256": "886619f479a1fb9292f76740fba733910ae51f40a9ce27ef88f851114588fbb8",
+      "bytes": 66728,
+      "dimensions": {
+        "width": 390,
+        "height": 844
+      },
+      "cssMetrics": {
+        "cssWidth": 390,
+        "cssHeight": 844,
+        "documentWidth": 390,
+        "bodyWidth": 390
+      }
+    },
+    {
+      "surface": "settings",
+      "locale": "en",
+      "viewport": "mobile-390x844",
+      "path": "canonical/en/mobile-390x844/settings.png",
+      "sha256": "40872f47c6b37259a25f4d4119182e95af42e738cc94b7291eae3de4873ca07f",
+      "bytes": 69339,
+      "dimensions": {
+        "width": 390,
+        "height": 844
+      },
+      "cssMetrics": {
+        "cssWidth": 390,
+        "cssHeight": 844,
+        "documentWidth": 390,
+        "bodyWidth": 390
+      }
+    },
+    {
+      "surface": "stock-entity-detail",
+      "locale": "en",
+      "viewport": "mobile-390x844",
+      "path": "canonical/en/mobile-390x844/stock-entity-detail.png",
+      "sha256": "cb532557aca95e49d29f9ce35ff7da2d43d6c41007aad0f4c96469145207518b",
+      "bytes": 67511,
+      "dimensions": {
+        "width": 390,
+        "height": 844
+      },
+      "cssMetrics": {
+        "cssWidth": 390,
+        "cssHeight": 844,
+        "documentWidth": 390,
+        "bodyWidth": 390
+      }
+    },
+    {
+      "surface": "metric-detail-sheet",
+      "locale": "en",
+      "viewport": "mobile-390x844",
+      "path": "canonical/en/mobile-390x844/metric-detail-sheet.png",
+      "sha256": "ecc2107e553b7521aac6b2ab928038bde8ab5e9c35bcf2534f5fb6bc6758444e",
+      "bytes": 68849,
+      "dimensions": {
+        "width": 390,
+        "height": 844
+      },
+      "cssMetrics": {
+        "cssWidth": 390,
+        "cssHeight": 844,
+        "documentWidth": 390,
+        "bodyWidth": 390
+      }
+    },
+    {
+      "surface": "eye-flows",
+      "locale": "en",
+      "viewport": "mobile-390x844",
+      "path": "canonical/en/mobile-390x844/eye-flows.png",
+      "sha256": "a9704f3f9ca38080ba0438300f2a155fbb82bfb6774089ed70befcdd0d46fc4b",
+      "bytes": 66275,
+      "dimensions": {
+        "width": 390,
+        "height": 844
+      },
+      "cssMetrics": {
+        "cssWidth": 390,
+        "cssHeight": 844,
+        "documentWidth": 390,
+        "bodyWidth": 390
+      }
+    },
+    {
+      "surface": "eye-detail",
+      "locale": "en",
+      "viewport": "mobile-390x844",
+      "path": "canonical/en/mobile-390x844/eye-detail.png",
+      "sha256": "6bbddc49762884a83dda7fe9839e8c1c6bdb388931eec7274416a12bec674d98",
+      "bytes": 75368,
+      "dimensions": {
+        "width": 390,
+        "height": 844
+      },
+      "cssMetrics": {
+        "cssWidth": 390,
+        "cssHeight": 844,
+        "documentWidth": 390,
+        "bodyWidth": 390
+      }
+    },
+    {
+      "surface": "decision-detail",
+      "locale": "en",
+      "viewport": "mobile-390x844",
+      "path": "canonical/en/mobile-390x844/decision-detail.png",
+      "sha256": "99fe5289f4a434c5831340a0d9d642be0f9872f3bb854d23b7974bf36764eb5a",
+      "bytes": 56268,
+      "dimensions": {
+        "width": 390,
+        "height": 844
+      },
+      "cssMetrics": {
+        "cssWidth": 390,
+        "cssHeight": 844,
+        "documentWidth": 390,
+        "bodyWidth": 390
+      }
+    },
+    {
+      "surface": "eye-composer",
+      "locale": "en",
+      "viewport": "mobile-390x844",
+      "path": "canonical/en/mobile-390x844/eye-composer.png",
+      "sha256": "a6d879599a87dbe6369bac90113d3b46fe8e61bf3f21c4f15e08392a241bd045",
+      "bytes": 61398,
+      "dimensions": {
+        "width": 390,
+        "height": 844
+      },
+      "cssMetrics": {
+        "cssWidth": 390,
+        "cssHeight": 844,
+        "documentWidth": 390,
+        "bodyWidth": 390
+      }
+    },
+    {
+      "surface": "journal-composer",
+      "locale": "en",
+      "viewport": "mobile-390x844",
+      "path": "canonical/en/mobile-390x844/journal-composer.png",
+      "sha256": "dc651e136e8479d300e3acfe7aa9c12e120cbcc6800d66e295384b3595e2a84d",
+      "bytes": 52514,
+      "dimensions": {
+        "width": 390,
+        "height": 844
+      },
+      "cssMetrics": {
+        "cssWidth": 390,
+        "cssHeight": 844,
+        "documentWidth": 390,
+        "bodyWidth": 390
+      }
+    },
+    {
+      "surface": "recipe-builder",
+      "locale": "en",
+      "viewport": "mobile-390x844",
+      "path": "canonical/en/mobile-390x844/recipe-builder.png",
+      "sha256": "17897a2887d9a1043e4b33c89b54dffbfde08ee2a93e4dfac3dcaed7ce9c96b1",
+      "bytes": 60684,
+      "dimensions": {
+        "width": 390,
+        "height": 844
+      },
+      "cssMetrics": {
+        "cssWidth": 390,
+        "cssHeight": 844,
+        "documentWidth": 390,
+        "bodyWidth": 390
+      }
+    },
+    {
+      "surface": "logic-registry",
+      "locale": "en",
+      "viewport": "mobile-390x844",
+      "path": "canonical/en/mobile-390x844/logic-registry.png",
+      "sha256": "de1b4fe56270f47ac959a8ee1d4edab7171f4ac16096e599307944403a583ec5",
+      "bytes": 70544,
+      "dimensions": {
+        "width": 390,
+        "height": 844
+      },
+      "cssMetrics": {
+        "cssWidth": 390,
+        "cssHeight": 844,
+        "documentWidth": 390,
+        "bodyWidth": 390
+      }
+    },
+    {
+      "surface": "notification-confirmation",
+      "locale": "en",
+      "viewport": "mobile-390x844",
+      "path": "canonical/en/mobile-390x844/notification-confirmation.png",
+      "sha256": "f11fc1cc8c757acf0f9dc101e89f24ff70401661676b0d50f21fe8d01dfa55a3",
+      "bytes": 37926,
+      "dimensions": {
+        "width": 390,
+        "height": 844
+      },
+      "cssMetrics": {
+        "cssWidth": 390,
+        "cssHeight": 844,
+        "documentWidth": 390,
+        "bodyWidth": 390
+      }
+    },
+    {
+      "surface": "today",
+      "locale": "en",
+      "viewport": "1366x768",
+      "path": "geometry/en/today-1366x768.png",
+      "sha256": "c3933444deef94e4553c38caccced85bbe435dea5ea3a25b754e2f6b2648b6ad",
+      "bytes": 114419,
+      "cssMetrics": {
+        "cssWidth": 1366,
+        "cssHeight": 768,
+        "documentWidth": 1366,
+        "bodyWidth": 1366
+      }
+    },
+    {
+      "surface": "today",
+      "locale": "en",
+      "viewport": "360x800",
+      "path": "geometry/en/today-360x800.png",
+      "sha256": "f204b0d0b8eddb62c82b87010c6766d8ef05e5f30322310b71e6fa2edf5e7e6b",
+      "bytes": 66611,
+      "cssMetrics": {
+        "cssWidth": 360,
+        "cssHeight": 800,
+        "documentWidth": 360,
+        "bodyWidth": 360
+      }
+    },
+    {
+      "surface": "today",
+      "locale": "en",
+      "viewport": "390x844",
+      "path": "geometry/en/today-390x844.png",
+      "sha256": "6314cf2668a779c42b4a2d92078b4dd761445442f35002a9beec46a87c29aec3",
+      "bytes": 70938,
+      "cssMetrics": {
+        "cssWidth": 390,
+        "cssHeight": 844,
+        "documentWidth": 390,
+        "bodyWidth": 390
+      }
+    },
+    {
+      "surface": "today",
+      "locale": "en",
+      "viewport": "412x915",
+      "path": "geometry/en/today-412x915.png",
+      "sha256": "c028920e60305b59f899c3fd252a3f34d2f6c0d54ad3c66cd686f73748fe6401",
+      "bytes": 85033,
+      "cssMetrics": {
+        "cssWidth": 412,
+        "cssHeight": 915,
+        "documentWidth": 412,
+        "bodyWidth": 412
+      }
+    },
+    {
+      "surface": "alerts",
+      "locale": "en",
+      "viewport": "390x844",
+      "path": "geometry/en/alerts-390x844.png",
+      "sha256": "b6c2c16171e33919bdf02ae4478ef26d9b4aa57078673d89dab0d53095948673",
+      "bytes": 67375,
+      "cssMetrics": {
+        "cssWidth": 390,
+        "cssHeight": 844,
+        "documentWidth": 390,
+        "bodyWidth": 390
+      }
+    },
+    {
+      "surface": "recipes",
+      "locale": "en",
+      "viewport": "360x800",
+      "path": "geometry/en/recipes-360x800.png",
+      "sha256": "cc943d1df09054c05b9088bd8e620f60baea50aa8fa01c6430c2552e007e9ba6",
+      "bytes": 60579,
+      "cssMetrics": {
+        "cssWidth": 360,
+        "cssHeight": 800,
+        "documentWidth": 360,
+        "bodyWidth": 360
+      }
+    },
+    {
+      "surface": "alerts",
+      "locale": "ko",
+      "viewport": "1280x720",
+      "path": "geometry/ko/alerts-1280x720.png",
+      "sha256": "c9a2951b0def5df35430e94d027f33c7a8042b828b90a565134766518f4d6bb0",
+      "bytes": 81196,
+      "cssMetrics": {
+        "cssWidth": 1280,
+        "cssHeight": 720,
+        "documentWidth": 1280,
+        "bodyWidth": 1280
+      }
+    },
+    {
+      "surface": "today",
+      "locale": "ko",
+      "viewport": "390x844",
+      "path": "geometry/ko/today-390x844.png",
+      "sha256": "3c456e521f25903247ecd113944a99b78e8bf3ccdfbfdf71db02812e2c9aacae",
+      "bytes": 75696,
+      "cssMetrics": {
+        "cssWidth": 390,
+        "cssHeight": 844,
+        "documentWidth": 390,
+        "bodyWidth": 390
+      }
+    },
+    {
+      "surface": "recipes",
+      "locale": "ko",
+      "viewport": "360x800",
+      "path": "geometry/ko/recipes-360x800.png",
+      "sha256": "fbf477278b09e6605c2b3f9a75d4817adfd5da2d8dca04a731fe925ec8968976",
+      "bytes": 54251,
+      "cssMetrics": {
+        "cssWidth": 360,
+        "cssHeight": 800,
+        "documentWidth": 360,
+        "bodyWidth": 360
+      }
+    },
+    {
+      "surface": "alerts",
+      "locale": "ko",
+      "viewport": "390x844",
+      "path": "geometry/ko/alerts-390x844.png",
+      "sha256": "8f17150782c2170238bb7d96d7b34f1e9f8c80e379701892bf231c296bdc936d",
+      "bytes": 62447,
+      "cssMetrics": {
+        "cssWidth": 390,
+        "cssHeight": 844,
+        "documentWidth": 390,
+        "bodyWidth": 390
+      }
+    },
+    {
+      "surface": "today",
+      "locale": "ko",
+      "viewport": "1366x768",
+      "path": "geometry/ko/today-1366x768.png",
+      "sha256": "35fbaf6e549ef05eee4d227f5a9f21522947916d3f3edf7ca0c916bdc5ebf7cd",
+      "bytes": 106758,
+      "cssMetrics": {
+        "cssWidth": 1366,
+        "cssHeight": 768,
+        "documentWidth": 1366,
+        "bodyWidth": 1366
+      }
+    },
+    {
+      "surface": "today",
+      "locale": "ko",
+      "viewport": "360x800",
+      "path": "geometry/ko/today-360x800.png",
+      "sha256": "4dcec5d34e9840a6a2e846d16b1c09a07a720dd5389345a0c1f197561b2c6c82",
+      "bytes": 69412,
+      "cssMetrics": {
+        "cssWidth": 360,
+        "cssHeight": 800,
+        "documentWidth": 360,
+        "bodyWidth": 360
+      }
+    },
+    {
+      "surface": "today",
+      "locale": "ko",
+      "viewport": "412x915",
+      "path": "geometry/ko/today-412x915.png",
+      "sha256": "617af49e8dcf9538f03e51792932c84bca93597184cef074e6aa1a47bda3ba84",
+      "bytes": 80107,
+      "cssMetrics": {
+        "cssWidth": 412,
+        "cssHeight": 915,
+        "documentWidth": 412,
+        "bodyWidth": 412
+      }
+    },
+    {
+      "surface": "scanner-review",
+      "locale": "en",
+      "viewport": "desktop-1440x900",
+      "path": "canonical/en/desktop-1440x900/scanner-review.png",
+      "sha256": "9f63b82590bf8070777268a6a28a81c88c3d826f1c08617d6220416fec2c73f3",
+      "bytes": 111100,
+      "dimensions": {
+        "width": 1440,
+        "height": 900
+      },
+      "cssMetrics": {
+        "cssWidth": 1440,
+        "cssHeight": 900,
+        "documentWidth": 1440,
+        "bodyWidth": 1440
+      }
+    },
+    {
+      "surface": "scanner-review",
+      "locale": "en",
+      "viewport": "mobile-390x844",
+      "path": "canonical/en/mobile-390x844/scanner-review.png",
+      "sha256": "a5b77d7b864d72d06adbeedc33268d9f5f780940aabda350ce364cf5dbf4c563",
+      "bytes": 82505,
+      "dimensions": {
+        "width": 390,
+        "height": 844
+      },
+      "cssMetrics": {
+        "cssWidth": 390,
+        "cssHeight": 844,
+        "documentWidth": 390,
+        "bodyWidth": 390
+      }
+    }
+  ],
+  "total": 45,
+  "captureCount": 47
+}

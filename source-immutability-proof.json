@@ -1,0 +1,31 @@
+{
+  "base": "ed377bb173387ebf56a4919ac4282d136c56e21d",
+  "candidate": "92b64a20c620da38422c22e73664eba395b58f17",
+  "tree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+  "protectedBaseExact": true,
+  "parentOfCandidate": "ed377bb173387ebf56a4919ac4282d136c56e21d",
+  "baseTreeActual": "dc99438cdcf8e2f737e5de87d6afc550d4008f24",
+  "candidateTreeActual": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+  "worktreeClean": true,
+  "productChangedFiles": 11,
+  "productFiles": [
+    "packages/layouts/src/PageHeader.tsx",
+    "packages/layouts/src/SectionHeader.tsx",
+    "src/app/StockLedgerApp.tsx",
+    "src/components/WindowPanel.tsx",
+    "src/domain/composerOperationGate.ts",
+    "src/features/alerts/AlertsScreen.tsx",
+    "src/features/recipes/RecipesScreen.tsx",
+    "src/features/shell/StockLedgerShell.tsx",
+    "src/features/today/TodayScreen.tsx",
+    "src/hooks/useWindowPanelFocus.ts",
+    "src/lib/webFocusEligibility.ts"
+  ],
+  "testFiles": [
+    "tests/composerOperationGate.test.ts",
+    "tests/e2e/chg172-primary-surfaces.spec.ts",
+    "tests/e2e/v3-focus-geometry.spec.ts",
+    "tests/webFocusEligibility.test.ts"
+  ],
+  "totalChangedFiles": 15
+}

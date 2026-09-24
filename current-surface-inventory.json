@@ -1,0 +1,531 @@
+{
+  "project": "stockledger",
+  "candidate": "92b64a20c620da38422c22e73664eba395b58f17",
+  "tree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+  "ledgerAuthority": "User-provided Current Visual Surfaces ledger",
+  "logicalSurfaceCount": 17,
+  "canonicalAnchorCount": 34,
+  "canonicalAnchorRule": "Each logical surface has one EN light desktop-1440x900 and one EN light mobile-390x844 evidence anchor. Korean, stress, holdout, and state captures are supplemental and do not inflate the 34 count.",
+  "surfaces": [
+    {
+      "name": "today",
+      "category": "primary",
+      "task": "Review why-now evidence and choose an intentional next step",
+      "priorOwningEvidence": "CHG-172 / AR-61",
+      "canonicalAnchors": [
+        {
+          "surface": "today",
+          "category": "primary",
+          "locale": "en",
+          "viewport": "desktop-1440x900",
+          "path": "screenshots/canonical/en/desktop-1440x900/today.png",
+          "sourceCommit": "92b64a20c620da38422c22e73664eba395b58f17",
+          "sourceTree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+          "sourceEvidence": "recaptured on exact R2 candidate by full Playwright and canonical capture",
+          "sha256": "3f4b6e8b330d0e9ecb8d3b009f3058643d64721193e7d1c867ac363751222939"
+        },
+        {
+          "surface": "today",
+          "category": "primary",
+          "locale": "en",
+          "viewport": "mobile-390x844",
+          "path": "screenshots/canonical/en/mobile-390x844/today.png",
+          "sourceCommit": "92b64a20c620da38422c22e73664eba395b58f17",
+          "sourceTree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+          "sourceEvidence": "recaptured on exact R2 candidate by full Playwright and canonical capture",
+          "sha256": "6314cf2668a779c42b4a2d92078b4dd761445442f35002a9beec46a87c29aec3"
+        }
+      ]
+    },
+    {
+      "name": "watchlist",
+      "category": "primary",
+      "task": "Review watchlist records and take supported follow-up actions",
+      "priorOwningEvidence": "CHG-172 / AR-61",
+      "canonicalAnchors": [
+        {
+          "surface": "watchlist",
+          "category": "primary",
+          "locale": "en",
+          "viewport": "desktop-1440x900",
+          "path": "screenshots/canonical/en/desktop-1440x900/watchlist.png",
+          "sourceCommit": "92b64a20c620da38422c22e73664eba395b58f17",
+          "sourceTree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+          "sourceEvidence": "recaptured on exact R2 candidate by full Playwright and canonical capture",
+          "sha256": "de8ac3cb2f6c72c251257ffeba29d46b8f9a1b29ce6cd63979f513e17f1e285a"
+        },
+        {
+          "surface": "watchlist",
+          "category": "primary",
+          "locale": "en",
+          "viewport": "mobile-390x844",
+          "path": "screenshots/canonical/en/mobile-390x844/watchlist.png",
+          "sourceCommit": "92b64a20c620da38422c22e73664eba395b58f17",
+          "sourceTree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+          "sourceEvidence": "recaptured on exact R2 candidate by full Playwright and canonical capture",
+          "sha256": "7c250a8f8b6624cad7596035cf778444476e14109f03cc7c754370b0d1afc93b"
+        }
+      ]
+    },
+    {
+      "name": "recipes",
+      "category": "primary",
+      "task": "Review recipes records and take supported follow-up actions",
+      "priorOwningEvidence": "CHG-172 / AR-61",
+      "canonicalAnchors": [
+        {
+          "surface": "recipes",
+          "category": "primary",
+          "locale": "en",
+          "viewport": "desktop-1440x900",
+          "path": "screenshots/canonical/en/desktop-1440x900/recipes.png",
+          "sourceCommit": "92b64a20c620da38422c22e73664eba395b58f17",
+          "sourceTree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+          "sourceEvidence": "recaptured on exact R2 candidate by full Playwright and canonical capture",
+          "sha256": "3093fe4e4752922946a0d63e0b5e653e776a64d65d0e7e2b991b64d2fb9e1a61"
+        },
+        {
+          "surface": "recipes",
+          "category": "primary",
+          "locale": "en",
+          "viewport": "mobile-390x844",
+          "path": "screenshots/canonical/en/mobile-390x844/recipes.png",
+          "sourceCommit": "92b64a20c620da38422c22e73664eba395b58f17",
+          "sourceTree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+          "sourceEvidence": "recaptured on exact R2 candidate by full Playwright and canonical capture",
+          "sha256": "34f9381a568e76a0feb19cb73bfe33e6c8b3690c49aef70472814d2eccb245be"
+        }
+      ]
+    },
+    {
+      "name": "alerts",
+      "category": "primary",
+      "task": "Review alerts records and take supported follow-up actions",
+      "priorOwningEvidence": "CHG-172 / AR-61",
+      "canonicalAnchors": [
+        {
+          "surface": "alerts",
+          "category": "primary",
+          "locale": "en",
+          "viewport": "desktop-1440x900",
+          "path": "screenshots/canonical/en/desktop-1440x900/alerts.png",
+          "sourceCommit": "92b64a20c620da38422c22e73664eba395b58f17",
+          "sourceTree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+          "sourceEvidence": "recaptured on exact R2 candidate by full Playwright and canonical capture",
+          "sha256": "9d2c9cbb72d3f650414ca8040b8f81503e7d7a953f0ff21398641944f77771d6"
+        },
+        {
+          "surface": "alerts",
+          "category": "primary",
+          "locale": "en",
+          "viewport": "mobile-390x844",
+          "path": "screenshots/canonical/en/mobile-390x844/alerts.png",
+          "sourceCommit": "92b64a20c620da38422c22e73664eba395b58f17",
+          "sourceTree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+          "sourceEvidence": "recaptured on exact R2 candidate by full Playwright and canonical capture",
+          "sha256": "b6c2c16171e33919bdf02ae4478ef26d9b4aa57078673d89dab0d53095948673"
+        }
+      ]
+    },
+    {
+      "name": "journal",
+      "category": "primary",
+      "task": "Review journal records and take supported follow-up actions",
+      "priorOwningEvidence": "CHG-172 / AR-61",
+      "canonicalAnchors": [
+        {
+          "surface": "journal",
+          "category": "primary",
+          "locale": "en",
+          "viewport": "desktop-1440x900",
+          "path": "screenshots/canonical/en/desktop-1440x900/journal.png",
+          "sourceCommit": "92b64a20c620da38422c22e73664eba395b58f17",
+          "sourceTree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+          "sourceEvidence": "recaptured on exact R2 candidate by full Playwright and canonical capture",
+          "sha256": "e568ca6feb0aaf5d50c6986bb9eb952a25864265d4085a1d845c006bd98d077b"
+        },
+        {
+          "surface": "journal",
+          "category": "primary",
+          "locale": "en",
+          "viewport": "mobile-390x844",
+          "path": "screenshots/canonical/en/mobile-390x844/journal.png",
+          "sourceCommit": "92b64a20c620da38422c22e73664eba395b58f17",
+          "sourceTree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+          "sourceEvidence": "recaptured on exact R2 candidate by full Playwright and canonical capture",
+          "sha256": "886619f479a1fb9292f76740fba733910ae51f40a9ce27ef88f851114588fbb8"
+        }
+      ]
+    },
+    {
+      "name": "settings",
+      "category": "primary",
+      "task": "Review settings records and take supported follow-up actions",
+      "priorOwningEvidence": "CHG-172 / AR-61",
+      "canonicalAnchors": [
+        {
+          "surface": "settings",
+          "category": "primary",
+          "locale": "en",
+          "viewport": "desktop-1440x900",
+          "path": "screenshots/canonical/en/desktop-1440x900/settings.png",
+          "sourceCommit": "92b64a20c620da38422c22e73664eba395b58f17",
+          "sourceTree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+          "sourceEvidence": "recaptured on exact R2 candidate by full Playwright and canonical capture",
+          "sha256": "938fe4bbcffb21cafbd0c410f8659ebafe7cc2b5bb8fa7d73b55f62cba8f9301"
+        },
+        {
+          "surface": "settings",
+          "category": "primary",
+          "locale": "en",
+          "viewport": "mobile-390x844",
+          "path": "screenshots/canonical/en/mobile-390x844/settings.png",
+          "sourceCommit": "92b64a20c620da38422c22e73664eba395b58f17",
+          "sourceTree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+          "sourceEvidence": "recaptured on exact R2 candidate by full Playwright and canonical capture",
+          "sha256": "40872f47c6b37259a25f4d4119182e95af42e738cc94b7291eae3de4873ca07f"
+        }
+      ]
+    },
+    {
+      "name": "stock-entity-detail",
+      "category": "deep-review-detail",
+      "task": "Inspect the selected stock entity detail context and return to its exact originating object",
+      "priorOwningEvidence": "CHG-184 / AR-64",
+      "canonicalAnchors": [
+        {
+          "surface": "stock-entity-detail",
+          "category": "deep-review-detail",
+          "locale": "en",
+          "viewport": "desktop-1440x900",
+          "path": "screenshots/canonical/en/desktop-1440x900/stock-entity-detail.png",
+          "sourceCommit": "92b64a20c620da38422c22e73664eba395b58f17",
+          "sourceTree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+          "sourceEvidence": "recaptured on exact R2 candidate by full Playwright and canonical capture",
+          "sha256": "56a1827ddf0aec6495af65daef4ac6d9b271259aebb74d2d2bee7218064e20ea"
+        },
+        {
+          "surface": "stock-entity-detail",
+          "category": "deep-review-detail",
+          "locale": "en",
+          "viewport": "mobile-390x844",
+          "path": "screenshots/canonical/en/mobile-390x844/stock-entity-detail.png",
+          "sourceCommit": "92b64a20c620da38422c22e73664eba395b58f17",
+          "sourceTree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+          "sourceEvidence": "recaptured on exact R2 candidate by full Playwright and canonical capture",
+          "sha256": "cb532557aca95e49d29f9ce35ff7da2d43d6c41007aad0f4c96469145207518b"
+        }
+      ]
+    },
+    {
+      "name": "metric-detail-sheet",
+      "category": "deep-review-detail",
+      "task": "Inspect the selected metric detail sheet context and return to its exact originating object",
+      "priorOwningEvidence": "CHG-184 / AR-64",
+      "canonicalAnchors": [
+        {
+          "surface": "metric-detail-sheet",
+          "category": "deep-review-detail",
+          "locale": "en",
+          "viewport": "desktop-1440x900",
+          "path": "screenshots/canonical/en/desktop-1440x900/metric-detail-sheet.png",
+          "sourceCommit": "92b64a20c620da38422c22e73664eba395b58f17",
+          "sourceTree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+          "sourceEvidence": "recaptured on exact R2 candidate by full Playwright and canonical capture",
+          "sha256": "e6dad1a7f540e61c81088daead3c9279ed9efe625b9442b8e483696b75e99336"
+        },
+        {
+          "surface": "metric-detail-sheet",
+          "category": "deep-review-detail",
+          "locale": "en",
+          "viewport": "mobile-390x844",
+          "path": "screenshots/canonical/en/mobile-390x844/metric-detail-sheet.png",
+          "sourceCommit": "92b64a20c620da38422c22e73664eba395b58f17",
+          "sourceTree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+          "sourceEvidence": "recaptured on exact R2 candidate by full Playwright and canonical capture",
+          "sha256": "ecc2107e553b7521aac6b2ab928038bde8ab5e9c35bcf2534f5fb6bc6758444e"
+        }
+      ]
+    },
+    {
+      "name": "eye-flows",
+      "category": "deep-review-detail",
+      "task": "Inspect the selected eye flows context and return to its exact originating object",
+      "priorOwningEvidence": "CHG-184 / AR-64",
+      "canonicalAnchors": [
+        {
+          "surface": "eye-flows",
+          "category": "deep-review-detail",
+          "locale": "en",
+          "viewport": "desktop-1440x900",
+          "path": "screenshots/canonical/en/desktop-1440x900/eye-flows.png",
+          "sourceCommit": "92b64a20c620da38422c22e73664eba395b58f17",
+          "sourceTree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+          "sourceEvidence": "recaptured on exact R2 candidate by full Playwright and canonical capture",
+          "sha256": "5c3755bb9c8c59ea69957bf3ba97aed23a9be22d79eea284a18801298af86ac6"
+        },
+        {
+          "surface": "eye-flows",
+          "category": "deep-review-detail",
+          "locale": "en",
+          "viewport": "mobile-390x844",
+          "path": "screenshots/canonical/en/mobile-390x844/eye-flows.png",
+          "sourceCommit": "92b64a20c620da38422c22e73664eba395b58f17",
+          "sourceTree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+          "sourceEvidence": "recaptured on exact R2 candidate by full Playwright and canonical capture",
+          "sha256": "a9704f3f9ca38080ba0438300f2a155fbb82bfb6774089ed70befcdd0d46fc4b"
+        }
+      ]
+    },
+    {
+      "name": "eye-detail",
+      "category": "deep-review-detail",
+      "task": "Inspect the selected eye detail context and return to its exact originating object",
+      "priorOwningEvidence": "CHG-184 / AR-64",
+      "canonicalAnchors": [
+        {
+          "surface": "eye-detail",
+          "category": "deep-review-detail",
+          "locale": "en",
+          "viewport": "desktop-1440x900",
+          "path": "screenshots/canonical/en/desktop-1440x900/eye-detail.png",
+          "sourceCommit": "92b64a20c620da38422c22e73664eba395b58f17",
+          "sourceTree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+          "sourceEvidence": "recaptured on exact R2 candidate by full Playwright and canonical capture",
+          "sha256": "e04bdfc3b5a91c0667a5a7792c93f8f1a7674573873d2bc9acedebc3706ce905"
+        },
+        {
+          "surface": "eye-detail",
+          "category": "deep-review-detail",
+          "locale": "en",
+          "viewport": "mobile-390x844",
+          "path": "screenshots/canonical/en/mobile-390x844/eye-detail.png",
+          "sourceCommit": "92b64a20c620da38422c22e73664eba395b58f17",
+          "sourceTree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+          "sourceEvidence": "recaptured on exact R2 candidate by full Playwright and canonical capture",
+          "sha256": "6bbddc49762884a83dda7fe9839e8c1c6bdb388931eec7274416a12bec674d98"
+        }
+      ]
+    },
+    {
+      "name": "scanner-review",
+      "category": "deep-review-detail",
+      "task": "Inspect the selected scanner review context and return to its exact originating object",
+      "priorOwningEvidence": "CHG-184 / AR-64",
+      "canonicalAnchors": [
+        {
+          "surface": "scanner-review",
+          "category": "deep-review-detail",
+          "locale": "en",
+          "viewport": "desktop-1440x900",
+          "path": "screenshots/canonical/en/desktop-1440x900/scanner-review.png",
+          "sourceCommit": "92b64a20c620da38422c22e73664eba395b58f17",
+          "sourceTree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+          "sourceEvidence": "recaptured from exact-candidate full Playwright regression output",
+          "sha256": "9f63b82590bf8070777268a6a28a81c88c3d826f1c08617d6220416fec2c73f3"
+        },
+        {
+          "surface": "scanner-review",
+          "category": "deep-review-detail",
+          "locale": "en",
+          "viewport": "mobile-390x844",
+          "path": "screenshots/canonical/en/mobile-390x844/scanner-review.png",
+          "sourceCommit": "92b64a20c620da38422c22e73664eba395b58f17",
+          "sourceTree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+          "sourceEvidence": "recaptured from exact-candidate full Playwright regression output",
+          "sha256": "a5b77d7b864d72d06adbeedc33268d9f5f780940aabda350ce364cf5dbf4c563"
+        }
+      ]
+    },
+    {
+      "name": "decision-detail",
+      "category": "deep-review-detail",
+      "task": "Inspect the selected decision detail context and return to its exact originating object",
+      "priorOwningEvidence": "CHG-184 / AR-64",
+      "canonicalAnchors": [
+        {
+          "surface": "decision-detail",
+          "category": "deep-review-detail",
+          "locale": "en",
+          "viewport": "desktop-1440x900",
+          "path": "screenshots/canonical/en/desktop-1440x900/decision-detail.png",
+          "sourceCommit": "92b64a20c620da38422c22e73664eba395b58f17",
+          "sourceTree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+          "sourceEvidence": "recaptured on exact R2 candidate by full Playwright and canonical capture",
+          "sha256": "30aa881d746fd6bdb09d98330e2f5f75d2cdbe15906b7ababdf1d6d253b312be"
+        },
+        {
+          "surface": "decision-detail",
+          "category": "deep-review-detail",
+          "locale": "en",
+          "viewport": "mobile-390x844",
+          "path": "screenshots/canonical/en/mobile-390x844/decision-detail.png",
+          "sourceCommit": "92b64a20c620da38422c22e73664eba395b58f17",
+          "sourceTree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+          "sourceEvidence": "recaptured on exact R2 candidate by full Playwright and canonical capture",
+          "sha256": "99fe5289f4a434c5831340a0d9d642be0f9872f3bb854d23b7974bf36764eb5a"
+        }
+      ]
+    },
+    {
+      "name": "eye-composer",
+      "category": "authoring-config",
+      "task": "Complete the supported eye composer task without implying external execution",
+      "priorOwningEvidence": "CHG-199 / AR-68",
+      "canonicalAnchors": [
+        {
+          "surface": "eye-composer",
+          "category": "authoring-config",
+          "locale": "en",
+          "viewport": "desktop-1440x900",
+          "path": "screenshots/canonical/en/desktop-1440x900/eye-composer.png",
+          "sourceCommit": "92b64a20c620da38422c22e73664eba395b58f17",
+          "sourceTree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+          "sourceEvidence": "recaptured on exact R2 candidate by full Playwright and canonical capture",
+          "sha256": "c2432834a85c51766daf20fdfc950a6fa973c6faf276c3528fde0ddbfd1ddf14"
+        },
+        {
+          "surface": "eye-composer",
+          "category": "authoring-config",
+          "locale": "en",
+          "viewport": "mobile-390x844",
+          "path": "screenshots/canonical/en/mobile-390x844/eye-composer.png",
+          "sourceCommit": "92b64a20c620da38422c22e73664eba395b58f17",
+          "sourceTree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+          "sourceEvidence": "recaptured on exact R2 candidate by full Playwright and canonical capture",
+          "sha256": "a6d879599a87dbe6369bac90113d3b46fe8e61bf3f21c4f15e08392a241bd045"
+        }
+      ]
+    },
+    {
+      "name": "journal-composer",
+      "category": "authoring-config",
+      "task": "Complete the supported journal composer task without implying external execution",
+      "priorOwningEvidence": "CHG-199 / AR-68",
+      "canonicalAnchors": [
+        {
+          "surface": "journal-composer",
+          "category": "authoring-config",
+          "locale": "en",
+          "viewport": "desktop-1440x900",
+          "path": "screenshots/canonical/en/desktop-1440x900/journal-composer.png",
+          "sourceCommit": "92b64a20c620da38422c22e73664eba395b58f17",
+          "sourceTree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+          "sourceEvidence": "recaptured on exact R2 candidate by full Playwright and canonical capture",
+          "sha256": "5ab85eb3e1f3ce2589d2e5aa8d2fc66398598ef52ffc3dabde110e33ee167d0f"
+        },
+        {
+          "surface": "journal-composer",
+          "category": "authoring-config",
+          "locale": "en",
+          "viewport": "mobile-390x844",
+          "path": "screenshots/canonical/en/mobile-390x844/journal-composer.png",
+          "sourceCommit": "92b64a20c620da38422c22e73664eba395b58f17",
+          "sourceTree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+          "sourceEvidence": "recaptured on exact R2 candidate by full Playwright and canonical capture",
+          "sha256": "dc651e136e8479d300e3acfe7aa9c12e120cbcc6800d66e295384b3595e2a84d"
+        }
+      ]
+    },
+    {
+      "name": "recipe-builder",
+      "category": "authoring-config",
+      "task": "Complete the supported recipe builder task without implying external execution",
+      "priorOwningEvidence": "CHG-199 / AR-68",
+      "canonicalAnchors": [
+        {
+          "surface": "recipe-builder",
+          "category": "authoring-config",
+          "locale": "en",
+          "viewport": "desktop-1440x900",
+          "path": "screenshots/canonical/en/desktop-1440x900/recipe-builder.png",
+          "sourceCommit": "92b64a20c620da38422c22e73664eba395b58f17",
+          "sourceTree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+          "sourceEvidence": "recaptured on exact R2 candidate by full Playwright and canonical capture",
+          "sha256": "34b814c406f80540094c6615b41adac620b2c7d25f52a95b7445712dcbaa0f1b"
+        },
+        {
+          "surface": "recipe-builder",
+          "category": "authoring-config",
+          "locale": "en",
+          "viewport": "mobile-390x844",
+          "path": "screenshots/canonical/en/mobile-390x844/recipe-builder.png",
+          "sourceCommit": "92b64a20c620da38422c22e73664eba395b58f17",
+          "sourceTree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+          "sourceEvidence": "recaptured on exact R2 candidate by full Playwright and canonical capture",
+          "sha256": "17897a2887d9a1043e4b33c89b54dffbfde08ee2a93e4dfac3dcaed7ce9c96b1"
+        }
+      ]
+    },
+    {
+      "name": "logic-registry",
+      "category": "authoring-config",
+      "task": "Complete the supported logic registry task without implying external execution",
+      "priorOwningEvidence": "CHG-199 / AR-68",
+      "canonicalAnchors": [
+        {
+          "surface": "logic-registry",
+          "category": "authoring-config",
+          "locale": "en",
+          "viewport": "desktop-1440x900",
+          "path": "screenshots/canonical/en/desktop-1440x900/logic-registry.png",
+          "sourceCommit": "92b64a20c620da38422c22e73664eba395b58f17",
+          "sourceTree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+          "sourceEvidence": "recaptured on exact R2 candidate by full Playwright and canonical capture",
+          "sha256": "8547451017afce5ed7498ac49bdaf0fd5d7fafae86f41b1758e65ac53a371c3c"
+        },
+        {
+          "surface": "logic-registry",
+          "category": "authoring-config",
+          "locale": "en",
+          "viewport": "mobile-390x844",
+          "path": "screenshots/canonical/en/mobile-390x844/logic-registry.png",
+          "sourceCommit": "92b64a20c620da38422c22e73664eba395b58f17",
+          "sourceTree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+          "sourceEvidence": "recaptured on exact R2 candidate by full Playwright and canonical capture",
+          "sha256": "de1b4fe56270f47ac959a8ee1d4edab7171f4ac16096e599307944403a583ec5"
+        }
+      ]
+    },
+    {
+      "name": "notification-confirmation",
+      "category": "authoring-config",
+      "task": "Complete the supported notification confirmation task without implying external execution",
+      "priorOwningEvidence": "CHG-199 / AR-68",
+      "canonicalAnchors": [
+        {
+          "surface": "notification-confirmation",
+          "category": "authoring-config",
+          "locale": "en",
+          "viewport": "desktop-1440x900",
+          "path": "screenshots/canonical/en/desktop-1440x900/notification-confirmation.png",
+          "sourceCommit": "92b64a20c620da38422c22e73664eba395b58f17",
+          "sourceTree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+          "sourceEvidence": "recaptured on exact R2 candidate by full Playwright and canonical capture",
+          "sha256": "815d8fd1cf87577f7f904bec241af2c346519ab216179ab24489434da530e18c"
+        },
+        {
+          "surface": "notification-confirmation",
+          "category": "authoring-config",
+          "locale": "en",
+          "viewport": "mobile-390x844",
+          "path": "screenshots/canonical/en/mobile-390x844/notification-confirmation.png",
+          "sourceCommit": "92b64a20c620da38422c22e73664eba395b58f17",
+          "sourceTree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+          "sourceEvidence": "recaptured on exact R2 candidate by full Playwright and canonical capture",
+          "sha256": "f11fc1cc8c757acf0f9dc101e89f24ff70401661676b0d50f21fe8d01dfa55a3"
+        }
+      ]
+    }
+  ],
+  "supplementalEvidence": {
+    "currentEnglishFailingAndStressProfiles": "See screenshots/geometry/en and geometry-action-measurements.json; Today 1366x768, 360x800, 390x844, 412x915; Alerts 390x844; Recipes 360x800.",
+    "currentKoreanFailingAndStressProfiles": "See screenshots/geometry/ko and geometry-action-measurements.json; Today 1366x768, 360x800, 390x844, 412x915; Alerts 1280x720 and 390x844; Recipes 360x800. These correspond to affected compact/short profiles and are supplemental to the 34 canonical EN anchors.",
+    "browserNativeZoom": "Complete nine-task Chrome native 200% qualification and task report: screenshots/browser-zoom-200/report.json.",
+    "accessibilityAndFocus": "Focus negative controls, forced-colors focus, and declared text-spacing tolerance evidence are included under screenshots/focus-negative-controls and screenshots/accessibility.",
+    "scopeLimit": "No claim is made for every Korean route/profile, native-device text scaling, assistive technology, or human field evidence."
+  },
+  "captureCandidate": "92b64a20c620da38422c22e73664eba395b58f17",
+  "captureTree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+  "captureManifest": "screenshots/capture-report.json"
+}

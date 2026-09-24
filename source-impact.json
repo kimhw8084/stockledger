@@ -1,0 +1,53 @@
+{
+  "candidate": "92b64a20c620da38422c22e73664eba395b58f17",
+  "tree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+  "sharedChanges": [
+    "src/components/WindowPanel.tsx",
+    "src/hooks/useWindowPanelFocus.ts",
+    "src/lib/webFocusEligibility.ts",
+    "src/features/shell/StockLedgerShell.tsx"
+  ],
+  "windowPanelConsumerCount": 19,
+  "windowPanelConsumers": [
+    {
+      "file": "src/features/today/TodayScreen.tsx",
+      "windowPanelInstances": 2
+    },
+    {
+      "file": "src/features/workspace/WorkspacePanel.tsx",
+      "windowPanelInstances": 1
+    },
+    {
+      "file": "src/features/notifications/NotificationSettingsPanel.tsx",
+      "windowPanelInstances": 1
+    },
+    {
+      "file": "src/features/eyes/EyeComposer.tsx",
+      "windowPanelInstances": 1
+    },
+    {
+      "file": "src/features/journal/JournalComposer.tsx",
+      "windowPanelInstances": 1
+    },
+    {
+      "file": "src/features/recipes/builder/RecipeBuilder.tsx",
+      "windowPanelInstances": 1
+    },
+    {
+      "file": "src/app/StockLedgerApp.tsx",
+      "windowPanelInstances": 12
+    }
+  ],
+  "stockLedgerShellConsumers": [
+    {
+      "file": "src/app/StockLedgerApp.tsx",
+      "routeCount": 17
+    }
+  ],
+  "impact": {
+    "focusEligibility": "shared web predicate used by invoker capture and restoration; native findNodeHandle restoration unchanged",
+    "navigation": "web navigation fixed to shell; native absolute layout retained; one scroll owner with route reset at task entry",
+    "surfaces": "all 17 canonical surfaces recaptured; all 34 anchors account for exact candidate; supplemental EN/KO short-profile, forced-color, spacing, focus and 200% captures included"
+  },
+  "reviewStatus": "complete_for_source_impact; independent visual audit pending"
+}

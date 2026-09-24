@@ -1,0 +1,35 @@
+{
+  "candidate": "92b64a20c620da38422c22e73664eba395b58f17",
+  "tree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+  "releaseVerify": {
+    "status": "PASS",
+    "verified": true,
+    "reasons": []
+  },
+  "releaseBase": "PASS",
+  "releaseWorkflow": "PASS",
+  "recovery": {
+    "status": "PASS",
+    "synthetic": true,
+    "sourceUnchanged": true
+  },
+  "operationsQualification": {
+    "status": "PASS",
+    "synthetic": true,
+    "qualificationBudgetsMet": true
+  },
+  "operationsStatus": {
+    "status": "UNCONFIGURED",
+    "details": "local isolated status DB has no configured workspace; scheduler stopped/uninstalled"
+  },
+  "frozenResearch": {
+    "status": "blocked_unverified",
+    "releaseBlocked": true,
+    "preexistingExternalEvidenceRules": 6
+  },
+  "cloudContract": {
+    "status": "UNAVAILABLE",
+    "details": "Docker API unavailable: OrbStack socket unix:///Users/haewonkim/.orbstack/run/docker.sock"
+  },
+  "nativeDeviceQualification": "out of scope; not claimed"
+}

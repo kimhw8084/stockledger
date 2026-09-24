@@ -1,0 +1,61 @@
+{
+  "candidate": "92b64a20c620da38422c22e73664eba395b58f17",
+  "tree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+  "checks": [
+    {
+      "state": "responsive-recomposition",
+      "result": "PASS",
+      "before": {
+        "name": "CHG-202 Responsive Draft",
+        "purpose": "Preserve purpose and selected object when the builder reflows."
+      },
+      "after": {
+        "name": "CHG-202 Responsive Draft",
+        "purpose": "Preserve purpose and selected object when the builder reflows."
+      },
+      "viewports": [
+        "360x800",
+        "412x915",
+        "1440x900"
+      ]
+    },
+    {
+      "state": "composer-cancel",
+      "result": "PASS",
+      "discardedDraft": "CHG-202 Responsive Draft",
+      "recordCreated": false
+    },
+    {
+      "state": "locale-switch-after-cancel",
+      "result": "PASS",
+      "language": "ko",
+      "newComposerDraft": "empty"
+    }
+  ],
+  "localeWhileModalOpen": {
+    "result": "NOT_REACHABLE_BY_SUPPORTED_POINTER_FLOW",
+    "observation": "The open WindowPanel intercepts pointer input to the shell Settings control; the attempt did not change locale or draft. Locale changes require leaving the composer first."
+  },
+  "lifecycleRegressionTests": [
+    {
+      "suite": "CHG-172",
+      "behavior": "locale switch and primary route meaning",
+      "status": "PASS"
+    },
+    {
+      "suite": "CHG-184",
+      "behavior": "detail open/close preserves originating row, filter, and selected object",
+      "status": "PASS"
+    },
+    {
+      "suite": "CHG-199",
+      "behavior": "create/edit/reopen/cancel and builder step draft state",
+      "status": "PASS"
+    },
+    {
+      "suite": "CHG-202",
+      "behavior": "async A-to-B-to-A acknowledgement cannot clear reopened Eye draft",
+      "status": "PASS"
+    }
+  ]
+}

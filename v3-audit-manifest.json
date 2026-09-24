@@ -1,0 +1,44 @@
+{
+  "schema": "project-os-golden-ui-v3-fix-v2",
+  "project": "stockledger",
+  "change": "CHG-202",
+  "request": "stockledger-prod-c17-golden-ui-v3-focus-geometry-zoom-fix-v2",
+  "operation": "FIX",
+  "fabricJob": "CF-17c1da3022019cbb19671f33",
+  "repository": "kimhw8084/stockledger",
+  "candidate": {
+    "commit": "92b64a20c620da38422c22e73664eba395b58f17",
+    "tree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+    "branch": "codex/stockledger-prod-c17-golden-ui-v3-focus-geometry-zoom-fix-v2",
+    "parent": "ed377bb173387ebf56a4919ac4282d136c56e21d"
+  },
+  "protectedBase": {
+    "commit": "ed377bb173387ebf56a4919ac4282d136c56e21d",
+    "tree": "dc99438cdcf8e2f737e5de87d6afc550d4008f24"
+  },
+  "historicalEvidence": {
+    "primary": "CHG-172 / AR-61",
+    "deep": "CHG-184 / AR-64",
+    "authoring": "CHG-199 / AR-68"
+  },
+  "scope": {
+    "logicalSurfaces": 17,
+    "canonicalAnchors": 34,
+    "inventory": "current-surface-inventory.json",
+    "productChangedFiles": 11,
+    "sharedConsumers": 19
+  },
+  "defects": {
+    "focusRestoration": "fixed_and_relationship_passed",
+    "geometryAction": "fixed_at_r1_failing_profiles",
+    "browserZoom200": "PASS"
+  },
+  "qualification": {
+    "fullPlaywright": "PASS_WITH_DOCUMENTED_EXPECTED_SKIP",
+    "releaseVerify": "PASS",
+    "taskOracles": "PASS",
+    "relationshipClosure": "PASS"
+  },
+  "visualDecision": "AWAITING_INDEPENDENT_AUDIT",
+  "selfAccepted": false
+}

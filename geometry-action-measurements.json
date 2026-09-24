@@ -1,0 +1,327 @@
+{
+  "candidate": "92b64a20c620da38422c22e73664eba395b58f17",
+  "tree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+  "result": "PASS",
+  "profiles": [
+    {
+      "profile": {
+        "width": 1366,
+        "height": 768,
+        "locale": "en",
+        "surface": "today"
+      },
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "documentWidth": 1366,
+      "bodyWidth": 1366,
+      "action": {
+        "x": 1089,
+        "y": 514,
+        "right": 1268.96875,
+        "bottom": 558,
+        "width": 179.96875,
+        "height": 44
+      },
+      "navigation": {
+        "x": 0,
+        "y": 0,
+        "right": 224,
+        "bottom": 768,
+        "width": 224,
+        "height": 768
+      },
+      "actionInViewport": true,
+      "actionOverlapsNavigation": false
+    },
+    {
+      "profile": {
+        "width": 360,
+        "height": 800,
+        "locale": "en",
+        "surface": "recipes"
+      },
+      "viewport": {
+        "width": 360,
+        "height": 800
+      },
+      "documentWidth": 360,
+      "bodyWidth": 360,
+      "action": {
+        "x": 16,
+        "y": 611,
+        "right": 344,
+        "bottom": 647,
+        "width": 328,
+        "height": 36
+      },
+      "navigation": {
+        "x": 0,
+        "y": 710,
+        "right": 360,
+        "bottom": 800,
+        "width": 360,
+        "height": 90
+      },
+      "actionInViewport": true,
+      "actionOverlapsNavigation": false
+    },
+    {
+      "profile": {
+        "width": 390,
+        "height": 844,
+        "locale": "en",
+        "surface": "alerts"
+      },
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "bodyWidth": 390,
+      "action": {
+        "x": 29,
+        "y": 592,
+        "right": 361,
+        "bottom": 636,
+        "width": 332,
+        "height": 44
+      },
+      "navigation": {
+        "x": 0,
+        "y": 754,
+        "right": 390,
+        "bottom": 844,
+        "width": 390,
+        "height": 90
+      },
+      "actionInViewport": true,
+      "actionOverlapsNavigation": false
+    },
+    {
+      "profile": {
+        "width": 412,
+        "height": 915,
+        "locale": "en",
+        "surface": "today"
+      },
+      "viewport": {
+        "width": 412,
+        "height": 915
+      },
+      "documentWidth": 412,
+      "bodyWidth": 412,
+      "action": {
+        "x": 29,
+        "y": 591,
+        "right": 383,
+        "bottom": 635,
+        "width": 354,
+        "height": 44
+      },
+      "navigation": {
+        "x": 0,
+        "y": 825,
+        "right": 412,
+        "bottom": 915,
+        "width": 412,
+        "height": 90
+      },
+      "actionInViewport": true,
+      "actionOverlapsNavigation": false
+    },
+    {
+      "profile": {
+        "width": 1280,
+        "height": 720,
+        "locale": "ko",
+        "surface": "alerts"
+      },
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "documentWidth": 1280,
+      "bodyWidth": 1280,
+      "action": {
+        "x": 987,
+        "y": 455,
+        "right": 1095.359375,
+        "bottom": 499,
+        "width": 108.359375,
+        "height": 44
+      },
+      "navigation": {
+        "x": 0,
+        "y": 0,
+        "right": 224,
+        "bottom": 720,
+        "width": 224,
+        "height": 720
+      },
+      "actionInViewport": true,
+      "actionOverlapsNavigation": false
+    },
+    {
+      "profile": {
+        "width": 1366,
+        "height": 768,
+        "locale": "ko",
+        "surface": "today"
+      },
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "documentWidth": 1366,
+      "bodyWidth": 1366,
+      "action": {
+        "x": 1089,
+        "y": 493,
+        "right": 1238.640625,
+        "bottom": 537,
+        "width": 149.640625,
+        "height": 44
+      },
+      "navigation": {
+        "x": 0,
+        "y": 0,
+        "right": 224,
+        "bottom": 768,
+        "width": 224,
+        "height": 768
+      },
+      "actionInViewport": true,
+      "actionOverlapsNavigation": false
+    },
+    {
+      "profile": {
+        "width": 360,
+        "height": 800,
+        "locale": "ko",
+        "surface": "recipes"
+      },
+      "viewport": {
+        "width": 360,
+        "height": 800
+      },
+      "documentWidth": 360,
+      "bodyWidth": 360,
+      "action": {
+        "x": 16,
+        "y": 611,
+        "right": 344,
+        "bottom": 647,
+        "width": 328,
+        "height": 36
+      },
+      "navigation": {
+        "x": 0,
+        "y": 710,
+        "right": 360,
+        "bottom": 800,
+        "width": 360,
+        "height": 90
+      },
+      "actionInViewport": true,
+      "actionOverlapsNavigation": false
+    },
+    {
+      "profile": {
+        "width": 390,
+        "height": 844,
+        "locale": "ko",
+        "surface": "alerts"
+      },
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "bodyWidth": 390,
+      "action": {
+        "x": 29,
+        "y": 592,
+        "right": 361,
+        "bottom": 636,
+        "width": 332,
+        "height": 44
+      },
+      "navigation": {
+        "x": 0,
+        "y": 754,
+        "right": 390,
+        "bottom": 844,
+        "width": 390,
+        "height": 90
+      },
+      "actionInViewport": true,
+      "actionOverlapsNavigation": false
+    },
+    {
+      "profile": {
+        "width": 412,
+        "height": 915,
+        "locale": "ko",
+        "surface": "today"
+      },
+      "viewport": {
+        "width": 412,
+        "height": 915
+      },
+      "documentWidth": 412,
+      "bodyWidth": 412,
+      "action": {
+        "x": 29,
+        "y": 532,
+        "right": 383,
+        "bottom": 576,
+        "width": 354,
+        "height": 44
+      },
+      "navigation": {
+        "x": 0,
+        "y": 825,
+        "right": 412,
+        "bottom": 915,
+        "width": 412,
+        "height": 90
+      },
+      "actionInViewport": true,
+      "actionOverlapsNavigation": false
+    },
+    {
+      "profile": {
+        "width": 390,
+        "height": 844,
+        "locale": "ko",
+        "surface": "today"
+      },
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "bodyWidth": 390,
+      "action": {
+        "x": 29,
+        "y": 532,
+        "right": 361,
+        "bottom": 576,
+        "width": 332,
+        "height": 44
+      },
+      "navigation": {
+        "x": 0,
+        "y": 754,
+        "right": 390,
+        "bottom": 844,
+        "width": 390,
+        "height": 90
+      },
+      "actionInViewport": true,
+      "actionOverlapsNavigation": false
+    }
+  ]
+}
