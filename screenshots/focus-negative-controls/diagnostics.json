@@ -1,0 +1,125 @@
+{
+  "candidate": "92b64a20c620da38422c22e73664eba395b58f17",
+  "tree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+  "cases": [
+    {
+      "mode": "aria-hidden-ancestor",
+      "restorationTarget": "scoped-today-navigation-fallback",
+      "expectedFallback": true,
+      "state": {
+        "activeTag": "DIV",
+        "activeTestId": null,
+        "activeRole": "tab",
+        "activeLabel": "Today",
+        "bodyFocused": false
+      },
+      "screenshot": "aria-hidden-ancestor.png",
+      "result": "PASS",
+      "invalidatingControlApplied": true,
+      "invokerEligibleAtCapture": false,
+      "invokerEligibleAtRestore": false,
+      "captureDecision": "reject_exact_target",
+      "restoreDecision": "scoped-today-navigation-fallback"
+    },
+    {
+      "mode": "inert-invoker",
+      "restorationTarget": "scoped-today-navigation-fallback",
+      "expectedFallback": true,
+      "state": {
+        "activeTag": "DIV",
+        "activeTestId": null,
+        "activeRole": "tab",
+        "activeLabel": "Today",
+        "bodyFocused": false
+      },
+      "screenshot": "inert-invoker.png",
+      "result": "PASS",
+      "invalidatingControlApplied": true,
+      "invokerEligibleAtCapture": false,
+      "invokerEligibleAtRestore": false,
+      "captureDecision": "reject_exact_target",
+      "restoreDecision": "scoped-today-navigation-fallback"
+    },
+    {
+      "mode": "hidden-invoker",
+      "restorationTarget": "scoped-today-navigation-fallback",
+      "expectedFallback": true,
+      "state": {
+        "activeTag": "DIV",
+        "activeTestId": null,
+        "activeRole": "tab",
+        "activeLabel": "Today",
+        "bodyFocused": false
+      },
+      "screenshot": "hidden-invoker.png",
+      "result": "PASS",
+      "invalidatingControlApplied": true,
+      "invokerEligibleAtCapture": false,
+      "invokerEligibleAtRestore": false,
+      "captureDecision": "reject_exact_target",
+      "restoreDecision": "scoped-today-navigation-fallback"
+    },
+    {
+      "mode": "disabled-invoker",
+      "restorationTarget": "scoped-today-navigation-fallback",
+      "expectedFallback": true,
+      "state": {
+        "activeTag": "DIV",
+        "activeTestId": null,
+        "activeRole": "tab",
+        "activeLabel": "Today",
+        "bodyFocused": false
+      },
+      "screenshot": "disabled-invoker.png",
+      "result": "PASS",
+      "invalidatingControlApplied": true,
+      "invokerEligibleAtCapture": false,
+      "invokerEligibleAtRestore": false,
+      "captureDecision": "reject_exact_target",
+      "restoreDecision": "scoped-today-navigation-fallback"
+    },
+    {
+      "mode": "removed-invoker",
+      "restorationTarget": "scoped-today-navigation-fallback",
+      "expectedFallback": true,
+      "state": {
+        "activeTag": "DIV",
+        "activeTestId": null,
+        "activeRole": "tab",
+        "activeLabel": "Today",
+        "bodyFocused": false
+      },
+      "screenshot": "removed-invoker.png",
+      "result": "PASS",
+      "invalidatingControlApplied": false,
+      "invokerEligibleAtCapture": true,
+      "invokerEligibleAtRestore": false,
+      "captureDecision": "retain_exact_invoker_candidate",
+      "restoreDecision": "scoped-today-navigation-fallback"
+    },
+    {
+      "mode": "eligible-invoker",
+      "restorationTarget": "exact-invoker",
+      "expectedFallback": false,
+      "state": {
+        "activeTag": "BUTTON",
+        "activeTestId": null,
+        "activeRole": "button",
+        "activeLabel": "Open review · AMD",
+        "bodyFocused": false
+      },
+      "screenshot": "eligible-invoker.png",
+      "result": "PASS",
+      "invalidatingControlApplied": false,
+      "invokerEligibleAtCapture": true,
+      "invokerEligibleAtRestore": true,
+      "captureDecision": "retain_exact_invoker_candidate",
+      "restoreDecision": "exact-invoker"
+    }
+  ],
+  "noBodyFocus": true,
+  "exactEligibleInvokerPreserved": true,
+  "captureAndRestoreSharePredicate": "src/lib/webFocusEligibility.ts:isWebFocusEligible; verified by src/hooks/useWindowPanelFocus.ts and src/components/WindowPanel.tsx",
+  "repeatedOpenCloseReopen": "covered by tests/e2e/v3-focus-geometry.spec.ts",
+  "captureHelperUnitProof": "tests/webFocusEligibility.test.ts directly proves chooseWebFocusInvoker returns null for hidden/inert/disabled/aria-hidden ancestor and exact eligible targets; the corresponding restore helper selects the same scoped fallback."
+}

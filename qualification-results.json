@@ -1,0 +1,84 @@
+{
+  "candidate": "92b64a20c620da38422c22e73664eba395b58f17",
+  "tree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+  "gates": [
+    {
+      "command": "npm ci",
+      "status": "PASS",
+      "packages": 639,
+      "vulnerabilities": 0
+    },
+    {
+      "command": "npm run check",
+      "status": "PASS",
+      "typecheck": "PASS",
+      "unitFiles": 26,
+      "unitTests": 209
+    },
+    {
+      "command": "npm run check:boundaries",
+      "status": "PASS"
+    },
+    {
+      "command": "npm audit --audit-level=high",
+      "status": "PASS",
+      "highOrCritical": 0
+    },
+    {
+      "command": "npm run export:all",
+      "status": "PASS",
+      "targets": [
+        "web",
+        "iOS",
+        "Android"
+      ]
+    },
+    {
+      "command": "npm run test:e2e",
+      "status": "PASS_WITH_DOCUMENTED_EXPECTED_SKIP",
+      "tests": 88,
+      "passed": 87,
+      "failed": 0,
+      "skipped": 1,
+      "expectedSkip": "native/mobile keyboard path requires hardware keyboard behavior unavailable in web automation",
+      "suites": [
+        "CHG-172 primary",
+        "CHG-184 deep/detail",
+        "CHG-199 authoring/config",
+        "CHG-202 focus/geometry/async/forced-colors/text-spacing"
+      ]
+    },
+    {
+      "command": "npm run release:evidence && npm run release:verify",
+      "status": "PASS",
+      "verified": true,
+      "reasons": []
+    },
+    {
+      "command": "npm run recovery:drill",
+      "status": "PASS",
+      "syntheticEvidenceOnly": true
+    },
+    {
+      "command": "npm run operations:qualify",
+      "status": "PASS",
+      "syntheticEvidenceOnly": true
+    },
+    {
+      "command": "npm run operations:status",
+      "status": "UNCONFIGURED",
+      "reason": "isolated status DB has no workspace and scheduler is stopped/uninstalled"
+    },
+    {
+      "command": "npm run check:frozen",
+      "status": "blocked_unverified",
+      "releaseBlocked": true,
+      "reason": "pre-existing frozen-research evidence rules remain unsatisfied"
+    },
+    {
+      "command": "npm run test:cloud",
+      "status": "UNAVAILABLE",
+      "reason": "OrbStack Docker API socket missing at unix:///Users/haewonkim/.orbstack/run/docker.sock"
+    }
+  ]
+}

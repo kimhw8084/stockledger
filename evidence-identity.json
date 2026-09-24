@@ -1,0 +1,8 @@
+{
+  "project": "stockledger",
+  "change": "CHG-202",
+  "candidate": "92b64a20c620da38422c22e73664eba395b58f17",
+  "tree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+  "sourceEvidenceOnly": true,
+  "browserNativeZoom": "1440x900 physical browser window became 720x450 CSS viewport; DPR 2; visualViewport.scale 1; CSS zoom 1"
+}

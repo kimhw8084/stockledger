@@ -1,0 +1,74 @@
+{
+  "schema": "project-os-accessibility-resilience-v3-v2",
+  "candidate": "92b64a20c620da38422c22e73664eba395b58f17",
+  "tree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+  "status": "PASS_FOR_BOUNDED_WEB_AUTOMATION",
+  "focus": {
+    "status": "PASS",
+    "visibleFocusForcedColors": true,
+    "EscapeCloses": true,
+    "eligibleInvokerRestored": true,
+    "semanticallyUnavailableInvokerUsesScopedFallback": true
+  },
+  "browserZoom": {
+    "status": "PASS",
+    "nativeDefaultZoom": {
+      "configured": true,
+      "setting": "chrome.settingsPrivate.setDefaultZoom(2)",
+      "zoomApi": {
+        "getDefaultZoom": "function",
+        "setDefaultZoom": "function"
+      },
+      "cssViewport": {
+        "innerWidth": 720,
+        "innerHeight": 450,
+        "devicePixelRatio": 2,
+        "visualViewport": {
+          "width": 720,
+          "height": 450,
+          "scale": 1
+        },
+        "htmlZoom": "1",
+        "bodyZoom": "1"
+      },
+      "proof": "1440x900 physical browser window became 720x450 CSS viewport; DPR 2; visualViewport.scale 1; CSS zoom 1"
+    },
+    "documentHorizontalOverflow": false,
+    "criticalActionsReachable": true,
+    "overlaysScrollableWithActionsReachable": true
+  },
+  "textSpacing": {
+    "status": "PASS",
+    "profile": {
+      "letterSpacing": ".12em",
+      "wordSpacing": ".16em",
+      "lineHeight": 1.5,
+      "paragraphMarginBlockEnd": "2em"
+    },
+    "surfaces": [
+      "Today",
+      "stock detail",
+      "metric detail",
+      "Eye form"
+    ],
+    "screenshots": [
+      "screenshots/accessibility/text-spacing-desktop.png",
+      "screenshots/accessibility/text-spacing-mobile.png"
+    ]
+  },
+  "forcedColors": {
+    "status": "PASS",
+    "keyboardFocusOutlineVisible": true,
+    "EscapeCloseAndFocusReturn": true,
+    "screenshots": [
+      "screenshots/accessibility/forced-colors-focus-desktop.png",
+      "screenshots/accessibility/forced-colors-focus-mobile.png"
+    ]
+  },
+  "scope": {
+    "nativeMobileTextScaling": "not exercised; separate from browser default zoom",
+    "voiceOverTalkBack": "not exercised",
+    "humanPreferenceAndFieldEvidence": "outside bounded web qualification",
+    "wcagConformance": "not claimed"
+  }
+}

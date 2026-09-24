@@ -1,0 +1,104 @@
+{
+  "schema": "project-os-golden-ui-v3-relationship-closure-v2",
+  "candidate": "92b64a20c620da38422c22e73664eba395b58f17",
+  "tree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+  "status": "PASS",
+  "relationships": [
+    {
+      "type": "modal_stack",
+      "status": "PASS",
+      "captureAndRestoreSharePredicate": true,
+      "negativeControls": [
+        {
+          "case": "aria-hidden-ancestor",
+          "status": "PASS",
+          "invokerEligibleAtCapture": false,
+          "invokerEligibleAtRestore": false,
+          "restorationTarget": "scoped-today-navigation-fallback"
+        },
+        {
+          "case": "inert-invoker",
+          "status": "PASS",
+          "invokerEligibleAtCapture": false,
+          "invokerEligibleAtRestore": false,
+          "restorationTarget": "scoped-today-navigation-fallback"
+        },
+        {
+          "case": "hidden-invoker",
+          "status": "PASS",
+          "invokerEligibleAtCapture": false,
+          "invokerEligibleAtRestore": false,
+          "restorationTarget": "scoped-today-navigation-fallback"
+        },
+        {
+          "case": "disabled-invoker",
+          "status": "PASS",
+          "invokerEligibleAtCapture": false,
+          "invokerEligibleAtRestore": false,
+          "restorationTarget": "scoped-today-navigation-fallback"
+        },
+        {
+          "case": "removed-invoker",
+          "status": "PASS",
+          "invokerEligibleAtCapture": true,
+          "invokerEligibleAtRestore": false,
+          "restorationTarget": "scoped-today-navigation-fallback"
+        },
+        {
+          "case": "eligible-invoker",
+          "status": "PASS",
+          "invokerEligibleAtCapture": true,
+          "invokerEligibleAtRestore": true,
+          "restorationTarget": "exact-invoker"
+        }
+      ],
+      "validInvokerExactRestoration": true,
+      "scopedFallbackOnly": true,
+      "noBodyFocus": true,
+      "repeatedOpenCloseReopen": "PASS"
+    },
+    {
+      "type": "geometry_action",
+      "status": "PASS",
+      "profiles": 10,
+      "measuredActionsInsideInitialViewport": true,
+      "documentHorizontalOverflow": false,
+      "navWithinViewport": true,
+      "scrollOwner": "shell content scroll; route change resets new task entry"
+    },
+    {
+      "type": "shared_consumer_impact",
+      "status": "PASS",
+      "windowPanelConsumerCount": 19,
+      "shellConsumerCount": 1,
+      "sourceImpact": "source-impact.json"
+    },
+    {
+      "type": "presentation_state",
+      "status": "PASS",
+      "lifecycle": "state-lifecycle.json",
+      "covered": [
+        "responsive recomposition preserves builder draft",
+        "locale switch after cancel resets new composer",
+        "create/edit/cancel/reopen covered by CHG-199",
+        "detail close preserves origin/filter/selection covered by CHG-184",
+        "A-to-B-to-A async Eye save covered by deterministic delayed IndexedDB acknowledgement"
+      ]
+    }
+  ],
+  "asyncScope": {
+    "status": "PASS_FOR_APPLICABLE_ASYNC_PATHS",
+    "applicable": [
+      "Eye save",
+      "Journal save",
+      "Recipe save"
+    ],
+    "guard": "composerOperationGate generation token + single in-flight operation",
+    "adversarial": [
+      "delayed IndexedDB A-to-B-to-A acknowledgement",
+      "rapid duplicate consequential save",
+      "retry after failed acknowledgement"
+    ],
+    "serializedOrUnsupportedPaths": "No additional asynchronous authority boundaries were introduced; paths without an independently controllable acknowledgement are reported by their synchronous/serialized implementation and were not fabricated."
+  }
+}

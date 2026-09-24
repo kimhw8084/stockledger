@@ -1,0 +1,126 @@
+{
+  "schema": "project-os-golden-ui-v3-task-oracle-v2",
+  "candidate": "92b64a20c620da38422c22e73664eba395b58f17",
+  "tree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+  "status": "PASS",
+  "nativeBrowserZoomTasks": [
+    {
+      "task": "today_review_path",
+      "status": "PASS",
+      "effects": {
+        "name": "today_review_path",
+        "status": "PASS",
+        "evidencePreserved": true,
+        "canceledDraftHadNoRecordEffect": true
+      }
+    },
+    {
+      "task": "watchlist_stock_metric_return",
+      "status": "PASS",
+      "effects": {
+        "name": "watchlist_stock_metric_return",
+        "status": "PASS",
+        "stockContext": "AAPL",
+        "metricDetailOpened": true,
+        "returnedToSameStock": true,
+        "sampleLimitationVisible": true
+      }
+    },
+    {
+      "task": "recipe_set_and_logic_path",
+      "status": "PASS",
+      "effects": {
+        "name": "recipe_set_and_logic_path",
+        "status": "PASS",
+        "purposeVersionContextPreserved": true,
+        "registryAuthorityAndDownstreamLinksVisible": true
+      }
+    },
+    {
+      "task": "alerts_inspect_path",
+      "status": "PASS",
+      "effects": {
+        "name": "alerts_inspect_path",
+        "status": "PASS",
+        "prioritySourceFreshnessAndUncertaintyPreserved": true,
+        "alertTitle": "Deep drawdown still holding support"
+      }
+    },
+    {
+      "task": "journal_detail_amend",
+      "status": "PASS",
+      "effects": {
+        "name": "journal_detail_amend",
+        "status": "PASS",
+        "recordUpdated": true,
+        "amendedNoteVisible": true,
+        "priorVersionRetained": true
+      }
+    },
+    {
+      "task": "eye_composer_invalid_input",
+      "status": "PASS",
+      "effects": {
+        "name": "eye_composer_invalid_input",
+        "status": "PASS",
+        "correctionShown": true,
+        "draftPreserved": true,
+        "noCommitAfterInvalidInput": true
+      }
+    },
+    {
+      "task": "journal_create_duplicate_control",
+      "status": "PASS",
+      "effects": {
+        "name": "journal_create_duplicate_control",
+        "status": "PASS",
+        "uniqueRecordEffectCount": 1,
+        "visibleTextOccurrencesAfterDetailOpened": 2,
+        "linkedEyeLabel": "AMD",
+        "draftClosedAfterCommit": true
+      }
+    },
+    {
+      "task": "recipe_builder_create",
+      "status": "PASS",
+      "effects": {
+        "name": "recipe_builder_create",
+        "status": "PASS",
+        "recipeName": "CHG-202 Native Zoom Review Recipe",
+        "version": 1,
+        "purposeVisible": true,
+        "logicConditionSaved": true,
+        "uniqueRecordEffectCount": 1
+      }
+    },
+    {
+      "task": "notification_confirmation_cancel_error_success",
+      "status": "PASS",
+      "effects": {
+        "name": "notification_confirmation_cancel_error_success",
+        "status": "PASS",
+        "cancelPreservedEnabledState": true,
+        "faultPreservedPriorTruth": true,
+        "exceptionLocalized": true,
+        "retryCommittedOff": true
+      }
+    }
+  ],
+  "negativeControls": {
+    "missingStalePartialMarketEvidence": "existing primary/deep review fixtures retain explicit freshness/sample limitation and uncertainty text; no simulated complete truth substituted",
+    "invalidRequiredInput": "Eye Composer validation leaves draft open and directs to required correction; no record committed",
+    "rapidDuplicateInput": "rapid duplicate Journal click events persisted exactly one decision in IndexedDB; the two visible matching text nodes after detail opened represent the same row and its detail view.",
+    "internalException": "notification write exception remains localized; prior enabled state preserved; retry may commit once",
+    "forbiddenEffects": [
+      "invalid Eye creates no record",
+      "cancelled review/composer/preferences create no record/state transition",
+      "stale acknowledgement cannot clear reopened A draft"
+    ]
+  },
+  "primaryNextActions": {
+    "today": "review evidence then record review if chosen",
+    "alerts": "Inspect evidence preserving priority/source/freshness",
+    "recipes": "open set or logic preserving layer/purpose/version"
+  },
+  "evidence": "screenshots/browser-zoom-200/report.json"
+}
