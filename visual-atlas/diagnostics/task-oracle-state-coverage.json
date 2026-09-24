@@ -1,0 +1,105 @@
+{
+  "contractVersion": "stockledger-chg199-authoring-task-oracle-v1",
+  "candidate": {
+    "commit": "8a9ac0104190144110d335c93eb11f8c51f6a898",
+    "tree": "dc99438cdcf8e2f737e5de87d6afc550d4008f24",
+    "base": "40e035da9940805a2971b1006488007dcef665e0"
+  },
+  "status": "PASS_SUPPORTED_STATES; UNPROVEN_AND_NOT_APPLICABLE_STATES_RECORDED",
+  "surfaces": [
+    {
+      "surface": "eye-composer",
+      "oracle": "Open; blank validation; select stock/recipe/thesis; invalid range and recovery with values retained; optional fields; save; reopen edit; preserve exact authored text; Escape and invoker focus.",
+      "verifiedBy": "tests/e2e/chg199-authoring-config.spec.ts",
+      "states": [
+        "blank-validation",
+        "invalid-range",
+        "create",
+        "edit",
+        "reopen",
+        "escape-focus"
+      ],
+      "screenshots": [
+        "captures/states/eye-blank-validation.png",
+        "captures/states/eye-invalid-range.png",
+        "captures/states/eye-edit.png"
+      ]
+    },
+    {
+      "surface": "journal-composer",
+      "oracle": "New; blank required validation; Eye/action/note/thesis/timing and optional concern; save; amend; previous history; Escape/cancel and invoker focus.",
+      "verifiedBy": "tests/e2e/chg199-authoring-config.spec.ts + tests/e2e/workspace.spec.ts",
+      "states": [
+        "new",
+        "required-validation",
+        "create",
+        "edit-amend",
+        "history",
+        "escape-focus"
+      ],
+      "screenshots": [
+        "captures/states/journal-required-validation.png",
+        "captures/states/journal-amend.png"
+      ]
+    },
+    {
+      "surface": "recipe-builder",
+      "oracle": "Create; each step forward/back with draft persistence; step-aware errors; supported condition; risk/review cadence; final review; save; reopen version context.",
+      "verifiedBy": "tests/e2e/chg199-authoring-config.spec.ts",
+      "states": [
+        "incomplete-purpose",
+        "incomplete-logic",
+        "draft-back-forward",
+        "final-review",
+        "save",
+        "version-1",
+        "save-version-2"
+      ],
+      "screenshots": [
+        "captures/states/recipe-purpose-validation.png",
+        "captures/states/recipe-logic-validation.png",
+        "captures/states/recipe-final-review.png",
+        "captures/states/recipe-version-context.png"
+      ]
+    },
+    {
+      "surface": "logic-registry",
+      "oracle": "Open; inspect priceHistorySeries identifier/meaning/importance/source/coverage/downstream processing; verify the complete EN/KO instruction wraps without clipping at all five supported viewports; supported help; close and exact focus return.",
+      "verifiedBy": "tests/e2e/chg199-authoring-config.spec.ts",
+      "states": [
+        "ready",
+        "field-detail",
+        "help",
+        "escape-focus",
+        "responsive-copy"
+      ],
+      "screenshots": [
+        "captures/states/registry-field-detail.png",
+        "captures/states/registry-help.png"
+      ]
+    },
+    {
+      "surface": "notification-confirmation",
+      "oracle": "Disable; cancel without mutation and restore focus; reopen; pending state; successful persistence; injected technical exception renders only localized safe copy, retains the prior preference, and permits retry/cancel.",
+      "verifiedBy": "tests/e2e/chg199-authoring-config.spec.ts + tests/e2e/workspace.spec.ts + state capture fixture",
+      "states": [
+        "cancel",
+        "pending-local-persistence-ack",
+        "success",
+        "error-safe-copy-retry",
+        "escape-focus"
+      ],
+      "screenshots": [
+        "captures/states/notification-confirmation-cancel.png",
+        "captures/states/notification-canceled.png",
+        "captures/states/notification-pending.png",
+        "captures/states/notification-save-error.png",
+        "captures/states/notification-save-success.png"
+      ]
+    }
+  ],
+  "loadingDeniedConflict": "NOT_APPLICABLE_OR_UNPROVEN_WHERE_NO_SAFE_SUPPORTED_FIXTURE_EXISTS",
+  "noMatchRegistry": "NOT_APPLICABLE; registry no-match state is not in the implemented path",
+  "zoom200": "SEPARATE_EVIDENCE_GATE",
+  "screenReaderCertification": "NOT_CLAIMED"
+}

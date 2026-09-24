@@ -1,0 +1,46 @@
+{
+  "candidate": {
+    "commit": "8a9ac0104190144110d335c93eb11f8c51f6a898",
+    "tree": "dc99438cdcf8e2f737e5de87d6afc550d4008f24",
+    "base": "40e035da9940805a2971b1006488007dcef665e0"
+  },
+  "productCommitCount": 2,
+  "productChangedFiles": 15,
+  "changedPaths": [
+    "src/app/StockLedgerApp.tsx",
+    "src/components/WindowPanel.tsx",
+    "src/domain/inputValidation.ts",
+    "src/features/eyes/EyeComposer.tsx",
+    "src/features/journal/JournalComposer.tsx",
+    "src/features/notifications/NotificationSettingsPanel.tsx",
+    "src/features/recipes/RecipesScreen.tsx",
+    "src/features/recipes/builder/RecipeBuilder.tsx",
+    "src/features/recipes/logic/RawDataRegistry.tsx",
+    "src/features/shared/AuthoringFields.tsx",
+    "src/hooks/useAppModel.ts",
+    "src/lib/i18n.ts",
+    "tests/e2e/chg172-primary-surfaces.spec.ts",
+    "tests/e2e/chg199-authoring-config.spec.ts",
+    "tests/e2e/workspace.spec.ts"
+  ],
+  "featureOwnership": {
+    "eyeComposer": "moved to src/features/eyes/EyeComposer.tsx; StockLedgerApp now retains draft/action orchestration",
+    "journalComposer": "moved to src/features/journal/JournalComposer.tsx; authored amendment/history semantics remain in domain orchestration",
+    "recipeBuilder": "moved to src/features/recipes/builder/RecipeBuilder.tsx; current Recipe/Condition model and version semantics remain unchanged",
+    "logicRegistry": "migrated from src/components/logic/L0DataLayer.tsx to src/features/recipes/logic/RawDataRegistry.tsx; no injected legacy component props",
+    "notificationConfirmation": "NotificationSettingsPanel uses fixed localized failure copy; the notification preference commit suppresses the global raw exception banner while preserving pending, success-only close, persisted truth, retry, and cancel behavior"
+  },
+  "architectureChecks": {
+    "newFeatureModulesImportLegacyStyles": false,
+    "newFeatureModulesImportComponentsCommon": false,
+    "rawDataRegistryAcceptsInjectedLegacyComponents": false,
+    "stockLedgerAppOwnsAuthoringOrchestration": true,
+    "financialCalculationsOrDomainTransitionsChanged": false,
+    "persistenceSchemaOrProviderWorkerContractChanged": false
+  },
+  "sharedPrimitiveImpact": {
+    "windowPanel": "two-line subtitle default preserved; Raw Data Registry opts into eight lines; shared focus, Escape, close, safe-area, and reduced-motion behavior exercised by release browser suite",
+    "primaryRouteRegression": "PASS",
+    "deepReviewDetailRegression": "PASS, including metric layout and Korean generated-system localization"
+  }
+}

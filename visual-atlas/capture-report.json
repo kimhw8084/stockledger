@@ -1,0 +1,1801 @@
+{
+  "contractVersion": "stockledger-golden-ui-v2-capture-report-v1",
+  "candidate": {
+    "commit": "8a9ac0104190144110d335c93eb11f8c51f6a898",
+    "tree": "dc99438cdcf8e2f737e5de87d6afc550d4008f24",
+    "base": "40e035da9940805a2971b1006488007dcef665e0",
+    "workingTree": "clean"
+  },
+  "result": "PASS_OBJECTIVE_CAPTURE_CHECKS",
+  "visualDecision": "AWAITING_INDEPENDENT_PIXEL_AUDIT",
+  "counts": {
+    "canonicalEn": 10,
+    "canonicalKo": 10,
+    "stressAndHoldout": 30,
+    "stateEvidence": 16
+  },
+  "runtime": {
+    "source": "static dist exported from the exact candidate",
+    "browser": "Playwright Chromium",
+    "colorScheme": "light",
+    "reducedMotion": "reduce",
+    "screenshotFormat": "lossless PNG",
+    "deviceScaleFactor": 1
+  },
+  "profiles": [
+    {
+      "name": "desktop-1440x900",
+      "width": 1440,
+      "height": 900,
+      "view": "desktop",
+      "profile": "canonical"
+    },
+    {
+      "name": "mobile-390x844",
+      "width": 390,
+      "height": 844,
+      "view": "mobile",
+      "profile": "canonical"
+    },
+    {
+      "name": "desktop-1366x768",
+      "width": 1366,
+      "height": 768,
+      "view": "desktop",
+      "profile": "stress"
+    },
+    {
+      "name": "mobile-360x800",
+      "width": 360,
+      "height": 800,
+      "view": "mobile",
+      "profile": "stress"
+    },
+    {
+      "name": "mobile-412x915",
+      "width": 412,
+      "height": 915,
+      "view": "mobile",
+      "profile": "holdout"
+    }
+  ],
+  "objectiveChecks": {
+    "exactCandidate": true,
+    "candidateTreeMatch": true,
+    "horizontalOverflow": "none across 50 canonical/responsive captures or 16 state captures",
+    "dialogViewportBounds": "all captured surface dialogs remain inside the configured viewport",
+    "exactUserAuthoredText": "covered by Eye and Journal create/edit task oracles",
+    "keyboardPaths": "full Playwright suite; mobile hardware-keyboard project is intentionally skipped by existing device profile",
+    "reducedMotion": "reduced-motion preference enabled for Playwright and atlas captures",
+    "screenReaderCertification": "not claimed",
+    "zoom200": "not evaluated; separate evidence gate"
+  },
+  "captures": [
+    {
+      "surface": "eye-composer",
+      "locale": "en",
+      "viewport": "desktop-1440x900",
+      "width": 1440,
+      "height": 900,
+      "path": "captures/canonical/en/desktop-1440x900/eye-composer.png",
+      "sha256": "5dd31cea18f19d7fcbf1da9a3a289de0a8468bbf120f48c2bfff3b0593e271df",
+      "bytes": 79054,
+      "metrics": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        }
+      },
+      "key": "stockledger|surface:eye-composer|canonical|open|reference-user|light|desktop-1440x900",
+      "state": "open",
+      "classification": "canonical"
+    },
+    {
+      "surface": "journal-composer",
+      "locale": "en",
+      "viewport": "desktop-1440x900",
+      "width": 1440,
+      "height": 900,
+      "path": "captures/canonical/en/desktop-1440x900/journal-composer.png",
+      "sha256": "70f6cfff35dfc1b115d87bdae86cf4139cd7f3335cdef78ed7f5b9590df82656",
+      "bytes": 67162,
+      "metrics": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        }
+      },
+      "key": "stockledger|surface:journal-composer|canonical|open|reference-user|light|desktop-1440x900",
+      "state": "open",
+      "classification": "canonical"
+    },
+    {
+      "surface": "recipe-builder",
+      "locale": "en",
+      "viewport": "desktop-1440x900",
+      "width": 1440,
+      "height": 900,
+      "path": "captures/canonical/en/desktop-1440x900/recipe-builder.png",
+      "sha256": "0a7b0fd26bd58edc1a3b28cefcc51d3be570b7bd7f8c555864ffb0c78c4e8f18",
+      "bytes": 75665,
+      "metrics": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        }
+      },
+      "key": "stockledger|surface:recipe-builder|canonical|open|reference-user|light|desktop-1440x900",
+      "state": "open",
+      "classification": "canonical"
+    },
+    {
+      "surface": "logic-registry",
+      "locale": "en",
+      "viewport": "desktop-1440x900",
+      "width": 1440,
+      "height": 900,
+      "path": "captures/canonical/en/desktop-1440x900/logic-registry.png",
+      "sha256": "1439bffcfc2798c2aa58425351a055f7aafe39b90592b4157c09bf6b58299d45",
+      "bytes": 102640,
+      "metrics": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        }
+      },
+      "key": "stockledger|surface:logic-registry|canonical|ready|reference-user|light|desktop-1440x900",
+      "state": "ready",
+      "classification": "canonical"
+    },
+    {
+      "surface": "notification-confirmation",
+      "locale": "en",
+      "viewport": "desktop-1440x900",
+      "width": 1440,
+      "height": 900,
+      "path": "captures/canonical/en/desktop-1440x900/notification-confirmation.png",
+      "sha256": "b506aece4f03ce34124f02c6717ea866ef25a70e39d092aa1d4efe1818aaca5b",
+      "bytes": 46629,
+      "metrics": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        }
+      },
+      "key": "stockledger|surface:notification-confirmation|canonical|confirmation|reference-user|light|desktop-1440x900",
+      "state": "confirmation",
+      "classification": "canonical"
+    },
+    {
+      "surface": "eye-composer",
+      "locale": "en",
+      "viewport": "mobile-390x844",
+      "width": 390,
+      "height": 844,
+      "path": "captures/canonical/en/mobile-390x844/eye-composer.png",
+      "sha256": "a6d879599a87dbe6369bac90113d3b46fe8e61bf3f21c4f15e08392a241bd045",
+      "bytes": 61398,
+      "metrics": {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "documentScrollWidth": 390,
+        "bodyScrollWidth": 390,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 844
+        }
+      },
+      "key": "stockledger|surface:eye-composer|canonical|open|reference-user|light|mobile-390x844",
+      "state": "open",
+      "classification": "canonical"
+    },
+    {
+      "surface": "journal-composer",
+      "locale": "en",
+      "viewport": "mobile-390x844",
+      "width": 390,
+      "height": 844,
+      "path": "captures/canonical/en/mobile-390x844/journal-composer.png",
+      "sha256": "dc651e136e8479d300e3acfe7aa9c12e120cbcc6800d66e295384b3595e2a84d",
+      "bytes": 52514,
+      "metrics": {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "documentScrollWidth": 390,
+        "bodyScrollWidth": 390,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 844
+        }
+      },
+      "key": "stockledger|surface:journal-composer|canonical|open|reference-user|light|mobile-390x844",
+      "state": "open",
+      "classification": "canonical"
+    },
+    {
+      "surface": "recipe-builder",
+      "locale": "en",
+      "viewport": "mobile-390x844",
+      "width": 390,
+      "height": 844,
+      "path": "captures/canonical/en/mobile-390x844/recipe-builder.png",
+      "sha256": "17897a2887d9a1043e4b33c89b54dffbfde08ee2a93e4dfac3dcaed7ce9c96b1",
+      "bytes": 60684,
+      "metrics": {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "documentScrollWidth": 390,
+        "bodyScrollWidth": 390,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 844
+        }
+      },
+      "key": "stockledger|surface:recipe-builder|canonical|open|reference-user|light|mobile-390x844",
+      "state": "open",
+      "classification": "canonical"
+    },
+    {
+      "surface": "logic-registry",
+      "locale": "en",
+      "viewport": "mobile-390x844",
+      "width": 390,
+      "height": 844,
+      "path": "captures/canonical/en/mobile-390x844/logic-registry.png",
+      "sha256": "de1b4fe56270f47ac959a8ee1d4edab7171f4ac16096e599307944403a583ec5",
+      "bytes": 70544,
+      "metrics": {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "documentScrollWidth": 390,
+        "bodyScrollWidth": 390,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 844
+        }
+      },
+      "key": "stockledger|surface:logic-registry|canonical|ready|reference-user|light|mobile-390x844",
+      "state": "ready",
+      "classification": "canonical"
+    },
+    {
+      "surface": "notification-confirmation",
+      "locale": "en",
+      "viewport": "mobile-390x844",
+      "width": 390,
+      "height": 844,
+      "path": "captures/canonical/en/mobile-390x844/notification-confirmation.png",
+      "sha256": "f11fc1cc8c757acf0f9dc101e89f24ff70401661676b0d50f21fe8d01dfa55a3",
+      "bytes": 37926,
+      "metrics": {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "documentScrollWidth": 390,
+        "bodyScrollWidth": 390,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 844
+        }
+      },
+      "key": "stockledger|surface:notification-confirmation|canonical|confirmation|reference-user|light|mobile-390x844",
+      "state": "confirmation",
+      "classification": "canonical"
+    },
+    {
+      "surface": "eye-composer",
+      "locale": "ko",
+      "viewport": "desktop-1440x900",
+      "width": 1440,
+      "height": 900,
+      "path": "captures/canonical/ko/desktop-1440x900/eye-composer.png",
+      "sha256": "87f10619d25a348f273abffe2dd6871c3f52e66ebadf080b56567fd92b47cc14",
+      "bytes": 76938,
+      "metrics": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        }
+      },
+      "key": "stockledger|surface:eye-composer|canonical|open|reference-user|light|desktop-1440x900",
+      "state": "open",
+      "classification": "canonical",
+      "canonicalKey": "stockledger|surface:eye-composer|canonical|open|reference-user|light|desktop-1440x900"
+    },
+    {
+      "surface": "journal-composer",
+      "locale": "ko",
+      "viewport": "desktop-1440x900",
+      "width": 1440,
+      "height": 900,
+      "path": "captures/canonical/ko/desktop-1440x900/journal-composer.png",
+      "sha256": "459ed0fd4237e5b72150c74399615c90ae10c50183439f197c3a66e26ee63332",
+      "bytes": 58578,
+      "metrics": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        }
+      },
+      "key": "stockledger|surface:journal-composer|canonical|open|reference-user|light|desktop-1440x900",
+      "state": "open",
+      "classification": "canonical",
+      "canonicalKey": "stockledger|surface:journal-composer|canonical|open|reference-user|light|desktop-1440x900"
+    },
+    {
+      "surface": "recipe-builder",
+      "locale": "ko",
+      "viewport": "desktop-1440x900",
+      "width": 1440,
+      "height": 900,
+      "path": "captures/canonical/ko/desktop-1440x900/recipe-builder.png",
+      "sha256": "48a7f7620dcb37484cfc9e97b9e6f378fd0d13ff7a08f8071822d530592cb772",
+      "bytes": 66520,
+      "metrics": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        }
+      },
+      "key": "stockledger|surface:recipe-builder|canonical|open|reference-user|light|desktop-1440x900",
+      "state": "open",
+      "classification": "canonical",
+      "canonicalKey": "stockledger|surface:recipe-builder|canonical|open|reference-user|light|desktop-1440x900"
+    },
+    {
+      "surface": "logic-registry",
+      "locale": "ko",
+      "viewport": "desktop-1440x900",
+      "width": 1440,
+      "height": 900,
+      "path": "captures/canonical/ko/desktop-1440x900/logic-registry.png",
+      "sha256": "d0c585b1d733ec9b81c7eab42e38620d546d8e9aed0a75862df974e74e07b576",
+      "bytes": 93287,
+      "metrics": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        }
+      },
+      "key": "stockledger|surface:logic-registry|canonical|ready|reference-user|light|desktop-1440x900",
+      "state": "ready",
+      "classification": "canonical",
+      "canonicalKey": "stockledger|surface:logic-registry|canonical|ready|reference-user|light|desktop-1440x900"
+    },
+    {
+      "surface": "notification-confirmation",
+      "locale": "ko",
+      "viewport": "desktop-1440x900",
+      "width": 1440,
+      "height": 900,
+      "path": "captures/canonical/ko/desktop-1440x900/notification-confirmation.png",
+      "sha256": "d4828a34ab9afaa348d01159f2fbb2cbbfec40a2ea46d82d13beaf54bf974ba8",
+      "bytes": 46504,
+      "metrics": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        }
+      },
+      "key": "stockledger|surface:notification-confirmation|canonical|confirmation|reference-user|light|desktop-1440x900",
+      "state": "confirmation",
+      "classification": "canonical",
+      "canonicalKey": "stockledger|surface:notification-confirmation|canonical|confirmation|reference-user|light|desktop-1440x900"
+    },
+    {
+      "surface": "eye-composer",
+      "locale": "ko",
+      "viewport": "mobile-390x844",
+      "width": 390,
+      "height": 844,
+      "path": "captures/canonical/ko/mobile-390x844/eye-composer.png",
+      "sha256": "4bc3ced628cc2355ab24f83edf500aa9b6e1bed311231af88671c5f4f1a995d8",
+      "bytes": 60329,
+      "metrics": {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "documentScrollWidth": 390,
+        "bodyScrollWidth": 390,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 844
+        }
+      },
+      "key": "stockledger|surface:eye-composer|canonical|open|reference-user|light|mobile-390x844",
+      "state": "open",
+      "classification": "canonical",
+      "canonicalKey": "stockledger|surface:eye-composer|canonical|open|reference-user|light|mobile-390x844"
+    },
+    {
+      "surface": "journal-composer",
+      "locale": "ko",
+      "viewport": "mobile-390x844",
+      "width": 390,
+      "height": 844,
+      "path": "captures/canonical/ko/mobile-390x844/journal-composer.png",
+      "sha256": "3efff8514eb24457c99319d73b86cbee68df2fa21344097af7e5e25b98e8333a",
+      "bytes": 44692,
+      "metrics": {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "documentScrollWidth": 390,
+        "bodyScrollWidth": 390,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 844
+        }
+      },
+      "key": "stockledger|surface:journal-composer|canonical|open|reference-user|light|mobile-390x844",
+      "state": "open",
+      "classification": "canonical",
+      "canonicalKey": "stockledger|surface:journal-composer|canonical|open|reference-user|light|mobile-390x844"
+    },
+    {
+      "surface": "recipe-builder",
+      "locale": "ko",
+      "viewport": "mobile-390x844",
+      "width": 390,
+      "height": 844,
+      "path": "captures/canonical/ko/mobile-390x844/recipe-builder.png",
+      "sha256": "41130e6bdf5f11d04f85d041748b2780a2df4d2c072c0e9b3f40cc4a9ee6849b",
+      "bytes": 54451,
+      "metrics": {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "documentScrollWidth": 390,
+        "bodyScrollWidth": 390,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 844
+        }
+      },
+      "key": "stockledger|surface:recipe-builder|canonical|open|reference-user|light|mobile-390x844",
+      "state": "open",
+      "classification": "canonical",
+      "canonicalKey": "stockledger|surface:recipe-builder|canonical|open|reference-user|light|mobile-390x844"
+    },
+    {
+      "surface": "logic-registry",
+      "locale": "ko",
+      "viewport": "mobile-390x844",
+      "width": 390,
+      "height": 844,
+      "path": "captures/canonical/ko/mobile-390x844/logic-registry.png",
+      "sha256": "39a8d5e0fa372288331a9907398dd249e0379a10eb65a32a3c55fb65e1965875",
+      "bytes": 69100,
+      "metrics": {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "documentScrollWidth": 390,
+        "bodyScrollWidth": 390,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 844
+        }
+      },
+      "key": "stockledger|surface:logic-registry|canonical|ready|reference-user|light|mobile-390x844",
+      "state": "ready",
+      "classification": "canonical",
+      "canonicalKey": "stockledger|surface:logic-registry|canonical|ready|reference-user|light|mobile-390x844"
+    },
+    {
+      "surface": "notification-confirmation",
+      "locale": "ko",
+      "viewport": "mobile-390x844",
+      "width": 390,
+      "height": 844,
+      "path": "captures/canonical/ko/mobile-390x844/notification-confirmation.png",
+      "sha256": "dc754ffc35afb4b84f7bff0e03bf54457038a4a9b860dba83340a29761d35804",
+      "bytes": 38796,
+      "metrics": {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "documentScrollWidth": 390,
+        "bodyScrollWidth": 390,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 844
+        }
+      },
+      "key": "stockledger|surface:notification-confirmation|canonical|confirmation|reference-user|light|mobile-390x844",
+      "state": "confirmation",
+      "classification": "canonical",
+      "canonicalKey": "stockledger|surface:notification-confirmation|canonical|confirmation|reference-user|light|mobile-390x844"
+    },
+    {
+      "surface": "eye-composer",
+      "locale": "en",
+      "viewport": "desktop-1366x768",
+      "width": 1366,
+      "height": 768,
+      "path": "captures/stress/en/desktop-1366x768/eye-composer.png",
+      "sha256": "9240ee0742c693a28539842b21e109bed29623fd9adb91272ccfb29645369a20",
+      "bytes": 69069,
+      "metrics": {
+        "viewport": {
+          "width": 1366,
+          "height": 768
+        },
+        "documentScrollWidth": 1366,
+        "bodyScrollWidth": 1366,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1366,
+          "height": 768
+        }
+      },
+      "state": "open",
+      "classification": "stress"
+    },
+    {
+      "surface": "journal-composer",
+      "locale": "en",
+      "viewport": "desktop-1366x768",
+      "width": 1366,
+      "height": 768,
+      "path": "captures/stress/en/desktop-1366x768/journal-composer.png",
+      "sha256": "8a39456825aa75594b70a9388ffc535b75aa65ba29b7fe71d39810147cc3e4b3",
+      "bytes": 55433,
+      "metrics": {
+        "viewport": {
+          "width": 1366,
+          "height": 768
+        },
+        "documentScrollWidth": 1366,
+        "bodyScrollWidth": 1366,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1366,
+          "height": 768
+        }
+      },
+      "state": "open",
+      "classification": "stress"
+    },
+    {
+      "surface": "recipe-builder",
+      "locale": "en",
+      "viewport": "desktop-1366x768",
+      "width": 1366,
+      "height": 768,
+      "path": "captures/stress/en/desktop-1366x768/recipe-builder.png",
+      "sha256": "f91c0054ea29e467e50274347c8989cd43c51cac7405ec4c72b173089d78c149",
+      "bytes": 69204,
+      "metrics": {
+        "viewport": {
+          "width": 1366,
+          "height": 768
+        },
+        "documentScrollWidth": 1366,
+        "bodyScrollWidth": 1366,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1366,
+          "height": 768
+        }
+      },
+      "state": "open",
+      "classification": "stress"
+    },
+    {
+      "surface": "logic-registry",
+      "locale": "en",
+      "viewport": "desktop-1366x768",
+      "width": 1366,
+      "height": 768,
+      "path": "captures/stress/en/desktop-1366x768/logic-registry.png",
+      "sha256": "c0d5c72da25500a2ddac5920a6ea5771a420d1e3a09b33e259e4af86306894fe",
+      "bytes": 86434,
+      "metrics": {
+        "viewport": {
+          "width": 1366,
+          "height": 768
+        },
+        "documentScrollWidth": 1366,
+        "bodyScrollWidth": 1366,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1366,
+          "height": 768
+        }
+      },
+      "state": "ready",
+      "classification": "stress"
+    },
+    {
+      "surface": "notification-confirmation",
+      "locale": "en",
+      "viewport": "desktop-1366x768",
+      "width": 1366,
+      "height": 768,
+      "path": "captures/stress/en/desktop-1366x768/notification-confirmation.png",
+      "sha256": "7ba98c1c01d8f4689a7aaefe547d20108c00e5fc525d77b60291a9ad816e6c5b",
+      "bytes": 43931,
+      "metrics": {
+        "viewport": {
+          "width": 1366,
+          "height": 768
+        },
+        "documentScrollWidth": 1366,
+        "bodyScrollWidth": 1366,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1366,
+          "height": 768
+        }
+      },
+      "state": "confirmation",
+      "classification": "stress"
+    },
+    {
+      "surface": "eye-composer",
+      "locale": "en",
+      "viewport": "mobile-360x800",
+      "width": 360,
+      "height": 800,
+      "path": "captures/stress/en/mobile-360x800/eye-composer.png",
+      "sha256": "6b8ada87149902eb253c07de851bdc89748a38dc8e1f7ecd11ec99f68b9831d9",
+      "bytes": 57685,
+      "metrics": {
+        "viewport": {
+          "width": 360,
+          "height": 800
+        },
+        "documentScrollWidth": 360,
+        "bodyScrollWidth": 360,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 800
+        }
+      },
+      "state": "open",
+      "classification": "stress"
+    },
+    {
+      "surface": "journal-composer",
+      "locale": "en",
+      "viewport": "mobile-360x800",
+      "width": 360,
+      "height": 800,
+      "path": "captures/stress/en/mobile-360x800/journal-composer.png",
+      "sha256": "bd5ec25c91d74635deee4d20be2cdb4db784446c477684ae98aa4a071ba83278",
+      "bytes": 48203,
+      "metrics": {
+        "viewport": {
+          "width": 360,
+          "height": 800
+        },
+        "documentScrollWidth": 360,
+        "bodyScrollWidth": 360,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 800
+        }
+      },
+      "state": "open",
+      "classification": "stress"
+    },
+    {
+      "surface": "recipe-builder",
+      "locale": "en",
+      "viewport": "mobile-360x800",
+      "width": 360,
+      "height": 800,
+      "path": "captures/stress/en/mobile-360x800/recipe-builder.png",
+      "sha256": "4578835e1a82d2dc8fa734843562273d5b35ff0c8b37f33eedd5f3bfea5db73e",
+      "bytes": 57739,
+      "metrics": {
+        "viewport": {
+          "width": 360,
+          "height": 800
+        },
+        "documentScrollWidth": 360,
+        "bodyScrollWidth": 360,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 800
+        }
+      },
+      "state": "open",
+      "classification": "stress"
+    },
+    {
+      "surface": "logic-registry",
+      "locale": "en",
+      "viewport": "mobile-360x800",
+      "width": 360,
+      "height": 800,
+      "path": "captures/stress/en/mobile-360x800/logic-registry.png",
+      "sha256": "1fb4343aedf124f268d1c7debc734e5b0396b48837b8a911da674fe4b25d42d6",
+      "bytes": 67633,
+      "metrics": {
+        "viewport": {
+          "width": 360,
+          "height": 800
+        },
+        "documentScrollWidth": 360,
+        "bodyScrollWidth": 360,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 800
+        }
+      },
+      "state": "ready",
+      "classification": "stress"
+    },
+    {
+      "surface": "notification-confirmation",
+      "locale": "en",
+      "viewport": "mobile-360x800",
+      "width": 360,
+      "height": 800,
+      "path": "captures/stress/en/mobile-360x800/notification-confirmation.png",
+      "sha256": "ab3de52ff3c02bdb41a13e6f44572d7c1feadb81b620b3e51cd487980f9bad7e",
+      "bytes": 38327,
+      "metrics": {
+        "viewport": {
+          "width": 360,
+          "height": 800
+        },
+        "documentScrollWidth": 360,
+        "bodyScrollWidth": 360,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 800
+        }
+      },
+      "state": "confirmation",
+      "classification": "stress"
+    },
+    {
+      "surface": "eye-composer",
+      "locale": "en",
+      "viewport": "mobile-412x915",
+      "width": 412,
+      "height": 915,
+      "path": "captures/holdout/en/mobile-412x915/eye-composer.png",
+      "sha256": "abd638ed48f989e9f089c26a0285b1fd6b88ea54921c9ca653a3ab212d370beb",
+      "bytes": 65575,
+      "metrics": {
+        "viewport": {
+          "width": 412,
+          "height": 915
+        },
+        "documentScrollWidth": 412,
+        "bodyScrollWidth": 412,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 412,
+          "height": 915
+        }
+      },
+      "state": "open",
+      "classification": "holdout"
+    },
+    {
+      "surface": "journal-composer",
+      "locale": "en",
+      "viewport": "mobile-412x915",
+      "width": 412,
+      "height": 915,
+      "path": "captures/holdout/en/mobile-412x915/journal-composer.png",
+      "sha256": "bda92104682882efaca8b9d1dd3f41f7c9f13c00c545b693d91c349a1c1a2f11",
+      "bytes": 56161,
+      "metrics": {
+        "viewport": {
+          "width": 412,
+          "height": 915
+        },
+        "documentScrollWidth": 412,
+        "bodyScrollWidth": 412,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 412,
+          "height": 915
+        }
+      },
+      "state": "open",
+      "classification": "holdout"
+    },
+    {
+      "surface": "recipe-builder",
+      "locale": "en",
+      "viewport": "mobile-412x915",
+      "width": 412,
+      "height": 915,
+      "path": "captures/holdout/en/mobile-412x915/recipe-builder.png",
+      "sha256": "8d878d0b67e7e73a39ab1a06f3c1f3f12fcd06c8cdac625a4e47634cd6dc877b",
+      "bytes": 63424,
+      "metrics": {
+        "viewport": {
+          "width": 412,
+          "height": 915
+        },
+        "documentScrollWidth": 412,
+        "bodyScrollWidth": 412,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 412,
+          "height": 915
+        }
+      },
+      "state": "open",
+      "classification": "holdout"
+    },
+    {
+      "surface": "logic-registry",
+      "locale": "en",
+      "viewport": "mobile-412x915",
+      "width": 412,
+      "height": 915,
+      "path": "captures/holdout/en/mobile-412x915/logic-registry.png",
+      "sha256": "c394fc9a0054d2a9f0ffcfe3d8d77d1cd47eae704a6504ff9c1b9e7764cdc86d",
+      "bytes": 79058,
+      "metrics": {
+        "viewport": {
+          "width": 412,
+          "height": 915
+        },
+        "documentScrollWidth": 412,
+        "bodyScrollWidth": 412,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 412,
+          "height": 915
+        }
+      },
+      "state": "ready",
+      "classification": "holdout"
+    },
+    {
+      "surface": "notification-confirmation",
+      "locale": "en",
+      "viewport": "mobile-412x915",
+      "width": 412,
+      "height": 915,
+      "path": "captures/holdout/en/mobile-412x915/notification-confirmation.png",
+      "sha256": "a26889cbc19f90393c204f440fb5b768a1f1f4f90e09856474f7877464bd210e",
+      "bytes": 37779,
+      "metrics": {
+        "viewport": {
+          "width": 412,
+          "height": 915
+        },
+        "documentScrollWidth": 412,
+        "bodyScrollWidth": 412,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 412,
+          "height": 915
+        }
+      },
+      "state": "confirmation",
+      "classification": "holdout"
+    },
+    {
+      "surface": "eye-composer",
+      "locale": "ko",
+      "viewport": "desktop-1366x768",
+      "width": 1366,
+      "height": 768,
+      "path": "captures/stress/ko/desktop-1366x768/eye-composer.png",
+      "sha256": "8858831d625495a3955fd84df1a0757162c82aafe0b3598eeb1d6c5d0afcb742",
+      "bytes": 68007,
+      "metrics": {
+        "viewport": {
+          "width": 1366,
+          "height": 768
+        },
+        "documentScrollWidth": 1366,
+        "bodyScrollWidth": 1366,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1366,
+          "height": 768
+        }
+      },
+      "state": "open",
+      "classification": "stress"
+    },
+    {
+      "surface": "journal-composer",
+      "locale": "ko",
+      "viewport": "desktop-1366x768",
+      "width": 1366,
+      "height": 768,
+      "path": "captures/stress/ko/desktop-1366x768/journal-composer.png",
+      "sha256": "bcc016a538769a0d16bc74e9f997a359d4da83f3dc7e63046ca259a6e7352f6d",
+      "bytes": 47580,
+      "metrics": {
+        "viewport": {
+          "width": 1366,
+          "height": 768
+        },
+        "documentScrollWidth": 1366,
+        "bodyScrollWidth": 1366,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1366,
+          "height": 768
+        }
+      },
+      "state": "open",
+      "classification": "stress"
+    },
+    {
+      "surface": "recipe-builder",
+      "locale": "ko",
+      "viewport": "desktop-1366x768",
+      "width": 1366,
+      "height": 768,
+      "path": "captures/stress/ko/desktop-1366x768/recipe-builder.png",
+      "sha256": "8cd5abf4f2cf5cae097ba3a1b19b239173a15682c279e9bf4e8e10cc980842d1",
+      "bytes": 61581,
+      "metrics": {
+        "viewport": {
+          "width": 1366,
+          "height": 768
+        },
+        "documentScrollWidth": 1366,
+        "bodyScrollWidth": 1366,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1366,
+          "height": 768
+        }
+      },
+      "state": "open",
+      "classification": "stress"
+    },
+    {
+      "surface": "logic-registry",
+      "locale": "ko",
+      "viewport": "desktop-1366x768",
+      "width": 1366,
+      "height": 768,
+      "path": "captures/stress/ko/desktop-1366x768/logic-registry.png",
+      "sha256": "d0b75c3a46e98b34cb57a2e83f85d8203164b60aac4e447a302137ab3e1bc266",
+      "bytes": 81325,
+      "metrics": {
+        "viewport": {
+          "width": 1366,
+          "height": 768
+        },
+        "documentScrollWidth": 1366,
+        "bodyScrollWidth": 1366,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1366,
+          "height": 768
+        }
+      },
+      "state": "ready",
+      "classification": "stress"
+    },
+    {
+      "surface": "notification-confirmation",
+      "locale": "ko",
+      "viewport": "desktop-1366x768",
+      "width": 1366,
+      "height": 768,
+      "path": "captures/stress/ko/desktop-1366x768/notification-confirmation.png",
+      "sha256": "da8604fea3153ca1e0980d6c8336558ec75a0587971742fb09dfb8db490bca52",
+      "bytes": 43774,
+      "metrics": {
+        "viewport": {
+          "width": 1366,
+          "height": 768
+        },
+        "documentScrollWidth": 1366,
+        "bodyScrollWidth": 1366,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1366,
+          "height": 768
+        }
+      },
+      "state": "confirmation",
+      "classification": "stress"
+    },
+    {
+      "surface": "eye-composer",
+      "locale": "ko",
+      "viewport": "mobile-360x800",
+      "width": 360,
+      "height": 800,
+      "path": "captures/stress/ko/mobile-360x800/eye-composer.png",
+      "sha256": "091438d8e4e0ff14cdd160c88d901898c1f61f649be9831b95373ec30282d931",
+      "bytes": 56615,
+      "metrics": {
+        "viewport": {
+          "width": 360,
+          "height": 800
+        },
+        "documentScrollWidth": 360,
+        "bodyScrollWidth": 360,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 800
+        }
+      },
+      "state": "open",
+      "classification": "stress"
+    },
+    {
+      "surface": "journal-composer",
+      "locale": "ko",
+      "viewport": "mobile-360x800",
+      "width": 360,
+      "height": 800,
+      "path": "captures/stress/ko/mobile-360x800/journal-composer.png",
+      "sha256": "844313e88c7253098b249417b9d8396a19b5490da8e2ad884fea557f9fef1004",
+      "bytes": 39995,
+      "metrics": {
+        "viewport": {
+          "width": 360,
+          "height": 800
+        },
+        "documentScrollWidth": 360,
+        "bodyScrollWidth": 360,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 800
+        }
+      },
+      "state": "open",
+      "classification": "stress"
+    },
+    {
+      "surface": "recipe-builder",
+      "locale": "ko",
+      "viewport": "mobile-360x800",
+      "width": 360,
+      "height": 800,
+      "path": "captures/stress/ko/mobile-360x800/recipe-builder.png",
+      "sha256": "ccf834aef2c2fcae8e66d78e4ff0a5f570f10e9b84d9daf97dd4279469189ed6",
+      "bytes": 52279,
+      "metrics": {
+        "viewport": {
+          "width": 360,
+          "height": 800
+        },
+        "documentScrollWidth": 360,
+        "bodyScrollWidth": 360,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 800
+        }
+      },
+      "state": "open",
+      "classification": "stress"
+    },
+    {
+      "surface": "logic-registry",
+      "locale": "ko",
+      "viewport": "mobile-360x800",
+      "width": 360,
+      "height": 800,
+      "path": "captures/stress/ko/mobile-360x800/logic-registry.png",
+      "sha256": "72d00c72ba885e8eb4b53a04c009f158a79f1440adc4ddd58f92b06481fd1bc5",
+      "bytes": 65350,
+      "metrics": {
+        "viewport": {
+          "width": 360,
+          "height": 800
+        },
+        "documentScrollWidth": 360,
+        "bodyScrollWidth": 360,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 800
+        }
+      },
+      "state": "ready",
+      "classification": "stress"
+    },
+    {
+      "surface": "notification-confirmation",
+      "locale": "ko",
+      "viewport": "mobile-360x800",
+      "width": 360,
+      "height": 800,
+      "path": "captures/stress/ko/mobile-360x800/notification-confirmation.png",
+      "sha256": "7b19c5079180983020ec6cc54be87e4074cee7f1dd12a4c1ab93d58f7d31e1ad",
+      "bytes": 36318,
+      "metrics": {
+        "viewport": {
+          "width": 360,
+          "height": 800
+        },
+        "documentScrollWidth": 360,
+        "bodyScrollWidth": 360,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 800
+        }
+      },
+      "state": "confirmation",
+      "classification": "stress"
+    },
+    {
+      "surface": "eye-composer",
+      "locale": "ko",
+      "viewport": "mobile-412x915",
+      "width": 412,
+      "height": 915,
+      "path": "captures/holdout/ko/mobile-412x915/eye-composer.png",
+      "sha256": "df6b1393ae6ea92c32e18a7d308e3c0bc49ac533fbf514b5cd6afea6a70b48da",
+      "bytes": 65056,
+      "metrics": {
+        "viewport": {
+          "width": 412,
+          "height": 915
+        },
+        "documentScrollWidth": 412,
+        "bodyScrollWidth": 412,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 412,
+          "height": 915
+        }
+      },
+      "state": "open",
+      "classification": "holdout"
+    },
+    {
+      "surface": "journal-composer",
+      "locale": "ko",
+      "viewport": "mobile-412x915",
+      "width": 412,
+      "height": 915,
+      "path": "captures/holdout/ko/mobile-412x915/journal-composer.png",
+      "sha256": "a0703eec9334be5fac709ef67a9a593c850a5a8921d6f4f0bf7e2a24987bc9ba",
+      "bytes": 48171,
+      "metrics": {
+        "viewport": {
+          "width": 412,
+          "height": 915
+        },
+        "documentScrollWidth": 412,
+        "bodyScrollWidth": 412,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 412,
+          "height": 915
+        }
+      },
+      "state": "open",
+      "classification": "holdout"
+    },
+    {
+      "surface": "recipe-builder",
+      "locale": "ko",
+      "viewport": "mobile-412x915",
+      "width": 412,
+      "height": 915,
+      "path": "captures/holdout/ko/mobile-412x915/recipe-builder.png",
+      "sha256": "8b5e4f56b39e5b6b84d9151fe15ddb6ad904b2c41818bf125d4f71e856ff1420",
+      "bytes": 56462,
+      "metrics": {
+        "viewport": {
+          "width": 412,
+          "height": 915
+        },
+        "documentScrollWidth": 412,
+        "bodyScrollWidth": 412,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 412,
+          "height": 915
+        }
+      },
+      "state": "open",
+      "classification": "holdout"
+    },
+    {
+      "surface": "logic-registry",
+      "locale": "ko",
+      "viewport": "mobile-412x915",
+      "width": 412,
+      "height": 915,
+      "path": "captures/holdout/ko/mobile-412x915/logic-registry.png",
+      "sha256": "2c6c71bb827e04f7cd66cd76db4ec926ebc6847a0cb99c872997afaa7b7915ab",
+      "bytes": 76656,
+      "metrics": {
+        "viewport": {
+          "width": 412,
+          "height": 915
+        },
+        "documentScrollWidth": 412,
+        "bodyScrollWidth": 412,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 412,
+          "height": 915
+        }
+      },
+      "state": "ready",
+      "classification": "holdout"
+    },
+    {
+      "surface": "notification-confirmation",
+      "locale": "ko",
+      "viewport": "mobile-412x915",
+      "width": 412,
+      "height": 915,
+      "path": "captures/holdout/ko/mobile-412x915/notification-confirmation.png",
+      "sha256": "d305b31c8393444812e1bcbff8dc07162b1562a9ce51c73994cd4c4da50c1e62",
+      "bytes": 36922,
+      "metrics": {
+        "viewport": {
+          "width": 412,
+          "height": 915
+        },
+        "documentScrollWidth": 412,
+        "bodyScrollWidth": 412,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 412,
+          "height": 915
+        }
+      },
+      "state": "confirmation",
+      "classification": "holdout"
+    }
+  ],
+  "stateEvidence": [
+    {
+      "name": "eye-blank-validation",
+      "path": "captures/states/eye-blank-validation.png",
+      "sha256": "374379288ce270a41f0a2f097e9e3f4ea5b396caed97808992c97b413b7b9a4b",
+      "bytes": 81411,
+      "note": "The first required Stock field and its adjacent actionable error are visible with composer context.",
+      "geometry": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        }
+      }
+    },
+    {
+      "name": "eye-invalid-range",
+      "path": "captures/states/eye-invalid-range.png",
+      "sha256": "69df9c544032b60ac19589f6f4eb439635df6115c69419ceeac307ef88ae7013",
+      "bytes": 58710,
+      "note": "Reversed optional range shows actionable errors and keeps the entered values.",
+      "geometry": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        }
+      }
+    },
+    {
+      "name": "eye-edit",
+      "path": "captures/states/eye-edit.png",
+      "sha256": "61ed517e4a418e778eb122e5091ae61fe766a15fb416eab98e87f125271ba3fc",
+      "bytes": 73034,
+      "note": "Edit mode restores the exact authored thesis and invalidation rule.",
+      "geometry": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        }
+      }
+    },
+    {
+      "name": "journal-required-validation",
+      "path": "captures/states/journal-required-validation.png",
+      "sha256": "272e9f4617a55247a123d9eaec7a01ffc4bd10d9db188ef0634af9fa24576e29",
+      "bytes": 68386,
+      "note": "The current required Eye context and adjacent error are visible; later action, thesis, and timing errors remain hidden.",
+      "geometry": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        }
+      }
+    },
+    {
+      "name": "journal-amend",
+      "path": "captures/states/journal-amend.png",
+      "sha256": "e0f248b688a8ab07036001209f7ed060b96be556885b72f23a95df28903eca1a",
+      "bytes": 68316,
+      "note": "Amend mode preserves the authored note and optional concern.",
+      "geometry": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        }
+      }
+    },
+    {
+      "name": "recipe-purpose-validation",
+      "path": "captures/states/recipe-purpose-validation.png",
+      "sha256": "a70f05be22da65263f9bd034b100368ec801a8c852b74879ff16a5defbce376a",
+      "bytes": 61469,
+      "note": "The Purpose step names only the information required for that step.",
+      "geometry": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        }
+      }
+    },
+    {
+      "name": "recipe-logic-validation",
+      "path": "captures/states/recipe-logic-validation.png",
+      "sha256": "01d88fd8a303230f564ff45a2c50fe9c6a29bc422a988d8eabf11ee1f33cc29d",
+      "bytes": 59398,
+      "note": "The Logic step asks for at least one supported condition.",
+      "geometry": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        }
+      }
+    },
+    {
+      "name": "recipe-final-review",
+      "path": "captures/states/recipe-final-review.png",
+      "sha256": "13acd8c46aff48e18e5e9b409a93de304ad14406d82a7b92e8eac366d5f68303",
+      "bytes": 75155,
+      "note": "The final step reviews purpose, supported logic, risk notes, and review cadence before saving.",
+      "geometry": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        }
+      }
+    },
+    {
+      "name": "recipe-version-context",
+      "path": "captures/states/recipe-version-context.png",
+      "sha256": "38db682f2913fca305098197b95fe431bccbab8066ad1e794082c70927788903",
+      "bytes": 68278,
+      "note": "Saved Recipe detail exposes its version context and persisted monitoring intent.",
+      "geometry": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        }
+      }
+    },
+    {
+      "name": "registry-field-detail",
+      "path": "captures/states/registry-field-detail.png",
+      "sha256": "aacaef0887c30965b2ba88e5b4e448bb17779f0d922c3f48e4d06c00de1cdd0e",
+      "bytes": 102961,
+      "note": "The identifier, meaning, importance, expected source and coverage, and downstream links are visible together.",
+      "geometry": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        }
+      }
+    },
+    {
+      "name": "registry-help",
+      "path": "captures/states/registry-help.png",
+      "sha256": "1341de283ca92d639ba6d2f533e170bbf85d1fd5cb2008d85764e81946420546",
+      "bytes": 105604,
+      "note": "Supported help explains how to read registry metadata without equating it with live provider health.",
+      "geometry": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        }
+      }
+    },
+    {
+      "name": "notification-confirmation-cancel",
+      "path": "captures/states/notification-confirmation-cancel.png",
+      "sha256": "e557223303d83a5592c688b425c77c198c0bed80403bbb825bcaa4297bb51602",
+      "bytes": 46123,
+      "note": "Confirmation presents the preference change and keeps cancel separate from the destructive action.",
+      "geometry": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        }
+      }
+    },
+    {
+      "name": "notification-canceled",
+      "path": "captures/states/notification-canceled.png",
+      "sha256": "f6df783c736c83459013d36028852bf3c392929a407179cda76d72256f97a4ee",
+      "bytes": 95759,
+      "note": "Cancel returns to the still-enabled preference state without changing it.",
+      "geometry": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": null
+      }
+    },
+    {
+      "name": "notification-save-error",
+      "path": "captures/states/notification-save-error.png",
+      "sha256": "af0ff26d577c9d5c36926349ce8e0b9a8b92c51354b0edf5e6a601a102afb694",
+      "bytes": 56645,
+      "note": "Injected technical exception retains localized safe copy, the unchanged Enabled preference, and retry/cancel actions.",
+      "geometry": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        }
+      }
+    },
+    {
+      "name": "notification-save-success",
+      "path": "captures/states/notification-save-success.png",
+      "sha256": "d4303fe27356840942459f9d1b00e8b46ddbdc8c7c16158b665a6da324f6d82f",
+      "bytes": 95003,
+      "note": "The confirmation closes only after the saved preference is Off.",
+      "geometry": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": null
+      }
+    },
+    {
+      "name": "notification-pending",
+      "path": "captures/states/notification-pending.png",
+      "sha256": "6cf8c0f816e916faa55b9f1c51974a6a8254fdd974579b8072043376f94a4512",
+      "bytes": 44824,
+      "note": "The preference save remains pending until the delayed local storage acknowledgement returns in this capture fixture.",
+      "geometry": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        }
+      }
+    }
+  ],
+  "sharedImpact": "WindowPanel keeps its two-line subtitle default and allows the Raw Data Registry to show its full instruction in eight lines. Primary-route and deep-review/detail regressions pass. Notification preference failures use localized safe copy and stay out of the global error banner.",
+  "independentPixelAudit": "required; Fabric did not self-accept visual craft"
+}

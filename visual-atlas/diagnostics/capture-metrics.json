@@ -1,0 +1,1257 @@
+{
+  "candidate": "8a9ac0104190144110d335c93eb11f8c51f6a898",
+  "tree": "dc99438cdcf8e2f737e5de87d6afc550d4008f24",
+  "reducedMotion": "reduce",
+  "captures": [
+    {
+      "key": "stockledger|surface:eye-composer|canonical|open|reference-user|light|desktop-1440x900",
+      "surface": "eye-composer",
+      "state": "open",
+      "locale": "en",
+      "viewport": "desktop-1440x900",
+      "path": "captures/canonical/en/desktop-1440x900/eye-composer.png",
+      "sha256": "5dd31cea18f19d7fcbf1da9a3a289de0a8468bbf120f48c2bfff3b0593e271df",
+      "bytes": 79054,
+      "metrics": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        }
+      }
+    },
+    {
+      "key": "stockledger|surface:journal-composer|canonical|open|reference-user|light|desktop-1440x900",
+      "surface": "journal-composer",
+      "state": "open",
+      "locale": "en",
+      "viewport": "desktop-1440x900",
+      "path": "captures/canonical/en/desktop-1440x900/journal-composer.png",
+      "sha256": "70f6cfff35dfc1b115d87bdae86cf4139cd7f3335cdef78ed7f5b9590df82656",
+      "bytes": 67162,
+      "metrics": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        }
+      }
+    },
+    {
+      "key": "stockledger|surface:recipe-builder|canonical|open|reference-user|light|desktop-1440x900",
+      "surface": "recipe-builder",
+      "state": "open",
+      "locale": "en",
+      "viewport": "desktop-1440x900",
+      "path": "captures/canonical/en/desktop-1440x900/recipe-builder.png",
+      "sha256": "0a7b0fd26bd58edc1a3b28cefcc51d3be570b7bd7f8c555864ffb0c78c4e8f18",
+      "bytes": 75665,
+      "metrics": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        }
+      }
+    },
+    {
+      "key": "stockledger|surface:logic-registry|canonical|ready|reference-user|light|desktop-1440x900",
+      "surface": "logic-registry",
+      "state": "ready",
+      "locale": "en",
+      "viewport": "desktop-1440x900",
+      "path": "captures/canonical/en/desktop-1440x900/logic-registry.png",
+      "sha256": "1439bffcfc2798c2aa58425351a055f7aafe39b90592b4157c09bf6b58299d45",
+      "bytes": 102640,
+      "metrics": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        }
+      }
+    },
+    {
+      "key": "stockledger|surface:notification-confirmation|canonical|confirmation|reference-user|light|desktop-1440x900",
+      "surface": "notification-confirmation",
+      "state": "confirmation",
+      "locale": "en",
+      "viewport": "desktop-1440x900",
+      "path": "captures/canonical/en/desktop-1440x900/notification-confirmation.png",
+      "sha256": "b506aece4f03ce34124f02c6717ea866ef25a70e39d092aa1d4efe1818aaca5b",
+      "bytes": 46629,
+      "metrics": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        }
+      }
+    },
+    {
+      "key": "stockledger|surface:eye-composer|canonical|open|reference-user|light|mobile-390x844",
+      "surface": "eye-composer",
+      "state": "open",
+      "locale": "en",
+      "viewport": "mobile-390x844",
+      "path": "captures/canonical/en/mobile-390x844/eye-composer.png",
+      "sha256": "a6d879599a87dbe6369bac90113d3b46fe8e61bf3f21c4f15e08392a241bd045",
+      "bytes": 61398,
+      "metrics": {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "documentScrollWidth": 390,
+        "bodyScrollWidth": 390,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 844
+        }
+      }
+    },
+    {
+      "key": "stockledger|surface:journal-composer|canonical|open|reference-user|light|mobile-390x844",
+      "surface": "journal-composer",
+      "state": "open",
+      "locale": "en",
+      "viewport": "mobile-390x844",
+      "path": "captures/canonical/en/mobile-390x844/journal-composer.png",
+      "sha256": "dc651e136e8479d300e3acfe7aa9c12e120cbcc6800d66e295384b3595e2a84d",
+      "bytes": 52514,
+      "metrics": {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "documentScrollWidth": 390,
+        "bodyScrollWidth": 390,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 844
+        }
+      }
+    },
+    {
+      "key": "stockledger|surface:recipe-builder|canonical|open|reference-user|light|mobile-390x844",
+      "surface": "recipe-builder",
+      "state": "open",
+      "locale": "en",
+      "viewport": "mobile-390x844",
+      "path": "captures/canonical/en/mobile-390x844/recipe-builder.png",
+      "sha256": "17897a2887d9a1043e4b33c89b54dffbfde08ee2a93e4dfac3dcaed7ce9c96b1",
+      "bytes": 60684,
+      "metrics": {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "documentScrollWidth": 390,
+        "bodyScrollWidth": 390,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 844
+        }
+      }
+    },
+    {
+      "key": "stockledger|surface:logic-registry|canonical|ready|reference-user|light|mobile-390x844",
+      "surface": "logic-registry",
+      "state": "ready",
+      "locale": "en",
+      "viewport": "mobile-390x844",
+      "path": "captures/canonical/en/mobile-390x844/logic-registry.png",
+      "sha256": "de1b4fe56270f47ac959a8ee1d4edab7171f4ac16096e599307944403a583ec5",
+      "bytes": 70544,
+      "metrics": {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "documentScrollWidth": 390,
+        "bodyScrollWidth": 390,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 844
+        }
+      }
+    },
+    {
+      "key": "stockledger|surface:notification-confirmation|canonical|confirmation|reference-user|light|mobile-390x844",
+      "surface": "notification-confirmation",
+      "state": "confirmation",
+      "locale": "en",
+      "viewport": "mobile-390x844",
+      "path": "captures/canonical/en/mobile-390x844/notification-confirmation.png",
+      "sha256": "f11fc1cc8c757acf0f9dc101e89f24ff70401661676b0d50f21fe8d01dfa55a3",
+      "bytes": 37926,
+      "metrics": {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "documentScrollWidth": 390,
+        "bodyScrollWidth": 390,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 844
+        }
+      }
+    },
+    {
+      "key": "stockledger|surface:eye-composer|canonical|open|reference-user|light|desktop-1366x768",
+      "surface": "eye-composer",
+      "state": "open",
+      "locale": "en",
+      "viewport": "desktop-1366x768",
+      "path": "captures/stress/en/desktop-1366x768/eye-composer.png",
+      "sha256": "9240ee0742c693a28539842b21e109bed29623fd9adb91272ccfb29645369a20",
+      "bytes": 69069,
+      "metrics": {
+        "viewport": {
+          "width": 1366,
+          "height": 768
+        },
+        "documentScrollWidth": 1366,
+        "bodyScrollWidth": 1366,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1366,
+          "height": 768
+        }
+      }
+    },
+    {
+      "key": "stockledger|surface:journal-composer|canonical|open|reference-user|light|desktop-1366x768",
+      "surface": "journal-composer",
+      "state": "open",
+      "locale": "en",
+      "viewport": "desktop-1366x768",
+      "path": "captures/stress/en/desktop-1366x768/journal-composer.png",
+      "sha256": "8a39456825aa75594b70a9388ffc535b75aa65ba29b7fe71d39810147cc3e4b3",
+      "bytes": 55433,
+      "metrics": {
+        "viewport": {
+          "width": 1366,
+          "height": 768
+        },
+        "documentScrollWidth": 1366,
+        "bodyScrollWidth": 1366,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1366,
+          "height": 768
+        }
+      }
+    },
+    {
+      "key": "stockledger|surface:recipe-builder|canonical|open|reference-user|light|desktop-1366x768",
+      "surface": "recipe-builder",
+      "state": "open",
+      "locale": "en",
+      "viewport": "desktop-1366x768",
+      "path": "captures/stress/en/desktop-1366x768/recipe-builder.png",
+      "sha256": "f91c0054ea29e467e50274347c8989cd43c51cac7405ec4c72b173089d78c149",
+      "bytes": 69204,
+      "metrics": {
+        "viewport": {
+          "width": 1366,
+          "height": 768
+        },
+        "documentScrollWidth": 1366,
+        "bodyScrollWidth": 1366,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1366,
+          "height": 768
+        }
+      }
+    },
+    {
+      "key": "stockledger|surface:logic-registry|canonical|ready|reference-user|light|desktop-1366x768",
+      "surface": "logic-registry",
+      "state": "ready",
+      "locale": "en",
+      "viewport": "desktop-1366x768",
+      "path": "captures/stress/en/desktop-1366x768/logic-registry.png",
+      "sha256": "c0d5c72da25500a2ddac5920a6ea5771a420d1e3a09b33e259e4af86306894fe",
+      "bytes": 86434,
+      "metrics": {
+        "viewport": {
+          "width": 1366,
+          "height": 768
+        },
+        "documentScrollWidth": 1366,
+        "bodyScrollWidth": 1366,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1366,
+          "height": 768
+        }
+      }
+    },
+    {
+      "key": "stockledger|surface:notification-confirmation|canonical|confirmation|reference-user|light|desktop-1366x768",
+      "surface": "notification-confirmation",
+      "state": "confirmation",
+      "locale": "en",
+      "viewport": "desktop-1366x768",
+      "path": "captures/stress/en/desktop-1366x768/notification-confirmation.png",
+      "sha256": "7ba98c1c01d8f4689a7aaefe547d20108c00e5fc525d77b60291a9ad816e6c5b",
+      "bytes": 43931,
+      "metrics": {
+        "viewport": {
+          "width": 1366,
+          "height": 768
+        },
+        "documentScrollWidth": 1366,
+        "bodyScrollWidth": 1366,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1366,
+          "height": 768
+        }
+      }
+    },
+    {
+      "key": "stockledger|surface:eye-composer|canonical|open|reference-user|light|mobile-360x800",
+      "surface": "eye-composer",
+      "state": "open",
+      "locale": "en",
+      "viewport": "mobile-360x800",
+      "path": "captures/stress/en/mobile-360x800/eye-composer.png",
+      "sha256": "6b8ada87149902eb253c07de851bdc89748a38dc8e1f7ecd11ec99f68b9831d9",
+      "bytes": 57685,
+      "metrics": {
+        "viewport": {
+          "width": 360,
+          "height": 800
+        },
+        "documentScrollWidth": 360,
+        "bodyScrollWidth": 360,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 800
+        }
+      }
+    },
+    {
+      "key": "stockledger|surface:journal-composer|canonical|open|reference-user|light|mobile-360x800",
+      "surface": "journal-composer",
+      "state": "open",
+      "locale": "en",
+      "viewport": "mobile-360x800",
+      "path": "captures/stress/en/mobile-360x800/journal-composer.png",
+      "sha256": "bd5ec25c91d74635deee4d20be2cdb4db784446c477684ae98aa4a071ba83278",
+      "bytes": 48203,
+      "metrics": {
+        "viewport": {
+          "width": 360,
+          "height": 800
+        },
+        "documentScrollWidth": 360,
+        "bodyScrollWidth": 360,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 800
+        }
+      }
+    },
+    {
+      "key": "stockledger|surface:recipe-builder|canonical|open|reference-user|light|mobile-360x800",
+      "surface": "recipe-builder",
+      "state": "open",
+      "locale": "en",
+      "viewport": "mobile-360x800",
+      "path": "captures/stress/en/mobile-360x800/recipe-builder.png",
+      "sha256": "4578835e1a82d2dc8fa734843562273d5b35ff0c8b37f33eedd5f3bfea5db73e",
+      "bytes": 57739,
+      "metrics": {
+        "viewport": {
+          "width": 360,
+          "height": 800
+        },
+        "documentScrollWidth": 360,
+        "bodyScrollWidth": 360,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 800
+        }
+      }
+    },
+    {
+      "key": "stockledger|surface:logic-registry|canonical|ready|reference-user|light|mobile-360x800",
+      "surface": "logic-registry",
+      "state": "ready",
+      "locale": "en",
+      "viewport": "mobile-360x800",
+      "path": "captures/stress/en/mobile-360x800/logic-registry.png",
+      "sha256": "1fb4343aedf124f268d1c7debc734e5b0396b48837b8a911da674fe4b25d42d6",
+      "bytes": 67633,
+      "metrics": {
+        "viewport": {
+          "width": 360,
+          "height": 800
+        },
+        "documentScrollWidth": 360,
+        "bodyScrollWidth": 360,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 800
+        }
+      }
+    },
+    {
+      "key": "stockledger|surface:notification-confirmation|canonical|confirmation|reference-user|light|mobile-360x800",
+      "surface": "notification-confirmation",
+      "state": "confirmation",
+      "locale": "en",
+      "viewport": "mobile-360x800",
+      "path": "captures/stress/en/mobile-360x800/notification-confirmation.png",
+      "sha256": "ab3de52ff3c02bdb41a13e6f44572d7c1feadb81b620b3e51cd487980f9bad7e",
+      "bytes": 38327,
+      "metrics": {
+        "viewport": {
+          "width": 360,
+          "height": 800
+        },
+        "documentScrollWidth": 360,
+        "bodyScrollWidth": 360,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 800
+        }
+      }
+    },
+    {
+      "key": "stockledger|surface:eye-composer|canonical|open|reference-user|light|mobile-412x915",
+      "surface": "eye-composer",
+      "state": "open",
+      "locale": "en",
+      "viewport": "mobile-412x915",
+      "path": "captures/holdout/en/mobile-412x915/eye-composer.png",
+      "sha256": "abd638ed48f989e9f089c26a0285b1fd6b88ea54921c9ca653a3ab212d370beb",
+      "bytes": 65575,
+      "metrics": {
+        "viewport": {
+          "width": 412,
+          "height": 915
+        },
+        "documentScrollWidth": 412,
+        "bodyScrollWidth": 412,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 412,
+          "height": 915
+        }
+      }
+    },
+    {
+      "key": "stockledger|surface:journal-composer|canonical|open|reference-user|light|mobile-412x915",
+      "surface": "journal-composer",
+      "state": "open",
+      "locale": "en",
+      "viewport": "mobile-412x915",
+      "path": "captures/holdout/en/mobile-412x915/journal-composer.png",
+      "sha256": "bda92104682882efaca8b9d1dd3f41f7c9f13c00c545b693d91c349a1c1a2f11",
+      "bytes": 56161,
+      "metrics": {
+        "viewport": {
+          "width": 412,
+          "height": 915
+        },
+        "documentScrollWidth": 412,
+        "bodyScrollWidth": 412,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 412,
+          "height": 915
+        }
+      }
+    },
+    {
+      "key": "stockledger|surface:recipe-builder|canonical|open|reference-user|light|mobile-412x915",
+      "surface": "recipe-builder",
+      "state": "open",
+      "locale": "en",
+      "viewport": "mobile-412x915",
+      "path": "captures/holdout/en/mobile-412x915/recipe-builder.png",
+      "sha256": "8d878d0b67e7e73a39ab1a06f3c1f3f12fcd06c8cdac625a4e47634cd6dc877b",
+      "bytes": 63424,
+      "metrics": {
+        "viewport": {
+          "width": 412,
+          "height": 915
+        },
+        "documentScrollWidth": 412,
+        "bodyScrollWidth": 412,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 412,
+          "height": 915
+        }
+      }
+    },
+    {
+      "key": "stockledger|surface:logic-registry|canonical|ready|reference-user|light|mobile-412x915",
+      "surface": "logic-registry",
+      "state": "ready",
+      "locale": "en",
+      "viewport": "mobile-412x915",
+      "path": "captures/holdout/en/mobile-412x915/logic-registry.png",
+      "sha256": "c394fc9a0054d2a9f0ffcfe3d8d77d1cd47eae704a6504ff9c1b9e7764cdc86d",
+      "bytes": 79058,
+      "metrics": {
+        "viewport": {
+          "width": 412,
+          "height": 915
+        },
+        "documentScrollWidth": 412,
+        "bodyScrollWidth": 412,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 412,
+          "height": 915
+        }
+      }
+    },
+    {
+      "key": "stockledger|surface:notification-confirmation|canonical|confirmation|reference-user|light|mobile-412x915",
+      "surface": "notification-confirmation",
+      "state": "confirmation",
+      "locale": "en",
+      "viewport": "mobile-412x915",
+      "path": "captures/holdout/en/mobile-412x915/notification-confirmation.png",
+      "sha256": "a26889cbc19f90393c204f440fb5b768a1f1f4f90e09856474f7877464bd210e",
+      "bytes": 37779,
+      "metrics": {
+        "viewport": {
+          "width": 412,
+          "height": 915
+        },
+        "documentScrollWidth": 412,
+        "bodyScrollWidth": 412,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 412,
+          "height": 915
+        }
+      }
+    },
+    {
+      "key": "stockledger|surface:eye-composer|canonical|open|reference-user|light|desktop-1440x900",
+      "surface": "eye-composer",
+      "state": "open",
+      "locale": "ko",
+      "viewport": "desktop-1440x900",
+      "path": "captures/canonical/ko/desktop-1440x900/eye-composer.png",
+      "sha256": "87f10619d25a348f273abffe2dd6871c3f52e66ebadf080b56567fd92b47cc14",
+      "bytes": 76938,
+      "metrics": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        }
+      }
+    },
+    {
+      "key": "stockledger|surface:journal-composer|canonical|open|reference-user|light|desktop-1440x900",
+      "surface": "journal-composer",
+      "state": "open",
+      "locale": "ko",
+      "viewport": "desktop-1440x900",
+      "path": "captures/canonical/ko/desktop-1440x900/journal-composer.png",
+      "sha256": "459ed0fd4237e5b72150c74399615c90ae10c50183439f197c3a66e26ee63332",
+      "bytes": 58578,
+      "metrics": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        }
+      }
+    },
+    {
+      "key": "stockledger|surface:recipe-builder|canonical|open|reference-user|light|desktop-1440x900",
+      "surface": "recipe-builder",
+      "state": "open",
+      "locale": "ko",
+      "viewport": "desktop-1440x900",
+      "path": "captures/canonical/ko/desktop-1440x900/recipe-builder.png",
+      "sha256": "48a7f7620dcb37484cfc9e97b9e6f378fd0d13ff7a08f8071822d530592cb772",
+      "bytes": 66520,
+      "metrics": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        }
+      }
+    },
+    {
+      "key": "stockledger|surface:logic-registry|canonical|ready|reference-user|light|desktop-1440x900",
+      "surface": "logic-registry",
+      "state": "ready",
+      "locale": "ko",
+      "viewport": "desktop-1440x900",
+      "path": "captures/canonical/ko/desktop-1440x900/logic-registry.png",
+      "sha256": "d0c585b1d733ec9b81c7eab42e38620d546d8e9aed0a75862df974e74e07b576",
+      "bytes": 93287,
+      "metrics": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        }
+      }
+    },
+    {
+      "key": "stockledger|surface:notification-confirmation|canonical|confirmation|reference-user|light|desktop-1440x900",
+      "surface": "notification-confirmation",
+      "state": "confirmation",
+      "locale": "ko",
+      "viewport": "desktop-1440x900",
+      "path": "captures/canonical/ko/desktop-1440x900/notification-confirmation.png",
+      "sha256": "d4828a34ab9afaa348d01159f2fbb2cbbfec40a2ea46d82d13beaf54bf974ba8",
+      "bytes": 46504,
+      "metrics": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "documentScrollWidth": 1440,
+        "bodyScrollWidth": 1440,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1440,
+          "height": 900
+        }
+      }
+    },
+    {
+      "key": "stockledger|surface:eye-composer|canonical|open|reference-user|light|mobile-390x844",
+      "surface": "eye-composer",
+      "state": "open",
+      "locale": "ko",
+      "viewport": "mobile-390x844",
+      "path": "captures/canonical/ko/mobile-390x844/eye-composer.png",
+      "sha256": "4bc3ced628cc2355ab24f83edf500aa9b6e1bed311231af88671c5f4f1a995d8",
+      "bytes": 60329,
+      "metrics": {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "documentScrollWidth": 390,
+        "bodyScrollWidth": 390,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 844
+        }
+      }
+    },
+    {
+      "key": "stockledger|surface:journal-composer|canonical|open|reference-user|light|mobile-390x844",
+      "surface": "journal-composer",
+      "state": "open",
+      "locale": "ko",
+      "viewport": "mobile-390x844",
+      "path": "captures/canonical/ko/mobile-390x844/journal-composer.png",
+      "sha256": "3efff8514eb24457c99319d73b86cbee68df2fa21344097af7e5e25b98e8333a",
+      "bytes": 44692,
+      "metrics": {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "documentScrollWidth": 390,
+        "bodyScrollWidth": 390,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 844
+        }
+      }
+    },
+    {
+      "key": "stockledger|surface:recipe-builder|canonical|open|reference-user|light|mobile-390x844",
+      "surface": "recipe-builder",
+      "state": "open",
+      "locale": "ko",
+      "viewport": "mobile-390x844",
+      "path": "captures/canonical/ko/mobile-390x844/recipe-builder.png",
+      "sha256": "41130e6bdf5f11d04f85d041748b2780a2df4d2c072c0e9b3f40cc4a9ee6849b",
+      "bytes": 54451,
+      "metrics": {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "documentScrollWidth": 390,
+        "bodyScrollWidth": 390,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 844
+        }
+      }
+    },
+    {
+      "key": "stockledger|surface:logic-registry|canonical|ready|reference-user|light|mobile-390x844",
+      "surface": "logic-registry",
+      "state": "ready",
+      "locale": "ko",
+      "viewport": "mobile-390x844",
+      "path": "captures/canonical/ko/mobile-390x844/logic-registry.png",
+      "sha256": "39a8d5e0fa372288331a9907398dd249e0379a10eb65a32a3c55fb65e1965875",
+      "bytes": 69100,
+      "metrics": {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "documentScrollWidth": 390,
+        "bodyScrollWidth": 390,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 844
+        }
+      }
+    },
+    {
+      "key": "stockledger|surface:notification-confirmation|canonical|confirmation|reference-user|light|mobile-390x844",
+      "surface": "notification-confirmation",
+      "state": "confirmation",
+      "locale": "ko",
+      "viewport": "mobile-390x844",
+      "path": "captures/canonical/ko/mobile-390x844/notification-confirmation.png",
+      "sha256": "dc754ffc35afb4b84f7bff0e03bf54457038a4a9b860dba83340a29761d35804",
+      "bytes": 38796,
+      "metrics": {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "documentScrollWidth": 390,
+        "bodyScrollWidth": 390,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 844
+        }
+      }
+    },
+    {
+      "key": "stockledger|surface:eye-composer|canonical|open|reference-user|light|desktop-1366x768",
+      "surface": "eye-composer",
+      "state": "open",
+      "locale": "ko",
+      "viewport": "desktop-1366x768",
+      "path": "captures/stress/ko/desktop-1366x768/eye-composer.png",
+      "sha256": "8858831d625495a3955fd84df1a0757162c82aafe0b3598eeb1d6c5d0afcb742",
+      "bytes": 68007,
+      "metrics": {
+        "viewport": {
+          "width": 1366,
+          "height": 768
+        },
+        "documentScrollWidth": 1366,
+        "bodyScrollWidth": 1366,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1366,
+          "height": 768
+        }
+      }
+    },
+    {
+      "key": "stockledger|surface:journal-composer|canonical|open|reference-user|light|desktop-1366x768",
+      "surface": "journal-composer",
+      "state": "open",
+      "locale": "ko",
+      "viewport": "desktop-1366x768",
+      "path": "captures/stress/ko/desktop-1366x768/journal-composer.png",
+      "sha256": "bcc016a538769a0d16bc74e9f997a359d4da83f3dc7e63046ca259a6e7352f6d",
+      "bytes": 47580,
+      "metrics": {
+        "viewport": {
+          "width": 1366,
+          "height": 768
+        },
+        "documentScrollWidth": 1366,
+        "bodyScrollWidth": 1366,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1366,
+          "height": 768
+        }
+      }
+    },
+    {
+      "key": "stockledger|surface:recipe-builder|canonical|open|reference-user|light|desktop-1366x768",
+      "surface": "recipe-builder",
+      "state": "open",
+      "locale": "ko",
+      "viewport": "desktop-1366x768",
+      "path": "captures/stress/ko/desktop-1366x768/recipe-builder.png",
+      "sha256": "8cd5abf4f2cf5cae097ba3a1b19b239173a15682c279e9bf4e8e10cc980842d1",
+      "bytes": 61581,
+      "metrics": {
+        "viewport": {
+          "width": 1366,
+          "height": 768
+        },
+        "documentScrollWidth": 1366,
+        "bodyScrollWidth": 1366,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1366,
+          "height": 768
+        }
+      }
+    },
+    {
+      "key": "stockledger|surface:logic-registry|canonical|ready|reference-user|light|desktop-1366x768",
+      "surface": "logic-registry",
+      "state": "ready",
+      "locale": "ko",
+      "viewport": "desktop-1366x768",
+      "path": "captures/stress/ko/desktop-1366x768/logic-registry.png",
+      "sha256": "d0b75c3a46e98b34cb57a2e83f85d8203164b60aac4e447a302137ab3e1bc266",
+      "bytes": 81325,
+      "metrics": {
+        "viewport": {
+          "width": 1366,
+          "height": 768
+        },
+        "documentScrollWidth": 1366,
+        "bodyScrollWidth": 1366,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1366,
+          "height": 768
+        }
+      }
+    },
+    {
+      "key": "stockledger|surface:notification-confirmation|canonical|confirmation|reference-user|light|desktop-1366x768",
+      "surface": "notification-confirmation",
+      "state": "confirmation",
+      "locale": "ko",
+      "viewport": "desktop-1366x768",
+      "path": "captures/stress/ko/desktop-1366x768/notification-confirmation.png",
+      "sha256": "da8604fea3153ca1e0980d6c8336558ec75a0587971742fb09dfb8db490bca52",
+      "bytes": 43774,
+      "metrics": {
+        "viewport": {
+          "width": 1366,
+          "height": 768
+        },
+        "documentScrollWidth": 1366,
+        "bodyScrollWidth": 1366,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1366,
+          "height": 768
+        }
+      }
+    },
+    {
+      "key": "stockledger|surface:eye-composer|canonical|open|reference-user|light|mobile-360x800",
+      "surface": "eye-composer",
+      "state": "open",
+      "locale": "ko",
+      "viewport": "mobile-360x800",
+      "path": "captures/stress/ko/mobile-360x800/eye-composer.png",
+      "sha256": "091438d8e4e0ff14cdd160c88d901898c1f61f649be9831b95373ec30282d931",
+      "bytes": 56615,
+      "metrics": {
+        "viewport": {
+          "width": 360,
+          "height": 800
+        },
+        "documentScrollWidth": 360,
+        "bodyScrollWidth": 360,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 800
+        }
+      }
+    },
+    {
+      "key": "stockledger|surface:journal-composer|canonical|open|reference-user|light|mobile-360x800",
+      "surface": "journal-composer",
+      "state": "open",
+      "locale": "ko",
+      "viewport": "mobile-360x800",
+      "path": "captures/stress/ko/mobile-360x800/journal-composer.png",
+      "sha256": "844313e88c7253098b249417b9d8396a19b5490da8e2ad884fea557f9fef1004",
+      "bytes": 39995,
+      "metrics": {
+        "viewport": {
+          "width": 360,
+          "height": 800
+        },
+        "documentScrollWidth": 360,
+        "bodyScrollWidth": 360,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 800
+        }
+      }
+    },
+    {
+      "key": "stockledger|surface:recipe-builder|canonical|open|reference-user|light|mobile-360x800",
+      "surface": "recipe-builder",
+      "state": "open",
+      "locale": "ko",
+      "viewport": "mobile-360x800",
+      "path": "captures/stress/ko/mobile-360x800/recipe-builder.png",
+      "sha256": "ccf834aef2c2fcae8e66d78e4ff0a5f570f10e9b84d9daf97dd4279469189ed6",
+      "bytes": 52279,
+      "metrics": {
+        "viewport": {
+          "width": 360,
+          "height": 800
+        },
+        "documentScrollWidth": 360,
+        "bodyScrollWidth": 360,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 800
+        }
+      }
+    },
+    {
+      "key": "stockledger|surface:logic-registry|canonical|ready|reference-user|light|mobile-360x800",
+      "surface": "logic-registry",
+      "state": "ready",
+      "locale": "ko",
+      "viewport": "mobile-360x800",
+      "path": "captures/stress/ko/mobile-360x800/logic-registry.png",
+      "sha256": "72d00c72ba885e8eb4b53a04c009f158a79f1440adc4ddd58f92b06481fd1bc5",
+      "bytes": 65350,
+      "metrics": {
+        "viewport": {
+          "width": 360,
+          "height": 800
+        },
+        "documentScrollWidth": 360,
+        "bodyScrollWidth": 360,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 800
+        }
+      }
+    },
+    {
+      "key": "stockledger|surface:notification-confirmation|canonical|confirmation|reference-user|light|mobile-360x800",
+      "surface": "notification-confirmation",
+      "state": "confirmation",
+      "locale": "ko",
+      "viewport": "mobile-360x800",
+      "path": "captures/stress/ko/mobile-360x800/notification-confirmation.png",
+      "sha256": "7b19c5079180983020ec6cc54be87e4074cee7f1dd12a4c1ab93d58f7d31e1ad",
+      "bytes": 36318,
+      "metrics": {
+        "viewport": {
+          "width": 360,
+          "height": 800
+        },
+        "documentScrollWidth": 360,
+        "bodyScrollWidth": 360,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 800
+        }
+      }
+    },
+    {
+      "key": "stockledger|surface:eye-composer|canonical|open|reference-user|light|mobile-412x915",
+      "surface": "eye-composer",
+      "state": "open",
+      "locale": "ko",
+      "viewport": "mobile-412x915",
+      "path": "captures/holdout/ko/mobile-412x915/eye-composer.png",
+      "sha256": "df6b1393ae6ea92c32e18a7d308e3c0bc49ac533fbf514b5cd6afea6a70b48da",
+      "bytes": 65056,
+      "metrics": {
+        "viewport": {
+          "width": 412,
+          "height": 915
+        },
+        "documentScrollWidth": 412,
+        "bodyScrollWidth": 412,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 412,
+          "height": 915
+        }
+      }
+    },
+    {
+      "key": "stockledger|surface:journal-composer|canonical|open|reference-user|light|mobile-412x915",
+      "surface": "journal-composer",
+      "state": "open",
+      "locale": "ko",
+      "viewport": "mobile-412x915",
+      "path": "captures/holdout/ko/mobile-412x915/journal-composer.png",
+      "sha256": "a0703eec9334be5fac709ef67a9a593c850a5a8921d6f4f0bf7e2a24987bc9ba",
+      "bytes": 48171,
+      "metrics": {
+        "viewport": {
+          "width": 412,
+          "height": 915
+        },
+        "documentScrollWidth": 412,
+        "bodyScrollWidth": 412,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 412,
+          "height": 915
+        }
+      }
+    },
+    {
+      "key": "stockledger|surface:recipe-builder|canonical|open|reference-user|light|mobile-412x915",
+      "surface": "recipe-builder",
+      "state": "open",
+      "locale": "ko",
+      "viewport": "mobile-412x915",
+      "path": "captures/holdout/ko/mobile-412x915/recipe-builder.png",
+      "sha256": "8b5e4f56b39e5b6b84d9151fe15ddb6ad904b2c41818bf125d4f71e856ff1420",
+      "bytes": 56462,
+      "metrics": {
+        "viewport": {
+          "width": 412,
+          "height": 915
+        },
+        "documentScrollWidth": 412,
+        "bodyScrollWidth": 412,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 412,
+          "height": 915
+        }
+      }
+    },
+    {
+      "key": "stockledger|surface:logic-registry|canonical|ready|reference-user|light|mobile-412x915",
+      "surface": "logic-registry",
+      "state": "ready",
+      "locale": "ko",
+      "viewport": "mobile-412x915",
+      "path": "captures/holdout/ko/mobile-412x915/logic-registry.png",
+      "sha256": "2c6c71bb827e04f7cd66cd76db4ec926ebc6847a0cb99c872997afaa7b7915ab",
+      "bytes": 76656,
+      "metrics": {
+        "viewport": {
+          "width": 412,
+          "height": 915
+        },
+        "documentScrollWidth": 412,
+        "bodyScrollWidth": 412,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 412,
+          "height": 915
+        }
+      }
+    },
+    {
+      "key": "stockledger|surface:notification-confirmation|canonical|confirmation|reference-user|light|mobile-412x915",
+      "surface": "notification-confirmation",
+      "state": "confirmation",
+      "locale": "ko",
+      "viewport": "mobile-412x915",
+      "path": "captures/holdout/ko/mobile-412x915/notification-confirmation.png",
+      "sha256": "d305b31c8393444812e1bcbff8dc07162b1562a9ce51c73994cd4c4da50c1e62",
+      "bytes": 36922,
+      "metrics": {
+        "viewport": {
+          "width": 412,
+          "height": 915
+        },
+        "documentScrollWidth": 412,
+        "bodyScrollWidth": 412,
+        "horizontalOverflowPx": 0,
+        "dialogRect": {
+          "x": 0,
+          "y": 0,
+          "width": 412,
+          "height": 915
+        }
+      }
+    }
+  ]
+}

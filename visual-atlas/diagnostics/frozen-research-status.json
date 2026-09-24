@@ -1,0 +1,12 @@
+{
+  "bundle": "/Users/haewonkim/.codex-fabric/worktrees/CF-bcf7ed56e73e87dc270f0ddf/docs/v12_3_app_import_bundle.json",
+  "status": "blocked_unverified",
+  "releaseBlocked": true,
+  "checkedRuleCount": 6,
+  "limitations": [
+    "research_numeric_golden_outputs_not_included_in_repository",
+    "current_constituents_survivorship_biased",
+    "point_in_time_membership_unavailable",
+    "forward_proof_required"
+  ]
+}
