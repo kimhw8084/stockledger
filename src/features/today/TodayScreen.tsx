@@ -285,6 +285,7 @@ export function TodayScreen(props: TodayScreenProps) {
   return (
     <Page width="dashboard">
       <PageHeader
+        compactActionsInline
         eyebrow={language === "ko" ? "StockLedger · 현재 검토 맥락" : "StockLedger · Current review context"}
         title={language === "ko" ? "오늘" : "Today"}
         description={language === "ko" ? "무엇이 바뀌었는지 이해하고, 검토할 근거를 열고, 의도적인 다음 행동을 기록하세요." : "Understand what changed, inspect the evidence that deserves review, and record a deliberate next action."}
@@ -321,6 +322,7 @@ export function TodayScreen(props: TodayScreenProps) {
 
       <Section>
         <SectionHeader
+          compactAccessoryInline
           eyebrow={language === "ko" ? "우선순위 1" : "Priority 1"}
           title={language === "ko" ? "검토 필요" : "Needs review"}
           description={language === "ko" ? "왜 지금인지가 보이는 항목부터 확인하세요." : "Start with the items whose visible evidence explains why now."}

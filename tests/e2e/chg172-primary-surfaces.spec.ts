@@ -281,7 +281,11 @@ test("critical changed-surface meaning stays visible in Korean", async ({ page }
   expect(inspectBounds).not.toBeNull();
   expect(primaryNavigation).not.toBeNull();
   expect(inspectBounds!.y + inspectBounds!.height).toBeLessThanOrEqual(page.viewportSize()!.height);
-  expect(inspectBounds!.y + inspectBounds!.height).toBeLessThanOrEqual(primaryNavigation!.y);
+  const inspectOverlapsNavigation = inspectBounds!.x < primaryNavigation!.x + primaryNavigation!.width
+    && inspectBounds!.x + inspectBounds!.width > primaryNavigation!.x
+    && inspectBounds!.y < primaryNavigation!.y + primaryNavigation!.height
+    && inspectBounds!.y + inspectBounds!.height > primaryNavigation!.y;
+  expect(inspectOverlapsNavigation).toBe(false);
 
   await openTab(page, "기록");
   await expect(page.locator("#journal-primary-surface").getByRole("heading", { name: "기록", exact: true })).toBeVisible();

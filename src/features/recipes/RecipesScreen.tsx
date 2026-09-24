@@ -1,4 +1,5 @@
 import React from "react";
+import { useWindowDimensions } from "react-native";
 import {
   Badge,
   Button,
@@ -208,6 +209,7 @@ const layerMeaning = (language: AppLanguage, layer: RecipeLayer) => {
 
 export function RecipesScreen(props: RecipesScreenProps) {
   const text = labels(props.language);
+  const compactActions = useWindowDimensions().width < 600;
   const layerTitle = props.layerChoices.find((choice) => choice.value === props.layer)?.label ?? text.layer;
   return (
     <View style={styles.root} nativeID="recipes-primary-surface">
@@ -297,14 +299,22 @@ export function RecipesScreen(props: RecipesScreenProps) {
                     <Badge label={`v${set.version}`} tone="neutral" />
                   </HStack>
                   <Text>{set.purpose}</Text>
+                  {compactActions ? (
+                    <View style={styles.setActions}>
+                      <Button label={text.openSet} variant="secondary" size="sm" onPress={() => props.onOpenSet(set.id)} responsiveWidth="compact-full" testID={`recipe-set-open-${set.id}`} />
+                      <Button label={text.versions} variant="ghost" size="sm" onPress={() => props.onOpenSetVersions(set.id)} responsiveWidth="compact-full" />
+                    </View>
+                  ) : null}
                   <Text variant="caption" tone="secondary">{text.intendedUse}: {set.intendedUse} · {set.timeHorizon}</Text>
                   <Text variant="caption" tone="secondary">{text.cadence}: {set.cadence} · {text.ruleCount}: {set.ruleCount}</Text>
                   <Text variant="caption" tone="secondary">{text.scanner}: {set.scannerState}{set.ruleCount === 0 ? ` · ${text.noData}` : ""}</Text>
                 </View>
-                <View style={styles.setActions}>
-                  <Button label={text.openSet} variant="secondary" size="sm" onPress={() => props.onOpenSet(set.id)} responsiveWidth="compact-full" testID={`recipe-set-open-${set.id}`} />
-                  <Button label={text.versions} variant="ghost" size="sm" onPress={() => props.onOpenSetVersions(set.id)} responsiveWidth="compact-full" />
-                </View>
+                {!compactActions ? (
+                  <View style={styles.setActions}>
+                    <Button label={text.openSet} variant="secondary" size="sm" onPress={() => props.onOpenSet(set.id)} responsiveWidth="compact-full" testID={`recipe-set-open-${set.id}`} />
+                    <Button label={text.versions} variant="ghost" size="sm" onPress={() => props.onOpenSetVersions(set.id)} responsiveWidth="compact-full" />
+                  </View>
+                ) : null}
               </View>
             </React.Fragment>
           )) : <Card variant="subtle"><Text tone="secondary">{text.noSets}</Text></Card>}

@@ -16,6 +16,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useReducedMotion } from "../hooks/useReducedMotion";
 import { t, type AppLanguage } from "../lib/i18n";
+import { chooseWebFocusRestoreTarget } from "../lib/webFocusEligibility";
 
 const fontFamily = "System";
 
@@ -67,21 +68,15 @@ export const WindowPanel = ({
     return () => clearTimeout(timer);
   }, []);
 
-  const canRestoreFocus = (candidate: any) => {
+  const canRestoreNativeFocus = (candidate: any) => {
     if (!candidate || candidate.isConnected === false) return false;
-    if (Platform.OS === "web") {
-      if (candidate === document.body) return false;
-      if (candidate.nodeType !== 1) return false;
-      if (typeof candidate.focus !== "function") return false;
-      if (candidate.disabled || candidate.getAttribute?.("aria-disabled") === "true") return false;
-      if (candidate.getAttribute?.("tabindex") === "-1") return false;
-      return true;
-    }
     return Boolean(findNodeHandle(candidate));
   };
 
   const restoreFocus = () => {
-    const target = [returnFocusRef?.current, fallbackFocusRef?.current].find(canRestoreFocus);
+    const target = Platform.OS === "web"
+      ? chooseWebFocusRestoreTarget(returnFocusRef?.current, fallbackFocusRef?.current)
+      : [returnFocusRef?.current, fallbackFocusRef?.current].find(canRestoreNativeFocus);
     if (!target) return;
     if (Platform.OS === "web") {
       target.focus?.();
