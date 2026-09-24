@@ -1,0 +1,456 @@
+{
+  "accepted_at": "2026-09-24T01:46:02Z",
+  "changed_files": [
+    {
+      "additions": 182,
+      "deletions": 412,
+      "path": "src/app/StockLedgerApp.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 20,
+      "deletions": 6,
+      "path": "src/components/WindowPanel.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 23,
+      "deletions": 0,
+      "path": "src/domain/inputValidation.ts",
+      "status": "M"
+    },
+    {
+      "additions": 174,
+      "deletions": 0,
+      "path": "src/features/eyes/EyeComposer.tsx",
+      "status": "A"
+    },
+    {
+      "additions": 172,
+      "deletions": 0,
+      "path": "src/features/journal/JournalComposer.tsx",
+      "status": "A"
+    },
+    {
+      "additions": 14,
+      "deletions": 5,
+      "path": "src/features/notifications/NotificationSettingsPanel.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 12,
+      "deletions": 3,
+      "path": "src/features/recipes/RecipesScreen.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 392,
+      "deletions": 0,
+      "path": "src/features/recipes/builder/RecipeBuilder.tsx",
+      "status": "A"
+    },
+    {
+      "path": "src/features/recipes/logic/RawDataRegistry.tsx",
+      "status": "R058"
+    },
+    {
+      "additions": 275,
+      "deletions": 0,
+      "path": "src/features/shared/AuthoringFields.tsx",
+      "status": "A"
+    },
+    {
+      "additions": 3,
+      "deletions": 3,
+      "path": "src/hooks/useAppModel.ts",
+      "status": "M"
+    },
+    {
+      "additions": 96,
+      "deletions": 4,
+      "path": "src/lib/i18n.ts",
+      "status": "M"
+    },
+    {
+      "additions": 1,
+      "deletions": 0,
+      "path": "tests/e2e/chg172-primary-surfaces.spec.ts",
+      "status": "M"
+    },
+    {
+      "additions": 396,
+      "deletions": 0,
+      "path": "tests/e2e/chg199-authoring-config.spec.ts",
+      "status": "A"
+    },
+    {
+      "additions": 6,
+      "deletions": 5,
+      "path": "tests/e2e/workspace.spec.ts",
+      "status": "M"
+    }
+  ],
+  "checks": [
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n 'release-verify|release-evidence|qualification|review-pdf|package-readback|visualDecision|artifactBundle|candidate|PDF' /Users/haewonkim/.codex-fabric/runs/stockledger/stockledger-prod-c16-authoring-config-error-responsive-fix-v2/seal-atlas.mjs\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '24,72p' /Users/haewonkim/.codex-fabric/runs/stockledger/stockledger-prod-c16-authoring-config-error-responsive-fix-v2/seal-atlas.mjs\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk cat /Users/haewonkim/.codex-fabric/runs/stockledger/stockledger-prod-c16-authoring-config-error-responsive-fix-v2/finalize-qualification.mjs'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n '\\\"source\\\"|\\\"commit\\\"|\\\"tree\\\"' /Users/haewonkim/.codex-fabric/worktrees/CF-e2b5042151557732c80eb1ca/artifacts/release-evidence.json\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n 'blank-validation|required-validation|scrollIntoView|first|required field|adjacent' /Users/haewonkim/.codex-fabric/runs/stockledger/stockledger-prod-c16-authoring-config-error-responsive-fix-v2/visual-atlas/diagnostics/state-evidence.json /Users/haewonkim/.codex-fabric/runs/stockledger/stockledger-prod-c16-authoring-config-error-responsive-fix-v2/visual-atlas/diagnostics/task-oracle-state-coverage.json\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk cp artifacts/release-evidence.json /Users/haewonkim/.codex-fabric/runs/stockledger/stockledger-prod-c16-authoring-config-error-responsive-fix-v2/visual-atlas/diagnostics/release-evidence.json'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk proxy node /Users/haewonkim/.codex-fabric/runs/stockledger/stockledger-prod-c16-authoring-config-error-responsive-fix-v2/finalize-qualification.mjs'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '64,150p' /Users/haewonkim/.codex-fabric/runs/stockledger/stockledger-prod-c16-authoring-config-error-responsive-fix-v2/seal-atlas.mjs\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH rtk proxy node /Users/haewonkim/.codex-fabric/runs/stockledger/stockledger-prod-c16-authoring-config-error-responsive-fix-v2/seal-atlas.mjs'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git worktree list'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk cat /Users/haewonkim/.codex-fabric/bin/fabricctl'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git status --short --branch'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy /Users/haewonkim/.codex-fabric/bin/fabricctl status CF-e2b5042151557732c80eb1ca'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy /Users/haewonkim/.codex-fabric/bin/fabricctl --help'",
+      "exit_code": 2,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git ls-remote --heads origin refs/heads/project-os-artifacts/stockledger/stockledger-prod-c16-authoring-config-error-responsive-fix-v2'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git ls-remote --heads origin refs/heads/codex/stockledger-prod-c16-authoring-config-error-responsive-fix-v2'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy git push origin HEAD:refs/heads/codex/stockledger-prod-c16-authoring-config-error-responsive-fix-v2'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git ls-tree 8a9ac0104190144110d335c93eb11f8c51f6a898 visual-atlas'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git rev-parse HEAD'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git ls-remote --heads origin refs/heads/codex/stockledger-prod-c16-authoring-config-error-responsive-fix-v2'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git worktree add --detach /tmp/stockledger-c16-r2-artifact 8a9ac0104190144110d335c93eb11f8c51f6a898'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk cp -R /Users/haewonkim/.codex-fabric/runs/stockledger/stockledger-prod-c16-authoring-config-error-responsive-fix-v2/visual-atlas /tmp/stockledger-c16-r2-artifact/visual-atlas'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk ls -la /tmp/stockledger-c16-r2-artifact/visual-atlas'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git status --short --branch'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git -C /tmp/stockledger-c16-r2-artifact status --short --branch'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git -C /tmp/stockledger-c16-r2-artifact add visual-atlas'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git -C /tmp/stockledger-c16-r2-artifact commit -m 'Add CHG-199 R2 visual evidence package'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git -C /tmp/stockledger-c16-r2-artifact show -s --format='%H%n%P' HEAD\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git -C /tmp/stockledger-c16-r2-artifact rev-parse HEAD''^{tree}'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git -C /tmp/stockledger-c16-r2-artifact status --short --branch'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy git -C /tmp/stockledger-c16-r2-artifact push origin HEAD:refs/heads/project-os-artifacts/stockledger/stockledger-prod-c16-authoring-config-error-responsive-fix-v2'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk ls -la /Users/haewonkim/.codex-fabric/runs/stockledger/stockledger-prod-c16-authoring-config-error-responsive-fix-v2'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git -C /tmp/stockledger-c16-r2-artifact show -s --format='%H%n%P' HEAD\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n 'publish-evidence|def .*publish.*evidence|publish_pending_evidence' /Users/haewonkim/.codex-fabric/current/fabric.py\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git ls-remote --heads origin refs/heads/project-os-artifacts/stockledger/stockledger-prod-c16-authoring-config-error-responsive-fix-v2'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '2895,3028p' /Users/haewonkim/.codex-fabric/current/fabric.py\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk cat /Users/haewonkim/.codex-fabric/results/CF-e2b5042151557732c80eb1ca/result.json'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk cat /Users/haewonkim/.codex-fabric/results/CF-e2b5042151557732c80eb1ca/job-summary.json'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk ls -la /Users/haewonkim/.codex-fabric/results/CF-e2b5042151557732c80eb1ca'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk ls -la /Users/haewonkim/.codex-fabric/jobs/CF-e2b5042151557732c80eb1ca.running'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n 'def _git_commit_with_single_file|parent_head_sha|EVIDENCE_LINEAGE_INVALID' /Users/haewonkim/.codex-fabric/current/fabric.py\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '3018,3056p' /Users/haewonkim/.codex-fabric/current/fabric.py\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n 'executed|terminal_job|publish_pending_evidence|evidence_publication' /Users/haewonkim/.codex-fabric/current/fabric.py | rg 'move|mkdir|publish|state|jobdir|os\\\\.rename|shutil'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '4248,4280p' /Users/haewonkim/.codex-fabric/current/fabric.py\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk cat /Users/haewonkim/.codex-fabric/runs/stockledger/stockledger-prod-c16-authoring-config-error-responsive-fix-v2/package-readback.json'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git status --short --branch'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy /Users/haewonkim/.codex-fabric/bin/fabricctl status CF-e2b5042151557732c80eb1ca'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git ls-remote --heads origin refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c16-authoring-config-error-responsive-fix-v2'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git ls-remote --heads origin refs/heads/codex/stockledger-prod-c16-authoring-config-error-responsive-fix-v2'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git ls-remote --heads origin refs/heads/project-os-artifacts/stockledger/stockledger-prod-c16-authoring-config-error-responsive-fix-v2'",
+      "exit_code": 0,
+      "type": "command_execution"
+    }
+  ],
+  "codex": {
+    "cli_version": "codex-cli 0.155.1",
+    "configured_model": "gpt-6-luna",
+    "event_count": 441,
+    "provider_reported_model": null,
+    "reasoning_effort": "xhigh",
+    "terminal_type": "turn.completed",
+    "usage": {
+      "cache_hit_percent": 97.13,
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 19728768,
+      "fresh_input_tokens": 582529,
+      "input_tokens": 20311297,
+      "non_reasoning_output_tokens": 38337,
+      "output_tokens": 103098,
+      "reasoning_output_tokens": 64761,
+      "total_processed_tokens": 20414395
+    },
+    "warnings": []
+  },
+  "commits": [
+    {
+      "sha": "8a9ac0104190144110d335c93eb11f8c51f6a898",
+      "subject": "fix: localize notification errors and wrap registry guidance"
+    },
+    {
+      "sha": "48aef5d8be21e83a95d299a78da7ab61557006ec",
+      "subject": "CHG-199: refine authoring and configuration surfaces"
+    }
+  ],
+  "diff": {
+    "additions": 1941,
+    "changed_files": 15,
+    "commit_count": 2,
+    "deletions": 645
+  },
+  "error_code": null,
+  "evidence_manifest": {
+    "count": 0,
+    "items": [],
+    "version": 1
+  },
+  "evidence_publisher_release": "1.2.5-dashboard-controls-candidate",
+  "fabric_capture": {
+    "applied": false,
+    "paths_before": 0,
+    "transient_untracked_removed": {
+      "count": 0,
+      "items": []
+    }
+  },
+  "fabric_release": "1.2.5-dashboard-controls-candidate",
+  "failure_class": null,
+  "finished_at": "2026-09-24T02:29:50Z",
+  "git": {
+    "base_is_ancestor": true,
+    "base_sha": "40e035da9940805a2971b1006488007dcef665e0",
+    "branch": "codex/stockledger-prod-c16-authoring-config-error-responsive-fix-v2",
+    "detached_verify": false,
+    "head_sha": "8a9ac0104190144110d335c93eb11f8c51f6a898",
+    "remote_exact_head": true,
+    "remote_head_sha": "8a9ac0104190144110d335c93eb11f8c51f6a898",
+    "target_branch": "main",
+    "target_drifted_since_acceptance": false,
+    "target_head_observed_after_execution": "40e035da9940805a2971b1006488007dcef665e0",
+    "work_branch": "codex/stockledger-prod-c16-authoring-config-error-responsive-fix-v2",
+    "worktree_clean": true
+  },
+  "instructions": {
+    "files": [],
+    "total_bytes": 0,
+    "warning": null
+  },
+  "job_id": "CF-e2b5042151557732c80eb1ca",
+  "kind": "codex-fabric-audit-evidence",
+  "locator": {
+    "branch": "codex-fabric/evidence/stockledger/stockledger-prod-c16-authoring-config-error-responsive-fix-v2",
+    "path": ".codex-fabric/audit.json",
+    "ref": "refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c16-authoring-config-error-responsive-fix-v2"
+  },
+  "operation": "FIX",
+  "policy": {
+    "environment_policy_sha256": "e077daca74297b3c30bee8989f00f8ca5338f7610b4d016a6c48db524205d064",
+    "fabric_release": "1.2.5-dashboard-controls-candidate",
+    "policy_sha256": "123615bf2f6e57dcac197e49ca98ceac59ada86a55e2c84445ea5d00812c0833",
+    "registry_sha256": "af81b8552f9d6a33847310e3c6bcd2d48401782b963a58efd2993e93570cb4aa"
+  },
+  "project_id": "stockledger",
+  "recovery": {
+    "model_rerun_safe": false,
+    "recovery_required": false,
+    "retry_safe": false,
+    "retry_scope": null,
+    "worktree_retained": true
+  },
+  "request": "stockledger-prod-c16-authoring-config-error-responsive-fix-v2",
+  "schema_version": 1,
+  "started_at": "2026-09-24T01:46:02Z",
+  "status": "EXECUTED_CHANGE",
+  "timing": {
+    "execution_seconds": 2628,
+    "queue_seconds": 0,
+    "total_seconds": 2628
+  },
+  "transport": {
+    "bytes": 10067,
+    "envelope": "FABRIC/2",
+    "prompt_bytes": 9688,
+    "prompt_sha256": "9e7a0f718a35d07fbe7e2d3ff7eb56b39291f1b28c5fd69e3b1e0fed35b90d03",
+    "sha256": "e2b5042151557732c80eb1ca79c8f7d502b7f9a51ba8e75ed77c1855e4901230"
+  }
+}
