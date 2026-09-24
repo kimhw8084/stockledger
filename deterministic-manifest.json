@@ -1,0 +1,521 @@
+{
+  "schema": "project-os-golden-ui-v3-deterministic-manifest-v1",
+  "candidate": "ed377bb173387ebf56a4919ac4282d136c56e21d",
+  "tree": "dc99438cdcf8e2f737e5de87d6afc550d4008f24",
+  "hash": "SHA-256",
+  "fileCount": 102,
+  "files": [
+    {
+      "path": "accessibility-resilience-v3.json",
+      "size": 3364,
+      "sha256": "fe46328d95228f9d1d23d1458bde937957532423b211285aef7af4583b12daec"
+    },
+    {
+      "path": "baseline-comparison.json",
+      "size": 1821,
+      "sha256": "d9868f1423fb8e5d00b344ba06ae7d89e75937a8ce01269170d23f9ae81b7ead"
+    },
+    {
+      "path": "current-surface-inventory.json",
+      "size": 25011,
+      "sha256": "5073284fd6bf416f61deb923cec5bb6084874017c8cbe4420c81d407baaff3ae"
+    },
+    {
+      "path": "relationship-closure.json",
+      "size": 9207,
+      "sha256": "0ec4a4d72cd6d84a52fb542039ab08b26a3999d4159188c58a481ecb25854f44"
+    },
+    {
+      "path": "release/operations-qualification.json",
+      "size": 1303,
+      "sha256": "de8c5514c294d310284a5606c0811d963ac384363eef870a65a56cb4fe50b142"
+    },
+    {
+      "path": "release/recovery-drill.json",
+      "size": 1143,
+      "sha256": "2279245fa039e7fa2a079e4bb942b92559f78166b7bcc7e9d0b95b4e8ee9c67c"
+    },
+    {
+      "path": "release/release-evidence.json",
+      "size": 3337,
+      "sha256": "fdd393449567302fe9e858c719b616bb4bddf51b8a926edb65ed2ea093399f07"
+    },
+    {
+      "path": "release/release-qualification.json",
+      "size": 3447,
+      "sha256": "db937bc7254900a170cffac2b6192914ddbe9eb06ff7f055af973fb1f6dc0b13"
+    },
+    {
+      "path": "screenshots/browser-zoom-200/01-today.png",
+      "size": 84067,
+      "sha256": "a59e3849f5fdd2ad3aaa059ff3c70151f1cee3a0f1f6a56ddf1ec3fddf8a5d03"
+    },
+    {
+      "path": "screenshots/browser-zoom-200/02-today-review-dialog.png",
+      "size": 25567,
+      "sha256": "5a8b37953358f993d417a48701fd5afac5b818a1469fc5186290ecad82bdb4a6"
+    },
+    {
+      "path": "screenshots/browser-zoom-200/03-watchlist.png",
+      "size": 79526,
+      "sha256": "4dbefce6cd37c54d04d9fe0cd0afaf2fb5dc38020ce11a66fa2f5d7e6bff0331"
+    },
+    {
+      "path": "screenshots/browser-zoom-200/10-recipe-builder.png",
+      "size": 57588,
+      "sha256": "8ceb83154f1d6fe7b3e9d22b9365d52778b812d9f4345b3d9e450817709f065b"
+    },
+    {
+      "path": "screenshots/browser-zoom-200/18-journal-composer.png",
+      "size": 66674,
+      "sha256": "287b28e0cc1365988d5c8d259d6fc8c88665da94ff4f8353460ea0d52f98494d"
+    },
+    {
+      "path": "screenshots/browser-zoom-200/22-notification-confirm.png",
+      "size": 5851,
+      "sha256": "99db2a93b06fa1bf617f5c495e02dcf6c0b76961108491217e2cf4fed8699d35"
+    },
+    {
+      "path": "screenshots/browser-zoom-200/24-text-spacing-stress.png",
+      "size": 5851,
+      "sha256": "99db2a93b06fa1bf617f5c495e02dcf6c0b76961108491217e2cf4fed8699d35"
+    },
+    {
+      "path": "screenshots/browser-zoom-200/native-browser-setting-probe.png",
+      "size": 80665,
+      "sha256": "6525ac1c4f67971b748a3757ebfcc177b051f3d5dbbce0150ac52950f29f76f9"
+    },
+    {
+      "path": "screenshots/browser-zoom-200/report.json",
+      "size": 21394,
+      "sha256": "9557ee6a9af98f38f82174ee45a6e6fd1a127518bd1261d2ddaa28878a837af4"
+    },
+    {
+      "path": "screenshots/canonical/en/desktop-1440x900/alerts.png",
+      "size": 88671,
+      "sha256": "21eb922b13e51e069c6dac380130556a63bb514931d7058b1e018c49a8927a9d"
+    },
+    {
+      "path": "screenshots/canonical/en/desktop-1440x900/decision-detail.png",
+      "size": 66396,
+      "sha256": "f17532ff94e4adae08f4618f933af9054b63c4c85aa62eb059ab92f97998da64"
+    },
+    {
+      "path": "screenshots/canonical/en/desktop-1440x900/eye-composer.png",
+      "size": 140541,
+      "sha256": "ed6977ad1d07c065c9ed8c9abc491005922504cbaf3e7a94aba0a9bdca3caeaf"
+    },
+    {
+      "path": "screenshots/canonical/en/desktop-1440x900/eye-detail.png",
+      "size": 85479,
+      "sha256": "d4ecd3bd0312dd9a8d4dd5b63751fb5b7a99c6a39ca3464eb6ae8714cb81b073"
+    },
+    {
+      "path": "screenshots/canonical/en/desktop-1440x900/eye-flows.png",
+      "size": 89348,
+      "sha256": "9ed5933b741eef942848549406f76a79f855b7ab3d3a87d0b8b5f0119ff59228"
+    },
+    {
+      "path": "screenshots/canonical/en/desktop-1440x900/journal-composer.png",
+      "size": 119246,
+      "sha256": "eea315d61e7e37aa0eadefd5ff79c75d6e8e896c1ff7caa7e93e6cfc28e5f4a4"
+    },
+    {
+      "path": "screenshots/canonical/en/desktop-1440x900/journal.png",
+      "size": 97451,
+      "sha256": "170556a3daf33c06632cb70fec28e4045810d55b3c9d67dc018123fc42addeed"
+    },
+    {
+      "path": "screenshots/canonical/en/desktop-1440x900/logic-registry.png",
+      "size": 182972,
+      "sha256": "86d87c5b341f4140fcc5a759ef3c0095a817bc199631bd69b0ebc8fcfaeba340"
+    },
+    {
+      "path": "screenshots/canonical/en/desktop-1440x900/metric-detail-sheet.png",
+      "size": 80140,
+      "sha256": "8fb037a4f9352fc4f8df43676b3788ce5fa839d507ac98dc20c4bc14a7398907"
+    },
+    {
+      "path": "screenshots/canonical/en/desktop-1440x900/notification-confirmation.png",
+      "size": 81677,
+      "sha256": "a7fd2453dd8fcd473b1ade207e6d0fc57f09bf57a0e5908a85ad039b8c715e40"
+    },
+    {
+      "path": "screenshots/canonical/en/desktop-1440x900/recipe-builder.png",
+      "size": 134952,
+      "sha256": "62487c07bfa63c790be732d00bf17f8e7f040aaa043f73d5aeacad3cfbd63421"
+    },
+    {
+      "path": "screenshots/canonical/en/desktop-1440x900/recipes.png",
+      "size": 88742,
+      "sha256": "3a8883b00d5cc8064a552030bc96e44133a4ca0accd9810967274abc331fd0eb"
+    },
+    {
+      "path": "screenshots/canonical/en/desktop-1440x900/scanner-review.png",
+      "size": 109440,
+      "sha256": "9bd193f1f2edac1c853cf706594a1d345392ba892543a8717814f60fec07404a"
+    },
+    {
+      "path": "screenshots/canonical/en/desktop-1440x900/settings.png",
+      "size": 104383,
+      "sha256": "b798f361349093d1cfcda18188c9bc249acb59ca5aa9061d2658e22e947e3d89"
+    },
+    {
+      "path": "screenshots/canonical/en/desktop-1440x900/stock-entity-detail.png",
+      "size": 125033,
+      "sha256": "522c2a7f42a39d1a73741aeb85f039cef4e2bce74546db7ba6c58e7868542dba"
+    },
+    {
+      "path": "screenshots/canonical/en/desktop-1440x900/today.png",
+      "size": 97431,
+      "sha256": "1bc3fa029ff642ad379e2b73a766cd479edf42cf825f897d3cc8443efb2e3ee6"
+    },
+    {
+      "path": "screenshots/canonical/en/desktop-1440x900/watchlist.png",
+      "size": 73734,
+      "sha256": "15fc6c946b69f20ff2c5d477654875b3c57d2ce57b769bec274b0d12b354b4c5"
+    },
+    {
+      "path": "screenshots/canonical/en/mobile-390x844/alerts.png",
+      "size": 68399,
+      "sha256": "cae0ffd0e32ab52835946834e8e2ae87f02c1017645d568c7ab11ee234ecb7c4"
+    },
+    {
+      "path": "screenshots/canonical/en/mobile-390x844/decision-detail.png",
+      "size": 60351,
+      "sha256": "0ed6f42a6fe3c592a067c403ee6fdcd8cc139dfb6fbbcbee4c66471acc19a910"
+    },
+    {
+      "path": "screenshots/canonical/en/mobile-390x844/eye-composer.png",
+      "size": 110576,
+      "sha256": "94334134be1f841a3b385fd4ea24481ea4a4baa5408b603ee977b56e1e044630"
+    },
+    {
+      "path": "screenshots/canonical/en/mobile-390x844/eye-detail.png",
+      "size": 77431,
+      "sha256": "51700088150b6cab0ca132f290887a71aee8fe68378611768a5dfc682ee5ec8f"
+    },
+    {
+      "path": "screenshots/canonical/en/mobile-390x844/eye-flows.png",
+      "size": 78646,
+      "sha256": "0d44e9d4fd21323cb25d8139b1d8dad9353c11a633bbe2064723fc3d1ff6ac94"
+    },
+    {
+      "path": "screenshots/canonical/en/mobile-390x844/journal-composer.png",
+      "size": 94355,
+      "sha256": "c300f8d082631fcc14609254dcfbb31ef9c02c18c2994f6c9903da557c83cbf7"
+    },
+    {
+      "path": "screenshots/canonical/en/mobile-390x844/journal.png",
+      "size": 74868,
+      "sha256": "be09976ff51f3a48caa187bb26ea5e44b1b00be1ebc36656c62af14cfa521dd0"
+    },
+    {
+      "path": "screenshots/canonical/en/mobile-390x844/logic-registry.png",
+      "size": 127022,
+      "sha256": "01b16ff939bb16be3d27852b30bc009030c813a98e8f9f8820a165650d095489"
+    },
+    {
+      "path": "screenshots/canonical/en/mobile-390x844/metric-detail-sheet.png",
+      "size": 65041,
+      "sha256": "b70ae236ed2c7d6b06693ed3d67ba6a8ca38f824c7e26077433d2d49489d4ff1"
+    },
+    {
+      "path": "screenshots/canonical/en/mobile-390x844/notification-confirmation.png",
+      "size": 67699,
+      "sha256": "bd56aebd380f59b49bed80d0cb176e0099dbce4bd5ec775b7c7953b0fad3f433"
+    },
+    {
+      "path": "screenshots/canonical/en/mobile-390x844/recipe-builder.png",
+      "size": 109548,
+      "sha256": "33c1e19c6015cc9ee1f5422caf96faac8e554abb919dbc2b4e60f13aed6ae271"
+    },
+    {
+      "path": "screenshots/canonical/en/mobile-390x844/recipes.png",
+      "size": 64987,
+      "sha256": "c64cab315944226ffe53072983fb368643bb7b8a97c2e99140c53530e259cad9"
+    },
+    {
+      "path": "screenshots/canonical/en/mobile-390x844/scanner-review.png",
+      "size": 84068,
+      "sha256": "66bd5ed58ccf2c5764624611d724fc0bf9d253c18be19f088853b1a4c5224e68"
+    },
+    {
+      "path": "screenshots/canonical/en/mobile-390x844/settings.png",
+      "size": 74191,
+      "sha256": "f231e87c714e6b752249691603bcddd766c2d8eea1b0b9109ce9ac86925269ac"
+    },
+    {
+      "path": "screenshots/canonical/en/mobile-390x844/stock-entity-detail.png",
+      "size": 90340,
+      "sha256": "da38c2ead413b22f887374b01233fdc43a4cd2daf13d81aa8efd2a55de67183f"
+    },
+    {
+      "path": "screenshots/canonical/en/mobile-390x844/today.png",
+      "size": 64081,
+      "sha256": "91455e4e256800583d5d77e1e053bce7c0df4e54c12736ff02ba611a9fe8abfa"
+    },
+    {
+      "path": "screenshots/canonical/en/mobile-390x844/watchlist.png",
+      "size": 56740,
+      "sha256": "47864b9e27b48c91462c97d98d66e36021090d1f161872ca3609b97ac9ab6e07"
+    },
+    {
+      "path": "screenshots/findings/alerts-mobile-390x844.png",
+      "size": 68206,
+      "sha256": "63dfe8d2a6834728c934e965e0a0bc3284f3d3f8d3d1f49d03c59f775c5e70a7"
+    },
+    {
+      "path": "screenshots/findings/hidden-invoker-not-eligible.png",
+      "size": 124122,
+      "sha256": "0e3e54feabd86eecb9d8d4a1f1d83c22255aa9b0b05eaa1cb276f63168348870"
+    },
+    {
+      "path": "screenshots/findings/recipes-mobile-360x800.png",
+      "size": 60213,
+      "sha256": "f453ca61380d6d4a509c6e6c894f205c69bc83f17e89bc1b849810b4b79ad149"
+    },
+    {
+      "path": "screenshots/findings/today-desktop-1366x768.png",
+      "size": 76686,
+      "sha256": "c8863c5df0f1097e9ddc238937851a346650e14bba3f7aedf285e72baaaad2bc"
+    },
+    {
+      "path": "screenshots/findings/today-holdout-412x915.png",
+      "size": 73241,
+      "sha256": "9bb25fcdaba3d5c4e5b5650b85e8b505d0e8d441219df82de30aaf30c4eb62c6"
+    },
+    {
+      "path": "screenshots/findings/today-mobile-390x844.png",
+      "size": 64081,
+      "sha256": "91455e4e256800583d5d77e1e053bce7c0df4e54c12736ff02ba611a9fe8abfa"
+    },
+    {
+      "path": "screenshots/localization/ko/desktop-1440x900/decision-detail.png",
+      "size": 57412,
+      "sha256": "0a35dbb0cfa6823da5ed40aad9c55b0e60572fb69d0d558db345f2c9112bc4fc"
+    },
+    {
+      "path": "screenshots/localization/ko/desktop-1440x900/eye-detail.png",
+      "size": 94587,
+      "sha256": "77fd1c3cc946de79a02c1dd46cfa26170da9be8bead843bf50dc1af00988c921"
+    },
+    {
+      "path": "screenshots/localization/ko/desktop-1440x900/eye-flows.png",
+      "size": 91312,
+      "sha256": "e82b48dd8eaceb708a3fffe74172ce1cf945aac80f6ed1db7b2f45ac150f993f"
+    },
+    {
+      "path": "screenshots/localization/ko/desktop-1440x900/metric-detail-sheet.png",
+      "size": 74539,
+      "sha256": "35854b2ebba4bab1591ea30f4dbd871461665180cd001729fc1892dc2aee5176"
+    },
+    {
+      "path": "screenshots/localization/ko/desktop-1440x900/stock-entity-detail.png",
+      "size": 113513,
+      "sha256": "c8630bd831af3066df1ca04744b009da0721b02dc227599f363f6f660500f9be"
+    },
+    {
+      "path": "screenshots/localization/ko/mobile-390x844/decision-detail.png",
+      "size": 51095,
+      "sha256": "780e6ac9ddc0f174b924d79ac841cb72263af7c44e9f156b8404841527829470"
+    },
+    {
+      "path": "screenshots/localization/ko/mobile-390x844/eye-detail.png",
+      "size": 86854,
+      "sha256": "6b5f6b865403bd4278895c495b98e6f68cef25a8308ad23cac851eab222e2197"
+    },
+    {
+      "path": "screenshots/localization/ko/mobile-390x844/eye-flows.png",
+      "size": 79716,
+      "sha256": "750f290bf86d4df3c57aa33cbe679bba921b77b7fd351b68d24c3677cda82fc8"
+    },
+    {
+      "path": "screenshots/localization/ko/mobile-390x844/metric-detail-sheet.png",
+      "size": 62693,
+      "sha256": "0c754da3f6b911c45adc38bc59f6a73a375ca098b3d148e6d98f61975afdb9d9"
+    },
+    {
+      "path": "screenshots/localization/ko/mobile-390x844/stock-entity-detail.png",
+      "size": 84695,
+      "sha256": "4506cad44f41b9ffa44d62bdb551cbd0c541f95680778bd08499be26a2fdcd8e"
+    },
+    {
+      "path": "screenshots/reused/en/desktop-1366x768/eye-composer.png",
+      "size": 122533,
+      "sha256": "de343a1d75757b1c6cf01203e9a3bd9fb206485d43ebb1d34d50b24527a41331"
+    },
+    {
+      "path": "screenshots/reused/en/desktop-1366x768/journal-composer.png",
+      "size": 97834,
+      "sha256": "5b4911fce948b91db12960969efca2ea7321e033ae0e71ce24573c3e3d17f3a4"
+    },
+    {
+      "path": "screenshots/reused/en/desktop-1366x768/logic-registry.png",
+      "size": 154910,
+      "sha256": "7b4809aab8ee342236b08bf1233cfde275d837c9ce467056709200a5d0c2d85b"
+    },
+    {
+      "path": "screenshots/reused/en/desktop-1366x768/notification-confirmation.png",
+      "size": 77178,
+      "sha256": "606fe67ee66157517947f4fa215d2e7a9bc9acf6ad59e4ff952055641166e2ff"
+    },
+    {
+      "path": "screenshots/reused/en/desktop-1366x768/recipe-builder.png",
+      "size": 123356,
+      "sha256": "0a3f2f1931699097807f611d3e8062ea37a39196ef97b13d6d5dbce2b4321777"
+    },
+    {
+      "path": "screenshots/reused/en/mobile-360x800/eye-composer.png",
+      "size": 103976,
+      "sha256": "a96c0dbe38257e2f4cd49d32aa811df50681ac938082679721da4be2f04ad97f"
+    },
+    {
+      "path": "screenshots/reused/en/mobile-360x800/journal-composer.png",
+      "size": 86493,
+      "sha256": "1faf6618185002bef2ddffdfd575409ee5ac698b09b4ad87eae9d50c62b33cc5"
+    },
+    {
+      "path": "screenshots/reused/en/mobile-360x800/logic-registry.png",
+      "size": 121795,
+      "sha256": "aca102a8d2d72aed87253baa721d663ce279fab5661cc09c7d8d06fe6a58e17e"
+    },
+    {
+      "path": "screenshots/reused/en/mobile-360x800/notification-confirmation.png",
+      "size": 69026,
+      "sha256": "70afee4cc7866e2c6e71ad36be1f3f373dc02a3a0ef2dfcad5fdf2156295a90e"
+    },
+    {
+      "path": "screenshots/reused/en/mobile-360x800/recipe-builder.png",
+      "size": 103808,
+      "sha256": "163e12329a8a17c60a973dc80b4d8134b6d5d4ad0eae36cdfec4422ab1763546"
+    },
+    {
+      "path": "screenshots/reused/en/mobile-412x915/eye-composer.png",
+      "size": 118078,
+      "sha256": "3e013f155cd7a1c399c4ebb549b2edf49af0f9b635d7876ae2ed61cde13add62"
+    },
+    {
+      "path": "screenshots/reused/en/mobile-412x915/journal-composer.png",
+      "size": 100659,
+      "sha256": "f2213c1d368bab9712b5c346fb99f0b0cc872b5247100837c161613e38996792"
+    },
+    {
+      "path": "screenshots/reused/en/mobile-412x915/logic-registry.png",
+      "size": 142552,
+      "sha256": "6ce9b4a14fdc949975072c07a9e7e6d1a3d0bede4cea38866bdebd3eb5b2d075"
+    },
+    {
+      "path": "screenshots/reused/en/mobile-412x915/notification-confirmation.png",
+      "size": 67317,
+      "sha256": "4de703c107cb0458cade00527d4cf9b828dfcfe6fac54d7b7bcbae78d4ed0f29"
+    },
+    {
+      "path": "screenshots/reused/en/mobile-412x915/recipe-builder.png",
+      "size": 114698,
+      "sha256": "db044c3b27fac6fb3c514d911331f70ea5e9ca9e2d5974333fb96136dc683872"
+    },
+    {
+      "path": "screenshots/reused/ko/desktop-1366x768/eye-composer.png",
+      "size": 121622,
+      "sha256": "29bd773141faf68457ba5684f141a74ffa58c2d67b9327ec61278f5b8c70988d"
+    },
+    {
+      "path": "screenshots/reused/ko/desktop-1366x768/journal-composer.png",
+      "size": 84508,
+      "sha256": "18d36ab151a37f4b8a86bd40a5815dfc50731488c77e257fa1971f9a3b5a5ee6"
+    },
+    {
+      "path": "screenshots/reused/ko/desktop-1366x768/logic-registry.png",
+      "size": 146149,
+      "sha256": "7be2dc6b2ccb6d0e965b6b6d89aaca4ae5dd82ae6a45b755c585656e83621486"
+    },
+    {
+      "path": "screenshots/reused/ko/desktop-1366x768/notification-confirmation.png",
+      "size": 77837,
+      "sha256": "704785f2a0b8b57f6ac163f7938cb97f9b16284be091f7fecb92e37d8a29a124"
+    },
+    {
+      "path": "screenshots/reused/ko/desktop-1366x768/recipe-builder.png",
+      "size": 109394,
+      "sha256": "0a5ee13388b2146c167c1dab1de9fee5d465bb4f2e61809aa1892dcb1ac76927"
+    },
+    {
+      "path": "screenshots/reused/ko/mobile-360x800/eye-composer.png",
+      "size": 102399,
+      "sha256": "575753bc1dbdebc1cfeed15af4ff35eb1d533da704b332b0fa192f24f210a2b7"
+    },
+    {
+      "path": "screenshots/reused/ko/mobile-360x800/journal-composer.png",
+      "size": 71770,
+      "sha256": "d8c2b373bc3b754bbfc90f70e4edf3cd77406e3611d4f1025fcb5fe26d131b60"
+    },
+    {
+      "path": "screenshots/reused/ko/mobile-360x800/logic-registry.png",
+      "size": 117366,
+      "sha256": "8c8e4f6a859003190d53998fb8401df1853afe0e7c4c28f6413c6a1bb422a933"
+    },
+    {
+      "path": "screenshots/reused/ko/mobile-360x800/notification-confirmation.png",
+      "size": 64745,
+      "sha256": "44c4dad93de885c094ead24d9750285a2a59665cf73b35947b6e67f28e9a744e"
+    },
+    {
+      "path": "screenshots/reused/ko/mobile-360x800/recipe-builder.png",
+      "size": 94516,
+      "sha256": "80427481680e0f0c7ac9538344a211ab8a83c9e1437152e8f01eb821aa3b3373"
+    },
+    {
+      "path": "screenshots/reused/ko/mobile-412x915/eye-composer.png",
+      "size": 117828,
+      "sha256": "1b11c2fb513af1ab6af96b568d887703b741c5c0ddbd6ef608f5ebd07cb18362"
+    },
+    {
+      "path": "screenshots/reused/ko/mobile-412x915/journal-composer.png",
+      "size": 86762,
+      "sha256": "2a1c549bf713ab2ca199b0cd20db29cba279a80ed8bb56d74bce9f05cee0eda6"
+    },
+    {
+      "path": "screenshots/reused/ko/mobile-412x915/logic-registry.png",
+      "size": 138184,
+      "sha256": "1a35d505d989239b6b042737637631b239e4c27a79b1f78dca3d015b25f4d4c6"
+    },
+    {
+      "path": "screenshots/reused/ko/mobile-412x915/notification-confirmation.png",
+      "size": 66480,
+      "sha256": "1138f9623393ec24d530d72ca57308aec43ae177558598197c724fda3d98ff4e"
+    },
+    {
+      "path": "screenshots/reused/ko/mobile-412x915/recipe-builder.png",
+      "size": 102436,
+      "sha256": "7acbe1ce62c28b229b14ec423628cd894c2818aa2ca93912a678594c511a6c2b"
+    },
+    {
+      "path": "source-immutability-proof.json",
+      "size": 701,
+      "sha256": "415342f422e92a91d7990a2827dec1556f3d4bae6f8555aa536817cb2f173757"
+    },
+    {
+      "path": "state-lifecycle.json",
+      "size": 26694,
+      "sha256": "0936b096916077c1091211b123e3b8a877cb4d539a910c969244bec6c6d57fc5"
+    },
+    {
+      "path": "task-oracle-v3.json",
+      "size": 14691,
+      "sha256": "36d41b0d0b0963359142bb5942fd4d4e746b0aff493132ee36b4a7dd10b3c21b"
+    },
+    {
+      "path": "v3-audit-manifest.json",
+      "size": 20632,
+      "sha256": "97b7493e8268e14c3bce140b99a485fd2022ad89b7b65add2358e37e1ecdda23"
+    },
+    {
+      "path": "visual-director-audit.json",
+      "size": 3818,
+      "sha256": "bcb9f94bc09d868797985a5431b3d3e8af94fe178e659ceb9dd119517d8b38fb"
+    }
+  ],
+  "bundle": "artifact-bundle.zip",
+  "bundleContents": "All package payload files including this manifest, excluding artifact-bundle.zip itself; ZIP entries sorted and use fixed timestamp 2026-09-24T00:00:00Z."
+}

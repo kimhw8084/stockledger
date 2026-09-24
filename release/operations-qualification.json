@@ -1,0 +1,56 @@
+{
+  "synthetic": true,
+  "contractVersion": "stockledger-operations-qualification-v1",
+  "revision": 1,
+  "workload": {
+    "stocks": 100,
+    "historySessions": 260,
+    "symbols": 104,
+    "sampleCount": 3
+  },
+  "dailyWorkload": {
+    "elapsedMs": 4585,
+    "deadlineBudgetMs": 1800000,
+    "headroomMs": 1795415,
+    "withinBudget": true,
+    "evidenceOnly": true
+  },
+  "repeatedSamples": {
+    "count": 3,
+    "elapsedMs": [
+      4585,
+      4468,
+      4541
+    ],
+    "p50Ms": 4541,
+    "p95Ms": 4580.6,
+    "percentilesRequireMultipleSamples": true
+  },
+  "backlogAndRetrySurge": {
+    "queueDepth": 13,
+    "oldestActionableAgeMs": 600000,
+    "retryCount": 1,
+    "terminalCount": 1,
+    "attemptBudgetPreserved": true
+  },
+  "storageGrowth": {
+    "beforeBytes": 473616,
+    "afterBytes": 12624672,
+    "deltaBytes": 12151056,
+    "workspaceBytes": 5822916
+  },
+  "restore": {
+    "elapsedMs": 36,
+    "headroomMs": 29964,
+    "withinBudget": true,
+    "integrity": true
+  },
+  "process": {
+    "endingRssBytes": 327335936
+  },
+  "qualificationBudgets": {
+    "dailyDeadlineMs": 1800000,
+    "restoreRtoMs": 30000,
+    "rationale": "bounded local engineering qualification budgets for synthetic fixtures; not an SLA, production capacity claim, provider throughput, or real-user load"
+  }
+}

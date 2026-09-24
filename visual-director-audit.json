@@ -1,0 +1,69 @@
+{
+  "candidate": "ed377bb173387ebf56a4919ac4282d136c56e21d",
+  "tree": "dc99438cdcf8e2f737e5de87d6afc550d4008f24",
+  "authority": "Golden UI v3 Visual Director & Product-Task Contract",
+  "decision": "AWAITING_INDEPENDENT_AUDIT",
+  "humanPreferenceClaim": false,
+  "productTask": "A busy individual reviews and records stock research, monitors evidence/decisions/changes without trading execution.",
+  "corePromise": "Save the reason once, know what changed, review when it matters.",
+  "objectiveChecks": {
+    "character": {
+      "observation": "Current product language and sampled UI expose review, evidence, source, freshness, local journal, recipe and preference actions; no order-entry task appears in reviewed paths.",
+      "sourceEvidence": [
+        "src/features/shell/StockLedgerShell.tsx",
+        "src/features/today/TodayScreen.tsx",
+        "src/features/watchlist/detail/StockEntityDetail.tsx"
+      ]
+    },
+    "typography": {
+      "observation": "Role hierarchy and numeric/context labels appear in current captures; Korean fallback and 5 deep KO captures are available. Full current KO primary and authoring viewport matrix remains partial.",
+      "status": "PARTIAL"
+    },
+    "density": {
+      "observation": "Screens show grouped evidence and status content; reader-level density/hierarchy judgement reserved to independent pixel audit.",
+      "status": "AWAITING_INDEPENDENT_AUDIT"
+    },
+    "hierarchy": {
+      "finding": "Today, Recipes, Alerts and deep surfaces exhibit primary-action bounds outside initial short viewport or navigation out of view while scrolled; exact geometry documented.",
+      "status": "OBJECTIVE_FINDING"
+    },
+    "spacingSurfacesBorders": {
+      "status": "AWAITING_INDEPENDENT_AUDIT",
+      "basis": "Current canonical captures included; no aesthetic superiority claim."
+    },
+    "color": {
+      "observation": "Status, primary action, selected tab, warning/error states pair color with visible text/icon/selection semantics in inspected component code.",
+      "status": "SOURCE_AND_PIXEL_REVIEW_REQUIRED"
+    },
+    "emphasis": {
+      "finding": "Primary next actions fall below initial viewport in documented compact/short profiles; consequence salience/reachability requires independent reviewer."
+    },
+    "icons": {
+      "status": "SOURCE_REVIEWED",
+      "observation": "Shared icon names have adjacent accessible labels in interactive controls; not every icon independently audited."
+    },
+    "imagery": {
+      "status": "NONE",
+      "observation": "No product imagery is part of the audited flows; no missing task image inferred."
+    },
+    "motion": {
+      "status": "PARTIAL",
+      "observation": "WindowPanel uses reduce-motion branch for immediate close; Playwright reducedMotion emulation used."
+    },
+    "dataDensity": {
+      "observation": "Sample/mock, provider health, freshness, missing evidence and source text are surfaced in reviewed screenshots and tasks.",
+      "status": "PARTIAL"
+    },
+    "contentTone": {
+      "observation": "No market execution success is claimed in sampled tested tasks; local preference and external worker handoff are separately represented."
+    },
+    "responsiveComposition": {
+      "finding": "Action bounds and nav scroll positions fail existing current stress/holdout checks; authentic browser zoom profile is captured but full task qualification remains UNPROVEN."
+    }
+  },
+  "findings": [
+    "Geometry: initial short-view action bounds fail at several current profiles.",
+    "Focus: semantically hidden invoker receives restored focus after modal close."
+  ],
+  "noAestheticSuperiorityClaim": "Historical AR-61/64/68 pixels are comparators only. Same-inspector comparison is not human-preference evidence; independent Project OS pixel/task review decides GO or FIX."
+}

@@ -1,0 +1,39 @@
+{
+  "candidate": "ed377bb173387ebf56a4919ac4282d136c56e21d",
+  "tree": "dc99438cdcf8e2f737e5de87d6afc550d4008f24",
+  "lawbookComparison": {
+    "priorLaw": "Golden UI Engineering Lawbook v2 accepted evidence",
+    "currentLaw": "Golden UI Engineering Lawbook v3.0.0, effective 2026-09-23",
+    "claim": "No controlled v2-to-v3 superiority or human-preference claim."
+  },
+  "comparators": [
+    {
+      "id": "AR-61",
+      "change": "CHG-172",
+      "scope": "six primary surfaces",
+      "sourceTree": "6eed4a44bbe2680a856159ff4716da7183a018b7",
+      "comparison": "Historical comparator only; canonical EN current anchors recaptured from exact target."
+    },
+    {
+      "id": "AR-64",
+      "change": "CHG-184",
+      "scope": "six deep review/detail surfaces",
+      "sourceTree": "89175c8afa404a04d9199166c77ec8cfb5b93898",
+      "comparison": "Historical comparator only; canonical EN current anchors recaptured from exact target."
+    },
+    {
+      "id": "AR-68",
+      "change": "CHG-199",
+      "scope": "five authoring/config surfaces",
+      "sourceCommit": "8a9ac0104190144110d335c93eb11f8c51f6a898",
+      "sourceTree": "dc99438cdcf8e2f737e5de87d6afc550d4008f24",
+      "comparison": "Current screenshots reused from accepted v2 evidence because source tree is byte-identical to candidate; EN/KO canonical and authoring stress/holdout captured there."
+    }
+  ],
+  "objectiveDelta": [
+    "Current CHG-172/184 E2E geometry assertions fail at compact/short viewports; see release-qualification.json and screenshots/findings/.",
+    "Current v3 focus adversary failed for a semantically hidden invoker.",
+    "200% native zoom probe is genuine but the full critical-flow matrix is UNPROVEN.",
+    "No aesthetic superiority, broad quality, native, production-data, or commercial-readiness inference."
+  ]
+}

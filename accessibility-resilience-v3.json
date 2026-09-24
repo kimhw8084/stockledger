@@ -1,0 +1,78 @@
+{
+  "candidate": "ed377bb173387ebf56a4919ac4282d136c56e21d",
+  "tree": "dc99438cdcf8e2f737e5de87d6afc550d4008f24",
+  "profile": "WEB is the primary qualification profile",
+  "browserZoom200": {
+    "result": "UNPROVEN",
+    "method": "Google Chrome native browser default zoom set to 200% with chrome.settingsPrivate.setDefaultZoom; 1440x900 browser window -> CSS layout viewport 720x450; visualViewport scale=1; html/body zoom=1; no CSS transform or page-scale approximation.",
+    "observed": {
+      "devicePixelRatio": 2,
+      "horizontalOverflow": false,
+      "screenshots": [
+        "screenshots/browser-zoom-200/01-today.png",
+        "screenshots/browser-zoom-200/02-today-review-dialog.png",
+        "screenshots/browser-zoom-200/10-recipe-builder.png",
+        "screenshots/browser-zoom-200/18-journal-composer.png",
+        "screenshots/browser-zoom-200/22-notification-confirm.png"
+      ],
+      "taskRun": "Initial Watchlist search option detached during scroll; dependent metric/Eye/registry/Eyes zoom sequence not completed. No product defect inferred from that harness interruption.",
+      "limits": "Does not prove every critical flow retains content/function at 200%."
+    }
+  },
+  "textSpacing": {
+    "result": "PARTIAL",
+    "requirements": {
+      "lineHeight": "1.5",
+      "paragraphSpacing": "2em",
+      "letterSpacing": ".12em",
+      "wordSpacing": ".16em"
+    },
+    "method": "Applied only as temporary test stylesheet to notification-settings view in zoom context; product defaults untouched.",
+    "observed": "No document horizontal overflow in captured view; full flow not repeated."
+  },
+  "keyboard": {
+    "result": "PARTIAL",
+    "evidence": "Existing keyboard route and authoring suites; short navigation route passed; one long multi-surface focus test timed out at focus locator and is classified harness/UNPROVEN."
+  },
+  "focus": {
+    "result": "FAIL",
+    "evidence": "Hidden semantic invoker descendant focus-restoration negative control demonstrably failed."
+  },
+  "inertness": {
+    "result": "UNPROVEN",
+    "reason": "closed/inactive UI focusable descendants not exhaustively probed"
+  },
+  "reducedMotion": {
+    "result": "PARTIAL",
+    "evidence": "Playwright full suite context configured reducedMotion=reduce; motion semantics not independently inspected"
+  },
+  "forcedColors": {
+    "result": "UNPROVEN",
+    "reason": "not captured in a forced-colors browser profile"
+  },
+  "locale": {
+    "result": "PARTIAL",
+    "evidence": "EN canonical current screenshots; EN/KO authoring current-tree exact captures; Korean deep E2E captures; Korean primary test path produced a current geometry failure; all critical surfaces in KO not captured at v3."
+  },
+  "rtl": {
+    "result": "NOT_APPLICABLE",
+    "reason": "RTL is not a declared StockLedger locale."
+  },
+  "native": {
+    "result": "UNPROVEN",
+    "reason": "no real iOS/Android device evidence; browser touch emulation is not native qualification."
+  },
+  "assistiveTechnology": {
+    "result": "UNPROVEN",
+    "reason": "no VoiceOver/TalkBack evidence."
+  },
+  "dynamicTypeScalableText": {
+    "result": "UNPROVEN",
+    "reason": "no real native Dynamic Type test."
+  },
+  "realImeSafeAreaSystemBack": {
+    "result": "UNPROVEN",
+    "reason": "no device IME/safe-area/system Back test."
+  },
+  "wcagClaim": "No WCAG conformance claim is made."
+}

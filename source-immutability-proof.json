@@ -1,0 +1,13 @@
+{
+  "candidate": "ed377bb173387ebf56a4919ac4282d136c56e21d",
+  "tree": "dc99438cdcf8e2f737e5de87d6afc550d4008f24",
+  "workBranch": "codex/stockledger-prod-c17-golden-ui-v3-integrated-verify-v1",
+  "initialState": "clean exact target worktree before verification execution",
+  "finalState": "clean; git diff and cached diff empty; exact commit/tree unchanged",
+  "remoteMain": "ed377bb173387ebf56a4919ac4282d136c56e21d at final freeze check",
+  "trackedSourceTreeBefore": "dc99438cdcf8e2f737e5de87d6afc550d4008f24",
+  "trackedSourceTreeAfter": "dc99438cdcf8e2f737e5de87d6afc550d4008f24",
+  "productChangedFiles": 0,
+  "productSourceMutation": false,
+  "evidenceGeneratedOutsideProductCheckout": true
+}
