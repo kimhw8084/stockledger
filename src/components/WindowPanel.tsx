@@ -22,6 +22,7 @@ const fontFamily = "System";
 interface WindowPanelProps {
   title: string;
   subtitle?: string;
+  subtitleNumberOfLines?: number;
   onClose: () => void;
   children: React.ReactNode | ((close: () => void, closeAfterCommit: () => void) => React.ReactNode);
   language?: AppLanguage;
@@ -34,6 +35,7 @@ interface WindowPanelProps {
 export const WindowPanel = ({
   title,
   subtitle,
+  subtitleNumberOfLines = 2,
   onClose,
   children,
   language = "en",
@@ -237,7 +239,7 @@ export const WindowPanel = ({
                 {title}
               </Text>
               {subtitle ? (
-                <Text style={styles.windowSubtitle} numberOfLines={2}>
+                <Text style={styles.windowSubtitle} numberOfLines={subtitleNumberOfLines}>
                   {subtitle}
                 </Text>
               ) : null}

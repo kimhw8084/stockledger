@@ -32,7 +32,9 @@ test("Eye Composer validates, saves, edits authored text, and restores invoker f
   await expect(composer.getByRole("heading", { name: "Create Eye", exact: true })).toBeVisible();
   await composer.getByTestId("eye-stock").fill("");
   await activateByKeyboard(composer.getByTestId("eye-save"));
-  await expect(composer.getByText("Select a stock.", { exact: true })).toBeVisible();
+  const missingStock = composer.getByText("Select a stock.", { exact: true });
+  await missingStock.scrollIntoViewIfNeeded();
+  await expect(missingStock).toBeInViewport();
   await expect(composer.getByText("Select a recipe.", { exact: true })).toBeVisible();
   await expect(composer.getByText("Thesis snapshot is required.", { exact: true })).toBeVisible();
   await activateByKeyboard(composer.getByRole("button", { name: "Cancel", exact: true }));
@@ -101,7 +103,12 @@ test("Journal Composer requires deliberate context and action, then preserves am
   await activateByKeyboard(create);
   composer = page.getByRole("dialog");
   await activateByKeyboard(composer.getByTestId("journal-save"));
-  await expect(composer.getByText("Select an Eye.", { exact: true })).toBeVisible();
+  const missingEye = composer.getByText("Select an Eye.", { exact: true });
+  await missingEye.scrollIntoViewIfNeeded();
+  await expect(missingEye).toBeInViewport();
+  await expect(composer.getByText("Choose the action you recorded.", { exact: true })).toHaveCount(0);
+  await expect(composer.getByText("Choose your thesis assessment.", { exact: true })).toHaveCount(0);
+  await expect(composer.getByText("Choose your timing assessment.", { exact: true })).toHaveCount(0);
   await activateByKeyboard(composer.getByRole("button", { name: "Cancel", exact: true }));
   await expect(composer).toHaveCount(0);
   await expect(create).toBeFocused();
@@ -114,6 +121,8 @@ test("Journal Composer requires deliberate context and action, then preserves am
   const eye = await selectFirstOption(composer, "journal-eye");
   await activateByKeyboard(composer.getByTestId("journal-save"));
   await expect(composer.getByText("Choose the action you recorded.", { exact: true })).toBeVisible();
+  await expect(composer.getByText("Choose your thesis assessment.", { exact: true })).toHaveCount(0);
+  await expect(composer.getByText("Choose your timing assessment.", { exact: true })).toHaveCount(0);
   await activateByKeyboard(composer.getByRole("radio", { name: "Entered", exact: true }), "Space");
   await activateByKeyboard(composer.getByTestId("journal-save"));
   await expect(composer.getByText("A decision note is required.", { exact: true })).toBeVisible();
@@ -251,6 +260,78 @@ test("Logic Registry exposes raw meaning, declared coverage, downstream links, h
   await expect(openRegistry).toBeFocused();
 });
 
+test("Raw Data Registry instruction stays fully readable across supported viewports and languages", async ({ page }) => {
+  const profiles = [
+    { width: 390, height: 844 },
+    { width: 360, height: 800 },
+    { width: 412, height: 915 },
+    { width: 1366, height: 768 },
+    { width: 1440, height: 900 },
+  ];
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  await activateByKeyboard(page.getByRole("button", { name: "Explore sample workspace", exact: true }));
+  await expect(page.getByText(/Sample data is present/)).toBeVisible();
+  for (const language of ["en", "ko"] as const) {
+    await activateByKeyboard(page.getByRole("button", { name: "Settings", exact: true }));
+    await activateByKeyboard(page.getByTestId(`settings-language-control-${language}`));
+    await activateByKeyboard(page.getByRole("tab", { name: language === "ko" ? "레시피" : "Recipes", exact: true }));
+
+    const instruction = language === "ko"
+      ? "여기서는 원천 데이터만 봅니다. 정의, 중요도, 연결된 처리 피처, 소스, API 원천을 확인하세요."
+      : "This is the raw-data registry only. Review the definitions, importance, linked processed features, sources, and API origins here.";
+    for (const profile of profiles) {
+      await page.setViewportSize(profile);
+      await activateByKeyboard(page.getByTestId("recipe-layer-control-Raw Data"));
+      await activateByKeyboard(page.getByRole("button", { name: language === "ko" ? "원천 데이터 레지스트리 열기" : "Open raw data registry", exact: true }));
+      const registry = page.getByRole("dialog");
+      const subtitle = registry.getByText(instruction, { exact: true });
+      await expect(subtitle).toBeVisible();
+      await expect(registry.getByRole("button", { name: language === "ko" ? "닫기" : "Done", exact: true })).toBeInViewport();
+      const layout = await subtitle.evaluate((element) => {
+        const measureLines = (target: Element) => {
+          const range = document.createRange();
+          range.selectNodeContents(target);
+          return new Set(Array.from(range.getClientRects()).map((rect) => Math.round(rect.top))).size;
+        };
+        const clone = element.cloneNode(true) as HTMLElement;
+        clone.style.position = "fixed";
+        clone.style.left = "-10000px";
+        clone.style.top = "-10000px";
+        clone.style.width = `${element.getBoundingClientRect().width}px`;
+        clone.style.height = "auto";
+        clone.style.maxHeight = "none";
+        clone.style.display = "block";
+        clone.style.overflow = "visible";
+        clone.style.webkitLineClamp = "unset";
+        clone.style.webkitBoxOrient = "initial";
+        document.body.appendChild(clone);
+        const fullLineCount = measureLines(clone);
+        clone.remove();
+        return {
+          text: element.textContent,
+          lineCount: measureLines(element),
+          fullLineCount,
+          lineClamp: getComputedStyle(element).webkitLineClamp,
+          width: element.clientWidth,
+          scrollWidth: element.scrollWidth,
+          documentWidth: document.documentElement.scrollWidth,
+        };
+      });
+      expect(layout.text).toBe(instruction);
+      expect(layout.lineClamp).toBe("8");
+      expect(layout.width).toBeGreaterThan(0);
+      expect(layout.scrollWidth).toBeLessThanOrEqual(layout.width);
+      expect(layout.documentWidth).toBeLessThanOrEqual(profile.width);
+      expect(layout.lineCount).toBe(layout.fullLineCount);
+      expect(layout.fullLineCount).toBeLessThanOrEqual(8);
+      if (profile.width >= 412) expect(layout.fullLineCount).toBeLessThanOrEqual(4);
+      await page.keyboard.press("Escape");
+      await expect(registry).toHaveCount(0);
+    }
+  }
+});
+
 test("notification disable keeps a failed preference save visible and retryable", async ({ page }) => {
   await page.goto("/");
   await activateByKeyboard(page.getByRole("button", { name: "Settings", exact: true }));
@@ -267,14 +348,16 @@ test("notification disable keeps a failed preference save visible and retryable"
     if (!prototype.__stockLedgerOriginalPut) prototype.__stockLedgerOriginalPut = prototype.put;
     const original = prototype.__stockLedgerOriginalPut;
     prototype.put = function (value: unknown, key?: IDBValidKey | null) {
-      if (key === "stockledger.appData.v2") throw new DOMException("Local write failed. Export a backup and free device space.", "QuotaExceededError");
+      if (key === "stockledger.appData.v2") throw new DOMException("Uncaught exception in event handler.", "UnknownError");
       return original.call(this, value, key ?? undefined);
     };
   });
   await activateByKeyboard(confirmation.getByRole("button", { name: "Turn off notifications", exact: true }));
   await expect(confirmation).toBeVisible();
   await expect(confirmation.getByRole("alert")).toBeVisible();
+  await expect(confirmation.getByText("Notification preferences could not be saved. No changes were made.", { exact: true })).toBeVisible();
   await expect(confirmation.getByText("The preference was not changed. Retry the save or cancel.", { exact: true })).toBeVisible();
+  await expect(page.getByText("Uncaught exception in event handler.", { exact: false })).toHaveCount(0);
   await expect(page.getByText("Enabled", { exact: true })).toBeVisible();
   await page.evaluate(() => {
     const prototype = IDBObjectStore.prototype as IDBObjectStore & { __stockLedgerOriginalPut?: IDBObjectStore["put"] };
@@ -283,4 +366,31 @@ test("notification disable keeps a failed preference save visible and retryable"
   await activateByKeyboard(confirmation.getByRole("button", { name: "Turn off notifications", exact: true }));
   await expect(page.getByRole("heading", { name: "Turn off notification delivery?", exact: true })).toHaveCount(0);
   await expect(page.getByText("Off", { exact: true })).toBeVisible();
+
+  await activateByKeyboard(page.getByTestId("settings-language-control-ko"));
+  await activateByKeyboard(page.getByRole("button", { name: "이메일 전달 사용", exact: true }));
+  await expect(page.getByRole("button", { name: "옵트아웃하고 이후 전달 취소", exact: true })).toBeVisible();
+  await activateByKeyboard(page.getByRole("button", { name: "옵트아웃하고 이후 전달 취소", exact: true }));
+  const koreanConfirmation = page.getByRole("dialog");
+  await page.evaluate(() => {
+    const prototype = IDBObjectStore.prototype as IDBObjectStore & { __stockLedgerOriginalPut?: IDBObjectStore["put"] };
+    if (!prototype.__stockLedgerOriginalPut) prototype.__stockLedgerOriginalPut = prototype.put;
+    const original = prototype.__stockLedgerOriginalPut;
+    prototype.put = function (value: unknown, key?: IDBValidKey | null) {
+      if (key === "stockledger.appData.v2") throw new DOMException("Uncaught exception in event handler.", "UnknownError");
+      return original.call(this, value, key ?? undefined);
+    };
+  });
+  await activateByKeyboard(koreanConfirmation.getByRole("button", { name: "알림 끄기", exact: true }));
+  await expect(koreanConfirmation.getByText("알림 설정을 저장하지 못했습니다. 변경 사항은 저장되지 않았습니다.", { exact: true })).toBeVisible();
+  await expect(koreanConfirmation.getByText("설정은 변경되지 않았습니다. 다시 저장하거나 취소하세요.", { exact: true })).toBeVisible();
+  await expect(page.getByText("Uncaught exception in event handler.", { exact: false })).toHaveCount(0);
+  await expect(page.getByText("사용 중", { exact: true })).toBeVisible();
+  await page.evaluate(() => {
+    const prototype = IDBObjectStore.prototype as IDBObjectStore & { __stockLedgerOriginalPut?: IDBObjectStore["put"] };
+    if (prototype.__stockLedgerOriginalPut) prototype.put = prototype.__stockLedgerOriginalPut;
+  });
+  await activateByKeyboard(koreanConfirmation.getByRole("button", { name: "알림 끄기", exact: true }));
+  await expect(page.getByRole("heading", { name: "알림 전달을 끌까요?", exact: true })).toHaveCount(0);
+  await expect(page.locator("#settings-notifications-content").getByText("꺼짐", { exact: true })).toBeVisible();
 });

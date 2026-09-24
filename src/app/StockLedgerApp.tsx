@@ -4377,6 +4377,7 @@ export default function App() {
                 ? "여기서는 원천 데이터만 봅니다. 정의, 중요도, 연결된 처리 피처, 소스, API 원천을 확인하세요."
                 : "This is the raw-data registry only. Review the definitions, importance, linked processed features, sources, and API origins here."
             }
+            subtitleNumberOfLines={8}
             onClose={() => setLogicL0RegistryOpen(false)}
             closeLabel={t(language, "common.done")}
             returnFocusRef={logicRegistryFocus.returnFocusRef}

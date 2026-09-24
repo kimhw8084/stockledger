@@ -48,8 +48,8 @@ export function NotificationSettingsPanel({
       await actions.updateNotificationPreferences(change);
       setMessage(language === "ko" ? "알림 설정을 저장했습니다." : "Notification preferences saved.");
       return true;
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : language === "ko" ? "알림 설정을 저장하지 못했습니다." : "Notification preferences could not be saved.");
+    } catch {
+      setError(t(language, "settings.notifications.saveFailed"));
       return false;
     } finally {
       setSaving(false);
