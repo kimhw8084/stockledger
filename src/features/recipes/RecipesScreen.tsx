@@ -99,6 +99,7 @@ export interface RecipesScreenProps {
   onOpenRule: (recipeId: string, ruleId: string) => void;
   onOpenSet: (id: string) => void;
   onOpenSetVersions: (id: string) => void;
+  onCreateRecipe: () => void;
   onCreateSet: () => void;
   onOpenSignalReview: (signalId: string) => void;
 }
@@ -129,6 +130,8 @@ const labels = (language: AppLanguage) => language === "ko" ? {
   createFormula: "수식 작성",
   editFormula: "수식 상세 및 수정",
   editRule: "규칙 상세 및 수정",
+  createRecipe: "새 레시피 만들기",
+  composeSet: "기존 규칙으로 세트 작성",
   createSet: "새 세트 작성",
   openSet: "세트 상세 보기",
   versions: "버전 이력",
@@ -172,6 +175,8 @@ const labels = (language: AppLanguage) => language === "ko" ? {
   createFormula: "Create formula",
   editFormula: "Formula detail and edit",
   editRule: "Rule detail and edit",
+  createRecipe: "New Recipe",
+  composeSet: "Compose set from saved rules",
   createSet: "Create set",
   openSet: "Open set detail",
   versions: "Version history",
@@ -278,11 +283,14 @@ export function RecipesScreen(props: RecipesScreenProps) {
 
       {props.layer === "Sets" ? (
         <VStack gap="md">
-          <PageHeader title={text.setsTitle} actions={<Button label={text.createSet} onPress={props.onCreateSet} responsiveWidth="compact-full" />} />
+          <PageHeader
+            title={text.setsTitle}
+            actions={<Button label={text.createRecipe} onPress={props.onCreateRecipe} responsiveWidth="compact-full" />}
+          />
           {props.sets.length ? props.sets.map((set, index) => (
             <React.Fragment key={set.id}>
               {index > 0 ? <Divider inset="start" /> : null}
-              <View style={styles.setRow}>
+              <View style={styles.setRow} testID={`recipe-set-row-${set.id}`}>
                 <View style={styles.flexOne}>
                   <HStack gap="sm" align="center">
                     <Text variant="h3">{set.name}</Text>
@@ -294,12 +302,13 @@ export function RecipesScreen(props: RecipesScreenProps) {
                   <Text variant="caption" tone="secondary">{text.scanner}: {set.scannerState}{set.ruleCount === 0 ? ` · ${text.noData}` : ""}</Text>
                 </View>
                 <View style={styles.setActions}>
-                  <Button label={text.openSet} variant="secondary" size="sm" onPress={() => props.onOpenSet(set.id)} responsiveWidth="compact-full" />
+                  <Button label={text.openSet} variant="secondary" size="sm" onPress={() => props.onOpenSet(set.id)} responsiveWidth="compact-full" testID={`recipe-set-open-${set.id}`} />
                   <Button label={text.versions} variant="ghost" size="sm" onPress={() => props.onOpenSetVersions(set.id)} responsiveWidth="compact-full" />
                 </View>
               </View>
             </React.Fragment>
           )) : <Card variant="subtle"><Text tone="secondary">{text.noSets}</Text></Card>}
+          <Button label={text.composeSet} variant="secondary" onPress={props.onCreateSet} responsiveWidth="compact-full" />
         </VStack>
       ) : null}
 

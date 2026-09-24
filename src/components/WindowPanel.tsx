@@ -22,10 +22,12 @@ const fontFamily = "System";
 interface WindowPanelProps {
   title: string;
   subtitle?: string;
+  subtitleNumberOfLines?: number;
   onClose: () => void;
-  children: React.ReactNode | ((close: () => void) => React.ReactNode);
+  children: React.ReactNode | ((close: () => void, closeAfterCommit: () => void) => React.ReactNode);
   language?: AppLanguage;
   closeLabel?: string;
+  closeDisabled?: boolean;
   returnFocusRef?: React.RefObject<any>;
   fallbackFocusRef?: React.RefObject<any>;
 }
@@ -33,10 +35,12 @@ interface WindowPanelProps {
 export const WindowPanel = ({
   title,
   subtitle,
+  subtitleNumberOfLines = 2,
   onClose,
   children,
   language = "en",
   closeLabel = t(language, "common.done"),
+  closeDisabled = false,
   returnFocusRef,
   fallbackFocusRef,
 }: WindowPanelProps) => {
@@ -46,6 +50,8 @@ export const WindowPanel = ({
   const sheetOffset = useRef(new Animated.Value(28)).current;
   const sheetScale = useRef(new Animated.Value(0.985)).current;
   const closingRef = useRef(false);
+  const closeDisabledRef = useRef(closeDisabled);
+  closeDisabledRef.current = closeDisabled;
   const closeButtonRef = useRef<any>(null);
 
   useEffect(() => {
@@ -105,7 +111,7 @@ export const WindowPanel = ({
       ? ({
           onKeyDown: (event: any) => {
             const key = event?.nativeEvent?.key ?? event?.key;
-            if (key === "Escape") {
+            if (key === "Escape" && !closeDisabled) {
               event.preventDefault();
               animateClose();
             }
@@ -113,7 +119,7 @@ export const WindowPanel = ({
         } as any)
       : {};
 
-  const animateClose = () => {
+  const startClose = () => {
     if (closingRef.current) return;
     closingRef.current = true;
     if (reduced) { finishClose(); return; }
@@ -136,7 +142,12 @@ export const WindowPanel = ({
     ]).start(finishClose);
   };
 
-  const panelChildren = typeof children === "function" ? children(animateClose) : children;
+  const animateClose = () => {
+    if (closeDisabledRef.current) return;
+    startClose();
+  };
+  const closeAfterCommit = () => startClose();
+  const panelChildren = typeof children === "function" ? children(animateClose, closeAfterCommit) : children;
 
   const dragResponder = useRef(
     PanResponder.create({
@@ -228,12 +239,12 @@ export const WindowPanel = ({
                 {title}
               </Text>
               {subtitle ? (
-                <Text style={styles.windowSubtitle} numberOfLines={2}>
+                <Text style={styles.windowSubtitle} numberOfLines={subtitleNumberOfLines}>
                   {subtitle}
                 </Text>
               ) : null}
             </View>
-            <Pressable ref={closeButtonRef} accessibilityRole="button" accessibilityLabel={closeLabel} onPress={animateClose} style={({ pressed, focused }: any) => [styles.doneButton, pressed ? styles.doneButtonPressed : null, focused ? styles.focusRing : null]}>
+            <Pressable ref={closeButtonRef} accessibilityRole="button" accessibilityLabel={closeLabel} accessibilityState={{ disabled: closeDisabled }} disabled={closeDisabled} onPress={animateClose} style={({ pressed, focused }: any) => [styles.doneButton, pressed ? styles.doneButtonPressed : null, focused ? styles.focusRing : null, closeDisabled ? styles.closeDisabled : null]}>
               <Text style={styles.doneButtonText}>{closeLabel}</Text>
             </Pressable>
           </View>
@@ -328,6 +339,9 @@ const styles = StyleSheet.create({
   doneButtonPressed: {
     transform: [{ scale: 0.985 }],
     opacity: 0.92,
+  },
+  closeDisabled: {
+    opacity: 0.55,
   },
   focusRing: {
     borderColor: "#2563eb",

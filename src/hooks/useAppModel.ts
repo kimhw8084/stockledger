@@ -129,14 +129,14 @@ export const useAppModel = () => {
       .finally(() => setProviderHealthLoading(false));
   }, []);
 
-  const commit = async (next: AppData | ((current: AppData) => AppData)) => {
+  const commit = async (next: AppData | ((current: AppData) => AppData), { reportError = true }: { reportError?: boolean } = {}) => {
     pendingWrites.current += 1;
     setSaving(true);
     setError(null);
     try {
       return await applicationService.commit(next);
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Save failed. Your last saved data is intact.");
+      if (reportError) setError(cause instanceof Error ? cause.message : "Save failed. Your last saved data is intact.");
       throw cause;
     } finally { pendingWrites.current -= 1; setSaving(pendingWrites.current > 0); }
   };
@@ -724,7 +724,7 @@ export const useAppModel = () => {
             quietHours: { ...prev.notificationPreferences.quietHours, ...(change.quietHours ?? {}) },
             updatedAt: new Date().toISOString(),
           }),
-        }));
+        }), { reportError: false });
       },
       exportBackup() {
         return applicationService.exportBackup();
