@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useLayoutEffect } from "react";
+import { Platform } from "react-native";
 import { useWorkspaceNavigation, type WorkspaceTab } from "../../hooks/useWorkspaceNavigation";
 import {
   Badge,
@@ -73,6 +74,16 @@ function Navigation({ props }: { props: StockLedgerShellProps }) {
 }
 
 export function StockLedgerShell(props: StockLedgerShellProps) {
+  useLayoutEffect(() => {
+    if (Platform.OS === "web" && typeof document !== "undefined") {
+      const scrollElement = document.getElementById("stockledger-content-scroll");
+      if (scrollElement) {
+        scrollElement.scrollTop = 0;
+        scrollElement.scrollLeft = 0;
+      }
+    }
+  }, [props.tab]);
+
   return (
     <View style={styles.root} nativeID="stockledger-shell">
       <Navigation props={props} />
@@ -109,6 +120,7 @@ export function StockLedgerShell(props: StockLedgerShellProps) {
           </View>
         </View>
         <ScrollView
+          nativeID="stockledger-content-scroll"
           style={styles.scroll}
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
@@ -126,7 +138,7 @@ const styles = StyleSheet.create((theme) => ({
   root: { flex: 1, minWidth: 0, position: "relative", backgroundColor: theme.colors.background.canvas },
   content: { flex: 1, minWidth: 0, paddingBottom: { compact: 86, expanded: 0 }, paddingStart: { compact: 0, expanded: 224 } },
   navigation: {
-    position: "absolute",
+    position: Platform.OS === "web" ? ("fixed" as any) : "absolute",
     zIndex: theme.layers.navigation,
     left: 0,
     right: { compact: 0, expanded: "auto" },

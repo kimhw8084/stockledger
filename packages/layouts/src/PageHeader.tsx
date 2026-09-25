@@ -9,11 +9,12 @@ export interface PageHeaderProps {
   eyebrow?: string;
   actions?: ReactNode;
   metadata?: ReactNode;
+  compactActionsInline?: boolean;
 }
 
-export function PageHeader({ title, description, eyebrow, actions, metadata }: PageHeaderProps) {
+export function PageHeader({ title, description, eyebrow, actions, metadata, compactActionsInline = false }: PageHeaderProps) {
   return (
-    <View style={styles.root}>
+    <View style={[styles.root, compactActionsInline && styles.rootCompactActionsInline]}>
       <View style={styles.copy}>
         <VStack gap="xs">
           {eyebrow ? <Text variant="micro" tone="secondary">{eyebrow}</Text> : null}
@@ -22,7 +23,7 @@ export function PageHeader({ title, description, eyebrow, actions, metadata }: P
           {metadata ? <View style={styles.metadata}>{metadata}</View> : null}
         </VStack>
       </View>
-      {actions ? <View style={styles.actions}>{actions}</View> : null}
+      {actions ? <View style={[styles.actions, compactActionsInline && styles.actionsCompactInline]}>{actions}</View> : null}
     </View>
   );
 }
@@ -35,6 +36,11 @@ const styles = StyleSheet.create((theme) => ({
     justifyContent: 'space-between',
     gap: { compact: theme.spacing.lg, expanded: theme.spacing.xl },
   },
+  rootCompactActionsInline: {
+    flexDirection: { compact: 'row', expanded: 'row' },
+    alignItems: { compact: 'flex-start', expanded: 'flex-start' },
+    gap: { compact: theme.spacing.sm, expanded: theme.spacing.xl },
+  },
   copy: { minWidth: 0, flex: 1, maxWidth: theme.contentWidths.reading },
   metadata: { minWidth: 0, flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: theme.spacing.sm, paddingTop: theme.spacing.xs },
   actions: {
@@ -44,5 +50,10 @@ const styles = StyleSheet.create((theme) => ({
     flexShrink: 1,
     alignSelf: { compact: 'stretch', expanded: 'flex-start' },
     alignItems: { compact: 'stretch', expanded: 'flex-end' },
+  },
+  actionsCompactInline: {
+    width: { compact: 'auto', expanded: 'auto' },
+    alignSelf: { compact: 'flex-start', expanded: 'flex-start' },
+    alignItems: { compact: 'flex-end', expanded: 'flex-end' },
   },
 }));

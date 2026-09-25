@@ -1,4 +1,5 @@
 import React from "react";
+import { useWindowDimensions } from "react-native";
 import {
   Badge,
   Button,
@@ -137,6 +138,7 @@ const labels = (language: AppLanguage) => language === "ko" ? {
 
 export function AlertsScreen(props: AlertsScreenProps) {
   const text = labels(props.language);
+  const compactActions = useWindowDimensions().width < 600;
   const currentCount = props.groups.reduce((total, group) => total + group.alerts.length, 0);
   return (
     <View style={styles.root} nativeID="alerts-primary-surface">
@@ -191,12 +193,13 @@ export function AlertsScreen(props: AlertsScreenProps) {
                             {alert.sample ? <Badge label={text.sample} tone="warning" /> : null}
                           </HStack>
                           <Text>{alert.whyNow}</Text>
+                          {compactActions ? <Button label={text.inspect} iconEnd="arrowRight" onPress={() => props.onOpenDetail(alert.id)} responsiveWidth="compact-full" /> : null}
                           <Text variant="caption" tone="secondary">{alert.createdAt} · {text.quality}: {alert.dataQuality}</Text>
                           <Text variant="caption" tone="secondary">{text.source}: {alert.freshness} · {alert.source}</Text>
                           <Text variant="caption" tone="secondary">{text.uncertainty}: {alert.uncertainty}</Text>
                         </View>
                         <View style={styles.actions}>
-                          <Button label={text.inspect} iconEnd="arrowRight" onPress={() => props.onOpenDetail(alert.id)} responsiveWidth="compact-full" />
+                          {!compactActions ? <Button label={text.inspect} iconEnd="arrowRight" onPress={() => props.onOpenDetail(alert.id)} responsiveWidth="compact-full" /> : null}
                           <Button label={text.recordEntered} variant="secondary" size="sm" onPress={() => props.onQuickDecision(alert.id, "Entered")} responsiveWidth="compact-full" />
                           <Button label={text.recordSkipped} variant="secondary" size="sm" onPress={() => props.onQuickDecision(alert.id, "Skipped")} responsiveWidth="compact-full" />
                           <Button label={text.snooze} variant="ghost" size="sm" onPress={() => props.onSnooze(alert.id)} responsiveWidth="compact-full" />

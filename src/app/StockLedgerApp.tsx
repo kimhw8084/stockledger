@@ -28,6 +28,7 @@ import { ScannerReview, type ScannerReviewForm } from "../features/recipes/scann
 import { StockMetricDetailSheet } from "../features/watchlist/detail/StockMetricDetailSheet";
 import { entryRangeFieldErrors, optionalPositiveNumber, validateEntryRange } from "../domain/inputValidation";
 import { createId as createLocalId } from "../platform/identity";
+import { createComposerOperationGate } from "../domain/composerOperationGate";
 import { useWorkspaceNavigation } from "../hooks/useWorkspaceNavigation";
 import { useSavedStringList } from "../hooks/useSavedStringList";
 import { useWindowPanelFocus } from "../hooks/useWindowPanelFocus";
@@ -1830,6 +1831,7 @@ export default function App() {
   const [selectedEvidenceCard, setSelectedEvidenceCard] = useState<VisualEvidenceCard | null>(null);
   const [selectedHeroPointIndex, setSelectedHeroPointIndex] = useState(0);
   const [recipeBuilderOpen, setRecipeBuilderOpen] = useState(false);
+  const recipeBuilderOperationGate = useRef(createComposerOperationGate()).current;
   const [recipeBuilderEditingId, setRecipeBuilderEditingId] = useState("");
   const [logicSetBuilderOpen, setLogicSetBuilderOpen] = useState(false);
   const [logicSetBuilderEditingId, setLogicSetBuilderEditingId] = useState("");
@@ -1860,9 +1862,11 @@ export default function App() {
   const [selectedDecisionId, setSelectedDecisionId] = useState("");
   const [eyeDetailOpen, setEyeDetailOpen] = useState(false);
   const [eyeComposerOpen, setEyeComposerOpen] = useState(false);
+  const eyeComposerOperationGate = useRef(createComposerOperationGate()).current;
   const [eyeComposerEditingId, setEyeComposerEditingId] = useState("");
   const [eyeComposerFallbackRef, setEyeComposerFallbackRef] = useState<React.RefObject<any>>();
   const [journalComposerOpen, setJournalComposerOpen] = useState(false);
+  const journalComposerOperationGate = useRef(createComposerOperationGate()).current;
   const [journalComposerEditingId, setJournalComposerEditingId] = useState("");
   const journalComposerNewButtonRef = useRef<any>(null);
   const journalSurfaceFallbackRef = useRef<any>(null);
@@ -3151,12 +3155,14 @@ export default function App() {
   };
 
   const openJournalComposer = (invoker?: unknown) => {
+    journalComposerOperationGate.beginSession();
     setJournalValidationSection("");
     journalComposerFocus.captureInvoker(invoker);
     setJournalComposerOpen(true);
   };
 
   const openEyeComposer = (invoker?: unknown) => {
+    eyeComposerOperationGate.beginSession();
     const fallbackRef = tab === "Logic Lab"
       ? logicSurfaceFallbackRef
       : tab === "Stocks"
@@ -3168,6 +3174,7 @@ export default function App() {
   };
 
   const openRecipeBuilder = (invoker?: unknown) => {
+    recipeBuilderOperationGate.beginSession();
     setRecipeValidationStep("");
     recipeBuilderFocus.captureInvoker(invoker);
     setRecipeBuilderOpen(true);
@@ -3802,23 +3809,31 @@ export default function App() {
       setRecipeValidationStep("Review & Outcome");
       return;
     }
-    let savedRecipeId = "";
-    if (recipeBuilderEditingId) {
-      savedRecipeId = (await actions.updateRecipe(recipeBuilderEditingId, {
-        ...recipeForm,
-        conditions: draftConditions,
-      })) ?? "";
-    } else {
-      await actions.addRecipe({
-        ...recipeForm,
-        conditions: draftConditions,
-      });
-    }
-    resetRecipeBuilderDraft();
-    setRecipeBuilderOpen(false);
-    if (savedRecipeId) {
-      setRecipeDetailId(savedRecipeId);
-      setTab("Logic Lab", { recipeId: savedRecipeId });
+    const operation = recipeBuilderOperationGate.beginOperation();
+    if (operation === null) return;
+    try {
+      let savedRecipeId = "";
+      if (recipeBuilderEditingId) {
+        savedRecipeId = (await actions.updateRecipe(recipeBuilderEditingId, {
+          ...recipeForm,
+          conditions: draftConditions,
+        })) ?? "";
+      } else {
+        await actions.addRecipe({
+          ...recipeForm,
+          conditions: draftConditions,
+        });
+      }
+      if (!recipeBuilderOperationGate.isCurrent(operation)) return;
+      resetRecipeBuilderDraft();
+      setRecipeBuilderOpen(false);
+      recipeBuilderOperationGate.endSession();
+      if (savedRecipeId) {
+        setRecipeDetailId(savedRecipeId);
+        setTab("Logic Lab", { recipeId: savedRecipeId });
+      }
+    } finally {
+      recipeBuilderOperationGate.endOperation();
     }
   };
 
@@ -3854,29 +3869,37 @@ export default function App() {
     const plannedEntryHigh = optionalPositiveNumber(eyeForm.plannedEntryHigh, "Entry high");
     validateEntryRange(plannedEntryLow, plannedEntryHigh);
 
-    if (eyeComposerEditingId) {
-      await actions.updateEye(eyeComposerEditingId, {
-        recipeId: eyeForm.recipeId,
-        thesisSnapshot: eyeForm.thesisSnapshot,
-        plannedEntryLow,
-        plannedEntryHigh,
-        invalidationRule: eyeForm.invalidationRule,
-        lastReviewedAt: isoDateDaysAgo(eyeForm.lastReviewedDaysAgo),
-      });
-    } else {
-      await actions.addEye({
-        symbol: stock.symbol,
-        name: stock.name,
-        thesis: eyeForm.thesisSnapshot,
-        recipeId: eyeForm.recipeId,
-        plannedEntryLow,
-        plannedEntryHigh,
-        invalidationRule: eyeForm.invalidationRule,
-        lastReviewedAt: isoDateDaysAgo(eyeForm.lastReviewedDaysAgo),
-      });
+    const operation = eyeComposerOperationGate.beginOperation();
+    if (operation === null) return;
+    try {
+      if (eyeComposerEditingId) {
+        await actions.updateEye(eyeComposerEditingId, {
+          recipeId: eyeForm.recipeId,
+          thesisSnapshot: eyeForm.thesisSnapshot,
+          plannedEntryLow,
+          plannedEntryHigh,
+          invalidationRule: eyeForm.invalidationRule,
+          lastReviewedAt: isoDateDaysAgo(eyeForm.lastReviewedDaysAgo),
+        });
+      } else {
+        await actions.addEye({
+          symbol: stock.symbol,
+          name: stock.name,
+          thesis: eyeForm.thesisSnapshot,
+          recipeId: eyeForm.recipeId,
+          plannedEntryLow,
+          plannedEntryHigh,
+          invalidationRule: eyeForm.invalidationRule,
+          lastReviewedAt: isoDateDaysAgo(eyeForm.lastReviewedDaysAgo),
+        });
+      }
+      if (!eyeComposerOperationGate.isCurrent(operation)) return;
+      resetEyeComposerDraft();
+      setEyeComposerOpen(false);
+      eyeComposerOperationGate.endSession();
+    } finally {
+      eyeComposerOperationGate.endOperation();
     }
-    resetEyeComposerDraft();
-    setEyeComposerOpen(false);
   };
 
   const saveDecision = async () => {
@@ -3887,18 +3910,26 @@ export default function App() {
     if (!decisionForm.timing) { setJournalValidationSection("timing"); return; }
     setJournalValidationSection("");
     const input = { ...decisionForm, action: decisionForm.action as DecisionAction, thesisValid: decisionForm.thesisValid, timing: decisionForm.timing };
-    let savedDecisionId = journalComposerEditingId;
-    if (journalComposerEditingId) {
-      await actions.updateDecision(journalComposerEditingId, input);
-    } else {
-      const decisionId = await actions.logDecision(input);
-      savedDecisionId = decisionId ?? "";
-    }
-    resetJournalComposerDraft();
-    setJournalComposerOpen(false);
-    if (savedDecisionId) {
-      setSelectedDecisionId(savedDecisionId);
-      setTab("Journal", { decisionId: savedDecisionId });
+    const operation = journalComposerOperationGate.beginOperation();
+    if (operation === null) return;
+    try {
+      let savedDecisionId = journalComposerEditingId;
+      if (journalComposerEditingId) {
+        await actions.updateDecision(journalComposerEditingId, input);
+      } else {
+        const decisionId = await actions.logDecision(input);
+        savedDecisionId = decisionId ?? "";
+      }
+      if (!journalComposerOperationGate.isCurrent(operation)) return;
+      resetJournalComposerDraft();
+      setJournalComposerOpen(false);
+      journalComposerOperationGate.endSession();
+      if (savedDecisionId) {
+        setSelectedDecisionId(savedDecisionId);
+        setTab("Journal", { decisionId: savedDecisionId });
+      }
+    } finally {
+      journalComposerOperationGate.endOperation();
     }
   };
 
@@ -5242,6 +5273,7 @@ export default function App() {
             onBack={previousRecipeBuilderStep}
             onSave={() => void saveRecipe()}
             onCancel={() => {
+              recipeBuilderOperationGate.endSession();
               setRecipeBuilderOpen(false);
               resetRecipeBuilderDraft();
             }}
@@ -5310,6 +5342,7 @@ export default function App() {
             onChange={(change) => setEyeForm((current) => ({ ...current, ...change }))}
             onSave={() => void saveEye()}
             onCancel={() => {
+              eyeComposerOperationGate.endSession();
               setEyeComposerOpen(false);
               resetEyeComposerDraft();
             }}
@@ -5456,6 +5489,7 @@ export default function App() {
             onChange={(change) => setDecisionForm((current) => ({ ...current, ...change }))}
             onSave={() => void saveDecision()}
             onCancel={() => {
+              journalComposerOperationGate.endSession();
               setJournalComposerOpen(false);
               resetJournalComposerDraft();
             }}
