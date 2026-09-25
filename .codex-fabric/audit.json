@@ -1,0 +1,224 @@
+{
+  "accepted_at": "2026-09-25T02:05:21Z",
+  "changed_files": [
+    {
+      "additions": 14,
+      "deletions": 3,
+      "path": "packages/layouts/src/PageHeader.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 11,
+      "deletions": 3,
+      "path": "packages/layouts/src/SectionHeader.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 85,
+      "deletions": 51,
+      "path": "src/app/StockLedgerApp.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 5,
+      "deletions": 10,
+      "path": "src/components/WindowPanel.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 27,
+      "deletions": 0,
+      "path": "src/domain/composerOperationGate.ts",
+      "status": "A"
+    },
+    {
+      "additions": 4,
+      "deletions": 1,
+      "path": "src/features/alerts/AlertsScreen.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 14,
+      "deletions": 4,
+      "path": "src/features/recipes/RecipesScreen.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 14,
+      "deletions": 2,
+      "path": "src/features/shell/StockLedgerShell.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 2,
+      "deletions": 0,
+      "path": "src/features/today/TodayScreen.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 5,
+      "deletions": 26,
+      "path": "src/hooks/useWindowPanelFocus.ts",
+      "status": "M"
+    },
+    {
+      "additions": 66,
+      "deletions": 0,
+      "path": "src/lib/webFocusEligibility.ts",
+      "status": "A"
+    },
+    {
+      "additions": 62,
+      "deletions": 0,
+      "path": "tests/composerOperationGate.test.ts",
+      "status": "A"
+    },
+    {
+      "additions": 5,
+      "deletions": 1,
+      "path": "tests/e2e/chg172-primary-surfaces.spec.ts",
+      "status": "M"
+    },
+    {
+      "additions": 285,
+      "deletions": 0,
+      "path": "tests/e2e/v3-focus-geometry.spec.ts",
+      "status": "A"
+    },
+    {
+      "additions": 117,
+      "deletions": 0,
+      "path": "tests/webFocusEligibility.test.ts",
+      "status": "A"
+    }
+  ],
+  "checks": [
+    {
+      "command": "/bin/zsh -lc \"rtk git status --short --branch && rtk git rev-parse HEAD && rtk git show -s --format='%H%n%P' /tmp/CF-1aad0c334ce856bfff0aa84d/artifact-commit-worktree/HEAD && rtk git -C /tmp/CF-1aad0c334ce856bfff0aa84d/artifact-commit-worktree status --short --branch && rtk git ls-remote --heads origin refs/heads/main refs/heads/codex/stockledger-prod-c17-golden-ui-v3-evidence-bind-verify-v3 refs/heads/project-os-artifacts/stockledger/stockledger-prod-c17-golden-ui-v3-evidence-bind-verify-v3 refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c17-golden-ui-v3-evidence-bind-verify-v3 refs/heads/codex/stockledger-prod-c17-golden-ui-v3-focus-geometry-zoom-fix-v2 refs/heads/project-os-artifacts/stockledger/stockledger-prod-c17-golden-ui-v3-focus-geometry-zoom-fix-v2 refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c17-golden-ui-v3-focus-geometry-zoom-fix-v2\"",
+      "exit_code": 128,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git -C /tmp/CF-1aad0c334ce856bfff0aa84d/artifact-commit-worktree rev-parse HEAD && rtk git -C /tmp/CF-1aad0c334ce856bfff0aa84d/artifact-commit-worktree show -s --format='%H%n%P' HEAD && rtk git -C /tmp/CF-1aad0c334ce856bfff0aa84d/artifact-commit-worktree status --short --branch && rtk git ls-remote --heads origin refs/heads/main refs/heads/codex/stockledger-prod-c17-golden-ui-v3-evidence-bind-verify-v3 refs/heads/project-os-artifacts/stockledger/stockledger-prod-c17-golden-ui-v3-evidence-bind-verify-v3 refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c17-golden-ui-v3-evidence-bind-verify-v3 refs/heads/codex/stockledger-prod-c17-golden-ui-v3-focus-geometry-zoom-fix-v2 refs/heads/project-os-artifacts/stockledger/stockledger-prod-c17-golden-ui-v3-focus-geometry-zoom-fix-v2 refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c17-golden-ui-v3-focus-geometry-zoom-fix-v2\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git -C /tmp/CF-1aad0c334ce856bfff0aa84d/artifact-commit-worktree push origin HEAD:refs/heads/project-os-artifacts/stockledger/stockledger-prod-c17-golden-ui-v3-evidence-bind-verify-v3 && rtk git ls-remote --heads origin refs/heads/project-os-artifacts/stockledger/stockledger-prod-c17-golden-ui-v3-evidence-bind-verify-v3 && rtk git fetch origin refs/heads/project-os-artifacts/stockledger/stockledger-prod-c17-golden-ui-v3-evidence-bind-verify-v3:refs/remotes/origin/project-os-artifacts/stockledger/stockledger-prod-c17-golden-ui-v3-evidence-bind-verify-v3 && rtk git show -s --format='%H%n%P' refs/remotes/origin/project-os-artifacts/stockledger/stockledger-prod-c17-golden-ui-v3-evidence-bind-verify-v3 && rtk git diff-tree --no-commit-id --name-only -r refs/remotes/origin/project-os-artifacts/stockledger/stockledger-prod-c17-golden-ui-v3-evidence-bind-verify-v3 && rtk git worktree remove /tmp/CF-1aad0c334ce856bfff0aa84d/artifact-commit-worktree\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git status --porcelain=v1 && rtk git branch --show-current && rtk git rev-parse HEAD && rtk git show -s --format='%T' 92b64a20c620da38422c22e73664eba395b58f17 && rtk git merge-base --is-ancestor ed377bb173387ebf56a4919ac4282d136c56e21d 92b64a20c620da38422c22e73664eba395b58f17; printf 'base_ancestor_exit=%s\\\\n' \\\"\"'$?\"; rtk git ls-remote --heads origin refs/heads/main refs/heads/codex/stockledger-prod-c17-golden-ui-v3-evidence-bind-verify-v3 refs/heads/project-os-artifacts/stockledger/stockledger-prod-c17-golden-ui-v3-evidence-bind-verify-v3 refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c17-golden-ui-v3-evidence-bind-verify-v3 refs/heads/codex/stockledger-prod-c17-golden-ui-v3-focus-geometry-zoom-fix-v2 refs/heads/project-os-artifacts/stockledger/stockledger-prod-c17-golden-ui-v3-focus-geometry-zoom-fix-v2 refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c17-golden-ui-v3-focus-geometry-zoom-fix-v2 && rtk git show -s --format='\"'%H%n%P' refs/remotes/origin/project-os-artifacts/stockledger/stockledger-prod-c17-golden-ui-v3-evidence-bind-verify-v3 && rtk git diff-tree --no-commit-id --name-only -r refs/remotes/origin/project-os-artifacts/stockledger/stockledger-prod-c17-golden-ui-v3-evidence-bind-verify-v3 && rtk git diff --quiet 92b64a20c620da38422c22e73664eba395b58f17 refs/heads/codex/stockledger-prod-c17-golden-ui-v3-evidence-bind-verify-v3; printf 'candidate_diff_exit=%s\\\\n' \\\"\"'$?\" && rtk git diff --quiet && printf '\"'worktree_clean=true\\\\n'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    }
+  ],
+  "codex": {
+    "cli_version": "codex-cli 0.156.1",
+    "configured_model": "gpt-6-luna",
+    "event_count": 14,
+    "provider_reported_model": null,
+    "reasoning_effort": "xhigh",
+    "terminal_type": "turn.completed",
+    "usage": {
+      "cache_hit_percent": 90.75,
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 509440,
+      "fresh_input_tokens": 51908,
+      "input_tokens": 561348,
+      "non_reasoning_output_tokens": 5805,
+      "output_tokens": 15176,
+      "reasoning_output_tokens": 9371,
+      "total_processed_tokens": 576524
+    },
+    "warnings": []
+  },
+  "commits": [
+    {
+      "sha": "92b64a20c620da38422c22e73664eba395b58f17",
+      "subject": "Fix Golden UI v3 focus and compact reachability"
+    }
+  ],
+  "diff": {
+    "additions": 716,
+    "changed_files": 15,
+    "commit_count": 1,
+    "deletions": 101
+  },
+  "error_code": null,
+  "evidence_manifest": {
+    "count": 0,
+    "items": [],
+    "version": 1
+  },
+  "evidence_publisher_release": "1.2.5-dashboard-controls-candidate",
+  "fabric_capture": {
+    "applied": false,
+    "paths_before": 0,
+    "transient_untracked_removed": {
+      "count": 0,
+      "items": []
+    }
+  },
+  "fabric_release": "1.2.5-dashboard-controls-candidate",
+  "failure_class": null,
+  "finished_at": "2026-09-25T02:24:28Z",
+  "git": {
+    "base_is_ancestor": true,
+    "base_sha": "ed377bb173387ebf56a4919ac4282d136c56e21d",
+    "branch": "codex/stockledger-prod-c17-golden-ui-v3-evidence-bind-verify-v3",
+    "detached_verify": false,
+    "head_sha": "92b64a20c620da38422c22e73664eba395b58f17",
+    "remote_exact_head": true,
+    "remote_head_sha": "92b64a20c620da38422c22e73664eba395b58f17",
+    "target_branch": "main",
+    "target_drifted_since_acceptance": false,
+    "target_head_observed_after_execution": "ed377bb173387ebf56a4919ac4282d136c56e21d",
+    "work_branch": "codex/stockledger-prod-c17-golden-ui-v3-evidence-bind-verify-v3",
+    "worktree_clean": true
+  },
+  "instructions": {
+    "files": [],
+    "total_bytes": 0,
+    "warning": null
+  },
+  "job_id": "CF-1aad0c334ce856bfff0aa84d",
+  "kind": "codex-fabric-audit-evidence",
+  "locator": {
+    "branch": "codex-fabric/evidence/stockledger/stockledger-prod-c17-golden-ui-v3-evidence-bind-verify-v3",
+    "path": ".codex-fabric/audit.json",
+    "ref": "refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c17-golden-ui-v3-evidence-bind-verify-v3"
+  },
+  "operation": "VERIFY",
+  "policy": {
+    "environment_policy_sha256": "e077daca74297b3c30bee8989f00f8ca5338f7610b4d016a6c48db524205d064",
+    "fabric_release": "1.2.5-dashboard-controls-candidate",
+    "policy_sha256": "123615bf2f6e57dcac197e49ca98ceac59ada86a55e2c84445ea5d00812c0833",
+    "registry_sha256": "af81b8552f9d6a33847310e3c6bcd2d48401782b963a58efd2993e93570cb4aa"
+  },
+  "project_id": "stockledger",
+  "recovery": {
+    "model_rerun_safe": false,
+    "recovery_required": false,
+    "retry_safe": false,
+    "retry_scope": null,
+    "worktree_retained": true
+  },
+  "request": "stockledger-prod-c17-golden-ui-v3-evidence-bind-verify-v3",
+  "schema_version": 1,
+  "started_at": "2026-09-25T02:22:56Z",
+  "status": "EXECUTED_CHANGE",
+  "timing": {
+    "execution_seconds": 92,
+    "queue_seconds": 1055,
+    "total_seconds": 1147
+  },
+  "transport": {
+    "bytes": 10572,
+    "envelope": "FABRIC/2",
+    "prompt_bytes": 10197,
+    "prompt_sha256": "89fadf173e631686f7e28fa8522898ef2ab39f0bc02abf7bb51bd7bb6ea04a8c",
+    "sha256": "1aad0c334ce856bfff0aa84ddc6178db2c79fa503071e13dce8992ecb93e4460"
+  }
+}
