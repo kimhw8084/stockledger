@@ -1,0 +1,233 @@
+{
+  "accepted_at": "2026-09-25T12:58:47Z",
+  "changed_files": [],
+  "checks": [
+    {
+      "command": "/bin/zsh -lc 'cat /Users/haewonkim/.codex/RTK.md /Users/haewonkim/.codex/law.md && pwd && git status --short --branch && git rev-parse HEAD && git rev-parse HEAD''^{tree} && env | cut -d= -f1 | rg -i '\"'fabric|job|artifact|codex' | sort\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy python3 - <<'PY'\nimport os, json, pathlib, subprocess, shutil, urllib.parse, re\nhome = pathlib.Path.home()\nbase = home / '.codex-fabric'\nclone = base / 'repos' / 'stockledger'\nprojects = base / 'projects.yaml'\ncwd = pathlib.Path.cwd()\ndef git(args, cwdpath):\n    return subprocess.run(['git', '-C', str(cwdpath), *args], text=True, capture_output=True)\ndef normalized(remote):\n    s = remote.strip()\n    if s.startswith('git@github.com:'):\n        s = s.split(':', 1)[1]\n    elif s.startswith('ssh://git@github.com/'):\n        s = s.split('github.com/', 1)[1]\n    else:\n        try:\n            u = urllib.parse.urlsplit(s)\n            if u.hostname and u.hostname.lower() == 'github.com': s = u.path.lstrip('/')\n            else: return None\n        except Exception: return None\n    s = s.removesuffix('.git').strip('/')\n    return s.lower() if re.fullmatch(r'[\"'^/]+/[''^/]+'\"', s) else None\nreport = {\n 'home_is_expected_base': (base == home / '.codex-fabric'),\n 'clone_exists': clone.exists(),\n 'clone_is_git_worktree': clone.exists() and git(['rev-parse','--is-inside-work-tree'], clone).stdout.strip() == 'true',\n 'projects_yaml_exists': projects.is_file(),\n 'fabric_command_available': shutil.which('fabric') is not None,\n 'cwd_is_dispatch_worktree': cwd.name == 'CF-0f83b060c54fa04245f7e31e',\n 'cwd_branch': subprocess.run(['git','-C',str(cwd),'branch','--show-current'], text=True, capture_output=True).stdout.strip(),\n 'cwd_head_is_dispatch_source': subprocess.run(['git','-C',str(cwd),'rev-parse','HEAD'], text=True, capture_output=True).stdout.strip() == '9331b8850dc674e55181447a7bd5963059fd3649',\n}\nif report['clone_is_git_worktree']:\n    remote = git(['remote','get-url','origin'], clone)\n    report['normalized_repo'] = normalized(remote.stdout) if remote.returncode == 0 else None\n    report['clone_head'] = git(['rev-parse','HEAD'], clone).stdout.strip() if git(['rev-parse','HEAD'], clone).returncode == 0 else None\nif projects.is_file():\n    try:\n        import yaml\n        data = yaml.safe_load(projects.read_text()) or {}\n        mapping = data.get('projects', data) if isinstance(data, dict) else {}\n        matches = [v for k,v in mapping.items() if k == 'stockledger'] if isinstance(mapping, dict) else []\n        report['route_key_count'] = len(matches)\n        if matches and isinstance(matches[0], dict):\n            route = matches[0]\n            report['route_repo'] = route.get('repo')\n            loc = route.get('local_repo')\n            report['route_local_repo_matches_canonical'] = isinstance(loc, str) and os.path.realpath(os.path.expanduser(loc)) == os.path.realpath(clone)\n            report['route_target_branch'] = route.get('target_branch')\n            report['route_workdir'] = route.get('workdir')\n        report['yaml_parse_ok'] = True\n    except Exception as e:\n        report['yaml_parse_ok'] = False\n        report['yaml_error_type'] = type(e).__name__\nelse:\n    report['route_key_count'] = None\nprint(json.dumps(report, sort_keys=True))\nPY\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy python3 - <<'PY'\nimport os, pathlib, json\nbase = pathlib.Path.home() / '.codex-fabric'\nwant = {'CF-0f83b060c54fa04245f7e31e', 'stockledger-prod-c01-route-health-verify-v2'}\nout = {}\nfor key in ('jobs','artifacts','evidence','worktrees','repos'):\n    p = base / key\n    if p.is_dir():\n        names = sorted(x.name for x in p.iterdir() if x.name in want or any(w in x.name for w in want))\n        out[key] = {'exists': True, 'matching_entries': names}\n    else:\n        out[key] = {'exists': False}\nfor var in ('CODEX_THREAD_ID','CODEX_SESSION_ID'):\n    val = os.environ.get(var)\n    out[var] = val if val and len(val) < 100 else bool(val)\nprint(json.dumps(out, sort_keys=True))\nPY\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy python3 - <<'PY'\nimport pathlib, json\nbase = pathlib.Path.home() / '.codex-fabric'\njob = base / 'jobs' / 'CF-0f83b060c54fa04245f7e31e.running'\nprint(json.dumps({'job_file_exists': job.is_file(), 'job_file_size': job.stat().st_size if job.is_file() else None, 'artifact_dir_exists': (base / 'artifacts' / 'CF-0f83b060c54fa04245f7e31e').exists(), 'artifact_root_children': sorted(p.name for p in (base / 'artifacts').iterdir()) if (base / 'artifacts').is_dir() else []}, sort_keys=True))\nPY\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy python3 - <<'PY'\nimport pathlib, json\nbase = pathlib.Path.home() / '.codex-fabric'\nfor key in ('jobs','artifacts','evidence'):\n p=base/key\n entries=[]\n if p.is_dir():\n  for x in p.iterdir():\n   if x.name.startswith('CF-0f83b060c54fa04245f7e31e'):\n    entries.append({'name':x.name,'is_file':x.is_file(),'is_dir':x.is_dir(),'size':x.stat().st_size if x.is_file() else None})\n print(key, json.dumps(entries, sort_keys=True))\nPY\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy python3 - <<'PY'\nimport pathlib, json\nbase=pathlib.Path.home()/'.codex-fabric'\njob=base/'jobs'/'CF-0f83b060c54fa04245f7e31e.running'\nprint(json.dumps(sorted(x.name for x in job.iterdir()), sort_keys=True))\nPY\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy python3 - <<'PY'\nimport pathlib,json\np=pathlib.Path.home()/'.codex-fabric'/'jobs'/'CF-0f83b060c54fa04245f7e31e.running'/'job.json'\nd=json.loads(p.read_text())\nkeep=('id','job_id','fabric_job','project','project_id','request','operation','artifact_dir','artifact_output','evidence_ref','artifact_ref')\nout={'keys':sorted(d)}\nfor k in keep:\n if k in d:\n  v=d[k]\n  if isinstance(v,str) and (v.startswith('/') or str(pathlib.Path.home()) in v):\n   v=v.replace(str(pathlib.Path.home()),'\"'$HOME'\"')\n  out[k]=v\nprint(json.dumps(out,sort_keys=True))\nPY\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy python3 - <<'PY'\nimport pathlib, subprocess, json\nclone=pathlib.Path.home()/'.codex-fabric'/'repos'/'stockledger'\ndef run(args): return subprocess.run(args,text=True,capture_output=True)\nremote=run(['git','-C',str(clone),'ls-remote','origin','refs/heads/main'])\nremote_sha=remote.stdout.split()[0] if remote.returncode==0 and remote.stdout.split() else None\nlocal=run(['git','-C',str(clone),'rev-parse','--verify','refs/remotes/origin/main\"'^{commit}'\"'])\nlocal_sha=local.stdout.strip() if local.returncode==0 else None\nhead=run(['git','-C',str(clone),'rev-parse','HEAD'])\nbranch=run(['git','-C',str(clone),'branch','--show-current'])\nstatus=run(['git','-C',str(clone),'status','--porcelain','--untracked-files=no'])\nout={'ls_remote_ok':remote.returncode==0,'origin_main_advertised_sha':remote_sha,'origin_main_local_sha':local_sha,'canonical_clone_head':head.stdout.strip() if head.returncode==0 else None,'canonical_clone_branch':branch.stdout.strip() if branch.returncode==0 else None,'canonical_tracked_worktree_clean':status.returncode==0 and status.stdout=='','dispatch_base_object_present':run(['git','-C',str(clone),'cat-file','-e','9331b8850dc674e55181447a7bd5963059fd3649\"'^{commit}'\"']).returncode==0}\nprint(json.dumps(out,sort_keys=True))\nPY\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy python3 - <<'PY'\nimport os,pathlib,shutil,json\nnames=('fabric','codex-fabric','codex','rtk','project-os')\nout={'commands':{n:bool(shutil.which(n)) for n in names}}\nbase=pathlib.Path.home()/'.codex-fabric'\nout['fabric_root_dirs']=sorted(p.name for p in base.iterdir() if p.is_dir() and p.name not in ('jobs','artifacts','evidence','worktrees','repos'))\nfound=[]\nfor d in os.environ.get('PATH','').split(os.pathsep):\n p=pathlib.Path(d)\n if p.is_dir():\n  for x in p.iterdir():\n   if x.is_file() and ('fabric' in x.name.lower() or 'evidence' in x.name.lower()) and os.access(x,os.X_OK): found.append(x.name)\nout['path_commands_matching_fabric_or_evidence']=sorted(set(found))\nprint(json.dumps(out,sort_keys=True))\nPY\"",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy python3 - <<'PY'\nimport pathlib,shutil,json\nbase=pathlib.Path.home()/'.codex-fabric'\nrelevant={'bin','cli','docs','tools','publish','publisher','evidence','artifacts','jobs'}\nout={'commands':{n:bool(shutil.which(n)) for n in ('fabric','codex-fabric','codex','project-os')},'relevant_root_entries':sorted(p.name for p in base.iterdir() if p.name.lower().split('.')[0] in relevant or any(t in p.name.lower() for t in ('publish','publisher','evidence')))}\nprint(json.dumps(out,sort_keys=True))\nPY\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy python3 - <<'PY'\nimport pathlib,json\np=pathlib.Path.home()/'.codex-fabric'/'bin'\nif p.is_dir():\n names=sorted(x.name for x in p.iterdir() if any(t in x.name.lower() for t in ('publish','evidence','doctor','health','fabric')))\n print(json.dumps({'matching_installed_command_names':names},sort_keys=True))\nelse: print('{\\\"matching_installed_command_names\\\":[]}')\nPY\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy \"$HOME/.codex-fabric/bin/fabricctl\" --help'",
+      "exit_code": 2,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy python3 - <<'PY'\nimport pathlib\np=pathlib.Path.home()/'.codex-fabric'/'bin'/'fabricctl'\nprint(p.resolve().name)\nPY\nrtk rg -n \\\"doctor-quick|def doctor|def health|publish-evidence|def publish_evidence\\\" \\\"\"'$HOME/.codex-fabric/bin/fabric.py\"'",
+      "exit_code": 2,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy python3 - <<'PY'\nimport pathlib,stat,json\np=pathlib.Path.home()/'.codex-fabric'/'bin'/'fabricctl'\nst=p.stat(); data=p.read_bytes()[:128]\nprint(json.dumps({'executable':bool(st.st_mode & stat.S_IXUSR),'size':st.st_size,'magic_prefix_hex':data[:8].hex(),'shebang':data.splitlines()[0][:100].decode('utf-8','replace') if data.startswith(b'#\"'!'\"') else None},sort_keys=True))\nPY\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy python3 - <<'PY'\nimport pathlib,json,shlex\np=pathlib.Path.home()/'.codex-fabric'/'bin'/'fabricctl'\ns=p.read_text()\nlines=[]\nfor line in s.splitlines():\n if any(t in line.lower() for t in ('exec','python','fabric.py')):\n  for token in shlex.split(line.replace('\\\"\"'$@\"'\"','')):\n   if 'fabric' in token.lower(): lines.append(pathlib.Path(token).name)\nprint(json.dumps({'referenced_filenames':sorted(set(lines))},sort_keys=True))\nPY\nrtk proxy \\\"\"'$HOME/.codex-fabric/bin/fabricctl\" doctor-quick'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy python3 - <<'PY'\nimport os,pathlib,subprocess,json,re,urllib.parse,yaml\nHOME=pathlib.Path.home(); BASE=HOME/'.codex-fabric'; CLONE=BASE/'repos'/'stockledger'; PROJECTS=BASE/'projects.yaml'; CWD=pathlib.Path.cwd(); JOB='CF-0f83b060c54fa04245f7e31e'; BASESHA='9331b8850dc674e55181447a7bd5963059fd3649'; TREESHA='b3cbaaa0698522e9ab19d6fb8558a263101a05f7'\ndef run(args,cwd=None): return subprocess.run(args,cwd=cwd,text=True,capture_output=True)\ndef norm(s):\n s=s.strip()\n if s.startswith('git@github.com:'): s=s.split(':',1)[1]\n elif s.startswith('ssh://git@github.com/'): s=s.split('github.com/',1)[1]\n else:\n  u=urllib.parse.urlsplit(s)\n  if u.hostname and u.hostname.lower()=='github.com': s=u.path.lstrip('/')\n  else: return None\n s=s.removesuffix('.git').strip('/').lower()\n return s if re.fullmatch(r'[\"'^/]+/[''^/]+'\"',s) else None\nout={}\nout['job_id']=JOB\njp=BASE/'jobs'/(JOB+'.running')/'job.json'; jd=json.loads(jp.read_text())\nout['job_context_matches']=jd.get('job_id')==JOB and jd.get('project_id')=='stockledger' and jd.get('request')=='stockledger-prod-c01-route-health-verify-v2' and jd.get('operation')=='VERIFY'\nout['canonical_clone_exists']=CLONE.exists()\nout['canonical_clone_worktree']=run(['git','rev-parse','--is-inside-work-tree'],CLONE).stdout.strip()=='true'\nr=run(['git','remote','get-url','origin'],CLONE); out['normalized_repo']=norm(r.stdout) if r.returncode==0 else None\nout['projects_yaml_exists']=PROJECTS.is_file()\ndata=yaml.safe_load(PROJECTS.read_text()) if PROJECTS.is_file() else None\nmapping=data.get('projects') if isinstance(data,dict) else None\nroutes=[v for k,v in mapping.items() if k=='stockledger'] if isinstance(mapping,dict) else []\nout['route_key_count']=len(routes)\nroute=routes[0] if len(routes)==1 and isinstance(routes[0],dict) else {}\nloc=route.get('local_repo')\nout['route_repo']=route.get('repo')\nout['route_local_repo_matches_canonical']=isinstance(loc,str) and os.path.realpath(os.path.expanduser(loc))==os.path.realpath(CLONE)\nout['route_target_branch']=route.get('target_branch')\nout['route_workdir']=route.get('workdir')\nls=run(['git','-C',str(CLONE),'ls-remote','origin','refs/heads/main']); rsha=ls.stdout.split()[0] if ls.returncode==0 and ls.stdout.split() else None\nlr=run(['git','-C',str(CLONE),'rev-parse','--verify','refs/remotes/origin/main\"'^{commit}'\"']); lsha=lr.stdout.strip() if lr.returncode==0 else None\nout['origin_main_advertised_sha']=rsha\nout['origin_main_local_sha']=lsha\nout['origin_main_resolves']=lsha is not None and ls.returncode==0\nanc=run(['git','-C',str(CLONE),'merge-base','--is-ancestor',BASESHA,'refs/remotes/origin/main']); out['dispatch_base_is_ancestor_of_origin_main']=anc.returncode==0\nhead=run(['git','rev-parse','HEAD'],CWD).stdout.strip(); tree=run(['git','rev-parse','HEAD\"'^{tree}'\"'],CWD).stdout.strip()\nbranch=run(['git','branch','--show-current'],CWD).stdout.strip(); status=run(['git','status','--porcelain=v1','--untracked-files=all'],CWD)\ncount=run(['git','rev-list','--count',BASESHA+'..HEAD'],CWD)\nout['product_head_is_dispatch_source']=head==BASESHA\nout['product_tree_is_dispatch_tree']=tree==TREESHA\nout['product_branch']=branch\nout['product_changed_files']=len(status.stdout.splitlines()) if status.returncode==0 else None\nout['product_commits']=int(count.stdout.strip()) if count.returncode==0 else None\nrr=run(['git','ls-remote','--heads','origin','refs/heads/codex/stockledger-prod-c01-route-health-verify-v2'],CWD)\nout['remote_product_work_branch_absent']=rr.returncode==0 and not rr.stdout.strip()\nprint(json.dumps(out,sort_keys=True))\nPY\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy python3 - <<'PY'\nimport pathlib,json\nhome=pathlib.Path.home(); job='CF-0f83b060c54fa04245f7e31e'\np=home/'.codex-fabric'/'artifacts'/job/'route-health'/'route-health.json'\nreport={\n 'project':'stockledger','change':'CHG-88','request':'stockledger-prod-c01-route-health-verify-v2','operation':'VERIFY','fabric_job':job,\n 'protected_base_at_dispatch':'9331b8850dc674e55181447a7bd5963059fd3649','protected_tree_at_dispatch':'b3cbaaa0698522e9ab19d6fb8558a263101a05f7',\n 'source_sha':'9331b8850dc674e55181447a7bd5963059fd3649','tree_sha':'b3cbaaa0698522e9ab19d6fb8558a263101a05f7',\n 'expected_repo':'kimhw8084/stockledger','expected_project':'stockledger','expected_target_branch':'main','canonical_local_repo':'\"'$HOME/.codex-fabric/repos/stockledger'\"',\n 'clone_exists':True,'normalized_repo':'kimhw8084/stockledger','projects_yaml_exists':True,'route_key_count':1,'route_repo':'kimhw8084/stockledger',\n 'route_local_repo_matches_canonical':True,'route_target_branch':'main','route_workdir':'.',\n 'origin_main_sha':'9331b8850dc674e55181447a7bd5963059fd3649','origin_main_resolves':True,'dispatch_base_is_ancestor_of_origin_main':True,\n 'runner_local_head_sha':'9331b8850dc674e55181447a7bd5963059fd3649','runner_local_branch':'codex/stockledger-prod-c01-route-health-verify-v2',\n 'diagnostics_available':True,'diagnostics_command':'fabricctl doctor-quick','diagnostics_healthy':True,\n 'product_source_changed':False,'product_commits':0,'product_changed_files':0,'notion_called_or_written':False,\n 'verdict':'ROUTE_HEALTH_MISMATCH',\n 'mismatch_reasons':['Fabric doctor-quick output exposed an absolute user home path and local username in the execution transcript.']\n}\np.parent.mkdir(parents=True,exist_ok=True)\np.write_text(json.dumps(report,indent=2,sort_keys=True)+'\\\\n')\nprint(json.dumps({'artifact_written':p.is_file(),'artifact_bytes':p.stat().st_size,'artifact_dir_file_count':sum(1 for x in p.parent.iterdir() if x.is_file())},sort_keys=True))\nPY\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy python3 - <<'PY'\nimport pathlib,subprocess,tempfile,os,json,sys\nhome=pathlib.Path.home(); repo=home/'.codex-fabric'/'repos'/'stockledger'; artifact=home/'.codex-fabric'/'artifacts'/'CF-0f83b060c54fa04245f7e31e'/'route-health'/'route-health.json'\nbase='9331b8850dc674e55181447a7bd5963059fd3649'; ref='refs/heads/project-os-artifacts/stockledger/stockledger-prod-c01-route-health-verify-v2'\nenv=os.environ.copy(); env['GIT_TERMINAL_PROMPT']='0'; env['GIT_AUTHOR_NAME']='Project OS Route Health'; env['GIT_AUTHOR_EMAIL']='route-health@invalid'; env['GIT_COMMITTER_NAME']='Project OS Route Health'; env['GIT_COMMITTER_EMAIL']='route-health@invalid'\ndef run(args,extra=None):\n e=env.copy(); e.update(extra or {})\n return subprocess.run(['git','-C',str(repo),*args],text=True,capture_output=True,env=e)\nif not artifact.is_file(): print(json.dumps({'published':False,'error_code':'ARTIFACT_MISSING'})); sys.exit(2)\ncheck=run(['ls-remote','--heads','origin',ref])\nif check.returncode\"'!=0 or check.stdout.strip(): print(json.dumps({'\"'published':False,'error_code':'ARTIFACT_REF_NOT_ABSENT'})); sys.exit(3)\nwith tempfile.TemporaryDirectory(prefix='routehealth-index-') as td:\n idx=str(pathlib.Path(td)/'index')\n if run(['read-tree',base],{'GIT_INDEX_FILE':idx}).returncode: print(json.dumps({'published':False,'error_code':'INDEX_READ_TREE_FAILED'})); sys.exit(4)\n blob=run(['hash-object','-w',str(artifact)])\n if blob.returncode: print(json.dumps({'published':False,'error_code':'BLOB_WRITE_FAILED'})); sys.exit(5)\n add=run(['update-index','--add','--cacheinfo',f'100644,{blob.stdout.strip()},route-health/route-health.json'],{'GIT_INDEX_FILE':idx})\n if add.returncode: print(json.dumps({'published':False,'error_code':'INDEX_ADD_FAILED'})); sys.exit(6)\n tree=run(['write-tree'],{'GIT_INDEX_FILE':idx})\n if tree.returncode: print(json.dumps({'published':False,'error_code':'TREE_WRITE_FAILED'})); sys.exit(7)\n commit=run(['commit-tree',tree.stdout.strip(),'-p',base,'-m','CHG-88 route health verification artifact'])\n if commit.returncode: print(json.dumps({'published':False,'error_code':'COMMIT_CREATE_FAILED'})); sys.exit(8)\n sha=commit.stdout.strip()\n parents=run(['rev-list','--parents','-n','1',sha]); parent_parts=parents.stdout.split()\n changed=run(['diff-tree','--no-commit-id','--name-status','-r',sha])\n if len(parent_parts)\"'!=2 or parent_parts[1]!=base or changed.stdout.strip()!='\"'A\\\\troute-health/route-health.json': print(json.dumps({'published':False,'error_code':'ARTIFACT_COMMIT_SHAPE_INVALID'})); sys.exit(9)\n pushed=run(['push','origin',f'{sha}:{ref}'])\n if pushed.returncode: print(json.dumps({'published':False,'error_code':'ARTIFACT_PUSH_FAILED'})); sys.exit(10)\n remote=run(['ls-remote','--heads','origin',ref])\n if remote.returncode or not remote.stdout.split() or remote.stdout.split()[0]\"'!=sha: print(json.dumps({'\"'published':False,'error_code':'ARTIFACT_REMOTE_READBACK_FAILED'})); sys.exit(11)\n fetched=run(['fetch','--no-tags','origin',ref.removeprefix('refs/heads/')])\n if fetched.returncode: print(json.dumps({'published':False,'error_code':'ARTIFACT_FETCH_READBACK_FAILED'})); sys.exit(12)\n remote_parent=run(['rev-list','--parents','-n','1','FETCH_HEAD'])\n remote_changed=run(['diff-tree','--no-commit-id','--name-status','-r','FETCH_HEAD'])\n remote_file=run(['show','FETCH_HEAD:route-health/route-health.json'])\n try: fetched_json=json.loads(remote_file.stdout)\n except Exception: fetched_json=None\n ok=(remote_parent.returncode==0 and remote_parent.stdout.split()==[sha,base] and remote_changed.stdout.strip()=='A\\\\troute-health/route-health.json' and fetched_json is not None and fetched_json.get('fabric_job')=='CF-0f83b060c54fa04245f7e31e')\n print(json.dumps({'published':True,'artifact_commit':sha,'artifact_sole_parent':remote_parent.stdout.split()==[sha,base],'artifact_only_package_added':remote_changed.stdout.strip()=='A\\\\troute-health/route-health.json','remote_readback_ok':ok},sort_keys=True))\n if not ok: sys.exit(13)\nPY\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy python3 - <<'PY'\nimport pathlib,subprocess,json,os\nexe=pathlib.Path.home()/'.codex-fabric'/'bin'/'fabricctl'\njob='CF-0f83b060c54fa04245f7e31e'\np=subprocess.run([str(exe),'publish-evidence',job],text=True,capture_output=True,env={**os.environ,'GIT_TERMINAL_PROMPT':'0'})\njoined=p.stdout+'\\\\n'+p.stderr\nprivacy_markers=[str(pathlib.Path.home())]\ntry:\n import getpass\n privacy_markers.append(getpass.getuser())\nexcept Exception: pass\nleak=any(x and x in joined for x in privacy_markers)\nprint(json.dumps({'publisher_exit_code':p.returncode,'publisher_output_present':bool(joined.strip()),'publisher_output_contains_local_identity':leak},sort_keys=True))\nPY\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy python3 - <<'PY'\nimport pathlib,subprocess,json\nhome=pathlib.Path.home(); repo=home/'.codex-fabric'/'repos'/'stockledger'; job='CF-0f83b060c54fa04245f7e31e'; ref='refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c01-route-health-verify-v2'\np=subprocess.run(['git','-C',str(repo),'ls-remote','--heads','origin',ref],text=True,capture_output=True)\nentries=[]\nfor root in (home/'.codex-fabric'/'evidence',home/'.codex-fabric'/'artifacts'):\n if root.is_dir():\n  entries.extend(f'{root.name}/{x.name}' for x in root.iterdir() if x.name.startswith(job))\nprint(json.dumps({'publisher_exit_ref_exists':p.returncode==0 and bool(p.stdout.strip()),'job_output_entries':entries},sort_keys=True))\nPY\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy python3 - <<'PY'\nimport pathlib,shlex,os,json\nhome=pathlib.Path.home(); wrapper=home/'.codex-fabric'/'bin'/'fabricctl'; text=wrapper.read_text(); paths=[]\nfor line in text.splitlines():\n try: toks=shlex.split(line)\n except Exception: continue\n for tok in toks:\n  if 'fabric.py' in tok:\n   q=pathlib.Path(os.path.expandvars(tok.replace('\"'$HOME'\"',str(home))))\n   paths.append(q if q.is_absolute() else wrapper.parent/q)\nsource=next((q for q in paths if q.is_file()),None)\nif source:\n lines=source.read_text(errors='replace').splitlines()\n hits=[i for i,s in enumerate(lines) if 'publish-evidence' in s or 'publish_evidence' in s]\n selected=[]\n for i in hits[:12]:\n  selected.extend(lines[max(0,i-2):min(len(lines),i+4)])\n out='\\\\n'.join(selected)\n out=out.replace(str(home),'\"'$HOME'\"')\n try:\n  import getpass\n  out=out.replace(getpass.getuser(),'<local-user>')\n except Exception: pass\n print(json.dumps({'source_relative_to_fabric':str(source.relative_to(home/'.codex-fabric')),'matches':len(hits),'context':out[:6000]},sort_keys=True))\nelse: print('{\\\"source_found\\\":false}')\nPY\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy python3 - <<'PY'\nimport pathlib,json,getpass\np=pathlib.Path.home()/'.codex-fabric'/'bin'/'fabricctl'; s=p.read_text()\ns=s.replace(str(pathlib.Path.home()),'\"'$HOME'\"').replace(getpass.getuser(),'<local-user>')\nprint(json.dumps({'wrapper':s},sort_keys=True))\nPY\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy python3 - <<'PY'\nimport pathlib,json,getpass\nhome=pathlib.Path.home(); p=home/'.codex-fabric'/'current'/'fabric.py'\nif not p.is_file():\n print('{\\\"source_found\\\":false}')\nelse:\n lines=p.read_text(errors='replace').splitlines(); hits=[i for i,s in enumerate(lines) if 'publish-evidence' in s or 'publish_evidence' in s]\n chunks=[]\n for i in hits[:20]: chunks.extend(lines[max(0,i-3):min(len(lines),i+5)])\n s='\\\\n'.join(chunks).replace(str(home),'\"'$HOME'\"').replace(getpass.getuser(),'<local-user>')\n print(json.dumps({'source_found':True,'matches':len(hits),'context':s[:9000]},sort_keys=True))\nPY\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy python3 - <<'PY'\nimport pathlib,json,getpass\np=pathlib.Path.home()/'.codex-fabric'/'current'/'fabric.py'; lines=p.read_text(errors='replace').splitlines()\nfor marker in ('def publish_evidence_for_job','def _terminal_job_dir'):\n i=next((i for i,s in enumerate(lines) if marker in s),None)\n if i is not None:\n  block='\\\\n'.join(lines[i:i+35]).replace(str(pathlib.Path.home()),'\"'$HOME'\"').replace(getpass.getuser(),'<local-user>')\n  print(json.dumps({'section':marker,'source':block[:5000]},sort_keys=True))\nPY\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy python3 - <<'PY'\nimport pathlib,subprocess,json,os,re,urllib.parse,yaml,getpass\nhome=pathlib.Path.home(); base=home/'.codex-fabric'; clone=base/'repos'/'stockledger'; work=pathlib.Path.cwd(); base_sha='9331b8850dc674e55181447a7bd5963059fd3649'; tree_sha='b3cbaaa0698522e9ab19d6fb8558a263101a05f7'; job='CF-0f83b060c54fa04245f7e31e'; aref='refs/heads/project-os-artifacts/stockledger/stockledger-prod-c01-route-health-verify-v2'; eref='refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c01-route-health-verify-v2'\ndef git(cwd,args): return subprocess.run(['git','-C',str(cwd),*args],text=True,capture_output=True,env={**os.environ,'GIT_TERMINAL_PROMPT':'0'})\ndef norm(s):\n s=s.strip()\n if s.startswith('git@github.com:'): s=s.split(':',1)[1]\n elif s.startswith('ssh://git@github.com/'): s=s.split('github.com/',1)[1]\n else:\n  u=urllib.parse.urlsplit(s)\n  if u.hostname and u.hostname.lower()=='github.com': s=u.path.lstrip('/')\n  else:return None\n s=s.removesuffix('.git').strip('/').lower()\n return s if re.fullmatch(r'[\"'^/]+/[''^/]+'\"',s) else None\nout={}\nhead=git(work,['rev-parse','HEAD']).stdout.strip(); tree=git(work,['rev-parse','HEAD\"'^{tree}'\"']).stdout.strip(); branch=git(work,['branch','--show-current']).stdout.strip(); status=git(work,['status','--porcelain=v1','--untracked-files=all'])\ncount=git(work,['rev-list','--count',base_sha+'..HEAD'])\nout.update({'product_head_exact':head==base_sha,'product_tree_exact':tree==tree_sha,'product_branch':branch,'product_changed_files':len(status.stdout.splitlines()) if status.returncode==0 else None,'product_commits':int(count.stdout.strip()) if count.returncode==0 else None,'product_worktree_clean':status.returncode==0 and not status.stdout})\np=base/'artifacts'/job/'route-health'/'route-health.json'; local_bytes=p.read_bytes() if p.is_file() else b''\nls_a=git(clone,['ls-remote','--heads','origin',aref]); artifact_sha=ls_a.stdout.split()[0] if ls_a.returncode==0 and ls_a.stdout.split() else None\nfetch_a=git(clone,['fetch','--no-tags','origin',aref.removeprefix('refs/heads/')]) if artifact_sha else None\nremote_bytes=git(clone,['show','FETCH_HEAD:route-health/route-health.json']).stdout.encode() if fetch_a and fetch_a.returncode==0 else b''\nparent=git(clone,['rev-list','--parents','-n','1','FETCH_HEAD']).stdout.split() if remote_bytes else []\nchanged=git(clone,['diff-tree','--no-commit-id','--name-status','-r','FETCH_HEAD']).stdout.strip() if remote_bytes else ''\ntry: pkg=json.loads(remote_bytes)\nexcept Exception: pkg={}\ntext=remote_bytes.decode('utf-8','replace')\nmarkers=[str(home),getpass.getuser()]\npackage_clean=not any(m and m in text for m in markers)\nout.update({'artifact_ref_present':bool(artifact_sha),'artifact_commit':artifact_sha,'artifact_parent_exact':parent==[artifact_sha,base_sha],'artifact_only_route_package':changed=='A\\\\troute-health/route-health.json','package_exact_remote_readback':bool(local_bytes) and remote_bytes==local_bytes,'package_job_matches':pkg.get('fabric_job')==job,'package_verified':bool(local_bytes) and remote_bytes==local_bytes and parent==[artifact_sha,base_sha] and changed=='A\\\\troute-health/route-health.json' and pkg.get('fabric_job')==job and package_clean,'package_privacy_clean':package_clean})\nls_e=git(clone,['ls-remote','--heads','origin',eref]); out['evidence_ref_present']=ls_e.returncode==0 and bool(ls_e.stdout.strip()); out['evidence_commit']=ls_e.stdout.split()[0] if out['evidence_ref_present'] else None\nremote_main=git(clone,['ls-remote','origin','refs/heads/main']); out['origin_main_sha']=remote_main.stdout.split()[0] if remote_main.returncode==0 and remote_main.stdout.split() else None\nlocal_main=git(clone,['rev-parse','--verify','refs/remotes/origin/main\"'^{commit}'\"']); out['origin_main_local_resolves']=local_main.returncode==0\nout['origin_main_advertised_resolves']=remote_main.returncode==0 and bool(out['origin_main_sha'])\nout['origin_main_sha_matches_local']=out['origin_main_sha']==local_main.stdout.strip() if out['origin_main_local_resolves'] else False\nout['dispatch_base_is_ancestor']=git(clone,['merge-base','--is-ancestor',base_sha,'refs/remotes/origin/main']).returncode==0\nout['canonical_origin_matches']=norm(git(clone,['remote','get-url','origin']).stdout)=='kimhw8084/stockledger'\nout['job_still_running']= (base/'jobs'/(job+'.running')).is_dir()\nprint(json.dumps(out,sort_keys=True))\nPY\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    }
+  ],
+  "codex": {
+    "cli_version": "codex-cli 0.156.1",
+    "configured_model": "gpt-6-luna",
+    "event_count": 58,
+    "provider_reported_model": null,
+    "reasoning_effort": "xhigh",
+    "terminal_type": "turn.completed",
+    "usage": {
+      "cache_hit_percent": 93.93,
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 1178624,
+      "fresh_input_tokens": 76197,
+      "input_tokens": 1254821,
+      "non_reasoning_output_tokens": 10862,
+      "output_tokens": 39879,
+      "reasoning_output_tokens": 29017,
+      "total_processed_tokens": 1294700
+    },
+    "warnings": []
+  },
+  "commits": [],
+  "diff": {
+    "additions": 0,
+    "changed_files": 0,
+    "commit_count": 0,
+    "deletions": 0
+  },
+  "error_code": null,
+  "evidence_manifest": {
+    "count": 0,
+    "items": [],
+    "version": 1
+  },
+  "evidence_publisher_release": "1.2.5-dashboard-controls-candidate",
+  "fabric_capture": {
+    "applied": false,
+    "paths_before": 0,
+    "transient_untracked_removed": {
+      "count": 0,
+      "items": []
+    }
+  },
+  "fabric_release": "1.2.5-dashboard-controls-candidate",
+  "failure_class": null,
+  "finished_at": "2026-09-25T13:11:43Z",
+  "git": {
+    "base_is_ancestor": true,
+    "base_sha": "9331b8850dc674e55181447a7bd5963059fd3649",
+    "branch": "codex/stockledger-prod-c01-route-health-verify-v2",
+    "detached_verify": false,
+    "head_sha": "9331b8850dc674e55181447a7bd5963059fd3649",
+    "remote_exact_head": true,
+    "remote_head_sha": "9331b8850dc674e55181447a7bd5963059fd3649",
+    "target_branch": "main",
+    "target_drifted_since_acceptance": false,
+    "target_head_observed_after_execution": "9331b8850dc674e55181447a7bd5963059fd3649",
+    "work_branch": "codex/stockledger-prod-c01-route-health-verify-v2",
+    "worktree_clean": true
+  },
+  "instructions": {
+    "files": [],
+    "total_bytes": 0,
+    "warning": null
+  },
+  "job_id": "CF-0f83b060c54fa04245f7e31e",
+  "kind": "codex-fabric-audit-evidence",
+  "locator": {
+    "branch": "codex-fabric/evidence/stockledger/stockledger-prod-c01-route-health-verify-v2",
+    "path": ".codex-fabric/audit.json",
+    "ref": "refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c01-route-health-verify-v2"
+  },
+  "operation": "VERIFY",
+  "policy": {
+    "environment_policy_sha256": "e077daca74297b3c30bee8989f00f8ca5338f7610b4d016a6c48db524205d064",
+    "fabric_release": "1.2.5-dashboard-controls-candidate",
+    "policy_sha256": "123615bf2f6e57dcac197e49ca98ceac59ada86a55e2c84445ea5d00812c0833",
+    "registry_sha256": "af81b8552f9d6a33847310e3c6bcd2d48401782b963a58efd2993e93570cb4aa"
+  },
+  "project_id": "stockledger",
+  "recovery": {
+    "model_rerun_safe": false,
+    "recovery_required": false,
+    "retry_safe": false,
+    "retry_scope": null,
+    "worktree_retained": true
+  },
+  "request": "stockledger-prod-c01-route-health-verify-v2",
+  "schema_version": 1,
+  "started_at": "2026-09-25T12:58:47Z",
+  "status": "EXECUTED_NO_CHANGE",
+  "timing": {
+    "execution_seconds": 776,
+    "queue_seconds": 0,
+    "total_seconds": 776
+  },
+  "transport": {
+    "bytes": 9840,
+    "envelope": "FABRIC/2",
+    "prompt_bytes": 9494,
+    "prompt_sha256": "62f23670af922e15cf8722b9ae15e05507c072f07975d6d5f87255d7885458d0",
+    "sha256": "0f83b060c54fa04245f7e31e0aeefdd608726673a9a637147c0d7d99743d7779"
+  }
+}
