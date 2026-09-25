@@ -1,0 +1,17 @@
+{
+  "accepted_head": "92b64a20c620da38422c22e73664eba395b58f17",
+  "accepted_tree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+  "audited_base": "ed377bb173387ebf56a4919ac4282d136c56e21d",
+  "base_is_ancestor_of_candidate": true,
+  "expected_native_evidence_parent": [
+    "92b64a20c620da38422c22e73664eba395b58f17"
+  ],
+  "expected_native_evidence_path": ".codex-fabric/audit.json",
+  "integration_evidence_request": "stockledger-prod-c17-golden-ui-v3-evidence-bind-verify-v3",
+  "remote_work_branch_exact_candidate": true,
+  "target_branch": "main",
+  "target_drifted": false,
+  "target_observed_after": "ed377bb173387ebf56a4919ac4282d136c56e21d",
+  "target_observed_before": "ed377bb173387ebf56a4919ac4282d136c56e21d",
+  "work_branch": "codex/stockledger-prod-c17-golden-ui-v3-evidence-bind-verify-v3"
+}

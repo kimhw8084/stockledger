@@ -1,0 +1,14 @@
+{
+  "accepted_head": "92b64a20c620da38422c22e73664eba395b58f17",
+  "accepted_tree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+  "browser_capture_launched": false,
+  "change": "CHG-202",
+  "fabric_job": "CF-1aad0c334ce856bfff0aa84d",
+  "operation": "VERIFY",
+  "product_changed_files": 0,
+  "product_work_branch": "codex/stockledger-prod-c17-golden-ui-v3-evidence-bind-verify-v3",
+  "project": "stockledger",
+  "protected_base_sha": "ed377bb173387ebf56a4919ac4282d136c56e21d",
+  "request": "stockledger-prod-c17-golden-ui-v3-evidence-bind-verify-v3",
+  "source_changed": false
+}

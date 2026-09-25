@@ -1,0 +1,29 @@
+{
+  "artifact_run": {
+    "authority": "Substantive source, release, task, and pixel acceptance",
+    "id": "AR-74",
+    "status": "Audit accepted"
+  },
+  "integration_failure": {
+    "code": "COMMAND_FAILED",
+    "message": "git fatal: path '.codex-fabric/audit.json' does not exist in '8884af3daca9d56d54b3ca34315ade774990e274'",
+    "operator_version": "0.2.0-rc3",
+    "status": "BLOCKED"
+  },
+  "r2_artifact_commit": {
+    "parent_count": 1,
+    "sha": "fb28e5a5ad0ee01331863a65e7b892a81ee1074c",
+    "sole_parent": "92b64a20c620da38422c22e73664eba395b58f17"
+  },
+  "r2_candidate_head": "92b64a20c620da38422c22e73664eba395b58f17",
+  "r2_candidate_tree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+  "r2_evidence_commit": {
+    "canonical_audit_path_present": false,
+    "parent_count": 1,
+    "sha": "8884af3daca9d56d54b3ca34315ade774990e274",
+    "sole_parent": "92b64a20c620da38422c22e73664eba395b58f17"
+  },
+  "r2_job": "CF-17c1da3022019cbb19671f33",
+  "r2_refs_statement": "R2 refs are immutable historical acceptance evidence and are not being repaired in place.",
+  "r2_request": "stockledger-prod-c17-golden-ui-v3-focus-geometry-zoom-fix-v2"
+}
