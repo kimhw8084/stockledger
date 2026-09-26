@@ -1,0 +1,32 @@
+{
+  "repositoryRootHandoffPath": ".local/stockledger-app-handoff",
+  "rootPathChecks": {
+    "beforeQualification": "absent",
+    "afterFocusedWorkerTest": "absent",
+    "afterNpmRunCheck": "absent",
+    "checkMethod": "Existence-only checks; no existing owner handoff contents were inspected or modified."
+  },
+  "test": {
+    "name": "runs the managed entry point from the app-closed CLI and reports truthful status",
+    "temporaryDirectoryPrefix": "stockledger-cli-test-",
+    "temporaryDirectoryCreatedBy": "mkdtempSync(join(tmpdir(), ...))",
+    "childWorkingDirectory": "The test's mkdtemp directory.",
+    "cliEntryArguments": [
+      "Absolute path to node_modules/tsx/dist/cli.mjs",
+      "Absolute path to server/worker/cli.ts"
+    ],
+    "handoffDirectory": "<mkdtemp>/handoff",
+    "pendingManifest": "<mkdtemp>/handoff/pending.json",
+    "fixtureWorkspaceId": "stockledger-cli-fixture",
+    "assertions": [
+      "pending.json exists under the temporary handoff directory",
+      "pending.json parses with parseWorkerHandoffManifest",
+      "parsed workspaceId equals the fixture workspace ID",
+      "managed mode and schedulerInstalled:false remain asserted",
+      "worker output file remains asserted"
+    ],
+    "cleanup": "Existing afterEach removes only registered test temporary directories recursively."
+  },
+  "runtimeCliOrDefaultChanged": false,
+  "syntheticPendingManifestIsolated": true
+}
