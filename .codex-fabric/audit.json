@@ -1,0 +1,525 @@
+{
+  "accepted_at": "2026-09-26T14:04:35Z",
+  "changed_files": [
+    {
+      "additions": 19,
+      "deletions": 8,
+      "path": "docs/operations/LOCAL_WORKER.md",
+      "status": "M"
+    },
+    {
+      "additions": 15,
+      "deletions": 2,
+      "path": "docs/production/IMPLEMENTATION_STATUS.md",
+      "status": "M"
+    },
+    {
+      "additions": 69,
+      "deletions": 8,
+      "path": "server/worker/cli.ts",
+      "status": "M"
+    },
+    {
+      "additions": 88,
+      "deletions": 2,
+      "path": "server/worker/store.ts",
+      "status": "M"
+    },
+    {
+      "additions": 8,
+      "deletions": 3,
+      "path": "src/app/StockLedgerApp.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 6,
+      "deletions": 5,
+      "path": "src/application/workspaceApplicationService.ts",
+      "status": "M"
+    },
+    {
+      "additions": 4,
+      "deletions": 2,
+      "path": "src/data/repositories/workspaceRepository.ts",
+      "status": "M"
+    },
+    {
+      "additions": 16,
+      "deletions": 0,
+      "path": "src/domain/appDataSchema.ts",
+      "status": "M"
+    },
+    {
+      "additions": 9,
+      "deletions": 0,
+      "path": "src/domain/backupFormat.ts",
+      "status": "M"
+    },
+    {
+      "additions": 9,
+      "deletions": 1,
+      "path": "src/domain/evaluateWorkspace.ts",
+      "status": "M"
+    },
+    {
+      "additions": 284,
+      "deletions": 0,
+      "path": "src/domain/workerHandoff.ts",
+      "status": "A"
+    },
+    {
+      "additions": 13,
+      "deletions": 6,
+      "path": "src/features/alerts/model.ts",
+      "status": "M"
+    },
+    {
+      "additions": 30,
+      "deletions": 0,
+      "path": "src/features/settings/WorkspaceSettingsPanel.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 10,
+      "deletions": 0,
+      "path": "src/features/workerHandoff/localHandoff.native.ts",
+      "status": "A"
+    },
+    {
+      "additions": 94,
+      "deletions": 0,
+      "path": "src/features/workerHandoff/localHandoff.ts",
+      "status": "A"
+    },
+    {
+      "additions": 109,
+      "deletions": 4,
+      "path": "src/hooks/useAppModel.ts",
+      "status": "M"
+    },
+    {
+      "additions": 56,
+      "deletions": 0,
+      "path": "src/lib/i18n.ts",
+      "status": "M"
+    },
+    {
+      "additions": 1,
+      "deletions": 1,
+      "path": "src/operations/releaseContracts.ts",
+      "status": "M"
+    },
+    {
+      "additions": 5,
+      "deletions": 1,
+      "path": "src/platform/keyValueStore.native.ts",
+      "status": "M"
+    },
+    {
+      "additions": 3,
+      "deletions": 2,
+      "path": "src/platform/keyValueStore.ts",
+      "status": "M"
+    },
+    {
+      "additions": 5,
+      "deletions": 1,
+      "path": "src/platform/keyValueStore.web.ts",
+      "status": "M"
+    },
+    {
+      "additions": 43,
+      "deletions": 0,
+      "path": "src/types.ts",
+      "status": "M"
+    },
+    {
+      "additions": 267,
+      "deletions": 0,
+      "path": "tests/e2e/worker-app-handoff.spec.ts",
+      "status": "A"
+    },
+    {
+      "additions": 22,
+      "deletions": 4,
+      "path": "tests/repository.test.ts",
+      "status": "M"
+    },
+    {
+      "additions": 174,
+      "deletions": 0,
+      "path": "tests/workerHandoff.test.ts",
+      "status": "A"
+    }
+  ],
+  "checks": [
+    {
+      "command": "/bin/zsh -lc 'rtk git status --short --branch && rtk git diff --cached --check'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git rev-parse HEAD && rtk git rev-parse HEAD''^{tree} && rtk git ls-remote origin refs/heads/main'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git commit -m \"CHG-256: hand off worker evidence for app review\"'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git diff --check HEAD''^ HEAD && rtk git diff --stat 9331b8850dc674e55181447a7bd5963059fd3649'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git status --short --branch && rtk git rev-parse HEAD && rtk git rev-parse HEAD''^{tree} && rtk git rev-parse HEAD''^'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npm exec --yes --package=node@22.23.2 -- node /Users/haewonkim/.nvm/versions/node/v20.19.4/lib/node_modules/npm/bin/npm-cli.js run release:evidence -- --base 9331b8850dc674e55181447a7bd5963059fd3649 --artifacts artifacts/chg-256-proof/ui --output artifacts/chg-256-proof/release-evidence.json'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk npm exec --yes --package=node@22.23.2 -- node /Users/haewonkim/.nvm/versions/node/v20.19.4/lib/node_modules/npm/bin/npm-cli.js run release:verify -- --base 9331b8850dc674e55181447a7bd5963059fd3649 --artifacts artifacts/chg-256-proof/ui --input artifacts/chg-256-proof/release-evidence.json'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk cat tests/workerHandoff.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk cat src/domain/workerHandoff.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk cat artifacts/chg-256-proof/release-evidence.json && rtk git status --short --branch && rtk git ls-remote origin refs/heads/main'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk mkdir -p artifacts/chg-256-proof/package'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk ls -lh artifacts/chg-256-proof/ui/stockledger-handoff-200-percent-browser-zoom.png && rtk du -sh artifacts/chg-256-proof/ui'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk node -e 'for (const f of process.argv.slice(1)) JSON.parse(require(\\\"node:fs\\\").readFileSync(f, \\\"utf8\\\")); console.log(\\\"valid JSON\\\")' artifacts/chg-256-proof/package/handoff-contract.json artifacts/chg-256-proof/package/acceptance.json artifacts/chg-256-proof/package/verification.json artifacts/chg-256-proof/package/recovery-conflict-matrix.json artifacts/chg-256-proof/package/ui-source-impact.json artifacts/chg-256-proof/package/owner-path.json artifacts/chg-256-proof/release-evidence.json\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git status --short --branch && rtk git rev-parse HEAD && rtk git rev-parse HEAD''^{tree} && rtk git rev-parse HEAD''^'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git push origin refs/heads/codex/stockledger-prod-c18-worker-app-review-handoff-fix-v2:refs/heads/codex/stockledger-prod-c18-worker-app-review-handoff-fix-v2'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git ls-remote origin refs/heads/main refs/heads/codex/stockledger-prod-c18-worker-app-review-handoff-fix-v2 refs/heads/project-os-artifacts/stockledger/stockledger-prod-c18-worker-app-review-handoff-fix-v2 refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c18-worker-app-review-handoff-fix-v2'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk cp artifacts/chg-256-proof/release-evidence.json artifacts/chg-256-proof/package/release-evidence.json'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git worktree add -b project-os-artifacts/stockledger/stockledger-prod-c18-worker-app-review-handoff-fix-v2 /tmp/stockledger-chg-256-artifacts 3a76d78663b555392cd152977bb2f9c5cd91a79f'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk cp /Users/haewonkim/.codex-fabric/worktrees/CF-06b785372e2bbaec06eb6224/artifacts/chg-256-proof/package/* /tmp/stockledger-chg-256-artifacts/'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk cp -R /Users/haewonkim/.codex-fabric/worktrees/CF-06b785372e2bbaec06eb6224/artifacts/chg-256-proof/ui /tmp/stockledger-chg-256-artifacts/ui'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git status --short --branch && rtk git rev-parse HEAD && rtk git rev-parse HEAD''^ && rtk ls'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk node -e 'for (const f of process.argv.slice(1)) JSON.parse(require(\\\"node:fs\\\").readFileSync(f, \\\"utf8\\\")); console.log(\\\"valid package JSON\\\")' handoff-contract.json acceptance.json verification.json recovery-conflict-matrix.json ui-source-impact.json owner-path.json release-evidence.json\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk node -e 'const fs=require(\\\"node:fs\\\"), crypto=require(\\\"node:crypto\\\"), path=require(\\\"node:path\\\"); const m=JSON.parse(fs.readFileSync(\\\"release-evidence.json\\\",\\\"utf8\\\")); for(const f of m.artifacts.files){const p=path.join(\\\"ui\\\",f.path); const b=fs.readFileSync(p); if(b.length\"'!==f.bytes||crypto.createHash(\"sha256\").update(b).digest(\"hex\")!==f.sha256) throw Error(\"artifact mismatch: \"+f.path)} console.log(JSON.stringify({verifiedFiles:m.artifacts.files.length,source:m.source.commit,tree:m.source.tree,base:m.baseCommit}))'\"'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git add -A'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git commit -m \"CHG-256: add handoff qualification evidence package\"'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git status --short --branch && rtk git rev-list --parents -n 1 HEAD && rtk git rev-parse HEAD && rtk git rev-parse HEAD''^ && rtk git diff-tree --no-commit-id --name-only -r HEAD'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git push origin refs/heads/project-os-artifacts/stockledger/stockledger-prod-c18-worker-app-review-handoff-fix-v2:refs/heads/project-os-artifacts/stockledger/stockledger-prod-c18-worker-app-review-handoff-fix-v2'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git ls-remote origin refs/heads/main refs/heads/codex/stockledger-prod-c18-worker-app-review-handoff-fix-v2 refs/heads/project-os-artifacts/stockledger/stockledger-prod-c18-worker-app-review-handoff-fix-v2 refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c18-worker-app-review-handoff-fix-v2'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk ls -la /Users/haewonkim/.codex-fabric && rtk ls -la .codex-fabric'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk command -v codex-fabric && rtk command -v fabric'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk node -e 'console.log(Object.keys(process.env).filter(k => /FABRIC|PROJECT_OS|CODEX.*JOB/i.test(k)).sort().join(\\\"\\\\n\\\"))'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk cat /Users/haewonkim/.codex-fabric/audit.json'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk ls -la /Users/haewonkim/.codex-fabric/bin /Users/haewonkim/.codex-fabric/libexec /Users/haewonkim/.codex-fabric/jobs /Users/haewonkim/.codex-fabric/evidence /Users/haewonkim/.codex-fabric/project-os-artifacts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n 'stockledger-prod-c18-worker-app-review-handoff-fix-v2|CHG-256|CF-' /Users/haewonkim/.codex-fabric/audit.json /Users/haewonkim/.codex-fabric/jobs /Users/haewonkim/.codex-fabric/evidence\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk ls /Users/haewonkim/.codex-fabric/jobs/CF-06b785372e2bbaec06eb6224.running'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk ls -la /Users/haewonkim/.codex-fabric/jobs/CF-06b785372e2bbaec06eb6224.running && rtk cat /Users/haewonkim/.codex-fabric/jobs/CF-06b785372e2bbaec06eb6224.running/job.json'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk cat /Users/haewonkim/.codex-fabric/bin/fabricctl && rtk file /Users/haewonkim/.codex-fabric/jobs/CF-06b785372e2bbaec06eb6224.running/transport.bin'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk cat /Users/haewonkim/.codex-fabric/jobs/CF-06b785372e2bbaec06eb6224.running/lease.json'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n 'audit.json|publish|complete|finalize|evidence' /Users/haewonkim/.codex-fabric/current/fabric.py /Users/haewonkim/.codex-fabric/current\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk /Users/haewonkim/.codex-fabric/bin/fabricctl --help'",
+      "exit_code": 2,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '2722,2820p' /Users/haewonkim/.codex-fabric/current/fabric.py && rtk sed -n '2948,3028p' /Users/haewonkim/.codex-fabric/current/fabric.py && rtk sed -n '4810,4860p' /Users/haewonkim/.codex-fabric/current/fabric.py\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk ls -la /Users/haewonkim/.codex-fabric/jobs/CF-06b785372e2bbaec06eb6224.running'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n 'def publish_evidence_for_job|def status_cli|def finalize|result.json' /Users/haewonkim/.codex-fabric/current/fabric.py\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk /Users/haewonkim/.codex-fabric/bin/fabricctl status CF-06b785372e2bbaec06eb6224'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '3050,3090p' /Users/haewonkim/.codex-fabric/current/fabric.py && rtk sed -n '4668,4695p' /Users/haewonkim/.codex-fabric/current/fabric.py && rtk ls -la /Users/haewonkim/.codex-fabric/results/CF-06b785372e2bbaec06eb6224\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n 'def _terminal_job_dir|def worker\\\\(' /Users/haewonkim/.codex-fabric/current/fabric.py && rtk sed -n '3054,3062p' /Users/haewonkim/.codex-fabric/current/fabric.py && rtk sed -n '3800,3860p' /Users/haewonkim/.codex-fabric/current/fabric.py\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk /Users/haewonkim/.codex-fabric/bin/fabricctl status CF-06b785372e2bbaec06eb6224 && rtk git ls-remote origin refs/heads/main refs/heads/codex/stockledger-prod-c18-worker-app-review-handoff-fix-v2 refs/heads/project-os-artifacts/stockledger/stockledger-prod-c18-worker-app-review-handoff-fix-v2 refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c18-worker-app-review-handoff-fix-v2'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk /Users/haewonkim/.codex-fabric/bin/fabricctl --help && rtk /Users/haewonkim/.codex-fabric/bin/fabricctl publish-pending-evidence --help'",
+      "exit_code": 2,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk rg -n \"publish-pending-evidence|JOB_NOT_TERMINAL|def publish_evidence_for_job|publish_evidence\" /Users/haewonkim/.codex-fabric/current/fabric.py /Users/haewonkim/.codex-fabric/current'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '3010,3110p' /Users/haewonkim/.codex-fabric/current/fabric.py && rtk sed -n '4700,4745p' /Users/haewonkim/.codex-fabric/current/fabric.py\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    }
+  ],
+  "codex": {
+    "cli_version": "codex-cli 0.157.0",
+    "configured_model": "gpt-6-luna",
+    "event_count": 790,
+    "provider_reported_model": null,
+    "reasoning_effort": "xhigh",
+    "terminal_type": "turn.completed",
+    "usage": {
+      "cache_hit_percent": 98.42,
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 61166336,
+      "fresh_input_tokens": 981210,
+      "input_tokens": 62147546,
+      "non_reasoning_output_tokens": 97101,
+      "output_tokens": 266253,
+      "reasoning_output_tokens": 169152,
+      "total_processed_tokens": 62413799
+    },
+    "warnings": []
+  },
+  "commits": [
+    {
+      "sha": "3a76d78663b555392cd152977bb2f9c5cd91a79f",
+      "subject": "CHG-256: hand off worker evidence for app review"
+    }
+  ],
+  "diff": {
+    "additions": 1359,
+    "changed_files": 25,
+    "commit_count": 1,
+    "deletions": 50
+  },
+  "error_code": null,
+  "evidence_manifest": {
+    "count": 2,
+    "items": [
+      {
+        "bytes": 27306,
+        "path": "docs/operations/LOCAL_WORKER.md",
+        "sha256": "eeb2536e55b7b0ebcf043c92d253d171cbb8638781ec2f71b83c5b77b38ef97d"
+      },
+      {
+        "bytes": 26271,
+        "path": "docs/production/IMPLEMENTATION_STATUS.md",
+        "sha256": "da5fbf721ef7c5da5b5531009ad7a7b7bcbec66522e026425ac20fde6706be21"
+      }
+    ],
+    "version": 1
+  },
+  "evidence_publisher_release": "1.2.5-dashboard-controls-candidate",
+  "fabric_capture": {
+    "applied": false,
+    "paths_before": 0,
+    "transient_untracked_removed": {
+      "count": 0,
+      "items": []
+    }
+  },
+  "fabric_release": "1.2.5-dashboard-controls-candidate",
+  "failure_class": null,
+  "finished_at": "2026-09-26T15:58:23Z",
+  "git": {
+    "base_is_ancestor": true,
+    "base_sha": "9331b8850dc674e55181447a7bd5963059fd3649",
+    "branch": "codex/stockledger-prod-c18-worker-app-review-handoff-fix-v2",
+    "detached_verify": false,
+    "head_sha": "3a76d78663b555392cd152977bb2f9c5cd91a79f",
+    "remote_exact_head": true,
+    "remote_head_sha": "3a76d78663b555392cd152977bb2f9c5cd91a79f",
+    "target_branch": "main",
+    "target_drifted_since_acceptance": false,
+    "target_head_observed_after_execution": "9331b8850dc674e55181447a7bd5963059fd3649",
+    "work_branch": "codex/stockledger-prod-c18-worker-app-review-handoff-fix-v2",
+    "worktree_clean": true
+  },
+  "instructions": {
+    "files": [],
+    "total_bytes": 0,
+    "warning": null
+  },
+  "job_id": "CF-06b785372e2bbaec06eb6224",
+  "kind": "codex-fabric-audit-evidence",
+  "locator": {
+    "branch": "codex-fabric/evidence/stockledger/stockledger-prod-c18-worker-app-review-handoff-fix-v2",
+    "path": ".codex-fabric/audit.json",
+    "ref": "refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c18-worker-app-review-handoff-fix-v2"
+  },
+  "operation": "FIX",
+  "policy": {
+    "environment_policy_sha256": "e077daca74297b3c30bee8989f00f8ca5338f7610b4d016a6c48db524205d064",
+    "fabric_release": "1.2.5-dashboard-controls-candidate",
+    "policy_sha256": "123615bf2f6e57dcac197e49ca98ceac59ada86a55e2c84445ea5d00812c0833",
+    "registry_sha256": "af81b8552f9d6a33847310e3c6bcd2d48401782b963a58efd2993e93570cb4aa"
+  },
+  "project_id": "stockledger",
+  "recovery": {
+    "model_rerun_safe": false,
+    "recovery_required": false,
+    "retry_safe": false,
+    "retry_scope": null,
+    "worktree_retained": true
+  },
+  "request": "stockledger-prod-c18-worker-app-review-handoff-fix-v2",
+  "schema_version": 1,
+  "started_at": "2026-09-26T14:04:35Z",
+  "status": "EXECUTED_CHANGE",
+  "timing": {
+    "execution_seconds": 6828,
+    "queue_seconds": 0,
+    "total_seconds": 6828
+  },
+  "transport": {
+    "bytes": 11177,
+    "envelope": "FABRIC/2",
+    "prompt_bytes": 10813,
+    "prompt_sha256": "06f21d479779ba46dac8e54e456179a0b511584899777eb596942090891804bc",
+    "sha256": "06b785372e2bbaec06eb62244aa84f640f82d09331d9c3abe866149398ce0f9e"
+  }
+}
