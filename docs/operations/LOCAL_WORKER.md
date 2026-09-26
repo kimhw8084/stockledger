@@ -17,7 +17,7 @@ Each scheduled market session has four deterministic stage jobs. The production 
 
 The semantic identity includes the contract version, kind, scheduled session, calendar version, engine/rule versions, source content hash, adjustment declaration, scanner settings, recipes and Eye definitions. Repeating the same input produces the same job keys. Corrected input produces a new evidence revision and preserves the earlier records.
 
-SQLite WAL keeps the workspace, recovery copies, jobs, scheduler checkpoint, reconciliation links, outbox, and CHG-95 ingestion run/item tables together. Claims use an immediate transaction. A job records `queued`, `running`, `retry-wait`, `completed`, `partial`, `blocked`, `terminal-failed`, or `superseded`, plus scheduled/due session, attempt count, lease owner/token/expiry, next retry, completion time, last safe error, input hash, output reference and semantic idempotency key. Leases are 15 minutes by default and are renewed by the managed runner heartbeat for long work. A replaced or expired token cannot commit.
+SQLite WAL keeps the workspace, recovery copies, jobs, scheduler checkpoint, reconciliation links, outbox, CHG-95 ingestion run/item tables, and CHG-256 app-handoff sequence/batch tables together. Claims use an immediate transaction. A job records `queued`, `running`, `retry-wait`, `completed`, `partial`, `blocked`, `terminal-failed`, or `superseded`, plus scheduled/due session, attempt count, lease owner/token/expiry, next retry, completion time, last safe error, input hash, output reference and semantic idempotency key. Leases are 15 minutes by default and are renewed by the managed runner heartbeat for long work. A replaced or expired token cannot commit.
 
 `lastExpectedSession` is an observation/planning watermark, not proof that all earlier work finished. After enqueueing, an invocation may have durable `queued`, expired `running`, or `retry-wait` jobs for older sessions. Every later invocation reconciles newly due calendar sessions with those persisted jobs and processes the union in chronological order. A retry-wait job remains visible with its original attempt count and `nextRetryAt`; it is runnable only after that time. A terminal-failed semantic job is never reset to obtain another five attempts.
 
@@ -33,7 +33,7 @@ Admission guards reject more than 600 symbols, more than 1,000,000 input rows, m
 
 The delivery contract is `stockledger-notification-delivery-v1`, revision 1. Digest batching is `stockledger-notification-digest-v1`, revision 1. Preferences are `stockledger-notification-preferences-v1`, revision 1. Preferences are user-owned and included in the complete v2 backup envelope, but are explicitly `device-local`; CHG-93 personal sync does not sync a delivery destination or operate a provider. A managed deployment must add its own authenticated account-owned delivery boundary before treating a preference as cross-device. This local worker does not claim account-global cancellation.
 
-Evaluation remains the source of deterministic alert state. A newly committed semantic alert can create one `notification_intents` row per channel/policy inside the same SQLite transaction as the workspace revision and the existing `notification.intent` outbox row. The outbox row is an event/intent record, never a sent or delivered count. Duplicate/replayed jobs are protected by semantic alert IDs and a unique `(semantic_key, channel, policy_key)` index. Existing v3 worker databases migrate additively through schema v4, v5 and v6; v6 adds digest tables, immutable member linkage, preference/cancellation fences and the safe status projection. Existing workspace, job, recovery, outbox, intent, attempt and receipt rows are not rewritten or discarded.
+Evaluation remains the source of deterministic alert state. A newly committed semantic alert can create one `notification_intents` row per channel/policy inside the same SQLite transaction as the workspace revision and the existing `notification.intent` outbox row. The outbox row is an event/intent record, never a sent or delivered count. Duplicate/replayed jobs are protected by semantic alert IDs and a unique `(semantic_key, channel, policy_key)` index. Worker databases migrate additively through schema 8: schema 6 adds digest tables, immutable member linkage, preference/cancellation fences and the safe status projection; schema 7 adds market-data ingestion run/item tables; schema 8 adds the bounded app-handoff sequence and batch tables. Existing workspace, job, recovery, outbox, intent, attempt, receipt, ingestion, and history rows are not rewritten or discarded by these migrations.
 
 Each intent retains its alert identity, channel, policy, privacy mode, destination, scheduled/not-before time, cancellation reason, lease/fencing token, attempt count, next retry, terminal state and account scope. State meanings are:
 
@@ -87,7 +87,7 @@ Stooq remains the explicit public/research-only on-demand adapter. It cannot act
 
 The worker’s additive schema 7 stores `ingestion_runs` and `ingestion_items`. Run IDs include the contract/provider/product/symbol/date/rights identity; item IDs are stable per run/symbol. Accepted normalized items are retained, completed items are not refetched on replay, and unfinished retryable items resume within the persisted request budget. Symbol count, concurrency, request budget, and attempts are capped. Retryable timeout/outage/rate-limit failures use deterministic capped backoff; provider outage, malformed/empty/stale/partial input, missing required symbols, rate limits, and budget exhaustion remain partial/blocked states. None can be reported as a successful zero-match scan.
 
-Defaults are `.local/stockledger.sqlite` and `.local/StockLedger-worker.json`. Override them with `--db` and `--output`. Generated directories/files have restrictive permissions. Backups are plaintext private records. Node 22 labels its built-in SQLite API experimental; the pinned version has restart, transaction, lease, migration and snapshot tests.
+The database defaults to `.local/stockledger.sqlite`. `--output FILE` is optional and writes a complete workspace backup only when explicitly supplied; a scheduled run otherwise does not replace or export the whole app workspace. The incremental handoff defaults to `.local/stockledger-app-handoff` and can be redirected with `--handoff-dir`. Generated directories/files have restrictive permissions. Backups are plaintext private records. Node 22 labels its built-in SQLite API experimental; the pinned version has restart, transaction, lease, migration and snapshot tests.
 
 ## Repeated operation and catch-up
 
@@ -111,23 +111,34 @@ The same command now includes the versioned `stockledger-operations-status-v1` p
 
 The JSON includes contract version/revision, `lastSuccessfulRunAtUtc`, `latestExpectedCompletedSession`, `nextDueAtUtc`, deadline budget/deadline, missed sessions, per-status counts including audit-only `superseded`, completed/partial/blocked/retrying/terminal-failed sessions, pending outbox intents, and the truthful local dependency. `schedulerInstalled` is always `false` in this repository because no schedule was installed here.
 
-The app cannot show this as live monitoring: app and worker storage remain an explicit export/import handoff, not synchronization. Import the worker export into the app to review results. Do not add a UI claim that a schedule is installed or that app opening drives the worker.
+The worker remains a local process and never starts from the Expo UI. When the owner later opens the web app, an explicitly linked local folder can carry only the new evaluation/alert evidence into the app's existing workspace. This is a one-way, device-local evidence handoff; it is not a live service, cloud sync, or an installed schedule.
 
 ## Installing a local schedule
 
-Configure launchd or cron with absolute Node/npm, repository, DB, CSV, output, backup and log paths. A 30-minute schedule after the provider’s normal publication window is reasonable for repeated checks; it is an operator choice, not an installed StockLedger schedule. CSV acquisition is a separate permissioned step.
+Configure launchd or cron with absolute Node/npm, repository, DB, CSV, handoff-folder and log paths. Use the same absolute handoff-folder path on every invocation. A 30-minute schedule after the provider’s normal publication window is reasonable for repeated checks; it is an operator choice, not an installed StockLedger schedule. CSV acquisition is a separate permissioned step. Scheduled runs do not write a full workspace JSON export unless `--output` is explicitly supplied.
 
 Use private rotated logs, alert on nonzero exits, and inspect `--status` for `missed`, `stopped`, `blocked`, or `terminal-failed`. The machine must remain awake. A sleeping laptop catches up only after waking; this is not an always-on hosted service. If the schedule is removed, the status surface can only report that invocations stopped—it cannot infer that an OS schedule exists.
 
-## App handoff and recovery
+## Worker-to-app review handoff
 
-Import the latest worker export into the app first, edit it, and export again. Pause scheduled writers during this handoff. Read the current worker revision from a normal export, then explicitly replace it:
+Initialize the worker once from an app backup. For scheduled runs, point `--handoff-dir` at a private folder on the same machine. In the web app, open Settings → Workspace and data → Local worker review handoff and choose that exact folder once. The browser retains its owner-granted read/write directory handle in device-local IndexedDB and checks `pending.json` when the app opens. It reads that file and writes only `ack.json`; the worker reads the receipt on its next invocation. If the browser suspends the grant, use **Check for worker updates** to request access again, or **Change worker folder** to select another folder. The browser's folder permission remains a separate owner-controlled boundary. The worker writes small, content-addressed evaluation batches atomically and retains unacknowledged batches in SQLite WAL. Example scheduler command:
+
+```sh
+npm run worker -- --db /absolute/path/worker.sqlite --csv /absolute/path/daily-bars \
+  --handoff-dir /absolute/path/stockledger-handoff
+```
+
+The browser folder chooser requires a secure browser with the File System Access API. The browser permission is scoped to the folder the owner selected; no localhost listener or network service is opened. On app launch, a complete validated handoff appends immutable evaluation/alert evidence, updates only the linked Eye's latest evaluation after checking its owner-authored fields and previous evaluation identity, and retains the exact recipe, referenced custom metric definitions, source snapshot, provenance, freshness and condition results. Today and Alerts show that captured source context. Journal actions remain deliberate owner-authored decisions. The app commits through its IndexedDB compare-and-set path, which preserves the preceding valid workspace copy, then writes an idempotent receipt. A crash before receipt causes a safe replay; a crash before the atomic app commit leaves the current app copy intact.
+
+The Settings handoff card reports no folder, permission/pending, applied, stale, partial, missed, conflict and retryable failure states. A checksum/schema/workspace/sequence error leaves app records unchanged. If the owner edited the Eye after the worker used it, the batch is held as an explicit conflict. Reviewed/snoozed/usefulness state on an existing alert is never replaced. An acknowledgement failure means the app copy is saved but SQLite may replay that batch. The worker does not infer browser receipt from a file write, and app status does not claim a schedule, awake machine, email delivery or human review.
+
+App-authored preferences and other edits still do not flow back to the worker automatically. When those must be sent to the worker, use the explicit revision-gated full import below, pause scheduled writers, and create the before-import SQLite copy:
 
 ```sh
 npm run worker -- --import /absolute/path/edited-worker-export.json --import-revision 12
 ```
 
-The revision must match. A consistent `before-import` SQLite copy is created before replacement. This is whole-workspace replacement, not an automatic three-way merge. Stop writers before replacing a DB. Prefer `--backup` over copying a live SQLite file alone. Preserve DB/WAL/SHM together after an unclean shutdown. Open backups at a new `--db` path, check integrity, export and validate in the app before switching the schedule.
+The revision must match. Stop writers before replacing a DB. Prefer `--backup` over copying a live SQLite file alone. Preserve DB/WAL/SHM together after an unclean shutdown. Open recovery backups at a new `--db` path, check integrity, export and validate in the app before switching the schedule.
 
 Outbox rows are delivery intent only. `pendingNotificationIntents` is not a sent/delivered count. Delivery status must be read from the notification intent/attempt/receipt tables. The lifecycle distinguishes alert creation, outbox intent, transport attempt, provider acceptance and confirmed delivery; none is inferred from another.
 

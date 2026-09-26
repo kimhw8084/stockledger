@@ -1774,7 +1774,7 @@ interface EyeDraftForm {
 }
 
 export default function App() {
-  const { data, loading, error, saving, scanning, providerHealth, providerHealthLoading, actions } = useAppModel();
+  const { data, loading, error, saving, scanning, providerHealth, providerHealthLoading, localWorkerHandoff, actions } = useAppModel();
   const [stockEditor, setStockEditor] = useState<string | null>(null);
   const [language, setLanguage] = useState<AppLanguage>("en");
   const [tab, setTab, route] = useWorkspaceNavigation();
@@ -2031,7 +2031,7 @@ export default function App() {
       .filter(stock => !stock.archivedAt)
       .map((stock) => {
         const eyes = data.eyes.filter((eye) => eye.stockId === stock.id && !eye.archivedAt);
-        const snapshot = data.snapshots.find((item) => item.stockId === stock.id);
+        const currentSnapshot = data.snapshots.find((item) => item.stockId === stock.id);
         const openAlerts = data.alerts.filter(
           (alert) =>
             !alert.reviewed &&
@@ -2046,6 +2046,10 @@ export default function App() {
             ? stateDelta
             : urgencyWeight(a.lastEvaluation?.actionUrgency) - urgencyWeight(b.lastEvaluation?.actionUrgency);
         })[0];
+        const capturedSnapshot = dominantEye?.lastEvaluation?.id
+          ? data.workerAppHandoff?.evidence.find(record => record.evidence.evaluation.id === dominantEye.lastEvaluation?.id)?.evidence.snapshot
+          : undefined;
+        const snapshot = capturedSnapshot ?? currentSnapshot;
 
         return {
           stock,
@@ -3965,6 +3969,7 @@ export default function App() {
     groups: groupedAlertQueue,
     history: alertHistory,
     stockSnapshots: stockDirectory,
+    evidenceSnapshots: data.workerAppHandoff?.evidence.map(record => ({ evaluationId: record.evidence.evaluation.id ?? "", snapshot: record.evidence.snapshot })) ?? [],
     eyes: data.eyes,
     decisions: data.decisions,
   });
@@ -4246,7 +4251,7 @@ export default function App() {
               providerCheckPending={providerHealthLoading}
               scanPending={scanning}
               cloudConfigured={Boolean(cloud)}
-              workspacePanel={<WorkspaceSettingsPanel data={data} actions={actions} language={language} />}
+              workspacePanel={<WorkspaceSettingsPanel data={data} actions={actions} language={language} localWorkerHandoff={localWorkerHandoff} />}
               notificationPanel={<NotificationSettingsPanel data={data} actions={actions} language={language} fallbackFocusRef={settingsSurfaceFallbackRef} />}
               syncPanel={<CloudSyncPanel data={data} actions={actions} language={language} />}
               onLanguageChange={(next) => {

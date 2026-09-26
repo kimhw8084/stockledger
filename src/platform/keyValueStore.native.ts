@@ -19,12 +19,16 @@ const store: KeyValueStore = {
   },
   async setItem(key: string, value: string) { const db = await database(); await db.runAsync("INSERT INTO documents VALUES (?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value", key, value); },
   async removeItem(key: string) { const db = await database(); await db.runAsync("DELETE FROM documents WHERE key=?", key); await AsyncStorage.removeItem(key); },
-  async compareAndSetItem(key: string, expected: string | null, next: string, backupKey: string) {
+  async compareAndSetItem(key: string, expected: string | null, next: string, backupKey: string, initialBackup?: string) {
     const db = await database();
     await db.withExclusiveTransactionAsync(async tx => {
       const row = await tx.getFirstAsync<{ value: string }>("SELECT value FROM documents WHERE key=?", key);
       if ((row?.value ?? null) !== expected) throw new Error("Another session saved changes. Reload before editing further.");
       if (expected !== null) await tx.runAsync("INSERT INTO documents VALUES (?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value", backupKey, expected);
+      else if (initialBackup !== undefined) {
+        const backup = await tx.getFirstAsync<{ value: string }>("SELECT value FROM documents WHERE key=?", backupKey);
+        if (!backup) await tx.runAsync("INSERT INTO documents VALUES (?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value", backupKey, initialBackup);
+      }
       await tx.runAsync("INSERT INTO documents VALUES (?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value", key, next);
     });
   },

@@ -1,6 +1,6 @@
 # StockLedger 0.2.0 implementation and release evidence
 
-Implementation began September 15, 2026, from `02e54c5`. Verification continued into September 16 UTC. The design and SL improvement backlog remain the target specification; this file is the current completion authority.
+Implementation began September 15, 2026, from `02e54c5`. The older ledger below records historical checks through September 16 UTC; CHG-256 R2 adds the current worker-to-app handoff implementation and verification for that area. The design and SL improvement backlog remain the target specification; this file is the current completion authority.
 
 **Release assessment: usable local-first beta candidate, with a separately gated cloud-sync pilot.** This is a substantial implementation, not completion of every item in the production roadmap. No public deployment, paid service, live trading integration, or native store release was performed.
 
@@ -43,7 +43,7 @@ Implementation began September 15, 2026, from `02e54c5`. Verification continued 
 - `server/worker` uses the shared engine and local CSV observations while the UI is closed. No server subscription is required.
 - SQLite WAL storage, expected revisions, job leases, capped retries, atomic result/outbox commits and restart idempotency are implemented.
 - Consistent SQLite backups and isolated restore tests pass. Importing a later app export requires a matching worker revision and creates a before-import backup.
-- Worker/app handoff is explicit export/import. CHG-94 adds a server-only versioned delivery lifecycle, real deterministic digest batching, in-flight opt-out fencing, a safe device-local last-known status projection, local SMTP adapter boundary, durable intent/attempt/receipt tables and device-local preferences; no hosted provider, real recipient, OS push service or user scheduler is installed.
+- CHG-256 R2 adds a local incremental worker-to-app evidence handoff. An owner-selected browser folder carries bounded, content-addressed evaluation batches and idempotent receipts; the app preserves exact worker context, owner history and an atomic recoverable prior copy, and reports conflicts and coverage states explicitly. App-authored preferences and edits still use the revision-gated reverse import below. CHG-94's server-only versioned delivery lifecycle, digest batching, opt-out fencing, safe device-local last-known status, local SMTP boundary and durable intent/attempt/receipt tables remain; no hosted provider, recipient, OS push service or scheduler is installed.
 
 ### Optional cloud pilot
 
@@ -54,6 +54,19 @@ Implementation began September 15, 2026, from `02e54c5`. Verification continued 
 - Cloud account lifecycle and managed hosted delivery/billing are incomplete. Local delivery behavior is proven only against isolated test transport; see the deployment runbook before enabling cloud for anyone else.
 
 ## Verification ledger
+
+CHG-256 R2 verification is recorded separately below after the September 26 qualification. The older ledger that follows is historical and is not evidence for the current worker/app handoff.
+
+### CHG-256 R2 verification (September 26, 2026)
+
+- Runtime: Node **22.23.2**. `npm ci`, strict typecheck plus Vitest (`npm run check`), `npm run check:boundaries`, `npm audit --audit-level=high`, and `npm run export:all` passed. The final unit run passed **216 tests across 27 files**. Dependency audit reported zero vulnerabilities; web, iOS, and Android exports completed.
+- Handoff unit/integration coverage (`tests/workerHandoff.test.ts`): **6 passed**, covering captured identity, replay, owner-authored state, overlap conflict, malformed/incomplete input, and durable worker batch/ack behavior. Repository recovery tests also cover the initial valid empty baseline copy.
+- Browser handoff journey (`tests/e2e/worker-app-handoff.spec.ts`): **2 passed** across desktop and Pixel 7 emulation. It reaches Today, Alerts, and Journal, verifies exact captured source context and decision/amendment retention, and exercises replay, permission regrant, missed/partial/stale/conflict and recovery states without importing a full workspace. The browser test uses a test directory-handle adapter; it does not claim native OS picker or native-device qualification.
+- Full Playwright: one full default run passed **89 tests with 1 existing mobile keyboard-only case skipped as not applicable**. Later full re-runs reproduced unrelated intermittent existing Recipes/Eye Composer focus/bounds failures (88 passed, 1 skipped, 1 failed); the two affected handoff journeys passed in every run and in the final focused run. This suite flakiness is retained explicitly rather than counted as a clean rerun.
+- `npm run recovery:drill`: passed with source unchanged, restored integrity, authored history/evaluations/decisions/jobs/ingestion/notification state retained, and corrupted/incompatible candidates rejected. The drill is synthetic evidence; its no-scheduler RPO remains unknown.
+- `npm run operations:qualify`: passed its synthetic 100-stock/260-session budget, retry-attempt preservation, and isolated restore budget. The three samples are an engineering qualification, not a production SLA or capacity promise. `npm run operations:status` passed on an uninitialized local database and truthfully reported `workspace_missing`, `schedulerInstalled:false`, no local schedule, and no release identity.
+- Golden UI v3 impact was limited to Today/Alerts worker evidence context and the Settings handoff card/status. Existing affected states were recaptured on desktop and mobile, in English and Korean, with keyboard focus return and reduced motion. A real Chrome tab zoom set to 200% produced a 640 CSS-pixel viewport at device pixel ratio 2; the handoff card reflowed within its content width and the folder action remained visible and reachable. Screenshot evidence is included in the CHG-256 artifact package. This is not a full-product visual audit, human preference finding, native-device qualification, or blanket accessibility conformance claim.
+- SMTP, a real recipient, owner data, an installed scheduler, and an always-awake machine were not used or asserted.
 
 | Check | Recorded result |
 | --- | --- |

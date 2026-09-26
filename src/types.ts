@@ -744,6 +744,47 @@ export interface LastKnownNotificationDeliveryStatus {
   preferenceHash: string;
 }
 
+export type WorkerAppHandoffStatus = "none" | "pending" | "available" | "applied" | "stale" | "partial" | "missed" | "conflict" | "failed" | "recovered";
+
+/** Historical worker evidence retained locally so later recipe/source edits cannot rewrite its explanation. */
+export interface WorkerHandoffEvidence {
+  eye: Eye;
+  stock: Stock;
+  recipe: Recipe;
+  customMetrics: MetricDefinition[];
+  evaluation: Evaluation;
+  snapshot: MockSnapshot;
+  alert?: Alert;
+  expectedPreviousEvaluationId?: string;
+  eyeIdentityHash: string;
+  recipeHash: string;
+  snapshotHash: string;
+}
+
+export interface WorkerHandoffEvidenceRecord {
+  batchId: string;
+  sequence: number;
+  capturedAt: string;
+  sourceJobId: string;
+  evidence: WorkerHandoffEvidence;
+}
+
+/** Local app receipt/cursor. It is excluded from cloud record sync. */
+export interface WorkerAppHandoffState {
+  contractVersion: "stockledger-worker-app-handoff-v1";
+  revision: 1;
+  status: WorkerAppHandoffStatus;
+  workerWorkspaceId?: string;
+  lastAppliedSequence?: number;
+  lastAppliedBatchId?: string;
+  lastAppliedAt?: string;
+  lastWorkerRunAt?: string;
+  latestWorkerRevision?: number;
+  pendingBatchCount?: number;
+  errorCode?: "permission_required" | "handoff_unavailable" | "invalid_handoff" | "workspace_mismatch" | "sequence_gap" | "owner_state_changed" | "identity_collision" | "storage_write_failed" | "acknowledgement_failed";
+  evidence: WorkerHandoffEvidenceRecord[];
+}
+
 export interface AppData {
   workspaceId?: string;
   evaluations?: Evaluation[];
@@ -768,6 +809,8 @@ export interface AppData {
   notificationPreferences: NotificationPreferences;
   /** Device-local worker projection; never uploaded by CHG-93 sync. */
   lastKnownNotificationDeliveryStatus?: LastKnownNotificationDeliveryStatus;
+  /** Device-local append-only worker evidence and atomic replay cursor. */
+  workerAppHandoff?: WorkerAppHandoffState;
 }
 
 export interface ProviderHealthEntry {

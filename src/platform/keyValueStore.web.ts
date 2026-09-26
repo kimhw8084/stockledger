@@ -41,7 +41,7 @@ const store: KeyValueStore = {
       tx.onabort = tx.onerror = () => reject(tx.error ?? new Error("Local write failed. Export a backup and free device space."));
     });
   },
-  async compareAndSetItem(key: string, expected: string | null, next: string, backupKey: string): Promise<void> {
+  async compareAndSetItem(key: string, expected: string | null, next: string, backupKey: string, initialBackup?: string): Promise<void> {
     const db = await database();
     await new Promise<void>((resolve, reject) => {
       const tx = db.transaction("documents", "readwrite"); const collection = tx.objectStore("documents");
@@ -49,6 +49,10 @@ const store: KeyValueStore = {
       current.onsuccess = () => {
         if ((current.result ?? null) !== expected) { tx.abort(); reject(new Error("Another tab saved changes. Reload before editing further.")); return; }
         if (expected !== null) collection.put(expected, backupKey);
+        else if (initialBackup !== undefined) {
+          const backup = collection.get(backupKey);
+          backup.onsuccess = () => { if (backup.result === undefined) collection.put(initialBackup, backupKey); };
+        }
         collection.put(next, key);
       };
       tx.oncomplete = () => resolve();

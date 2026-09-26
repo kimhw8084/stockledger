@@ -4,7 +4,7 @@ import { FINANCIAL_TRUTH_ENGINE_VERSION, metricCatalog } from "../lib/metricCata
 import { contentHash } from "./contentHash";
 import { latestCompletedTradingDate } from "../lib/marketCalendar";
 
-export function evaluateWorkspace(data: AppData, now = new Date()): AppData {
+export function evaluateWorkspace(data: AppData, now = new Date(), skipEyeIds: readonly string[] = []): AppData {
   const completedSession = latestCompletedTradingDate(now);
   const snapshots = data.snapshots.map(snapshot => !snapshot.isMock && snapshot.provenance ? {
     ...snapshot, freshness: snapshot.provenance.observedDate < completedSession ? "Stale" as const
@@ -12,7 +12,15 @@ export function evaluateWorkspace(data: AppData, now = new Date()): AppData {
   } : snapshot);
   const alerts = [...data.alerts], evaluations = [...(data.evaluations ?? [])];
   const definitions = [...metricCatalog, ...data.customMetrics];
+  const skippedEyes = new Set(skipEyeIds);
+  const capturedOwnerIdentity = new Map<string, string>();
+  for (const record of data.workerAppHandoff?.evidence ?? []) {
+    capturedOwnerIdentity.set(record.evidence.eye.id, record.evidence.eyeIdentityHash);
+  }
   const eyes = data.eyes.map(eye => {
+    const { lastEvaluation: _lastEvaluation, ...ownerFields } = eye;
+    const workerEvidenceStillMatchesOwnerState = capturedOwnerIdentity.get(eye.id) === contentHash(ownerFields);
+    if (skippedEyes.has(eye.id) || workerEvidenceStillMatchesOwnerState) return eye;
     const stock = data.stocks.find(item => item.id === eye.stockId);
     const recipe = data.recipes.find(item => item.id === eye.recipeId);
     const snapshot = snapshots.find(item => item.stockId === eye.stockId);
