@@ -1,0 +1,151 @@
+{
+  "schema_version": 1,
+  "project": "stockledger",
+  "request": "stockledger-prod-c19-final-personal-handoff-qualification-verify-v1",
+  "subject": {
+    "main": "1d3fc085b54b5002342982cc9c15ccc32bf086ba",
+    "tree": "b0013584a69ed47bd7eb1c7d331bddc773f57c6c"
+  },
+  "blocker": {
+    "id": "test-handoff-isolation",
+    "classification": "MATERIAL_PRODUCT_GAP",
+    "blocks_code_handoff_audit": true,
+    "blocks_live_monitoring_safety_while_check_runs": true,
+    "evidence": [
+      "tests/worker.test.ts:521-531",
+      "server/worker/cli.ts:14,61-64"
+    ],
+    "caveat": "Local handoff directory exists; file contents and pre-run state were not inspected, so actual owner-record loss is not asserted."
+  },
+  "residual_items": [
+    {
+      "id": "watchlist",
+      "classification": "OWNER_CONFIGURATION_REQUIRED",
+      "blocks_code_handoff": false,
+      "blocks_live_monitoring": true,
+      "blocks_only_optional_scope": false,
+      "action": "Supply actual owner workspace/watchlist."
+    },
+    {
+      "id": "daily-bars",
+      "classification": "OWNER_CONFIGURATION_REQUIRED",
+      "blocks_code_handoff": false,
+      "blocks_live_monitoring": true,
+      "blocks_only_optional_scope": false,
+      "action": "Supply permitted regularly updated completed daily CSV with explicit adjustment/provenance/freshness."
+    },
+    {
+      "id": "source-rights-freshness",
+      "classification": "UNPROVEN_EXTERNAL",
+      "blocks_code_handoff": false,
+      "blocks_live_monitoring": true,
+      "blocks_only_optional_scope": false,
+      "action": "Verify selected external source authorization, availability and updates."
+    },
+    {
+      "id": "node-db-folder",
+      "classification": "OWNER_CONFIGURATION_REQUIRED",
+      "blocks_code_handoff": false,
+      "blocks_live_monitoring": true,
+      "blocks_only_optional_scope": false,
+      "action": "Use Node 22.23.2 and select private worker DB/handoff paths."
+    },
+    {
+      "id": "schedule-awake-input",
+      "classification": "OWNER_CONFIGURATION_REQUIRED",
+      "condition": "Unattended monitoring only.",
+      "blocks_code_handoff": false,
+      "blocks_live_monitoring": false,
+      "blocks_only_optional_scope": true,
+      "action": "Owner installs schedule, keeps machine awake and input path readable; manual runs remain supported."
+    },
+    {
+      "id": "backup-cadence",
+      "classification": "OWNER_CONFIGURATION_REQUIRED",
+      "blocks_code_handoff": false,
+      "blocks_live_monitoring": false,
+      "blocks_only_optional_scope": false,
+      "blocks_safe_durable_use": true,
+      "action": "Set private backup destination/cadence; loss since operator backup otherwise unknown."
+    },
+    {
+      "id": "smtp",
+      "classification": "NOT_APPLICABLE",
+      "blocks_code_handoff": false,
+      "blocks_live_monitoring": false,
+      "blocks_only_optional_scope": true,
+      "action": "In-app review suffices; setup only if external mail is chosen."
+    },
+    {
+      "id": "cloud-sync",
+      "classification": "NOT_APPLICABLE",
+      "blocks_code_handoff": false,
+      "blocks_live_monitoring": false,
+      "blocks_only_optional_scope": true,
+      "action": "Cloud identity and multi-device sync."
+    },
+    {
+      "id": "commerce",
+      "classification": "NOT_APPLICABLE",
+      "blocks_code_handoff": false,
+      "blocks_live_monitoring": false,
+      "blocks_only_optional_scope": true,
+      "action": "Paid/public commerce, billing, support/privacy lifecycle."
+    },
+    {
+      "id": "teams-marketplace",
+      "classification": "NOT_APPLICABLE",
+      "blocks_code_handoff": false,
+      "blocks_live_monitoring": false,
+      "blocks_only_optional_scope": true,
+      "action": "Multi-user/team/marketplace."
+    },
+    {
+      "id": "managed-hosting",
+      "classification": "NOT_APPLICABLE",
+      "blocks_code_handoff": false,
+      "blocks_live_monitoring": false,
+      "blocks_only_optional_scope": true,
+      "action": "Broad hosted service."
+    },
+    {
+      "id": "native",
+      "classification": "NOT_APPLICABLE",
+      "blocks_code_handoff": false,
+      "blocks_live_monitoring": false,
+      "blocks_only_optional_scope": true,
+      "action": "Native/app-store/physical-device/OS-push claims."
+    },
+    {
+      "id": "commercial-rights",
+      "classification": "NOT_APPLICABLE",
+      "blocks_code_handoff": false,
+      "blocks_live_monitoring": false,
+      "blocks_only_optional_scope": true,
+      "action": "Commercial redistribution/managed-provider activation; owner source permission is separate above."
+    },
+    {
+      "id": "public-launch-wtp",
+      "classification": "NOT_APPLICABLE",
+      "blocks_code_handoff": false,
+      "blocks_live_monitoring": false,
+      "blocks_only_optional_scope": true,
+      "action": "Public-launch dependencies, paid pilot, real-user WTP."
+    },
+    {
+      "id": "scanner-parity",
+      "classification": "NOT_APPLICABLE",
+      "blocks_code_handoff": false,
+      "blocks_live_monitoring": false,
+      "blocks_only_optional_scope": true,
+      "action": "Broad scanner/backtest parity beyond adopted watch recipes."
+    }
+  ],
+  "no_contact_or_fabrication": {
+    "provider_contacted": false,
+    "recipient_contacted": false,
+    "owner_source_fabricated": false,
+    "schedule_installed_or_asserted": false,
+    "delivery_or_human_read_asserted": false
+  }
+}

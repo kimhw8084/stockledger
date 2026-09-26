@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "project": "stockledger",
+  "request": "stockledger-prod-c19-final-personal-handoff-qualification-verify-v1",
+  "subject": {
+    "main": "1d3fc085b54b5002342982cc9c15ccc32bf086ba",
+    "tree": "b0013584a69ed47bd7eb1c7d331bddc773f57c6c"
+  },
+  "recommendation": "FIX_REQUIRED",
+  "literal_owner_handoff": {
+    "ready": false,
+    "reason": "Isolate the CLI test's handoff directory before owner handoff audit; it can replace pending.json in the documented default owner folder."
+  },
+  "live_monitoring_now": {
+    "ready": false,
+    "classification": "OWNER_CONFIGURATION_REQUIRED",
+    "reason": "No owner workspace/watchlist, real permitted/current bar source, private DB/handoff paths or optional schedule supplied."
+  },
+  "product_behavior": [
+    "Personal workspace starts empty; owner creates/imports records and authors a versioned recipe/Eye locally.",
+    "Worker CLI runs while UI closed, reads SYMBOL.csv OHLCV files and writes SQLite job/evaluation history.",
+    "Worker publishes bounded content-addressed pending.json to the selected local folder; full app export is produced only when --output FILE is explicitly supplied.",
+    "Later secure browser open validates pending evidence, applies only to the existing workspace after owner identity checks, commits by compare-and-set, then writes ack.json.",
+    "Today/Alerts show captured context; Journal decisions and outcomes are deliberate. Settings exposes permission, partial, missed, stale, conflict, retry and recovery states.",
+    "StockLedger installs no scheduler, keeps no machine awake, acquires no feed, sends no required email and cannot prove human review."
+  ],
+  "owner_supplied_setup": [
+    {
+      "id": "watchlist",
+      "classification": "OWNER_CONFIGURATION_REQUIRED",
+      "action": "Create/import real workspace/watchlist.",
+      "blocks_code_handoff": false,
+      "blocks_live_monitoring": true
+    },
+    {
+      "id": "daily-bars",
+      "classification": "OWNER_CONFIGURATION_REQUIRED",
+      "action": "Supply permitted completed daily OHLCV files, explicit adjustment and truthful source.",
+      "blocks_code_handoff": false,
+      "blocks_live_monitoring": true
+    },
+    {
+      "id": "external-source",
+      "classification": "UNPROVEN_EXTERNAL",
+      "action": "Verify chosen source rights, availability, freshness and update cadence; no provider contacted.",
+      "blocks_code_handoff": false,
+      "blocks_live_monitoring": true
+    },
+    {
+      "id": "node",
+      "classification": "OWNER_CONFIGURATION_REQUIRED",
+      "action": "Use Node 22.23.2.",
+      "blocks_code_handoff": false,
+      "blocks_live_monitoring": true
+    },
+    {
+      "id": "worker-db-handoff",
+      "classification": "OWNER_CONFIGURATION_REQUIRED",
+      "action": "Choose private SQLite/handoff paths and grant the same folder to the secure browser.",
+      "blocks_code_handoff": false,
+      "blocks_live_monitoring": true
+    },
+    {
+      "id": "schedule-machine",
+      "classification": "OWNER_CONFIGURATION_REQUIRED",
+      "condition": "Only for unattended work.",
+      "action": "Install/monitor launchd/cron or equivalent; machine awake and authorized input path readable. Manual runs remain possible.",
+      "blocks_code_handoff": false,
+      "blocks_live_monitoring": false,
+      "blocks_unattended_monitoring": true
+    },
+    {
+      "id": "backup",
+      "classification": "OWNER_CONFIGURATION_REQUIRED",
+      "action": "Choose private backup destination/cadence; backups are plaintext and RPO since operator backup is unknown without cadence.",
+      "blocks_code_handoff": false,
+      "blocks_live_monitoring": false,
+      "blocks_safe_durable_use": true
+    },
+    {
+      "id": "smtp",
+      "classification": "NOT_APPLICABLE",
+      "action": "In-app review is sufficient. Credentials/destination only if owner later chooses external email.",
+      "blocks_code_handoff": false,
+      "blocks_live_monitoring": false,
+      "blocks_only_optional_scope": true
+    }
+  ],
+  "shortest_safe_path": [
+    "1. Install Node 22.23.2, npm ci, npm run web in secure desktop browser.",
+    "2. Create/import the real watchlist, author/version a recipe, bind an Eye; import completed bars with declared source/adjustment.",
+    "3. Export app JSON; initialize worker and take first SQLite snapshot: npm run worker -- --db /absolute/private/worker.sqlite --import /absolute/private/StockLedger.json --backup /absolute/private/worker-initial.sqlite.",
+    "4. In Settings → Workspace and data → Local worker review handoff, choose a private folder. Keep that same absolute path in every invocation.",
+    "5. With UI closed run: npm run worker -- --db /absolute/private/worker.sqlite --csv /absolute/path/daily-bars --adjustment adjusted --source 'Owner verified source / dataset release' --handoff-dir /absolute/private/stockledger-handoff.",
+    "6. If unattended operation is desired, owner installs launchd/cron with absolute paths/private logs and keeps machine awake/input readable; there is no installed-schedule guarantee.",
+    "7. Later open app, re-grant folder if needed, inspect Settings state and worker coverage, review Today/Alerts, then record decision/lesson in Journal.",
+    "8. Next worker invocation consumes ack.json. Replay is idempotent. Inspect stale/missing/partial/missed/conflict states; do not infer success from invocation/email intent.",
+    "9. Restore consistent SQLite backup to a new path, check integrity and validate export before switching; use prior valid app copy or validated JSON import for app recovery. Keep DB/WAL/SHM and plaintext exports private."
+  ],
+  "backup_and_privacy": {
+    "backup_plaintext": true,
+    "default_permissions_restrictive": true,
+    "limit_access_and_rotate_private_copies": true,
+    "browser_storage_may_be_removed": true
+  },
+  "owner_run_guarantees": [
+    "No provider uptime guarantee.",
+    "A sleeping host catches up only after wake; no hosted SLA.",
+    "Catch-up is bounded and blocked work remains visible.",
+    "Today/Alerts are sufficient; SMTP/provider acceptance/human reading are distinct."
+  ],
+  "not_supplied": [
+    "owner watchlist",
+    "permitted/current CSV source",
+    "owner Node installation",
+    "private worker DB/handoff folder",
+    "scheduler if unattended",
+    "awake/readable host/source",
+    "SMTP credentials/destination (optional)"
+  ]
+}

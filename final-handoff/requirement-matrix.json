@@ -1,0 +1,834 @@
+{
+  "schema_version": 1,
+  "project": "stockledger",
+  "repository": "kimhw8084/stockledger",
+  "request": "stockledger-prod-c19-final-personal-handoff-qualification-verify-v1",
+  "operation": "VERIFY",
+  "selected_scope": "single-owner local-first web/desktop; US equities/ETFs; completed daily bars; English/Korean; owner-authored versioned recipes; deterministic evaluation; Today/Alerts/Journal; optional SMTP",
+  "subject": {
+    "main": "1d3fc085b54b5002342982cc9c15ccc32bf086ba",
+    "tree": "b0013584a69ed47bd7eb1c7d331bddc773f57c6c",
+    "accepted_head": "3a76d78663b555392cd152977bb2f9c5cd91a79f",
+    "work_branch": "codex/stockledger-prod-c19-final-personal-handoff-qualification-verify-v1"
+  },
+  "items": [
+    {
+      "id": "stage-readiness",
+      "title": "Evidence-bound personal-stage readiness",
+      "classification": "MATERIAL_PRODUCT_GAP",
+      "decisive_facts": [
+        "Exact main and exact tree confirmed; PR #28 integration parents and successful exact-tree checks read back.",
+        "The required npm run check runs tests/worker.test.ts:521-531. That test gives the CLI a temporary DB, CSV and export but omits --handoff-dir. The CLI defaults to .local/stockledger-app-handoff and atomically replaces pending.json with test data.",
+        "That directory exists in this checkout. Its contents and pre-run state were not inspected, so actual owner-data loss is unproven; the unsafe path is established.",
+        "No Product fix was made; recommendation FIX_REQUIRED."
+      ],
+      "evidence_paths": [
+        "tests/worker.test.ts:521-531",
+        "server/worker/cli.ts:14,61-64",
+        "docs/operations/LOCAL_WORKER.md:90,124",
+        "https://github.com/kimhw8084/stockledger/actions/runs/36263932012"
+      ],
+      "commands": [
+        "npm run check on Node v22.23.2: twice 215/216 due unchanged 5000ms notification test timeout; worker CLI test runs in suite",
+        "Isolated notification test: passed in 2.12s",
+        "PR #28 exact-tree app job: success"
+      ],
+      "confidence": "high",
+      "claim_chain": {
+        "approved_outcome": "Prescribed verification must not replace the owner's pending worker evidence.",
+        "actual_owner_entry_point": "npm run check from the repository root.",
+        "authoritative_state_effect_owner": "CLI handoff writer uses a shared default folder and atomic rename.",
+        "affected_consumers": [
+          "Existing pending.json consumed by the browser app on later open",
+          "Owner's captured worker evaluation/alert history."
+        ],
+        "decisive_proof": [
+          "CLI test omits --handoff-dir; CLI default is .local/stockledger-app-handoff; writeFileSync plus renameSync replaces pending.json."
+        ],
+        "evidence_identity": "1d3fc085b54b5002342982cc9c15ccc32bf086ba / b0013584a69ed47bd7eb1c7d331bddc773f57c6c",
+        "independent_decision_ready_record": "MATERIAL_PRODUCT_GAP; isolate test output before recommending owner handoff audit. Actual prior payload was not inspected."
+      }
+    },
+    {
+      "id": "financial-truth",
+      "title": "One deterministic financial truth engine",
+      "classification": "PASS",
+      "decisive_facts": [
+        "Versioned financial_truth_v1 formulas, units, session windows, warmup, adjustment and UNKNOWN behavior are consumed by shared preview/workspace/worker paths.",
+        "Independent dated-gap, stale/partial, split-basis and zero-denominator fixtures are present; exact-tree app CI passed."
+      ],
+      "evidence_paths": [
+        "docs/production/IMPLEMENTATION_STATUS.md",
+        "tests/financialTruth.test.ts",
+        "src/lib/evaluateEye.ts",
+        "src/domain/evaluateWorkspace.ts"
+      ],
+      "commands": [
+        "npm run check (215 local tests passed; exact-tree app CI passed)",
+        "npm run test:e2e"
+      ],
+      "confidence": "high",
+      "claim_chain": {
+        "approved_outcome": "Same dated evidence and evaluation instant use one defined result.",
+        "actual_owner_entry_point": "Recipe preview and bound Eye evaluation.",
+        "authoritative_state_effect_owner": "financial_truth_v1 registry and shared engine.",
+        "affected_consumers": [
+          "Today",
+          "Alerts",
+          "worker evaluation."
+        ],
+        "decisive_proof": [
+          "tests/financialTruth.test.ts and exact-tree app job."
+        ],
+        "evidence_identity": "1d3fc085b54b5002342982cc9c15ccc32bf086ba / b0013584a69ed47bd7eb1c7d331bddc773f57c6c",
+        "independent_decision_ready_record": "PASS for personal recipe evaluation; no numerical research parity/performance guarantee."
+      }
+    },
+    {
+      "id": "provenance",
+      "title": "Provenance and market-data honesty",
+      "classification": "PASS",
+      "decisive_facts": [
+        "CLI accepts SYMBOL.csv with Date,Open,High,Low,Close,Volume plus explicit adjusted/unadjusted/unknown declaration.",
+        "Source, date, retrieval time, content identity and freshness/adjustment are retained; stale, partial or unadjusted inputs remain explicit.",
+        "No actual owner source was supplied/contacted."
+      ],
+      "evidence_paths": [
+        "README.md",
+        "docs/operations/LOCAL_WORKER.md",
+        "src/lib/eodDataProvider.ts",
+        "src/domain/marketSnapshot.ts",
+        "tests/worker.test.ts:70-87,521-531"
+      ],
+      "commands": [
+        "npm run check (CLI test generates CSV rows and supplies --adjustment adjusted)",
+        "npm test -- --run tests/workerHandoff.test.ts"
+      ],
+      "confidence": "high",
+      "claim_chain": {
+        "approved_outcome": "Only completed permitted daily bars with declared adjustment and traceable source can inform review.",
+        "actual_owner_entry_point": "Owner CSV folder through local CLI.",
+        "authoritative_state_effect_owner": "CSV parser, shared evaluation and provenance snapshot.",
+        "affected_consumers": [
+          "Worker result",
+          "Today/Alerts evidence context."
+        ],
+        "decisive_proof": [
+          "Exact tree worker CSV CLI fixture and 6 passing handoff tests."
+        ],
+        "evidence_identity": "1d3fc085b54b5002342982cc9c15ccc32bf086ba / b0013584a69ed47bd7eb1c7d331bddc773f57c6c",
+        "independent_decision_ready_record": "Product contract PASS; current owner source authorization/freshness is UNPROVEN_EXTERNAL."
+      }
+    },
+    {
+      "id": "immutable-history",
+      "title": "Immutable recipe/evaluation/alert/decision history",
+      "classification": "PASS",
+      "decisive_facts": [
+        "Batches bind exact Eye, recipe version, evaluation/input, snapshot, conditions and alert context.",
+        "Replay is idempotent; owner decisions/amendments/outcomes and alert review state survive later runs; overlap is a conflict."
+      ],
+      "evidence_paths": [
+        "src/domain/workerHandoff.ts",
+        "server/worker/store.ts",
+        "tests/workerHandoff.test.ts",
+        "tests/e2e/worker-app-handoff.spec.ts"
+      ],
+      "commands": [
+        "npm test -- --run tests/workerHandoff.test.ts: 6 passed",
+        "npm run test:e2e: handoff passed desktop/mobile"
+      ],
+      "confidence": "high",
+      "claim_chain": {
+        "approved_outcome": "Later worker evidence appends without replacing historical or authored context.",
+        "actual_owner_entry_point": "Browser opens owner-selected pending handoff; Journal action is deliberate.",
+        "authoritative_state_effect_owner": "WorkerStore content identities and app compare-and-set/history.",
+        "affected_consumers": [
+          "Today",
+          "Alerts",
+          "Journal",
+          "worker acknowledgement."
+        ],
+        "decisive_proof": [
+          "Six worker handoff tests and current desktop/mobile Playwright journey."
+        ],
+        "evidence_identity": "1d3fc085b54b5002342982cc9c15ccc32bf086ba / b0013584a69ed47bd7eb1c7d331bddc773f57c6c",
+        "independent_decision_ready_record": "PASS on fixtures; no human review inferred."
+      }
+    },
+    {
+      "id": "review-loop",
+      "title": "Complete calm personal review loop",
+      "classification": "PASS",
+      "decisive_facts": [
+        "Captured context appears in Today and Alerts; Journal decisions bind to historical evaluation/alert; outcome lessons remain owner-authored.",
+        "Full E2E passed 89 tests with one existing mobile keyboard-only skip; handoff journey passed on desktop and mobile."
+      ],
+      "evidence_paths": [
+        "README.md",
+        "docs/production/IMPLEMENTATION_STATUS.md",
+        "tests/e2e/worker-app-handoff.spec.ts",
+        "tests/e2e/workspace.spec.ts"
+      ],
+      "commands": [
+        "npm run test:e2e",
+        "npm test -- --run tests/workerHandoff.test.ts"
+      ],
+      "confidence": "high",
+      "claim_chain": {
+        "approved_outcome": "Owner sees dated source context, decides deliberately and can later review a lesson.",
+        "actual_owner_entry_point": "Today → Alerts → Journal.",
+        "authoritative_state_effect_owner": "Workspace history and immutable evidence identities.",
+        "affected_consumers": [
+          "Today",
+          "Alerts",
+          "Journal/outcomes."
+        ],
+        "decisive_proof": [
+          "Current exact-tree Playwright and worker handoff test assertions."
+        ],
+        "evidence_identity": "1d3fc085b54b5002342982cc9c15ccc32bf086ba / b0013584a69ed47bd7eb1c7d331bddc773f57c6c",
+        "independent_decision_ready_record": "PASS for browser fixtures; no actual owner read/decision asserted."
+      }
+    },
+    {
+      "id": "storage-recovery",
+      "title": "Durable storage, migration, export and restore",
+      "classification": "PASS",
+      "decisive_facts": [
+        "Web IndexedDB uses compare-and-set and previous valid copy; SQLite WAL/schema 8 migrations are additive.",
+        "App JSON imports validate before replacement; SQLite backups are consistent snapshots.",
+        "Recovery drill retained authored/evaluation/decision/job/ingestion/notification state and rejected corrupted/incompatible candidates.",
+        "RPO since operator backup is unknown without owner cadence; backup records are plaintext/private."
+      ],
+      "evidence_paths": [
+        "README.md",
+        "docs/operations/LOCAL_WORKER.md",
+        "docs/operations/RELEASE_RUNBOOK.md",
+        "src/data/repositories/workspaceRepository.ts",
+        "src/domain/backupFormat.ts",
+        "tests/repository.test.ts",
+        "tests/recovery.test.ts"
+      ],
+      "commands": [
+        "npm run recovery:drill -- --output /tmp/stockledger-c19-recovery-result.json",
+        "npm run test:e2e"
+      ],
+      "confidence": "high",
+      "claim_chain": {
+        "approved_outcome": "Interrupted writes/restores preserve or recover the last valid personal records.",
+        "actual_owner_entry_point": "Settings export/restore and worker --backup/--import.",
+        "authoritative_state_effect_owner": "IndexedDB repository and SQLite consistent snapshot.",
+        "affected_consumers": [
+          "Workspace",
+          "jobs",
+          "authored history",
+          "notification/handoff state."
+        ],
+        "decisive_proof": [
+          "Synthetic recovery drill plus browser backup/restore journeys."
+        ],
+        "evidence_identity": "1d3fc085b54b5002342982cc9c15ccc32bf086ba / b0013584a69ed47bd7eb1c7d331bddc773f57c6c",
+        "independent_decision_ready_record": "PASS for deterministic restore evidence; private backup path/cadence remains owner setup."
+      }
+    },
+    {
+      "id": "ui-closed-worker",
+      "title": "Monitoring independent of open UI under the local-worker boundary",
+      "classification": "PASS",
+      "decisive_facts": [
+        "CLI worker evaluates while UI closed, persists SQLite evidence and publishes bounded pending.json; later app open imports only the incremental evidence.",
+        "No server/cloud, app-open-triggered worker or installed schedule is claimed."
+      ],
+      "evidence_paths": [
+        "docs/operations/LOCAL_WORKER.md",
+        "server/worker/cli.ts",
+        "server/worker/run.ts",
+        "server/worker/store.ts",
+        "tests/worker.test.ts:70-87,521-531",
+        "tests/e2e/worker-app-handoff.spec.ts"
+      ],
+      "commands": [
+        "npm test -- --run tests/workerHandoff.test.ts",
+        "npm run test:e2e",
+        "npm run operations:status with isolated /tmp DB"
+      ],
+      "confidence": "high",
+      "claim_chain": {
+        "approved_outcome": "Worker runs independently and results reach the existing app workspace on later open.",
+        "actual_owner_entry_point": "Owner CLI or optional external local schedule; secure web app folder grant.",
+        "authoritative_state_effect_owner": "SQLite worker state and browser compare-and-set/ack.",
+        "affected_consumers": [
+          "Worker CSV",
+          "Today/Alerts/Settings."
+        ],
+        "decisive_proof": [
+          "App-closed CSV CLI fixture, 6 handoff tests, desktop/mobile E2E and unconfigured status."
+        ],
+        "evidence_identity": "1d3fc085b54b5002342982cc9c15ccc32bf086ba / b0013584a69ed47bd7eb1c7d331bddc773f57c6c",
+        "independent_decision_ready_record": "PASS for behavior; owner DB/folder/schedule still need setup."
+      }
+    },
+    {
+      "id": "notification-attention",
+      "title": "Truthful user-controlled attention; in-app review is sufficient",
+      "classification": "PASS",
+      "decisive_facts": [
+        "Today/Alerts are required path. SMTP optional; alert, intent, attempt, provider acceptance, confirmed delivery and human review are distinct."
+      ],
+      "evidence_paths": [
+        "README.md",
+        "docs/operations/LOCAL_WORKER.md",
+        "docs/production/CHG-94_EVIDENCE.md",
+        "src/domain/notificationDelivery.ts",
+        "tests/notification.test.ts"
+      ],
+      "commands": [
+        "npm run test:e2e",
+        "Focused retry case passed unchanged; full suite timing exception is recorded."
+      ],
+      "confidence": "high",
+      "claim_chain": {
+        "approved_outcome": "Alert means review evidence, not sent email or human attention.",
+        "actual_owner_entry_point": "In-app Today/Alerts; optional Settings email boundary.",
+        "authoritative_state_effect_owner": "Local delivery intent/attempt/receipt records and user preferences.",
+        "affected_consumers": [
+          "Today",
+          "Alerts",
+          "optional SMTP."
+        ],
+        "decisive_proof": [
+          "Docs, state model and exact-tree E2E/CI."
+        ],
+        "evidence_identity": "1d3fc085b54b5002342982cc9c15ccc32bf086ba / b0013584a69ed47bd7eb1c7d331bddc773f57c6c",
+        "independent_decision_ready_record": "PASS; no SMTP recipient or delivery was asserted."
+      }
+    },
+    {
+      "id": "web-quality",
+      "title": "Applicable web accessibility, localization and responsive quality",
+      "classification": "PASS",
+      "decisive_facts": [
+        "Full E2E exercised desktop/mobile viewports, English/Korean, keyboard focus, reduced motion, stress sizes and overflow checks.",
+        "Golden UI covers unaffected surfaces; CHG-256 R2/R3 covers affected Today/Alerts/Settings.",
+        "No screen reader, blanket WCAG, native device or preference claim."
+      ],
+      "evidence_paths": [
+        "packages/accessibility/src",
+        "tests/e2e/chg172-primary-surfaces.spec.ts",
+        "tests/e2e/chg184-deep-review-details.spec.ts",
+        "tests/e2e/v3-focus-geometry.spec.ts",
+        "tests/e2e/worker-app-handoff.spec.ts"
+      ],
+      "commands": [
+        "npm run test:e2e: 89 passed, 1 skipped",
+        "CHG-256 R3 evidence on identical candidate tree"
+      ],
+      "confidence": "medium_high",
+      "claim_chain": {
+        "approved_outcome": "Selected browser surfaces expose reachable controls and clear status in supported languages/sizes.",
+        "actual_owner_entry_point": "Secure web browser, Today/Alerts/Settings/Journal.",
+        "authoritative_state_effect_owner": "App composition, localized state and accessible controls.",
+        "affected_consumers": [
+          "Affected surfaces in CHG-256 R2/R3",
+          "unaffected Golden UI surfaces."
+        ],
+        "decisive_proof": [
+          "Current full E2E and exact-tree reuse identity."
+        ],
+        "evidence_identity": "1d3fc085b54b5002342982cc9c15ccc32bf086ba / b0013584a69ed47bd7eb1c7d331bddc773f57c6c",
+        "independent_decision_ready_record": "PASS only for actual browser evidence; no wider conformance inference."
+      }
+    },
+    {
+      "id": "release-operations",
+      "title": "Observable recoverable bounded operations/release behavior",
+      "classification": "MATERIAL_PRODUCT_GAP",
+      "decisive_facts": [
+        "Recovery, ops qualification/status and source-bound release verification passed on Node 22.23.2; status reported verified source identity, workspace_missing and schedulerInstalled=false.",
+        "Exact-tree PR #28 app/cloud-contract/operations jobs passed.",
+        "The prescribed npm run check's CLI test can replace owner pending evidence; safe handoff audit is blocked until isolated."
+      ],
+      "evidence_paths": [
+        "scripts/recovery-drill.ts",
+        "scripts/operations-qualification.ts",
+        "server/worker/cli.ts:14,61-64",
+        "tests/worker.test.ts:521-531",
+        "docs/operations/RELEASE_RUNBOOK.md",
+        "https://github.com/kimhw8084/stockledger/actions/runs/36263932012"
+      ],
+      "commands": [
+        "npm run recovery:drill -- --output /tmp/stockledger-c19-recovery-result.json",
+        "npm run operations:qualify -- --output /tmp/stockledger-c19-operations-qualification.json",
+        "npm run operations:status with exact release evidence and safe /tmp DB",
+        "npm run release:evidence -- --base 1d3fc085b54b5002342982cc9c15ccc32bf086ba",
+        "npm run release:verify -- --base 1d3fc085b54b5002342982cc9c15ccc32bf086ba",
+        "npm run check: local timeout and test-output defect recorded"
+      ],
+      "confidence": "high",
+      "claim_chain": {
+        "approved_outcome": "Status and verification must remain bounded and must not overwrite owner state.",
+        "actual_owner_entry_point": "Worker --status, release manifest, prescribed check.",
+        "authoritative_state_effect_owner": "SQLite projection/release proof and CLI handoff writer.",
+        "affected_consumers": [
+          "Owner-facing status",
+          "pending.json",
+          "release operator."
+        ],
+        "decisive_proof": [
+          "Recovery/qualification/status/release evidence passed; local check test isolation source path established."
+        ],
+        "evidence_identity": "1d3fc085b54b5002342982cc9c15ccc32bf086ba / b0013584a69ed47bd7eb1c7d331bddc773f57c6c",
+        "independent_decision_ready_record": "FIX_REQUIRED before owner handoff audit."
+      }
+    },
+    {
+      "id": "architecture",
+      "title": "One product/one engine/clear boundaries",
+      "classification": "PASS",
+      "decisive_facts": [
+        "Boundary script checked secret, parser and server import boundaries; release workflow script verified pinned actions and protected base."
+      ],
+      "evidence_paths": [
+        "scripts/check-boundaries.mjs",
+        "scripts/check-release-workflow.mjs",
+        "src/domain",
+        "server/worker"
+      ],
+      "commands": [
+        "npm run check:boundaries",
+        "npm run check:release-workflow"
+      ],
+      "confidence": "high",
+      "claim_chain": {
+        "approved_outcome": "App and worker share domain truth across explicit persistence/platform boundaries.",
+        "actual_owner_entry_point": "Owner app and local CLI.",
+        "authoritative_state_effect_owner": "Domain engine and application/service boundaries.",
+        "affected_consumers": [
+          "Web app",
+          "SQLite worker",
+          "optional cloud pilot outside this scope."
+        ],
+        "decisive_proof": [
+          "Static boundary checks passed on exact main."
+        ],
+        "evidence_identity": "1d3fc085b54b5002342982cc9c15ccc32bf086ba / b0013584a69ed47bd7eb1c7d331bddc773f57c6c",
+        "independent_decision_ready_record": "PASS; no hosted launch inferred."
+      }
+    },
+    {
+      "id": "product-boundary",
+      "title": "Private investment research/monitoring with human judgment",
+      "classification": "PASS",
+      "decisive_facts": [
+        "No automated trading, custody, return guarantee or investment-performance promise; decisions remain deliberate owner actions."
+      ],
+      "evidence_paths": [
+        "README.md",
+        "docs/production/IMPLEMENTATION_STATUS.md",
+        "docs/operations/LOCAL_WORKER.md"
+      ],
+      "commands": [
+        "npm run test:e2e"
+      ],
+      "confidence": "high",
+      "claim_chain": {
+        "approved_outcome": "Product supplies dated research evidence for human judgment.",
+        "actual_owner_entry_point": "Owner-authored watch conditions and deliberate Journal entry.",
+        "authoritative_state_effect_owner": "Research evaluation state, no trading side effect.",
+        "affected_consumers": [
+          "Today",
+          "Alerts",
+          "Journal."
+        ],
+        "decisive_proof": [
+          "Scope language and personal workflow tests."
+        ],
+        "evidence_identity": "1d3fc085b54b5002342982cc9c15ccc32bf086ba / b0013584a69ed47bd7eb1c7d331bddc773f57c6c",
+        "independent_decision_ready_record": "PASS; no performance promise."
+      }
+    },
+    {
+      "id": "test-handoff-isolation",
+      "title": "Worker test isolates local handoff files",
+      "classification": "MATERIAL_PRODUCT_GAP",
+      "decisive_facts": [
+        "tests/worker.test.ts:521-531 uses temporary DB/backup/CSV/output but no --handoff-dir.",
+        "server/worker/cli.ts:14 defaults to the repo-local owner handoff folder; lines 61-64 atomically replaces pending.json.",
+        "The command ran inside npm run check. The local directory exists, but its contents/pre-run state were not inspected."
+      ],
+      "evidence_paths": [
+        "tests/worker.test.ts:521-531",
+        "server/worker/cli.ts:14,61-64"
+      ],
+      "commands": [
+        "npm run check twice; CLI test included; no further test rerun after finding"
+      ],
+      "confidence": "high",
+      "claim_chain": {
+        "approved_outcome": "Tests do not mutate owner handoff state.",
+        "actual_owner_entry_point": "Local npm run check.",
+        "authoritative_state_effect_owner": "CLI publishes test manifest to the default path.",
+        "affected_consumers": [
+          "Existing browser handoff evidence."
+        ],
+        "decisive_proof": [
+          "Source call and atomic writer identity on exact main."
+        ],
+        "evidence_identity": "1d3fc085b54b5002342982cc9c15ccc32bf086ba / b0013584a69ed47bd7eb1c7d331bddc773f57c6c",
+        "independent_decision_ready_record": "MATERIAL_PRODUCT_GAP; later bounded FIX must isolate the test directory."
+      }
+    },
+    {
+      "id": "owner-workspace",
+      "title": "Owner workspace and watchlist",
+      "classification": "OWNER_CONFIGURATION_REQUIRED",
+      "decisive_facts": [
+        "Personal workspace starts empty; no real watchlist/workspace was supplied. CSV watchlist parser/UI are present; only local fixtures were used."
+      ],
+      "evidence_paths": [
+        "README.md",
+        "src/domain/watchlistImport.ts",
+        "src/features/settings/WatchlistImportPanel.tsx",
+        "tests/workflows.test.ts",
+        "tests/e2e/workspace.spec.ts"
+      ],
+      "commands": [
+        "npm run test:e2e",
+        "npm run check (watchlist parser tests included)"
+      ],
+      "confidence": "high",
+      "claim_chain": {
+        "approved_outcome": "Monitoring is bound to the owner's actual universe and authored records.",
+        "actual_owner_entry_point": "Create/import in Settings.",
+        "authoritative_state_effect_owner": "Workspace storage and owner watchlist.",
+        "affected_consumers": [
+          "Recipe/Eye",
+          "worker",
+          "Today/Alerts."
+        ],
+        "decisive_proof": [
+          "Empty-state contract and synthetic operations status workspace_missing."
+        ],
+        "evidence_identity": "1d3fc085b54b5002342982cc9c15ccc32bf086ba / b0013584a69ed47bd7eb1c7d331bddc773f57c6c",
+        "independent_decision_ready_record": "Blocks live monitoring, not literal code handoff."
+      }
+    },
+    {
+      "id": "owner-daily-bars",
+      "title": "Permitted completed daily-bar path",
+      "classification": "OWNER_CONFIGURATION_REQUIRED",
+      "decisive_facts": [
+        "No real owner CSV folder/source supplied. Product supports SYMBOL.csv and OHLCV with explicit adjustment/source.",
+        "CSV support alone does not prove live feed availability."
+      ],
+      "evidence_paths": [
+        "README.md",
+        "docs/operations/LOCAL_WORKER.md",
+        "src/lib/eodDataProvider.ts",
+        "server/worker/cli.ts",
+        "tests/worker.test.ts:521-531"
+      ],
+      "commands": [
+        "Owner command template: npm run worker -- --db <private> --csv <path> --adjustment adjusted --source <declared> --handoff-dir <private>"
+      ],
+      "confidence": "high",
+      "claim_chain": {
+        "approved_outcome": "Evaluation requires complete permitted bars with declared adjustment and freshness.",
+        "actual_owner_entry_point": "Owner-provided CSV path.",
+        "authoritative_state_effect_owner": "CSV parser and worker provenance.",
+        "affected_consumers": [
+          "Worker result and app review."
+        ],
+        "decisive_proof": [
+          "Exact generated CSV CLI fixture; no real source."
+        ],
+        "evidence_identity": "1d3fc085b54b5002342982cc9c15ccc32bf086ba / b0013584a69ed47bd7eb1c7d331bddc773f57c6c",
+        "independent_decision_ready_record": "Blocks live monitoring until owner supplies source."
+      }
+    },
+    {
+      "id": "owner-source",
+      "title": "Current source authorization, availability and regular updating",
+      "classification": "UNPROVEN_EXTERNAL",
+      "decisive_facts": [
+        "No provider contact, owner source, rights evidence, refresh cadence or current availability was supplied.",
+        "No managed/commercial rights or uptime is inferred from generic CSV support."
+      ],
+      "evidence_paths": [
+        "README.md",
+        "docs/operations/LOCAL_WORKER.md",
+        "docs/production/IMPLEMENTATION_STATUS.md"
+      ],
+      "commands": [
+        "Safe operations:status reported workspace_missing and no source rows"
+      ],
+      "confidence": "high",
+      "claim_chain": {
+        "approved_outcome": "Chosen owner source must be permitted and current.",
+        "actual_owner_entry_point": "External owner acquisition step.",
+        "authoritative_state_effect_owner": "No Product authority over external permission or future uptime.",
+        "affected_consumers": [
+          "Worker evaluation."
+        ],
+        "decisive_proof": [
+          "No real owner source; no external provider contact."
+        ],
+        "evidence_identity": "1d3fc085b54b5002342982cc9c15ccc32bf086ba / b0013584a69ed47bd7eb1c7d331bddc773f57c6c",
+        "independent_decision_ready_record": "UNPROVEN_EXTERNAL; blocks live monitoring on that source only."
+      }
+    },
+    {
+      "id": "owner-runtime-paths",
+      "title": "Node, private worker DB and private handoff folder",
+      "classification": "OWNER_CONFIGURATION_REQUIRED",
+      "decisive_facts": [
+        "This qualification used Node v22.23.2; no owner runtime/database/folder configured. Synthetic status used a private /tmp DB."
+      ],
+      "evidence_paths": [
+        ".nvmrc",
+        "package.json",
+        "docs/operations/LOCAL_WORKER.md",
+        "server/worker/cli.ts"
+      ],
+      "commands": [
+        "npm ci on Node v22.23.2",
+        "operations:status with isolated /tmp DB"
+      ],
+      "confidence": "high",
+      "claim_chain": {
+        "approved_outcome": "Owner process uses supported runtime and private local paths.",
+        "actual_owner_entry_point": "Install Node; select DB/folder; grant browser folder.",
+        "authoritative_state_effect_owner": "SQLite WorkerStore and browser IndexedDB directory handle.",
+        "affected_consumers": [
+          "CLI",
+          "Settings handoff."
+        ],
+        "decisive_proof": [
+          "Exact Node verification; unconfigured synthetic status."
+        ],
+        "evidence_identity": "1d3fc085b54b5002342982cc9c15ccc32bf086ba / b0013584a69ed47bd7eb1c7d331bddc773f57c6c",
+        "independent_decision_ready_record": "Blocks live worker operation, not code handoff."
+      }
+    },
+    {
+      "id": "owner-unattended",
+      "title": "Schedule, awake machine and readable data path",
+      "classification": "OWNER_CONFIGURATION_REQUIRED",
+      "decisive_facts": [
+        "No scheduler installed. Product reports schedulerInstalled=false; manual runs remain supported.",
+        "Unattended operation needs owner schedule, awake machine and readable authorized input."
+      ],
+      "evidence_paths": [
+        "docs/operations/LOCAL_WORKER.md",
+        "server/worker/cli.ts",
+        "synthetic operations status"
+      ],
+      "commands": [
+        "operations:status on unconfigured DB"
+      ],
+      "confidence": "high",
+      "claim_chain": {
+        "approved_outcome": "No app claim of installed schedule; invocation state stays observable.",
+        "actual_owner_entry_point": "Owner-managed launchd/cron if unattended.",
+        "authoritative_state_effect_owner": "External OS scheduler; StockLedger only records work/coverage.",
+        "affected_consumers": [
+          "Worker jobs and handoff."
+        ],
+        "decisive_proof": [
+          "Status shows stopped/false; local-worker docs."
+        ],
+        "evidence_identity": "1d3fc085b54b5002342982cc9c15ccc32bf086ba / b0013584a69ed47bd7eb1c7d331bddc773f57c6c",
+        "independent_decision_ready_record": "Blocks unattended operation only."
+      }
+    },
+    {
+      "id": "owner-backup-cadence",
+      "title": "Private backup path/cadence",
+      "classification": "OWNER_CONFIGURATION_REQUIRED",
+      "decisive_facts": [
+        "Recovery/restore works on synthetic evidence; no actual owner backup path or cadence supplied.",
+        "Loss since last operator backup is unknown without cadence; backups are plaintext."
+      ],
+      "evidence_paths": [
+        "README.md",
+        "docs/operations/LOCAL_WORKER.md",
+        "docs/operations/RELEASE_RUNBOOK.md",
+        "scripts/recovery-drill.ts"
+      ],
+      "commands": [
+        "npm run recovery:drill -- --output /tmp/stockledger-c19-recovery-result.json"
+      ],
+      "confidence": "high",
+      "claim_chain": {
+        "approved_outcome": "Owner records need an independent private backup cadence beyond the previous-copy safety net.",
+        "actual_owner_entry_point": "Settings JSON export and worker --backup.",
+        "authoritative_state_effect_owner": "Workspace/SQLite snapshot files.",
+        "affected_consumers": [
+          "Authored records, jobs and notification/handoff state."
+        ],
+        "decisive_proof": [
+          "Recovery drill retained-state checks and unbounded operator-backup RPO."
+        ],
+        "evidence_identity": "1d3fc085b54b5002342982cc9c15ccc32bf086ba / b0013584a69ed47bd7eb1c7d331bddc773f57c6c",
+        "independent_decision_ready_record": "Required for safe durable operation; does not block code handoff."
+      }
+    },
+    {
+      "id": "optional-smtp",
+      "title": "External SMTP credentials and recipient",
+      "classification": "NOT_APPLICABLE",
+      "decisive_facts": [
+        "In-app review is sufficient; no email credential/destination supplied or contacted."
+      ],
+      "evidence_paths": [
+        "README.md",
+        "docs/operations/LOCAL_WORKER.md",
+        "docs/production/CHG-94_EVIDENCE.md"
+      ],
+      "commands": [
+        "Not run; optional external email"
+      ],
+      "confidence": "high",
+      "claim_chain": {
+        "approved_outcome": "Owner may review in-app without external email.",
+        "actual_owner_entry_point": "Today/Alerts.",
+        "authoritative_state_effect_owner": "Local evaluation and evidence; SMTP is optional.",
+        "affected_consumers": [
+          "Today/Alerts and future optional SMTP."
+        ],
+        "decisive_proof": [
+          "Product contract and truthful delivery states."
+        ],
+        "evidence_identity": "1d3fc085b54b5002342982cc9c15ccc32bf086ba / b0013584a69ed47bd7eb1c7d331bddc773f57c6c",
+        "independent_decision_ready_record": "Optional scope only."
+      }
+    },
+    {
+      "id": "cloud-sync",
+      "title": "Cloud identity/multi-device sync",
+      "classification": "NOT_APPLICABLE",
+      "decisive_facts": [
+        "One owner, one local-first installation."
+      ],
+      "evidence_paths": [
+        "README.md",
+        "docs/operations/CLOUD_DEPLOYMENT.md"
+      ],
+      "commands": [
+        "Out of selected stage."
+      ],
+      "confidence": "high"
+    },
+    {
+      "id": "paid-commerce",
+      "title": "Paid/public commerce and billing/support/privacy lifecycle",
+      "classification": "NOT_APPLICABLE",
+      "decisive_facts": [
+        "No public customer or paid service in selected stage."
+      ],
+      "evidence_paths": [
+        "README.md",
+        "docs/production/IMPLEMENTATION_STATUS.md"
+      ],
+      "commands": [
+        "CHG-98 supplied control-plane context; no Notion call."
+      ],
+      "confidence": "high"
+    },
+    {
+      "id": "teams-marketplace",
+      "title": "Multi-user/team/marketplace features",
+      "classification": "NOT_APPLICABLE",
+      "decisive_facts": [
+        "One owner; no shared/team product."
+      ],
+      "evidence_paths": [
+        "README.md"
+      ],
+      "commands": [
+        "Out of selected stage."
+      ],
+      "confidence": "high"
+    },
+    {
+      "id": "managed-hosting",
+      "title": "Broad managed hosting",
+      "classification": "NOT_APPLICABLE",
+      "decisive_facts": [
+        "Local worker boundary selected; no hosted service."
+      ],
+      "evidence_paths": [
+        "README.md",
+        "docs/operations/LOCAL_WORKER.md"
+      ],
+      "commands": [
+        "Out of selected stage."
+      ],
+      "confidence": "high"
+    },
+    {
+      "id": "native-distribution",
+      "title": "Native app store, physical devices and OS push",
+      "classification": "NOT_APPLICABLE",
+      "decisive_facts": [
+        "Web/desktop browser stage only; native handoff support false."
+      ],
+      "evidence_paths": [
+        "docs/operations/LOCAL_WORKER.md",
+        "CHG-256 R2 handoff-contract.json"
+      ],
+      "commands": [
+        "Out of selected stage."
+      ],
+      "confidence": "high"
+    },
+    {
+      "id": "commercial-redistribution",
+      "title": "Commercial data rights/managed-provider activation",
+      "classification": "NOT_APPLICABLE",
+      "decisive_facts": [
+        "Commercial redistribution and managed provider activation are outside personal owner CSV scope; source permission remains a separate UNPROVEN_EXTERNAL item."
+      ],
+      "evidence_paths": [
+        "README.md",
+        "docs/production/IMPLEMENTATION_STATUS.md"
+      ],
+      "commands": [
+        "No provider contacted or activated."
+      ],
+      "confidence": "high"
+    },
+    {
+      "id": "public-launch-wtp",
+      "title": "Public launch dependencies and real-user WTP/pilot evidence",
+      "classification": "NOT_APPLICABLE",
+      "decisive_facts": [
+        "Public launch and paid/user pilot evidence are outside scope; CHG-98/99 are supplied as current control-plane truth."
+      ],
+      "evidence_paths": [
+        "docs/production/IMPLEMENTATION_STATUS.md"
+      ],
+      "commands": [
+        "No Notion call."
+      ],
+      "confidence": "high"
+    },
+    {
+      "id": "scanner-parity",
+      "title": "Broad scanner/backtest parity beyond adopted watch recipes",
+      "classification": "NOT_APPLICABLE",
+      "decisive_facts": [
+        "Owner-adopted watch-recipe path is the requirement; broad scanner/backtest parity deferred."
+      ],
+      "evidence_paths": [
+        "docs/production/IMPLEMENTATION_STATUS.md",
+        "KNOWN_LIMITATIONS.md"
+      ],
+      "commands": [
+        "Out of selected stage."
+      ],
+      "confidence": "high"
+    }
+  ]
+}

@@ -1,0 +1,136 @@
+{
+  "schema_version": 1,
+  "project": "stockledger",
+  "repository": "kimhw8084/stockledger",
+  "request": "stockledger-prod-c19-final-personal-handoff-qualification-verify-v1",
+  "operation": "VERIFY",
+  "fabric_job": "CF-29df9cf0a9bafca63978aa45",
+  "subject": {
+    "protected_target": "main",
+    "base": "1d3fc085b54b5002342982cc9c15ccc32bf086ba",
+    "tested_main": "1d3fc085b54b5002342982cc9c15ccc32bf086ba",
+    "tree": "b0013584a69ed47bd7eb1c7d331bddc773f57c6c",
+    "accepted_head": "3a76d78663b555392cd152977bb2f9c5cd91a79f",
+    "accepted_tree": "b0013584a69ed47bd7eb1c7d331bddc773f57c6c",
+    "work_branch": "codex/stockledger-prod-c19-final-personal-handoff-qualification-verify-v1"
+  },
+  "integration": {
+    "pr": 28,
+    "state": "merged",
+    "base_before_merge": "9331b8850dc674e55181447a7bd5963059fd3649",
+    "head": "3a76d78663b555392cd152977bb2f9c5cd91a79f",
+    "merge_commit": "1d3fc085b54b5002342982cc9c15ccc32bf086ba",
+    "merge_parents": [
+      "9331b8850dc674e55181447a7bd5963059fd3649",
+      "3a76d78663b555392cd152977bb2f9c5cd91a79f"
+    ],
+    "merge_tree": "b0013584a69ed47bd7eb1c7d331bddc773f57c6c",
+    "tree_equal_to_accepted_head": true,
+    "workflow_run": 36263932012,
+    "checks": {
+      "app": "success",
+      "cloud_contract": "success",
+      "operations": "success"
+    },
+    "workflow_url": "https://github.com/kimhw8084/stockledger/actions/runs/36263932012"
+  },
+  "command_results": [
+    {
+      "command": "npm ci",
+      "result": "PASS",
+      "detail": "Node v22.23.2; 639 packages; 0 audit vulnerabilities."
+    },
+    {
+      "command": "npm run check",
+      "result": "LOCAL_FAILURE_WITH_EXACT_TREE_CI_PASS",
+      "detail": "Two full runs each 215 passed / one 5000ms timeout in tests/notification.test.ts. The identical focused test passed in 2.12s. Exact-tree PR #28 app job passed npm run check. The test suite also executed the unsafe tests/worker.test.ts CLI case."
+    },
+    {
+      "command": "npm run check:boundaries",
+      "result": "PASS"
+    },
+    {
+      "command": "npm audit --audit-level=high",
+      "result": "PASS",
+      "detail": "0 vulnerabilities."
+    },
+    {
+      "command": "npm run check:release-workflow",
+      "result": "PASS"
+    },
+    {
+      "command": "npm run export:all",
+      "result": "PASS",
+      "detail": "Web, iOS, Android exported."
+    },
+    {
+      "command": "npm run test:e2e",
+      "result": "PASS",
+      "detail": "89 passed, 1 existing mobile keyboard-only skip; worker journey passed desktop and mobile."
+    },
+    {
+      "command": "npm test -- --run tests/workerHandoff.test.ts",
+      "result": "PASS",
+      "detail": "6 passed."
+    },
+    {
+      "command": "npm run recovery:drill -- --output /tmp/stockledger-c19-recovery-result.json",
+      "result": "PASS",
+      "detail": "Source unchanged, restore integrity true, authored/evaluation/decision/job/ingestion/notification state retained; corrupt/incompatible restore candidates rejected; RPO since operator backup unknown without cadence."
+    },
+    {
+      "command": "npm run operations:qualify -- --output /tmp/stockledger-c19-operations-qualification.json",
+      "result": "PASS",
+      "detail": "Synthetic 100 stocks × 260 sessions, three samples, retry/restore budgets passed; not SLA/capacity claim."
+    },
+    {
+      "command": "npm run operations:status -- --db /tmp/stockledger-c19-operations-status.sqlite --release-evidence /tmp/stockledger-c19-release-evidence.json",
+      "result": "PASS_TRUTHFUL_UNCONFIGURED",
+      "detail": "STOCKLEDGER_PROTECTED_BASE set to exact main; releaseIdentity known for exact commit/tree; workspace_missing; scheduler stopped; schedulerInstalled=false."
+    },
+    {
+      "command": "npm run release:evidence -- --base 1d3fc085b54b5002342982cc9c15ccc32bf086ba --output /tmp/stockledger-c19-release-evidence.json",
+      "result": "PASS",
+      "detail": "Source commit/tree exact."
+    },
+    {
+      "command": "npm run release:verify -- --base 1d3fc085b54b5002342982cc9c15ccc32bf086ba --input /tmp/stockledger-c19-release-evidence.json",
+      "result": "PASS",
+      "detail": "verified=true, reasons=[]."
+    },
+    {
+      "command": "npm run test:cloud",
+      "result": "ENVIRONMENT_UNAVAILABLE",
+      "detail": "Configured OrbStack Docker socket absent. Exact-tree PR #28 cloud-contract job ran isolated local Supabase and passed; only that scoped cloud claim uses it."
+    }
+  ],
+  "remote_readback": {
+    "work_branch_head": "1d3fc085b54b5002342982cc9c15ccc32bf086ba",
+    "work_branch_exact": true,
+    "main_at_start": "1d3fc085b54b5002342982cc9c15ccc32bf086ba",
+    "main_at_end": "1d3fc085b54b5002342982cc9c15ccc32bf086ba",
+    "target_drift": false
+  },
+  "mutation_boundary": {
+    "source_changed": false,
+    "product_commits": 0,
+    "product_changed_files": 0,
+    "tracked_diff_from_main": false,
+    "main_changed": false,
+    "tree_at_end": "b0013584a69ed47bd7eb1c7d331bddc773f57c6c"
+  },
+  "qualification": {
+    "recommended_disposition": "FIX_REQUIRED",
+    "fixture_path": "PASS",
+    "release_and_operations": "BLOCKED",
+    "owner_configuration_explicit": true,
+    "ui_authority_current": true,
+    "personal_scope_matrix_complete": true
+  },
+  "fabric_publication_contract": {
+    "evidence_ref": "refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c19-final-personal-handoff-qualification-verify-v1",
+    "canonical_audit_path": ".codex-fabric/audit.json",
+    "evidence_sole_parent": "1d3fc085b54b5002342982cc9c15ccc32bf086ba",
+    "publication": "normal Fabric publisher only"
+  }
+}
