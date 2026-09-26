@@ -1,0 +1,525 @@
+{
+  "accepted_at": "2026-09-26T18:10:45Z",
+  "changed_files": [
+    {
+      "additions": 19,
+      "deletions": 8,
+      "path": "docs/operations/LOCAL_WORKER.md",
+      "status": "M"
+    },
+    {
+      "additions": 15,
+      "deletions": 2,
+      "path": "docs/production/IMPLEMENTATION_STATUS.md",
+      "status": "M"
+    },
+    {
+      "additions": 69,
+      "deletions": 8,
+      "path": "server/worker/cli.ts",
+      "status": "M"
+    },
+    {
+      "additions": 88,
+      "deletions": 2,
+      "path": "server/worker/store.ts",
+      "status": "M"
+    },
+    {
+      "additions": 8,
+      "deletions": 3,
+      "path": "src/app/StockLedgerApp.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 6,
+      "deletions": 5,
+      "path": "src/application/workspaceApplicationService.ts",
+      "status": "M"
+    },
+    {
+      "additions": 4,
+      "deletions": 2,
+      "path": "src/data/repositories/workspaceRepository.ts",
+      "status": "M"
+    },
+    {
+      "additions": 16,
+      "deletions": 0,
+      "path": "src/domain/appDataSchema.ts",
+      "status": "M"
+    },
+    {
+      "additions": 9,
+      "deletions": 0,
+      "path": "src/domain/backupFormat.ts",
+      "status": "M"
+    },
+    {
+      "additions": 9,
+      "deletions": 1,
+      "path": "src/domain/evaluateWorkspace.ts",
+      "status": "M"
+    },
+    {
+      "additions": 284,
+      "deletions": 0,
+      "path": "src/domain/workerHandoff.ts",
+      "status": "A"
+    },
+    {
+      "additions": 13,
+      "deletions": 6,
+      "path": "src/features/alerts/model.ts",
+      "status": "M"
+    },
+    {
+      "additions": 30,
+      "deletions": 0,
+      "path": "src/features/settings/WorkspaceSettingsPanel.tsx",
+      "status": "M"
+    },
+    {
+      "additions": 10,
+      "deletions": 0,
+      "path": "src/features/workerHandoff/localHandoff.native.ts",
+      "status": "A"
+    },
+    {
+      "additions": 94,
+      "deletions": 0,
+      "path": "src/features/workerHandoff/localHandoff.ts",
+      "status": "A"
+    },
+    {
+      "additions": 109,
+      "deletions": 4,
+      "path": "src/hooks/useAppModel.ts",
+      "status": "M"
+    },
+    {
+      "additions": 56,
+      "deletions": 0,
+      "path": "src/lib/i18n.ts",
+      "status": "M"
+    },
+    {
+      "additions": 1,
+      "deletions": 1,
+      "path": "src/operations/releaseContracts.ts",
+      "status": "M"
+    },
+    {
+      "additions": 5,
+      "deletions": 1,
+      "path": "src/platform/keyValueStore.native.ts",
+      "status": "M"
+    },
+    {
+      "additions": 3,
+      "deletions": 2,
+      "path": "src/platform/keyValueStore.ts",
+      "status": "M"
+    },
+    {
+      "additions": 5,
+      "deletions": 1,
+      "path": "src/platform/keyValueStore.web.ts",
+      "status": "M"
+    },
+    {
+      "additions": 43,
+      "deletions": 0,
+      "path": "src/types.ts",
+      "status": "M"
+    },
+    {
+      "additions": 267,
+      "deletions": 0,
+      "path": "tests/e2e/worker-app-handoff.spec.ts",
+      "status": "A"
+    },
+    {
+      "additions": 22,
+      "deletions": 4,
+      "path": "tests/repository.test.ts",
+      "status": "M"
+    },
+    {
+      "additions": 174,
+      "deletions": 0,
+      "path": "tests/workerHandoff.test.ts",
+      "status": "A"
+    }
+  ],
+  "checks": [
+    {
+      "command": "/bin/zsh -lc 'rtk cp /tmp/stockledger-r3-capture-output/worker-app-handoff-worker--c7816-out-replacing-the-workspace-mobile-390/settings-handoff-recovered-ko.png /tmp/stockledger-r3-artifact/ui/mobile/settings-handoff-recovered-ko.png'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk sips -g pixelWidth -g pixelHeight /tmp/stockledger-r3-artifact/ui/desktop/*.png /tmp/stockledger-r3-artifact/ui/mobile/*.png'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git hash-object /tmp/stockledger-r3-artifact/ui/desktop/*.png /tmp/stockledger-r3-artifact/ui/mobile/*.png'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk shasum -a 256 /tmp/stockledger-r3-artifact/ui/desktop/*.png /tmp/stockledger-r3-artifact/ui/mobile/*.png'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/node - <<'EOF'\nconst fs = await import('node:fs/promises');\nconst specPath = '/tmp/stockledger-r3-capture/tests/e2e/worker-app-handoff.spec.ts';\nconst spec = await fs.readFile(specPath, 'utf8');\nconst before = 'await page.getByRole(\\\"button\\\", { name: \\\"Choose worker folder\\\", exact: true }).focus();\\\\n  await page.keyboard.press(\\\"Enter\\\");';\nconst after = \"'`const folderAction = page.getByRole(\"button\", { name: \"Choose worker folder\", exact: true });\n  await page.evaluate(() => { (document.activeElement as HTMLElement | null)?.blur(); document.body.focus(); });\n  let tabSteps = 0;\n  while (!(await folderAction.evaluate(element => element === document.activeElement)) && tabSteps < 100) {\n    await page.keyboard.press(\"Tab\");\n    tabSteps += 1;\n  }\n  expect(tabSteps).toBeGreaterThan(0);\n  await expect(folderAction).toBeFocused();\n  await page.keyboard.press(\"Enter\");`;\nif (!spec.includes(before)) throw new Error('\"'keyboard activation anchor not found');\nawait fs.writeFile(specPath, spec.replace(before, after));\nawait fs.rm('/tmp/stockledger-r3-capture-output', { recursive: true, force: true });\nconsole.log('Added actual Tab traversal and retained focus-return assertion in the temporary capture test only.');\nEOF\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/node node_modules/@playwright/test/cli.js test --config=/tmp/stockledger-r3-capture.config.mjs --grep 'worker evidence opens into Today'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk rg --files /tmp/stockledger-r3-capture-output'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/node - <<'EOF'\nconst fs = await import('node:fs/promises');\nconst capture = '/tmp/stockledger-r3-capture-output/worker-app-handoff-worker--c7816-out-replacing-the-workspace-';\nconst out = '/tmp/stockledger-r3-artifact/ui';\nfor (const [profile, project] of [['desktop', 'desktop-1440'], ['mobile', 'mobile-390']]) {\n  await fs.mkdir(\"'`${out}/${profile}`, { recursive: true });\n  for (const name of ['\"'settings-handoff-permission-required-en.png', 'settings-handoff-recovered-en.png', 'settings-handoff-recovered-ko.png']) {\n    await fs.copyFile(\"'`${capture}${project}/${name}`, `${out}/${profile}/${name}`);\n  }\n}\nconsole.log('\"'Copied exactly the six targeted recaptures.');\nEOF\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk sips -g pixelWidth -g pixelHeight /tmp/stockledger-r3-artifact/ui/desktop/*.png /tmp/stockledger-r3-artifact/ui/mobile/*.png'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git hash-object /tmp/stockledger-r3-artifact/ui/desktop/*.png /tmp/stockledger-r3-artifact/ui/mobile/*.png'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk shasum -a 256 /tmp/stockledger-r3-artifact/ui/desktop/*.png /tmp/stockledger-r3-artifact/ui/mobile/*.png'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk mkdir -p /tmp/stockledger-r3-artifact/evidence-repair'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/node - <<'EOF'\nconst fs = await import('node:fs/promises');\nconst dir = '/tmp/stockledger-r3-artifact/evidence-repair';\nconst candidate = {\n  schema_version: 1,\n  project: 'stockledger',\n  repository: 'kimhw8084/stockledger',\n  change: 'CHG-256',\n  request: 'stockledger-prod-c18-handoff-recovery-visual-evidence-verify-v3',\n  operation: 'VERIFY',\n  fabric_job: 'CF-7093d40510c24716ba32a133',\n  protected_base: { branch: 'main', commit: '9331b8850dc674e55181447a7bd5963059fd3649' },\n  preserved_candidate: {\n    commit: '3a76d78663b555392cd152977bb2f9c5cd91a79f',\n    tree: 'b0013584a69ed47bd7eb1c7d331bddc773f57c6c',\n    sole_parent: '9331b8850dc674e55181447a7bd5963059fd3649'\n  },\n  work_branch: 'codex/stockledger-prod-c18-handoff-recovery-visual-evidence-verify-v3',\n  source_changed: false,\n  product_commits: 0,\n  product_changed_files: 0\n};\nconst authority = {\n  schema_version: 1,\n  project: 'stockledger',\n  change: 'CHG-256',\n  r2_request: 'stockledger-prod-c18-worker-app-review-handoff-fix-v2',\n  r2_fabric_job: 'CF-06b785372e2bbaec06eb6224',\n  candidate: '3a76d78663b555392cd152977bb2f9c5cd91a79f',\n  candidate_tree: 'b0013584a69ed47bd7eb1c7d331bddc773f57c6c',\n  r2_work_branch: {\n    ref: 'refs/heads/codex/stockledger-prod-c18-worker-app-review-handoff-fix-v2',\n    head: '3a76d78663b555392cd152977bb2f9c5cd91a79f'\n  },\n  r2_artifact: {\n    ref: 'refs/heads/project-os-artifacts/stockledger/stockledger-prod-c18-worker-app-review-handoff-fix-v2',\n    commit: '31135aac94d02718893ba3834a7a792595dc32ee',\n    tree: '2991bb891ede4fef5522a5417871c37e49ae0972',\n    parents: ['3a76d78663b555392cd152977bb2f9c5cd91a79f'],\n    sole_parent_is_candidate: true\n  },\n  r2_native_evidence: {\n    ref: 'refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c18-worker-app-review-handoff-fix-v2',\n    commit: '9752666cc1500c580719e89087442c0d265c8c2c',\n    tree: 'cd36a9c75928c295586289a0e51f2d8a43b16608',\n    parents: ['3a76d78663b555392cd152977bb2f9c5cd91a79f'],\n    sole_parent_is_candidate: true,\n    canonical_audit: {\n      path: '.codex-fabric/audit.json',\n      project_id: 'stockledger',\n      request: 'stockledger-prod-c18-worker-app-review-handoff-fix-v2',\n      operation: 'FIX',\n      job_id: 'CF-06b785372e2bbaec06eb6224',\n      git_head_sha: '3a76d78663b555392cd152977bb2f9c5cd91a79f'\n    }\n  },\n  duplicated_state_evidence: {\n    desktop: {\n      permission_required: {\n        filename: 'ui/desktop/settings-handoff-permission-required-en.png',\n        sha256: '205cc946931cb112c96c4b4b066eb0319a153a6a256397f420029a6f50e36a18',\n        git_blob_sha: 'b3cbf2b3efca74220b2fc86564f956b4e03a7078',\n        bytes: 90915\n      },\n      recovered: {\n        filename: 'ui/desktop/settings-handoff-recovered-en.png',\n        sha256: '205cc946931cb112c96c4b4b066eb0319a153a6a256397f420029a6f50e36a18',\n        git_blob_sha: 'b3cbf2b3efca74220b2fc86564f956b4e03a7078',\n        bytes: 90915\n      },\n      identical_bytes_and_blob: true\n    },\n    mobile: {\n      permission_required: {\n        filename: 'ui/mobile/settings-handoff-permission-required-en.png',\n        sha256: 'a82952d650b1dff19fce48f4f4ae03052cd78bdc0780be120b4e24d73335cd1c',\n        git_blob_sha: '7271894729b3f909191cceb9120fbd00d203d32d',\n        bytes: 228196\n      },\n      recovered: {\n        filename: 'ui/mobile/settings-handoff-recovered-en.png',\n        sha256: 'a82952d650b1dff19fce48f4f4ae03052cd78bdc0780be120b4e24d73335cd1c',\n        git_blob_sha: '7271894729b3f909191cceb9120fbd00d203d32d',\n        bytes: 228196\n      },\n      identical_bytes_and_blob: true\n    }\n  },\n  r2_refs_remain_immutable_historical_evidence: true\n};\nconst visual = {\n  schema_version: 1,\n  candidate: '3a76d78663b555392cd152977bb2f9c5cd91a79f',\n  candidate_tree: 'b0013584a69ed47bd7eb1c7d331bddc773f57c6c',\n  browser: { engine: 'Chromium', playwright: '1.63.0', node: 'v22.23.2' },\n  recapture_journey: {\n    source_spec: 'tests/e2e/worker-app-handoff.spec.ts',\n    test_name: 'worker evidence opens into Today, Alerts and Journal without replacing the workspace',\n    runs: [\n      { profile: 'desktop', project: 'desktop-1440', result: 'PASS' },\n      { profile: 'mobile', project: 'mobile-390', result: 'PASS' }\n    ],\n    temporary_harness_changes: [\n      'Temporary copy outside the repository retained only the six requested screenshot calls and scrolled each target status message into view before capture.',\n      'Temporary copy used actual Tab traversal to reach the local worker folder action; existing Enter activation and focus-return assertions remained in the journey.',\n      'Temporary config used the exact requested CSS viewport and DPR 1; mobile emulation used isMobile=true and hasTouch=true.'\n    ]\n  },\n  captures: [\n    {\n      filename: 'ui/desktop/settings-handoff-permission-required-en.png',\n      profile: 'desktop', language: 'EN', state: 'permission_required',\n      viewport_css_pixels: { width: 1440, height: 900 }, device_scale_factor: 1,\n      sha256: '7da4ff01b06b6388f13b4f008c7e440a8651a014964881d8e0f5be530598359b',\n      git_blob_sha: '832a9ab7867d4bf365a337875529a50165be66e0',\n      visible_copy: 'Grant this browser access to the selected folder to check worker evidence.'\n    },\n    {\n      filename: 'ui/desktop/settings-handoff-recovered-en.png',\n      profile: 'desktop', language: 'EN', state: 'recovered_restored',\n      viewport_css_pixels: { width: 1440, height: 900 }, device_scale_factor: 1,\n      sha256: '79ba91e9ae0b1ffb916413b93db3fb383325e14dc73f12da6c9f6b22e1e9ccb9',\n      git_blob_sha: '5fec47f7b9c31e991789e069c69f537f27895b0a',\n      visible_copy: 'A prior valid workspace copy was restored'\n    },\n    {\n      filename: 'ui/desktop/settings-handoff-recovered-ko.png',\n      profile: 'desktop', language: 'KO', state: 'recovered_restored',\n      viewport_css_pixels: { width: 1440, height: 900 }, device_scale_factor: 1,\n      sha256: 'fd87caba3e0bb20a1c20a663d8848931a86d996a54924de626a3b9c11b8e847d',\n      git_blob_sha: 'fde450e7ceffc6d7877ff1a15c508721c027399b',\n      visible_copy: '이전의 유효한 워크스페이스 복사본을 복원함'\n    },\n    {\n      filename: 'ui/mobile/settings-handoff-permission-required-en.png',\n      profile: 'mobile', language: 'EN', state: 'permission_required',\n      viewport_css_pixels: { width: 390, height: 844 }, device_scale_factor: 1,\n      mobile_emulation: { isMobile: true, hasTouch: true },\n      sha256: 'a598ea0ef96b5cef27546e06da8d25e79e9e77b7409d0cd21ebdb74da420e446',\n      git_blob_sha: '1b1a3cc7f965ddaf2947410826e253de0511d2fb',\n      visible_copy: 'Grant this browser access to the selected folder to check worker evidence.'\n    },\n    {\n      filename: 'ui/mobile/settings-handoff-recovered-en.png',\n      profile: 'mobile', language: 'EN', state: 'recovered_restored',\n      viewport_css_pixels: { width: 390, height: 844 }, device_scale_factor: 1,\n      mobile_emulation: { isMobile: true, hasTouch: true },\n      sha256: '9bd5f3ca4003c87bb48850ba0b5cd4ed5aea58d45ea775f559e34d138ecee7c8',\n      git_blob_sha: '443629bd63cb816f80a39948b3b24447807e6917',\n      visible_copy: 'A prior valid workspace copy was restored'\n    },\n    {\n      filename: 'ui/mobile/settings-handoff-recovered-ko.png',\n      profile: 'mobile', language: 'KO', state: 'recovered_restored',\n      viewport_css_pixels: { width: 390, height: 844 }, device_scale_factor: 1,\n      mobile_emulation: { isMobile: true, hasTouch: true },\n      sha256: 'f037a8ec87d244ea133ee532acbf526b0eef50b7a4701133abb11ea5b585f7b7',\n      git_blob_sha: '75df2267c9eace4b8469a869642ac40ed308e82d',\n      visible_copy: '이전의 유효한 워크스페이스 복사본을 복원함'\n    }\n  ],\n  assertions: {\n    desktop_permission_required_vs_recovered_en_sha256_inequality: true,\n    desktop_permission_required_vs_recovered_en_git_blob_inequality: true,\n    mobile_permission_required_vs_recovered_en_sha256_inequality: true,\n    mobile_permission_required_vs_recovered_en_git_blob_inequality: true,\n    recovered_en_and_ko_owner_copy_visible_desktop: true,\n    recovered_en_and_ko_owner_copy_visible_mobile: true,\n    keyboard_tab_reaches_local_worker_folder_action_desktop: true,\n    keyboard_tab_reaches_local_worker_folder_action_mobile: true,\n    enter_activation_and_focus_return_desktop: true,\n    enter_activation_and_focus_return_mobile: true,\n    no_document_horizontal_overflow_in_recovery_state_desktop_1440x900: true,\n    no_document_horizontal_overflow_in_recovery_state_mobile_390x844: true\n  },\n  two_hundred_percent_zoom: {\n    new_capture_taken: false,\n    reused_r2_proof: 'ui/stockledger-handoff-200-percent-browser-zoom.png',\n    basis: 'The candidate and tree are identical to R2; the defect is limited to recovery-state evidence binding.'\n  }\n};\nconst md = \"'`# CHG-256 R3 visual evidence reconciliation\n\nThis VERIFY run recaptured only the six requested worker-app handoff recovery images on candidate `3a76d78663b555392cd152977bb2f9c5cd91a79f` (tree `b0013584a69ed47bd7eb1c7d331bddc773f57c6c`). The R3 work branch remains at that candidate. No Product source, tests, docs, configuration, dependencies, lockfile, schemas, generated Product files, or runtime behavior changed; R3 has zero Product commits and zero Product changed files.\n\nR2 remains the substantive Product, test, and release authority. R3 does not replace its implementation or broad verification. The R2 package defect was evidence binding: the desktop permission-required and recovered EN screenshots were the same bytes (SHA-256 `205cc946931cb112c96c4b4b066eb0319a153a6a256397f420029a6f50e36a18`, Git blob `b3cbf2b3efca74220b2fc86564f956b4e03a7078`); the mobile pair was also the same bytes (SHA-256 `a82952d650b1dff19fce48f4f4ae03052cd78bdc0780be120b4e24d73335cd1c`, Git blob `7271894729b3f909191cceb9120fbd00d203d32d`). R2 artifact and native evidence refs remain unchanged historical evidence.\n\nThe existing worker-app handoff Playwright journey passed on desktop 1440×900 DPR 1 and mobile 390×844 DPR 1 (mobile emulation enabled). The isolated temporary harness retained only the six target screenshot calls, scrolled the asserted state copy into view, and exercised Tab traversal to the local worker folder action. Enter activation, focus return, and the journey'\"'s document horizontal-overflow assertions passed on both profiles. The recovered EN message (“A prior valid workspace copy was restored”) and its KO localization (“이전의 유효한 워크스페이스 복사본을 복원함”) are visible in the captures.\n\nNo whole-product visual re-audit is claimed. No new 200% zoom capture was taken; the R2 proof remains applicable because the candidate/tree are unchanged and this evidence defect is unrelated to that proof. The R3 artifact package contains only the six recaptured screenshots and the four evidence-repair files.\n\"'`;\nawait fs.writeFile(`${dir}/candidate.json`, JSON.stringify(candidate, null, 2) + '\"'\\\\n');\nawait fs.writeFile(\"'`${dir}/r2-authority.json`, JSON.stringify(authority, null, 2) + '\"'\\\\n');\nawait fs.writeFile(\"'`${dir}/visual-proof.json`, JSON.stringify(visual, null, 2) + '\"'\\\\n');\nawait fs.writeFile(\"'`${dir}/validation.md`, md);\nconsole.log('\"'Wrote candidate, R2 authority, visual proof, and validation records.');\nEOF\"",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/node --input-type=module - <<'EOF'\nimport fs from 'node:fs/promises';\nconst dir = '/tmp/stockledger-r3-artifact/evidence-repair';\nconst candidate = {\n  schema_version: 1,\n  project: 'stockledger', repository: 'kimhw8084/stockledger', change: 'CHG-256',\n  request: 'stockledger-prod-c18-handoff-recovery-visual-evidence-verify-v3', operation: 'VERIFY',\n  fabric_job: 'CF-7093d40510c24716ba32a133',\n  protected_base: { branch: 'main', commit: '9331b8850dc674e55181447a7bd5963059fd3649' },\n  preserved_candidate: { commit: '3a76d78663b555392cd152977bb2f9c5cd91a79f', tree: 'b0013584a69ed47bd7eb1c7d331bddc773f57c6c', sole_parent: '9331b8850dc674e55181447a7bd5963059fd3649' },\n  work_branch: 'codex/stockledger-prod-c18-handoff-recovery-visual-evidence-verify-v3',\n  source_changed: false, product_commits: 0, product_changed_files: 0\n};\nconst authority = {\n  schema_version: 1, project: 'stockledger', change: 'CHG-256',\n  r2_request: 'stockledger-prod-c18-worker-app-review-handoff-fix-v2',\n  r2_fabric_job: 'CF-06b785372e2bbaec06eb6224',\n  candidate: '3a76d78663b555392cd152977bb2f9c5cd91a79f',\n  candidate_tree: 'b0013584a69ed47bd7eb1c7d331bddc773f57c6c',\n  r2_work_branch: { ref: 'refs/heads/codex/stockledger-prod-c18-worker-app-review-handoff-fix-v2', head: '3a76d78663b555392cd152977bb2f9c5cd91a79f' },\n  r2_artifact: {\n    ref: 'refs/heads/project-os-artifacts/stockledger/stockledger-prod-c18-worker-app-review-handoff-fix-v2',\n    commit: '31135aac94d02718893ba3834a7a792595dc32ee', tree: '2991bb891ede4fef5522a5417871c37e49ae0972',\n    parents: ['3a76d78663b555392cd152977bb2f9c5cd91a79f'], sole_parent_is_candidate: true\n  },\n  r2_native_evidence: {\n    ref: 'refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c18-worker-app-review-handoff-fix-v2',\n    commit: '9752666cc1500c580719e89087442c0d265c8c2c', tree: 'cd36a9c75928c295586289a0e51f2d8a43b16608',\n    parents: ['3a76d78663b555392cd152977bb2f9c5cd91a79f'], sole_parent_is_candidate: true,\n    canonical_audit: { path: '.codex-fabric/audit.json', project_id: 'stockledger', request: 'stockledger-prod-c18-worker-app-review-handoff-fix-v2', operation: 'FIX', job_id: 'CF-06b785372e2bbaec06eb6224', git_head_sha: '3a76d78663b555392cd152977bb2f9c5cd91a79f' }\n  },\n  duplicated_state_evidence: {\n    desktop: {\n      permission_required: { filename: 'ui/desktop/settings-handoff-permission-required-en.png', sha256: '205cc946931cb112c96c4b4b066eb0319a153a6a256397f420029a6f50e36a18', git_blob_sha: 'b3cbf2b3efca74220b2fc86564f956b4e03a7078', bytes: 90915 },\n      recovered: { filename: 'ui/desktop/settings-handoff-recovered-en.png', sha256: '205cc946931cb112c96c4b4b066eb0319a153a6a256397f420029a6f50e36a18', git_blob_sha: 'b3cbf2b3efca74220b2fc86564f956b4e03a7078', bytes: 90915 },\n      identical_bytes_and_blob: true\n    },\n    mobile: {\n      permission_required: { filename: 'ui/mobile/settings-handoff-permission-required-en.png', sha256: 'a82952d650b1dff19fce48f4f4ae03052cd78bdc0780be120b4e24d73335cd1c', git_blob_sha: '7271894729b3f909191cceb9120fbd00d203d32d', bytes: 228196 },\n      recovered: { filename: 'ui/mobile/settings-handoff-recovered-en.png', sha256: 'a82952d650b1dff19fce48f4f4ae03052cd78bdc0780be120b4e24d73335cd1c', git_blob_sha: '7271894729b3f909191cceb9120fbd00d203d32d', bytes: 228196 },\n      identical_bytes_and_blob: true\n    }\n  },\n  r2_refs_remain_immutable_historical_evidence: true\n};\nconst visual = {\n  schema_version: 1,\n  candidate: '3a76d78663b555392cd152977bb2f9c5cd91a79f', candidate_tree: 'b0013584a69ed47bd7eb1c7d331bddc773f57c6c',\n  browser: { engine: 'Chromium', playwright: '1.63.0', node: 'v22.23.2' },\n  recapture_journey: {\n    source_spec: 'tests/e2e/worker-app-handoff.spec.ts',\n    test_name: 'worker evidence opens into Today, Alerts and Journal without replacing the workspace',\n    runs: [{ profile: 'desktop', project: 'desktop-1440', result: 'PASS' }, { profile: 'mobile', project: 'mobile-390', result: 'PASS' }],\n    temporary_harness_changes: [\n      'Temporary copy outside the repository retained only the six requested screenshot calls and scrolled each target status message into view before capture.',\n      'Temporary copy used actual Tab traversal to reach the local worker folder action; existing Enter activation and focus-return assertions remained in the journey.',\n      'Temporary config used the exact requested CSS viewport and DPR 1; mobile emulation used isMobile=true and hasTouch=true.'\n    ]\n  },\n  captures: [\n    { filename: 'ui/desktop/settings-handoff-permission-required-en.png', profile: 'desktop', language: 'EN', state: 'permission_required', viewport_css_pixels: { width: 1440, height: 900 }, device_scale_factor: 1, sha256: '7da4ff01b06b6388f13b4f008c7e440a8651a014964881d8e0f5be530598359b', git_blob_sha: '832a9ab7867d4bf365a337875529a50165be66e0', visible_copy: 'Grant this browser access to the selected folder to check worker evidence.' },\n    { filename: 'ui/desktop/settings-handoff-recovered-en.png', profile: 'desktop', language: 'EN', state: 'recovered_restored', viewport_css_pixels: { width: 1440, height: 900 }, device_scale_factor: 1, sha256: '79ba91e9ae0b1ffb916413b93db3fb383325e14dc73f12da6c9f6b22e1e9ccb9', git_blob_sha: '5fec47f7b9c31e991789e069c69f537f27895b0a', visible_copy: 'A prior valid workspace copy was restored' },\n    { filename: 'ui/desktop/settings-handoff-recovered-ko.png', profile: 'desktop', language: 'KO', state: 'recovered_restored', viewport_css_pixels: { width: 1440, height: 900 }, device_scale_factor: 1, sha256: 'fd87caba3e0bb20a1c20a663d8848931a86d996a54924de626a3b9c11b8e847d', git_blob_sha: 'fde450e7ceffc6d7877ff1a15c508721c027399b', visible_copy: '이전의 유효한 워크스페이스 복사본을 복원함' },\n    { filename: 'ui/mobile/settings-handoff-permission-required-en.png', profile: 'mobile', language: 'EN', state: 'permission_required', viewport_css_pixels: { width: 390, height: 844 }, device_scale_factor: 1, mobile_emulation: { isMobile: true, hasTouch: true }, sha256: 'a598ea0ef96b5cef27546e06da8d25e79e9e77b7409d0cd21ebdb74da420e446', git_blob_sha: '1b1a3cc7f965ddaf2947410826e253de0511d2fb', visible_copy: 'Grant this browser access to the selected folder to check worker evidence.' },\n    { filename: 'ui/mobile/settings-handoff-recovered-en.png', profile: 'mobile', language: 'EN', state: 'recovered_restored', viewport_css_pixels: { width: 390, height: 844 }, device_scale_factor: 1, mobile_emulation: { isMobile: true, hasTouch: true }, sha256: '9bd5f3ca4003c87bb48850ba0b5cd4ed5aea58d45ea775f559e34d138ecee7c8', git_blob_sha: '443629bd63cb816f80a39948b3b24447807e6917', visible_copy: 'A prior valid workspace copy was restored' },\n    { filename: 'ui/mobile/settings-handoff-recovered-ko.png', profile: 'mobile', language: 'KO', state: 'recovered_restored', viewport_css_pixels: { width: 390, height: 844 }, device_scale_factor: 1, mobile_emulation: { isMobile: true, hasTouch: true }, sha256: 'f037a8ec87d244ea133ee532acbf526b0eef50b7a4701133abb11ea5b585f7b7', git_blob_sha: '75df2267c9eace4b8469a869642ac40ed308e82d', visible_copy: '이전의 유효한 워크스페이스 복사본을 복원함' }\n  ],\n  assertions: {\n    desktop_permission_required_vs_recovered_en_sha256_inequality: true,\n    desktop_permission_required_vs_recovered_en_git_blob_inequality: true,\n    mobile_permission_required_vs_recovered_en_sha256_inequality: true,\n    mobile_permission_required_vs_recovered_en_git_blob_inequality: true,\n    recovered_en_and_ko_owner_copy_visible_desktop: true,\n    recovered_en_and_ko_owner_copy_visible_mobile: true,\n    keyboard_tab_reaches_local_worker_folder_action_desktop: true,\n    keyboard_tab_reaches_local_worker_folder_action_mobile: true,\n    enter_activation_and_focus_return_desktop: true,\n    enter_activation_and_focus_return_mobile: true,\n    no_document_horizontal_overflow_in_recovery_state_desktop_1440x900: true,\n    no_document_horizontal_overflow_in_recovery_state_mobile_390x844: true\n  },\n  two_hundred_percent_zoom: { new_capture_taken: false, reused_r2_proof: 'ui/stockledger-handoff-200-percent-browser-zoom.png', basis: 'The candidate and tree are identical to R2; the defect is limited to recovery-state evidence binding.' }\n};\nconst md = \"'`# CHG-256 R3 visual evidence reconciliation\n\nThis VERIFY run recaptured only the six requested worker-app handoff recovery images on candidate '\"\\\\\"'`3a76d78663b555392cd152977bb2f9c5cd91a79f'\"\\\\\"'` (tree '\"\\\\\"'`b0013584a69ed47bd7eb1c7d331bddc773f57c6c'\"\\\\\"'`). The R3 work branch remains at that candidate. No Product source, tests, docs, configuration, dependencies, lockfile, schemas, generated Product files, or runtime behavior changed; R3 has zero Product commits and zero Product changed files.\n\nR2 remains the substantive Product, test, and release authority. R3 does not replace its implementation or broad verification. The R2 package defect was evidence binding: the desktop permission-required and recovered EN screenshots were the same bytes (SHA-256 '\"\\\\\"'`205cc946931cb112c96c4b4b066eb0319a153a6a256397f420029a6f50e36a18'\"\\\\\"'`, Git blob '\"\\\\\"'`b3cbf2b3efca74220b2fc86564f956b4e03a7078'\"\\\\\"'`); the mobile pair was also the same bytes (SHA-256 '\"\\\\\"'`a82952d650b1dff19fce48f4f4ae03052cd78bdc0780be120b4e24d73335cd1c'\"\\\\\"'`, Git blob '\"\\\\\"'`7271894729b3f909191cceb9120fbd00d203d32d'\"\\\\\"'`). R2 artifact and native evidence refs remain unchanged historical evidence.\n\nThe existing worker-app handoff Playwright journey passed on desktop 1440×900 DPR 1 and mobile 390×844 DPR 1 (mobile emulation enabled). The isolated temporary harness retained only the six target screenshot calls, scrolled the asserted state copy into view, and exercised Tab traversal to the local worker folder action. Enter activation, focus return, and the journey'\"'s document horizontal-overflow assertions passed on both profiles. The recovered EN message (“A prior valid workspace copy was restored”) and its KO localization (“이전의 유효한 워크스페이스 복사본을 복원함”) are visible in the captures.\n\nNo whole-product visual re-audit is claimed. No new 200% zoom capture was taken; the R2 proof remains applicable because the candidate/tree are unchanged and this evidence defect is unrelated to that proof. The R3 artifact package contains only the six recaptured screenshots and the four evidence-repair files.\n\"'`;\nawait fs.writeFile(`${dir}/candidate.json`, JSON.stringify(candidate, null, 2) + '\"'\\\\n');\nawait fs.writeFile(\"'`${dir}/r2-authority.json`, JSON.stringify(authority, null, 2) + '\"'\\\\n');\nawait fs.writeFile(\"'`${dir}/visual-proof.json`, JSON.stringify(visual, null, 2) + '\"'\\\\n');\nawait fs.writeFile(\"'`${dir}/validation.md`, md);\nconsole.log('\"'Wrote candidate, R2 authority, visual proof, and validation records.');\nEOF\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n 'def publish_evidence_for_job|def publish_pending_evidence|def worker\\\\(|def worker_cli|publish-evidence|JOB_NOT_TERMINAL|result.json' /Users/haewonkim/.codex-fabric/current/fabric.py\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '3048,3098p' /Users/haewonkim/.codex-fabric/current/fabric.py && rtk sed -n '3860,4035p' /Users/haewonkim/.codex-fabric/current/fabric.py && rtk sed -n '4844,4860p' /Users/haewonkim/.codex-fabric/current/fabric.py\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk /Users/haewonkim/.nvm/versions/node/v22.23.2/bin/node --input-type=module - <<'EOF'\nimport fs from 'node:fs/promises';\nconst dir = '/tmp/stockledger-r3-artifact';\nfor (const name of ['candidate.json', 'r2-authority.json', 'visual-proof.json']) JSON.parse(await fs.readFile(\"'`${dir}/evidence-repair/${name}`, '\"'utf8'));\nconst files = [];\nfor (const folder of ['evidence-repair', 'ui/desktop', 'ui/mobile']) for (const entry of await fs.readdir(\"'`${dir}/${folder}`)) files.push(`${folder}/${entry}`);\nconsole.log(JSON.stringify({json_valid: true, package_files: files.sort()}, null, 2));\nEOF'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git worktree add --detach /tmp/stockledger-r3-artifact-worktree 3a76d78663b555392cd152977bb2f9c5cd91a79f'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk cp -R /tmp/stockledger-r3-artifact/evidence-repair /tmp/stockledger-r3-artifact-worktree/'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk cp -R /tmp/stockledger-r3-artifact/ui /tmp/stockledger-r3-artifact-worktree/'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git status --short && rtk git add evidence-repair ui && rtk git diff --cached --check && rtk git diff --cached --name-only'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git ls-files -s ui/desktop/settings-handoff-permission-required-en.png ui/desktop/settings-handoff-recovered-en.png ui/desktop/settings-handoff-recovered-ko.png ui/mobile/settings-handoff-permission-required-en.png ui/mobile/settings-handoff-recovered-en.png ui/mobile/settings-handoff-recovered-ko.png && rtk git status --short --branch && rtk git rev-parse HEAD HEAD''^{tree}'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git commit -m \"CHG-256: repair handoff recovery visual evidence\"'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git rev-parse HEAD && rtk git rev-list --parents -n 1 HEAD && rtk git diff-tree --no-commit-id --name-only -r HEAD && rtk git status --short --branch'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git push origin dea288a5930a95a76e4239653b49430ee701ffe9:refs/heads/project-os-artifacts/stockledger/stockledger-prod-c18-handoff-recovery-visual-evidence-verify-v3'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git fetch origin refs/heads/project-os-artifacts/stockledger/stockledger-prod-c18-handoff-recovery-visual-evidence-verify-v3:refs/remotes/origin/project-os-artifacts/stockledger/stockledger-prod-c18-handoff-recovery-visual-evidence-verify-v3 && rtk git rev-parse refs/remotes/origin/project-os-artifacts/stockledger/stockledger-prod-c18-handoff-recovery-visual-evidence-verify-v3 && rtk git rev-list --parents -n 1 refs/remotes/origin/project-os-artifacts/stockledger/stockledger-prod-c18-handoff-recovery-visual-evidence-verify-v3 && rtk git diff-tree --no-commit-id --name-only -r refs/remotes/origin/project-os-artifacts/stockledger/stockledger-prod-c18-handoff-recovery-visual-evidence-verify-v3'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git rev-parse refs/remotes/origin/project-os-artifacts/stockledger/stockledger-prod-c18-handoff-recovery-visual-evidence-verify-v3:ui/desktop/settings-handoff-permission-required-en.png'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git rev-parse refs/remotes/origin/project-os-artifacts/stockledger/stockledger-prod-c18-handoff-recovery-visual-evidence-verify-v3:ui/desktop/settings-handoff-recovered-en.png'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git rev-parse refs/remotes/origin/project-os-artifacts/stockledger/stockledger-prod-c18-handoff-recovery-visual-evidence-verify-v3:ui/desktop/settings-handoff-recovered-ko.png'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git show refs/remotes/origin/project-os-artifacts/stockledger/stockledger-prod-c18-handoff-recovery-visual-evidence-verify-v3:ui/desktop/settings-handoff-permission-required-en.png | rtk shasum -a 256'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git rev-parse refs/remotes/origin/project-os-artifacts/stockledger/stockledger-prod-c18-handoff-recovery-visual-evidence-verify-v3:ui/mobile/settings-handoff-permission-required-en.png'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git show refs/remotes/origin/project-os-artifacts/stockledger/stockledger-prod-c18-handoff-recovery-visual-evidence-verify-v3:ui/desktop/settings-handoff-recovered-en.png | rtk shasum -a 256'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git show refs/remotes/origin/project-os-artifacts/stockledger/stockledger-prod-c18-handoff-recovery-visual-evidence-verify-v3:ui/desktop/settings-handoff-recovered-ko.png | rtk shasum -a 256'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git rev-parse refs/remotes/origin/project-os-artifacts/stockledger/stockledger-prod-c18-handoff-recovery-visual-evidence-verify-v3:ui/mobile/settings-handoff-recovered-en.png'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git show refs/remotes/origin/project-os-artifacts/stockledger/stockledger-prod-c18-handoff-recovery-visual-evidence-verify-v3:ui/mobile/settings-handoff-permission-required-en.png | rtk shasum -a 256'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git rev-parse refs/remotes/origin/project-os-artifacts/stockledger/stockledger-prod-c18-handoff-recovery-visual-evidence-verify-v3:ui/mobile/settings-handoff-recovered-ko.png'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git show refs/remotes/origin/project-os-artifacts/stockledger/stockledger-prod-c18-handoff-recovery-visual-evidence-verify-v3:ui/mobile/settings-handoff-recovered-en.png | rtk shasum -a 256'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git show refs/remotes/origin/project-os-artifacts/stockledger/stockledger-prod-c18-handoff-recovery-visual-evidence-verify-v3:ui/mobile/settings-handoff-recovered-ko.png | rtk shasum -a 256'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy git cat-file blob fde450e7ceffc6d7877ff1a15c508721c027399b | rtk shasum -a 256'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy git cat-file blob 443629bd63cb816f80a39948b3b24447807e6917 | rtk shasum -a 256'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy git cat-file blob 5fec47f7b9c31e991789e069c69f537f27895b0a | rtk shasum -a 256'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy git cat-file blob 75df2267c9eace4b8469a869642ac40ed308e82d | rtk shasum -a 256'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy git cat-file blob 1b1a3cc7f965ddaf2947410826e253de0511d2fb | rtk shasum -a 256'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy git cat-file blob 832a9ab7867d4bf365a337875529a50165be66e0 | rtk shasum -a 256'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git fetch origin main'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git ls-remote --heads origin refs/heads/main refs/heads/codex/stockledger-prod-c18-worker-app-review-handoff-fix-v2 refs/heads/project-os-artifacts/stockledger/stockledger-prod-c18-worker-app-review-handoff-fix-v2 refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c18-worker-app-review-handoff-fix-v2 refs/heads/codex/stockledger-prod-c18-handoff-recovery-visual-evidence-verify-v3 refs/heads/project-os-artifacts/stockledger/stockledger-prod-c18-handoff-recovery-visual-evidence-verify-v3 refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c18-handoff-recovery-visual-evidence-verify-v3 && rtk git rev-parse origin/main && rtk git rev-parse HEAD HEAD''^{tree} && rtk git status --short --branch'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk rm -rf node_modules'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git worktree remove --force /tmp/stockledger-r3-artifact-worktree'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk rm -rf /tmp/stockledger-r3-artifact /tmp/stockledger-r3-capture /tmp/stockledger-r3-capture-output /tmp/stockledger-r3-capture.config.mjs /tmp/stockledger-r3-serve-preview.mjs /tmp/stockledger-r3-web'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk /Users/haewonkim/.codex-fabric/bin/fabricctl status CF-7093d40510c24716ba32a133 && rtk git status --short --branch && rtk git rev-parse HEAD HEAD''^{tree} origin/main && rtk git diff --quiet 3a76d78663b555392cd152977bb2f9c5cd91a79f -- && rtk git worktree list'",
+      "exit_code": 0,
+      "type": "command_execution"
+    }
+  ],
+  "codex": {
+    "cli_version": "codex-cli 0.157.0",
+    "configured_model": "gpt-6-luna",
+    "event_count": 222,
+    "provider_reported_model": null,
+    "reasoning_effort": "xhigh",
+    "terminal_type": "turn.completed",
+    "usage": {
+      "cache_hit_percent": 97.5,
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 6983680,
+      "fresh_input_tokens": 178784,
+      "input_tokens": 7162464,
+      "non_reasoning_output_tokens": 19990,
+      "output_tokens": 66219,
+      "reasoning_output_tokens": 46229,
+      "total_processed_tokens": 7228683
+    },
+    "warnings": []
+  },
+  "commits": [
+    {
+      "sha": "3a76d78663b555392cd152977bb2f9c5cd91a79f",
+      "subject": "CHG-256: hand off worker evidence for app review"
+    }
+  ],
+  "diff": {
+    "additions": 1359,
+    "changed_files": 25,
+    "commit_count": 1,
+    "deletions": 50
+  },
+  "error_code": null,
+  "evidence_manifest": {
+    "count": 2,
+    "items": [
+      {
+        "bytes": 27306,
+        "path": "docs/operations/LOCAL_WORKER.md",
+        "sha256": "eeb2536e55b7b0ebcf043c92d253d171cbb8638781ec2f71b83c5b77b38ef97d"
+      },
+      {
+        "bytes": 26271,
+        "path": "docs/production/IMPLEMENTATION_STATUS.md",
+        "sha256": "da5fbf721ef7c5da5b5531009ad7a7b7bcbec66522e026425ac20fde6706be21"
+      }
+    ],
+    "version": 1
+  },
+  "evidence_publisher_release": "1.2.5-dashboard-controls-candidate",
+  "fabric_capture": {
+    "applied": false,
+    "paths_before": 0,
+    "transient_untracked_removed": {
+      "count": 0,
+      "items": []
+    }
+  },
+  "fabric_release": "1.2.5-dashboard-controls-candidate",
+  "failure_class": null,
+  "finished_at": "2026-09-26T18:34:16Z",
+  "git": {
+    "base_is_ancestor": true,
+    "base_sha": "9331b8850dc674e55181447a7bd5963059fd3649",
+    "branch": "codex/stockledger-prod-c18-handoff-recovery-visual-evidence-verify-v3",
+    "detached_verify": false,
+    "head_sha": "3a76d78663b555392cd152977bb2f9c5cd91a79f",
+    "remote_exact_head": true,
+    "remote_head_sha": "3a76d78663b555392cd152977bb2f9c5cd91a79f",
+    "target_branch": "main",
+    "target_drifted_since_acceptance": false,
+    "target_head_observed_after_execution": "9331b8850dc674e55181447a7bd5963059fd3649",
+    "work_branch": "codex/stockledger-prod-c18-handoff-recovery-visual-evidence-verify-v3",
+    "worktree_clean": true
+  },
+  "instructions": {
+    "files": [],
+    "total_bytes": 0,
+    "warning": null
+  },
+  "job_id": "CF-7093d40510c24716ba32a133",
+  "kind": "codex-fabric-audit-evidence",
+  "locator": {
+    "branch": "codex-fabric/evidence/stockledger/stockledger-prod-c18-handoff-recovery-visual-evidence-verify-v3",
+    "path": ".codex-fabric/audit.json",
+    "ref": "refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c18-handoff-recovery-visual-evidence-verify-v3"
+  },
+  "operation": "VERIFY",
+  "policy": {
+    "environment_policy_sha256": "e077daca74297b3c30bee8989f00f8ca5338f7610b4d016a6c48db524205d064",
+    "fabric_release": "1.2.5-dashboard-controls-candidate",
+    "policy_sha256": "123615bf2f6e57dcac197e49ca98ceac59ada86a55e2c84445ea5d00812c0833",
+    "registry_sha256": "af81b8552f9d6a33847310e3c6bcd2d48401782b963a58efd2993e93570cb4aa"
+  },
+  "project_id": "stockledger",
+  "recovery": {
+    "model_rerun_safe": false,
+    "recovery_required": false,
+    "retry_safe": false,
+    "retry_scope": null,
+    "worktree_retained": true
+  },
+  "request": "stockledger-prod-c18-handoff-recovery-visual-evidence-verify-v3",
+  "schema_version": 1,
+  "started_at": "2026-09-26T18:10:45Z",
+  "status": "EXECUTED_CHANGE",
+  "timing": {
+    "execution_seconds": 1411,
+    "queue_seconds": 0,
+    "total_seconds": 1411
+  },
+  "transport": {
+    "bytes": 10992,
+    "envelope": "FABRIC/2",
+    "prompt_bytes": 10605,
+    "prompt_sha256": "729a5d5e0cb776733fd3241b86bb68dc03eb50a0b3bc9704ae49ad2a3512d7a5",
+    "sha256": "7093d40510c24716ba32a133f626c1bb1b6feac7a8bbda24664edf7d374eb597"
+  }
+}
