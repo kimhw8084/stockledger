@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, expect, it } from "vitest";
@@ -10,6 +10,7 @@ import { runManagedJob } from "../server/worker/managed";
 import { jobIdentityFor, retryDelayMs, WORKER_MAX_ATTEMPTS, WORKER_MAX_QUEUED_JOBS } from "../server/worker/contract";
 import { marketSessionDueAtUtc, previousUsTradingDate } from "../src/lib/marketCalendar";
 import { serializeExport } from "../src/domain/backupFormat";
+import { parseWorkerHandoffManifest } from "../src/domain/workerHandoff";
 const folders: string[] = [];
 const databasePath = () => { const dir = mkdtempSync(join(tmpdir(), "stockledger-test-")); folders.push(dir); return join(dir, "ledger.sqlite"); };
 afterEach(() => { for (const dir of folders.splice(0)) rmSync(dir, { recursive: true, force: true }); });
@@ -521,14 +522,19 @@ it("distinguishes an explicit null scheduler patch from an omitted property", ()
 it("runs the managed entry point from the app-closed CLI and reports truthful status", () => {
   const directory = mkdtempSync(join(tmpdir(), "stockledger-cli-test-")); folders.push(directory);
   const { data, histories } = managedFixture();
-  const backup = join(directory, "workspace.json"); const csvDirectory = join(directory, "prices"); const db = join(directory, "worker.sqlite"); const output = join(directory, "worker.json");
+  data.workspaceId = "stockledger-cli-fixture";
+  const backup = join(directory, "workspace.json"); const csvDirectory = join(directory, "prices"); const db = join(directory, "worker.sqlite"); const output = join(directory, "worker.json"); const handoffDirectory = join(directory, "handoff");
   mkdirSync(csvDirectory);
   writeFileSync(backup, serializeExport(data, 0));
   for (const history of histories) writeFileSync(join(csvDirectory, `${history.symbol}.csv`), `Date,Open,High,Low,Close,Volume\n${history.rows.map(row => `${row.date},${row.open},${row.high},${row.low},${row.close},${row.volume}`).join("\n")}\n`);
-  const stdout = execFileSync(process.execPath, [join(process.cwd(), "node_modules/tsx/dist/cli.mjs"), "server/worker/cli.ts", "--managed", "--db", db, "--import", backup, "--csv", csvDirectory, "--output", output, "--adjustment", "adjusted", "--source", "CLI fixture"], { cwd: process.cwd(), encoding: "utf8" });
+  const repositoryRoot = process.cwd();
+  const stdout = execFileSync(process.execPath, [join(repositoryRoot, "node_modules/tsx/dist/cli.mjs"), join(repositoryRoot, "server/worker/cli.ts"), "--managed", "--db", db, "--import", backup, "--csv", csvDirectory, "--output", output, "--handoff-dir", handoffDirectory, "--adjustment", "adjusted", "--source", "CLI fixture"], { cwd: directory, encoding: "utf8" });
   expect(stdout).toContain('"mode":"managed"');
   expect(stdout).toContain('"schedulerInstalled":false');
   expect(existsSync(output)).toBe(true);
+  const pendingPath = join(handoffDirectory, "pending.json");
+  expect(existsSync(pendingPath)).toBe(true);
+  expect(parseWorkerHandoffManifest(readFileSync(pendingPath, "utf8")).workspaceId).toBe(data.workspaceId);
 });
 
 it("rejects pathological input without silently discarding queued work", async () => {
