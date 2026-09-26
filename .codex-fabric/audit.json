@@ -1,0 +1,358 @@
+{
+  "accepted_at": "2026-09-26T19:05:17Z",
+  "changed_files": [],
+  "checks": [
+    {
+      "command": "/bin/zsh -lc 'rtk git diff --name-status 92b64a20c620da38422c22e73664eba395b58f17 1d3fc085b54b5002342982cc9c15ccc32bf086ba | head -200'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git show fb28e5a5ad0ee01331863a65e7b892a81ee1074c:acceptance.json 2>/dev/null; rtk git show fb28e5a5ad0ee01331863a65e7b892a81ee1074c:evidence-binding.json 2>/dev/null; rtk git show fb28e5a5ad0ee01331863a5b1234567890:acceptance.json 2>/dev/null'",
+      "exit_code": 128,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git show fb28e5a5ad0ee01331863a65e7b892a81ee1074c:source-impact.json'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git show refs/remotes/origin/project-os-artifacts/stockledger/stockledger-prod-c17-golden-ui-v3-evidence-bind-verify-v3:evidence-binding/candidate.json && rtk git show refs/remotes/origin/project-os-artifacts/stockledger/stockledger-prod-c17-golden-ui-v3-evidence-bind-verify-v3:evidence-binding/validation.md'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git rev-parse HEAD HEAD''^{tree} origin/main && rtk git status --porcelain=v1'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git show refs/remotes/origin/project-os-artifacts/stockledger/stockledger-prod-c18-handoff-recovery-visual-evidence-verify-v3:evidence-repair/validation.md && rtk git show refs/remotes/origin/project-os-artifacts/stockledger/stockledger-prod-c18-worker-app-review-handoff-fix-v2:handoff-contract.json'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git diff --exit-code 92b64a20c620da38422c22e73664eba395b58f17 1d3fc085b54b5002342982cc9c15ccc32bf086ba -- src/components/WindowPanel.tsx src/hooks/useWindowPanelFocus.ts src/lib/webFocusEligibility.ts src/features/shell/StockLedgerShell.tsx && rtk git rev-parse 92b64a20c620da38422c22e73664eba395b58f17''^{tree} && rtk git show -s --format='\"'%H%n%P%n%T' fb28e5a5ad0ee01331863a65e7b892a81ee1074c\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git ls-remote origin refs/heads/main refs/heads/codex/stockledger-prod-c19-final-personal-handoff-qualification-verify-v1 refs/heads/project-os-artifacts/stockledger/stockledger-prod-c19-final-personal-handoff-qualification-verify-v1 refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c19-final-personal-handoff-qualification-verify-v1 && rtk git rev-parse HEAD HEAD''^{tree} && rtk git show -s --format='\"'%H%n%P%n%T%n%s' 1d3fc085b54b5002342982cc9c15ccc32bf086ba && rtk git status --short --branch\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy zsh -lc 'export PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:\"'$PATH; npm run operations:status -- --db /tmp/stockledger-c19-operations-status.sqlite --release-evidence /tmp/stockledger-c19-release-evidence.json'\"'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy zsh -lc 'export PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:\"'$PATH; export STOCKLEDGER_PROTECTED_BASE=1d3fc085b54b5002342982cc9c15ccc32bf086ba; npm run operations:status -- --db /tmp/stockledger-c19-operations-status.sqlite --release-evidence /tmp/stockledger-c19-release-evidence.json'\"'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git push origin HEAD:refs/heads/codex/stockledger-prod-c19-final-personal-handoff-qualification-verify-v1'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git ls-remote origin refs/heads/main refs/heads/codex/stockledger-prod-c19-final-personal-handoff-qualification-verify-v1 refs/heads/project-os-artifacts/stockledger/stockledger-prod-c19-final-personal-handoff-qualification-verify-v1 refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c19-final-personal-handoff-qualification-verify-v1 && rtk git rev-parse HEAD HEAD''^{tree} && rtk git status --short --branch'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk rg -n \"read.*Csv|parse.*Csv|--csv|parse.*history|loadHistory|daily bars|Date,Open,High,Low,Close,Volume|import-revision|handoff-dir\" server/worker src tests'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk cat server/worker/cli.ts && rtk cat tests/worker.integration.test.ts'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy zsh -lc 'export PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:\"'$PATH; npm run worker -- --help'\"'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk ls -la .local'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n 'it\\\\(|test\\\\(' tests/worker.test.ts | tail -30\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy sed -n '490,560p' tests/worker.test.ts && rtk proxy sed -n '1,80p' tests/worker.test.ts\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy nl -ba server/worker/cli.ts | sed -n '10,18p;43,70p;145,165p' && rtk proxy nl -ba tests/worker.test.ts | sed -n '518,533p'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk rg -n \"stockledger-app-handoff|pending.json\" .gitignore docs/operations/LOCAL_WORKER.md server/worker/cli.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git show -s --format='%H%n%P%n%T' 31135aac94d02718893ba3834a7a792595dc32ee && rtk git show -s --format='%H%n%P%n%T' dea288a5930a95a76e4239653b49430ee701ffe9 && rtk git show -s --format='%H%n%P%n%T' 6e839c92d0fb5c34204d45846e151f3acdeda512\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git status --porcelain=v1 && rtk git diff --exit-code 1d3fc085b54b5002342982cc9c15ccc32bf086ba --'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git worktree add --detach /tmp/stockledger-c19-final-artifact-worktree 1d3fc085b54b5002342982cc9c15ccc32bf086ba'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk rg -n -i \"watchlist.*csv|import.*watchlist|import csv|daily bars|stockledger-handoff\" tests/e2e tests/worker.test.ts tests/workflows.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk rg --files src tests | rtk rg \"financialTruth|marketSnapshot|backupFormat|workerHandoff|today|alerts|settings\" | head -120'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git status --short --branch && rtk git rev-parse HEAD HEAD''^{tree} && rtk git ls-remote origin refs/heads/main refs/heads/codex/stockledger-prod-c19-final-personal-handoff-qualification-verify-v1'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk rg -n \"CSV|csv|Import|import\" tests/e2e/workspace.spec.ts tests/e2e/chg172-primary-surfaces.spec.ts tests/e2e/chg199-authoring-config.spec.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy node - <<'NODE'\nconst fs = require(\\\"node:fs\\\");\nconst d = \\\"final-handoff\\\";\nfs.mkdirSync(d, { recursive: true, mode: 0o700 });\nconst main = \\\"1d3fc085b54b5002342982cc9c15ccc32bf086ba\\\";\nconst tree = \\\"b0013584a69ed47bd7eb1c7d331bddc773f57c6c\\\";\nconst request = \\\"stockledger-prod-c19-final-personal-handoff-qualification-verify-v1\\\";\nconst job = \\\"CF-29df9cf0a9bafca63978aa45\\\";\nconst chain = (approved, entry, owner, consumers, proof, record) => ({\n  approved_outcome: approved, actual_owner_entry_point: entry, authoritative_state_effect_owner: owner,\n  affected_consumers: consumers, decisive_proof: proof, evidence_identity: main + \\\" / \\\" + tree,\n  independent_decision_ready_record: record\n});\nconst row = (id, title, classification, facts, paths, commands, confidence, claim_chain) => ({\n  id, title, classification, decisive_facts: facts, evidence_paths: paths, commands, confidence,\n  ...(claim_chain ? { claim_chain } : {})\n});\nconst m = {\n  schema_version: 1, project: \\\"stockledger\\\", repository: \\\"kimhw8084/stockledger\\\", request, operation: \\\"VERIFY\\\",\n  selected_scope: \\\"single-owner local-first web/desktop; US equities/ETFs; completed daily bars; English/Korean; owner-authored versioned recipes; deterministic evaluation; Today/Alerts/Journal; optional SMTP\\\",\n  subject: { main, tree, accepted_head: \\\"3a76d78663b555392cd152977bb2f9c5cd91a79f\\\", work_branch: \\\"codex/\\\" + request },\n  items: [\n    row(\\\"stage-readiness\\\", \\\"Evidence-bound personal-stage readiness\\\", \\\"MATERIAL_PRODUCT_GAP\\\",\n      [\\\"Exact main and exact tree confirmed; PR #28 integration parents and successful exact-tree checks read back.\\\", \\\"The required npm run check runs tests/worker.test.ts:521-531. That test gives the CLI a temporary DB, CSV and export but omits --handoff-dir. The CLI defaults to .local/stockledger-app-handoff and atomically replaces pending.json with test data.\\\", \\\"That directory exists in this checkout. Its contents and pre-run state were not inspected, so actual owner-data loss is unproven; the unsafe path is established.\\\", \\\"No Product fix was made; recommendation FIX_REQUIRED.\\\"],\n      [\\\"tests/worker.test.ts:521-531\\\", \\\"server/worker/cli.ts:14,61-64\\\", \\\"docs/operations/LOCAL_WORKER.md:90,124\\\", \\\"https://github.com/kimhw8084/stockledger/actions/runs/36263932012\\\"],\n      [\\\"npm run check on Node v22.23.2: twice 215/216 due unchanged 5000ms notification test timeout; worker CLI test runs in suite\\\", \\\"Isolated notification test: passed in 2.12s\\\", \\\"PR #28 exact-tree app job: success\\\"],\n      \\\"high\\\",\n      chain(\\\"Prescribed verification must not replace the owner's pending worker evidence.\\\", \\\"npm run check from the repository root.\\\", \\\"CLI handoff writer uses a shared default folder and atomic rename.\\\", [\\\"Existing pending.json consumed by the browser app on later open\\\", \\\"Owner's captured worker evaluation/alert history.\\\"], [\\\"CLI test omits --handoff-dir; CLI default is .local/stockledger-app-handoff; writeFileSync plus renameSync replaces pending.json.\\\"], \\\"MATERIAL_PRODUCT_GAP; isolate test output before recommending owner handoff audit. Actual prior payload was not inspected.\\\")\n    ),\n    row(\\\"financial-truth\\\", \\\"One deterministic financial truth engine\\\", \\\"PASS\\\",\n      [\\\"Versioned financial_truth_v1 formulas, units, session windows, warmup, adjustment and UNKNOWN behavior are consumed by shared preview/workspace/worker paths.\\\", \\\"Independent dated-gap, stale/partial, split-basis and zero-denominator fixtures are present; exact-tree app CI passed.\\\"],\n      [\\\"docs/production/IMPLEMENTATION_STATUS.md\\\", \\\"tests/financialTruth.test.ts\\\", \\\"src/lib/evaluateEye.ts\\\", \\\"src/domain/evaluateWorkspace.ts\\\"],\n      [\\\"npm run check (215 local tests passed; exact-tree app CI passed)\\\", \\\"npm run test:e2e\\\"],\n      \\\"high\\\",\n      chain(\\\"Same dated evidence and evaluation instant use one defined result.\\\", \\\"Recipe preview and bound Eye evaluation.\\\", \\\"financial_truth_v1 registry and shared engine.\\\", [\\\"Today\\\", \\\"Alerts\\\", \\\"worker evaluation.\\\"], [\\\"tests/financialTruth.test.ts and exact-tree app job.\\\"], \\\"PASS for personal recipe evaluation; no numerical research parity/performance guarantee.\\\")\n    ),\n    row(\\\"provenance\\\", \\\"Provenance and market-data honesty\\\", \\\"PASS\\\",\n      [\\\"CLI accepts SYMBOL.csv with Date,Open,High,Low,Close,Volume plus explicit adjusted/unadjusted/unknown declaration.\\\", \\\"Source, date, retrieval time, content identity and freshness/adjustment are retained; stale, partial or unadjusted inputs remain explicit.\\\", \\\"No actual owner source was supplied/contacted.\\\"],\n      [\\\"README.md\\\", \\\"docs/operations/LOCAL_WORKER.md\\\", \\\"src/lib/eodDataProvider.ts\\\", \\\"src/domain/marketSnapshot.ts\\\", \\\"tests/worker.test.ts:70-87,521-531\\\"],\n      [\\\"npm run check (CLI test generates CSV rows and supplies --adjustment adjusted)\\\", \\\"npm test -- --run tests/workerHandoff.test.ts\\\"],\n      \\\"high\\\",\n      chain(\\\"Only completed permitted daily bars with declared adjustment and traceable source can inform review.\\\", \\\"Owner CSV folder through local CLI.\\\", \\\"CSV parser, shared evaluation and provenance snapshot.\\\", [\\\"Worker result\\\", \\\"Today/Alerts evidence context.\\\"], [\\\"Exact tree worker CSV CLI fixture and 6 passing handoff tests.\\\"], \\\"Product contract PASS; current owner source authorization/freshness is UNPROVEN_EXTERNAL.\\\")\n    ),\n    row(\\\"immutable-history\\\", \\\"Immutable recipe/evaluation/alert/decision history\\\", \\\"PASS\\\",\n      [\\\"Batches bind exact Eye, recipe version, evaluation/input, snapshot, conditions and alert context.\\\", \\\"Replay is idempotent; owner decisions/amendments/outcomes and alert review state survive later runs; overlap is a conflict.\\\"],\n      [\\\"src/domain/workerHandoff.ts\\\", \\\"server/worker/store.ts\\\", \\\"tests/workerHandoff.test.ts\\\", \\\"tests/e2e/worker-app-handoff.spec.ts\\\"],\n      [\\\"npm test -- --run tests/workerHandoff.test.ts: 6 passed\\\", \\\"npm run test:e2e: handoff passed desktop/mobile\\\"],\n      \\\"high\\\",\n      chain(\\\"Later worker evidence appends without replacing historical or authored context.\\\", \\\"Browser opens owner-selected pending handoff; Journal action is deliberate.\\\", \\\"WorkerStore content identities and app compare-and-set/history.\\\", [\\\"Today\\\", \\\"Alerts\\\", \\\"Journal\\\", \\\"worker acknowledgement.\\\"], [\\\"Six worker handoff tests and current desktop/mobile Playwright journey.\\\"], \\\"PASS on fixtures; no human review inferred.\\\")\n    ),\n    row(\\\"review-loop\\\", \\\"Complete calm personal review loop\\\", \\\"PASS\\\",\n      [\\\"Captured context appears in Today and Alerts; Journal decisions bind to historical evaluation/alert; outcome lessons remain owner-authored.\\\", \\\"Full E2E passed 89 tests with one existing mobile keyboard-only skip; handoff journey passed on desktop and mobile.\\\"],\n      [\\\"README.md\\\", \\\"docs/production/IMPLEMENTATION_STATUS.md\\\", \\\"tests/e2e/worker-app-handoff.spec.ts\\\", \\\"tests/e2e/workspace.spec.ts\\\"],\n      [\\\"npm run test:e2e\\\", \\\"npm test -- --run tests/workerHandoff.test.ts\\\"],\n      \\\"high\\\",\n      chain(\\\"Owner sees dated source context, decides deliberately and can later review a lesson.\\\", \\\"Today → Alerts → Journal.\\\", \\\"Workspace history and immutable evidence identities.\\\", [\\\"Today\\\", \\\"Alerts\\\", \\\"Journal/outcomes.\\\"], [\\\"Current exact-tree Playwright and worker handoff test assertions.\\\"], \\\"PASS for browser fixtures; no actual owner read/decision asserted.\\\")\n    ),\n    row(\\\"storage-recovery\\\", \\\"Durable storage, migration, export and restore\\\", \\\"PASS\\\",\n      [\\\"Web IndexedDB uses compare-and-set and previous valid copy; SQLite WAL/schema 8 migrations are additive.\\\", \\\"App JSON imports validate before replacement; SQLite backups are consistent snapshots.\\\", \\\"Recovery drill retained authored/evaluation/decision/job/ingestion/notification state and rejected corrupted/incompatible candidates.\\\", \\\"RPO since operator backup is unknown without owner cadence; backup records are plaintext/private.\\\"],\n      [\\\"README.md\\\", \\\"docs/operations/LOCAL_WORKER.md\\\", \\\"docs/operations/RELEASE_RUNBOOK.md\\\", \\\"src/data/repositories/workspaceRepository.ts\\\", \\\"src/domain/backupFormat.ts\\\", \\\"tests/repository.test.ts\\\", \\\"tests/recovery.test.ts\\\"],\n      [\\\"npm run recovery:drill -- --output /tmp/stockledger-c19-recovery-result.json\\\", \\\"npm run test:e2e\\\"],\n      \\\"high\\\",\n      chain(\\\"Interrupted writes/restores preserve or recover the last valid personal records.\\\", \\\"Settings export/restore and worker --backup/--import.\\\", \\\"IndexedDB repository and SQLite consistent snapshot.\\\", [\\\"Workspace\\\", \\\"jobs\\\", \\\"authored history\\\", \\\"notification/handoff state.\\\"], [\\\"Synthetic recovery drill plus browser backup/restore journeys.\\\"], \\\"PASS for deterministic restore evidence; private backup path/cadence remains owner setup.\\\")\n    ),\n    row(\\\"ui-closed-worker\\\", \\\"Monitoring independent of open UI under the local-worker boundary\\\", \\\"PASS\\\",\n      [\\\"CLI worker evaluates while UI closed, persists SQLite evidence and publishes bounded pending.json; later app open imports only the incremental evidence.\\\", \\\"No server/cloud, app-open-triggered worker or installed schedule is claimed.\\\"],\n      [\\\"docs/operations/LOCAL_WORKER.md\\\", \\\"server/worker/cli.ts\\\", \\\"server/worker/run.ts\\\", \\\"server/worker/store.ts\\\", \\\"tests/worker.test.ts:70-87,521-531\\\", \\\"tests/e2e/worker-app-handoff.spec.ts\\\"],\n      [\\\"npm test -- --run tests/workerHandoff.test.ts\\\", \\\"npm run test:e2e\\\", \\\"npm run operations:status with isolated /tmp DB\\\"],\n      \\\"high\\\",\n      chain(\\\"Worker runs independently and results reach the existing app workspace on later open.\\\", \\\"Owner CLI or optional external local schedule; secure web app folder grant.\\\", \\\"SQLite worker state and browser compare-and-set/ack.\\\", [\\\"Worker CSV\\\", \\\"Today/Alerts/Settings.\\\"], [\\\"App-closed CSV CLI fixture, 6 handoff tests, desktop/mobile E2E and unconfigured status.\\\"], \\\"PASS for behavior; owner DB/folder/schedule still need setup.\\\")\n    ),\n    row(\\\"notification-attention\\\", \\\"Truthful user-controlled attention; in-app review is sufficient\\\", \\\"PASS\\\",\n      [\\\"Today/Alerts are required path. SMTP optional; alert, intent, attempt, provider acceptance, confirmed delivery and human review are distinct.\\\"],\n      [\\\"README.md\\\", \\\"docs/operations/LOCAL_WORKER.md\\\", \\\"docs/production/CHG-94_EVIDENCE.md\\\", \\\"src/domain/notificationDelivery.ts\\\", \\\"tests/notification.test.ts\\\"],\n      [\\\"npm run test:e2e\\\", \\\"Focused retry case passed unchanged; full suite timing exception is recorded.\\\"],\n      \\\"high\\\",\n      chain(\\\"Alert means review evidence, not sent email or human attention.\\\", \\\"In-app Today/Alerts; optional Settings email boundary.\\\", \\\"Local delivery intent/attempt/receipt records and user preferences.\\\", [\\\"Today\\\", \\\"Alerts\\\", \\\"optional SMTP.\\\"], [\\\"Docs, state model and exact-tree E2E/CI.\\\"], \\\"PASS; no SMTP recipient or delivery was asserted.\\\")\n    ),\n    row(\\\"web-quality\\\", \\\"Applicable web accessibility, localization and responsive quality\\\", \\\"PASS\\\",\n      [\\\"Full E2E exercised desktop/mobile viewports, English/Korean, keyboard focus, reduced motion, stress sizes and overflow checks.\\\", \\\"Golden UI covers unaffected surfaces; CHG-256 R2/R3 covers affected Today/Alerts/Settings.\\\", \\\"No screen reader, blanket WCAG, native device or preference claim.\\\"],\n      [\\\"packages/accessibility/src\\\", \\\"tests/e2e/chg172-primary-surfaces.spec.ts\\\", \\\"tests/e2e/chg184-deep-review-details.spec.ts\\\", \\\"tests/e2e/v3-focus-geometry.spec.ts\\\", \\\"tests/e2e/worker-app-handoff.spec.ts\\\"],\n      [\\\"npm run test:e2e: 89 passed, 1 skipped\\\", \\\"CHG-256 R3 evidence on identical candidate tree\\\"],\n      \\\"medium_high\\\",\n      chain(\\\"Selected browser surfaces expose reachable controls and clear status in supported languages/sizes.\\\", \\\"Secure web browser, Today/Alerts/Settings/Journal.\\\", \\\"App composition, localized state and accessible controls.\\\", [\\\"Affected surfaces in CHG-256 R2/R3\\\", \\\"unaffected Golden UI surfaces.\\\"], [\\\"Current full E2E and exact-tree reuse identity.\\\"], \\\"PASS only for actual browser evidence; no wider conformance inference.\\\")\n    ),\n    row(\\\"release-operations\\\", \\\"Observable recoverable bounded operations/release behavior\\\", \\\"MATERIAL_PRODUCT_GAP\\\",\n      [\\\"Recovery, ops qualification/status and source-bound release verification passed on Node 22.23.2; status reported verified source identity, workspace_missing and schedulerInstalled=false.\\\", \\\"Exact-tree PR #28 app/cloud-contract/operations jobs passed.\\\", \\\"The prescribed npm run check's CLI test can replace owner pending evidence; safe handoff audit is blocked until isolated.\\\"],\n      [\\\"scripts/recovery-drill.ts\\\", \\\"scripts/operations-qualification.ts\\\", \\\"server/worker/cli.ts:14,61-64\\\", \\\"tests/worker.test.ts:521-531\\\", \\\"docs/operations/RELEASE_RUNBOOK.md\\\", \\\"https://github.com/kimhw8084/stockledger/actions/runs/36263932012\\\"],\n      [\\\"npm run recovery:drill -- --output /tmp/stockledger-c19-recovery-result.json\\\", \\\"npm run operations:qualify -- --output /tmp/stockledger-c19-operations-qualification.json\\\", \\\"npm run operations:status with exact release evidence and safe /tmp DB\\\", \\\"npm run release:evidence -- --base \\\" + main, \\\"npm run release:verify -- --base \\\" + main, \\\"npm run check: local timeout and test-output defect recorded\\\"],\n      \\\"high\\\",\n      chain(\\\"Status and verification must remain bounded and must not overwrite owner state.\\\", \\\"Worker --status, release manifest, prescribed check.\\\", \\\"SQLite projection/release proof and CLI handoff writer.\\\", [\\\"Owner-facing status\\\", \\\"pending.json\\\", \\\"release operator.\\\"], [\\\"Recovery/qualification/status/release evidence passed; local check test isolation source path established.\\\"], \\\"FIX_REQUIRED before owner handoff audit.\\\")\n    ),\n    row(\\\"architecture\\\", \\\"One product/one engine/clear boundaries\\\", \\\"PASS\\\",\n      [\\\"Boundary script checked secret, parser and server import boundaries; release workflow script verified pinned actions and protected base.\\\"],\n      [\\\"scripts/check-boundaries.mjs\\\", \\\"scripts/check-release-workflow.mjs\\\", \\\"src/domain\\\", \\\"server/worker\\\"],\n      [\\\"npm run check:boundaries\\\", \\\"npm run check:release-workflow\\\"],\n      \\\"high\\\",\n      chain(\\\"App and worker share domain truth across explicit persistence/platform boundaries.\\\", \\\"Owner app and local CLI.\\\", \\\"Domain engine and application/service boundaries.\\\", [\\\"Web app\\\", \\\"SQLite worker\\\", \\\"optional cloud pilot outside this scope.\\\"], [\\\"Static boundary checks passed on exact main.\\\"], \\\"PASS; no hosted launch inferred.\\\")\n    ),\n    row(\\\"product-boundary\\\", \\\"Private investment research/monitoring with human judgment\\\", \\\"PASS\\\",\n      [\\\"No automated trading, custody, return guarantee or investment-performance promise; decisions remain deliberate owner actions.\\\"],\n      [\\\"README.md\\\", \\\"docs/production/IMPLEMENTATION_STATUS.md\\\", \\\"docs/operations/LOCAL_WORKER.md\\\"],\n      [\\\"npm run test:e2e\\\"],\n      \\\"high\\\",\n      chain(\\\"Product supplies dated research evidence for human judgment.\\\", \\\"Owner-authored watch conditions and deliberate Journal entry.\\\", \\\"Research evaluation state, no trading side effect.\\\", [\\\"Today\\\", \\\"Alerts\\\", \\\"Journal.\\\"], [\\\"Scope language and personal workflow tests.\\\"], \\\"PASS; no performance promise.\\\")\n    ),\n    row(\\\"test-handoff-isolation\\\", \\\"Worker test isolates local handoff files\\\", \\\"MATERIAL_PRODUCT_GAP\\\",\n      [\\\"tests/worker.test.ts:521-531 uses temporary DB/backup/CSV/output but no --handoff-dir.\\\", \\\"server/worker/cli.ts:14 defaults to the repo-local owner handoff folder; lines 61-64 atomically replaces pending.json.\\\", \\\"The command ran inside npm run check. The local directory exists, but its contents/pre-run state were not inspected.\\\"],\n      [\\\"tests/worker.test.ts:521-531\\\", \\\"server/worker/cli.ts:14,61-64\\\"],\n      [\\\"npm run check twice; CLI test included; no further test rerun after finding\\\"],\n      \\\"high\\\",\n      chain(\\\"Tests do not mutate owner handoff state.\\\", \\\"Local npm run check.\\\", \\\"CLI publishes test manifest to the default path.\\\", [\\\"Existing browser handoff evidence.\\\"], [\\\"Source call and atomic writer identity on exact main.\\\"], \\\"MATERIAL_PRODUCT_GAP; later bounded FIX must isolate the test directory.\\\")\n    ),\n    row(\\\"owner-workspace\\\", \\\"Owner workspace and watchlist\\\", \\\"OWNER_CONFIGURATION_REQUIRED\\\",\n      [\\\"Personal workspace starts empty; no real watchlist/workspace was supplied. CSV watchlist parser/UI are present; only local fixtures were used.\\\"],\n      [\\\"README.md\\\", \\\"src/domain/watchlistImport.ts\\\", \\\"src/features/settings/WatchlistImportPanel.tsx\\\", \\\"tests/workflows.test.ts\\\", \\\"tests/e2e/workspace.spec.ts\\\"],\n      [\\\"npm run test:e2e\\\", \\\"npm run check (watchlist parser tests included)\\\"],\n      \\\"high\\\",\n      chain(\\\"Monitoring is bound to the owner's actual universe and authored records.\\\", \\\"Create/import in Settings.\\\", \\\"Workspace storage and owner watchlist.\\\", [\\\"Recipe/Eye\\\", \\\"worker\\\", \\\"Today/Alerts.\\\"], [\\\"Empty-state contract and synthetic operations status workspace_missing.\\\"], \\\"Blocks live monitoring, not literal code handoff.\\\")\n    ),\n    row(\\\"owner-daily-bars\\\", \\\"Permitted completed daily-bar path\\\", \\\"OWNER_CONFIGURATION_REQUIRED\\\",\n      [\\\"No real owner CSV folder/source supplied. Product supports SYMBOL.csv and OHLCV with explicit adjustment/source.\\\", \\\"CSV support alone does not prove live feed availability.\\\"],\n      [\\\"README.md\\\", \\\"docs/operations/LOCAL_WORKER.md\\\", \\\"src/lib/eodDataProvider.ts\\\", \\\"server/worker/cli.ts\\\", \\\"tests/worker.test.ts:521-531\\\"],\n      [\\\"Owner command template: npm run worker -- --db <private> --csv <path> --adjustment adjusted --source <declared> --handoff-dir <private>\\\"],\n      \\\"high\\\",\n      chain(\\\"Evaluation requires complete permitted bars with declared adjustment and freshness.\\\", \\\"Owner-provided CSV path.\\\", \\\"CSV parser and worker provenance.\\\", [\\\"Worker result and app review.\\\"], [\\\"Exact generated CSV CLI fixture; no real source.\\\"], \\\"Blocks live monitoring until owner supplies source.\\\")\n    ),\n    row(\\\"owner-source\\\", \\\"Current source authorization, availability and regular updating\\\", \\\"UNPROVEN_EXTERNAL\\\",\n      [\\\"No provider contact, owner source, rights evidence, refresh cadence or current availability was supplied.\\\", \\\"No managed/commercial rights or uptime is inferred from generic CSV support.\\\"],\n      [\\\"README.md\\\", \\\"docs/operations/LOCAL_WORKER.md\\\", \\\"docs/production/IMPLEMENTATION_STATUS.md\\\"],\n      [\\\"Safe operations:status reported workspace_missing and no source rows\\\"],\n      \\\"high\\\",\n      chain(\\\"Chosen owner source must be permitted and current.\\\", \\\"External owner acquisition step.\\\", \\\"No Product authority over external permission or future uptime.\\\", [\\\"Worker evaluation.\\\"], [\\\"No real owner source; no external provider contact.\\\"], \\\"UNPROVEN_EXTERNAL; blocks live monitoring on that source only.\\\")\n    ),\n    row(\\\"owner-runtime-paths\\\", \\\"Node, private worker DB and private handoff folder\\\", \\\"OWNER_CONFIGURATION_REQUIRED\\\",\n      [\\\"This qualification used Node v22.23.2; no owner runtime/database/folder configured. Synthetic status used a private /tmp DB.\\\"],\n      [\\\".nvmrc\\\", \\\"package.json\\\", \\\"docs/operations/LOCAL_WORKER.md\\\", \\\"server/worker/cli.ts\\\"],\n      [\\\"npm ci on Node v22.23.2\\\", \\\"operations:status with isolated /tmp DB\\\"],\n      \\\"high\\\",\n      chain(\\\"Owner process uses supported runtime and private local paths.\\\", \\\"Install Node; select DB/folder; grant browser folder.\\\", \\\"SQLite WorkerStore and browser IndexedDB directory handle.\\\", [\\\"CLI\\\", \\\"Settings handoff.\\\"], [\\\"Exact Node verification; unconfigured synthetic status.\\\"], \\\"Blocks live worker operation, not code handoff.\\\")\n    ),\n    row(\\\"owner-unattended\\\", \\\"Schedule, awake machine and readable data path\\\", \\\"OWNER_CONFIGURATION_REQUIRED\\\",\n      [\\\"No scheduler installed. Product reports schedulerInstalled=false; manual runs remain supported.\\\", \\\"Unattended operation needs owner schedule, awake machine and readable authorized input.\\\"],\n      [\\\"docs/operations/LOCAL_WORKER.md\\\", \\\"server/worker/cli.ts\\\", \\\"synthetic operations status\\\"],\n      [\\\"operations:status on unconfigured DB\\\"],\n      \\\"high\\\",\n      chain(\\\"No app claim of installed schedule; invocation state stays observable.\\\", \\\"Owner-managed launchd/cron if unattended.\\\", \\\"External OS scheduler; StockLedger only records work/coverage.\\\", [\\\"Worker jobs and handoff.\\\"], [\\\"Status shows stopped/false; local-worker docs.\\\"], \\\"Blocks unattended operation only.\\\")\n    ),\n    row(\\\"owner-backup-cadence\\\", \\\"Private backup path/cadence\\\", \\\"OWNER_CONFIGURATION_REQUIRED\\\",\n      [\\\"Recovery/restore works on synthetic evidence; no actual owner backup path or cadence supplied.\\\", \\\"Loss since last operator backup is unknown without cadence; backups are plaintext.\\\"],\n      [\\\"README.md\\\", \\\"docs/operations/LOCAL_WORKER.md\\\", \\\"docs/operations/RELEASE_RUNBOOK.md\\\", \\\"scripts/recovery-drill.ts\\\"],\n      [\\\"npm run recovery:drill -- --output /tmp/stockledger-c19-recovery-result.json\\\"],\n      \\\"high\\\",\n      chain(\\\"Owner records need an independent private backup cadence beyond the previous-copy safety net.\\\", \\\"Settings JSON export and worker --backup.\\\", \\\"Workspace/SQLite snapshot files.\\\", [\\\"Authored records, jobs and notification/handoff state.\\\"], [\\\"Recovery drill retained-state checks and unbounded operator-backup RPO.\\\"], \\\"Required for safe durable operation; does not block code handoff.\\\")\n    ),\n    row(\\\"optional-smtp\\\", \\\"External SMTP credentials and recipient\\\", \\\"NOT_APPLICABLE\\\",\n      [\\\"In-app review is sufficient; no email credential/destination supplied or contacted.\\\"],\n      [\\\"README.md\\\", \\\"docs/operations/LOCAL_WORKER.md\\\", \\\"docs/production/CHG-94_EVIDENCE.md\\\"],\n      [\\\"Not run; optional external email\\\"],\n      \\\"high\\\",\n      chain(\\\"Owner may review in-app without external email.\\\", \\\"Today/Alerts.\\\", \\\"Local evaluation and evidence; SMTP is optional.\\\", [\\\"Today/Alerts and future optional SMTP.\\\"], [\\\"Product contract and truthful delivery states.\\\"], \\\"Optional scope only.\\\")\n    ),\n    row(\\\"cloud-sync\\\", \\\"Cloud identity/multi-device sync\\\", \\\"NOT_APPLICABLE\\\", [\\\"One owner, one local-first installation.\\\"], [\\\"README.md\\\", \\\"docs/operations/CLOUD_DEPLOYMENT.md\\\"], [\\\"Out of selected stage.\\\"], \\\"high\\\"),\n    row(\\\"paid-commerce\\\", \\\"Paid/public commerce and billing/support/privacy lifecycle\\\", \\\"NOT_APPLICABLE\\\", [\\\"No public customer or paid service in selected stage.\\\"], [\\\"README.md\\\", \\\"docs/production/IMPLEMENTATION_STATUS.md\\\"], [\\\"CHG-98 supplied control-plane context; no Notion call.\\\"], \\\"high\\\"),\n    row(\\\"teams-marketplace\\\", \\\"Multi-user/team/marketplace features\\\", \\\"NOT_APPLICABLE\\\", [\\\"One owner; no shared/team product.\\\"], [\\\"README.md\\\"], [\\\"Out of selected stage.\\\"], \\\"high\\\"),\n    row(\\\"managed-hosting\\\", \\\"Broad managed hosting\\\", \\\"NOT_APPLICABLE\\\", [\\\"Local worker boundary selected; no hosted service.\\\"], [\\\"README.md\\\", \\\"docs/operations/LOCAL_WORKER.md\\\"], [\\\"Out of selected stage.\\\"], \\\"high\\\"),\n    row(\\\"native-distribution\\\", \\\"Native app store, physical devices and OS push\\\", \\\"NOT_APPLICABLE\\\", [\\\"Web/desktop browser stage only; native handoff support false.\\\"], [\\\"docs/operations/LOCAL_WORKER.md\\\", \\\"CHG-256 R2 handoff-contract.json\\\"], [\\\"Out of selected stage.\\\"], \\\"high\\\"),\n    row(\\\"commercial-redistribution\\\", \\\"Commercial data rights/managed-provider activation\\\", \\\"NOT_APPLICABLE\\\", [\\\"Commercial redistribution and managed provider activation are outside personal owner CSV scope; source permission remains a separate UNPROVEN_EXTERNAL item.\\\"], [\\\"README.md\\\", \\\"docs/production/IMPLEMENTATION_STATUS.md\\\"], [\\\"No provider contacted or activated.\\\"], \\\"high\\\"),\n    row(\\\"public-launch-wtp\\\", \\\"Public launch dependencies and real-user WTP/pilot evidence\\\", \\\"NOT_APPLICABLE\\\", [\\\"Public launch and paid/user pilot evidence are outside scope; CHG-98/99 are supplied as current control-plane truth.\\\"], [\\\"docs/production/IMPLEMENTATION_STATUS.md\\\"], [\\\"No Notion call.\\\"], \\\"high\\\"),\n    row(\\\"scanner-parity\\\", \\\"Broad scanner/backtest parity beyond adopted watch recipes\\\", \\\"NOT_APPLICABLE\\\", [\\\"Owner-adopted watch-recipe path is the requirement; broad scanner/backtest parity deferred.\\\"], [\\\"docs/production/IMPLEMENTATION_STATUS.md\\\", \\\"KNOWN_LIMITATIONS.md\\\"], [\\\"Out of selected stage.\\\"], \\\"high\\\")\n  ]\n};\nconst owner = {\n  schema_version: 1, project: \\\"stockledger\\\", request, subject: { main, tree }, recommendation: \\\"FIX_REQUIRED\\\",\n  literal_owner_handoff: { ready: false, reason: \\\"Isolate the CLI test's handoff directory before owner handoff audit; it can replace pending.json in the documented default owner folder.\\\" },\n  live_monitoring_now: { ready: false, classification: \\\"OWNER_CONFIGURATION_REQUIRED\\\", reason: \\\"No owner workspace/watchlist, real permitted/current bar source, private DB/handoff paths or optional schedule supplied.\\\" },\n  product_behavior: [\n    \\\"Personal workspace starts empty; owner creates/imports records and authors a versioned recipe/Eye locally.\\\",\n    \\\"Worker CLI runs while UI closed, reads SYMBOL.csv OHLCV files and writes SQLite job/evaluation history.\\\",\n    \\\"Worker publishes bounded content-addressed pending.json to the selected local folder; full app export is produced only when --output FILE is explicitly supplied.\\\",\n    \\\"Later secure browser open validates pending evidence, applies only to the existing workspace after owner identity checks, commits by compare-and-set, then writes ack.json.\\\",\n    \\\"Today/Alerts show captured context; Journal decisions and outcomes are deliberate. Settings exposes permission, partial, missed, stale, conflict, retry and recovery states.\\\",\n    \\\"StockLedger installs no scheduler, keeps no machine awake, acquires no feed, sends no required email and cannot prove human review.\\\"\n  ],\n  owner_supplied_setup: [\n    { id: \\\"watchlist\\\", classification: \\\"OWNER_CONFIGURATION_REQUIRED\\\", action: \\\"Create/import real workspace/watchlist.\\\", blocks_code_handoff: false, blocks_live_monitoring: true },\n    { id: \\\"daily-bars\\\", classification: \\\"OWNER_CONFIGURATION_REQUIRED\\\", action: \\\"Supply permitted completed daily OHLCV files, explicit adjustment and truthful source.\\\", blocks_code_handoff: false, blocks_live_monitoring: true },\n    { id: \\\"external-source\\\", classification: \\\"UNPROVEN_EXTERNAL\\\", action: \\\"Verify chosen source rights, availability, freshness and update cadence; no provider contacted.\\\", blocks_code_handoff: false, blocks_live_monitoring: true },\n    { id: \\\"node\\\", classification: \\\"OWNER_CONFIGURATION_REQUIRED\\\", action: \\\"Use Node 22.23.2.\\\", blocks_code_handoff: false, blocks_live_monitoring: true },\n    { id: \\\"worker-db-handoff\\\", classification: \\\"OWNER_CONFIGURATION_REQUIRED\\\", action: \\\"Choose private SQLite/handoff paths and grant the same folder to the secure browser.\\\", blocks_code_handoff: false, blocks_live_monitoring: true },\n    { id: \\\"schedule-machine\\\", classification: \\\"OWNER_CONFIGURATION_REQUIRED\\\", condition: \\\"Only for unattended work.\\\", action: \\\"Install/monitor launchd/cron or equivalent; machine awake and authorized input path readable. Manual runs remain possible.\\\", blocks_code_handoff: false, blocks_live_monitoring: false, blocks_unattended_monitoring: true },\n    { id: \\\"backup\\\", classification: \\\"OWNER_CONFIGURATION_REQUIRED\\\", action: \\\"Choose private backup destination/cadence; backups are plaintext and RPO since operator backup is unknown without cadence.\\\", blocks_code_handoff: false, blocks_live_monitoring: false, blocks_safe_durable_use: true },\n    { id: \\\"smtp\\\", classification: \\\"NOT_APPLICABLE\\\", action: \\\"In-app review is sufficient. Credentials/destination only if owner later chooses external email.\\\", blocks_code_handoff: false, blocks_live_monitoring: false, blocks_only_optional_scope: true }\n  ],\n  shortest_safe_path: [\n    \\\"1. Install Node 22.23.2, npm ci, npm run web in secure desktop browser.\\\",\n    \\\"2. Create/import the real watchlist, author/version a recipe, bind an Eye; import completed bars with declared source/adjustment.\\\",\n    \\\"3. Export app JSON; initialize worker and take first SQLite snapshot: npm run worker -- --db /absolute/private/worker.sqlite --import /absolute/private/StockLedger.json --backup /absolute/private/worker-initial.sqlite.\\\",\n    \\\"4. In Settings → Workspace and data → Local worker review handoff, choose a private folder. Keep that same absolute path in every invocation.\\\",\n    \\\"5. With UI closed run: npm run worker -- --db /absolute/private/worker.sqlite --csv /absolute/path/daily-bars --adjustment adjusted --source 'Owner verified source / dataset release' --handoff-dir /absolute/private/stockledger-handoff.\\\",\n    \\\"6. If unattended operation is desired, owner installs launchd/cron with absolute paths/private logs and keeps machine awake/input readable; there is no installed-schedule guarantee.\\\",\n    \\\"7. Later open app, re-grant folder if needed, inspect Settings state and worker coverage, review Today/Alerts, then record decision/lesson in Journal.\\\",\n    \\\"8. Next worker invocation consumes ack.json. Replay is idempotent. Inspect stale/missing/partial/missed/conflict states; do not infer success from invocation/email intent.\\\",\n    \\\"9. Restore consistent SQLite backup to a new path, check integrity and validate export before switching; use prior valid app copy or validated JSON import for app recovery. Keep DB/WAL/SHM and plaintext exports private.\\\"\n  ],\n  backup_and_privacy: { backup_plaintext: true, default_permissions_restrictive: true, limit_access_and_rotate_private_copies: true, browser_storage_may_be_removed: true },\n  owner_run_guarantees: [\\\"No provider uptime guarantee.\\\", \\\"A sleeping host catches up only after wake; no hosted SLA.\\\", \\\"Catch-up is bounded and blocked work remains visible.\\\", \\\"Today/Alerts are sufficient; SMTP/provider acceptance/human reading are distinct.\\\"],\n  not_supplied: [\\\"owner watchlist\\\", \\\"permitted/current CSV source\\\", \\\"owner Node installation\\\", \\\"private worker DB/handoff folder\\\", \\\"scheduler if unattended\\\", \\\"awake/readable host/source\\\", \\\"SMTP credentials/destination (optional)\\\"]\n};\nconst residual = {\n  schema_version: 1, project: \\\"stockledger\\\", request, subject: { main, tree },\n  blocker: { id: \\\"test-handoff-isolation\\\", classification: \\\"MATERIAL_PRODUCT_GAP\\\", blocks_code_handoff_audit: true, blocks_live_monitoring_safety_while_check_runs: true, evidence: [\\\"tests/worker.test.ts:521-531\\\", \\\"server/worker/cli.ts:14,61-64\\\"], caveat: \\\"Local handoff directory exists; file contents and pre-run state were not inspected, so actual owner-record loss is not asserted.\\\" },\n  residual_items: [\n    { id: \\\"watchlist\\\", classification: \\\"OWNER_CONFIGURATION_REQUIRED\\\", blocks_code_handoff: false, blocks_live_monitoring: true, blocks_only_optional_scope: false, action: \\\"Supply actual owner workspace/watchlist.\\\" },\n    { id: \\\"daily-bars\\\", classification: \\\"OWNER_CONFIGURATION_REQUIRED\\\", blocks_code_handoff: false, blocks_live_monitoring: true, blocks_only_optional_scope: false, action: \\\"Supply permitted regularly updated completed daily CSV with explicit adjustment/provenance/freshness.\\\" },\n    { id: \\\"source-rights-freshness\\\", classification: \\\"UNPROVEN_EXTERNAL\\\", blocks_code_handoff: false, blocks_live_monitoring: true, blocks_only_optional_scope: false, action: \\\"Verify selected external source authorization, availability and updates.\\\" },\n    { id: \\\"node-db-folder\\\", classification: \\\"OWNER_CONFIGURATION_REQUIRED\\\", blocks_code_handoff: false, blocks_live_monitoring: true, blocks_only_optional_scope: false, action: \\\"Use Node 22.23.2 and select private worker DB/handoff paths.\\\" },\n    { id: \\\"schedule-awake-input\\\", classification: \\\"OWNER_CONFIGURATION_REQUIRED\\\", condition: \\\"Unattended monitoring only.\\\", blocks_code_handoff: false, blocks_live_monitoring: false, blocks_only_optional_scope: true, action: \\\"Owner installs schedule, keeps machine awake and input path readable; manual runs remain supported.\\\" },\n    { id: \\\"backup-cadence\\\", classification: \\\"OWNER_CONFIGURATION_REQUIRED\\\", blocks_code_handoff: false, blocks_live_monitoring: false, blocks_only_optional_scope: false, blocks_safe_durable_use: true, action: \\\"Set private backup destination/cadence; loss since operator backup otherwise unknown.\\\" },\n    { id: \\\"smtp\\\", classification: \\\"NOT_APPLICABLE\\\", blocks_code_handoff: false, blocks_live_monitoring: false, blocks_only_optional_scope: true, action: \\\"In-app review suffices; setup only if external mail is chosen.\\\" },\n    { id: \\\"cloud-sync\\\", classification: \\\"NOT_APPLICABLE\\\", blocks_code_handoff: false, blocks_live_monitoring: false, blocks_only_optional_scope: true, action: \\\"Cloud identity and multi-device sync.\\\" },\n    { id: \\\"commerce\\\", classification: \\\"NOT_APPLICABLE\\\", blocks_code_handoff: false, blocks_live_monitoring: false, blocks_only_optional_scope: true, action: \\\"Paid/public commerce, billing, support/privacy lifecycle.\\\" },\n    { id: \\\"teams-marketplace\\\", classification: \\\"NOT_APPLICABLE\\\", blocks_code_handoff: false, blocks_live_monitoring: false, blocks_only_optional_scope: true, action: \\\"Multi-user/team/marketplace.\\\" },\n    { id: \\\"managed-hosting\\\", classification: \\\"NOT_APPLICABLE\\\", blocks_code_handoff: false, blocks_live_monitoring: false, blocks_only_optional_scope: true, action: \\\"Broad hosted service.\\\" },\n    { id: \\\"native\\\", classification: \\\"NOT_APPLICABLE\\\", blocks_code_handoff: false, blocks_live_monitoring: false, blocks_only_optional_scope: true, action: \\\"Native/app-store/physical-device/OS-push claims.\\\" },\n    { id: \\\"commercial-rights\\\", classification: \\\"NOT_APPLICABLE\\\", blocks_code_handoff: false, blocks_live_monitoring: false, blocks_only_optional_scope: true, action: \\\"Commercial redistribution/managed-provider activation; owner source permission is separate above.\\\" },\n    { id: \\\"public-launch-wtp\\\", classification: \\\"NOT_APPLICABLE\\\", blocks_code_handoff: false, blocks_live_monitoring: false, blocks_only_optional_scope: true, action: \\\"Public-launch dependencies, paid pilot, real-user WTP.\\\" },\n    { id: \\\"scanner-parity\\\", classification: \\\"NOT_APPLICABLE\\\", blocks_code_handoff: false, blocks_live_monitoring: false, blocks_only_optional_scope: true, action: \\\"Broad scanner/backtest parity beyond adopted watch recipes.\\\" }\n  ],\n  no_contact_or_fabrication: { provider_contacted: false, recipient_contacted: false, owner_source_fabricated: false, schedule_installed_or_asserted: false, delivery_or_human_read_asserted: false }\n};\nconst exact = {\n  schema_version: 1, project: \\\"stockledger\\\", repository: \\\"kimhw8084/stockledger\\\", request, operation: \\\"VERIFY\\\", fabric_job: job,\n  subject: { protected_target: \\\"main\\\", base: main, tested_main: main, tree, accepted_head: \\\"3a76d78663b555392cd152977bb2f9c5cd91a79f\\\", accepted_tree: tree, work_branch: \\\"codex/\\\" + request },\n  integration: { pr: 28, state: \\\"merged\\\", base_before_merge: \\\"9331b8850dc674e55181447a7bd5963059fd3649\\\", head: \\\"3a76d78663b555392cd152977bb2f9c5cd91a79f\\\", merge_commit: main, merge_parents: [\\\"9331b8850dc674e55181447a7bd5963059fd3649\\\", \\\"3a76d78663b555392cd152977bb2f9c5cd91a79f\\\"], merge_tree: tree, tree_equal_to_accepted_head: true, workflow_run: 36263932012, checks: { app: \\\"success\\\", cloud_contract: \\\"success\\\", operations: \\\"success\\\" }, workflow_url: \\\"https://github.com/kimhw8084/stockledger/actions/runs/36263932012\\\" },\n  command_results: [\n    { command: \\\"npm ci\\\", result: \\\"PASS\\\", detail: \\\"Node v22.23.2; 639 packages; 0 audit vulnerabilities.\\\" },\n    { command: \\\"npm run check\\\", result: \\\"LOCAL_FAILURE_WITH_EXACT_TREE_CI_PASS\\\", detail: \\\"Two full runs each 215 passed / one 5000ms timeout in tests/notification.test.ts. The identical focused test passed in 2.12s. Exact-tree PR #28 app job passed npm run check. The test suite also executed the unsafe tests/worker.test.ts CLI case.\\\" },\n    { command: \\\"npm run check:boundaries\\\", result: \\\"PASS\\\" },\n    { command: \\\"npm audit --audit-level=high\\\", result: \\\"PASS\\\", detail: \\\"0 vulnerabilities.\\\" },\n    { command: \\\"npm run check:release-workflow\\\", result: \\\"PASS\\\" },\n    { command: \\\"npm run export:all\\\", result: \\\"PASS\\\", detail: \\\"Web, iOS, Android exported.\\\" },\n    { command: \\\"npm run test:e2e\\\", result: \\\"PASS\\\", detail: \\\"89 passed, 1 existing mobile keyboard-only skip; worker journey passed desktop and mobile.\\\" },\n    { command: \\\"npm test -- --run tests/workerHandoff.test.ts\\\", result: \\\"PASS\\\", detail: \\\"6 passed.\\\" },\n    { command: \\\"npm run recovery:drill -- --output /tmp/stockledger-c19-recovery-result.json\\\", result: \\\"PASS\\\", detail: \\\"Source unchanged, restore integrity true, authored/evaluation/decision/job/ingestion/notification state retained; corrupt/incompatible restore candidates rejected; RPO since operator backup unknown without cadence.\\\" },\n    { command: \\\"npm run operations:qualify -- --output /tmp/stockledger-c19-operations-qualification.json\\\", result: \\\"PASS\\\", detail: \\\"Synthetic 100 stocks × 260 sessions, three samples, retry/restore budgets passed; not SLA/capacity claim.\\\" },\n    { command: \\\"npm run operations:status -- --db /tmp/stockledger-c19-operations-status.sqlite --release-evidence /tmp/stockledger-c19-release-evidence.json\\\", result: \\\"PASS_TRUTHFUL_UNCONFIGURED\\\", detail: \\\"STOCKLEDGER_PROTECTED_BASE set to exact main; releaseIdentity known for exact commit/tree; workspace_missing; scheduler stopped; schedulerInstalled=false.\\\" },\n    { command: \\\"npm run release:evidence -- --base \\\" + main + \\\" --output /tmp/stockledger-c19-release-evidence.json\\\", result: \\\"PASS\\\", detail: \\\"Source commit/tree exact.\\\" },\n    { command: \\\"npm run release:verify -- --base \\\" + main + \\\" --input /tmp/stockledger-c19-release-evidence.json\\\", result: \\\"PASS\\\", detail: \\\"verified=true, reasons=[].\\\" },\n    { command: \\\"npm run test:cloud\\\", result: \\\"ENVIRONMENT_UNAVAILABLE\\\", detail: \\\"Configured OrbStack Docker socket absent. Exact-tree PR #28 cloud-contract job ran isolated local Supabase and passed; only that scoped cloud claim uses it.\\\" }\n  ],\n  remote_readback: { work_branch_head: main, work_branch_exact: true, main_at_start: main, main_at_end: main, target_drift: false },\n  mutation_boundary: { source_changed: false, product_commits: 0, product_changed_files: 0, tracked_diff_from_main: false, main_changed: false, tree_at_end: tree },\n  qualification: { recommended_disposition: \\\"FIX_REQUIRED\\\", fixture_path: \\\"PASS\\\", release_and_operations: \\\"BLOCKED\\\", owner_configuration_explicit: true, ui_authority_current: true, personal_scope_matrix_complete: true },\n  fabric_publication_contract: { evidence_ref: \\\"refs/heads/codex-fabric/evidence/stockledger/\\\" + request, canonical_audit_path: \\\".codex-fabric/audit.json\\\", evidence_sole_parent: main, publication: \\\"normal Fabric publisher only\\\" }\n};\nconst ui = {\n  schema_version: 1, project: \\\"stockledger\\\", request, subject: { main, tree },\n  golden_ui_v3_unaffected_authority: {\n    change: \\\"CHG-202\\\", accepted_head: \\\"92b64a20c620da38422c22e73664eba395b58f17\\\", accepted_tree: \\\"b3cbaaa0698522e9ab19d6fb8558a263101a05f7\\\",\n    artifact_ref: \\\"refs/heads/project-os-artifacts/stockledger/stockledger-prod-c17-golden-ui-v3-focus-geometry-zoom-fix-v2\\\",\n    artifact_commit: \\\"fb28e5a5ad0ee01331863a65e7b892a81ee1074c\\\", evidence_path: \\\"source-impact.json\\\",\n    source_impact_covers: \\\"17 canonical surfaces plus focus/geometry/zoom evidence\\\",\n    unchanged_shared_dependencies: [\\\"src/components/WindowPanel.tsx\\\", \\\"src/hooks/useWindowPanelFocus.ts\\\", \\\"src/lib/webFocusEligibility.ts\\\", \\\"src/features/shell/StockLedgerShell.tsx\\\"],\n    reuse_identity_check: { command: \\\"git diff --exit-code 92b64a20c620da38422c22e73664eba395b58f17 1d3fc085b54b5002342982cc9c15ccc32bf086ba -- src/components/WindowPanel.tsx src/hooks/useWindowPanelFocus.ts src/lib/webFocusEligibility.ts src/features/shell/StockLedgerShell.tsx\\\", result: \\\"PASS_NO_DIFFERENCES\\\" }\n  },\n  changed_surface_authority: {\n    r2: { change: \\\"CHG-256\\\", job: \\\"CF-06b785372e2bbaec06eb6224\\\", candidate: \\\"3a76d78663b555392cd152977bb2f9c5cd91a79f\\\", tree },\n    r3: { change: \\\"CHG-256 recovery visual verification\\\", job: \\\"CF-7093d40510c24716ba32a133\\\", artifact_ref: \\\"refs/heads/project-os-artifacts/stockledger/stockledger-prod-c18-handoff-recovery-visual-evidence-verify-v3\\\", artifact_commit: \\\"dea288a5930a95a76e4239653b49430ee701ffe9\\\", candidate: \\\"3a76d78663b555392cd152977bb2f9c5cd91a79f\\\", tree,\n      recaptured: [\\\"ui/desktop/settings-handoff-permission-required-en.png\\\", \\\"ui/desktop/settings-handoff-recovered-en.png\\\", \\\"ui/desktop/settings-handoff-recovered-ko.png\\\", \\\"ui/mobile/settings-handoff-permission-required-en.png\\\", \\\"ui/mobile/settings-handoff-recovered-en.png\\\", \\\"ui/mobile/settings-handoff-recovered-ko.png\\\"] }\n  },\n  affected_surfaces: [\n    \\\"Today captured worker context\\\",\n    \\\"Alerts captured source/condition/quality context\\\",\n    \\\"Settings → Workspace and data → Local worker review handoff, permission/applied/stale/partial/missed/conflict/recovery states\\\"\n  ],\n  unaffected_surfaces_reusing_golden_ui_v3_where_dependencies_are_unchanged: [\n    \\\"Watchlist and stock detail\\\", \\\"Recipe list/detail/builder\\\", \\\"Eye detail/composer\\\", \\\"Journal and decision detail/composer\\\",\n    \\\"Logic registry and metric detail\\\", \\\"Notification settings/confirmation\\\", \\\"Scanner review\\\", \\\"Settings outside local worker handoff\\\"\n  ],\n  current_execution: { command: \\\"npm run test:e2e\\\", result: \\\"89 passed, 1 existing skip; exact worker handoff journey passed on desktop and mobile.\\\" },\n  limits: [\\\"No human preference inference\\\", \\\"No physical-device/native certification\\\", \\\"No screen-reader or blanket WCAG claim\\\", \\\"No field-availability claim\\\", \\\"No model self-acceptance.\\\"]\n};\nconst summary = [\n  \\\"# StockLedger personal handoff qualification\\\",\n  \\\"\\\",\n  \\\"Request: \\\" + request,\n  \\\"Subject: main \\\" + main + \\\"; tree \\\" + tree,\n  \\\"Operation: VERIFY; no Product source/test/docs/config/dependency/lockfile/CI/runtime edits; zero Product commits.\\\",\n  \\\"\\\",\n  \\\"## Recommended disposition\\\",\n  \\\"\\\",\n  \\\"FIX_REQUIRED. The deterministic personal path and exact-tree CI checks passed, but a material test-isolation defect prevents owner handoff audit. tests/worker.test.ts launches the CLI with temporary DB/CSV/export files while omitting --handoff-dir. The CLI defaults to .local/stockledger-app-handoff and atomically renames its synthetic pending.json over the destination. npm run check executes this test. This can replace real owner pending evidence when checks run in the same repository. The directory exists here; its contents and pre-run state were not inspected, so actual owner-data loss is not asserted. No Product fix was applied.\\\",\n  \\\"\\\",\n  \\\"## Qualification evidence\\\",\n  \\\"\\\",\n  \\\"- Exact main is PR #28's merge of the exact prior main and CHG-256 Accepted Head; merge tree equals accepted candidate tree. Main stayed unchanged at readback.\\\",\n  \\\"- Node v22.23.2 used. npm ci, boundary/audit/workflow checks, all-platform export, full Playwright (89 passed, one existing skip), six focused worker handoff tests, recovery drill, operations qualification/status, and source-bound release evidence/verify passed.\\\",\n  \\\"- Local npm run check twice timed out one notification retry test at its unchanged 5-second limit (215/216 each time). The same test passed alone in 2.12 seconds; exact-tree PR #28 app job passed npm run check. The local full-suite outcome is recorded as failure, not called a local pass.\\\",\n  \\\"- Local npm run test:cloud was unavailable because the configured OrbStack Docker socket was absent. PR #28's exact-tree cloud-contract job ran isolated Supabase and passed; it supports only that cloud-contract claim.\\\",\n  \\\"- Deterministic fixtures cover the app-closed CSV worker path, explicit adjustment, handoff/replay, context in Today/Alerts/Journal, decision retention, stale/partial/missed/conflict/recovery, export/restore and bounded operations. Browser directory access uses a test adapter, not native device evidence.\\\",\n  \\\"- No actual owner watchlist/source, schedule, awake-machine state, SMTP destination, delivery, or human read was supplied/asserted. See matrix and residual boundaries.\\\",\n  \\\"- CHG-202 Golden UI v3 is reused only for unchanged rendered dependencies; CHG-256 R2/R3 covers Today/Alerts/Settings handoff states on this exact tree. Current E2E passed those browser journeys.\\\",\n  \\\"- Supplied Project OS queue context has CHG-98 commerce/privacy/support and CHG-99 native distribution only; both are NOT_APPLICABLE. No Notion change was made.\\\",\n  \\\"\\\",\n  \\\"## Owner setup\\\",\n  \\\"\\\",\n  \\\"Live monitoring also needs the owner's real workspace/watchlist, a permitted and regularly updated completed-daily-bar path with adjustment/provenance, Node 22.23.2, private SQLite and handoff paths, and (for unattended mode only) an owner schedule, awake machine and readable data path. SMTP is optional; Today/Alerts is sufficient. Independent audit/acceptance remains pending.\\\"\n].join(\\\"\\\\n\\\");\nconst files = {\n  \\\"qualification-summary.md\\\": summary,\n  \\\"requirement-matrix.json\\\": JSON.stringify(m, null, 2) + \\\"\\\\n\\\",\n  \\\"owner-path.json\\\": JSON.stringify(owner, null, 2) + \\\"\\\\n\\\",\n  \\\"residual-boundaries.json\\\": JSON.stringify(residual, null, 2) + \\\"\\\\n\\\",\n  \\\"exact-main-verification.json\\\": JSON.stringify(exact, null, 2) + \\\"\\\\n\\\",\n  \\\"ui-source-impact.json\\\": JSON.stringify(ui, null, 2) + \\\"\\\\n\\\"\n};\nfor (const [name, body] of Object.entries(files)) fs.writeFileSync(d + \\\"/\\\" + name, body, { mode: 0o600 });\nprocess.stdout.write(JSON.stringify({ written: Object.keys(files), source_changed: false }) + \\\"\\\\n\\\");\nNODE\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy node - <<'NODE'\nconst fs = require('node:fs');\nconst p = 'final-handoff/qualification-summary.md';\nconst s = fs.readFileSync(p, 'utf8');\nconst old = '- Supplied Project OS queue context has CHG-98 commerce/privacy/support and CHG-99 native distribution only; both are NOT_APPLICABLE. No Notion change was made.';\nconst next = '- Supplied Project OS queue context has no known personal-scope Open/Design Change and only CHG-98 commerce/privacy/support and CHG-99 native distribution require attention; both are NOT_APPLICABLE. No Notion change was made.';\nif (\"'!s.includes(old)) throw new Error('\"'summary context anchor missing');\nfs.writeFileSync(p, s.replace(old, next), { mode: 0o600 });\nconst files = ['requirement-matrix.json','owner-path.json','residual-boundaries.json','exact-main-verification.json','ui-source-impact.json'];\nfor (const f of files) JSON.parse(fs.readFileSync('final-handoff/' + f, 'utf8'));\nconst matrix = JSON.parse(fs.readFileSync('final-handoff/requirement-matrix.json','utf8'));\nconst allowed = new Set(['PASS','NOT_APPLICABLE','OWNER_CONFIGURATION_REQUIRED','UNPROVEN_EXTERNAL','MATERIAL_PRODUCT_GAP','MATERIAL_EVIDENCE_GAP']);\nfor (const r of matrix.items) if (\"'!allowed.has(r.classification)) throw new Error('\"'invalid classification ' + r.id);\nfor (const r of matrix.items) if (['PASS','OWNER_CONFIGURATION_REQUIRED','UNPROVEN_EXTERNAL'].includes(r.classification) && \"'!r.claim_chain) throw new Error('\"'claim chain missing ' + r.id);\nconsole.log(JSON.stringify({json_files:files.length, matrix_items:matrix.items.length, classifications:[...new Set(matrix.items.map(x=>x.classification))], summary_updated:true}));\nNODE\nrtk git status --short\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git ls-remote origin refs/heads/main refs/heads/codex/stockledger-prod-c19-final-personal-handoff-qualification-verify-v1 refs/heads/project-os-artifacts/stockledger/stockledger-prod-c19-final-personal-handoff-qualification-verify-v1 refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c19-final-personal-handoff-qualification-verify-v1 && rtk git rev-parse HEAD HEAD''^{tree} && rtk git status --porcelain=v1'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git add final-handoff/qualification-summary.md final-handoff/requirement-matrix.json final-handoff/owner-path.json final-handoff/residual-boundaries.json final-handoff/exact-main-verification.json final-handoff/ui-source-impact.json && rtk git commit -m \\\"docs: qualify StockLedger personal handoff\\\" && rtk git show -s --format='%H%n%P%n%T%n%s' HEAD && rtk git diff --name-status 1d3fc085b54b5002342982cc9c15ccc32bf086ba HEAD\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git ls-remote origin refs/heads/main refs/heads/codex/stockledger-prod-c19-final-personal-handoff-qualification-verify-v1 refs/heads/project-os-artifacts/stockledger/stockledger-prod-c19-final-personal-handoff-qualification-verify-v1 refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c19-final-personal-handoff-qualification-verify-v1 && rtk git rev-parse HEAD HEAD''^ HEAD''^{tree}'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git push origin HEAD:refs/heads/project-os-artifacts/stockledger/stockledger-prod-c19-final-personal-handoff-qualification-verify-v1'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy /Users/haewonkim/.codex-fabric/bin/fabricctl status CF-29df9cf0a9bafca63978aa45'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git show -s --format='%H%n%P%n%T%n%s' 1a63a7723c3b3fe8f6c08a1bd18d8a8b32937271 && rtk git diff --name-status 1d3fc085b54b5002342982cc9c15ccc32bf086ba 1a63a7723c3b3fe8f6c08a1bd18d8a8b32937271 && rtk git ls-tree -r --name-only 1a63a7723c3b3fe8f6c08a1bd18d8a8b32937271 final-handoff\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git ls-remote origin refs/heads/main refs/heads/codex/stockledger-prod-c19-final-personal-handoff-qualification-verify-v1 refs/heads/project-os-artifacts/stockledger/stockledger-prod-c19-final-personal-handoff-qualification-verify-v1 refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c19-final-personal-handoff-qualification-verify-v1'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy sed -n '1,160p' /Users/haewonkim/.codex-fabric/bin/fabricctl\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy rg -n \"publish-evidence|publish_evidence|publish_evidence_command\" /Users/haewonkim/.codex-fabric/releases/1.2.5-dashboard-controls-candidate/fabric.py'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy sed -n '3040,3098p' /Users/haewonkim/.codex-fabric/releases/1.2.5-dashboard-controls-candidate/fabric.py && rtk proxy sed -n '4828,4862p' /Users/haewonkim/.codex-fabric/releases/1.2.5-dashboard-controls-candidate/fabric.py\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy /Users/haewonkim/.codex-fabric/bin/fabricctl status CF-29df9cf0a9bafca63978aa45'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git show -s --format='%H%n%P%n%T' 1a63a7723c3b3fe8f6c08a1bd18d8a8b32937271 && rtk git ls-tree -r --name-only 1a63a7723c3b3fe8f6c08a1bd18d8a8b32937271 final-handoff\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git ls-remote origin refs/heads/main refs/heads/codex/stockledger-prod-c19-final-personal-handoff-qualification-verify-v1 refs/heads/project-os-artifacts/stockledger/stockledger-prod-c19-final-personal-handoff-qualification-verify-v1 refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c19-final-personal-handoff-qualification-verify-v1 && rtk git rev-parse HEAD HEAD''^{tree} && rtk git status --short --branch'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk fabricctl status'",
+      "exit_code": 127,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git status --short --branch && rtk git rev-parse HEAD && rtk git rev-parse HEAD''^{tree}'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git ls-remote origin refs/heads/main refs/heads/codex/stockledger-prod-c19-final-personal-handoff-qualification-verify-v1 refs/heads/project-os-artifacts/stockledger/stockledger-prod-c19-final-personal-handoff-qualification-verify-v1 refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c19-final-personal-handoff-qualification-verify-v1'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk cat /Users/haewonkim/.codex/RTK.md /Users/haewonkim/.codex/law.md'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk find /Users/haewonkim/.codex-fabric -type f -name fabricctl -o -name 'fabricctl.py'\"",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy find /Users/haewonkim/.codex-fabric -type f -name fabricctl'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk /Users/haewonkim/.codex-fabric/bin/fabricctl status'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk /Users/haewonkim/.codex-fabric/bin/fabricctl --help'",
+      "exit_code": 2,
+      "type": "command_execution"
+    }
+  ],
+  "codex": {
+    "cli_version": "codex-cli 0.157.0",
+    "configured_model": "gpt-6-luna",
+    "event_count": 238,
+    "provider_reported_model": null,
+    "reasoning_effort": "xhigh",
+    "terminal_type": "turn.completed",
+    "usage": {
+      "cache_hit_percent": 96.43,
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 7781888,
+      "fresh_input_tokens": 288031,
+      "input_tokens": 8069919,
+      "non_reasoning_output_tokens": 36652,
+      "output_tokens": 106940,
+      "reasoning_output_tokens": 70288,
+      "total_processed_tokens": 8176859
+    },
+    "warnings": []
+  },
+  "commits": [],
+  "diff": {
+    "additions": 0,
+    "changed_files": 0,
+    "commit_count": 0,
+    "deletions": 0
+  },
+  "error_code": null,
+  "evidence_manifest": {
+    "count": 0,
+    "items": [],
+    "version": 1
+  },
+  "evidence_publisher_release": "1.2.5-dashboard-controls-candidate",
+  "fabric_capture": {
+    "applied": false,
+    "paths_before": 0,
+    "transient_untracked_removed": {
+      "count": 0,
+      "items": []
+    }
+  },
+  "fabric_release": "1.2.5-dashboard-controls-candidate",
+  "failure_class": null,
+  "finished_at": "2026-09-26T19:54:06Z",
+  "git": {
+    "base_is_ancestor": true,
+    "base_sha": "1d3fc085b54b5002342982cc9c15ccc32bf086ba",
+    "branch": "codex/stockledger-prod-c19-final-personal-handoff-qualification-verify-v1",
+    "detached_verify": false,
+    "head_sha": "1d3fc085b54b5002342982cc9c15ccc32bf086ba",
+    "remote_exact_head": true,
+    "remote_head_sha": "1d3fc085b54b5002342982cc9c15ccc32bf086ba",
+    "target_branch": "main",
+    "target_drifted_since_acceptance": false,
+    "target_head_observed_after_execution": "1d3fc085b54b5002342982cc9c15ccc32bf086ba",
+    "work_branch": "codex/stockledger-prod-c19-final-personal-handoff-qualification-verify-v1",
+    "worktree_clean": true
+  },
+  "instructions": {
+    "files": [],
+    "total_bytes": 0,
+    "warning": null
+  },
+  "job_id": "CF-29df9cf0a9bafca63978aa45",
+  "kind": "codex-fabric-audit-evidence",
+  "locator": {
+    "branch": "codex-fabric/evidence/stockledger/stockledger-prod-c19-final-personal-handoff-qualification-verify-v1",
+    "path": ".codex-fabric/audit.json",
+    "ref": "refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c19-final-personal-handoff-qualification-verify-v1"
+  },
+  "operation": "VERIFY",
+  "policy": {
+    "environment_policy_sha256": "e077daca74297b3c30bee8989f00f8ca5338f7610b4d016a6c48db524205d064",
+    "fabric_release": "1.2.5-dashboard-controls-candidate",
+    "policy_sha256": "123615bf2f6e57dcac197e49ca98ceac59ada86a55e2c84445ea5d00812c0833",
+    "registry_sha256": "af81b8552f9d6a33847310e3c6bcd2d48401782b963a58efd2993e93570cb4aa"
+  },
+  "project_id": "stockledger",
+  "recovery": {
+    "model_rerun_safe": false,
+    "recovery_required": false,
+    "retry_safe": false,
+    "retry_scope": null,
+    "worktree_retained": true
+  },
+  "request": "stockledger-prod-c19-final-personal-handoff-qualification-verify-v1",
+  "schema_version": 1,
+  "started_at": "2026-09-26T19:06:37Z",
+  "status": "EXECUTED_NO_CHANGE",
+  "timing": {
+    "execution_seconds": 2849,
+    "queue_seconds": 80,
+    "total_seconds": 2929
+  },
+  "transport": {
+    "bytes": 15194,
+    "envelope": "FABRIC/2",
+    "prompt_bytes": 14799,
+    "prompt_sha256": "056e45fdfe009c9c82c07847fa7fea81384773ce7d94cf4f265c202a6f5542b9",
+    "sha256": "29df9cf0a9bafca63978aa45751916b3834a54f9af5d25c3869381ed0a3ab35e"
+  }
+}
