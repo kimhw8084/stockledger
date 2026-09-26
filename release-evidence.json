@@ -1,0 +1,259 @@
+{
+  "contractVersion": "stockledger-release-evidence-v1",
+  "revision": 1,
+  "baseCommit": "9331b8850dc674e55181447a7bd5963059fd3649",
+  "source": {
+    "commit": "3a76d78663b555392cd152977bb2f9c5cd91a79f",
+    "tree": "b0013584a69ed47bd7eb1c7d331bddc773f57c6c",
+    "workingTree": "clean"
+  },
+  "versions": {
+    "app": "0.2.0",
+    "nodeRequirement": ">=22.23.2",
+    "nodeRuntime": "v22.23.2",
+    "workspaceExportSchema": 2,
+    "workerDatabaseSchema": 8,
+    "financialTruthEngine": "2.1.0",
+    "financialTruthContract": "financial_truth_v1",
+    "calendar": "NYSE-2026-09-15",
+    "workerJobContract": {
+      "version": "stockledger-production-job-v1",
+      "revision": 2
+    },
+    "notification": {
+      "delivery": "stockledger-notification-delivery-v1",
+      "deliveryRevision": 1,
+      "digest": "stockledger-notification-digest-v1",
+      "digestRevision": 1,
+      "preferences": "stockledger-notification-preferences-v1"
+    },
+    "ingestion": {
+      "version": "stockledger-market-data-ingestion-v1",
+      "revision": 1
+    },
+    "rights": {
+      "version": "stockledger-market-data-rights-v1",
+      "revision": 2,
+      "authorityModel": "stockledger-market-data-rights-authority-v1"
+    },
+    "sync": "stockledger-personal-sync-v1"
+  },
+  "migrations": {
+    "ordered": true,
+    "files": [
+      {
+        "path": "supabase/migrations/20260916032227_ledger_sync.sql",
+        "sha256": "a7ac814c99675b5bfd0e375da338124f5084214b593a56efd16e34846825cca4",
+        "order": 0
+      },
+      {
+        "path": "supabase/migrations/20260918000000_secure_personal_sync.sql",
+        "sha256": "1c0763164f2e1257a8cbc3cf2338f68b0170257af6f072f8a73e1e4ebfb0d3ce",
+        "order": 1
+      }
+    ]
+  },
+  "packageLock": {
+    "sha256": "81117b82120669c16680c7f92ffe34be80a438bea52d2196aa2071f7533314ec"
+  },
+  "artifacts": {
+    "generated": true,
+    "files": [
+      {
+        "path": "desktop/alerts-handoff-applied-ko.png",
+        "sha256": "a5f2e7cf3c0541339309b9a1f8817f39b79e5b5b2ab832a3c37f4770d23f9365",
+        "bytes": 128995
+      },
+      {
+        "path": "desktop/settings-handoff-applied-en.png",
+        "sha256": "5afa65d0b25811d2a15ccf7e6659f6380ed4ffa999d1f4e888410c57784c57a7",
+        "bytes": 92309
+      },
+      {
+        "path": "desktop/settings-handoff-applied-ko.png",
+        "sha256": "b1a44a5a9949f3e2dac09790808969ed0200bec26e79faa4aa3e2ac5806309d5",
+        "bytes": 82591
+      },
+      {
+        "path": "desktop/settings-handoff-conflict-en.png",
+        "sha256": "663e682befccf82854d2784700eacb6200bc0899f18e55b7c428c0bb091c4026",
+        "bytes": 93259
+      },
+      {
+        "path": "desktop/settings-handoff-missed-en.png",
+        "sha256": "5b8018216e04c2b7e53e31f0eacfdf3aa925fc1030c7e052cb771dbd2e32023d",
+        "bytes": 91710
+      },
+      {
+        "path": "desktop/settings-handoff-none-en.png",
+        "sha256": "6ef3aec685537024ad4ef6e5068ea0246788ec0a6e328287a335b48ec00e3a85",
+        "bytes": 90856
+      },
+      {
+        "path": "desktop/settings-handoff-none-ko.png",
+        "sha256": "98a54bbc23a3802faf1d166524067ad3b7a0011245b0c16e33cf5a85d8cd1bc3",
+        "bytes": 81397
+      },
+      {
+        "path": "desktop/settings-handoff-partial-en.png",
+        "sha256": "4402d1017cae16591a9b29255c5959787d24a9a1d2709543cf563f9667c60e2c",
+        "bytes": 91969
+      },
+      {
+        "path": "desktop/settings-handoff-permission-required-en.png",
+        "sha256": "205cc946931cb112c96c4b4b066eb0319a153a6a256397f420029a6f50e36a18",
+        "bytes": 90915
+      },
+      {
+        "path": "desktop/settings-handoff-recovered-en.png",
+        "sha256": "205cc946931cb112c96c4b4b066eb0319a153a6a256397f420029a6f50e36a18",
+        "bytes": 90915
+      },
+      {
+        "path": "desktop/settings-handoff-recovered-ko.png",
+        "sha256": "48dca687ea9f56753a9d8ddac92e57caa3f61c6007ab80d73db41f9aa14d258a",
+        "bytes": 81446
+      },
+      {
+        "path": "desktop/settings-handoff-regranted-en.png",
+        "sha256": "81ef3bd195c973a6b4d3e3da69444657fd86d87031d6a3bd7dfb6a9e49b17932",
+        "bytes": 91051
+      },
+      {
+        "path": "desktop/settings-handoff-stale-en.png",
+        "sha256": "bcc718c3d4137499a5024451df6e1931685af920bd5a906dae279161f66f8531",
+        "bytes": 90493
+      },
+      {
+        "path": "desktop/today-handoff-applied-ko.png",
+        "sha256": "4d33727d5e6aae0a0ae54375b11dd09ffd2370ee9291e4025cad03863b177181",
+        "bytes": 98983
+      },
+      {
+        "path": "mobile/alerts-handoff-applied-ko.png",
+        "sha256": "a1d75000aef820ad929a0d61805fee2f9924217831dea94928408130b2a8fcd9",
+        "bytes": 249621
+      },
+      {
+        "path": "mobile/settings-handoff-applied-en.png",
+        "sha256": "55416a4b717f59be28de0f22aa678e05774511c4bfb632184c2fa8cb4a41d0a1",
+        "bytes": 230249
+      },
+      {
+        "path": "mobile/settings-handoff-applied-ko.png",
+        "sha256": "0648962b151bab2f68554e5d38c4aa3fa79c7b93e7fd67b8978c2064a4fc60fe",
+        "bytes": 176131
+      },
+      {
+        "path": "mobile/settings-handoff-conflict-en.png",
+        "sha256": "96ba16d8c73c37987bb3955763bd4de8489c72a99cb95a4c8baed323e8408b1f",
+        "bytes": 237989
+      },
+      {
+        "path": "mobile/settings-handoff-missed-en.png",
+        "sha256": "e4e4d8deab9c352990dda9b74e202ac075f83eb2c585cc7fd67acc33340cfd57",
+        "bytes": 229844
+      },
+      {
+        "path": "mobile/settings-handoff-none-en.png",
+        "sha256": "ba67aba631b48a52ad6bf47a6e3fb3974dcfb8f6f2b7f95c1083d2fdb09e73fc",
+        "bytes": 228069
+      },
+      {
+        "path": "mobile/settings-handoff-none-ko.png",
+        "sha256": "33fbadf4291a830c17de82d3638dbba0a5583a23831a4f669f9acdc4e5ad404c",
+        "bytes": 184801
+      },
+      {
+        "path": "mobile/settings-handoff-partial-en.png",
+        "sha256": "e5e7fc7543b778ba89a3f5b7da60d7cf8bc8b158aba9506ae77fd1aa7a7c6346",
+        "bytes": 231023
+      },
+      {
+        "path": "mobile/settings-handoff-permission-required-en.png",
+        "sha256": "a82952d650b1dff19fce48f4f4ae03052cd78bdc0780be120b4e24d73335cd1c",
+        "bytes": 228196
+      },
+      {
+        "path": "mobile/settings-handoff-recovered-en.png",
+        "sha256": "a82952d650b1dff19fce48f4f4ae03052cd78bdc0780be120b4e24d73335cd1c",
+        "bytes": 228196
+      },
+      {
+        "path": "mobile/settings-handoff-recovered-ko.png",
+        "sha256": "4335708024800fedc2df86e3953746aee4a7b052ec3a8ddb4914efb3f3afb844",
+        "bytes": 184940
+      },
+      {
+        "path": "mobile/settings-handoff-regranted-en.png",
+        "sha256": "dc45412d9ee945f8bfbfe3ed230a5cf9c911df251401c04becd083a9da460684",
+        "bytes": 228784
+      },
+      {
+        "path": "mobile/settings-handoff-stale-en.png",
+        "sha256": "e012afbef0e2e58513284c9e6aa17cc9e28c1e5395422543e4bff81f5dad15de",
+        "bytes": 226381
+      },
+      {
+        "path": "mobile/today-handoff-applied-ko.png",
+        "sha256": "9d4b5f7d91d1cafa2dc265f329d0e353f88d5631b39a6a98958271cb41607847",
+        "bytes": 197473
+      },
+      {
+        "path": "stockledger-handoff-200-percent-browser-zoom.png",
+        "sha256": "a9d6373de5959cf39cbd2587f3c2a20227ecb7088a31d685a155023385c46b70",
+        "bytes": 103291
+      }
+    ]
+  },
+  "verification": {
+    "commands": [
+      "npm ci",
+      "npm run typecheck",
+      "npm test -- --run",
+      "npm run check:release-workflow",
+      "npm run check:boundaries",
+      "npm run check:frozen",
+      "npm run export:all",
+      "npm run test:e2e",
+      "npm audit --audit-level=high",
+      "npm run test:cloud"
+    ],
+    "checks": [
+      "source-tree-match",
+      "migration-order-and-digest-match",
+      "contract-snapshot-match",
+      "package-lock-match",
+      "artifact-digest-match-when-present",
+      "rollback-compatibility"
+    ]
+  },
+  "externalGates": [
+    "hosted-scheduler",
+    "hosted-notification-transport",
+    "commercial-market-data-agreement",
+    "billing-lifecycle",
+    "production-cloud-backup",
+    "external-incident-pager",
+    "native-device-certification",
+    "real-user-load"
+  ],
+  "rollback": {
+    "policy": "additive-forward-only",
+    "safeRollback": [
+      "static-artifact-to-a-verified-compatible-build",
+      "same-schema-export-restore-to-a-new-sqlite-path"
+    ],
+    "forwardMigrationRequired": [
+      "worker-database-schema",
+      "cloud-migrations",
+      "workspace-export-schema"
+    ],
+    "incompatibleAssertions": [
+      "no-destructive-database-downgrade",
+      "no-rollback-across-unsupported-schema",
+      "no-rollback-from-changed-financial-truth-contract"
+    ]
+  },
+  "evidenceHash": "70798054fac0f923f324bc88f276bafbe22996545a7cac929dac32cf3ed97120"
+}

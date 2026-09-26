@@ -1,0 +1,68 @@
+{
+  "project": "stockledger",
+  "change": "CHG-256",
+  "request": "stockledger-prod-c18-worker-app-review-handoff-fix-v2",
+  "criteria": [
+    {
+      "id": "closed-app-worker-to-review",
+      "requirement": "Worker-created evidence is reviewable after opening the app, without full-workspace replacement.",
+      "result": "PASS",
+      "evidence": ["tests/workerHandoff.test.ts: durable WorkerStore batch capture", "tests/e2e/worker-app-handoff.spec.ts: desktop and mobile Today/Alerts/Journal journey", "ui/desktop/today-handoff-applied-ko.png", "ui/mobile/alerts-handoff-applied-ko.png"]
+    },
+    {
+      "id": "deterministic-idempotent-replay",
+      "requirement": "Replaying the same update creates no duplicate evaluations, alerts, jobs, intents, history, or owner-visible work.",
+      "result": "PASS",
+      "evidence": ["tests/workerHandoff.test.ts: exact batch replay has one evaluation, alert, evidence row and no applied batch", "tests/workerHandoff.test.ts: worker replay and matching acknowledgement are duplicate-safe"]
+    },
+    {
+      "id": "captured-evidence-identity",
+      "requirement": "Recipe/version, evaluation identity/time/session, source/provenance/adjustment/freshness/quality, condition outcome and alert context stay exact.",
+      "result": "PASS",
+      "evidence": ["tests/workerHandoff.test.ts: captured recipe/source/provenance/condition/alert identity", "tests/e2e/worker-app-handoff.spec.ts: exact source rendered in review contexts"]
+    },
+    {
+      "id": "owner-history-preservation",
+      "requirement": "Newer app decisions, amendments, outcomes, notes and alert review state survive a worker update.",
+      "result": "PASS",
+      "evidence": ["tests/workerHandoff.test.ts: owner decisions, amendments, outcomes, notes and review state", "tests/e2e/worker-app-handoff.spec.ts: newer decision and amendment survive next batch and app reload"]
+    },
+    {
+      "id": "explicit-overlap-conflict",
+      "requirement": "Overlapping mutable owner state conflicts or safely no-ops; it is not silently merged.",
+      "result": "PASS",
+      "evidence": ["tests/workerHandoff.test.ts: owner Eye edit returns owner_state_changed and preserves it", "ui/desktop/settings-handoff-conflict-en.png", "ui/mobile/settings-handoff-conflict-en.png"]
+    },
+    {
+      "id": "atomic-recovery",
+      "requirement": "Malformed, interrupted or incompatible handoff and damaged app persistence retain a recoverable prior valid state.",
+      "result": "PASS",
+      "evidence": ["tests/workerHandoff.test.ts: malformed checksum and truncated bytes do not mutate input", "tests/repository.test.ts: first-save baseline and CAS recovery", "tests/e2e/worker-app-handoff.spec.ts: damaged workspace restore", "npm run recovery:drill"]
+    },
+    {
+      "id": "truthful-owner-visible-state",
+      "requirement": "No-folder, pending/available, applied, stale, partial/missed, conflict, failed/retryable and recovered states are explicit and truthful.",
+      "result": "PASS",
+      "evidence": ["tests/e2e/worker-app-handoff.spec.ts: permission, pending, applied, stale, partial, missed, conflict, regrant and recovery states", "ui/desktop/", "ui/mobile/", "operations:status reports schedulerInstalled:false"]
+    },
+    {
+      "id": "optional-notification-and-scheduler-boundaries",
+      "requirement": "In-app review works without SMTP; scheduler, awake machine, data path, alert, notification intent, provider acceptance, confirmed receipt and human review remain distinct.",
+      "result": "PASS",
+      "evidence": ["docs/operations/LOCAL_WORKER.md", "handoff-contract.json: truthBoundaries", "npm run operations:status", "npm test: notification lifecycle tests"]
+    },
+    {
+      "id": "worker-and-persistence-guarantees",
+      "requirement": "Bounded leases/retries/catch-up and app persistence/recovery behavior remain in place with additive migration.",
+      "result": "PASS",
+      "evidence": ["npm run check: 216 tests across worker, notification, market-data, backup, history and recovery suites", "npm run recovery:drill", "npm run operations:qualify", "Worker database schema 8 additive migration"]
+    },
+    {
+      "id": "owner-documentation-and-current-verification",
+      "requirement": "LOCAL_WORKER and IMPLEMENTATION_STATUS describe the final contract and current CHG-256 verification rather than relying on the September 16 baseline.",
+      "result": "PASS",
+      "evidence": ["docs/operations/LOCAL_WORKER.md: Worker-to-app review handoff", "docs/production/IMPLEMENTATION_STATUS.md: CHG-256 R2 verification, September 26, 2026"]
+    }
+  ],
+  "qualificationLimitations": ["Browser journey uses a test directory-handle adapter; browser-native OS chooser was not separately qualified.", "No scheduler, awake-machine guarantee, external provider, SMTP recipient, owner data, hosted service or native device was fabricated.", "Full Playwright produced one clean 89-pass/1-skip run; later reruns had unrelated intermittent existing Recipes/Eye Composer bounds/focus failures. The R2 handoff journeys passed every run."]
+}

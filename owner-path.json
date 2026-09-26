@@ -1,0 +1,44 @@
+{
+  "pathVersion": 1,
+  "owner": "Single owner on one local-first worker/app installation.",
+  "prerequisites": ["Node 22.23.2 and dependencies installed", "App workspace exported once to initialize the local worker", "Private authorized CSV path with completed US equity/ETF daily bars", "Owner machine awake during a locally installed schedule", "Supported secure web browser with File System Access API"],
+  "oneTimeSetup": [
+    {
+      "step": 1,
+      "action": "Initialize the local SQLite worker from the app workspace backup and create a private consistent backup.",
+      "commandTemplate": "npm run worker -- --db /absolute/private/worker.sqlite --import /absolute/private/StockLedger.json --backup /absolute/private/worker-initial.sqlite"
+    },
+    {
+      "step": 2,
+      "action": "Select a private handoff directory once in web Settings → Workspace and data → Local worker review handoff.",
+      "permissions": "The browser stores its owner-selected directory handle in local IndexedDB. It can be re-granted through Check for worker updates."
+    },
+    {
+      "step": 3,
+      "action": "If desired, the owner installs and monitors a scheduler that invokes the local CLI after data publication.",
+      "truth": "StockLedger does not install the scheduler. The machine must be awake and the authorized CSV path readable."
+    }
+  ],
+  "closedAppWorkerRun": {
+    "commandTemplate": "npm run worker -- --managed --db /absolute/private/worker.sqlite --csv /absolute/private/daily-bars --adjustment adjusted --source 'Authorized provider/dataset release' --handoff-dir /absolute/private/stockledger-handoff",
+    "outputs": ["SQLite WAL workspace/jobs/evaluations/alerts", "bounded atomic pending.json evidence manifest"],
+    "fullWorkspaceExport": "Not produced unless the operator explicitly supplies --output FILE.",
+    "externalNotification": "Optional server-only transport; not required for in-app review."
+  },
+  "laterAppOpen": [
+    "Open the StockLedger web app.",
+    "The app checks the owner-granted folder and validates pending.json contract/checksum/workspace/sequence/evidence.",
+    "A valid batch appends captured evaluations and alerts to the existing workspace, subject to owner-state conflict checks.",
+    "The app persists by compare-and-set with a retained previous valid copy, then writes the matching ack.json receipt.",
+    "Review captured source context in Today and Alerts; make any decision deliberately in Journal.",
+    "The worker consumes ack.json on its next invocation and deletes only the acknowledged batch prefix."
+  ],
+  "failurePath": {
+    "permission": "Owner re-grants access or selects a new folder.",
+    "conflict": "No guessed merge; owner reviews unchanged app state and resolves the underlying Eye/stock/recipe/metric edit explicitly.",
+    "malformedOrPartial": "Last valid app state is kept; status remains truthful and the durable worker batch can retry.",
+    "appRecovery": "Restore the app's prior validated saved copy; worker pending batch remains replay-safe."
+  },
+  "reverseAppToWorker": "Still an explicit revision-gated full import for owner-authored changes that must affect later worker evaluations: pause the schedule, export intentionally, create a before-import SQLite backup, and import at the exact worker revision.",
+  "notClaimed": ["Installed scheduler", "Always-on machine", "Hosted service/cloud synchronization", "SMTP delivery or recipient receipt", "Human review until the owner acts"]
+}

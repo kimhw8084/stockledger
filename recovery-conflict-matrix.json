@@ -1,0 +1,91 @@
+{
+  "contractVersion": "stockledger-worker-app-handoff-v1",
+  "matrix": [
+    {
+      "case": "exact_same_batch_replay",
+      "workerState": "Same sequence and batchId remain unacknowledged or are published again.",
+      "appState": "Already applied exact batch.",
+      "result": "SAFE_NO_OP_THEN_IDEMPOTENT_ACK",
+      "evidence": "tests/workerHandoff.test.ts: replay leaves one evaluation, alert and evidence record"
+    },
+    {
+      "case": "worker_replay_after_owner_decision_or_amendment",
+      "workerState": "Next batch contains new evaluation evidence for unchanged Eye owner fields.",
+      "appState": "Has newer decision, amendment, outcome, note and alert review state.",
+      "result": "APPLY_NEW_EVIDENCE_PRESERVE_OWNER_HISTORY",
+      "evidence": "tests/workerHandoff.test.ts; tests/e2e/worker-app-handoff.spec.ts"
+    },
+    {
+      "case": "overlapping_eye_edit",
+      "workerState": "Capture expects prior owner identity and last evaluation.",
+      "appState": "Thesis or another Eye-authored field changed after capture.",
+      "result": "EXPLICIT_CONFLICT_NO_EVIDENCE_MUTATION",
+      "errorCode": "owner_state_changed",
+      "evidence": "tests/workerHandoff.test.ts; ui/desktop/settings-handoff-conflict-en.png"
+    },
+    {
+      "case": "stock_recipe_or_referenced_metric_changed",
+      "workerState": "Captured stock, exact recipe/version, or referenced custom metric hash differs.",
+      "appState": "Current linked owner state no longer matches capture.",
+      "result": "EXPLICIT_CONFLICT_NO_TIMESTAMP_MERGE",
+      "evidence": "src/domain/workerHandoff.ts applyWorkerHandoff identity checks"
+    },
+    {
+      "case": "workspace_mismatch_or_sequence_gap",
+      "workerState": "Different workspace identity or noncontiguous sequence.",
+      "appState": "Last valid app workspace.",
+      "result": "EXPLICIT_CONFLICT_SAFE_NO_OP",
+      "errorCode": "workspace_mismatch_or_sequence_gap",
+      "evidence": "src/domain/workerHandoff.ts; tests/e2e/worker-app-handoff.spec.ts"
+    },
+    {
+      "case": "malformed_truncated_or_checksum_invalid_manifest",
+      "workerState": "Invalid JSON, interrupted bytes, unsupported contract, checksum or evidence identity.",
+      "appState": "Last valid workspace and recovery copy.",
+      "result": "REJECT_BEFORE_APP_MUTATION_RETRYABLE_FAILURE",
+      "evidence": "tests/workerHandoff.test.ts: malformed and interrupted bytes"
+    },
+    {
+      "case": "worker_pending_write_interrupted",
+      "workerState": "Complete manifest written to restrictive temporary file before rename.",
+      "appState": "Reads prior pending.json or receives retryable malformed state.",
+      "result": "ATOMIC_RENAME_PRESERVES_PRIOR_PENDING_FILE",
+      "evidence": "server/worker/cli.ts atomic temporary-file publication"
+    },
+    {
+      "case": "app_commit_fails_or_revision_changes_during_handoff",
+      "workerState": "Batch remains unacknowledged.",
+      "appState": "Compare-and-set rejects commit; prior valid app state is unchanged.",
+      "result": "EXPLICIT_CONFLICT_OR_RETRYABLE_FAILURE",
+      "evidence": "src/hooks/useAppModel.ts; IndexedDB repository CAS tests"
+    },
+    {
+      "case": "app_commit_succeeds_ack_write_fails_or_process_stops",
+      "workerState": "Batch remains durable until matching receipt is consumed.",
+      "appState": "Committed evidence and cursor already exist.",
+      "result": "SAFE_REPLAY_NO_DUPLICATES_THEN_ACK",
+      "evidence": "tests/workerHandoff.test.ts: replay and duplicate acknowledgement; receipt follows app commit"
+    },
+    {
+      "case": "damaged_app_workspace_after_valid_commit",
+      "workerState": "Does not replace workspace.",
+      "appState": "Current store damaged; prior validated copy available.",
+      "result": "RECOVERED_RESTORED_WITH_LAST_VALID_COPY",
+      "evidence": "tests/e2e/worker-app-handoff.spec.ts; ui/desktop/settings-handoff-recovered-en.png"
+    },
+    {
+      "case": "browser_folder_permission_suspended",
+      "workerState": "Pending file remains durable; no scheduler or delivery claim changes.",
+      "appState": "Permission-required state; explicit Check re-requests access or owner changes folder.",
+      "result": "PENDING_PERMISSION_REQUIRED_THEN_REGRANTED",
+      "evidence": "tests/e2e/worker-app-handoff.spec.ts; ui/desktop/settings-handoff-permission-required-en.png; ui/desktop/settings-handoff-regranted-en.png"
+    },
+    {
+      "case": "partial_missed_or_stale_worker_coverage",
+      "workerState": "Manifest carries bounded coverage and truthful scheduler timestamps; schedulerInstalled is always false.",
+      "appState": "Evidence may be applied while the state remains partial, missed or stale.",
+      "result": "OWNER_VISIBLE_COVERAGE_LIMITATION",
+      "evidence": "ui/desktop/settings-handoff-partial-en.png; ui/desktop/settings-handoff-missed-en.png; ui/desktop/settings-handoff-stale-en.png"
+    }
+  ]
+}

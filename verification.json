@@ -1,0 +1,40 @@
+{
+  "source": {
+    "repository": "kimhw8084/stockledger",
+    "project": "stockledger",
+    "change": "CHG-256",
+    "operation": "FIX",
+    "request": "stockledger-prod-c18-worker-app-review-handoff-fix-v2",
+    "protectedBase": "9331b8850dc674e55181447a7bd5963059fd3649",
+    "candidate": "3a76d78663b555392cd152977bb2f9c5cd91a79f",
+    "candidateTree": "b0013584a69ed47bd7eb1c7d331bddc773f57c6c",
+    "candidateParent": "9331b8850dc674e55181447a7bd5963059fd3649",
+    "productChangedFiles": 25,
+    "mainBeforeAndAfterPublication": "9331b8850dc674e55181447a7bd5963059fd3649"
+  },
+  "runtime": { "node": "v22.23.2", "appVersion": "0.2.0", "workspaceExportSchema": 2, "workerDatabaseSchema": 8 },
+  "commands": [
+    { "command": "npm ci", "result": "PASS", "detail": "Completed on Node 22.23.2." },
+    { "command": "npm run check", "result": "PASS", "detail": "Strict TypeScript; 216 tests across 27 files." },
+    { "command": "npm run check:boundaries", "result": "PASS", "detail": "Client secret boundary, runtime parser, and server imports." },
+    { "command": "npm audit --audit-level=high", "result": "PASS", "detail": "Zero vulnerabilities." },
+    { "command": "npm run export:all", "result": "PASS", "detail": "Web, iOS, and Android bundles exported." },
+    { "command": "npm run test:e2e", "result": "PASS_WITH_RERUN_FLAKINESS", "detail": "One full default run passed 89 with 1 existing mobile keyboard-only case skipped as not applicable. Later full reruns had unrelated intermittent Recipes/Eye Composer bounds or focus failures (88 passed, 1 skipped, 1 failed). The R2 handoff test passed in every full run." },
+    { "command": "npm run test:e2e -- --grep 'worker evidence opens into Today'", "result": "PASS", "detail": "2 tests passed across desktop and mobile." },
+    { "command": "npm test -- tests/workerHandoff.test.ts", "result": "PASS", "detail": "6 targeted handoff tests passed; the final npm run check also ran the full 216-test suite after the last source change." },
+    { "command": "npm run recovery:drill", "result": "PASS", "detail": "Synthetic source unchanged; restored integrity true; corrupted and incompatible restore candidates rejected; retained-state checks passed. RPO since operator backup remains unknown without configured cadence." },
+    { "command": "npm run operations:qualify", "result": "PASS", "detail": "Synthetic 100-stock/260-session workload and retries within stated engineering budgets; three samples; isolated restore integrity true. Not an SLA or capacity claim." },
+    { "command": "npm run operations:status", "result": "PASS", "detail": "Uninitialized workspace reported workspace_missing; schedulerInstalled false; release identity unavailable; no schedule or workspace was claimed." },
+    { "command": "npm run release:evidence -- --base 9331b8850dc674e55181447a7bd5963059fd3649 --artifacts artifacts/chg-256-proof/ui --output artifacts/chg-256-proof/release-evidence.json", "result": "PASS", "detail": "Manifest bound candidate 3a76d78663b555392cd152977bb2f9c5cd91a79f, tree b0013584a69ed47bd7eb1c7d331bddc773f57c6c, exact protected base, and UI screenshot hashes." },
+    { "command": "npm run release:verify -- --base 9331b8850dc674e55181447a7bd5963059fd3649 --artifacts artifacts/chg-256-proof/ui --input artifacts/chg-256-proof/release-evidence.json", "result": "PASS", "detail": "verified:true; reasons: []." },
+    { "command": "Chrome actual tab zoom at 200%", "result": "PASS", "detail": "Chrome tabs.setZoom returned 2; viewport 640x450 CSS pixels at devicePixelRatio 2; handoff card clientWidth/scrollWidth 564/564; folder action fully within viewport. Screenshot: ui/stockledger-handoff-200-percent-browser-zoom.png." }
+  ],
+  "fullPlaywrightObservations": [
+    { "passed": 89, "skipped": 1, "failed": 0, "result": "PASS" },
+    { "passed": 88, "skipped": 1, "failed": 1, "result": "UNRELATED_INTERMITTENT_RECIPE_OR_COMPOSER_FOCUS_BOUNDS_FAILURE" },
+    { "passed": 88, "skipped": 1, "failed": 1, "result": "UNRELATED_INTERMITTENT_RECIPE_OR_COMPOSER_FOCUS_BOUNDS_FAILURE" },
+    { "passed": 88, "skipped": 1, "failed": 1, "result": "UNRELATED_INTERMITTENT_RECIPE_OR_COMPOSER_FOCUS_BOUNDS_FAILURE", "workers": 1 }
+  ],
+  "notRun": ["npm run check:release-workflow", "npm run check:frozen", "npm run test:cloud"],
+  "externalWork": { "providerContacted": false, "smtpRecipientContacted": false, "ownerDataUsed": false, "schedulerInstalled": false, "hostedServiceUsed": false, "nativeDeviceUsed": false }
+}

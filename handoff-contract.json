@@ -1,0 +1,54 @@
+{
+  "contractVersion": "stockledger-worker-app-handoff-v1",
+  "revision": 1,
+  "ownerScope": "single-owner-local-first-web-app",
+  "identities": {
+    "workspace": "Exact workspaceId shared by the imported worker workspace and the app. A mismatch conflicts.",
+    "batch": "Content hash of contract, workspaceId, monotonic sequence, creation time, worker revision, source job ID, and ordered captured evidence.",
+    "evaluation": "Exact captured evaluation ID, evaluatedAt, session/date, Eye ID, recipe ID/version, condition results, and input hash.",
+    "evidenceHashes": ["eyeIdentityHash", "recipeHash", "snapshotHash"],
+    "manifest": "Versioned checksum over the manifest body and ordered batches.",
+    "acknowledgement": "Content checksum over contract, workspaceId, sequence, and batchId."
+  },
+  "capture": {
+    "boundary": "WorkerStore.commitJobResult transaction",
+    "selects": "Only newly created evaluation IDs in the committed result.",
+    "preserves": ["Eye owner identity and expected previous evaluation", "Stock identity", "Exact recipe/version", "Referenced custom metric definitions", "Exact evaluation ID/time/session and captured result", "Captured snapshot, provider/source/provenance, adjustment, freshness and quality", "Condition outcomes and alert context"],
+    "durability": "SQLite WAL batch and sequence rows are committed atomically with the worker workspace revision and job completion."
+  },
+  "transport": {
+    "ownerSetup": "In web Settings, choose a private local directory once using the browser File System Access API.",
+    "storedPermission": "Browser directory handle in device-local IndexedDB; permission is checked on open and can be re-requested by Check for worker updates.",
+    "workerWrites": ["pending.json", "atomic temporary file then rename"],
+    "workerReads": ["ack.json on the next invocation"],
+    "appReads": ["pending.json only"],
+    "appWrites": ["ack.json only after the app state commit"],
+    "localNetworkListener": false,
+    "maximumPublishedManifestBytes": 20000000,
+    "nativeAppSupport": false
+  },
+  "ownershipAndReplay": {
+    "evidence": "Append-only historical evaluation/evidence records keyed by captured identity.",
+    "latestEyeEvaluation": "Updated only after current owner identity, stock, recipe, referenced metrics, and previous evaluation identity match the capture.",
+    "sameBatchReplay": "No new evaluation, alert, history row, or owner-visible work; the matching saved cursor is acknowledged again.",
+    "ownerHistory": "Existing decisions, amendments, outcomes, notes, review logs, alert review/snooze/usefulness, and other unrelated app records are preserved.",
+    "overlap": "Explicit conflict; no timestamp-based merge or silent overwrite.",
+    "outOfOrder": "Sequence gap, workspace mismatch, identity collision, or changed referenced state is an explicit conflict or safe no-op."
+  },
+  "recovery": {
+    "appCommit": "IndexedDB compare-and-set; a previous validated workspace copy is retained. The first save writes a valid empty baseline in the same transaction.",
+    "receiptOrder": "Persist app state first, then atomically write the worker receipt.",
+    "interruptedReceipt": "Worker retains the batch; app replays it without duplicates.",
+    "malformedOrIncompatibleManifest": "Rejected before app mutation; prior valid app state remains available for restore."
+  },
+  "truthBoundaries": {
+    "schedulerInstalled": false,
+    "requiresAwakeMachine": true,
+    "requiresAuthorizedDataPath": true,
+    "smtpRequiredForInAppReview": false,
+    "alertIsDelivery": false,
+    "providerAcceptanceIsConfirmedReceipt": false,
+    "confirmedReceiptIsHumanReview": false
+  },
+  "workerSemantics": ["Bounded leases", "Deterministic semantic job identity", "Capped retries and backoff", "Bounded catch-up", "Atomic workspace and job result commit", "Unacknowledged handoff batches retained"]
+}

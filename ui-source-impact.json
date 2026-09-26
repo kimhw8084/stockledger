@@ -1,0 +1,36 @@
+{
+  "goldenUiVersion": 3,
+  "acceptedAuthority": {
+    "acceptedHead": "92b64a20c620da38422c22e73664eba395b58f17",
+    "acceptedTree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+    "currentMainTreeAtStart": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7"
+  },
+  "affectedProductSurfaces": [
+    { "surface": "Today", "impact": "New worker evidence and captured source context appear in the owner review flow.", "proof": ["ui/desktop/today-handoff-applied-ko.png", "ui/mobile/today-handoff-applied-ko.png"] },
+    { "surface": "Alerts", "impact": "Worker alert uses its captured evaluation/source and retains review state.", "proof": ["ui/desktop/alerts-handoff-applied-ko.png", "ui/mobile/alerts-handoff-applied-ko.png"] },
+    { "surface": "Settings / Workspace and data", "impact": "One-time local folder setup, truthful status, permission renewal, conflict and recovery actions.", "proof": ["ui/desktop/", "ui/mobile/"] }
+  ],
+  "coverage": {
+    "profiles": ["desktop Playwright browser", "mobile Pixel 7 Playwright emulation"],
+    "languages": ["EN", "KO"],
+    "states": ["none", "pending/permission-required", "available/applied", "stale", "partial", "missed", "conflict", "regranted", "recovered"],
+    "keyboardAndFocus": "Owner folder selection journey verifies keyboard reachability and focus return to the stable folder action.",
+    "reducedMotion": "Browser journey runs with prefers-reduced-motion enabled and verifies the preference.",
+    "authenticBrowserZoom": {
+      "browser": "Chrome tab zoom API",
+      "zoom": 2,
+      "viewportCssPixels": { "width": 640, "height": 450 },
+      "devicePixelRatio": 2,
+      "documentScrollWidth": 640,
+      "handoffCardScrollAndClientWidth": 564,
+      "folderActionCssBounds": { "x": 54, "right": 223.5546875, "top": 308.5, "bottom": 352.5 },
+      "actionFullyReachable": true,
+      "proof": "ui/stockledger-handoff-200-percent-browser-zoom.png"
+    }
+  },
+  "reuseDecisions": {
+    "TodayAlertsAndSettings": "Recaptured affected review and handoff states; no accepted styles outside the required data/status additions were reopened.",
+    "unaffectedAcceptedSurfaces": "Reused current accepted Golden UI v3 authority because source changes do not alter their rendering components or styles; full-product visual re-audit is not claimed."
+  },
+  "limitations": ["Browser state journey uses a test directory-handle adapter; browser-native operating-system picker was not separately qualified.", "Mobile is browser emulation, not a native device.", "No human preference, screen-reader acceptance, or blanket WCAG conformance claim."]
+}
