@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "project": "stockledger",
+  "change": "CHG-256",
+  "r2_request": "stockledger-prod-c18-worker-app-review-handoff-fix-v2",
+  "r2_fabric_job": "CF-06b785372e2bbaec06eb6224",
+  "candidate": "3a76d78663b555392cd152977bb2f9c5cd91a79f",
+  "candidate_tree": "b0013584a69ed47bd7eb1c7d331bddc773f57c6c",
+  "r2_work_branch": {
+    "ref": "refs/heads/codex/stockledger-prod-c18-worker-app-review-handoff-fix-v2",
+    "head": "3a76d78663b555392cd152977bb2f9c5cd91a79f"
+  },
+  "r2_artifact": {
+    "ref": "refs/heads/project-os-artifacts/stockledger/stockledger-prod-c18-worker-app-review-handoff-fix-v2",
+    "commit": "31135aac94d02718893ba3834a7a792595dc32ee",
+    "tree": "2991bb891ede4fef5522a5417871c37e49ae0972",
+    "parents": [
+      "3a76d78663b555392cd152977bb2f9c5cd91a79f"
+    ],
+    "sole_parent_is_candidate": true
+  },
+  "r2_native_evidence": {
+    "ref": "refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c18-worker-app-review-handoff-fix-v2",
+    "commit": "9752666cc1500c580719e89087442c0d265c8c2c",
+    "tree": "cd36a9c75928c295586289a0e51f2d8a43b16608",
+    "parents": [
+      "3a76d78663b555392cd152977bb2f9c5cd91a79f"
+    ],
+    "sole_parent_is_candidate": true,
+    "canonical_audit": {
+      "path": ".codex-fabric/audit.json",
+      "project_id": "stockledger",
+      "request": "stockledger-prod-c18-worker-app-review-handoff-fix-v2",
+      "operation": "FIX",
+      "job_id": "CF-06b785372e2bbaec06eb6224",
+      "git_head_sha": "3a76d78663b555392cd152977bb2f9c5cd91a79f"
+    }
+  },
+  "duplicated_state_evidence": {
+    "desktop": {
+      "permission_required": {
+        "filename": "ui/desktop/settings-handoff-permission-required-en.png",
+        "sha256": "205cc946931cb112c96c4b4b066eb0319a153a6a256397f420029a6f50e36a18",
+        "git_blob_sha": "b3cbf2b3efca74220b2fc86564f956b4e03a7078",
+        "bytes": 90915
+      },
+      "recovered": {
+        "filename": "ui/desktop/settings-handoff-recovered-en.png",
+        "sha256": "205cc946931cb112c96c4b4b066eb0319a153a6a256397f420029a6f50e36a18",
+        "git_blob_sha": "b3cbf2b3efca74220b2fc86564f956b4e03a7078",
+        "bytes": 90915
+      },
+      "identical_bytes_and_blob": true
+    },
+    "mobile": {
+      "permission_required": {
+        "filename": "ui/mobile/settings-handoff-permission-required-en.png",
+        "sha256": "a82952d650b1dff19fce48f4f4ae03052cd78bdc0780be120b4e24d73335cd1c",
+        "git_blob_sha": "7271894729b3f909191cceb9120fbd00d203d32d",
+        "bytes": 228196
+      },
+      "recovered": {
+        "filename": "ui/mobile/settings-handoff-recovered-en.png",
+        "sha256": "a82952d650b1dff19fce48f4f4ae03052cd78bdc0780be120b4e24d73335cd1c",
+        "git_blob_sha": "7271894729b3f909191cceb9120fbd00d203d32d",
+        "bytes": 228196
+      },
+      "identical_bytes_and_blob": true
+    }
+  },
+  "r2_refs_remain_immutable_historical_evidence": true
+}

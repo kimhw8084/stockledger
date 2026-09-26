@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "project": "stockledger",
+  "repository": "kimhw8084/stockledger",
+  "change": "CHG-256",
+  "request": "stockledger-prod-c18-handoff-recovery-visual-evidence-verify-v3",
+  "operation": "VERIFY",
+  "fabric_job": "CF-7093d40510c24716ba32a133",
+  "protected_base": {
+    "branch": "main",
+    "commit": "9331b8850dc674e55181447a7bd5963059fd3649"
+  },
+  "preserved_candidate": {
+    "commit": "3a76d78663b555392cd152977bb2f9c5cd91a79f",
+    "tree": "b0013584a69ed47bd7eb1c7d331bddc773f57c6c",
+    "sole_parent": "9331b8850dc674e55181447a7bd5963059fd3649"
+  },
+  "work_branch": "codex/stockledger-prod-c18-handoff-recovery-visual-evidence-verify-v3",
+  "source_changed": false,
+  "product_commits": 0,
+  "product_changed_files": 0
+}

@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "candidate": "3a76d78663b555392cd152977bb2f9c5cd91a79f",
+  "candidate_tree": "b0013584a69ed47bd7eb1c7d331bddc773f57c6c",
+  "browser": {
+    "engine": "Chromium",
+    "playwright": "1.63.0",
+    "node": "v22.23.2"
+  },
+  "recapture_journey": {
+    "source_spec": "tests/e2e/worker-app-handoff.spec.ts",
+    "test_name": "worker evidence opens into Today, Alerts and Journal without replacing the workspace",
+    "runs": [
+      {
+        "profile": "desktop",
+        "project": "desktop-1440",
+        "result": "PASS"
+      },
+      {
+        "profile": "mobile",
+        "project": "mobile-390",
+        "result": "PASS"
+      }
+    ],
+    "temporary_harness_changes": [
+      "Temporary copy outside the repository retained only the six requested screenshot calls and scrolled each target status message into view before capture.",
+      "Temporary copy used actual Tab traversal to reach the local worker folder action; existing Enter activation and focus-return assertions remained in the journey.",
+      "Temporary config used the exact requested CSS viewport and DPR 1; mobile emulation used isMobile=true and hasTouch=true."
+    ]
+  },
+  "captures": [
+    {
+      "filename": "ui/desktop/settings-handoff-permission-required-en.png",
+      "profile": "desktop",
+      "language": "EN",
+      "state": "permission_required",
+      "viewport_css_pixels": {
+        "width": 1440,
+        "height": 900
+      },
+      "device_scale_factor": 1,
+      "sha256": "7da4ff01b06b6388f13b4f008c7e440a8651a014964881d8e0f5be530598359b",
+      "git_blob_sha": "832a9ab7867d4bf365a337875529a50165be66e0",
+      "visible_copy": "Grant this browser access to the selected folder to check worker evidence."
+    },
+    {
+      "filename": "ui/desktop/settings-handoff-recovered-en.png",
+      "profile": "desktop",
+      "language": "EN",
+      "state": "recovered_restored",
+      "viewport_css_pixels": {
+        "width": 1440,
+        "height": 900
+      },
+      "device_scale_factor": 1,
+      "sha256": "79ba91e9ae0b1ffb916413b93db3fb383325e14dc73f12da6c9f6b22e1e9ccb9",
+      "git_blob_sha": "5fec47f7b9c31e991789e069c69f537f27895b0a",
+      "visible_copy": "A prior valid workspace copy was restored"
+    },
+    {
+      "filename": "ui/desktop/settings-handoff-recovered-ko.png",
+      "profile": "desktop",
+      "language": "KO",
+      "state": "recovered_restored",
+      "viewport_css_pixels": {
+        "width": 1440,
+        "height": 900
+      },
+      "device_scale_factor": 1,
+      "sha256": "fd87caba3e0bb20a1c20a663d8848931a86d996a54924de626a3b9c11b8e847d",
+      "git_blob_sha": "fde450e7ceffc6d7877ff1a15c508721c027399b",
+      "visible_copy": "이전의 유효한 워크스페이스 복사본을 복원함"
+    },
+    {
+      "filename": "ui/mobile/settings-handoff-permission-required-en.png",
+      "profile": "mobile",
+      "language": "EN",
+      "state": "permission_required",
+      "viewport_css_pixels": {
+        "width": 390,
+        "height": 844
+      },
+      "device_scale_factor": 1,
+      "mobile_emulation": {
+        "isMobile": true,
+        "hasTouch": true
+      },
+      "sha256": "a598ea0ef96b5cef27546e06da8d25e79e9e77b7409d0cd21ebdb74da420e446",
+      "git_blob_sha": "1b1a3cc7f965ddaf2947410826e253de0511d2fb",
+      "visible_copy": "Grant this browser access to the selected folder to check worker evidence."
+    },
+    {
+      "filename": "ui/mobile/settings-handoff-recovered-en.png",
+      "profile": "mobile",
+      "language": "EN",
+      "state": "recovered_restored",
+      "viewport_css_pixels": {
+        "width": 390,
+        "height": 844
+      },
+      "device_scale_factor": 1,
+      "mobile_emulation": {
+        "isMobile": true,
+        "hasTouch": true
+      },
+      "sha256": "9bd5f3ca4003c87bb48850ba0b5cd4ed5aea58d45ea775f559e34d138ecee7c8",
+      "git_blob_sha": "443629bd63cb816f80a39948b3b24447807e6917",
+      "visible_copy": "A prior valid workspace copy was restored"
+    },
+    {
+      "filename": "ui/mobile/settings-handoff-recovered-ko.png",
+      "profile": "mobile",
+      "language": "KO",
+      "state": "recovered_restored",
+      "viewport_css_pixels": {
+        "width": 390,
+        "height": 844
+      },
+      "device_scale_factor": 1,
+      "mobile_emulation": {
+        "isMobile": true,
+        "hasTouch": true
+      },
+      "sha256": "f037a8ec87d244ea133ee532acbf526b0eef50b7a4701133abb11ea5b585f7b7",
+      "git_blob_sha": "75df2267c9eace4b8469a869642ac40ed308e82d",
+      "visible_copy": "이전의 유효한 워크스페이스 복사본을 복원함"
+    }
+  ],
+  "assertions": {
+    "desktop_permission_required_vs_recovered_en_sha256_inequality": true,
+    "desktop_permission_required_vs_recovered_en_git_blob_inequality": true,
+    "mobile_permission_required_vs_recovered_en_sha256_inequality": true,
+    "mobile_permission_required_vs_recovered_en_git_blob_inequality": true,
+    "recovered_en_and_ko_owner_copy_visible_desktop": true,
+    "recovered_en_and_ko_owner_copy_visible_mobile": true,
+    "keyboard_tab_reaches_local_worker_folder_action_desktop": true,
+    "keyboard_tab_reaches_local_worker_folder_action_mobile": true,
+    "enter_activation_and_focus_return_desktop": true,
+    "enter_activation_and_focus_return_mobile": true,
+    "no_document_horizontal_overflow_in_recovery_state_desktop_1440x900": true,
+    "no_document_horizontal_overflow_in_recovery_state_mobile_390x844": true
+  },
+  "two_hundred_percent_zoom": {
+    "new_capture_taken": false,
+    "reused_r2_proof": "ui/stockledger-handoff-200-percent-browser-zoom.png",
+    "basis": "The candidate and tree are identical to R2; the defect is limited to recovery-state evidence binding."
+  }
+}
