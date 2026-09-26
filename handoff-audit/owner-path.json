@@ -1,0 +1,187 @@
+{
+  "schema_version": 1,
+  "project": "stockledger",
+  "change": "CHG-256",
+  "request": "stockledger-prod-c18-personal-handoff-gap-verify-v1",
+  "fabric_job": "CF-d4852ae8cce94f2b772fcb19",
+  "source_sha": "9331b8850dc674e55181447a7bd5963059fd3649",
+  "tree_sha": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+  "path": [
+    {
+      "step": 1,
+      "activity": "Open an empty personal workspace or deliberately leave sample mode",
+      "state": "implemented",
+      "evidence": [
+        "src/data/workspaceDefaults.ts",
+        "src/app/StockLedgerApp.tsx",
+        "tests/e2e/workspace.spec.ts"
+      ]
+    },
+    {
+      "step": 2,
+      "activity": "Create/edit stocks or preview and import a watchlist CSV",
+      "state": "implemented",
+      "evidence": [
+        "src/domain/watchlistImport.ts",
+        "src/features/settings/WatchlistImportPanel.tsx",
+        "tests/workflows.test.ts",
+        "tests/e2e/workspace.spec.ts"
+      ]
+    },
+    {
+      "step": 3,
+      "activity": "Author and publish a versioned recipe with roles, gates, risk and alert/review rules",
+      "state": "implemented",
+      "evidence": [
+        "src/domain/recipeRevision.ts",
+        "src/features/recipes/builder/RecipeBuilder.tsx",
+        "tests/history.test.ts",
+        "tests/e2e/chg199-authoring-config.spec.ts"
+      ]
+    },
+    {
+      "step": 4,
+      "activity": "Bind the recipe to a stock as an Eye and inspect its supported preview",
+      "state": "implemented",
+      "evidence": [
+        "src/features/eyes/EyeComposer.tsx",
+        "src/lib/evaluateEye.ts",
+        "src/app/StockLedgerApp.tsx"
+      ]
+    },
+    {
+      "step": 5,
+      "activity": "Supply authorized completed daily bars with explicit adjustment basis",
+      "state": "configuration-dependent",
+      "evidence": [
+        "src/lib/eodDataProvider.ts",
+        "src/domain/marketSnapshot.ts",
+        "server/worker/cli.ts",
+        "docs/operations/LOCAL_WORKER.md#Bootstrap"
+      ]
+    },
+    {
+      "step": 6,
+      "activity": "Evaluate at explicit time/session through shared engine; preserve UNKNOWN and stale/partial semantics",
+      "state": "implemented",
+      "evidence": [
+        "src/domain/evaluateWorkspace.ts",
+        "src/lib/evaluateEye.ts",
+        "src/lib/metricCatalog.ts",
+        "tests/financialTruth.test.ts"
+      ]
+    },
+    {
+      "step": 7,
+      "activity": "Run scheduled work with UI closed using SQLite leases/retries/reconciliation/catch-up",
+      "state": "configuration-dependent",
+      "boundary": "Owner installs launchd/cron, uses authorized CSV directory and keeps machine awake; inspect missed/blocked/partial status after interruption.",
+      "evidence": [
+        "server/worker/managed.ts",
+        "server/worker/store.ts",
+        "server/worker/operations.ts",
+        "docs/operations/LOCAL_WORKER.md#Installing a local schedule"
+      ]
+    },
+    {
+      "step": 8,
+      "activity": "Commit evaluation/alert evidence and separate notification intent",
+      "state": "implemented",
+      "evidence": [
+        "server/worker/store.ts",
+        "src/domain/evaluateWorkspace.ts",
+        "src/domain/notificationDelivery.ts",
+        "tests/worker.test.ts",
+        "tests/notification.test.ts"
+      ]
+    },
+    {
+      "step": 9,
+      "activity": "Expose worker changes in Today/Alerts/Journal when owner opens app",
+      "state": "material-gap",
+      "evidence": [
+        "src/platform/keyValueStore.web.ts",
+        "src/data/repositories/workspaceRepository.ts",
+        "src/features/today/TodayScreen.tsx",
+        "docs/operations/LOCAL_WORKER.md#App handoff and recovery"
+      ]
+    },
+    {
+      "step": 10,
+      "activity": "Current bridge: import worker full JSON into app, then export app and revision-check worker replacement",
+      "state": "material-gap",
+      "boundary": "Operations validate and recover, but repeated whole-workspace shuttling, schedule pause and revision handling are too cumbersome for the promised monitoring/review loop.",
+      "evidence": [
+        "src/domain/backupFormat.ts",
+        "src/application/workspaceApplicationService.ts",
+        "src/features/settings/WorkspaceSettingsPanel.tsx",
+        "server/worker/cli.ts",
+        "docs/operations/LOCAL_WORKER.md#App handoff and recovery"
+      ]
+    },
+    {
+      "step": 11,
+      "activity": "Review alert/evidence and record decision, amendment, later outcome/lesson",
+      "state": "implemented",
+      "evidence": [
+        "src/features/today/TodayScreen.tsx",
+        "src/features/alerts/AlertsScreen.tsx",
+        "src/features/journal/JournalComposer.tsx",
+        "src/features/journal/DecisionDetail.tsx",
+        "src/features/journal/OutcomeEditor.tsx",
+        "tests/e2e/workspace.spec.ts",
+        "tests/e2e/r11-today.spec.ts"
+      ]
+    },
+    {
+      "step": 12,
+      "activity": "Export full workspace, retain previous copy and restore at isolated SQLite path",
+      "state": "implemented",
+      "evidence": [
+        "src/domain/backupFormat.ts",
+        "src/data/repositories/workspaceRepository.ts",
+        "server/worker/recovery.ts",
+        "tests/recovery.test.ts",
+        "verification.json"
+      ]
+    },
+    {
+      "step": 13,
+      "activity": "Use email only if explicitly configured; distinguish intent, acceptance, receipt and review",
+      "state": "configuration-dependent",
+      "evidence": [
+        "src/features/notifications/NotificationSettingsPanel.tsx",
+        "server/worker/notificationTransport.ts",
+        "docs/operations/LOCAL_WORKER.md#Notification delivery contract",
+        "tests/notification.test.ts"
+      ]
+    }
+  ],
+  "monitoring_scheduler_boundary": {
+    "implemented_mechanically_when_invoked": true,
+    "app_must_be_open": false,
+    "scheduler_installed_by_product_or_this_job": false,
+    "scheduler_installed_status_value": false,
+    "requires_awake_machine": true,
+    "requires_authorized_data_path": true,
+    "catch_up": "Later invocation reconciles bounded missed sessions and durable unfinished work; sleep/offline time delays work until wake/invocation.",
+    "status_projection": "Safe versioned worker status includes invocation, expected/successful session, deadlines, missed/partial/blocked/retrying/terminal coverage, queue, ingestion, notification and recovery indicators.",
+    "owner_setup_dependency": "Install and monitor launchd/cron externally; no always-on or hosted availability claim."
+  },
+  "worker_to_app_handoff_boundary": {
+    "worker_store": "SQLite WAL local worker",
+    "app_store": "IndexedDB on web",
+    "worker_output": "Complete validated schemaVersion 2 StockLedger JSON backup",
+    "current_bridge": "Manual full export/import in both directions; existing-worker replacement requires matching --import-revision and creates before-import copy.",
+    "state": "material-gap",
+    "consequence": "Today is not updated from closed-app worker output until manual import; status is last-known/imported, not live."
+  },
+  "attention_delivery_boundary": {
+    "in_app_today_review": "Works for app's currently loaded workspace; external channel not required.",
+    "notification_intent": "Durable intent separate from alert creation and transport.",
+    "smtp": "Optional server-only transport; endpoint and destination are owner input.",
+    "provider_accepted": "Never called delivered; SMTP 250 remains provider-accepted/ambiguous.",
+    "confirmed_delivery": "Only transport-specific confirmed receipt; no human-open claim.",
+    "state": "implemented-with-optional-configuration-and-R5-worker-handoff-gap"
+  }
+}

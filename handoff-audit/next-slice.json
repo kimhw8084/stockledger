@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "project": "stockledger",
+  "change": "CHG-256",
+  "request": "stockledger-prod-c18-personal-handoff-gap-verify-v1",
+  "fabric_job": "CF-d4852ae8cce94f2b772fcb19",
+  "disposition": "FIX_REQUIRED",
+  "recommended_next_operation": "FIX",
+  "fix": {
+    "objective": "Close the local scheduled-worker-to-app review gap so worker-created evidence reaches Today/Alerts/Journal without recurring whole-workspace export/import replacement.",
+    "root_cause": "Worker SQLite WAL and web IndexedDB are independent durable workspaces; their only bridge is whole-backup file transfer and revision-gated workspace replacement.",
+    "smallest_coherent_repair": "Add deterministic owner-visible local worker update handoff with revision/content identity and conflict protection, preserving newer app decisions/notes; surface pending/available/stale/recovered status. Require neither hosted sync nor external email.",
+    "exact_files_or_components": [
+      "src/application/workspaceApplicationService.ts",
+      "src/data/repositories/workspaceRepository.ts",
+      "src/domain/backupFormat.ts",
+      "src/features/today/TodayScreen.tsx",
+      "src/features/alerts/AlertsScreen.tsx",
+      "src/features/settings/WorkspaceSettingsPanel.tsx",
+      "src/features/settings/SettingsScreen.tsx",
+      "src/app/StockLedgerApp.tsx",
+      "server/worker/cli.ts",
+      "server/worker/store.ts",
+      "server/worker/operations.ts",
+      "tests/workflows.test.ts",
+      "tests/e2e/workspace.spec.ts",
+      "tests/e2e/r11-today.spec.ts",
+      "docs/operations/LOCAL_WORKER.md",
+      "docs/production/IMPLEMENTATION_STATUS.md"
+    ],
+    "acceptance_criteria": [
+      "Run local worker with UI closed; later app open presents new evaluation/alert with exact recipe version, evaluation identity, source/date/provenance and condition context.",
+      "Handoff is deterministic/idempotent; replay creates no duplicates and never substitutes current recipe/snapshot state for captured evidence.",
+      "New app decisions/amendments/notes survive worker update; conflicts are explicit and a recovery copy is available.",
+      "Pending, available, stale, partial, missed, conflict and restored states are owner-visible; no schedule-installed, email-delivered or always-on claim is inferred.",
+      "CSV adjustment/source honesty, SQLite durability, leases/retries/catch-up, alert-vs-delivery, complete backup/recovery and current Golden UI quality remain covered."
+    ],
+    "explicit_non_goals": [
+      "No hosted deployment or multi-user service",
+      "No external email/OS push prerequisite",
+      "No cloud sync requirement",
+      "No paid/public redistribution/billing/native store work",
+      "No broad scanner/backtest expansion",
+      "No generic refactor/file-size cleanup"
+    ]
+  },
+  "final_qualification_after_fix": [
+    "Configure owner path with watchlist, recipe/Eye, authorized adjusted completed US daily CSV and benchmark inputs.",
+    "Run worker with app closed for normal session, outage/retry, duplicate replay, corrected input and bounded catch-up; verify IDs and missed/partial states.",
+    "Open app and verify new worker change appears without whole-workspace replacement; record decision/amendment/outcome bound to historical evaluation/recipe.",
+    "Exercise simultaneous/newer app edits, stale/malformed bundle, interrupted handoff, backup-before-import and isolated restore.",
+    "Verify local awake-machine/scheduler boundary and optional SMTP intent/provider acceptance/confirmed receipt without external delivery claims.",
+    "Run locked install, tests/boundaries/audit, required exports/browser/accessibility/recovery/operations and exact-base release evidence."
+  ]
+}

@@ -1,0 +1,146 @@
+{
+  "schema_version": 1,
+  "project": "stockledger",
+  "change": "CHG-256",
+  "request": "stockledger-prod-c18-personal-handoff-gap-verify-v1",
+  "operation": "VERIFY",
+  "fabric_job": "CF-d4852ae8cce94f2b772fcb19",
+  "source_before": {
+    "sha": "9331b8850dc674e55181447a7bd5963059fd3649",
+    "tree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+    "branch": "codex/stockledger-prod-c18-personal-handoff-gap-verify-v1",
+    "worktree_clean": true
+  },
+  "source_after": {
+    "sha": "9331b8850dc674e55181447a7bd5963059fd3649",
+    "tree": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+    "branch": "codex/stockledger-prod-c18-personal-handoff-gap-verify-v1",
+    "worktree_clean": true
+  },
+  "source_changed": false,
+  "product_commits": 0,
+  "product_changed_files": 0,
+  "commands": [
+    {
+      "command": "rtk npm ci",
+      "runtime": "Node 20.19.4 / npm 10.8.2",
+      "exit_code": 0,
+      "result": "Install completed with EBADENGINE; package requires Node >=22.23.2, so rerun at supported runtime."
+    },
+    {
+      "command": "rtk npm ci",
+      "runtime": "Node 22.23.2 / npm 10.9.8",
+      "exit_code": 0,
+      "result": "639 packages installed; install audit 0 vulnerabilities."
+    },
+    {
+      "command": "rtk npm run check",
+      "runtime": "Node 22.23.2",
+      "exit_code": 0,
+      "result": "TypeScript passed; 26 test files and 209 tests passed."
+    },
+    {
+      "command": "rtk npm run check:boundaries",
+      "runtime": "Node 22.23.2",
+      "exit_code": 0,
+      "result": "Client secret/runtime parser/server import boundaries passed."
+    },
+    {
+      "command": "rtk npm audit --audit-level=high",
+      "runtime": "Node 22.23.2 / npm 10.9.8",
+      "exit_code": 0,
+      "result": "0 vulnerabilities."
+    },
+    {
+      "command": "rtk npm run check:release-workflow",
+      "runtime": "Node 22.23.2",
+      "exit_code": 0,
+      "result": "Pinned actions, full checkout and protected-base-before-release-evidence order validated."
+    },
+    {
+      "command": "rtk npm run export:all",
+      "runtime": "Node 22.23.2",
+      "exit_code": 0,
+      "result": "Web, Android and iOS exported under ignored dist/."
+    },
+    {
+      "command": "rtk npm run test:e2e",
+      "runtime": "Node 22.23.2",
+      "exit_code": 1,
+      "result": "First pass: 86 passed, 1 intentionally skipped, 1 desktop keyboard task timed out at 45 seconds locating Settings provider-check control."
+    },
+    {
+      "command": "rtk npm exec playwright -- test tests/e2e/chg172-primary-surfaces.spec.ts --project=desktop --grep 'keyboard task paths operate segmented choices and restore focus after deep flows'",
+      "runtime": "Node 22.23.2",
+      "exit_code": 0,
+      "result": "Isolated rerun passed; timeout did not reproduce."
+    },
+    {
+      "command": "rtk npm run test:e2e",
+      "runtime": "Node 22.23.2",
+      "exit_code": 0,
+      "result": "Full rerun: 87 passed, 1 intentional mobile hardware-keyboard skip, 0 failed."
+    },
+    {
+      "command": "rtk npm run recovery:drill -- --output /tmp/stockledger-c18-recovery-drill.json",
+      "runtime": "Node 22.23.2",
+      "exit_code": 0,
+      "result": "Synthetic source unchanged; snapshot/isolated restore integrity true; authored/evaluation/decision/job/ingestion/notification state retained; corrupt/incompatible candidates rejected. Operator-backup RPO remains unknown without cadence; elapsed 71 ms within 30 s engineering budget."
+    },
+    {
+      "command": "rtk npm run operations:qualify -- --output /tmp/stockledger-c18-operations-qualification.json",
+      "runtime": "Node 22.23.2",
+      "exit_code": 0,
+      "result": "Synthetic 100 stocks x 260 sessions; 3 samples 4944/4679/4594 ms, p50 4679 ms, p95 4917.5 ms; 13-job surge/retry budget preserved; restore 35 ms and integrity true. Not SLA/capacity evidence."
+    },
+    {
+      "command": "rtk npm run operations:status -- --db /tmp/stockledger-c18-empty-worker.sqlite",
+      "runtime": "Node 22.23.2",
+      "exit_code": 0,
+      "result": "Synthetic empty DB: unconfigured/stopped, schedulerInstalled false, requiresAwakeMachine true and requiresAuthorizedDataPath true; no owner data/schedule used."
+    },
+    {
+      "command": "rtk npm run release:evidence -- --output /tmp/stockledger-c18-release-evidence.json --base 9331b8850dc674e55181447a7bd5963059fd3649",
+      "runtime": "Node 22.23.2",
+      "exit_code": 0,
+      "result": "Generated release evidence bound to source commit/tree equal to explicit base."
+    },
+    {
+      "command": "rtk npm run release:verify -- --input /tmp/stockledger-c18-release-evidence.json --base 9331b8850dc674e55181447a7bd5963059fd3649",
+      "runtime": "Node 22.23.2",
+      "exit_code": 0,
+      "result": "verified=true; reasons=[]; source, tree, migration, lockfile, contract/version snapshots and rollback assertions matched."
+    }
+  ],
+  "dependency_audit": {
+    "install_audit": "0 vulnerabilities",
+    "high_severity_audit": "0 vulnerabilities",
+    "changed_lockfile": false
+  },
+  "relevant_test_results": {
+    "all_checks": "26 files / 209 passed",
+    "financial_truth": "tests/financialTruth.test.ts passed in full suite",
+    "history": "tests/history.test.ts passed in full suite",
+    "worker": "tests/worker.test.ts and tests/monitoring.test.ts passed in full suite",
+    "notifications": "tests/notification.test.ts passed in full suite",
+    "market_data": "tests/marketDataIngestion.test.ts passed in full suite",
+    "recovery": "tests/recovery.test.ts passed in full suite plus recovery:drill",
+    "browser": "87 passed / 1 intentional skip on final full rerun"
+  },
+  "recovery_operations_release": {
+    "recovery_drill": "PASS_SYNTHETIC",
+    "operations_qualification": "PASS_SYNTHETIC",
+    "operations_status": "UNCONFIGURED_AS_EXPECTED_FOR_EMPTY_SYNTHETIC_DB",
+    "release_evidence_generation": "PASS_EXACT_SOURCE_EQUAL_BASE",
+    "release_evidence_verification": "PASS",
+    "same_source_verify_permitted": true,
+    "same_source_basis": "Release runtime accepts exact base SHA and checks merge-base ancestry; equal base/source is an ancestor; no constraint was weakened.",
+    "cloud_or_external_provider_checks": "Not run; excluded hosted/cloud profile, no credentials or real provider evidence fabricated."
+  },
+  "publication_expectations": {
+    "artifact_ref": "refs/heads/project-os-artifacts/stockledger/stockledger-prod-c18-personal-handoff-gap-verify-v1",
+    "native_evidence_ref": "refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c18-personal-handoff-gap-verify-v1",
+    "native_publisher": "Fabric normal publisher only; do not hand-author .codex-fabric/audit.json.",
+    "generated_package_files": 6
+  }
+}

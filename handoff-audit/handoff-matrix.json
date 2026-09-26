@@ -1,0 +1,431 @@
+{
+  "schema_version": 1,
+  "project": "stockledger",
+  "change": "CHG-256 — Certify StockLedger personal-use perfection handoff readiness",
+  "request": "stockledger-prod-c18-personal-handoff-gap-verify-v1",
+  "operation": "VERIFY",
+  "fabric_job": "CF-d4852ae8cce94f2b772fcb19",
+  "source": {
+    "base_sha": "9331b8850dc674e55181447a7bd5963059fd3649",
+    "head_sha": "9331b8850dc674e55181447a7bd5963059fd3649",
+    "tree_sha": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+    "protected_target": "main",
+    "remote_main_sha": "9331b8850dc674e55181447a7bd5963059fd3649",
+    "product_source_changed": false,
+    "product_commits": 0,
+    "product_changed_files": 0
+  },
+  "product_version": "0.2.0",
+  "selected_handoff_scope": "Single-owner personal local-first/web-first StockLedger for US equities and ETFs using completed daily bars; no automatic trading, custody, return guarantee, or guaranteed maximum-profit claim.",
+  "current_authority": {
+    "accepted_substantive_head": "92b64a20c620da38422c22e73664eba395b58f17",
+    "accepted_tree_sha": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+    "current_tree_sha": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+    "current_tree_equals_accepted_tree": true
+  },
+  "requirements": [
+    {
+      "id": "R1-stage-readiness-is-evidence-bound",
+      "status": "PASS",
+      "evidence": [
+        "src/operations/releaseEvidence.ts",
+        "scripts/release-evidence.ts",
+        "scripts/verify-release-evidence.ts",
+        "verification.json"
+      ],
+      "decisive_facts": [
+        "Source-bound release evidence was generated and verified against the explicit protected base equal to the unchanged source commit.",
+        "No prior individual Change GO is treated as Project handoff readiness."
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "id": "R2-one-deterministic-financial-truth-engine",
+      "status": "PASS",
+      "evidence": [
+        "src/domain/evaluateWorkspace.ts",
+        "src/lib/evaluateEye.ts",
+        "src/lib/metricCatalog.ts",
+        "src/domain/marketSnapshot.ts",
+        "tests/financialTruth.test.ts",
+        "tests/history.test.ts"
+      ],
+      "decisive_facts": [
+        "Preview, workspace and worker evaluation share the versioned dated engine; engine 2.1.0 and financial_truth_v1.",
+        "Results preserve TRUE/FALSE/UNKNOWN, exact evaluation time, gates, risk, warmups, units and benchmark/date alignment.",
+        "Missing or quality-blocked inputs cannot establish a confident setup."
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "id": "R3-market-data-provenance-and-honesty",
+      "status": "PASS",
+      "evidence": [
+        "src/domain/marketSnapshot.ts",
+        "src/lib/eodDataProvider.ts",
+        "src/lib/marketDataContract.ts",
+        "server/worker/marketDataIngestion.ts",
+        "tests/marketDataIngestion.test.ts",
+        "tests/monitoring.test.ts"
+      ],
+      "decisive_facts": [
+        "Provenance keeps source/origin, observed session, retrieval time, adjustment basis, dataset identity and optional provider/rights/content/coverage details.",
+        "Stale, partial, unavailable, malformed, rights-blocked and failed evidence remains non-clean and cannot silently produce a trusted signal.",
+        "No source or legal authority was fabricated."
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "id": "R4-versioned-recipe-evaluation-alert-and-decision-history",
+      "status": "PASS",
+      "evidence": [
+        "src/domain/recipeRevision.ts",
+        "src/domain/evaluateWorkspace.ts",
+        "src/types.ts",
+        "src/features/journal/JournalComposer.tsx",
+        "src/features/journal/DecisionDetail.tsx",
+        "tests/history.test.ts"
+      ],
+      "decisive_facts": [
+        "Recipe revision publication creates a new version with stable condition lineage while preserving the prior recipe.",
+        "Evaluation history is content-addressed by evidence revision; alert and decision context retains the recipe version and condition evidence.",
+        "Decision amendments and outcome notes are retained and exported."
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "id": "R5-complete-owner-monitoring-to-review-loop",
+      "status": "MATERIAL_GAP",
+      "evidence": [
+        "server/worker/cli.ts",
+        "server/worker/store.ts",
+        "src/platform/keyValueStore.web.ts",
+        "src/data/repositories/workspaceRepository.ts",
+        "src/application/workspaceApplicationService.ts",
+        "src/features/settings/WorkspaceSettingsPanel.tsx",
+        "src/features/notifications/NotificationSettingsPanel.tsx",
+        "src/features/today/TodayScreen.tsx",
+        "docs/operations/LOCAL_WORKER.md",
+        "tests/e2e/workspace.spec.ts:196"
+      ],
+      "decisive_facts": [
+        "Worker persists jobs, alerts and evaluations in separate SQLite and writes a complete StockLedger JSON export.",
+        "Web app persists its workspace in IndexedDB and displays imported last-known worker state; it does not observe or subscribe to worker output.",
+        "Runbook requires manual worker-export-to-app import and reverse app-export-to-worker replacement with matching worker revision, paused scheduled writers and before-import SQLite copy.",
+        "Consequently scheduled worker changes do not reach Today/Alerts/Journal when the owner opens the app; repeated whole-workspace shuttling materially weakens the review-when-it-matters workflow."
+      ],
+      "confidence": "HIGH",
+      "implicated_paths": [
+        "server/worker/cli.ts",
+        "server/worker/store.ts",
+        "src/platform/keyValueStore.web.ts",
+        "src/data/repositories/workspaceRepository.ts",
+        "src/application/workspaceApplicationService.ts",
+        "src/features/settings/WorkspaceSettingsPanel.tsx",
+        "src/features/notifications/NotificationSettingsPanel.tsx",
+        "src/features/today/TodayScreen.tsx"
+      ]
+    },
+    {
+      "id": "R6-user-supplied-daily-csv-path-and-owner-data",
+      "status": "CONFIGURATION_OR_OWNER_INPUT",
+      "evidence": [
+        "README.md",
+        "src/lib/eodDataProvider.ts",
+        "src/domain/marketSnapshot.ts",
+        "server/worker/cli.ts",
+        "docs/operations/LOCAL_WORKER.md",
+        "tests/marketDataIngestion.test.ts"
+      ],
+      "decisive_facts": [
+        "A supported local path exists for Date,Open,High,Low,Close,Volume histories; worker files use TICKER.csv and adjustment basis is explicitly declared adjusted, unadjusted or unknown.",
+        "Complete consecutive NYSE sessions and exact benchmark histories are validated; long metrics require full warmup.",
+        "Fabric has no real owner watchlist, authorized CSV directory or provider provenance; these are owner inputs."
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "id": "R7-closed-app-monitoring-and-scheduler",
+      "status": "CONFIGURATION_OR_OWNER_INPUT",
+      "evidence": [
+        "server/worker/managed.ts",
+        "server/worker/run.ts",
+        "server/worker/store.ts",
+        "server/worker/operations.ts",
+        "server/worker/cli.ts",
+        "docs/operations/LOCAL_WORKER.md",
+        "tests/worker.test.ts",
+        "tests/monitoring.test.ts",
+        "verification.json"
+      ],
+      "decisive_facts": [
+        "Invoked Node/SQLite worker operates independently of Expo UI with durable leases, retries, atomic commits, semantic idempotency, corrected-input reconciliation, bounded admission and catch-up.",
+        "Owner must install/monitor launchd or cron on an awake machine with an authorized CSV path; schedulerInstalled remains false until then.",
+        "Synthetic status reported stopped/unconfigured with requiresAwakeMachine=true; no owner hardware or schedule was fabricated."
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "id": "R8-alert-creation-and-delivery-lifecycles",
+      "status": "PASS",
+      "evidence": [
+        "src/domain/evaluateWorkspace.ts",
+        "src/domain/notificationDelivery.ts",
+        "src/domain/notificationPreferences.ts",
+        "server/worker/notificationTransport.ts",
+        "src/features/notifications/NotificationSettingsPanel.tsx",
+        "tests/notification.test.ts"
+      ],
+      "decisive_facts": [
+        "Alert creation, durable intent, transport submission and receipt are distinct.",
+        "SMTP 250 remains provider-accepted/ambiguous; delivered requires a transport-specific confirmed receipt.",
+        "Preferences, quiet hours, digest, snooze, cancellation, retry, leases, ambiguity and safe last-known status are durably represented.",
+        "In-app Today covers its loaded workspace; background worker visibility is R5."
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "id": "R9-optional-external-attention-channel",
+      "status": "CONFIGURATION_OR_OWNER_INPUT",
+      "evidence": [
+        "server/worker/notificationTransport.ts",
+        "src/features/notifications/NotificationSettingsPanel.tsx",
+        "docs/operations/LOCAL_WORKER.md",
+        "tests/notification.test.ts"
+      ],
+      "decisive_facts": [
+        "SMTP is optional, server-only and absent from client bundles; in-app review needs no external channel.",
+        "If email is selected, destination, consent, awake invocation and private SMTP endpoint/credentials are owner config.",
+        "No external delivery or OS push was claimed."
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "id": "R10-storage-export-migration-and-recovery",
+      "status": "PASS",
+      "evidence": [
+        "src/domain/appDataSchema.ts",
+        "src/domain/backupFormat.ts",
+        "src/data/repositories/workspaceRepository.ts",
+        "src/platform/keyValueStore.web.ts",
+        "server/worker/store.ts",
+        "server/worker/recovery.ts",
+        "tests/storage.test.ts",
+        "tests/indexeddb.test.ts",
+        "tests/recovery.test.ts",
+        "verification.json"
+      ],
+      "decisive_facts": [
+        "Validated schema-versioned complete workspace import/export, IndexedDB revision-checked writes and previous-copy recovery are implemented.",
+        "Worker SQLite migrations are additive; consistent backups and isolated restore preserve authored history, evaluations, decisions, jobs, ingestion and notification state.",
+        "Synthetic recovery drill passed; real owner data and backup cadence remain external."
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "id": "R11-bounded-operations-and-release-rollback-contract",
+      "status": "PASS",
+      "evidence": [
+        "server/worker/operations.ts",
+        "server/worker/releaseEvidenceRuntime.ts",
+        "src/operations/releaseEvidence.ts",
+        "docs/operations/RELEASE_RUNBOOK.md",
+        "tests/operations.test.ts",
+        "tests/releaseEvidence.test.ts",
+        "verification.json"
+      ],
+      "decisive_facts": [
+        "Safe status covers missed/partial/blocked/retrying/terminal coverage, worker/database/ingestion/notification state, release identity and bounded measurements.",
+        "Same-source release:evidence and release:verify passed; equal explicit base/source satisfies checked ancestry.",
+        "Rollback assertions allow compatible static artifacts or same-schema restore, not schema downgrade.",
+        "Synthetic operations qualification is not an SLA or real-owner restore."
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "id": "R12-web-accessibility-localization-and-device-quality",
+      "status": "PASS",
+      "evidence": [
+        "src/app/StockLedgerApp.tsx",
+        "src/features/today/TodayScreen.tsx",
+        "src/features/settings/SettingsScreen.tsx",
+        "src/hooks/useWindowPanelFocus.ts",
+        "tests/e2e/v3-focus-geometry.spec.ts",
+        "tests/e2e/chg172-primary-surfaces.spec.ts",
+        "tests/e2e/r11-today.spec.ts",
+        "verification.json"
+      ],
+      "decisive_facts": [
+        "Current tree equals accepted Golden UI v3 tree, whose bounded web authority includes zoom/reflow, focus restoration, geometry/action reachability and task oracles.",
+        "Current-source browser rerun passed 87 cases; the only skip is the intentional mobile hardware-keyboard case.",
+        "Native physical-device/store requirements are outside this web/desktop profile."
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "id": "R13-one-product-engine-and-testable-boundaries",
+      "status": "PASS",
+      "evidence": [
+        "src/domain/evaluateWorkspace.ts",
+        "server/worker/managed.ts",
+        "scripts/check-boundaries.mjs",
+        "tests/financialTruth.test.ts",
+        "tests/worker.test.ts",
+        "verification.json"
+      ],
+      "decisive_facts": [
+        "App and worker share domain evaluation/contracts; client/server boundary check passes.",
+        "The data-shuttle issue is an owner-facing integration gap, not an architecture-aesthetics objection."
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "id": "R14-selected-personal-product-boundary",
+      "status": "PASS",
+      "evidence": [
+        "README.md",
+        "src/features/today/TodayScreen.tsx",
+        "src/domain/evaluateWorkspace.ts",
+        "docs/operations/LOCAL_WORKER.md"
+      ],
+      "decisive_facts": [
+        "Private research memory and monitoring for US equities/ETFs on completed daily bars, with human decisions; no trading, custody or performance guarantee.",
+        "Broad scanning is optional discovery; watchlist monitoring does not require scanner expansion."
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "id": "R15-Stooq-as-trusted-automated-feed",
+      "status": "DEFERRED_NOT_APPLICABLE",
+      "evidence": [
+        "src/lib/eodDataProvider.ts",
+        "src/lib/marketDataContract.ts",
+        "server/worker/marketDataIngestion.ts",
+        "tests/marketDataIngestion.test.ts",
+        "README.md"
+      ],
+      "decisive_facts": [
+        "Stooq is explicitly on-demand/research-only and unverified adjustment/authority does not qualify managed trusted ingestion.",
+        "It is not required by user-supplied adjusted CSV monitoring."
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "id": "R16-excluded-commercial-native-multiuser-and-broad-discovery-gates",
+      "status": "DEFERRED_NOT_APPLICABLE",
+      "evidence": [
+        "README.md",
+        "docs/operations/CLOUD_DEPLOYMENT.md",
+        "docs/operations/RELEASE_RUNBOOK.md",
+        "src/lib/marketDataContract.ts"
+      ],
+      "decisive_facts": [
+        "Paid/public/native/multi-user/hosted/commercial, teams/marketplace and broad scanner/backtest expansion are outside the local personal handoff."
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "id": "R17-currentness-of-owner-facing-status-authority",
+      "status": "UNPROVEN",
+      "evidence": [
+        "README.md",
+        "docs/production/IMPLEMENTATION_STATUS.md",
+        "docs/operations/LOCAL_WORKER.md",
+        "package.json",
+        "src/lib/metricCatalog.ts",
+        "verification.json"
+      ],
+      "decisive_facts": [
+        "README points to IMPLEMENTATION_STATUS as current verified scope, but it still records a September 16-era baseline, engine 2.0.0 and 61 tests/11 files; current source is later, engine 2.1.0 and this run passed 209 tests/26 files.",
+        "Current local-worker and release runbooks give clearer operational boundaries, so factual drift is established but harm to a careful owner is not demonstrated."
+      ],
+      "confidence": "MEDIUM"
+    }
+  ],
+  "deferred_not_applicable": [
+    {
+      "id": "R15",
+      "scope": "Stooq as trusted automated production feed",
+      "reason": "Research-only adapter; not needed for user-supplied personal CSV monitoring."
+    },
+    {
+      "id": "R16",
+      "scope": "Paid/public/native/multi-user/hosted/commercial/broad-discovery requirements",
+      "reason": "Explicitly excluded from selected personal local/web handoff."
+    }
+  ],
+  "configuration_or_owner_input_dependencies": [
+    {
+      "id": "D1",
+      "item": "Owner watchlist, authorized data source/private CSV directory and adjustment declaration",
+      "boundary": "CSV schema and validation are implemented; no real owner files were provided."
+    },
+    {
+      "id": "D2",
+      "item": "Node >=22.23.2 runtime, local machine and schedule installation",
+      "boundary": "Local worker and launchd/cron contract are documented; computer must stay awake and missed work catches up after wake/invocation."
+    },
+    {
+      "id": "D3",
+      "item": "Optional external notification channel",
+      "boundary": "Only needed if owner selects email; SMTP destination/credentials are private config. In-app review requires no external channel but has R5 gap."
+    }
+  ],
+  "material_gaps": [
+    {
+      "id": "G1",
+      "requirement_id": "R5-complete-owner-monitoring-to-review-loop",
+      "title": "Scheduled worker changes do not reach app review without repeated whole-workspace handoffs",
+      "root_cause": "Worker SQLite WAL and web IndexedDB are independent durable workspaces; the bridge is full backup file import/export with no app-visible ready/update handoff or incremental conflict-safe reconciliation.",
+      "owner_consequence": "After app-closed scheduled evaluation, Today/Alerts/Journal remain stale until owner finds and manually imports worker export. Reverse app-to-worker import also requires a matching revision, paused schedule and before-import copy. This materially burdens routine review.",
+      "implicated_paths": [
+        "server/worker/cli.ts",
+        "server/worker/store.ts",
+        "src/platform/keyValueStore.web.ts",
+        "src/data/repositories/workspaceRepository.ts",
+        "src/application/workspaceApplicationService.ts",
+        "src/domain/backupFormat.ts",
+        "src/features/settings/WorkspaceSettingsPanel.tsx",
+        "src/features/notifications/NotificationSettingsPanel.tsx",
+        "src/features/today/TodayScreen.tsx",
+        "src/app/StockLedgerApp.tsx",
+        "docs/operations/LOCAL_WORKER.md"
+      ],
+      "evidence_refs": [
+        "docs/operations/LOCAL_WORKER.md#App handoff and recovery",
+        "server/worker/cli.ts#--output and --import-revision",
+        "tests/e2e/workspace.spec.ts#shows imported last-known worker state and pending preference handoff"
+      ],
+      "confidence": "HIGH"
+    }
+  ],
+  "unproven_items": [
+    {
+      "id": "U1",
+      "item": "Whether stale implementation-status prose alone would misdirect this owner",
+      "reason": "The conflict is established, but current operational runbooks are clearer and user impact is not demonstrated."
+    }
+  ],
+  "truth_and_documentation_drift": [
+    {
+      "path": "docs/production/IMPLEMENTATION_STATUS.md",
+      "facts": [
+        "Calls itself the current completion authority.",
+        "Source baseline, verification ledger, engine version and remaining gates predate later CHG updates/current source."
+      ],
+      "user_effect": "May misstate implemented behavior versus external configuration or deferred work.",
+      "classification": "UNPROVEN",
+      "no_source_change_made": true
+    },
+    {
+      "path": "README.md",
+      "facts": [
+        "Directs owner to the stale implementation-status authority."
+      ],
+      "user_effect": "Makes that stale status discoverable; selected-scope description and current LOCAL_WORKER runbook remain accurate.",
+      "classification": "UNPROVEN",
+      "no_source_change_made": true
+    }
+  ],
+  "final_disposition": "FIX_REQUIRED"
+}

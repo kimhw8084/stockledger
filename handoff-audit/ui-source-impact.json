@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "project": "stockledger",
+  "change": "CHG-256",
+  "request": "stockledger-prod-c18-personal-handoff-gap-verify-v1",
+  "fabric_job": "CF-d4852ae8cce94f2b772fcb19",
+  "current_source_sha": "9331b8850dc674e55181447a7bd5963059fd3649",
+  "current_tree_sha": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+  "golden_ui_v3_accepted_head": "92b64a20c620da38422c22e73664eba395b58f17",
+  "golden_ui_v3_accepted_tree_sha": "b3cbaaa0698522e9ab19d6fb8558a263101a05f7",
+  "current_tree_equals_golden_ui_v3_accepted_tree": true,
+  "current_visual_authority_reusable": true,
+  "visual_capture_repeated_in_this_audit": false,
+  "classification": "REQUIRED_AFFECTED_SURFACES",
+  "reason": "Current tree matches accepted Golden UI v3 and visual authority is reusable for unchanged source. Recommended worker-to-review repair changes Today/Settings and app state projection, so affected surfaces require fresh capture and browser/task-oracle verification.",
+  "future_fix_surfaces": [
+    {
+      "surface": "Today/Alerts review of newly available worker results",
+      "files": [
+        "src/features/today/TodayScreen.tsx",
+        "src/features/alerts/AlertsScreen.tsx",
+        "src/app/StockLedgerApp.tsx"
+      ]
+    },
+    {
+      "surface": "Owner-facing worker update status and import/reconciliation action",
+      "files": [
+        "src/features/settings/WorkspaceSettingsPanel.tsx",
+        "src/features/settings/SettingsScreen.tsx",
+        "src/features/notifications/NotificationSettingsPanel.tsx"
+      ]
+    },
+    {
+      "surface": "Durable app/worker handoff and store boundary",
+      "files": [
+        "src/application/workspaceApplicationService.ts",
+        "src/data/repositories/workspaceRepository.ts",
+        "src/domain/backupFormat.ts",
+        "server/worker/cli.ts",
+        "server/worker/store.ts",
+        "server/worker/operations.ts"
+      ]
+    }
+  ],
+  "required_future_recapture": [
+    "Affected Today/Alerts and Settings handoff states",
+    "Keyboard/focus-return path",
+    "English and Korean",
+    "empty/pending/available/stale/conflict/recovery states",
+    "reflow/zoom geometry and action reachability"
+  ]
+}
