@@ -1,0 +1,370 @@
+{
+  "accepted_at": "2026-09-26T23:06:18Z",
+  "changed_files": [
+    {
+      "additions": 9,
+      "deletions": 3,
+      "path": "tests/worker.test.ts",
+      "status": "M"
+    }
+  ],
+  "checks": [
+    {
+      "command": "/bin/zsh -lc 'rtk git status --porcelain=v1 && rtk git branch -avv && rtk git log -6 --oneline --decorate --all'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk node --version && rtk npm --version && if test -e .local/stockledger-app-handoff; then rtk printf 'handoff-path-present\\\\n'; else rtk printf 'handoff-path-absent\\\\n'; fi\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg --files -g 'AGENTS.md' -g '.nvmrc' -g '.node-version' -g 'package.json' -g 'tests/worker.test.ts' -g '*fabric*' -g '*artifact*' | head -200\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '1,260p' tests/worker.test.ts && rtk cat package.json\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk which node && rtk which rtk && rtk command -v fabric && rtk command -v fnm && rtk command -v nvm && rtk command -v mise && rtk command -v npx'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git rev-parse origin/main && rtk git show-ref --verify refs/heads/main && rtk git show -s --format='%H%n%P%n%s' origin/main && rtk git remote -v\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk find /Users/haewonkim/.codex-fabric -maxdepth 3 -type f -iname '*fabric*' -o -iname '*project*os*' | head -100\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk env | rtk cut -d= -f1 | rtk rg -i 'fabric|project|job|request|worktree|evidence' || true\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n \\\"app-closed|handoff-dir|schedulerInstalled|pending\\\\.json|tsx\\\" tests/worker.test.ts\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk cat .nvmrc && rtk ls /Users/haewonkim/.nvm/versions/node'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk command -v nvm; rtk command -v npx; rtk command -v node22; rtk command -v fabric; rtk command -v codex-fabric'",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '1,260p' server/worker/cli.ts\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '500,545p' tests/worker.test.ts && rtk rg -n \\\"handoffDir|handoff-dir|pending\\\\.json|manifest\\\" server/worker/cli.ts server/worker\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy find /Users/haewonkim/.codex-fabric -maxdepth 3 -type f | head -100'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH node --version && rtk proxy env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm --version'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n \\\"parseWorkerHandoffManifest|WorkerHandoffManifest|makeWorkerHandoffManifest|workspaceId\\\" src/domain/workerHandoff.ts src/domain/types.ts src | head -100 && rtk sed -n '1,220p' src/domain/workerHandoff.ts && rtk rg -n \\\"workspaceId\\\" src/lib/seed.ts src/domain/backupFormat.ts\"",
+      "exit_code": 1,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '1,40p' src/lib/seed.ts && rtk rg -n \\\"import\\\\(data|workspaceId\\\" server/worker/store.ts src/domain/backupFormat.ts | head -90 && rtk sed -n '240,290p' server/worker/store.ts && rtk sed -n '1,110p' src/domain/backupFormat.ts\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk diff -- tests/worker.test.ts && rtk status --short'",
+      "exit_code": 127,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH node --version && rtk proxy env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm --version'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm ci'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm test -- tests/worker.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"if test -e .local/stockledger-app-handoff; then rtk printf 'FAIL: repository handoff path exists\\\\n'; exit 1; else rtk printf 'PASS: repository handoff path absent after focused test\\\\n'; fi\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm run check'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"if test -e .local/stockledger-app-handoff; then rtk printf 'FAIL: repository handoff path exists after full check\\\\n'; exit 1; else rtk printf 'PASS: repository handoff path absent after full check\\\\n'; fi\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git rev-parse origin/main && rtk git rev-parse main && rtk git rev-parse HEAD && rtk git rev-parse HEAD''^{tree}'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git diff --check && rtk git status --short && rtk git diff -- tests/worker.test.ts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm run check:boundaries'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git log -1 --format='%H%n%P%n%s' codex-fabric/evidence/stockledger/stockledger-prod-c18-worker-app-review-handoff-fix-v2\"",
+      "exit_code": 128,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git show -s --format='%H%n%P%n%s' project-os-artifacts/stockledger/stockledger-prod-c18-worker-app-review-handoff-fix-v2 && rtk git ls-tree -r --name-only project-os-artifacts/stockledger/stockledger-prod-c18-worker-app-review-handoff-fix-v2\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git branch --list 'project-os-artifacts/stockledger/stockledger-prod-c19-worker-cli-test-handoff-isolation-fix-v2' && rtk git branch -r --list 'origin/project-os-artifacts/stockledger/stockledger-prod-c19-worker-cli-test-handoff-isolation-fix-v2' && rtk git config user.name && rtk git config user.email\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk git show project-os-artifacts/stockledger/stockledger-prod-c18-worker-app-review-handoff-fix-v2:implementation-summary.md && rtk git show project-os-artifacts/stockledger/stockledger-prod-c18-worker-app-review-handoff-fix-v2:verification.json && rtk git show -s --format='%H%n%P%n%s' project-os-artifacts/stockledger/prod-c13-ui-perfection-inspection-v1\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git add tests/worker.test.ts && rtk git diff --cached --check && rtk git commit -m \"test(worker): isolate CLI handoff output\" && rtk git rev-parse HEAD && rtk git rev-parse HEAD''^{tree} && rtk git rev-parse HEAD''^ && rtk git diff-tree --no-commit-id --name-only -r HEAD'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"if test -e /private/tmp/stockledger-chg-273-test-handoff-artifacts; then rtk printf 'artifact worktree path already exists\\\\n'; exit 1; fi\nrtk git worktree add -b project-os-artifacts/stockledger/stockledger-prod-c19-worker-cli-test-handoff-isolation-fix-v2 /private/tmp/stockledger-chg-273-test-handoff-artifacts 3e94a3d201b9147a5ecb3c4282cc25a4e6d99670\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy mkdir -p test-isolation\nrtk proxy tee test-isolation/implementation-summary.md >/dev/null <<'EOF'\n# CHG-273 R2 — worker CLI test handoff isolation\n\n## Repair\n\nThe managed app-closed CLI test now gives the worker a \"'`handoff` directory inside its existing `mkdtemp` directory and passes that path through `--handoff-dir`. The child CLI runs with the temporary directory as its current working directory, and both `tsx` and `server/worker/cli.ts` are passed as absolute paths.\n\nThe fixture uses the explicit workspace ID `stockledger-cli-fixture`. The test asserts that the temporary `pending.json` exists, parses it with `parseWorkerHandoffManifest`, and checks that its workspace ID matches the fixture. Existing managed-mode, `schedulerInstalled:false`, output, and scoped cleanup assertions remain in place.\n\nNo runtime Product source or CLI default changed. The candidate changes only `tests/worker.test.ts`.\n\n## Candidate\n\n- Base: `1d3fc085b54b5002342982cc9c15ccc32bf086ba`\n- Candidate: `3e94a3d201b9147a5ecb3c4282cc25a4e6d99670`\n- Candidate tree: `e5de003bc445672748b10b4aebf45be5e58bda02`\n- Candidate parent: `1d3fc085b54b5002342982cc9c15ccc32bf086ba`\n- Changed path: `tests/worker.test.ts`\n\n## Verification\n\nNode `v22.23.2` was used. `npm ci`, the focused worker test file (28 tests), `npm run check` (typecheck and 216 tests), `npm run check:boundaries`, and `git diff --check` passed. The repository-root `.local/stockledger-app-handoff` path was absent before qualification, after the focused test, and after the full check. The known notification retry timeout did not occur.\nEOF\nrtk proxy tee test-isolation/verification.json >/dev/null <<'\"'EOF'\n{\n  \\\"source\\\": {\n    \\\"repository\\\": \\\"kimhw8084/stockledger\\\",\n    \\\"project\\\": \\\"stockledger\\\",\n    \\\"change\\\": \\\"CHG-273\\\",\n    \\\"operation\\\": \\\"FIX\\\",\n    \\\"request\\\": \\\"stockledger-prod-c19-worker-cli-test-handoff-isolation-fix-v2\\\",\n    \\\"job\\\": \\\"CF-1f42b99b1d489d2494b96882\\\",\n    \\\"predecessorVerify\\\": \\\"CF-29df9cf0a9bafca63978aa45\\\",\n    \\\"protectedBase\\\": \\\"1d3fc085b54b5002342982cc9c15ccc32bf086ba\\\",\n    \\\"candidate\\\": \\\"3e94a3d201b9147a5ecb3c4282cc25a4e6d99670\\\",\n    \\\"candidateTree\\\": \\\"e5de003bc445672748b10b4aebf45be5e58bda02\\\",\n    \\\"candidateParent\\\": \\\"1d3fc085b54b5002342982cc9c15ccc32bf086ba\\\",\n    \\\"candidateChangedPaths\\\": [\n      \\\"tests/worker.test.ts\\\"\n    ],\n    \\\"runtimeProductSourceChanged\\\": false\n  },\n  \\\"runtime\\\": {\n    \\\"node\\\": \\\"v22.23.2\\\"\n  },\n  \\\"qualification\\\": {\n    \\\"npmCi\\\": {\n      \\\"result\\\": \\\"PASS\\\",\n      \\\"detail\\\": \\\"Completed on Node 22.23.2; npm reported zero vulnerabilities.\\\"\n    },\n    \\\"focusedWorkerTest\\\": {\n      \\\"command\\\": \\\"npm test -- tests/worker.test.ts\\\",\n      \\\"result\\\": \\\"PASS\\\",\n      \\\"testFilesPassed\\\": 1,\n      \\\"testsPassed\\\": 28\n    },\n    \\\"testHandoffIsolation\\\": {\n      \\\"result\\\": \\\"PASS\\\",\n      \\\"testPendingManifestAssertion\\\": \\\"Temporary pending.json exists and passes parseWorkerHandoffManifest; manifest workspaceId equals stockledger-cli-fixture.\\\",\n      \\\"repositoryRootHandoffPath\\\": \\\".local/stockledger-app-handoff\\\",\n      \\\"pathBeforeQualification\\\": \\\"absent\\\",\n      \\\"pathAfterFocusedWorkerTest\\\": \\\"absent\\\",\n      \\\"pathAfterFullCheck\\\": \\\"absent\\\"\n    },\n    \\\"npmRunCheck\\\": {\n      \\\"result\\\": \\\"PASS\\\",\n      \\\"typecheck\\\": \\\"PASS\\\",\n      \\\"testFilesPassed\\\": 27,\n      \\\"testsPassed\\\": 216,\n      \\\"knownNotificationRetryTimeoutObserved\\\": false\n    },\n    \\\"npmRunCheckBoundaries\\\": {\n      \\\"result\\\": \\\"PASS\\\",\n      \\\"detail\\\": \\\"Client secret boundary, runtime parser, and server imports checked.\\\"\n    },\n    \\\"gitDiffCheck\\\": {\n      \\\"result\\\": \\\"PASS\\\"\n    }\n  },\n  \\\"scope\\\": {\n    \\\"onlyAuthorizedTestPathChangedInCandidate\\\": true,\n    \\\"runtimeProductSourceChanged\\\": false,\n    \\\"runtimeCliDefaultChanged\\\": false\n  },\n  \\\"mainState\\\": {\n    \\\"originMainBefore\\\": \\\"1d3fc085b54b5002342982cc9c15ccc32bf086ba\\\",\n    \\\"originMainAfter\\\": \\\"1d3fc085b54b5002342982cc9c15ccc32bf086ba\\\",\n    \\\"localMainBefore\\\": \\\"02e54c5f8c01edab228c20fc56e910a41da0852e\\\",\n    \\\"localMainAfter\\\": \\\"02e54c5f8c01edab228c20fc56e910a41da0852e\\\",\n    \\\"mainRefsTouched\\\": false\n  },\n  \\\"fabricEvidencePublication\\\": {\n    \\\"status\\\": \\\"normal_fabric_publication_requested\\\",\n    \\\"branch\\\": \\\"codex-fabric/evidence/stockledger/stockledger-prod-c19-worker-cli-test-handoff-isolation-fix-v2\\\",\n    \\\"handAuthored\\\": false\n  }\n}\nEOF\nrtk proxy tee test-isolation/path-isolation.json >/dev/null <<'EOF'\n{\n  \\\"repositoryRootHandoffPath\\\": \\\".local/stockledger-app-handoff\\\",\n  \\\"rootPathChecks\\\": {\n    \\\"beforeQualification\\\": \\\"absent\\\",\n    \\\"afterFocusedWorkerTest\\\": \\\"absent\\\",\n    \\\"afterNpmRunCheck\\\": \\\"absent\\\",\n    \\\"checkMethod\\\": \\\"Existence-only checks; no existing owner handoff contents were inspected or modified.\\\"\n  },\n  \\\"test\\\": {\n    \\\"name\\\": \\\"runs the managed entry point from the app-closed CLI and reports truthful status\\\",\n    \\\"temporaryDirectoryPrefix\\\": \\\"stockledger-cli-test-\\\",\n    \\\"temporaryDirectoryCreatedBy\\\": \\\"mkdtempSync(join(tmpdir(), ...))\\\",\n    \\\"childWorkingDirectory\\\": \\\"The test's mkdtemp directory.\\\",\n    \\\"cliEntryArguments\\\": [\n      \\\"Absolute path to node_modules/tsx/dist/cli.mjs\\\",\n      \\\"Absolute path to server/worker/cli.ts\\\"\n    ],\n    \\\"handoffDirectory\\\": \\\"<mkdtemp>/handoff\\\",\n    \\\"pendingManifest\\\": \\\"<mkdtemp>/handoff/pending.json\\\",\n    \\\"fixtureWorkspaceId\\\": \\\"stockledger-cli-fixture\\\",\n    \\\"assertions\\\": [\n      \\\"pending.json exists under the temporary handoff directory\\\",\n      \\\"pending.json parses with parseWorkerHandoffManifest\\\",\n      \\\"parsed workspaceId equals the fixture workspace ID\\\",\n      \\\"managed mode and schedulerInstalled:false remain asserted\\\",\n      \\\"worker output file remains asserted\\\"\n    ],\n    \\\"cleanup\\\": \\\"Existing afterEach removes only registered test temporary directories recursively.\\\"\n  },\n  \\\"runtimeCliOrDefaultChanged\\\": false,\n  \\\"syntheticPendingManifestIsolated\\\": true\n}\nEOF\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git add test-isolation/implementation-summary.md test-isolation/verification.json test-isolation/path-isolation.json && rtk git diff --cached --check && rtk proxy env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH node -e '\"'for (const path of [\\\"test-isolation/verification.json\\\", \\\"test-isolation/path-isolation.json\\\"]) JSON.parse(require(\\\"node:fs\\\").readFileSync(path, \\\"utf8\\\"));' && rtk git commit -m \\\"Publish CHG-273 test isolation artifacts\\\" && rtk git rev-parse HEAD && rtk git rev-parse HEAD\"'^ && rtk git diff-tree --no-commit-id --name-only -r HEAD'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git ls-remote --heads origin refs/heads/codex/stockledger-prod-c19-worker-cli-test-handoff-isolation-fix-v2 refs/heads/project-os-artifacts/stockledger/stockledger-prod-c19-worker-cli-test-handoff-isolation-fix-v2 refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c19-worker-cli-test-handoff-isolation-fix-v2'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git push origin codex/stockledger-prod-c19-worker-cli-test-handoff-isolation-fix-v2 project-os-artifacts/stockledger/stockledger-prod-c19-worker-cli-test-handoff-isolation-fix-v2'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git rev-parse main && rtk git rev-parse origin/main && rtk git rev-parse HEAD && rtk git status --porcelain=v1'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git status --short --branch && rtk git rev-parse HEAD && rtk git rev-list --parents -n 1 HEAD && rtk git diff-tree --no-commit-id --name-only -r HEAD && rtk git rev-parse main && rtk git rev-parse origin/main'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git status --short --branch && rtk git rev-parse HEAD && rtk git rev-parse HEAD''^{tree} && rtk git rev-parse HEAD''^ && rtk git diff-tree --no-commit-id --name-only -r HEAD && if test -e .local/stockledger-app-handoff; then rtk printf '\"'FAIL repository handoff path exists\\\\n'; exit 1; else rtk printf 'PASS repository handoff path absent\\\\n'; fi\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk git ls-remote --heads origin refs/heads/main refs/heads/codex/stockledger-prod-c19-worker-cli-test-handoff-isolation-fix-v2 refs/heads/project-os-artifacts/stockledger/stockledger-prod-c19-worker-cli-test-handoff-isolation-fix-v2 refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c19-worker-cli-test-handoff-isolation-fix-v2'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy /bin/zsh -c 'command -v fabric; command -v codex-fabric; command -v codex; command -v project-os; true'\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy ls -la /Users/haewonkim/.codex-fabric && rtk proxy ls -la /Users/haewonkim/.local/bin'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk proxy find /Users/haewonkim/.codex-fabric -maxdepth 4 -type f | rtk rg -v '/locks/' | rtk rg -i 'fabric|dispatch|project|artifact|evidence|worker' | head -100\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk proxy ls -la /Users/haewonkim/.codex-fabric/bin /Users/haewonkim/.codex-fabric/libexec /Users/haewonkim/.codex-fabric/project-os-artifacts'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '1,120p' /Users/haewonkim/.codex-fabric/bin/fabricctl && rtk sed -n '1,120p' /Users/haewonkim/.codex-fabric/bin/projectos-integrate-stdin && rtk proxy find /Users/haewonkim/.codex-fabric/current -maxdepth 3 -type f | rtk rg '/(README|SKILL|AGENTS|fabricctl|package.json)\"'$'\"' | head -80\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk /Users/haewonkim/.codex-fabric/bin/fabricctl --help'",
+      "exit_code": 2,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc 'rtk /Users/haewonkim/.codex-fabric/bin/fabricctl status CF-1f42b99b1d489d2494b96882'",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk rg -n \\\"publish-evidence|publish_pending_evidence|def publish_evidence|publish-evidence\\\" /Users/haewonkim/.codex-fabric/current/fabric.py | head -100 && rtk sed -n '1,220p' /Users/haewonkim/.codex-fabric/current/fabric.py\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "/bin/zsh -lc \"rtk sed -n '3010,3150p' /Users/haewonkim/.codex-fabric/current/fabric.py && rtk sed -n '4660,4750p' /Users/haewonkim/.codex-fabric/current/fabric.py\"",
+      "exit_code": 0,
+      "type": "command_execution"
+    }
+  ],
+  "codex": {
+    "cli_version": "codex-cli 0.157.0",
+    "configured_model": "gpt-6-luna",
+    "event_count": 117,
+    "provider_reported_model": null,
+    "reasoning_effort": "xhigh",
+    "terminal_type": "turn.completed",
+    "usage": {
+      "cache_hit_percent": 95.43,
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 2058240,
+      "fresh_input_tokens": 98629,
+      "input_tokens": 2156869,
+      "non_reasoning_output_tokens": 8774,
+      "output_tokens": 25926,
+      "reasoning_output_tokens": 17152,
+      "total_processed_tokens": 2182795
+    },
+    "warnings": []
+  },
+  "commits": [
+    {
+      "sha": "3e94a3d201b9147a5ecb3c4282cc25a4e6d99670",
+      "subject": "test(worker): isolate CLI handoff output"
+    }
+  ],
+  "diff": {
+    "additions": 9,
+    "changed_files": 1,
+    "commit_count": 1,
+    "deletions": 3
+  },
+  "error_code": null,
+  "evidence_manifest": {
+    "count": 0,
+    "items": [],
+    "version": 1
+  },
+  "evidence_publisher_release": "1.2.5-dashboard-controls-candidate",
+  "fabric_capture": {
+    "applied": false,
+    "paths_before": 0,
+    "transient_untracked_removed": {
+      "count": 0,
+      "items": []
+    }
+  },
+  "fabric_release": "1.2.5-dashboard-controls-candidate",
+  "failure_class": null,
+  "finished_at": "2026-09-26T23:15:22Z",
+  "git": {
+    "base_is_ancestor": true,
+    "base_sha": "1d3fc085b54b5002342982cc9c15ccc32bf086ba",
+    "branch": "codex/stockledger-prod-c19-worker-cli-test-handoff-isolation-fix-v2",
+    "detached_verify": false,
+    "head_sha": "3e94a3d201b9147a5ecb3c4282cc25a4e6d99670",
+    "remote_exact_head": true,
+    "remote_head_sha": "3e94a3d201b9147a5ecb3c4282cc25a4e6d99670",
+    "target_branch": "main",
+    "target_drifted_since_acceptance": false,
+    "target_head_observed_after_execution": "1d3fc085b54b5002342982cc9c15ccc32bf086ba",
+    "work_branch": "codex/stockledger-prod-c19-worker-cli-test-handoff-isolation-fix-v2",
+    "worktree_clean": true
+  },
+  "instructions": {
+    "files": [],
+    "total_bytes": 0,
+    "warning": null
+  },
+  "job_id": "CF-1f42b99b1d489d2494b96882",
+  "kind": "codex-fabric-audit-evidence",
+  "locator": {
+    "branch": "codex-fabric/evidence/stockledger/stockledger-prod-c19-worker-cli-test-handoff-isolation-fix-v2",
+    "path": ".codex-fabric/audit.json",
+    "ref": "refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c19-worker-cli-test-handoff-isolation-fix-v2"
+  },
+  "operation": "FIX",
+  "policy": {
+    "environment_policy_sha256": "e077daca74297b3c30bee8989f00f8ca5338f7610b4d016a6c48db524205d064",
+    "fabric_release": "1.2.5-dashboard-controls-candidate",
+    "policy_sha256": "123615bf2f6e57dcac197e49ca98ceac59ada86a55e2c84445ea5d00812c0833",
+    "registry_sha256": "af81b8552f9d6a33847310e3c6bcd2d48401782b963a58efd2993e93570cb4aa"
+  },
+  "project_id": "stockledger",
+  "recovery": {
+    "model_rerun_safe": false,
+    "recovery_required": false,
+    "retry_safe": false,
+    "retry_scope": null,
+    "worktree_retained": true
+  },
+  "request": "stockledger-prod-c19-worker-cli-test-handoff-isolation-fix-v2",
+  "schema_version": 1,
+  "started_at": "2026-09-26T23:06:18Z",
+  "status": "EXECUTED_CHANGE",
+  "timing": {
+    "execution_seconds": 544,
+    "queue_seconds": 0,
+    "total_seconds": 544
+  },
+  "transport": {
+    "bytes": 4354,
+    "envelope": "FABRIC/2",
+    "prompt_bytes": 3975,
+    "prompt_sha256": "875899a020e71a359c784d8e7ad02d218cead5bef58ae45609b6079814883554",
+    "sha256": "1f42b99b1d489d2494b968822ab04b825ec9ae16d31c01623fd2ac9910a0ebb1"
+  }
+}
