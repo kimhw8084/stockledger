@@ -9,9 +9,12 @@ import { reviewReport } from "../../domain/reviewReport";
 import { t } from "../../lib/i18n";
 import { FormField } from "./FormField";
 import { WatchlistImportPanel } from "./WatchlistImportPanel";
+import type { LocalWorkerHandoffView } from "../../hooks/useAppModel";
 
 type WorkspaceActions = Pick<ReturnType<typeof useAppModel>["actions"],
   | "exportBackup"
+  | "connectLocalWorkerHandoff"
+  | "refreshLocalWorkerHandoff"
   | "evaluateSavedData"
   | "startPersonalWorkspace"
   | "importBackup"
@@ -29,10 +32,12 @@ export function WorkspaceSettingsPanel({
   data,
   actions,
   language,
+  localWorkerHandoff,
 }: {
   data: AppData;
   actions: WorkspaceActions;
   language: AppLanguage;
+  localWorkerHandoff: LocalWorkerHandoffView;
 }) {
   const [backup, setBackup] = useState("");
   const [preview, setPreview] = useState<AppData | null>(null);
@@ -55,6 +60,13 @@ export function WorkspaceSettingsPanel({
     } finally {
       setBusy(false);
     }
+  };
+  const connectWorkerFolder = () => {
+    void run(actions.connectLocalWorkerHandoff, t(language, "workspace.handoff.connected")).finally(() => {
+      if (typeof document !== "undefined") {
+        window.setTimeout(() => (document.querySelector('[data-testid="local-worker-handoff-folder"]') as HTMLElement | null)?.focus(), 0);
+      }
+    });
   };
   const activeStocks = data.stocks.filter((stock) => !stock.archivedAt);
   const archivedStocks = data.stocks.filter((stock) => stock.archivedAt);
@@ -81,6 +93,24 @@ export function WorkspaceSettingsPanel({
                 responsiveWidth="compact-full"
               />
             ) : null}
+          </View>
+        </VStack>
+      </Card>
+
+      <Card variant="subtle" testID="local-worker-handoff">
+        <VStack gap="md">
+          <Text variant="h3">{t(language, "workspace.handoff.title")}</Text>
+          <Text tone="secondary">{t(language, "workspace.handoff.body")}</Text>
+          <AlertBanner
+            tone={localWorkerHandoff.status === "applied" ? "positive" : localWorkerHandoff.status === "conflict" || localWorkerHandoff.status === "failed" || localWorkerHandoff.status === "missed" || localWorkerHandoff.status === "partial" || localWorkerHandoff.status === "stale" ? "warning" : "info"}
+            title={t(language, `workspace.handoff.status.${localWorkerHandoff.status}`)}
+            message={localWorkerHandoff.errorCode ? t(language, `workspace.handoff.error.${localWorkerHandoff.errorCode}`) : undefined}
+          />
+          {localWorkerHandoff.lastAppliedAt ? <Text variant="caption" tone="secondary">{t(language, "workspace.handoff.lastApplied", { at: localWorkerHandoff.lastAppliedAt })}</Text> : null}
+          {localWorkerHandoff.pendingBatchCount ? <Text variant="caption" tone="secondary">{t(language, "workspace.handoff.pendingCount", { count: localWorkerHandoff.pendingBatchCount })}</Text> : null}
+          <View style={styles.actions}>
+            <Button testID="local-worker-handoff-folder" label={t(language, localWorkerHandoff.configured ? "workspace.handoff.changeFolder" : "workspace.handoff.chooseFolder")} variant="secondary" disabled={busy} onPress={connectWorkerFolder} responsiveWidth="compact-full" />
+            {localWorkerHandoff.configured ? <Button label={t(language, "workspace.handoff.checkNow")} variant="ghost" disabled={busy} onPress={() => { void run(actions.refreshLocalWorkerHandoff, t(language, "workspace.handoff.checked")); }} responsiveWidth="compact-full" /> : null}
           </View>
         </VStack>
       </Card>

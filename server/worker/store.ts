@@ -4,6 +4,7 @@ import { chmodSync, mkdirSync } from "node:fs";
 import { dirname } from "node:path";
 import { validateAppData } from "../../src/domain/appDataSchema";
 import { contentHash } from "../../src/domain/contentHash";
+import { makeWorkerHandoffBatch, type WorkerHandoffBatch } from "../../src/domain/workerHandoff";
 import { notificationDigestIdentity, notificationDigestGrouping, notificationEligibility, notificationPreferencesFingerprint, notificationRetryDelayMs, NOTIFICATION_DIGEST_CONTRACT_REVISION, NOTIFICATION_DIGEST_CONTRACT_VERSION, NOTIFICATION_MAX_ATTEMPTS, type NotificationAttemptOutcome, type NotificationDeliveryState, type NotificationDigestGrouping, type NotificationIntentInput } from "../../src/domain/notificationDelivery";
 import { normalizeNotificationPreferences } from "../../src/domain/notificationPreferences";
 import { latestCompletedTradingDate, marketSessionDueAtUtc, nextUsTradingDate } from "../../src/lib/marketCalendar";
@@ -294,7 +295,7 @@ export class WorkerStore {
     if (path !== ":memory:") chmodSync(path, 0o600);
     this.db.exec("PRAGMA journal_mode=WAL; PRAGMA foreign_keys=ON; PRAGMA busy_timeout=5000;");
     const version = Number(this.db.prepare("PRAGMA user_version").get()?.user_version ?? 0);
-    if (version !== 0 && version !== 1 && version !== 2 && version !== 3 && version !== 4 && version !== 5 && version !== 6 && version !== 7) throw new Error("Unsupported worker database version.");
+    if (version !== 0 && version !== 1 && version !== 2 && version !== 3 && version !== 4 && version !== 5 && version !== 6 && version !== 7 && version !== 8) throw new Error("Unsupported worker database version.");
     this.createSchema();
     if (version === 1) this.migrateV1ToV2();
     if (version === 1 || version === 2) this.migrateV2ToV3();
@@ -302,6 +303,7 @@ export class WorkerStore {
     if (version <= 4) this.migrateV4ToV5();
     if (version <= 5) this.migrateV5ToV6();
     if (version <= 6) this.migrateV6ToV7();
+    if (version <= 7) this.migrateV7ToV8();
     this.createIndexes();
     this.db.exec(`PRAGMA user_version=${WORKER_DATABASE_SCHEMA_VERSION};`);
   }
@@ -312,6 +314,8 @@ export class WorkerStore {
     this.db.exec(`
       CREATE TABLE IF NOT EXISTS workspace (id INTEGER PRIMARY KEY CHECK(id=1), revision INTEGER NOT NULL, payload TEXT NOT NULL);
       CREATE TABLE IF NOT EXISTS recovery (revision INTEGER PRIMARY KEY, payload TEXT NOT NULL, saved_at TEXT NOT NULL);
+      CREATE TABLE IF NOT EXISTS worker_handoff_state (id INTEGER PRIMARY KEY CHECK(id=1), workspace_id TEXT NOT NULL, last_sequence INTEGER NOT NULL DEFAULT 0, acknowledged_sequence INTEGER NOT NULL DEFAULT 0, acknowledged_batch_id TEXT);
+      CREATE TABLE IF NOT EXISTS worker_handoff_batches (sequence INTEGER PRIMARY KEY, batch_id TEXT NOT NULL UNIQUE, workspace_id TEXT NOT NULL, payload TEXT NOT NULL, created_at TEXT NOT NULL);
       CREATE TABLE IF NOT EXISTS jobs (
         id TEXT PRIMARY KEY,
         contract_version TEXT NOT NULL,
@@ -595,6 +599,10 @@ export class WorkerStore {
     `);
   }
 
+  private migrateV7ToV8() {
+    this.db.exec("CREATE TABLE IF NOT EXISTS worker_handoff_state (id INTEGER PRIMARY KEY CHECK(id=1), workspace_id TEXT NOT NULL, last_sequence INTEGER NOT NULL DEFAULT 0, acknowledged_sequence INTEGER NOT NULL DEFAULT 0, acknowledged_batch_id TEXT); CREATE TABLE IF NOT EXISTS worker_handoff_batches (sequence INTEGER PRIMARY KEY, batch_id TEXT NOT NULL UNIQUE, workspace_id TEXT NOT NULL, payload TEXT NOT NULL, created_at TEXT NOT NULL);");
+  }
+
   private workerProjectionInside(data: AppData, now: number): LastKnownNotificationDeliveryStatus {
     const preferences = normalizeNotificationPreferences(data.notificationPreferences, new Date(now));
     const row = this.db.prepare("SELECT id,status,attempt_count,terminal_error_class,updated_at FROM notification_intents ORDER BY updated_at DESC,id DESC LIMIT 1").get() as Record<string, unknown> | undefined;
@@ -649,7 +657,13 @@ export class WorkerStore {
 
   import(data: AppData, expectedRevision: number, now = Date.now()) {
     this.transaction(() => {
-      const imported = validateAppData(data);
+      const stableWorkspaceId = data.workspaceId ?? `workspace-${contentHash(data)}`;
+      const imported = validateAppData({ ...data, workspaceId: stableWorkspaceId });
+      const handoff = this.db.prepare("SELECT workspace_id FROM worker_handoff_state WHERE id=1").get() as { workspace_id?: string } | undefined;
+      if (handoff?.workspace_id !== imported.workspaceId) {
+        this.db.exec("DELETE FROM worker_handoff_batches; DELETE FROM worker_handoff_state;");
+        this.db.prepare("INSERT INTO worker_handoff_state(id,workspace_id,last_sequence,acknowledged_sequence,acknowledged_batch_id) VALUES(1,?,0,0,NULL)").run(stableWorkspaceId);
+      }
       // Reconcile against the imported policy before replacing the workspace
       // payload. This keeps opt-out fencing and backup replacement atomic.
       this.refreshNotificationPolicyInside(imported, now);
@@ -1022,14 +1036,86 @@ export class WorkerStore {
     this.transaction(() => {
       this.assertLeaseInside(input.id, input.token, now);
       for (const related of input.relatedClaims ?? []) this.assertLeaseInside(related.id, related.token, now);
+      const before = this.load();
       this.refreshNotificationPolicyInside(input.data, now, input.accountInvalidated ?? false);
       for (const intent of input.notificationIntents ?? []) this.insertNotificationIntentInside(intent);
+      if (before) this.recordWorkerHandoffInside(before.data, input.data, input.expectedRevision + 1, input.id, now);
       this.writeInside(this.withWorkerProjectionInside(input.data, now), input.expectedRevision);
       const timestamp = new Date(now).toISOString();
       const status = input.status ?? "completed";
       this.db.prepare("UPDATE jobs SET status=?,completed_at=?,lease_owner=NULL,token=NULL,lease_until=0,next_retry_at=NULL,updated_at=? WHERE id=? AND token=?").run(status, timestamp, timestamp, input.id, input.token);
       for (const related of input.relatedClaims ?? []) this.db.prepare("UPDATE jobs SET status=?,completed_at=?,lease_owner=NULL,token=NULL,lease_until=0,next_retry_at=NULL,updated_at=? WHERE id=? AND token=?").run(related.status, timestamp, timestamp, related.id, related.token);
       if (input.outbox) this.db.prepare("INSERT OR IGNORE INTO outbox(id,job_id,payload,created_at) VALUES(?,?,?,?)").run(input.outbox.id, input.outbox.jobId ?? input.id, JSON.stringify(input.outbox.payload), timestamp);
+    });
+  }
+
+  private recordWorkerHandoffInside(before: AppData, after: AppData, workerRevision: number, sourceJobId: string, now: number) {
+    const workspaceId = after.workspaceId ?? before.workspaceId;
+    if (!workspaceId) return;
+    const previousIds = new Set((before.evaluations ?? []).flatMap(item => item.id ? [item.id] : []));
+    const added = (after.evaluations ?? []).filter(item => item.id && !previousIds.has(item.id));
+    if (!added.length) return;
+    const state = this.db.prepare("SELECT workspace_id,last_sequence FROM worker_handoff_state WHERE id=1").get() as { workspace_id: string; last_sequence: number } | undefined;
+    if (!state) this.db.prepare("INSERT INTO worker_handoff_state(id,workspace_id,last_sequence,acknowledged_sequence,acknowledged_batch_id) VALUES(1,?,0,0,NULL)").run(workspaceId);
+    else if (state.workspace_id !== workspaceId) throw new Error("Worker handoff workspace identity changed; import the intended app workspace before running jobs.");
+    const sequence = Number(state?.last_sequence ?? 0) + 1;
+    const evidence = added.map(evaluation => {
+      const eye = before.eyes.find(item => item.id === evaluation.eyeId);
+      const currentEye = after.eyes.find(item => item.id === evaluation.eyeId);
+      const stock = after.stocks.find(item => item.id === eye?.stockId);
+      const recipe = after.recipes.find(item => item.id === evaluation.recipeId && item.version === evaluation.recipeVersion);
+      const snapshot = after.snapshots.find(item => item.stockId === eye?.stockId);
+      if (!eye || !currentEye || !stock || !recipe || !snapshot || !evaluation.id) throw new Error("Worker evaluation cannot be captured for the local app handoff.");
+      const customMetricKeys = new Set(recipe.conditions.flatMap(condition => condition.metricKey ? [condition.metricKey] : []));
+      const alert = after.alerts.find(item => item.evaluationId === evaluation.id);
+      return {
+        eye,
+        stock,
+        recipe,
+        customMetrics: after.customMetrics.filter(metric => customMetricKeys.has(metric.key)),
+        evaluation,
+        snapshot,
+        ...(alert ? { alert } : {}),
+        ...(eye.lastEvaluation?.id ? { expectedPreviousEvaluationId: eye.lastEvaluation.id } : {}),
+        eyeIdentityHash: contentHash((({ lastEvaluation: _lastEvaluation, ...fields }) => fields)(eye)),
+        recipeHash: contentHash(recipe),
+        snapshotHash: contentHash(snapshot),
+      };
+    });
+    const batch = makeWorkerHandoffBatch({
+      workspaceId,
+      sequence,
+      createdAt: new Date(now).toISOString(),
+      workerRevision,
+      sourceJobId,
+      evidence,
+    });
+    this.db.prepare("INSERT INTO worker_handoff_batches(sequence,batch_id,workspace_id,payload,created_at) VALUES(?,?,?,?,?)").run(sequence, batch.batchId, workspaceId, JSON.stringify(batch), batch.createdAt);
+    this.db.prepare("UPDATE worker_handoff_state SET last_sequence=? WHERE id=1 AND workspace_id=?").run(sequence, workspaceId);
+  }
+
+  workerHandoffBatches(workspaceId: string): WorkerHandoffBatch[] {
+    return (this.db.prepare("SELECT payload FROM worker_handoff_batches WHERE workspace_id=? ORDER BY sequence").all(workspaceId) as Array<{ payload: string }>).map(row => JSON.parse(row.payload) as WorkerHandoffBatch);
+  }
+
+  workerHandoffSequence(workspaceId: string): { lastSequence: number; acknowledgedSequence: number } {
+    const row = this.db.prepare("SELECT last_sequence,acknowledged_sequence FROM worker_handoff_state WHERE id=1 AND workspace_id=?").get(workspaceId) as { last_sequence: number; acknowledged_sequence: number } | undefined;
+    return row ? { lastSequence: Number(row.last_sequence), acknowledgedSequence: Number(row.acknowledged_sequence) } : { lastSequence: 0, acknowledgedSequence: 0 };
+  }
+
+  acknowledgeWorkerHandoff(input: { workspaceId: string; sequence: number; batchId: string }) {
+    this.transaction(() => {
+      const state = this.db.prepare("SELECT workspace_id,last_sequence,acknowledged_sequence,acknowledged_batch_id FROM worker_handoff_state WHERE id=1").get() as { workspace_id: string; last_sequence: number; acknowledged_sequence: number; acknowledged_batch_id: string | null } | undefined;
+      if (!state || state.workspace_id !== input.workspaceId || input.sequence > Number(state.last_sequence)) throw new Error("Worker handoff acknowledgement does not match this workspace.");
+      if (input.sequence === Number(state.acknowledged_sequence)) {
+        if (state.acknowledged_batch_id !== input.batchId) throw new Error("Worker handoff acknowledgement identity conflicts with the saved receipt.");
+        return;
+      }
+      if (input.sequence < Number(state.acknowledged_sequence)) return;
+      const target = this.db.prepare("SELECT batch_id FROM worker_handoff_batches WHERE sequence=? AND workspace_id=?").get(input.sequence, input.workspaceId) as { batch_id?: string } | undefined;
+      if (!target || target.batch_id !== input.batchId) throw new Error("Worker handoff acknowledgement identity is unknown.");
+      this.db.prepare("DELETE FROM worker_handoff_batches WHERE workspace_id=? AND sequence<=?").run(input.workspaceId, input.sequence);
+      this.db.prepare("UPDATE worker_handoff_state SET acknowledged_sequence=?,acknowledged_batch_id=? WHERE id=1").run(input.sequence, input.batchId);
     });
   }
 

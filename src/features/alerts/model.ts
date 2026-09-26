@@ -35,6 +35,7 @@ export const buildAlertsModel = ({
   stockSnapshots,
   eyes,
   decisions,
+  evidenceSnapshots = [],
 }: {
   language: AppLanguage;
   groups: readonly AlertQueueGroup[];
@@ -42,6 +43,7 @@ export const buildAlertsModel = ({
   stockSnapshots: readonly StockSnapshotEntry[];
   eyes: readonly Eye[];
   decisions: readonly Decision[];
+  evidenceSnapshots?: readonly { evaluationId: string; snapshot: MockSnapshot }[];
 }): AlertsModel => {
   const groupViews = groups.map((group) => {
     const actualHighestPriority = group.openAlerts.some((alert) => alert.priority === "High")
@@ -55,7 +57,10 @@ export const buildAlertsModel = ({
       source: group.snapshot?.sourceName ?? (language === "ko" ? "출처 없음" : "No source recorded"),
       highestPriority: localizedAlertPriority(language, actualHighestPriority),
       priorityTone: priorityTone(actualHighestPriority),
-      alerts: group.openAlerts.map((alert) => ({
+      alerts: group.openAlerts.map((alert) => {
+        const captured = alert.evaluationId ? evidenceSnapshots.find(item => item.evaluationId === alert.evaluationId)?.snapshot : undefined;
+        const snapshot = captured ?? group.snapshot;
+        return ({
         id: alert.id,
         title: alert.title,
         whyNow: alert.whyNow,
@@ -64,17 +69,19 @@ export const buildAlertsModel = ({
         createdAt: formatLocaleDateTime(language, alert.createdAt),
         dataQuality: alert.dataQuality,
         uncertainty: uncertaintyText(language, alert),
-        freshness: localizedFreshness(language, group.snapshot?.freshness ?? "Unavailable"),
-        source: group.snapshot?.sourceName ?? (language === "ko" ? "출처 없음" : "No source recorded"),
-        sample: Boolean(group.snapshot?.isMock),
+        freshness: localizedFreshness(language, snapshot?.freshness ?? "Unavailable"),
+        source: snapshot?.sourceName ?? (language === "ko" ? "출처 없음" : "No source recorded"),
+        sample: Boolean(snapshot?.isMock),
         reviewLogged: decisions.some((decision) => decision.alertId === alert.id),
-      })),
+      }); }),
     } satisfies AlertGroupView;
   });
   const historyViews = history.map((alert) => {
     const eye = eyes.find((item) => item.id === alert.eyeId);
     const stock = eye ? stockSnapshots.find((item) => item.stock.id === eye.stockId)?.stock : undefined;
-    const snapshot = stockSnapshots.find((item) => item.stock.id === stock?.id)?.snapshot;
+    const currentSnapshot = stockSnapshots.find((item) => item.stock.id === stock?.id)?.snapshot;
+    const capturedSnapshot = alert.evaluationId ? evidenceSnapshots.find(item => item.evaluationId === alert.evaluationId)?.snapshot : undefined;
+    const snapshot = capturedSnapshot ?? currentSnapshot;
     const linkedDecision = decisions.find((decision) => decision.alertId === alert.id);
     const reviewed = alert.reviewed;
     return {

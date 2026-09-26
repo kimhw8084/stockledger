@@ -6,11 +6,12 @@ import type { AppData } from "../types";
 import { workspaceRepository, type RecoveryData, type WorkspaceRepository } from "../data/repositories/workspaceRepository";
 
 type AppDataChange = AppData | ((current: AppData) => AppData);
+type CommitOptions = { skipEvaluationForEyeIds?: readonly string[] };
 
 export interface WorkspaceApplicationService {
   load(): Promise<AppData>;
-  evaluate(data: AppData): AppData;
-  commit(change: AppDataChange): Promise<AppData>;
+  evaluate(data: AppData, skipEvaluationForEyeIds?: readonly string[]): AppData;
+  commit(change: AppDataChange, options?: CommitOptions): Promise<AppData>;
   runDailyScanner(): Promise<void>;
   importBackup(raw: string): Promise<void>;
   exportBackup(): string;
@@ -31,10 +32,10 @@ export const createWorkspaceApplicationService = (dependencies: {
     return command;
   };
 
-  const commit = (change: AppDataChange) => enqueue(async () => {
+  const commit = (change: AppDataChange, options: CommitOptions = {}) => enqueue(async () => {
     const current = dependencies.getCurrent();
     if (current === null && typeof change === "function") throw new Error("Workspace is not loaded.");
-    const next = evaluateWorkspace(typeof change === "function" ? change(current as AppData) : change);
+    const next = evaluateWorkspace(typeof change === "function" ? change(current as AppData) : change, new Date(), options.skipEvaluationForEyeIds);
     await repository.save(next);
     dependencies.publish(next);
     return next;
@@ -42,7 +43,7 @@ export const createWorkspaceApplicationService = (dependencies: {
 
   return {
     load: () => repository.load(),
-    evaluate: evaluateWorkspace,
+    evaluate: (data, skipEvaluationForEyeIds) => evaluateWorkspace(data, new Date(), skipEvaluationForEyeIds),
     commit,
     async runDailyScanner() {
       const current = dependencies.getCurrent();

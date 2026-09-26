@@ -121,7 +121,8 @@ export const createWorkspaceRepository = (keyValueStore: KeyValueStore = store):
       if (attemptedBudget.overBudget && attemptedBudget.currentBytes > currentBudget.currentBytes) {
         throw new WorkspaceStorageBudgetError(currentBudget, attemptedBudget);
       }
-      await keyValueStore.compareAndSetItem(STORAGE_KEYS.current, previous, serializeExport(snapshot, revision), STORAGE_KEYS.previous);
+      const initialBackup = previous === null && loadedRevision === 0 ? serializeExport(createEmptyAppData(), 0) : undefined;
+      await keyValueStore.compareAndSetItem(STORAGE_KEYS.current, previous, serializeExport(snapshot, revision), STORAGE_KEYS.previous, initialBackup);
       loadedRevision = revision;
     });
     writes = write.catch(() => {});
@@ -152,7 +153,8 @@ export const createWorkspaceRepository = (keyValueStore: KeyValueStore = store):
         }
       })();
       const revision = Math.max(currentRevision, previousRevision) + 1;
-      await keyValueStore.compareAndSetItem(STORAGE_KEYS.current, current, serializeExport(snapshot, revision), STORAGE_KEYS.previous);
+      const initialBackup = current === null && (loadedRevision === null || loadedRevision === 0) ? serializeExport(createEmptyAppData(), 0) : undefined;
+      await keyValueStore.compareAndSetItem(STORAGE_KEYS.current, current, serializeExport(snapshot, revision), STORAGE_KEYS.previous, initialBackup);
       loadedRevision = revision;
     });
     writes = write.catch(() => {});

@@ -22,10 +22,11 @@ const makeStore = () => {
     async getItem(key) { return values.get(key) ?? null; },
     async setItem(key, value) { values.set(key, value); },
     async removeItem(key) { values.delete(key); },
-    async compareAndSetItem(key, expected, next, backupKey) {
+    async compareAndSetItem(key, expected, next, backupKey, initialBackup) {
       if (failCompare) throw new Error("interrupted write");
       if ((values.get(key) ?? null) !== expected) throw new Error("stale revision");
       if (expected !== null) values.set(backupKey, expected);
+      else if (initialBackup !== undefined && !values.has(backupKey)) values.set(backupKey, initialBackup);
       values.set(key, next);
     },
   };
@@ -34,6 +35,15 @@ const makeStore = () => {
 
 const savedData = (workspaceId: string): AppData => ({ ...createEmptyAppData(), workspaceId });
 const repositoryFor = (store: KeyValueStore): WorkspaceRepository => createWorkspaceRepository(store);
+const expectEmptyRecoveryCopy = (raw: string) => {
+  const recovered = parseExport(raw);
+  expect(recovered.stocks).toEqual([]);
+  expect(recovered.eyes).toEqual([]);
+  expect(recovered.alerts).toEqual([]);
+  expect(recovered.decisions).toEqual([]);
+  expect(recovered.outcomes).toEqual([]);
+  expect(recovered.snapshots).toEqual([]);
+};
 const withoutWorkspaceId = (data: AppData) => {
   const { workspaceId: _workspaceId, ...rest } = data;
   return rest;
@@ -115,6 +125,14 @@ it("keeps corrupt current bytes and restores the previous validated copy", async
   expect([...values.values()]).toContain("corrupt-v2");
 });
 
+it("keeps the initially empty workspace as a recoverable first-save copy", async () => {
+  const { store, values } = makeStore();
+  const repository = repositoryFor(store);
+  await repository.load();
+  await repository.save(savedData("first-save"));
+  expectEmptyRecoveryCopy(values.get(STORAGE_KEYS.previous)!);
+});
+
 it("serializes authored writes in order and rejects a stale repository revision", async () => {
   const { store, values } = makeStore();
   const repository = repositoryFor(store);
@@ -166,7 +184,7 @@ it("rejects only attempted over-budget growth and preserves the last valid revis
   try { await failedWrite; } catch (error) { expect((error as WorkspaceStorageBudgetError).code).toBe("WORKSPACE_STORAGE_BUDGET_EXCEEDED"); }
   expect(values.get(STORAGE_KEYS.current)).toBe(before);
   expect((JSON.parse(values.get(STORAGE_KEYS.current)!) as { revision: number }).revision).toBe(1);
-  expect(values.get(STORAGE_KEYS.previous)).toBeUndefined();
+  expectEmptyRecoveryCopy(values.get(STORAGE_KEYS.previous)!);
 });
 
 it("loads, exports, recovers, and permits unrelated edits for an existing oversized workspace", async () => {
@@ -208,7 +226,7 @@ it("imports a complete oversized backup into a fresh store without losing author
   expect(state.current!.workspaceId).toMatch(/^restored-/);
   expect(profileWorkspace(state.current!).budget.currentBytes).toBeGreaterThan(WORKSPACE_STORAGE_BUDGET_CONTRACT.hardBudgetBytes);
   expect((JSON.parse(values.get(STORAGE_KEYS.current)!) as { revision: number }).revision).toBe(1);
-  expect(values.get(STORAGE_KEYS.previous)).toBeUndefined();
+  expectEmptyRecoveryCopy(values.get(STORAGE_KEYS.previous)!);
 });
 
 it("restores an oversized backup over valid state while preserving the prior current copy", async () => {
@@ -255,7 +273,7 @@ it("rejects invalid or corrupt oversized input without replacing valid current s
   await expect(service.importBackup(corruptJson)).rejects.toThrow();
   expect(values.get(STORAGE_KEYS.current)).toBe(before);
   expect(state.current).toEqual(current);
-  expect(values.get(STORAGE_KEYS.previous)).toBeUndefined();
+  expectEmptyRecoveryCopy(values.get(STORAGE_KEYS.previous)!);
 });
 
 it("resumes ordinary budget enforcement after oversized restore", async () => {

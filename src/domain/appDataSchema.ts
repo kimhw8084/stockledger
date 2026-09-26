@@ -70,6 +70,21 @@ const lastKnownNotificationDeliveryStatusSchema = z.looseObject({
   attemptCount: num.int().nonnegative().max(5), lastConfirmedAt: opt(timestamp), lastProviderAcceptedAt: opt(timestamp), lastFailureAt: opt(timestamp),
   errorClass: opt(text.max(120)), preferenceUpdatedAt: timestamp, preferenceHash: text.regex(/^[a-f0-9]{64}$/),
 });
+const workerHandoffEvidenceSchema = z.looseObject({
+  eye: eyeSchema, stock: stockSchema, recipe: recipeSchema, customMetrics: z.array(metricSchema),
+  evaluation: evaluationSchema, snapshot: snapshotSchema, alert: opt(alertSchema),
+  expectedPreviousEvaluationId: opt(id), eyeIdentityHash: text.regex(/^[a-f0-9]{64}$/),
+  recipeHash: text.regex(/^[a-f0-9]{64}$/), snapshotHash: text.regex(/^[a-f0-9]{64}$/),
+});
+const workerAppHandoffSchema = z.looseObject({
+  contractVersion: z.literal("stockledger-worker-app-handoff-v1"), revision: z.literal(1),
+  status: z.enum(["none", "pending", "available", "applied", "stale", "partial", "missed", "conflict", "failed", "recovered"]),
+  workerWorkspaceId: opt(id), lastAppliedSequence: opt(num.int().nonnegative()), lastAppliedBatchId: opt(text.regex(/^[a-f0-9]{64}$/)),
+  lastAppliedAt: opt(timestamp), lastWorkerRunAt: opt(timestamp), latestWorkerRevision: opt(num.int().nonnegative()),
+  pendingBatchCount: opt(num.int().nonnegative()),
+  errorCode: opt(z.enum(["permission_required", "handoff_unavailable", "invalid_handoff", "workspace_mismatch", "sequence_gap", "owner_state_changed", "identity_collision", "storage_write_failed", "acknowledgement_failed"])),
+  evidence: z.array(z.looseObject({ batchId: text.regex(/^[a-f0-9]{64}$/), sequence: num.int().positive(), capturedAt: timestamp, sourceJobId: id, evidence: workerHandoffEvidenceSchema })),
+});
 const appDataSchema = z.looseObject({
   workspaceId: opt(id),
   evaluations: opt(z.array(evaluationSchema)),
@@ -85,6 +100,7 @@ const appDataSchema = z.looseObject({
   reviewLogs: z.array(z.looseObject({ id, signalId: id, reviewedAt: timestamp, userDecision: z.enum(["watch", "ignore", "bought", "skipped", "sold", "other"]), manualReason: text, convictionScoreOptional: opt(num.min(0).max(100)), notes: opt(text), entryPriceOptional: opt(num.positive()), exitPriceOptional: opt(num.positive()), resultNotes: opt(text) })),
   forwardProofLedger: z.array(forwardSchema), scannerSettings: scannerSettingsSchema, notificationPreferences: opt(notificationPreferencesSchema),
   lastKnownNotificationDeliveryStatus: opt(lastKnownNotificationDeliveryStatusSchema),
+  workerAppHandoff: opt(workerAppHandoffSchema),
 });
 
 export function validateAppData(raw: unknown): AppData {

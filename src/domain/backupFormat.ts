@@ -56,6 +56,15 @@ export const serializeUserExport = (data: AppData, revision = 0, now = new Date(
       return !signal?.rightsProvenance || exportableSignalIds.has(proof.signalId);
     }),
     alerts: data.alerts.filter(alert => !alert.rightsProvenance || derivedAllowed(alert.rightsProvenance)),
+    workerAppHandoff: data.workerAppHandoff ? {
+      ...data.workerAppHandoff,
+      evidence: data.workerAppHandoff.evidence.filter(record => {
+        const snapshot = record.evidence.snapshot;
+        const provenance = snapshot.provenance?.rightsProvenance ?? record.evidence.alert?.rightsProvenance;
+        const providerDerived = snapshot.provenance?.origin === "provider" || Boolean(provenance);
+        return !providerDerived || derivedAllowed(provenance);
+      }),
+    } : undefined,
     universeSnapshots: data.universeSnapshots,
   };
   return serializeExport(filtered, revision, now);

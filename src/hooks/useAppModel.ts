@@ -13,6 +13,8 @@ import { unavailableSnapshot, snapshotFromBars } from "../domain/marketSnapshot"
 import { normalizeToSchema, write_raw_archive } from "../lib/eodDataProvider";
 import { buildSnapshotsFromAdapters } from "../lib/providerSnapshot";
 import { createReviewLogEntry } from "../lib/stockConditionScanner";
+import { applyWorkerHandoff } from "../domain/workerHandoff";
+import { acknowledgeLocalWorkerHandoff, connectWorkerHandoffFolder, makeLocalWorkerHandoffAck, readLocalWorkerHandoff } from "../features/workerHandoff/localHandoff";
 import {
   AppData,
   Decision,
@@ -27,8 +29,18 @@ import {
   RecipeCondition,
   Stock,
   NotificationPreferences,
+  WorkerAppHandoffStatus,
 } from "../types";
 import { createId } from "../platform/identity";
+
+export type LocalWorkerHandoffView = {
+  status: WorkerAppHandoffStatus;
+  configured: boolean;
+  pendingBatchCount?: number;
+  lastAppliedAt?: string;
+  lastWorkerRunAt?: string;
+  errorCode?: string;
+};
 
 const buildSnapshotForStock = (stock: Stock, existing?: AppData["snapshots"][number]) => {
   const generated = unavailableSnapshot(stock);
@@ -90,6 +102,9 @@ const syncLogicModel = (prev: AppData, nextRecipes: Recipe[]) => {
 export const useAppModel = () => {
   const [data, setData] = useState<AppData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [localWorkerHandoff, setLocalWorkerHandoff] = useState<LocalWorkerHandoffView>({ status: "none", configured: false });
+  const recoveryRestored = useRef(false);
+  const handoffConfigured = useRef(false);
   const [providerHealth, setProviderHealth] = useState<ProviderHealthEntry[]>([]);
   const [providerHealthLoading, setProviderHealthLoading] = useState(true);
   const dataRef = useRef<AppData | null>(null);
@@ -106,6 +121,67 @@ export const useAppModel = () => {
   });
   const applicationService = applicationServiceRef.current!;
 
+  const syncLocalWorkerHandoff = async (base: AppData, requestAccess = false): Promise<AppData> => {
+    const read = await readLocalWorkerHandoff(requestAccess);
+    if (read.kind === "not-configured") {
+      handoffConfigured.current = false;
+      setLocalWorkerHandoff({ status: base.workerAppHandoff?.status ?? "none", configured: false,
+        pendingBatchCount: base.workerAppHandoff?.pendingBatchCount, lastAppliedAt: base.workerAppHandoff?.lastAppliedAt,
+        lastWorkerRunAt: base.workerAppHandoff?.lastWorkerRunAt, errorCode: base.workerAppHandoff?.errorCode });
+      return applicationService.evaluate(base);
+    }
+    if (read.kind === "permission-required") {
+      handoffConfigured.current = true;
+      setLocalWorkerHandoff({ status: "pending", configured: true, pendingBatchCount: base.workerAppHandoff?.pendingBatchCount, errorCode: "permission_required" });
+      return applicationService.evaluate(base);
+    }
+    if (read.kind === "empty") {
+      handoffConfigured.current = true;
+      setLocalWorkerHandoff({ status: "pending", configured: true, pendingBatchCount: base.workerAppHandoff?.pendingBatchCount });
+      return applicationService.evaluate(base);
+    }
+    if (read.kind === "failed") {
+      handoffConfigured.current = true;
+      setLocalWorkerHandoff({ status: "failed", configured: true, errorCode: read.errorCode, pendingBatchCount: base.workerAppHandoff?.pendingBatchCount });
+      return base;
+    }
+
+    const hasNewBatch = read.manifest.batches.some(batch => batch.sequence > (base.workerAppHandoff?.lastAppliedSequence ?? 0));
+    handoffConfigured.current = true;
+    if (hasNewBatch) setLocalWorkerHandoff({ status: "available", configured: true, pendingBatchCount: read.manifest.batches.length });
+    const applied = applyWorkerHandoff(base, read.manifest);
+    if (applied.status === "conflict") {
+      setLocalWorkerHandoff({ status: "conflict", configured: true, errorCode: applied.errorCode, pendingBatchCount: read.manifest.batches.length });
+      return base;
+    }
+    let candidate = applicationService.evaluate(applied.data, applied.touchedEyeIds);
+    if (contentHash(candidate) !== contentHash(base)) {
+      dataRef.current = base;
+      try {
+        candidate = await applicationService.commit(candidate, { skipEvaluationForEyeIds: applied.touchedEyeIds });
+      } catch (cause) {
+        setError(null);
+        const isRevisionConflict = cause instanceof Error && /conflict|another tab|another session/i.test(cause.message);
+        setLocalWorkerHandoff({ status: isRevisionConflict ? "conflict" : "failed", configured: true,
+          errorCode: isRevisionConflict ? "owner_state_changed" : "storage_write_failed", pendingBatchCount: read.manifest.batches.length });
+        return base;
+      }
+    }
+
+    const receipt = candidate.workerAppHandoff;
+    let view: LocalWorkerHandoffView = { status: applied.status, configured: true, pendingBatchCount: receipt?.pendingBatchCount,
+      lastAppliedAt: receipt?.lastAppliedAt, lastWorkerRunAt: receipt?.lastWorkerRunAt };
+    if (receipt?.workerWorkspaceId && receipt.lastAppliedSequence && receipt.lastAppliedBatchId) {
+      try {
+        await acknowledgeLocalWorkerHandoff(read.directory, makeLocalWorkerHandoffAck(receipt.workerWorkspaceId, receipt.lastAppliedSequence, receipt.lastAppliedBatchId));
+      } catch {
+        view = { ...view, status: "failed", errorCode: "acknowledgement_failed" };
+      }
+    }
+    setLocalWorkerHandoff(view);
+    return candidate;
+  };
+
   useEffect(() => {
     let active = true;
     setLoading(true);
@@ -113,9 +189,17 @@ export const useAppModel = () => {
     applicationService.load().then(async loaded => {
       if (!active) return;
       dataRef.current = loaded;
-      setData(loaded);
-      const evaluated = applicationService.evaluate(loaded);
-      if (contentHash(evaluated) !== contentHash(loaded)) await commit(current => current);
+      const evaluated = await syncLocalWorkerHandoff(loaded);
+      if (!active) return;
+      let next = evaluated;
+      if (recoveryRestored.current) {
+        setLocalWorkerHandoff({ status: "recovered", configured: handoffConfigured.current,
+          pendingBatchCount: next.workerAppHandoff?.pendingBatchCount, lastAppliedAt: next.workerAppHandoff?.lastAppliedAt,
+          lastWorkerRunAt: next.workerAppHandoff?.lastWorkerRunAt });
+        recoveryRestored.current = false;
+      }
+      dataRef.current = next;
+      setData(next);
     }).catch(cause => {
       if (active) setError(cause instanceof Error ? cause.message : "Could not load saved data.");
     }).finally(() => { if (active) setLoading(false); });
@@ -143,6 +227,26 @@ export const useAppModel = () => {
 
   const actions = useMemo(
     () => ({
+      async refreshLocalWorkerHandoff() {
+        const current = dataRef.current;
+        if (!current) return;
+        const next = await syncLocalWorkerHandoff(current, true);
+        dataRef.current = next;
+        setData(next);
+      },
+      async connectLocalWorkerHandoff() {
+        try {
+          await connectWorkerHandoffFolder();
+          const current = dataRef.current;
+          if (!current) return;
+          const next = await syncLocalWorkerHandoff(current);
+          dataRef.current = next;
+          setData(next);
+        } catch (cause) {
+          setLocalWorkerHandoff({ status: "failed", configured: true, errorCode: "handoff_unavailable" });
+          throw cause;
+        }
+      },
       async addEye(input: {
         symbol: string;
         name: string;
@@ -730,7 +834,7 @@ export const useAppModel = () => {
         return applicationService.exportBackup();
       },
       readRecoveryData() { return applicationService.readRecoveryData(); },
-      restorePreviousBackup() { return applicationService.restorePreviousBackup(); },
+      async restorePreviousBackup() { await applicationService.restorePreviousBackup(); recoveryRestored.current = true; },
       retryLoad() { setLoadAttempt(value => value + 1); },
       dismissError() { setError(null); },
       async refreshProviderHealth() {
@@ -752,6 +856,7 @@ export const useAppModel = () => {
     data,
     loading,
     error, saving, scanning,
+    localWorkerHandoff,
     providerHealth,
     providerHealthLoading,
     actions,
