@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "protected_main": "3934e4cd9f45ee911e0d05e623ad10156cbf0282",
+  "work_branch": "codex/stockledger-prod-c20-owner-environment-activation-verify-v1",
+  "work_branch_head": "3934e4cd9f45ee911e0d05e623ad10156cbf0282",
+  "expected_tree": "dccf00667a9fa73e58525e564e379d328ae82843",
+  "worktree_clean": true,
+  "source_changed": false,
+  "product_commits": 0,
+  "product_changed_files": 0,
+  "node": {
+    "observed_version": "20.19.4",
+    "minimum_version": "22.23.2",
+    "meets_minimum": false,
+    "status": "OWNER_INPUT_REQUIRED",
+    "npm_ci": "SKIPPED_BELOW_MINIMUM_RUNTIME"
+  },
+  "owner_runtime_candidates": {
+    "worker_database": {
+      "category": "OWNER_PRIVATE_DB_PATH_ABSENT",
+      "present": false,
+      "readable": false,
+      "writable": false
+    },
+    "handoff_folder": {
+      "category": "OWNER_PRIVATE_HANDOFF_PATH_ABSENT",
+      "present": false,
+      "readable": false,
+      "writable": false,
+      "expected_pending_filename_present": false,
+      "expected_ack_filename_present": false
+    },
+    "backup_destination": {
+      "category": "BACKUP_PATH_ABSENT_IN_DOCUMENTED_RUNTIME_CANDIDATES",
+      "present": false,
+      "cadence_configured": false,
+      "isolated_restore_validated": false
+    }
+  },
+  "input": {
+    "status": "DATA_PERMISSION_CONFIRMATION_REQUIRED",
+    "path_configuration_present": false,
+    "structural_compatibility": "NOT_OBSERVABLE",
+    "freshness_class": "NOT_OBSERVABLE_NO_CONFIGURED_INPUT",
+    "source_provenance_declared": false,
+    "adjustment_provenance_declared": false,
+    "permission_explicitly_declared": false
+  },
+  "scheduler": {
+    "status": "OPTIONAL_NOT_CONFIGURED",
+    "stockledger_launchd_match": false,
+    "stockledger_cron_match": false,
+    "qualified_worker_path_verified": false
+  },
+  "smtp": {
+    "status": "NOT_OBSERVABLE"
+  },
+  "worker_status_command": "NOT_RUN_SIDE_EFFECT_RISK",
+  "tests_run": false
+}

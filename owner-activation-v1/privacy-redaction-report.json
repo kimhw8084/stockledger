@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "sensitive_data_published": false,
+  "owner_files_uploaded": false,
+  "owner_payload_contents_read": false,
+  "absolute_owner_paths_published": false,
+  "email_addresses_published": false,
+  "credentials_or_secret_values_read_or_published": false,
+  "raw_csv_database_handoff_or_backup_contents_published": false,
+  "owner_metadata_scope": [
+    "StockLedger documented runtime candidate presence/access metadata",
+    "Expected handoff filenames only",
+    "StockLedger-specific launchd/cron match booleans",
+    "Node version"
+  ],
+  "owner_data_categories_not_read": [
+    "holdings and watchlist contents",
+    "CSV row contents",
+    "SQLite rows",
+    "handoff evidence payloads",
+    "backup contents",
+    "environment values",
+    "credentials and SMTP values",
+    "browser profile state",
+    "shell history"
+  ],
+  "command_evidence_sanitized": true,
+  "unrelated_process_or_scheduler_inventory_published": false
+}

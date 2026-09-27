@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "identity": {
+    "repository": "kimhw8084/stockledger",
+    "project": "stockledger",
+    "change": "CHG-291",
+    "operation": "VERIFY",
+    "request": "stockledger-prod-c20-owner-environment-activation-verify-v1",
+    "protected_base": "3934e4cd9f45ee911e0d05e623ad10156cbf0282",
+    "expected_tree": "dccf00667a9fa73e58525e564e379d328ae82843"
+  },
+  "recommended_disposition": "OWNER_ACTION_REQUIRED",
+  "manual_live_monitoring_ready": false,
+  "unattended_monitoring_ready": false,
+  "backup_restore_ready": false,
+  "prerequisites": [
+    {
+      "id": "A",
+      "name": "Real owner workspace/watchlist",
+      "required_for_manual_live_monitoring": true,
+      "status": "OWNER_INPUT_REQUIRED",
+      "evidence_category": "NO_OWNER_DB_CANDIDATE; BROWSER_WORKSPACE_NOT_SAFELY_OBSERVED; AUTHENTICITY_UNCONFIRMED",
+      "blocker_impact": "Manual live monitoring cannot be confirmed against authentic owner workspace data.",
+      "next_owner_action": "Open StockLedger with the real owner workspace/watchlist and confirm it is not synthetic; keep its contents private."
+    },
+    {
+      "id": "B",
+      "name": "Permitted current completed-daily-bar input",
+      "required_for_manual_live_monitoring": true,
+      "status": "DATA_PERMISSION_CONFIRMATION_REQUIRED",
+      "evidence_category": "NO_INPUT_CONFIGURATION_DISCOVERED_IN_ALLOWED_STOCKLEDGER_SOURCES; PERMISSION_AND_PROVENANCE_UNESTABLISHED",
+      "blocker_impact": "A compatible, fresh input with declared source/adjustment and confirmed use permission is required.",
+      "next_owner_action": "Select a compatible current completed-daily-bar input, confirm the right to use it, and declare its source and adjustment basis."
+    },
+    {
+      "id": "C",
+      "name": "Node runtime",
+      "required_for_manual_live_monitoring": true,
+      "status": "OWNER_INPUT_REQUIRED",
+      "evidence_category": "NODE_RUNTIME_BELOW_MINIMUM",
+      "observed_version": "20.19.4",
+      "required_minimum": "22.23.2",
+      "blocker_impact": "The worker runtime does not meet the Product minimum.",
+      "next_owner_action": "Select or install Node 22.23.2 or newer for StockLedger worker operation."
+    },
+    {
+      "id": "D",
+      "name": "Private worker SQLite path",
+      "required_for_manual_live_monitoring": true,
+      "status": "OWNER_INPUT_REQUIRED",
+      "evidence_category": "OWNER_PRIVATE_DB_PATH_ABSENT",
+      "blocker_impact": "No owner-specific worker database was available to verify.",
+      "next_owner_action": "Configure an owner-specific private worker SQLite database and verify that it is readable and writable."
+    },
+    {
+      "id": "E",
+      "name": "Private local handoff folder",
+      "required_for_manual_live_monitoring": true,
+      "status": "OWNER_INPUT_REQUIRED",
+      "evidence_category": "OWNER_PRIVATE_HANDOFF_PATH_ABSENT",
+      "blocker_impact": "No owner-specific worker handoff folder was available to verify.",
+      "next_owner_action": "Choose an owner-specific private handoff folder and configure the worker to use it; verify read/write access and StockLedger handoff structure."
+    },
+    {
+      "id": "F",
+      "name": "App folder grant",
+      "required_for_manual_live_monitoring": true,
+      "status": "OWNER_CONFIRMATION_REQUIRED",
+      "evidence_category": "BROWSER_INDEXEDDB_FOLDER_GRANT_NOT_SAFELY_OBSERVED",
+      "blocker_impact": "The app may not be able to read or acknowledge worker handoff evidence.",
+      "next_owner_action": "In StockLedger Settings, choose and grant the worker handoff folder, then confirm read/write access."
+    },
+    {
+      "id": "G",
+      "name": "Private backup destination/cadence and restore",
+      "required_for_manual_live_monitoring": true,
+      "status": "RESTORE_CHECK_REQUIRED",
+      "evidence_category": "NO_BACKUP_CANDIDATE_OR_CADENCE_FOUND; ISOLATED_RESTORE_NOT_VALIDATED",
+      "blocker_impact": "Required recoverability has not been established.",
+      "next_owner_action": "Configure a private backup destination and repeatable cadence, then restore one backup to an isolated temporary copy and validate it without overwriting live data."
+    },
+    {
+      "id": "H",
+      "name": "Unattended monitoring (optional)",
+      "required_for_manual_live_monitoring": false,
+      "status": "OPTIONAL_NOT_CONFIGURED",
+      "evidence_category": "NO_STOCKLEDGER_LAUNCHD_OR_CRON_MATCH",
+      "blocker_impact": "No unattended schedule is configured; this does not block manual monitoring.",
+      "next_owner_action": "No action unless unattended monitoring is intended; if intended, configure a StockLedger-specific schedule and confirm the worker path, awake-machine readiness, and readable input."
+    },
+    {
+      "id": "I",
+      "name": "SMTP (optional)",
+      "required_for_manual_live_monitoring": false,
+      "status": "NOT_OBSERVABLE",
+      "evidence_category": "NO_SAFE_DOCUMENTED_LOCAL_PRESENCE_SOURCE",
+      "blocker_impact": "None; Today/Alerts is sufficient without SMTP.",
+      "next_owner_action": "No action unless SMTP is desired; if desired, configure it server-side and verify presence without exposing values."
+    }
+  ]
+}
