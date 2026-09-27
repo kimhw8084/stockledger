@@ -1,0 +1,508 @@
+{
+  "identity": {
+    "repository": "kimhw8084/stockledger",
+    "project": "stockledger",
+    "change": "CHG-273",
+    "operation": "VERIFY",
+    "request": "stockledger-prod-c19-pr29-worker-handoff-e2e-verify-v3",
+    "fabric_job": "CF-23eda07a989f8d1f1de381f3"
+  },
+  "candidate": {
+    "base_sha": "1d3fc085b54b5002342982cc9c15ccc32bf086ba",
+    "base_tree_sha": "b0013584a69ed47bd7eb1c7d331bddc773f57c6c",
+    "accepted_sha": "3e94a3d201b9147a5ecb3c4282cc25a4e6d99670",
+    "accepted_tree_sha": "e5de003bc445672748b10b4aebf45be5e58bda02",
+    "work_branch": "codex/stockledger-prod-c19-pr29-worker-handoff-e2e-verify-v3",
+    "remote_work_branch_sha": "3e94a3d201b9147a5ecb3c4282cc25a4e6d99670"
+  },
+  "environment": {
+    "node": "v22.23.2",
+    "npm": "10.9.8",
+    "ci": 1,
+    "expo_no_dotenv": 1
+  },
+  "setup": [
+    {
+      "command": "npm ci",
+      "duration_seconds": 8.22,
+      "exit_code": 0,
+      "node": "v22.23.2",
+      "npm": "10.9.8"
+    },
+    {
+      "command": "npm run export:all",
+      "duration_seconds": 22.03,
+      "exit_code": 0,
+      "note": "Required to create dist/ for scripts/serve-preview.mjs."
+    }
+  ],
+  "preflight_runs_not_counted": [
+    {
+      "profile": "desktop",
+      "duration_seconds": 31.11,
+      "exit_code": 1,
+      "result": "webServer timeout because dist/ was absent; no test started"
+    },
+    {
+      "profile": "mobile",
+      "duration_seconds": 30.57,
+      "exit_code": 1,
+      "result": "webServer timeout because dist/ was absent; no test started"
+    }
+  ],
+  "local_targeted_invocations": [
+    {
+      "profile": "desktop",
+      "started_at": "2026-09-27T03:19:47.989Z",
+      "ended_at": "2026-09-27T03:20:02.289Z",
+      "duration_seconds": 14.25,
+      "exit_code": 1,
+      "attempts": [
+        {
+          "profile": "desktop",
+          "duration_seconds": 6.3,
+          "result": "FAILED",
+          "retry": false,
+          "assertion": "exact applied-status locator not found after 5000ms",
+          "status_visible": false,
+          "lastAppliedSequence": null
+        },
+        {
+          "profile": "desktop",
+          "duration_seconds": 5.9,
+          "result": "FAILED",
+          "retry": true,
+          "assertion": "exact applied-status locator not found after 5000ms",
+          "status_visible": false,
+          "lastAppliedSequence": null
+        }
+      ]
+    },
+    {
+      "profile": "mobile",
+      "started_at": "2026-09-27T03:20:02.297Z",
+      "ended_at": "2026-09-27T03:20:15.898Z",
+      "duration_seconds": 13.56,
+      "exit_code": 1,
+      "attempts": [
+        {
+          "profile": "mobile",
+          "duration_seconds": 6.1,
+          "result": "FAILED",
+          "retry": false,
+          "assertion": "exact applied-status locator not found after 5000ms",
+          "status_visible": false,
+          "lastAppliedSequence": null
+        },
+        {
+          "profile": "mobile",
+          "duration_seconds": 6,
+          "result": "FAILED",
+          "retry": true,
+          "assertion": "exact applied-status locator not found after 5000ms",
+          "status_visible": false,
+          "lastAppliedSequence": null
+        }
+      ]
+    },
+    {
+      "profile": "desktop+mobile",
+      "started_at": "2026-09-27T03:21:44.250Z",
+      "ended_at": "2026-09-27T03:21:58.945Z",
+      "duration_seconds": 14.64,
+      "exit_code": 1,
+      "attempts": [
+        {
+          "profile": "desktop",
+          "duration_seconds": 6.4,
+          "result": "FAILED",
+          "retry": false,
+          "assertion": "exact applied-status locator not found after 5000ms",
+          "status_visible": false,
+          "lastAppliedSequence": null
+        },
+        {
+          "profile": "mobile",
+          "duration_seconds": 6.4,
+          "result": "FAILED",
+          "retry": false,
+          "assertion": "exact applied-status locator not found after 5000ms",
+          "status_visible": false,
+          "lastAppliedSequence": null
+        },
+        {
+          "profile": "desktop",
+          "duration_seconds": 6.3,
+          "result": "FAILED",
+          "retry": true,
+          "assertion": "exact applied-status locator not found after 5000ms",
+          "status_visible": false,
+          "lastAppliedSequence": null
+        },
+        {
+          "profile": "mobile",
+          "duration_seconds": 6.3,
+          "result": "FAILED",
+          "retry": true,
+          "assertion": "exact applied-status locator not found after 5000ms",
+          "status_visible": false,
+          "lastAppliedSequence": null
+        }
+      ]
+    }
+  ],
+  "instrumented_same_adapter_replay": [
+    {
+      "profile": "desktop",
+      "started_at": "2026-09-27T03:32:43.870Z",
+      "keyboard_activation_to_apply_ms": 131,
+      "applied_label_visible": false,
+      "stored_status": "stale",
+      "lastAppliedSequence": 1,
+      "lastAppliedAt": "2026-09-27T03:32:43.894Z",
+      "permission": "granted",
+      "folder_configured": "yes",
+      "focus_returned": true,
+      "ack_sequence": 1,
+      "pending_manifest_consumed_and_acknowledged": true,
+      "workspace_evaluation_count": 22,
+      "workspace_alert_count": 13,
+      "adapter_events": [
+        {
+          "stage": "directory.picker",
+          "performance_ms": 3007.7
+        },
+        {
+          "stage": "permission.query",
+          "performance_ms": 3011.6
+        },
+        {
+          "stage": "permission.request",
+          "performance_ms": 3011.9
+        },
+        {
+          "stage": "idb.settings.put",
+          "performance_ms": 3017.8
+        },
+        {
+          "stage": "idb.settings.get.mocked",
+          "performance_ms": 3019.1
+        },
+        {
+          "stage": "idb.settings.handler.registered",
+          "performance_ms": 3019.1
+        },
+        {
+          "stage": "idb.settings.success.queued",
+          "performance_ms": 3019.1
+        },
+        {
+          "stage": "idb.settings.success.called",
+          "performance_ms": 3019.1
+        },
+        {
+          "stage": "idb.settings.get.mocked",
+          "performance_ms": 3020.6
+        },
+        {
+          "stage": "idb.settings.handler.registered",
+          "performance_ms": 3020.6
+        },
+        {
+          "stage": "idb.settings.success.queued",
+          "performance_ms": 3020.6
+        },
+        {
+          "stage": "idb.settings.success.called",
+          "performance_ms": 3020.6
+        },
+        {
+          "stage": "permission.query",
+          "performance_ms": 3020.6
+        },
+        {
+          "stage": "file.pending.open",
+          "performance_ms": 3020.6
+        },
+        {
+          "stage": "file.pending.read",
+          "performance_ms": 3020.6
+        },
+        {
+          "stage": "file.pending.text",
+          "performance_ms": 3020.6
+        },
+        {
+          "stage": "idb.settings.get.mocked",
+          "performance_ms": 3090.8
+        },
+        {
+          "stage": "idb.settings.handler.registered",
+          "performance_ms": 3090.8
+        },
+        {
+          "stage": "idb.settings.success.queued",
+          "performance_ms": 3090.8
+        },
+        {
+          "stage": "idb.settings.success.called",
+          "performance_ms": 3090.8
+        },
+        {
+          "stage": "file.ack.open",
+          "performance_ms": 3094
+        },
+        {
+          "stage": "file.ack.write.open",
+          "performance_ms": 3094.1
+        },
+        {
+          "stage": "file.ack.write",
+          "performance_ms": 3094.1
+        },
+        {
+          "stage": "file.ack.write.close",
+          "performance_ms": 3094.1
+        },
+        {
+          "stage": "idb.settings.get.mocked",
+          "performance_ms": 3127
+        },
+        {
+          "stage": "idb.settings.handler.registered",
+          "performance_ms": 3127
+        },
+        {
+          "stage": "idb.settings.success.queued",
+          "performance_ms": 3127
+        },
+        {
+          "stage": "idb.settings.success.called",
+          "performance_ms": 3127
+        },
+        {
+          "stage": "idb.settings.get.mocked",
+          "performance_ms": 3158.2
+        },
+        {
+          "stage": "idb.settings.handler.registered",
+          "performance_ms": 3158.2
+        },
+        {
+          "stage": "idb.settings.success.queued",
+          "performance_ms": 3158.2
+        },
+        {
+          "stage": "idb.settings.success.called",
+          "performance_ms": 3158.2
+        }
+      ],
+      "page_errors": [],
+      "console_errors": []
+    },
+    {
+      "profile": "mobile",
+      "started_at": "2026-09-27T03:32:44.775Z",
+      "keyboard_activation_to_apply_ms": 121,
+      "applied_label_visible": false,
+      "stored_status": "stale",
+      "lastAppliedSequence": 1,
+      "lastAppliedAt": "2026-09-27T03:32:44.794Z",
+      "permission": "granted",
+      "folder_configured": "yes",
+      "focus_returned": true,
+      "ack_sequence": 1,
+      "pending_manifest_consumed_and_acknowledged": true,
+      "workspace_evaluation_count": 22,
+      "workspace_alert_count": 13,
+      "adapter_events": [
+        {
+          "stage": "directory.picker",
+          "performance_ms": 697.8
+        },
+        {
+          "stage": "permission.query",
+          "performance_ms": 702.1
+        },
+        {
+          "stage": "permission.request",
+          "performance_ms": 702.4
+        },
+        {
+          "stage": "idb.settings.put",
+          "performance_ms": 708.3
+        },
+        {
+          "stage": "idb.settings.get.mocked",
+          "performance_ms": 709.3
+        },
+        {
+          "stage": "idb.settings.handler.registered",
+          "performance_ms": 709.3
+        },
+        {
+          "stage": "idb.settings.success.queued",
+          "performance_ms": 709.3
+        },
+        {
+          "stage": "idb.settings.success.called",
+          "performance_ms": 709.3
+        },
+        {
+          "stage": "idb.settings.get.mocked",
+          "performance_ms": 710.5
+        },
+        {
+          "stage": "idb.settings.handler.registered",
+          "performance_ms": 710.5
+        },
+        {
+          "stage": "idb.settings.success.queued",
+          "performance_ms": 710.5
+        },
+        {
+          "stage": "idb.settings.success.called",
+          "performance_ms": 710.5
+        },
+        {
+          "stage": "permission.query",
+          "performance_ms": 710.5
+        },
+        {
+          "stage": "file.pending.open",
+          "performance_ms": 710.6
+        },
+        {
+          "stage": "file.pending.read",
+          "performance_ms": 710.6
+        },
+        {
+          "stage": "file.pending.text",
+          "performance_ms": 710.6
+        },
+        {
+          "stage": "idb.settings.get.mocked",
+          "performance_ms": 777.2
+        },
+        {
+          "stage": "idb.settings.handler.registered",
+          "performance_ms": 777.2
+        },
+        {
+          "stage": "idb.settings.success.queued",
+          "performance_ms": 777.2
+        },
+        {
+          "stage": "idb.settings.success.called",
+          "performance_ms": 777.2
+        },
+        {
+          "stage": "file.ack.open",
+          "performance_ms": 779.6
+        },
+        {
+          "stage": "file.ack.write.open",
+          "performance_ms": 779.7
+        },
+        {
+          "stage": "file.ack.write",
+          "performance_ms": 779.7
+        },
+        {
+          "stage": "file.ack.write.close",
+          "performance_ms": 779.7
+        },
+        {
+          "stage": "idb.settings.get.mocked",
+          "performance_ms": 811.8
+        },
+        {
+          "stage": "idb.settings.handler.registered",
+          "performance_ms": 811.8
+        },
+        {
+          "stage": "idb.settings.success.queued",
+          "performance_ms": 811.9
+        },
+        {
+          "stage": "idb.settings.success.called",
+          "performance_ms": 811.9
+        },
+        {
+          "stage": "idb.settings.get.mocked",
+          "performance_ms": 842.3
+        },
+        {
+          "stage": "idb.settings.handler.registered",
+          "performance_ms": 842.4
+        },
+        {
+          "stage": "idb.settings.success.queued",
+          "performance_ms": 842.4
+        },
+        {
+          "stage": "idb.settings.success.called",
+          "performance_ms": 842.4
+        }
+      ],
+      "page_errors": [],
+      "console_errors": []
+    }
+  ],
+  "github_actions": {
+    "run_id": 36289183109,
+    "pr_number": 29,
+    "pr_head_sha": "3e94a3d201b9147a5ecb3c4282cc25a4e6d99670",
+    "checked_out_merge_commit": "6366ee4ea4d3f2fa10688bb859fb5bd28adcb776",
+    "node": "v22.23.2",
+    "npm": "10.9.8",
+    "app_job_id": 108535816396,
+    "app_conclusion": "failure",
+    "e2e": {
+      "passed": 87,
+      "failed": 2,
+      "skipped": 1,
+      "desktop_attempts": [
+        {
+          "duration_seconds": 7.4,
+          "result": "FAILED"
+        },
+        {
+          "duration_seconds": 7.6,
+          "result": "FAILED",
+          "retry": true
+        }
+      ],
+      "mobile_attempts": [
+        {
+          "duration_seconds": 7.6,
+          "result": "FAILED"
+        },
+        {
+          "duration_seconds": 7.9,
+          "result": "FAILED",
+          "retry": true
+        }
+      ],
+      "assertion": "exact applied status text absent after 5000ms",
+      "error_context_status": "Worker handoff is older than 48 hours",
+      "error_context_last_applied_at": "2026-09-27T02:44:41.703Z"
+    },
+    "diagnostics_artifact": {
+      "id": 10921324121,
+      "name": "browser-diagnostics",
+      "sha256": "27ac6635f37e8ba10224d136ce422219804d0874d1c7989d2e6be2ece40981f9"
+    }
+  },
+  "full_e2e": {
+    "local_outcome": "NOT_RUN_TARGETED_FAILURE",
+    "github_actions_outcome": "FAILED",
+    "github_actions_run_id": 36289183109
+  },
+  "source_mutation": {
+    "changed": false,
+    "product_commits": 0,
+    "product_changed_files": 0,
+    "working_tree_clean": true
+  }
+}

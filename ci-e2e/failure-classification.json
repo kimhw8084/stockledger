@@ -1,0 +1,35 @@
+{
+  "classification": "CANDIDATE_INDEPENDENT_HARNESS_FLAKE",
+  "reproducible": true,
+  "product_defect": false,
+  "error_code": "E2E_FIXTURE_TIME_EXPIRED_48H",
+  "root_cause": {
+    "test_helper": "makeManifest() defaults generatedAt and scheduler.lastSuccessfulRunAtUtc to 2026-09-25T02:00:00.000Z",
+    "runtime_rule": "applyWorkerHandoff marks status stale when lastSuccessfulRunAtUtc is older than 48h; stale takes precedence over applied",
+    "ci_age": "48h 44m 41.703s at lastAppliedAt 2026-09-27T02:44:41.703Z",
+    "local_age": "49h 32m 43.894s at desktop replay",
+    "explanation": "The batch is committed and acknowledged, but status renders stale; the test expects the applied label and times out."
+  },
+  "diagnostics": {
+    "keyboard_activation_to_apply_ms": {
+      "desktop": 131,
+      "mobile": 121
+    },
+    "lastAppliedSequence": {
+      "desktop": 1,
+      "mobile": 1
+    },
+    "ack_sequence": {
+      "desktop": 1,
+      "mobile": 1
+    },
+    "permission": "granted",
+    "focus_returned": true,
+    "page_errors": 0,
+    "console_errors": 0,
+    "conflict_or_rejection": false,
+    "idb_handler_registered_before_success_microtask": true
+  },
+  "smallest_future_fix_scope": "Change only the E2E helper default to generate current generatedAt/lastSuccessfulRunAtUtc; preserve explicitly old timestamps for stale coverage. Do not change product status rule, assertion, retry, timeout, fixture flow, or UI.",
+  "full_e2e_local": "NOT_RUN_TARGETED_FAILURE"
+}

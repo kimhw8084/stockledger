@@ -1,0 +1,26 @@
+{
+  "github_run_id": 36289183109,
+  "artifact_id": 10921324121,
+  "ci_trace_console_event_records": 0,
+  "ci_note": "Trace records assertion failure; original spec does not reach its final pageerror assertion and has no console listener.",
+  "local_instrumented_replays": [
+    {
+      "profile": "desktop",
+      "page_errors": [],
+      "console_errors": [],
+      "activation_to_apply_ms": 131,
+      "permission": "granted",
+      "lastAppliedSequence": 1,
+      "ack_sequence": 1
+    },
+    {
+      "profile": "mobile",
+      "page_errors": [],
+      "console_errors": [],
+      "activation_to_apply_ms": 121,
+      "permission": "granted",
+      "lastAppliedSequence": 1,
+      "ack_sequence": 1
+    }
+  ]
+}

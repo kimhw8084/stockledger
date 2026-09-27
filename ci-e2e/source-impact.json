@@ -1,0 +1,155 @@
+{
+  "base_sha": "1d3fc085b54b5002342982cc9c15ccc32bf086ba",
+  "base_tree_sha": "b0013584a69ed47bd7eb1c7d331bddc773f57c6c",
+  "candidate_sha": "3e94a3d201b9147a5ecb3c4282cc25a4e6d99670",
+  "candidate_tree_sha": "e5de003bc445672748b10b4aebf45be5e58bda02",
+  "full_diff": [
+    {
+      "path": "tests/worker.test.ts",
+      "status": "M",
+      "base_blob_sha": "0fffb1e8dc1bdcdc3a071f772ca0ab35ff797d83",
+      "candidate_blob_sha": "c14ceabbc54e8f3054105390a1913c06a808ae69",
+      "additions": 9,
+      "deletions": 3,
+      "scope": "accepted CLI handoff test isolation repair"
+    }
+  ],
+  "journey_source_files": [
+    {
+      "path": "tests/e2e/worker-app-handoff.spec.ts",
+      "base_blob_sha": "91b9dca549143dbcc330653337401ed16d4f21bf",
+      "candidate_blob_sha": "91b9dca549143dbcc330653337401ed16d4f21bf",
+      "unchanged": true
+    },
+    {
+      "path": "playwright.config.ts",
+      "base_blob_sha": "6426e4258a2cc667e6b4a69c6fec692c27ed3eed",
+      "candidate_blob_sha": "6426e4258a2cc667e6b4a69c6fec692c27ed3eed",
+      "unchanged": true
+    },
+    {
+      "path": "package.json",
+      "base_blob_sha": "f13aa1212a9ca5faafb516e322eea9559bc93939",
+      "candidate_blob_sha": "f13aa1212a9ca5faafb516e322eea9559bc93939",
+      "unchanged": true
+    },
+    {
+      "path": "package-lock.json",
+      "base_blob_sha": "4a5e945bd789aa7afbfa638642894f6ddfb49088",
+      "candidate_blob_sha": "4a5e945bd789aa7afbfa638642894f6ddfb49088",
+      "unchanged": true
+    },
+    {
+      "path": ".nvmrc",
+      "base_blob_sha": "c94711948a665d304dfc7016e1bebc497162b451",
+      "candidate_blob_sha": "c94711948a665d304dfc7016e1bebc497162b451",
+      "unchanged": true
+    },
+    {
+      "path": "scripts/serve-preview.mjs",
+      "base_blob_sha": "28b504b9496280b4b505ba14fb673bc8923c8fed",
+      "candidate_blob_sha": "28b504b9496280b4b505ba14fb673bc8923c8fed",
+      "unchanged": true
+    },
+    {
+      "path": "App.tsx",
+      "base_blob_sha": "2388507f143fa368964ad690f3948eb1941a0204",
+      "candidate_blob_sha": "2388507f143fa368964ad690f3948eb1941a0204",
+      "unchanged": true
+    },
+    {
+      "path": "src/app/StockLedgerApp.tsx",
+      "base_blob_sha": "22711e16612cc62137517831ada159353e1e5d93",
+      "candidate_blob_sha": "22711e16612cc62137517831ada159353e1e5d93",
+      "unchanged": true
+    },
+    {
+      "path": "src/features/settings/WorkspaceSettingsPanel.tsx",
+      "base_blob_sha": "84edd0654c6605e6dbb3fb1e3590ed8024d3a4b5",
+      "candidate_blob_sha": "84edd0654c6605e6dbb3fb1e3590ed8024d3a4b5",
+      "unchanged": true
+    },
+    {
+      "path": "src/features/workerHandoff/localHandoff.ts",
+      "base_blob_sha": "e385d4338da2ab41153a9181f0aac35472158323",
+      "candidate_blob_sha": "e385d4338da2ab41153a9181f0aac35472158323",
+      "unchanged": true
+    },
+    {
+      "path": "src/hooks/useAppModel.ts",
+      "base_blob_sha": "aa58d8b66a6a049b6158a508d5cb53e279847bb9",
+      "candidate_blob_sha": "aa58d8b66a6a049b6158a508d5cb53e279847bb9",
+      "unchanged": true
+    },
+    {
+      "path": "src/domain/workerHandoff.ts",
+      "base_blob_sha": "8e2e16a94e106b7db18cec8a7f54ad8fb66c94a7",
+      "candidate_blob_sha": "8e2e16a94e106b7db18cec8a7f54ad8fb66c94a7",
+      "unchanged": true
+    },
+    {
+      "path": "src/domain/appDataSchema.ts",
+      "base_blob_sha": "366e03779241e824ca8aaa07a413d14ddbfe7eaf",
+      "candidate_blob_sha": "366e03779241e824ca8aaa07a413d14ddbfe7eaf",
+      "unchanged": true
+    },
+    {
+      "path": "src/application/workspaceApplicationService.ts",
+      "base_blob_sha": "f5ea086a6f94e80166d9314e72775e178861c3ef",
+      "candidate_blob_sha": "f5ea086a6f94e80166d9314e72775e178861c3ef",
+      "unchanged": true
+    },
+    {
+      "path": "src/data/repositories/workspaceRepository.ts",
+      "base_blob_sha": "9a47726e939dc2b9e0f17f14d75cb4bf1bc5fa44",
+      "candidate_blob_sha": "9a47726e939dc2b9e0f17f14d75cb4bf1bc5fa44",
+      "unchanged": true
+    },
+    {
+      "path": "src/domain/contentHash.ts",
+      "base_blob_sha": "f9dd301ce735b6005e4f724ebcba4986a7ef0fd0",
+      "candidate_blob_sha": "f9dd301ce735b6005e4f724ebcba4986a7ef0fd0",
+      "unchanged": true
+    },
+    {
+      "path": "src/lib/evaluateEye.ts",
+      "base_blob_sha": "11195f46b132d416395609af81a8d65b573faee5",
+      "candidate_blob_sha": "11195f46b132d416395609af81a8d65b573faee5",
+      "unchanged": true
+    },
+    {
+      "path": "src/lib/metricCatalog.ts",
+      "base_blob_sha": "e24338c211557e51dcc55cb76c6d266e387acc16",
+      "candidate_blob_sha": "e24338c211557e51dcc55cb76c6d266e387acc16",
+      "unchanged": true
+    },
+    {
+      "path": "src/lib/i18n.ts",
+      "base_blob_sha": "ae1ab8e7f1bdca8355421a617f4f7a6eae4dca11",
+      "candidate_blob_sha": "ae1ab8e7f1bdca8355421a617f4f7a6eae4dca11",
+      "unchanged": true
+    },
+    {
+      "path": "src/features/alerts/AlertsScreen.tsx",
+      "base_blob_sha": "d6a51f46b553124e7eb676f4ff8567acdc9370c8",
+      "candidate_blob_sha": "d6a51f46b553124e7eb676f4ff8567acdc9370c8",
+      "unchanged": true
+    },
+    {
+      "path": "src/features/today/TodayScreen.tsx",
+      "base_blob_sha": "4d6859f521fe41b1e50dda0820b954903a8bbf7a",
+      "candidate_blob_sha": "4d6859f521fe41b1e50dda0820b954903a8bbf7a",
+      "unchanged": true
+    },
+    {
+      "path": "src/features/journal/JournalScreen.tsx",
+      "base_blob_sha": "1edfc05c5954be9ec37d84e9dccabf94ba1bfc23",
+      "candidate_blob_sha": "1edfc05c5954be9ec37d84e9dccabf94ba1bfc23",
+      "unchanged": true
+    }
+  ],
+  "e2e_journey_and_runtime_unchanged": true,
+  "dependency_manifests_unchanged": true,
+  "candidate_dependency_diff": false,
+  "proof": "git diff --name-status base candidate returned only tests/worker.test.ts; all listed journey, runtime, Playwright, Node and lockfile blobs match at base and candidate."
+}
