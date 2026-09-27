@@ -1,0 +1,36 @@
+{
+  "repository": "kimhw8084/stockledger",
+  "project": "stockledger",
+  "change": "CHG-273",
+  "operation": "FIX",
+  "request": "stockledger-prod-c19-worker-handoff-e2e-time-fixture-fix-v4",
+  "protected_base": "1d3fc085b54b5002342982cc9c15ccc32bf086ba",
+  "predecessor_accepted_head": "3e94a3d201b9147a5ecb3c4282cc25a4e6d99670",
+  "final_candidate": "3387151e14bad81bfa07c82eb6ec39f106408580",
+  "final_candidate_tree": "dccf00667a9fa73e58525e564e379d328ae82843",
+  "candidate_parent": "3e94a3d201b9147a5ecb3c4282cc25a4e6d99670",
+  "r4_changed_paths": [
+    "tests/e2e/worker-app-handoff.spec.ts"
+  ],
+  "full_diff_from_protected_base": [
+    "tests/e2e/worker-app-handoff.spec.ts",
+    "tests/worker.test.ts"
+  ],
+  "accepted_r2_change_carried_forward_exactly": {
+    "commit": "3e94a3d201b9147a5ecb3c4282cc25a4e6d99670",
+    "tree": "e5de003bc445672748b10b4aebf45be5e58bda02",
+    "path": "tests/worker.test.ts",
+    "preserved_as_exact_parent": true
+  },
+  "runtime_product_source_changed": false,
+  "runtime_product_source_changed_paths": [],
+  "runtime_product_source_diff_from_base": "empty",
+  "application_code_changed": false,
+  "ui_copy_changed": false,
+  "dependency_or_lockfile_changed": false,
+  "package_or_workflow_config_changed": false,
+  "test_assertions_weakened": false,
+  "evidence": "Git path comparison from protected base to final candidate yields only the two listed test paths; the one-file R4 delta from the exact predecessor is the E2E fixture helper line.",
+  "main_sha": "1d3fc085b54b5002342982cc9c15ccc32bf086ba",
+  "main_unchanged": true
+}

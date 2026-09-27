@@ -1,0 +1,109 @@
+{
+  "status": "FIX_COMPLETE_AWAITING_INDEPENDENT_AUDIT",
+  "fabric_job": "CF-f4e5f0b36bef0af3c7318e2b",
+  "repository": "kimhw8084/stockledger",
+  "project": "stockledger",
+  "change": "CHG-273",
+  "operation": "FIX",
+  "request": "stockledger-prod-c19-worker-handoff-e2e-time-fixture-fix-v4",
+  "protected_base": "1d3fc085b54b5002342982cc9c15ccc32bf086ba",
+  "predecessor_accepted_head": "3e94a3d201b9147a5ecb3c4282cc25a4e6d99670",
+  "predecessor_tree": "e5de003bc445672748b10b4aebf45be5e58bda02",
+  "final_candidate": "3387151e14bad81bfa07c82eb6ec39f106408580",
+  "final_candidate_tree": "dccf00667a9fa73e58525e564e379d328ae82843",
+  "candidate_parent": "3e94a3d201b9147a5ecb3c4282cc25a4e6d99670",
+  "candidate_commit_count_after_predecessor": 1,
+  "work_branch": "codex/stockledger-prod-c19-worker-handoff-e2e-time-fixture-fix-v4",
+  "changed_paths_from_predecessor": [
+    "tests/e2e/worker-app-handoff.spec.ts"
+  ],
+  "changed_paths_from_protected_base": [
+    "tests/e2e/worker-app-handoff.spec.ts",
+    "tests/worker.test.ts"
+  ],
+  "runtime_product_source_changed": false,
+  "runtime_product_source_changed_paths": [],
+  "node_version": "22.23.2",
+  "npm_version": "10.8.2",
+  "npm_ci": {
+    "status": "PASS",
+    "packages_added": 639,
+    "vulnerabilities_reported": 0
+  },
+  "export_all": {
+    "status": "PASS",
+    "platforms": [
+      "web",
+      "ios",
+      "android"
+    ],
+    "completed_before_playwright": true
+  },
+  "targeted_journey": {
+    "test": "worker evidence opens into Today, Alerts and Journal without replacing the workspace",
+    "ci": true,
+    "desktop": {
+      "status": "PASS",
+      "sequential_runs": 3,
+      "results": [
+        { "run": 1, "status": "PASS", "retry_used": false },
+        { "run": 2, "status": "PASS", "retry_used": false },
+        { "run": 3, "status": "PASS", "retry_used": false }
+      ]
+    },
+    "mobile": {
+      "status": "PASS",
+      "sequential_runs": 3,
+      "results": [
+        { "run": 1, "status": "PASS", "retry_used": false },
+        { "run": 2, "status": "PASS", "retry_used": false },
+        { "run": 3, "status": "PASS", "retry_used": false }
+      ]
+    },
+    "combined_desktop_mobile": {
+      "status": "PASS",
+      "passed": 2,
+      "retry_used": false,
+      "normal_config_and_retries": true
+    }
+  },
+  "full_e2e": {
+    "status": "PASS",
+    "ci": true,
+    "total": 90,
+    "passed": 89,
+    "intentional_skips": 1,
+    "existing_intentional_skip_preserved": true,
+    "skipped_test": "keyboard task paths operate segmented choices and restore focus after deep flows"
+  },
+  "npm_check": {
+    "status": "PASS",
+    "typecheck": "PASS",
+    "unit_tests_passed": 216,
+    "unit_test_files_passed": 27
+  },
+  "check_boundaries": "PASS",
+  "npm_audit_high": {
+    "status": "PASS",
+    "vulnerabilities": 0
+  },
+  "git_diff_check": "PASS",
+  "ordinary_fixture_assertions": {
+    "status": "PASS",
+    "applied_label": "Worker evidence applied to this workspace",
+    "last_applied_sequence_persisted": true,
+    "ack_written": true,
+    "focus_returned": true,
+    "page_errors": 0
+  },
+  "stale_negative_control": {
+    "status": "PASS",
+    "explicit_generated_at_override": "2026-09-20T00:00:00.000Z",
+    "stale_label": "Worker handoff is older than 48 hours",
+    "runtime_threshold_hours": 48,
+    "assertion_exercised_in_each_targeted_run": true
+  },
+  "missed_and_partial_coverage": "PASS",
+  "main_unchanged": true,
+  "error_code": null
+}

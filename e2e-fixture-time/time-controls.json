@@ -1,0 +1,27 @@
+{
+  "fixture": "tests/e2e/worker-app-handoff.spec.ts:makeManifest",
+  "default_timestamp_expression": "new Date().toISOString()",
+  "timestamp_captured_once_per_manifest_creation": true,
+  "manifest_generatedAt_uses_captured_timestamp": true,
+  "scheduler_lastSuccessfulRunAtUtc_uses_captured_timestamp": true,
+  "explicit_generatedAt_override_preserved": true,
+  "stale_negative_control": {
+    "override": "2026-09-20T00:00:00.000Z",
+    "expected_label": "Worker handoff is older than 48 hours",
+    "observed": "PASS",
+    "runtime_stale_threshold_hours": 48,
+    "runtime_stale_rule_unchanged": true,
+    "stale_precedes_applied_for_complete_healthy_manifests": true,
+    "test_assertion_retained": true
+  },
+  "coverage_controls": {
+    "missed_sessions_state_retained": true,
+    "partial_coverage_state_retained": true,
+    "ordinary_applied_label_assertion_retained": true,
+    "ordinary_sequence_persistence_assertion_retained": true,
+    "ordinary_ack_assertion_retained": true,
+    "focus_return_assertion_retained": true
+  },
+  "source_commit": "3387151e14bad81bfa07c82eb6ec39f106408580",
+  "source_tree": "dccf00667a9fa73e58525e564e379d328ae82843"
+}
