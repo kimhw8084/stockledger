@@ -1,0 +1,147 @@
+{
+  "schema_version": 1,
+  "kind": "codex-fabric-audit-evidence",
+  "project_id": "stockledger",
+  "job_id": "CF-87c9014772f464ead8473e89",
+  "operation": "VERIFY",
+  "request": "stockledger-prod-c20-owner-environment-activation-verify-v1",
+  "status": "OWNER_ENVIRONMENT_VERIFY_COMPLETE_AWAITING_INDEPENDENT_AUDIT",
+  "accepted_at": "2026-09-27T23:16:37Z",
+  "started_at": "2026-09-27T23:16:37Z",
+  "finished_at": "2026-09-27T23:16:37Z",
+  "error_code": null,
+  "failure_class": null,
+  "locator": {
+    "branch": "codex-fabric/evidence/stockledger/stockledger-prod-c20-owner-environment-activation-verify-v1",
+    "path": ".codex-fabric/audit.json",
+    "ref": "refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c20-owner-environment-activation-verify-v1"
+  },
+  "git": {
+    "base_sha": "3934e4cd9f45ee911e0d05e623ad10156cbf0282",
+    "base_is_ancestor": true,
+    "branch": "codex/stockledger-prod-c20-owner-environment-activation-verify-v1",
+    "work_branch": "codex/stockledger-prod-c20-owner-environment-activation-verify-v1",
+    "head_sha": "3934e4cd9f45ee911e0d05e623ad10156cbf0282",
+    "remote_exact_head": true,
+    "remote_head_sha": "3934e4cd9f45ee911e0d05e623ad10156cbf0282",
+    "target_branch": "main",
+    "target_head_observed_after_execution": "3934e4cd9f45ee911e0d05e623ad10156cbf0282",
+    "target_drifted_since_acceptance": false,
+    "detached_verify": false,
+    "worktree_clean": true
+  },
+  "diff": {
+    "additions": 0,
+    "deletions": 0,
+    "changed_files": 0,
+    "commit_count": 0
+  },
+  "commits": [],
+  "changed_files": [],
+  "checks": [
+    {
+      "type": "command_execution",
+      "command": "rtk git rev-parse HEAD and HEAD tree",
+      "exit_code": 0
+    },
+    {
+      "type": "command_execution",
+      "command": "rtk git status --porcelain=v1",
+      "exit_code": 0
+    },
+    {
+      "type": "command_execution",
+      "command": "rtk git ls-remote main and named work branch",
+      "exit_code": 0
+    },
+    {
+      "type": "command_execution",
+      "command": "rtk node --version and rtk npm --version",
+      "exit_code": 0
+    },
+    {
+      "type": "command_execution",
+      "command": "StockLedger documented runtime candidate metadata probe (presence/access booleans only)",
+      "exit_code": 0
+    },
+    {
+      "type": "command_execution",
+      "command": "StockLedger-specific launchd/cron match filters (booleans only)",
+      "exit_code": 0
+    },
+    {
+      "type": "command_execution",
+      "command": "sanitized artifact JSON/classification and path/email-pattern validation",
+      "exit_code": 0
+    },
+    {
+      "type": "command_execution",
+      "command": "[REDACTED]",
+      "exit_code": 0
+    }
+  ],
+  "policy": {
+    "environment_policy_sha256": "unavailable",
+    "fabric_release": "unavailable",
+    "policy_sha256": "unavailable",
+    "registry_sha256": "unavailable"
+  },
+  "transport": {
+    "bytes": 0,
+    "envelope": "metadata-only-no-owner-payload",
+    "prompt_bytes": 0,
+    "prompt_sha256": "unavailable",
+    "sha256": "unavailable"
+  },
+  "recovery": {
+    "model_rerun_safe": false,
+    "recovery_required": false,
+    "retry_safe": false,
+    "retry_scope": null,
+    "worktree_retained": true
+  },
+  "timing": {
+    "execution_seconds": 0,
+    "queue_seconds": 0,
+    "total_seconds": 0
+  },
+  "fabric_capture": {
+    "applied": true,
+    "paths_before": 0,
+    "transient_untracked_removed": {}
+  },
+  "fabric_release": "unavailable-from-local-tooling",
+  "evidence_publisher_release": "manual-git-ref-publication",
+  "evidence_manifest": {
+    "count": 0,
+    "items": [],
+    "version": 1
+  },
+  "instructions": {
+    "files": [],
+    "total_bytes": 0,
+    "warning": null
+  },
+  "codex": {
+    "cli_version": "unreported",
+    "configured_model": "unreported",
+    "event_count": 0,
+    "provider_reported_model": "unreported",
+    "reasoning_effort": "unreported",
+    "terminal_type": "non-pty",
+    "usage": {
+      "cache_hit_percent": 0,
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 0,
+      "fresh_input_tokens": 0,
+      "input_tokens": 0,
+      "non_reasoning_output_tokens": 0,
+      "output_tokens": 0,
+      "reasoning_output_tokens": 0,
+      "total_processed_tokens": 0
+    },
+    "warnings": [
+      "Fabric release metadata, Codex usage, and elapsed timing were not captured by local tooling; zero-valued counters denote unavailable capture."
+    ]
+  }
+}
