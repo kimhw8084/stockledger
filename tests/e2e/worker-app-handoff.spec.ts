@@ -62,7 +62,7 @@ const makeBatch = (data: AppData, sequence: number, evidence: WorkerHandoffEvide
 });
 
 const makeManifest = (workspaceId: string, batches: ReturnType<typeof makeBatch>[], options: { generatedAt?: string; missed?: boolean; partial?: boolean } = {}) => {
-  const at = options.generatedAt ?? "2026-09-25T02:00:00.000Z";
+  const at = options.generatedAt ?? new Date().toISOString();
   return makeWorkerHandoffManifest({
     workspaceId, generatedAt: at, workerRevision: batches.at(-1)?.workerRevision ?? 2,
     latestSequence: batches.at(-1)?.sequence ?? 0, coverage: options.partial ? "partial" : "complete",
