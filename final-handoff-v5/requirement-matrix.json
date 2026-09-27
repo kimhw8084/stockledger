@@ -1,0 +1,752 @@
+{
+  "schema_version": 1,
+  "project": "stockledger",
+  "change": "CHG-273",
+  "request": "stockledger-prod-c19-final-integrated-main-personal-handoff-verify-v5",
+  "subject": {
+    "commit": "3934e4cd9f45ee911e0d05e623ad10156cbf0282",
+    "tree": "dccf00667a9fa73e58525e564e379d328ae82843"
+  },
+  "selected_scope": "single-owner local-first web/desktop; US equities/ETFs; completed daily bars; English/Korean; owner-authored versioned recipes; deterministic evaluation; Today/Alerts/Journal review; optional SMTP",
+  "classification_enum": [
+    "PASS",
+    "NOT_APPLICABLE",
+    "OWNER_CONFIGURATION_REQUIRED",
+    "UNPROVEN_EXTERNAL",
+    "MATERIAL_PRODUCT_GAP",
+    "MATERIAL_EVIDENCE_GAP"
+  ],
+  "requirement_count": 31,
+  "classification_counts": {
+    "PASS": 15,
+    "OWNER_CONFIGURATION_REQUIRED": 7,
+    "NOT_APPLICABLE": 9
+  },
+  "requirements": [
+    {
+      "requirement_id": "R-01",
+      "requirement": "Evidence-bound stage readiness",
+      "classification": "PASS",
+      "decisive_facts": [
+        "Release evidence generated from exact commit/tree and independently verified with no reasons.",
+        "Operations qualification and isolated status are source-bound; status identifies an unconfigured workspace rather than claiming a live owner setup."
+      ],
+      "evidence": [
+        {
+          "type": "command",
+          "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH STOCKLEDGER_PROTECTED_BASE=3934e4cd9f45ee911e0d05e623ad10156cbf0282 npm run release:evidence -- --base 3934e4cd9f45ee911e0d05e623ad10156cbf0282 --output /tmp/stockledger-c19-v5-release-evidence.json",
+          "result_detail": "sourceCommit=3934e4c…; sourceTree=dccf006…"
+        },
+        {
+          "type": "command",
+          "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH STOCKLEDGER_PROTECTED_BASE=3934e4cd9f45ee911e0d05e623ad10156cbf0282 npm run release:verify -- --input /tmp/stockledger-c19-v5-release-evidence.json --base 3934e4cd9f45ee911e0d05e623ad10156cbf0282",
+          "result_detail": "verified=true; reasons=[]"
+        },
+        {
+          "type": "command",
+          "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH STOCKLEDGER_PROTECTED_BASE=3934e4cd9f45ee911e0d05e623ad10156cbf0282 npm run operations:status -- --db /tmp/stockledger-CF-e09132542fe4be3c2092f7e2-operations-status.sqlite --handoff-dir /tmp/stockledger-CF-e09132542fe4be3c2092f7e2-handoff --release-evidence /tmp/stockledger-c19-v5-release-evidence.json",
+          "result_detail": "releaseIdentity.state=known; overall.state=unconfigured; workspace_missing; schedulerInstalled=false"
+        }
+      ],
+      "confidence": "high",
+      "confidence_basis": "Exact-tree source review and requested current-tree checks passed."
+    },
+    {
+      "requirement_id": "R-02",
+      "requirement": "One deterministic financial truth engine",
+      "classification": "PASS",
+      "decisive_facts": [
+        "Client and local worker share the same domain calculation/evaluation path.",
+        "Boundary check and all financial truth tests passed in the full 216-test suite."
+      ],
+      "evidence": [
+        {
+          "type": "command",
+          "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm run check",
+          "result_detail": "TypeScript passed; 216 tests across 27 files passed."
+        },
+        {
+          "type": "command",
+          "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm run check:boundaries"
+        },
+        {
+          "type": "source",
+          "ref": "src/domain/evaluateWorkspace.ts; src/lib/evaluateEye.ts; src/lib/processedFeatureEngine.ts; src/lib/stockConditionScanner.ts"
+        }
+      ],
+      "confidence": "high",
+      "confidence_basis": "Exact-tree source review and requested current-tree checks passed."
+    },
+    {
+      "requirement_id": "R-03",
+      "requirement": "Provenance, adjustment, completed-session and stale-data honesty",
+      "classification": "PASS",
+      "decisive_facts": [
+        "CSV fixture declares source and adjusted basis; data validation preserves missing/stale/partial quality rather than substituting mock data.",
+        "Product capability passes; real owner source/permission is classified separately as OWNER_CONFIGURATION_REQUIRED."
+      ],
+      "evidence": [
+        {
+          "type": "command",
+          "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm test -- --run tests/worker.test.ts",
+          "result_detail": "28 tests passed, including managed CLI CSV with explicit --adjustment adjusted and --source CLI fixture."
+        },
+        {
+          "type": "command",
+          "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm test -- --run tests/workerHandoff.test.ts",
+          "result_detail": "6 tests passed, including captured source and adjusted provenance."
+        },
+        {
+          "type": "source",
+          "ref": "src/lib/marketDataContract.ts; src/lib/eodDataProvider.ts; docs/operations/LOCAL_WORKER.md"
+        }
+      ],
+      "confidence": "high",
+      "confidence_basis": "Exact-tree source review and requested current-tree checks passed."
+    },
+    {
+      "requirement_id": "R-04",
+      "requirement": "Owner-authored recipes, versioned Eye binding and immutable evaluation/alert/decision history",
+      "classification": "PASS",
+      "decisive_facts": [
+        "Handoff evidence binds recipe version, Eye identity, source snapshot, condition results and alert identity.",
+        "Replay and later worker evidence preserve newer owner decisions, amendments, outcomes and review state."
+      ],
+      "evidence": [
+        {
+          "type": "command",
+          "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm test -- --run tests/workerHandoff.test.ts",
+          "result_detail": "6/6 passed."
+        },
+        {
+          "type": "command",
+          "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH CI=1 npm run test:e2e",
+          "result_detail": "89 passed, 1 existing mobile keyboard-only skip; worker journey passed on desktop and mobile."
+        },
+        {
+          "type": "source",
+          "ref": "src/domain/recipeRevision.ts; src/domain/workerHandoff.ts; tests/workerHandoff.test.ts"
+        }
+      ],
+      "confidence": "high",
+      "confidence_basis": "Exact-tree source review and requested current-tree checks passed."
+    },
+    {
+      "requirement_id": "R-05",
+      "requirement": "Complete personal review loop: workspace/watchlist, recipe/Eye, daily CSV worker, Today/Alerts/Journal",
+      "classification": "PASS",
+      "decisive_facts": [
+        "Browser workspace journey creates a watchlist and restores a validated backup.",
+        "CLI fixture runs with UI closed semantics; deterministic handoff fixture applies into Today, Alerts and Journal without whole-workspace replacement."
+      ],
+      "evidence": [
+        {
+          "type": "command",
+          "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm test -- --run tests/worker.test.ts",
+          "result_detail": "App-closed CLI invocation passed and wrote pending.json under its isolated temporary handoff directory."
+        },
+        {
+          "type": "command",
+          "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm test -- --run tests/workerHandoff.test.ts"
+        },
+        {
+          "type": "command",
+          "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH CI=1 npm run test:e2e",
+          "result_detail": "Worker handoff journey passed on Desktop Chrome and Pixel 7 browser emulation; no physical-device claim."
+        },
+        {
+          "type": "source",
+          "ref": "tests/e2e/workspace.spec.ts; tests/e2e/worker-app-handoff.spec.ts"
+        }
+      ],
+      "confidence": "high",
+      "confidence_basis": "Exact-tree source review and requested current-tree checks passed."
+    },
+    {
+      "requirement_id": "R-06",
+      "requirement": "Durable storage, export, restore and recovery including worker/app handoff state",
+      "classification": "PASS",
+      "decisive_facts": [
+        "Recovery drill preserved authored history, evaluations, decisions, jobs, ingestion and notifications; corrupt and incompatible restores rejected.",
+        "Additional synthetic verification restored a pending SQLite worker handoff batch/sequence and serialized/parsed app handoff evidence with decisions, amendment, outcome and alert intact."
+      ],
+      "evidence": [
+        {
+          "type": "command",
+          "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm run recovery:drill -- --output /tmp/stockledger-c19-v5-recovery-result.json",
+          "result_detail": "source/restore integrity=true; authored/evaluations/decisions/jobs/ingestion/notification retained; corrupt/incompatible rejected."
+        },
+        {
+          "type": "command",
+          "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH node_modules/.bin/tsx /tmp/stockledger-c19-v5-handoff-recovery.ts",
+          "result_detail": "SQLite snapshot PASS; 1 pending handoff batch, sequence, 4 jobs and 1 pending outbox retained; JSON export/parse retained app handoff, decisions, outcomes, evaluations and 13 alerts."
+        },
+        {
+          "type": "source",
+          "ref": "server/worker/recovery.ts; server/worker/store.ts; src/domain/backupFormat.ts"
+        }
+      ],
+      "confidence": "high",
+      "confidence_basis": "Exact-tree source review and requested current-tree checks passed."
+    },
+    {
+      "requirement_id": "R-07",
+      "requirement": "Local worker operation independent of open UI",
+      "classification": "PASS",
+      "decisive_facts": [
+        "Worker CLI is a standalone Node process, does not require app participation, and reports schedulerInstalled=false.",
+        "Temporary CLI fixture runs with a separate working directory and explicit temporary DB, output and handoff paths."
+      ],
+      "evidence": [
+        {
+          "type": "command",
+          "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm test -- --run tests/worker.test.ts",
+          "result_detail": "28 passed, including app-closed managed CLI path."
+        },
+        {
+          "type": "command",
+          "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH STOCKLEDGER_PROTECTED_BASE=3934e4cd9f45ee911e0d05e623ad10156cbf0282 npm run operations:status -- --db /tmp/stockledger-CF-e09132542fe4be3c2092f7e2-operations-status.sqlite --handoff-dir /tmp/stockledger-CF-e09132542fe4be3c2092f7e2-handoff --release-evidence /tmp/stockledger-c19-v5-release-evidence.json",
+          "result_detail": "appParticipationRequired=false; schedulerInstalled=false."
+        },
+        {
+          "type": "source",
+          "ref": "server/worker/cli.ts; docs/operations/LOCAL_WORKER.md"
+        }
+      ],
+      "confidence": "high",
+      "confidence_basis": "Exact-tree source review and requested current-tree checks passed."
+    },
+    {
+      "requirement_id": "R-08",
+      "requirement": "Incremental worker-to-app handoff without whole-workspace replacement",
+      "classification": "PASS",
+      "decisive_facts": [
+        "App applies content-addressed evidence batches only after validating workspace/sequence/identity; browser journey explicitly verifies existing workspace remains.",
+        "Current desktop and mobile browser handoff tests passed."
+      ],
+      "evidence": [
+        {
+          "type": "command",
+          "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm test -- --run tests/workerHandoff.test.ts"
+        },
+        {
+          "type": "command",
+          "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH CI=1 npm run test:e2e",
+          "result_detail": "Worker evidence opened into Today, Alerts and Journal without replacing workspace."
+        },
+        {
+          "type": "source",
+          "ref": "src/domain/workerHandoff.ts; src/features/workerHandoff/localHandoff.ts"
+        }
+      ],
+      "confidence": "high",
+      "confidence_basis": "Exact-tree source review and requested current-tree checks passed."
+    },
+    {
+      "requirement_id": "R-09",
+      "requirement": "Idempotent replay and owner-history preservation",
+      "classification": "PASS",
+      "decisive_facts": [
+        "Exact replay produces no duplicate evidence; second worker update preserves newer owner-authored state; acknowledgement is idempotent."
+      ],
+      "evidence": [
+        {
+          "type": "command",
+          "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm test -- --run tests/workerHandoff.test.ts",
+          "result_detail": "Replay, owner-authored preservation, overlap conflict and durable receipt tests all passed."
+        },
+        {
+          "type": "command",
+          "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH CI=1 npm run test:e2e",
+          "result_detail": "Replayed handoff browser journey passed."
+        },
+        {
+          "type": "source",
+          "ref": "tests/workerHandoff.test.ts"
+        }
+      ],
+      "confidence": "high",
+      "confidence_basis": "Exact-tree source review and requested current-tree checks passed."
+    },
+    {
+      "requirement_id": "R-10",
+      "requirement": "Truthful stale, missing, partial, missed, conflict, malformed and recovery semantics",
+      "classification": "PASS",
+      "decisive_facts": [
+        "Worker and app distinguish quality coverage and explicit owner overlap conflicts; invalid/interrupted bytes leave input unchanged.",
+        "Ordinary Playwright fixture timestamps use current time; explicit 2026-09-20 fixture exercises 48-hour stale state and passed on 2026-09-27."
+      ],
+      "evidence": [
+        {
+          "type": "command",
+          "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm test -- --run tests/workerHandoff.test.ts"
+        },
+        {
+          "type": "command",
+          "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm test -- --run tests/worker.test.ts"
+        },
+        {
+          "type": "command",
+          "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH CI=1 npm run test:e2e",
+          "result_detail": "All 89 passing journeys include desktop/mobile handoff and explicit stale-state path."
+        },
+        {
+          "type": "source",
+          "ref": "tests/e2e/worker-app-handoff.spec.ts; docs/operations/LOCAL_WORKER.md"
+        }
+      ],
+      "confidence": "high",
+      "confidence_basis": "Exact-tree source review and requested current-tree checks passed."
+    },
+    {
+      "requirement_id": "R-11",
+      "requirement": "In-app attention is sufficient; SMTP is optional and delivery truth is bounded",
+      "classification": "PASS",
+      "decisive_facts": [
+        "Today/Alerts expose worker evidence and status; SMTP is optional and server-only.",
+        "Outbox/intent is not reported as delivered; no recipient, email transmission or human read is claimed."
+      ],
+      "evidence": [
+        {
+          "type": "command",
+          "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH CI=1 npm run test:e2e",
+          "result_detail": "Today/Alerts/notification preference journeys passed."
+        },
+        {
+          "type": "command",
+          "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm run test:cloud",
+          "result_detail": "Cloud test does not exercise SMTP; not applicable to selected path."
+        },
+        {
+          "type": "source",
+          "ref": "docs/operations/LOCAL_WORKER.md: Notification delivery contract; src/features/today/TodayScreen.tsx"
+        }
+      ],
+      "confidence": "high",
+      "confidence_basis": "Exact-tree source review and requested current-tree checks passed."
+    },
+    {
+      "requirement_id": "R-12",
+      "requirement": "Applicable web accessibility, English/Korean localization and responsive quality",
+      "classification": "PASS",
+      "decisive_facts": [
+        "Exact UI dependency reuse is byte-proven and current browser suite passed across desktop and mobile emulation, viewports and English/Korean journeys.",
+        "Evidence is limited to tested browser emulation; no blanket WCAG, screen-reader, physical-device or native claim."
+      ],
+      "evidence": [
+        {
+          "type": "command",
+          "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH CI=1 npm run test:e2e",
+          "result_detail": "89 passed, 1 existing mobile keyboard-only skip; desktop/mobile, Korean and viewport journeys included."
+        },
+        {
+          "type": "artifact",
+          "ref": "refs/heads/project-os-artifacts/stockledger/stockledger-prod-c17-golden-ui-v3-focus-geometry-zoom-fix-v2 (CHG-202 Golden UI v3)"
+        },
+        {
+          "type": "artifact",
+          "ref": "refs/heads/project-os-artifacts/stockledger/stockledger-prod-c18-handoff-recovery-visual-evidence-verify-v3 (CHG-256 R3)"
+        }
+      ],
+      "confidence": "high",
+      "confidence_basis": "Exact-tree source review and requested current-tree checks passed."
+    },
+    {
+      "requirement_id": "R-13",
+      "requirement": "Release and operations observability/recovery",
+      "classification": "PASS",
+      "decisive_facts": [
+        "Release workflow definition, dependency audit, all-platform exports and exact-tree release evidence passed.",
+        "Synthetic worker/recovery budgets passed; safe operations status accurately reports no workspace or schedule in the isolated DB."
+      ],
+      "evidence": [
+        {
+          "type": "command",
+          "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm run check:release-workflow"
+        },
+        {
+          "type": "command",
+          "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm audit --audit-level=high",
+          "result_detail": "0 vulnerabilities."
+        },
+        {
+          "type": "command",
+          "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm run export:all",
+          "result_detail": "Web, Android and iOS exports completed."
+        },
+        {
+          "type": "command",
+          "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm run operations:qualify -- --output /tmp/stockledger-c19-v5-operations-qualification.json",
+          "result_detail": "100 stocks × 260 sessions; 3 samples within engineering budget; restore integrity=true."
+        },
+        {
+          "type": "command",
+          "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH STOCKLEDGER_PROTECTED_BASE=3934e4cd9f45ee911e0d05e623ad10156cbf0282 npm run operations:status -- --db /tmp/stockledger-CF-e09132542fe4be3c2092f7e2-operations-status.sqlite --handoff-dir /tmp/stockledger-CF-e09132542fe4be3c2092f7e2-handoff --release-evidence /tmp/stockledger-c19-v5-release-evidence.json"
+        },
+        {
+          "type": "command",
+          "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm run recovery:drill -- --output /tmp/stockledger-c19-v5-recovery-result.json"
+        }
+      ],
+      "confidence": "high",
+      "confidence_basis": "Exact-tree source review and requested current-tree checks passed."
+    },
+    {
+      "requirement_id": "R-14",
+      "requirement": "One-engine architecture boundary between app and worker",
+      "classification": "PASS",
+      "decisive_facts": [
+        "Boundary check passed; worker and app import the shared deterministic domain engine.",
+        "No second calculation engine or modified runtime source in CHG-273."
+      ],
+      "evidence": [
+        {
+          "type": "command",
+          "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm run check:boundaries"
+        },
+        {
+          "type": "source",
+          "ref": "server/worker/run.ts; src/domain/evaluateWorkspace.ts; source equivalence record"
+        }
+      ],
+      "confidence": "high",
+      "confidence_basis": "Exact-tree source review and requested current-tree checks passed."
+    },
+    {
+      "requirement_id": "R-15",
+      "requirement": "Private investment research/monitoring boundary",
+      "classification": "PASS",
+      "decisive_facts": [
+        "Current UI and documentation frame StockLedger as research/review; scanner language says inspection, not trading instruction.",
+        "No automatic trading, custody, return guarantee or investment-performance claim is made."
+      ],
+      "evidence": [
+        {
+          "type": "source",
+          "ref": "README.md; docs/production/IMPLEMENTATION_STATUS.md; src/features/today/TodayScreen.tsx; src/app/StockLedgerApp.tsx"
+        },
+        {
+          "type": "command",
+          "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH CI=1 npm run test:e2e",
+          "result_detail": "Truthful review surfaces passed."
+        }
+      ],
+      "confidence": "high",
+      "confidence_basis": "Exact-tree source review and requested current-tree checks passed."
+    },
+    {
+      "requirement_id": "C-01",
+      "requirement": "Real owner workspace and watchlist",
+      "classification": "OWNER_CONFIGURATION_REQUIRED",
+      "decisive_facts": [
+        "No owner workspace/watchlist was supplied or inspected; isolated status intentionally reports workspace_missing.",
+        "Needed for live and unattended monitoring; does not block code handoff."
+      ],
+      "evidence": [
+        {
+          "type": "command",
+          "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH STOCKLEDGER_PROTECTED_BASE=3934e4cd9f45ee911e0d05e623ad10156cbf0282 npm run operations:status -- --db /tmp/stockledger-CF-e09132542fe4be3c2092f7e2-operations-status.sqlite --handoff-dir /tmp/stockledger-CF-e09132542fe4be3c2092f7e2-handoff --release-evidence /tmp/stockledger-c19-v5-release-evidence.json",
+          "result_detail": "Isolated DB only: workspace_missing."
+        },
+        {
+          "type": "source",
+          "ref": "README.md: Run; docs/operations/LOCAL_WORKER.md: Bootstrap"
+        }
+      ],
+      "confidence": "high",
+      "confidence_basis": "This run used synthetic/local fixtures and did not infer the real owner environment."
+    },
+    {
+      "requirement_id": "C-02",
+      "requirement": "Permitted current completed-daily-bar input with source/adjustment/provenance/freshness",
+      "classification": "OWNER_CONFIGURATION_REQUIRED",
+      "decisive_facts": [
+        "No real owner CSV, authorization, source release, adjustment declaration or freshness state was supplied.",
+        "Blocks live/unattended monitoring and safe interpretation of owner data; no Product defect."
+      ],
+      "evidence": [
+        {
+          "type": "source",
+          "ref": "README.md: Daily prices; docs/operations/LOCAL_WORKER.md: Bootstrap and CHG-95 market-data boundary"
+        },
+        {
+          "type": "command",
+          "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm test -- --run tests/worker.test.ts",
+          "result_detail": "Only synthetic CSV with explicit source and adjusted metadata was used."
+        }
+      ],
+      "confidence": "high",
+      "confidence_basis": "Owner input is intentionally unobserved; capability was verified using labeled fixtures only."
+    },
+    {
+      "requirement_id": "C-03",
+      "requirement": "Owner machine with Node >=22.23.2",
+      "classification": "OWNER_CONFIGURATION_REQUIRED",
+      "decisive_facts": [
+        "Qualification ran under Node v22.23.2; actual owner machine runtime was not supplied.",
+        "Required to run the local worker CLI; does not block code handoff or web UI inspection."
+      ],
+      "evidence": [
+        {
+          "type": "command",
+          "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm ci",
+          "result_detail": "Node v22.23.2 PATH was explicitly selected for all requested commands."
+        },
+        {
+          "type": "source",
+          "ref": ".nvmrc; package.json: engines; docs/operations/LOCAL_WORKER.md: Bootstrap"
+        }
+      ],
+      "confidence": "high",
+      "confidence_basis": "The verification host runtime is observed; owner machine configuration is not."
+    },
+    {
+      "requirement_id": "C-04",
+      "requirement": "Private worker SQLite and local handoff folder",
+      "classification": "OWNER_CONFIGURATION_REQUIRED",
+      "decisive_facts": [
+        "Verification used isolated /tmp DB/handoff paths; no actual owner paths or permissions were inspected.",
+        "Blocks live worker-to-app operation and safe durable use until owner selects private paths; does not block code handoff."
+      ],
+      "evidence": [
+        {
+          "type": "command",
+          "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH STOCKLEDGER_PROTECTED_BASE=3934e4cd9f45ee911e0d05e623ad10156cbf0282 npm run operations:status -- --db /tmp/stockledger-CF-e09132542fe4be3c2092f7e2-operations-status.sqlite --handoff-dir /tmp/stockledger-CF-e09132542fe4be3c2092f7e2-handoff --release-evidence /tmp/stockledger-c19-v5-release-evidence.json",
+          "result_detail": "Isolated temporary database and handoff folder; empty workspace."
+        },
+        {
+          "type": "source",
+          "ref": "docs/operations/LOCAL_WORKER.md: database defaults and Worker-to-app review handoff"
+        }
+      ],
+      "confidence": "high",
+      "confidence_basis": "The local test path is explicitly synthetic, not owner configuration."
+    },
+    {
+      "requirement_id": "C-05",
+      "requirement": "Owner-installed launchd/cron/equivalent if unattended monitoring is desired",
+      "classification": "OWNER_CONFIGURATION_REQUIRED",
+      "decisive_facts": [
+        "No scheduler installation is claimed; product and isolated status report schedulerInstalled=false.",
+        "Blocks only unattended monitoring; manual worker runs and app review remain available."
+      ],
+      "evidence": [
+        {
+          "type": "command",
+          "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH STOCKLEDGER_PROTECTED_BASE=3934e4cd9f45ee911e0d05e623ad10156cbf0282 npm run operations:status -- --db /tmp/stockledger-CF-e09132542fe4be3c2092f7e2-operations-status.sqlite --handoff-dir /tmp/stockledger-CF-e09132542fe4be3c2092f7e2-handoff --release-evidence /tmp/stockledger-c19-v5-release-evidence.json",
+          "result_detail": "schedulerInstalled=false; state=stopped."
+        },
+        {
+          "type": "source",
+          "ref": "docs/operations/LOCAL_WORKER.md: Installing a local schedule"
+        }
+      ],
+      "confidence": "high",
+      "confidence_basis": "No OS scheduler was inspected or installed."
+    },
+    {
+      "requirement_id": "C-06",
+      "requirement": "Awake machine and readable data path during scheduled runs",
+      "classification": "OWNER_CONFIGURATION_REQUIRED",
+      "decisive_facts": [
+        "These are runtime prerequisites documented by the product; no owner machine uptime/path state was asserted.",
+        "Blocks scheduled/unattended monitoring when unavailable; not a code handoff blocker."
+      ],
+      "evidence": [
+        {
+          "type": "source",
+          "ref": "docs/operations/LOCAL_WORKER.md: local-first path and Installing a local schedule"
+        },
+        {
+          "type": "command",
+          "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH STOCKLEDGER_PROTECTED_BASE=3934e4cd9f45ee911e0d05e623ad10156cbf0282 npm run operations:status -- --db /tmp/stockledger-CF-e09132542fe4be3c2092f7e2-operations-status.sqlite --handoff-dir /tmp/stockledger-CF-e09132542fe4be3c2092f7e2-handoff --release-evidence /tmp/stockledger-c19-v5-release-evidence.json",
+          "result_detail": "localDependency.requiresAwakeMachine=true; requiresAuthorizedDataPath=true."
+        }
+      ],
+      "confidence": "high",
+      "confidence_basis": "Documentation and truthful status contract verified; owner runtime was not observed."
+    },
+    {
+      "requirement_id": "C-07",
+      "requirement": "Private backup destination and owner backup cadence",
+      "classification": "OWNER_CONFIGURATION_REQUIRED",
+      "decisive_facts": [
+        "Recovery drill proves consistent snapshots but reports loss since last operator backup as unknown without configured cadence.",
+        "Blocks safe durable use of real owner records until the owner chooses a private destination and cadence; does not block code handoff."
+      ],
+      "evidence": [
+        {
+          "type": "command",
+          "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm run recovery:drill -- --output /tmp/stockledger-c19-v5-recovery-result.json",
+          "result_detail": "lossSinceLastOperatorBackup=unknown-unbounded-without-configured-cadence."
+        },
+        {
+          "type": "source",
+          "ref": "README.md: backups; docs/operations/RELEASE_RUNBOOK.md: SQLite recovery; docs/operations/LOCAL_WORKER.md: backups are plaintext private records"
+        }
+      ],
+      "confidence": "high",
+      "confidence_basis": "No owner backup destination or cadence was supplied."
+    },
+    {
+      "requirement_id": "N-01",
+      "requirement": "SMTP configuration/destination for external email",
+      "classification": "NOT_APPLICABLE",
+      "decisive_facts": [
+        "Today/Alerts is sufficient for the selected scope; SMTP was not selected and no credentials, destination, delivery or recipient was used.",
+        "If the owner later chooses email, the conditional configuration is OWNER_CONFIGURATION_REQUIRED and outside this qualification."
+      ],
+      "evidence": [
+        {
+          "type": "source",
+          "ref": "docs/operations/LOCAL_WORKER.md: Notification delivery contract"
+        },
+        {
+          "type": "command",
+          "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH CI=1 npm run test:e2e",
+          "result_detail": "In-app attention journeys passed; no email transport invoked."
+        }
+      ],
+      "confidence": "high",
+      "confidence_basis": "Exact-tree source review and requested current-tree checks passed."
+    },
+    {
+      "requirement_id": "N-02",
+      "requirement": "Cloud identity and multi-device synchronization",
+      "classification": "NOT_APPLICABLE",
+      "decisive_facts": [
+        "Local-first single-owner web/desktop handoff does not depend on cloud identity or sync; optional sync code is outside selected path."
+      ],
+      "evidence": [
+        {
+          "type": "source",
+          "ref": "README.md: no-subscription local path; docs/production/IMPLEMENTATION_STATUS.md: optional cloud pilot"
+        }
+      ],
+      "confidence": "high",
+      "confidence_basis": "Exact-tree source review and requested current-tree checks passed."
+    },
+    {
+      "requirement_id": "N-03",
+      "requirement": "Paid/public commerce, billing, support/privacy launch lifecycle",
+      "classification": "NOT_APPLICABLE",
+      "decisive_facts": [
+        "No paid/public commerce or launch lifecycle is needed for this private local handoff."
+      ],
+      "evidence": [
+        {
+          "type": "source",
+          "ref": "README.md; docs/production/IMPLEMENTATION_STATUS.md: no deployed commercial service"
+        }
+      ],
+      "confidence": "high",
+      "confidence_basis": "Exact-tree source review and requested current-tree checks passed."
+    },
+    {
+      "requirement_id": "N-04",
+      "requirement": "Multi-user, team or marketplace behavior",
+      "classification": "NOT_APPLICABLE",
+      "decisive_facts": [
+        "Scope is one owner; team and marketplace paths are not required."
+      ],
+      "evidence": [
+        {
+          "type": "source",
+          "ref": "README.md: personal local workspace; docs/production/IMPLEMENTATION_STATUS.md: deferred roadmap"
+        }
+      ],
+      "confidence": "high",
+      "confidence_basis": "Exact-tree source review and requested current-tree checks passed."
+    },
+    {
+      "requirement_id": "N-05",
+      "requirement": "Broad managed hosting or hosted scheduler",
+      "classification": "NOT_APPLICABLE",
+      "decisive_facts": [
+        "Local worker is explicitly provider-independent; repository does not provision a managed scheduler or broad hosting."
+      ],
+      "evidence": [
+        {
+          "type": "source",
+          "ref": "docs/operations/LOCAL_WORKER.md: no managed scheduler deployment claimed"
+        }
+      ],
+      "confidence": "high",
+      "confidence_basis": "Exact-tree source review and requested current-tree checks passed."
+    },
+    {
+      "requirement_id": "N-06",
+      "requirement": "Native store distribution, physical-device certification and OS push",
+      "classification": "NOT_APPLICABLE",
+      "decisive_facts": [
+        "Selected scope is web/desktop; Expo bundles are not signed native distribution and OS push is not required."
+      ],
+      "evidence": [
+        {
+          "type": "command",
+          "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm run export:all",
+          "result_detail": "Native bundles generated as build check only."
+        },
+        {
+          "type": "source",
+          "ref": "docs/operations/RELEASE_RUNBOOK.md: native QA boundary; docs/operations/LOCAL_WORKER.md: app does not send OS push"
+        }
+      ],
+      "confidence": "high",
+      "confidence_basis": "Exact-tree source review and requested current-tree checks passed."
+    },
+    {
+      "requirement_id": "N-07",
+      "requirement": "Commercial data rights, managed-provider activation and raw redistribution",
+      "classification": "NOT_APPLICABLE",
+      "decisive_facts": [
+        "No managed provider or commercial redistribution is selected. Owner CSV must still be authorized for owner use and is separately OWNER_CONFIGURATION_REQUIRED."
+      ],
+      "evidence": [
+        {
+          "type": "source",
+          "ref": "docs/operations/LOCAL_WORKER.md: CHG-95 market-data boundary; README.md: fetching does not establish commercial rights"
+        }
+      ],
+      "confidence": "high",
+      "confidence_basis": "Exact-tree source review and requested current-tree checks passed."
+    },
+    {
+      "requirement_id": "N-08",
+      "requirement": "Broad scanner/backtest parity beyond adopted owner watch-recipe path",
+      "classification": "NOT_APPLICABLE",
+      "decisive_facts": [
+        "Qualification covers the selected versioned recipe/Eye path only; broad scanner and backtest parity are explicitly out of scope."
+      ],
+      "evidence": [
+        {
+          "type": "source",
+          "ref": "docs/production/IMPLEMENTATION_STATUS.md: known limitations and backlog"
+        }
+      ],
+      "confidence": "high",
+      "confidence_basis": "Exact-tree source review and requested current-tree checks passed."
+    },
+    {
+      "requirement_id": "N-09",
+      "requirement": "Public pilot or willingness-to-pay evidence",
+      "classification": "NOT_APPLICABLE",
+      "decisive_facts": [
+        "No public pilot or willingness-to-pay claim is required for single-owner handoff."
+      ],
+      "evidence": [
+        {
+          "type": "source",
+          "ref": "docs/production/IMPLEMENTATION_STATUS.md: external pilot and monetization remain gated"
+        }
+      ],
+      "confidence": "high",
+      "confidence_basis": "Exact-tree source review and requested current-tree checks passed."
+    }
+  ],
+  "qualification_gaps": {
+    "MATERIAL_PRODUCT_GAP": 0,
+    "MATERIAL_EVIDENCE_GAP": 0,
+    "UNPROVEN_EXTERNAL": 0
+  }
+}

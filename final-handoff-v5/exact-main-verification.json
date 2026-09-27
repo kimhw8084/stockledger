@@ -1,0 +1,176 @@
+{
+  "schema_version": 1,
+  "project": "stockledger",
+  "repository": "kimhw8084/stockledger",
+  "change": "CHG-273",
+  "operation": "VERIFY",
+  "request": "stockledger-prod-c19-final-integrated-main-personal-handoff-verify-v5",
+  "fabric_job": "CF-e09132542fe4be3c2092f7e2",
+  "subject": {
+    "protected_target": "main",
+    "exact_main": "3934e4cd9f45ee911e0d05e623ad10156cbf0282",
+    "exact_tree": "dccf00667a9fa73e58525e564e379d328ae82843",
+    "tested_subject": "3934e4cd9f45ee911e0d05e623ad10156cbf0282",
+    "pre_chg273_main": "1d3fc085b54b5002342982cc9c15ccc32bf086ba",
+    "pre_chg273_tree": "b0013584a69ed47bd7eb1c7d331bddc773f57c6c",
+    "accepted_head": "3387151e14bad81bfa07c82eb6ec39f106408580",
+    "accepted_head_tree": "dccf00667a9fa73e58525e564e379d328ae82843",
+    "merge_parents": [
+      "1d3fc085b54b5002342982cc9c15ccc32bf086ba",
+      "3387151e14bad81bfa07c82eb6ec39f106408580"
+    ],
+    "accepted_head_ancestor": true,
+    "merge_tree_equals_accepted_head_tree": true,
+    "work_branch": "codex/stockledger-prod-c19-final-integrated-main-personal-handoff-verify-v5"
+  },
+  "identity_readback": {
+    "start_remote_main": "3934e4cd9f45ee911e0d05e623ad10156cbf0282",
+    "end_remote_main": "3934e4cd9f45ee911e0d05e623ad10156cbf0282",
+    "start_checkout_head": "3934e4cd9f45ee911e0d05e623ad10156cbf0282",
+    "end_checkout_head": "3934e4cd9f45ee911e0d05e623ad10156cbf0282",
+    "main_unchanged": true,
+    "remote_work_branch_head": "3934e4cd9f45ee911e0d05e623ad10156cbf0282",
+    "worktree_clean": true,
+    "local_commits_after_exact_main": 0,
+    "local_product_changed_files_after_exact_main": 0
+  },
+  "source_impact": {
+    "pre_chg273_to_exact_main_changed_files": [
+      "tests/worker.test.ts",
+      "tests/e2e/worker-app-handoff.spec.ts"
+    ],
+    "runtime_product_docs_configuration_dependencies_lockfile_schema_ui_worker_runtime_byte_identical_to_pre_chg273": true,
+    "diff_exit_code": 0,
+    "work_branch_head_equals_exact_main": true
+  },
+  "release_workflow_run": {
+    "id": 36328472547,
+    "url": "https://github.com/kimhw8084/stockledger/actions/runs/36328472547",
+    "workflow": "Release checks",
+    "event": "pull_request",
+    "head_sha": "3387151e14bad81bfa07c82eb6ec39f106408580",
+    "head_tree": "dccf00667a9fa73e58525e564e379d328ae82843",
+    "conclusion": "success",
+    "jobs": {
+      "app": "success",
+      "cloud-contract": "success",
+      "operations": "success"
+    },
+    "evidence": "github_fetch_workflow_run_jobs and GitHub Actions run metadata; PR #30 merged to exact main."
+  },
+  "local_commands": [
+    {
+      "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm ci",
+      "result": "PASS",
+      "detail": "Node v22.23.2; 639 packages installed; 0 vulnerabilities."
+    },
+    {
+      "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm run check",
+      "result": "PASS",
+      "detail": "TypeScript and 216 tests across 27 files passed."
+    },
+    {
+      "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm run check:boundaries",
+      "result": "PASS",
+      "detail": "Client secret boundary, runtime parser and server imports checked."
+    },
+    {
+      "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm audit --audit-level=high",
+      "result": "PASS",
+      "detail": "0 vulnerabilities."
+    },
+    {
+      "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm run check:release-workflow",
+      "result": "PASS",
+      "detail": "Workflow valid; pinned actions and protected-base sequencing checked."
+    },
+    {
+      "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm run export:all",
+      "result": "PASS",
+      "detail": "Web, Android and iOS exports completed."
+    },
+    {
+      "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH CI=1 npm run test:e2e",
+      "result": "PASS_WITH_EXISTING_SKIP",
+      "detail": "89 passed, 1 existing mobile keyboard-only skip; both worker handoff journeys passed."
+    },
+    {
+      "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm test -- --run tests/workerHandoff.test.ts",
+      "result": "PASS",
+      "detail": "6 passed."
+    },
+    {
+      "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm test -- --run tests/worker.test.ts",
+      "result": "PASS",
+      "detail": "28 passed; CLI test wrote to its explicit temporary handoff directory."
+    },
+    {
+      "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm run recovery:drill -- --output /tmp/stockledger-c19-v5-recovery-result.json",
+      "result": "PASS",
+      "detail": "Synthetic backup/restore integrity; authored/evaluation/decision/job/ingestion/notification state retained; corrupt and incompatible candidates rejected; RPO since operator backup unknown without cadence."
+    },
+    {
+      "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm run operations:qualify -- --output /tmp/stockledger-c19-v5-operations-qualification.json",
+      "result": "PASS",
+      "detail": "100 stocks × 260 sessions, 3 samples; daily and restore budgets met; synthetic engineering evidence only."
+    },
+    {
+      "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH STOCKLEDGER_PROTECTED_BASE=3934e4cd9f45ee911e0d05e623ad10156cbf0282 npm run operations:status -- --db /tmp/stockledger-CF-e09132542fe4be3c2092f7e2-operations-status.sqlite --handoff-dir /tmp/stockledger-CF-e09132542fe4be3c2092f7e2-handoff --release-evidence /tmp/stockledger-c19-v5-release-evidence.json",
+      "result": "PASS_TRUTHFUL_UNCONFIGURED",
+      "detail": "workspace_missing; scheduler stopped/false; releaseIdentity known for exact commit/tree and Node runtime v22.23.2."
+    },
+    {
+      "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH STOCKLEDGER_PROTECTED_BASE=3934e4cd9f45ee911e0d05e623ad10156cbf0282 npm run release:evidence -- --base 3934e4cd9f45ee911e0d05e623ad10156cbf0282 --output /tmp/stockledger-c19-v5-release-evidence.json",
+      "result": "PASS",
+      "detail": "sourceCommit=3934e4cd9f45ee911e0d05e623ad10156cbf0282; sourceTree=dccf00667a9fa73e58525e564e379d328ae82843."
+    },
+    {
+      "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH STOCKLEDGER_PROTECTED_BASE=3934e4cd9f45ee911e0d05e623ad10156cbf0282 npm run release:verify -- --input /tmp/stockledger-c19-v5-release-evidence.json --base 3934e4cd9f45ee911e0d05e623ad10156cbf0282",
+      "result": "PASS",
+      "detail": "verified=true; reasons=[]."
+    },
+    {
+      "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npx supabase start -x studio,edge-runtime,logflare,vector,supavisor,imgproxy,realtime,storage-api",
+      "result": "PASS",
+      "detail": "Isolated local stack started; no data provider or email recipient contacted."
+    },
+    {
+      "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npm run test:cloud",
+      "result": "PASS",
+      "detail": "Local Auth, two-account ownership, same-account devices, cursor feed, tombstones, deletion invalidation, atomic RPC, retry and revision checks passed."
+    },
+    {
+      "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH npx supabase stop --no-backup",
+      "result": "PASS",
+      "detail": "Local stack stopped; post-check showed no running containers."
+    },
+    {
+      "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH node_modules/.bin/tsx /tmp/stockledger-c19-v5-handoff-recovery.ts",
+      "result": "PASS",
+      "detail": "Synthetic pending SQLite worker handoff batch/sequence and app export/parse handoff, authored decision/amendment, outcome, evaluation and alert state all preserved."
+    }
+  ],
+  "disposition": "OWNER_SETUP_REQUIRED",
+  "end_to_end_personal_path": "PASS",
+  "release_and_operations": "PASS",
+  "owner_configuration_explicit": true,
+  "ui_authority_current": true,
+  "matrix_complete": true,
+  "native_fabric_evidence": {
+    "expected_ref": "refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c19-final-integrated-main-personal-handoff-verify-v5",
+    "canonical_path": ".codex-fabric/audit.json",
+    "expected_sole_parent": "3934e4cd9f45ee911e0d05e623ad10156cbf0282",
+    "job_id": "CF-e09132542fe4be3c2092f7e2",
+    "publisher_lifecycle": "normal Fabric publisher accepts terminal jobs; current Fabric execution is RUNNING until this turn returns",
+    "readback_at_package_creation": "pending terminal publication",
+    "error_code": "JOB_NOT_TERMINAL"
+  },
+  "mutation_boundary": {
+    "source_changed": false,
+    "product_commits": 0,
+    "product_changed_files": 0,
+    "main_changed": false,
+    "PRs_or_release_state_mutated": false,
+    "Notion_mutated": false
+  }
+}

@@ -1,0 +1,124 @@
+{
+  "schema_version": 1,
+  "project": "stockledger",
+  "request": "stockledger-prod-c19-final-integrated-main-personal-handoff-verify-v5",
+  "owner_environment_inspected": false,
+  "owner_configuration_explicit": true,
+  "code_handoff_ready": true,
+  "live_monitoring_ready": false,
+  "unattended_monitoring_ready": false,
+  "safe_durable_use_with_owner_records_ready": false,
+  "items": [
+    {
+      "id": "owner_workspace_watchlist",
+      "classification": "OWNER_CONFIGURATION_REQUIRED",
+      "owner_state": "not supplied or inspected",
+      "required": "Prepare/import the real personal workspace and watchlist.",
+      "blocks": {
+        "code_handoff": false,
+        "live_monitoring": true,
+        "unattended_monitoring": true,
+        "safe_durable_use": false,
+        "only_optional_scope": false
+      }
+    },
+    {
+      "id": "authorized_daily_bar_input",
+      "classification": "OWNER_CONFIGURATION_REQUIRED",
+      "owner_state": "not supplied or inspected",
+      "required": "Private provider-authorized completed US equity/ETF CSVs, full required sessions/warmups, exact source/dataset, explicit adjusted/unadjusted basis and freshness; do not treat unknown provenance as trusted.",
+      "blocks": {
+        "code_handoff": false,
+        "live_monitoring": true,
+        "unattended_monitoring": true,
+        "safe_durable_use": true,
+        "only_optional_scope": false
+      }
+    },
+    {
+      "id": "node_runtime",
+      "classification": "OWNER_CONFIGURATION_REQUIRED",
+      "owner_state": "verification host used v22.23.2; owner machine not inspected",
+      "required": "Node >=22.23.2 for the supported local worker CLI.",
+      "blocks": {
+        "code_handoff": false,
+        "live_monitoring": true,
+        "unattended_monitoring": true,
+        "safe_durable_use": false,
+        "only_optional_scope": false
+      }
+    },
+    {
+      "id": "private_worker_sqlite_and_handoff_paths",
+      "classification": "OWNER_CONFIGURATION_REQUIRED",
+      "owner_state": "verification used isolated /tmp paths; actual owner paths not inspected",
+      "required": "Choose owner-private, readable/writable SQLite DB and the same private local handoff folder on each worker run; grant that folder to the app in Settings.",
+      "blocks": {
+        "code_handoff": false,
+        "live_monitoring": true,
+        "unattended_monitoring": true,
+        "safe_durable_use": true,
+        "only_optional_scope": false
+      }
+    },
+    {
+      "id": "local_scheduler_if_unattended",
+      "classification": "OWNER_CONFIGURATION_REQUIRED",
+      "owner_state": "not installed or asserted",
+      "required": "Owner installs and monitors launchd/cron/equivalent only if unattended monitoring is wanted.",
+      "blocks": {
+        "code_handoff": false,
+        "live_monitoring": false,
+        "unattended_monitoring": true,
+        "safe_durable_use": false,
+        "only_optional_scope": true
+      }
+    },
+    {
+      "id": "awake_machine_and_readable_path",
+      "classification": "OWNER_CONFIGURATION_REQUIRED",
+      "owner_state": "not observed",
+      "required": "The scheduled machine stays awake and the authorized input path is readable during every run.",
+      "blocks": {
+        "code_handoff": false,
+        "live_monitoring": false,
+        "unattended_monitoring": true,
+        "safe_durable_use": false,
+        "only_optional_scope": true
+      }
+    },
+    {
+      "id": "private_backup_destination_cadence",
+      "classification": "OWNER_CONFIGURATION_REQUIRED",
+      "owner_state": "not supplied or inspected",
+      "required": "Choose an owner-private backup destination and cadence; keep plaintext backup records private and test restores.",
+      "blocks": {
+        "code_handoff": false,
+        "live_monitoring": false,
+        "unattended_monitoring": false,
+        "safe_durable_use": true,
+        "only_optional_scope": false
+      }
+    },
+    {
+      "id": "smtp_credentials_destination",
+      "classification": "OWNER_CONFIGURATION_REQUIRED",
+      "owner_state": "not configured or used",
+      "condition": "Only if external email is chosen later.",
+      "required": "Configure server-only transport credentials, sender and recipient outside app bundles/backups/logs.",
+      "blocks": {
+        "code_handoff": false,
+        "live_monitoring": false,
+        "unattended_monitoring": false,
+        "safe_durable_use": false,
+        "only_optional_scope": true
+      }
+    }
+  ],
+  "disposition": "OWNER_SETUP_REQUIRED",
+  "notes": [
+    "The isolated operations:status DB is a synthetic unconfigured DB, not an assertion about the owner’s actual machine or workspace.",
+    "Current product handoff code is ready; absent owner inputs/configuration are setup tasks, not Product defects.",
+    "Today/Alerts are sufficient; SMTP remains optional."
+  ]
+}

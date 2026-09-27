@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "project": "stockledger",
+  "request": "stockledger-prod-c19-final-integrated-main-personal-handoff-verify-v5",
+  "byte_equivalence_proven_before_reuse": true,
+  "source_equivalence_checks": [
+    {
+      "claim": "CHG-273 changes only two harness files relative to pre-CHG-273 main.",
+      "command": "rtk git diff --name-status 1d3fc085b54b5002342982cc9c15ccc32bf086ba 3934e4cd9f45ee911e0d05e623ad10156cbf0282",
+      "exit_code": 0,
+      "observed_files": [
+        "tests/worker.test.ts",
+        "tests/e2e/worker-app-handoff.spec.ts"
+      ]
+    },
+    {
+      "claim": "All other Product/UI/docs/config/dependency/schema/worker files remain byte-identical to CHG-256 R2 accepted candidate.",
+      "command": "rtk git diff --exit-code 3a76d78663b555392cd152977bb2f9c5cd91a79f 3934e4cd9f45ee911e0d05e623ad10156cbf0282 -- . ':(exclude)tests/worker.test.ts' ':(exclude)tests/e2e/worker-app-handoff.spec.ts'",
+      "exit_code": 0,
+      "trees": {
+        "pre_chg273": "b0013584a69ed47bd7eb1c7d331bddc773f57c6c",
+        "chg256_r2_candidate": "b0013584a69ed47bd7eb1c7d331bddc773f57c6c"
+      }
+    },
+    {
+      "claim": "CHG-202 shared rendering/focus/navigation dependencies are byte-identical to Golden UI v3 accepted head.",
+      "command": "rtk git diff --exit-code 92b64a20c620da38422c22e73664eba395b58f17 3934e4cd9f45ee911e0d05e623ad10156cbf0282 -- src/components/WindowPanel.tsx src/hooks/useWindowPanelFocus.ts src/lib/webFocusEligibility.ts src/features/shell/StockLedgerShell.tsx",
+      "exit_code": 0,
+      "files": [
+        "src/components/WindowPanel.tsx",
+        "src/hooks/useWindowPanelFocus.ts",
+        "src/lib/webFocusEligibility.ts",
+        "src/features/shell/StockLedgerShell.tsx"
+      ]
+    }
+  ],
+  "reuse_records": [
+    {
+      "change": "CHG-202 Golden UI v3",
+      "accepted_head": "92b64a20c620da38422c22e73664eba395b58f17",
+      "artifact_ref": "refs/heads/project-os-artifacts/stockledger/stockledger-prod-c17-golden-ui-v3-focus-geometry-zoom-fix-v2",
+      "artifact_commit": "fb28e5a5ad0ee01331863a65e7b892a81ee1074c",
+      "source_impact": "17 canonical surfaces plus focus/geometry/zoom evidence; reused only where rendered dependencies remain identical.",
+      "reuse": "PASS_AFTER_DIRECT_BYTE_COMPARISON",
+      "visual_recapture": "not repeated; CHG-273 has no UI/source changes; current Playwright passed."
+    },
+    {
+      "change": "CHG-256 R2 local worker-to-app handoff",
+      "accepted_candidate": "3a76d78663b555392cd152977bb2f9c5cd91a79f",
+      "accepted_tree": "b0013584a69ed47bd7eb1c7d331bddc773f57c6c",
+      "artifact_ref": "refs/heads/project-os-artifacts/stockledger/stockledger-prod-c18-worker-app-review-handoff-fix-v2",
+      "artifact_commit": "31135aac94d02718893ba3834a7a792595dc32ee",
+      "reuse": "PASS_AFTER_FULL_NON_HARNESS_SOURCE_BYTE_COMPARISON",
+      "current_confirmation": "Focused handoff/worker tests and desktop/mobile browser handoff journeys passed."
+    },
+    {
+      "change": "CHG-256 R3 recovery visual verification",
+      "job": "CF-7093d40510c24716ba32a133",
+      "artifact_ref": "refs/heads/project-os-artifacts/stockledger/stockledger-prod-c18-handoff-recovery-visual-evidence-verify-v3",
+      "artifact_commit": "dea288a5930a95a76e4239653b49430ee701ffe9",
+      "evidence_ref": "refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c18-handoff-recovery-visual-evidence-verify-v3",
+      "candidate": "3a76d78663b555392cd152977bb2f9c5cd91a79f",
+      "tree": "b0013584a69ed47bd7eb1c7d331bddc773f57c6c",
+      "recaptured": [
+        "ui/desktop/settings-handoff-permission-required-en.png",
+        "ui/desktop/settings-handoff-recovered-en.png",
+        "ui/desktop/settings-handoff-recovered-ko.png",
+        "ui/mobile/settings-handoff-permission-required-en.png",
+        "ui/mobile/settings-handoff-recovered-en.png",
+        "ui/mobile/settings-handoff-recovered-ko.png"
+      ],
+      "reuse": "PASS_AFTER_FULL_NON_HARNESS_SOURCE_BYTE_COMPARISON"
+    }
+  ],
+  "prior_r1": {
+    "job": "CF-29df9cf0a9bafca63978aa45",
+    "artifact_ref": "refs/heads/project-os-artifacts/stockledger/stockledger-prod-c19-final-personal-handoff-qualification-verify-v1",
+    "artifact_commit": "1a63a7723c3b3fe8f6c08a1bd18d8a8b32937271",
+    "evidence_ref": "refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c19-final-personal-handoff-qualification-verify-v1",
+    "evidence_commit": "1e4c7bcee4a581a3a7c5bda5c45f794c6e35b9e0",
+    "prior_disposition": "FIX_REQUIRED",
+    "reuse": "SOURCE_IMPACT_CONTEXT_ONLY; final R1 disposition/evidence is not reused as current pass.",
+    "superseded_blockers": [
+      "tests/worker.test.ts synthetic CLI previously targeted repository default handoff path; current version isolates its paths and passed 28 focused tests.",
+      "E2E default timestamp previously aged out; current default uses now and explicit stale fixture still passed."
+    ]
+  }
+}

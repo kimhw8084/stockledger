@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "project": "stockledger",
+  "request": "stockledger-prod-c19-final-integrated-main-personal-handoff-verify-v5",
+  "subject": {
+    "exact_main": "3934e4cd9f45ee911e0d05e623ad10156cbf0282",
+    "exact_tree": "dccf00667a9fa73e58525e564e379d328ae82843",
+    "pre_chg273_main": "1d3fc085b54b5002342982cc9c15ccc32bf086ba",
+    "pre_chg273_tree": "b0013584a69ed47bd7eb1c7d331bddc773f57c6c",
+    "chg256_r2_candidate": "3a76d78663b555392cd152977bb2f9c5cd91a79f",
+    "chg256_r2_tree": "b0013584a69ed47bd7eb1c7d331bddc773f57c6c"
+  },
+  "exact_source_delta": {
+    "files": [
+      "tests/worker.test.ts",
+      "tests/e2e/worker-app-handoff.spec.ts"
+    ],
+    "runtime_product_source_changed": false,
+    "docs_changed": false,
+    "configuration_changed": false,
+    "dependencies_or_lockfile_changed": false,
+    "schema_changed": false,
+    "ui_changed": false,
+    "worker_runtime_changed": false,
+    "evidence": [
+      {
+        "command": "rtk git diff --name-status 1d3fc085b54b5002342982cc9c15ccc32bf086ba 3934e4cd9f45ee911e0d05e623ad10156cbf0282",
+        "exit_code": 0,
+        "result": [
+          "M tests/e2e/worker-app-handoff.spec.ts",
+          "M tests/worker.test.ts"
+        ]
+      },
+      {
+        "command": "rtk git diff --exit-code 3a76d78663b555392cd152977bb2f9c5cd91a79f 3934e4cd9f45ee911e0d05e623ad10156cbf0282 -- . ':(exclude)tests/worker.test.ts' ':(exclude)tests/e2e/worker-app-handoff.spec.ts'",
+        "exit_code": 0,
+        "result": "All non-harness files byte-identical to CHG-256 accepted candidate."
+      }
+    ]
+  },
+  "test_harness_fixes": {
+    "cli_test": "Uses unique synthetic workspace id; explicit --handoff-dir under mkdtemp directory; absolute CLI/tsx script paths; child cwd=temp directory; explicit temp DB, import, CSV and export paths. Repository runtime-default .local/stockledger-app-handoff is not targeted.",
+    "e2e_fixture": "Default generatedAt is current runtime time; explicit stale fixture remains 2026-09-20 and passes the >48-hour stale assertion on 2026-09-27."
+  },
+  "ui_authority_current": true,
+  "reuse_rule": "No visual recapture for ceremony. CHG-273 changes only tests; source-equivalence checks and current Playwright establish that prior UI authority remains current.",
+  "current_e2e": {
+    "command": "rtk env PATH=/Users/haewonkim/.nvm/versions/node/v22.23.2/bin:$PATH CI=1 npm run test:e2e",
+    "result": "89 passed, 1 existing mobile keyboard-only skip; desktop/mobile handoff journeys passed."
+  }
+}

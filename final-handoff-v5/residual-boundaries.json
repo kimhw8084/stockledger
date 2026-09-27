@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "project": "stockledger",
+  "request": "stockledger-prod-c19-final-integrated-main-personal-handoff-verify-v5",
+  "selected_scope": "single-owner private local-first web/desktop handoff",
+  "not_applicable_boundaries": [
+    {
+      "id": "cloud_identity_and_multidevice",
+      "classification": "NOT_APPLICABLE",
+      "reason": "No cloud account/sync dependency for selected local path."
+    },
+    {
+      "id": "paid_public_commerce_billing_support_privacy_launch_lifecycle",
+      "classification": "NOT_APPLICABLE",
+      "reason": "No paid/public launch in selected handoff."
+    },
+    {
+      "id": "multi_user_team_marketplace",
+      "classification": "NOT_APPLICABLE",
+      "reason": "One owner only."
+    },
+    {
+      "id": "broad_managed_hosting_or_scheduler",
+      "classification": "NOT_APPLICABLE",
+      "reason": "No managed hosting/scheduler is required; owner OS schedule is conditional setup only."
+    },
+    {
+      "id": "native_app_store_physical_device_os_push",
+      "classification": "NOT_APPLICABLE",
+      "reason": "Web/desktop use only; no native/store/push qualification claimed."
+    },
+    {
+      "id": "commercial_data_rights_managed_provider_activation_raw_redistribution",
+      "classification": "NOT_APPLICABLE",
+      "reason": "Commercial acquisition/redistribution not selected; owner must still supply data permitted for the owner’s use."
+    },
+    {
+      "id": "broad_scanner_backtest_parity",
+      "classification": "NOT_APPLICABLE",
+      "reason": "Only the adopted owner-authored watch recipe path is qualified."
+    },
+    {
+      "id": "public_pilot_or_willingness_to_pay",
+      "classification": "NOT_APPLICABLE",
+      "reason": "No public pilot or monetization evidence is needed."
+    }
+  ],
+  "residual_owner_setup": [
+    "real workspace/watchlist",
+    "authorized regularly updated completed daily bars with source/adjustment/freshness",
+    "Node >=22.23.2 on owner machine",
+    "private worker SQLite and app-selected handoff folder",
+    "owner-managed local schedule only if unattended use is desired",
+    "awake machine and readable input during scheduled runs",
+    "private backup destination and cadence",
+    "SMTP configuration only if external email is later chosen"
+  ],
+  "nonclaims": [
+    "No owner workspace/watchlist or permitted real dataset was supplied.",
+    "No scheduler installation, awake-machine operation or provider uptime claimed.",
+    "No SMTP credential, recipient, transport submission, delivery, or human read claimed.",
+    "No hosted availability, production cloud backup, physical-device evidence, native app qualification, screen-reader certification, or blanket WCAG conformance claimed.",
+    "No automatic trading, custody, return guarantee, investment-performance promise, or investment advice claim.",
+    "Synthetic recovery/operations results are engineering evidence only, not SLA/RPO guarantee or production capacity promise."
+  ],
+  "known_product_limits_not_blocking_selected_path": [
+    "Full native/physical-device and screen-reader qualification remains out of scope.",
+    "Commercial market-data providers/rights remain unselected; local owner-authorized CSV path is supported.",
+    "Scheduled monitoring depends on owner OS setup, machine power state, and readable data path.",
+    "Independent audit remains pending."
+  ]
+}
