@@ -1,0 +1,157 @@
+{
+  "schema_version": 1,
+  "kind": "codex-fabric-audit-evidence",
+  "job_id": "CF-1d8fe2c1770949071d53fb3d",
+  "project_id": "stockledger",
+  "operation": "BUILD",
+  "request": "stockledger-prod-c20-owner-runtime-bootstrap-build-v2",
+  "status": "OWNER_RUNTIME_BOOTSTRAP_COMPLETE_AWAITING_INDEPENDENT_AUDIT",
+  "accepted_at": "2026-09-28T01:09:05Z",
+  "started_at": "2026-09-28T01:09:05Z",
+  "finished_at": "2026-09-28T01:09:05Z",
+  "error_code": null,
+  "failure_class": null,
+  "git": {
+    "base_sha": "3934e4cd9f45ee911e0d05e623ad10156cbf0282",
+    "head_sha": "3934e4cd9f45ee911e0d05e623ad10156cbf0282",
+    "branch": "codex/stockledger-prod-c20-owner-runtime-bootstrap-build-v2",
+    "work_branch": "codex/stockledger-prod-c20-owner-runtime-bootstrap-build-v2",
+    "target_branch": "main",
+    "remote_head_sha": "3934e4cd9f45ee911e0d05e623ad10156cbf0282",
+    "target_head_observed_after_execution": "3934e4cd9f45ee911e0d05e623ad10156cbf0282",
+    "base_is_ancestor": true,
+    "detached_verify": false,
+    "remote_exact_head": true,
+    "target_drifted_since_acceptance": false,
+    "worktree_clean": true
+  },
+  "diff": {
+    "additions": 0,
+    "deletions": 0,
+    "changed_files": 0,
+    "commit_count": 0
+  },
+  "changed_files": [],
+  "commits": [],
+  "checks": [
+    {
+      "command": "git rev-parse HEAD matches the qualified base",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "git ls-remote origin refs/heads/main matches the qualified base",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "git ls-remote origin work branch matches the qualified base",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "git diff and staged diff are clean",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "node --version under repository .nvmrc with process-local nvm",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "npm ci under Node v22.23.2",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "npm run worker -- --help under Node v22.23.2",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "git check-ignore .local/ confirms ignored",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "owner-only directory modes and temporary probe cleanup",
+      "exit_code": 0,
+      "type": "command_execution"
+    },
+    {
+      "command": "requested private data directories are empty and worker database is absent",
+      "exit_code": 0,
+      "type": "command_execution"
+    }
+  ],
+  "evidence_manifest": {
+    "version": 1,
+    "count": 0,
+    "items": []
+  },
+  "evidence_publisher_release": "manual-git-ref-publication",
+  "fabric_release": "unavailable-from-local-tooling",
+  "fabric_capture": {
+    "applied": true,
+    "paths_before": 0,
+    "transient_untracked_removed": {}
+  },
+  "instructions": {
+    "files": [],
+    "total_bytes": 0,
+    "warning": null
+  },
+  "codex": {
+    "cli_version": "unreported",
+    "configured_model": "unreported",
+    "provider_reported_model": "unreported",
+    "reasoning_effort": "unreported",
+    "terminal_type": "non-pty",
+    "event_count": 0,
+    "usage": {
+      "cache_hit_percent": 0,
+      "cache_write_input_tokens": 0,
+      "cached_input_tokens": 0,
+      "fresh_input_tokens": 0,
+      "input_tokens": 0,
+      "non_reasoning_output_tokens": 0,
+      "output_tokens": 0,
+      "reasoning_output_tokens": 0,
+      "total_processed_tokens": 0
+    },
+    "warnings": [
+      "Fabric release metadata, Codex usage, and elapsed timing were not captured by local tooling; zero-valued counters denote unavailable capture."
+    ]
+  },
+  "policy": {
+    "environment_policy_sha256": "unavailable",
+    "fabric_release": "unavailable",
+    "policy_sha256": "unavailable",
+    "registry_sha256": "unavailable"
+  },
+  "recovery": {
+    "model_rerun_safe": false,
+    "recovery_required": false,
+    "retry_safe": false,
+    "retry_scope": null,
+    "worktree_retained": true
+  },
+  "timing": {
+    "execution_seconds": 0,
+    "queue_seconds": 0,
+    "total_seconds": 0
+  },
+  "transport": {
+    "bytes": 0,
+    "envelope": "metadata-only-no-owner-payload",
+    "prompt_bytes": 0,
+    "prompt_sha256": "unavailable",
+    "sha256": "unavailable"
+  },
+  "locator": {
+    "branch": "codex-fabric/evidence/stockledger/stockledger-prod-c20-owner-runtime-bootstrap-build-v2",
+    "path": ".codex-fabric/audit.json",
+    "ref": "refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c20-owner-runtime-bootstrap-build-v2"
+  }
+}
