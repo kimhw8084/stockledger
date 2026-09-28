@@ -1,0 +1,8 @@
+{
+  "schema": "stockledger-backup-readiness-v3",
+  "worker_database_ready": false,
+  "backup_created": false,
+  "backup_restore_ready": false,
+  "backup_integrity": "not_run",
+  "isolated_restore_check": "not_run"
+}

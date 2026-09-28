@@ -1,0 +1,19 @@
+{
+  "schema": "stockledger-owner-input-readiness-v3",
+  "recommended_disposition": "OWNER_INPUT_STAGING_REQUIRED",
+  "workspace_input_present": false,
+  "data_declaration_present": false,
+  "daily_bars_present": false,
+  "compatible_csv_count": 0,
+  "node_ready": true,
+  "workspace_parser_validation": "not_run",
+  "workspace_authenticity": "not_assessed",
+  "source_declared": false,
+  "dataset_release_declared": false,
+  "permission_confirmed": false,
+  "adjustment": null,
+  "completed_daily_bars": null,
+  "template_created": true,
+  "owner_input_directory_mode": "0700",
+  "template_mode": "0600"
+}

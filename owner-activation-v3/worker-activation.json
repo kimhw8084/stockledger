@@ -1,0 +1,14 @@
+{
+  "schema": "stockledger-worker-activation-v3",
+  "status": "not_started",
+  "blocker": "OWNER_INPUT_STAGING_REQUIRED",
+  "worker_database_ready": false,
+  "worker_cycle_count": 0,
+  "cli_exit_code": null,
+  "integrity_check": "not_run",
+  "provider_contacted": false,
+  "notifications_sent": false,
+  "scheduler_installed": false,
+  "handoff_pending_ready": false,
+  "app_ack_observed": false
+}

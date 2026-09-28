@@ -1,0 +1,10 @@
+{
+  "schema": "stockledger-owner-actions-v3",
+  "actions": [
+    "Stage the authentic StockLedger workspace export at .local/owner-input/workspace.json.",
+    "Stage .local/owner-input/data-source-declaration.json with owner-confirmed permission, a non-secret source label, a non-secret dataset-release label, adjustment mode, and completed_daily_bars=true.",
+    "Stage 1–600 compatible completed daily-bar CSV files under .local/daily-bars/ using the Product filename contract.",
+    "Rerun owner-input activation after all required inputs are present."
+  ],
+  "owner_app_handoff_action_required": false
+}

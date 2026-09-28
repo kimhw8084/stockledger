@@ -1,0 +1,12 @@
+{
+  "schema": "stockledger-privacy-redaction-v3",
+  "sensitive_data_published": false,
+  "workspace_identity_published": false,
+  "holdings_symbols_or_private_strategy_published": false,
+  "csv_filenames_rows_prices_or_volumes_published": false,
+  "source_or_dataset_release_labels_published": false,
+  "credentials_or_license_material_published": false,
+  "database_or_handoff_payloads_published": false,
+  "absolute_local_paths_published": false,
+  "raw_owner_input_errors_published": false
+}
