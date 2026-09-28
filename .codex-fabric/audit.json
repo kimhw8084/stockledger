@@ -1,0 +1,69 @@
+{
+  "schema": "codex-fabric-audit-v1",
+  "fabric_job": "CF-cc3e2137c0e4f0d5b49743d4",
+  "repository": "kimhw8084/stockledger",
+  "project": "stockledger",
+  "change": "CHG-291",
+  "operation": "BUILD",
+  "request": "stockledger-prod-c20-owner-input-activation-build-v3",
+  "recommended_disposition": "OWNER_INPUT_STAGING_REQUIRED",
+  "identity": {
+    "protected_main": "3934e4cd9f45ee911e0d05e623ad10156cbf0282",
+    "protected_main_unchanged": true,
+    "work_branch": "codex/stockledger-prod-c20-owner-input-activation-build-v3",
+    "work_branch_remote_head": "3934e4cd9f45ee911e0d05e623ad10156cbf0282",
+    "source_head": "3934e4cd9f45ee911e0d05e623ad10156cbf0282",
+    "source_tree": "dccf00667a9fa73e58525e564e379d328ae82843",
+    "worktree_clean": true,
+    "source_changed": false,
+    "product_commits": 0,
+    "product_changed_files": 0
+  },
+  "preflight": {
+    "required_base_verified": true,
+    "work_branch_remote_exact_base": true,
+    "local_inputs_git_ignored": true,
+    "node_via_repository_nvmrc": "v22.23.2",
+    "workspace_input_present": false,
+    "data_declaration_present": false,
+    "daily_bars_present": false,
+    "declaration_template_created": true,
+    "owner_input_directory_mode": "0700",
+    "template_mode": "0600"
+  },
+  "activation": {
+    "started": false,
+    "blocker": "OWNER_INPUT_STAGING_REQUIRED",
+    "worker_database_ready": false,
+    "backup_restore_ready": false,
+    "handoff_pending_ready": false,
+    "app_ack_observed": false,
+    "provider_contacted": false,
+    "notifications_sent": false,
+    "scheduler_installed": false
+  },
+  "privacy": {
+    "sensitive_data_published": false,
+    "workspace_identity_published": false,
+    "strategy_or_symbols_published": false,
+    "source_or_dataset_release_labels_published": false,
+    "private_payloads_published": false,
+    "absolute_local_paths_published": false
+  },
+  "artifact": {
+    "ref": "project-os-artifacts/stockledger/stockledger-prod-c20-owner-input-activation-build-v3",
+    "commit": "2329ebc6220d79fe974e69bf0149cfa9f7cb280e",
+    "required_parent": "3934e4cd9f45ee911e0d05e623ad10156cbf0282",
+    "sole_parent_verified": true
+  },
+  "evidence": {
+    "ref": "codex-fabric/evidence/stockledger/stockledger-prod-c20-owner-input-activation-build-v3",
+    "required_parent": "3934e4cd9f45ee911e0d05e623ad10156cbf0282",
+    "sole_parent_required": true
+  },
+  "safe_command_evidence": [
+    "protected main, source branch, clean worktree, and ignored local input state verified",
+    "Node v22.23.2 selected through repository .nvmrc",
+    "workspace parser, CSV parser, and worker intentionally not run because required owner inputs are absent"
+  ]
+}
