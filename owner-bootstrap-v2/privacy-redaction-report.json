@@ -1,0 +1,10 @@
+{
+  "sensitive_data_published": false,
+  "absolute_home_paths_published": false,
+  "usernames_or_email_addresses_published": false,
+  "holdings_symbols_watchlists_decisions_or_notes_published": false,
+  "raw_file_contents_published": false,
+  "secrets_tokens_or_credentials_published": false,
+  "process_or_environment_dumps_published": false,
+  "unrelated_system_inventory_published": false
+}

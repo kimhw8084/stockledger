@@ -1,0 +1,120 @@
+{
+  "schema_version": 2,
+  "project": "stockledger",
+  "change": "CHG-291",
+  "operation": "BUILD",
+  "request": "stockledger-prod-c20-owner-runtime-bootstrap-build-v2",
+  "qualified_base": "3934e4cd9f45ee911e0d05e623ad10156cbf0282",
+  "qualified_tree": "dccf00667a9fa73e58525e564e379d328ae82843",
+  "work_branch": "codex/stockledger-prod-c20-owner-runtime-bootstrap-build-v2",
+  "overall_status": "PASS",
+  "recommended_disposition": "OWNER_INPUT_REQUIRED",
+  "invariants": {
+    "protected_main_exact": true,
+    "protected_main_sha": "3934e4cd9f45ee911e0d05e623ad10156cbf0282",
+    "work_branch_remote_exact": true,
+    "work_branch_remote_sha": "3934e4cd9f45ee911e0d05e623ad10156cbf0282",
+    "source_changed": false,
+    "product_commits": 0,
+    "product_changed_files": 0,
+    "worktree_clean": true
+  },
+  "bootstrap": {
+    "node_runtime": {
+      "status": "PASS",
+      "version": "v22.23.2",
+      "activation": "existing nvm sourced process-locally from repository .nvmrc"
+    },
+    "npm_ci": {
+      "status": "PASS",
+      "node_version": "v22.23.2"
+    },
+    "worker_help": {
+      "status": "PASS",
+      "command": "npm run worker -- --help",
+      "node_version": "v22.23.2"
+    },
+    "local_ignore": {
+      "status": "PASS",
+      "gitignored": true
+    },
+    "local_root": {
+      "status": "PASS",
+      "owner_only_mode": "0700"
+    },
+    "daily_bars_directory": {
+      "status": "PASS",
+      "exists": true,
+      "owner_only_mode": "0700",
+      "owner_access_probe": "PASS",
+      "temporary_probe_removed": true,
+      "empty": true
+    },
+    "handoff_directory": {
+      "status": "PASS",
+      "exists": true,
+      "owner_only_mode": "0700",
+      "owner_access_probe": "PASS",
+      "temporary_probe_removed": true,
+      "empty": true
+    },
+    "backups_directory": {
+      "status": "PASS",
+      "exists": true,
+      "owner_only_mode": "0700",
+      "owner_access_probe": "PASS",
+      "temporary_probe_removed": true,
+      "empty": true
+    },
+    "worker_database": {
+      "status": "PASS",
+      "created": false,
+      "initialization_deferred_for_real_owner_export": true
+    },
+    "owner_inputs_fabricated": false,
+    "scheduler_installed": false,
+    "smtp_configured": false
+  },
+  "pending_owner_actions": [
+    {
+      "id": "A",
+      "status": "OWNER_ACTION_REQUIRED",
+      "action": "Export the real personal workspace and watchlist backup from StockLedger."
+    },
+    {
+      "id": "B",
+      "status": "OWNER_ACTION_REQUIRED",
+      "action": "Place or select permitted current completed-daily-bar CSVs and confirm the right to use them."
+    },
+    {
+      "id": "C",
+      "status": "OWNER_ACTION_REQUIRED",
+      "action": "Declare the source and dataset release, plus adjusted or unadjusted basis."
+    },
+    {
+      "id": "D",
+      "status": "OWNER_ACTION_REQUIRED",
+      "action": "Initialize the worker database from the real exported workspace."
+    },
+    {
+      "id": "E",
+      "status": "OWNER_ACTION_REQUIRED",
+      "action": "Run the real worker against the owner-authorized daily bars."
+    },
+    {
+      "id": "F",
+      "status": "OWNER_ACTION_REQUIRED",
+      "action": "In the app, choose and grant the exact handoff folder."
+    },
+    {
+      "id": "G",
+      "status": "OWNER_ACTION_REQUIRED",
+      "action": "Validate Today and Alerts ingestion from the real run without replacing owner-authored state."
+    },
+    {
+      "id": "H",
+      "status": "OWNER_ACTION_REQUIRED",
+      "action": "Produce a real private backup and perform an isolated restore check."
+    }
+  ]
+}

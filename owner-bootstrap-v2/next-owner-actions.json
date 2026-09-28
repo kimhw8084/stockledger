@@ -1,0 +1,58 @@
+{
+  "schema_version": 2,
+  "status": "OWNER_ACTION_REQUIRED",
+  "pending_owner_actions": [
+    {
+      "id": "A",
+      "status": "OWNER_ACTION_REQUIRED",
+      "action": "Export the real personal workspace and watchlist backup from StockLedger."
+    },
+    {
+      "id": "B",
+      "status": "OWNER_ACTION_REQUIRED",
+      "action": "Place or select permitted current completed-daily-bar CSVs and confirm the right to use them."
+    },
+    {
+      "id": "C",
+      "status": "OWNER_ACTION_REQUIRED",
+      "action": "Declare the source and dataset release, plus adjusted or unadjusted basis."
+    },
+    {
+      "id": "D",
+      "status": "OWNER_ACTION_REQUIRED",
+      "action": "Initialize the worker database from the real exported workspace."
+    },
+    {
+      "id": "E",
+      "status": "OWNER_ACTION_REQUIRED",
+      "action": "Run the real worker against the owner-authorized daily bars."
+    },
+    {
+      "id": "F",
+      "status": "OWNER_ACTION_REQUIRED",
+      "action": "In the app, choose and grant the exact handoff folder."
+    },
+    {
+      "id": "G",
+      "status": "OWNER_ACTION_REQUIRED",
+      "action": "Validate Today and Alerts ingestion from the real run without replacing owner-authored state."
+    },
+    {
+      "id": "H",
+      "status": "OWNER_ACTION_REQUIRED",
+      "action": "Produce a real private backup and perform an isolated restore check."
+    }
+  ],
+  "optional_owner_actions": [
+    {
+      "id": "OPTIONAL_SCHEDULER",
+      "status": "OPTIONAL",
+      "action": "Install an unattended scheduler only if desired after supervised real-data validation."
+    },
+    {
+      "id": "OPTIONAL_SMTP",
+      "status": "OPTIONAL",
+      "action": "Configure SMTP only if desired after explicit owner setup."
+    }
+  ]
+}
