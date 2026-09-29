@@ -1,0 +1,9 @@
+{
+  "schema": "stockledger-owner-backup-readiness-v1",
+  "status": "not-started",
+  "reason": "activation-blocked-during-workspace-discovery",
+  "new_private_backup_created": false,
+  "isolated_restore_attempted": false,
+  "isolated_restore_integrity_pass": false,
+  "existing_backup_overwritten": false
+}

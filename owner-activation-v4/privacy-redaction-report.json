@@ -1,0 +1,17 @@
+{
+  "schema": "stockledger-owner-activation-privacy-v1",
+  "sensitive_data_published": false,
+  "workspace_payload_published": false,
+  "holdings_symbols_watchlists_or_strategy_counts_published": false,
+  "recipes_decisions_notes_alerts_or_market_values_published": false,
+  "raw_bars_or_private_archive_labels_published": false,
+  "workspace_identity_or_identifier_published": false,
+  "credentials_or_email_addresses_published": false,
+  "absolute_home_paths_published": false,
+  "browser_history_cookies_passwords_or_localstorage_contents_read": false,
+  "unrelated_browser_origin_or_database_entry_names_enumerated_read_only": true,
+  "unrelated_browser_origin_or_database_contents_opened": false,
+  "unrelated_local_metadata_filenames_enumerated_read_only": true,
+  "unrelated_local_metadata_contents_opened": false,
+  "unrelated_local_metadata_paths_or_filenames_published": false
+}

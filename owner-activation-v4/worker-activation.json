@@ -1,0 +1,12 @@
+{
+  "schema": "stockledger-owner-worker-activation-v1",
+  "status": "not-started",
+  "reason": "activation-blocked-during-workspace-discovery",
+  "worker_database_ready": false,
+  "supervised_worker_run_ready": false,
+  "worker_run_attempted": false,
+  "database_integrity_pass": false,
+  "external_provider_acquisition": false,
+  "smtp_enabled": false,
+  "scheduler_installed": false
+}

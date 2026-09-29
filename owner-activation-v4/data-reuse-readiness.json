@@ -1,0 +1,11 @@
+{
+  "schema": "stockledger-owner-data-reuse-readiness-v1",
+  "status": "not-started",
+  "reason": "activation-blocked-during-workspace-discovery",
+  "existing_rights_qualified_data_reused": false,
+  "archive_validation_performed": false,
+  "csv_files_written": false,
+  "source_declaration_written": false,
+  "external_market_data_fetched": false,
+  "private_archive_labels_published": false
+}

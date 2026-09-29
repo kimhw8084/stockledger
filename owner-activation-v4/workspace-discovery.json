@@ -1,0 +1,21 @@
+{
+  "schema": "stockledger-owner-workspace-discovery-v1",
+  "request": "stockledger-prod-c20-automatic-owner-activation-build-v4",
+  "disposition": "ACTIVATION_BLOCKED",
+  "workspace_recovered": false,
+  "staged_backup_present": false,
+  "web": {
+    "status": "incomplete-after-privacy-scope-breach",
+    "repository_known_origin_available": false,
+    "unrelated_origin_or_database_entry_names_enumerated_read_only": true,
+    "unrelated_origin_or_database_contents_opened": false
+  },
+  "native": {
+    "status": "no-exact-sqlite-signature-found-in-standard-application-roots",
+    "unrelated_application_data_read": false
+  },
+  "backup_validation": "not-run-no-candidate",
+  "sample_or_synthetic_review": "not-applicable",
+  "custom_origin_discovery": "not-performed-without-a-safe-stockledger-origin-identity",
+  "reason": "Discovery stopped because browser IndexedDB directory names outside the StockLedger origin scope had been enumerated."
+}
