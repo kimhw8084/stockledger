@@ -1,0 +1,5 @@
+{
+  "status": "not_started",
+  "worker_database_ready": false,
+  "worker_cycle_ran": false
+}

@@ -1,0 +1,10 @@
+{
+  "sensitive_data_published": false,
+  "owner_content_included": false,
+  "holdings_or_symbols_included": false,
+  "raw_data_included": false,
+  "private_source_identity_included": false,
+  "workspace_identity_included": false,
+  "credentials_included": false,
+  "redaction_status": "sanitized"
+}

@@ -1,0 +1,9 @@
+{
+  "status": "blocked_before_workspace_export",
+  "disposition": "NO_OWNER_WORKSPACE_IN_UI",
+  "stockledger_window_found": true,
+  "stockledger_window_activated": true,
+  "product_ui_export_triggered": false,
+  "authentic_workspace_validated": false,
+  "ui_automation": "unavailable"
+}
