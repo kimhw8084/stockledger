@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "project_id": "stockledger",
+  "request": "stockledger-prod-c20-automatic-owner-activation-build-v4",
+  "operation": "BUILD",
+  "kind": "project-os-operation",
+  "job_id": "CF-c7f1956e326a0d133bb58319",
+  "fabric_job_id": "CF-c7f1956e326a0d133bb58319",
+  "current_fabric_job_id": "CF-c7f1956e326a0d133bb58319",
+  "status": "blocked",
+  "final_status": "ACTIVATION_BLOCKED",
+  "failure_class": "privacy_scope_boundary_exceeded",
+  "error_code": {
+    "code": "ACTIVATION_BLOCKED"
+  },
+  "finished_at": "2026-09-29T01:41:09Z",
+  "recommended_disposition": "ACTIVATION_BLOCKED",
+  "source_sha": "3934e4cd9f45ee911e0d05e623ad10156cbf0282",
+  "tree_sha": "dccf00667a9fa73e58525e564e379d328ae82843",
+  "product_work_branch": "codex/stockledger-prod-c20-automatic-owner-activation-build-v4",
+  "source_changed": false,
+  "product_source_changed": false,
+  "product_commits": 0,
+  "product_changed_files": 0,
+  "changed_files": [],
+  "execution_outcome": "blocked-during-workspace-discovery-before-owner-data-mutation",
+  "claim_boundary": {
+    "workspace_recovered": false,
+    "existing_rights_qualified_data_reused": false,
+    "worker_database_ready": false,
+    "supervised_worker_run_ready": false,
+    "backup_restore_ready": false,
+    "handoff_pending_ready": false,
+    "app_folder_grant_ready": false,
+    "app_handoff_applied": false,
+    "app_ack_observed": false,
+    "manual_live_monitoring_ready": false
+  },
+  "git": {
+    "base_sha": "3934e4cd9f45ee911e0d05e623ad10156cbf0282",
+    "base_tree": "dccf00667a9fa73e58525e564e379d328ae82843",
+    "base_is_ancestor": true,
+    "branch": "codex/stockledger-prod-c20-automatic-owner-activation-build-v4",
+    "head_sha": "3934e4cd9f45ee911e0d05e623ad10156cbf0282",
+    "head_tree": "dccf00667a9fa73e58525e564e379d328ae82843",
+    "work_branch": "codex/stockledger-prod-c20-automatic-owner-activation-build-v4",
+    "worktree_clean": true,
+    "remote_exact_head": true,
+    "remote_head_sha": "3934e4cd9f45ee911e0d05e623ad10156cbf0282",
+    "protected_main_sha": "3934e4cd9f45ee911e0d05e623ad10156cbf0282",
+    "protected_main_tree": "dccf00667a9fa73e58525e564e379d328ae82843",
+    "protected_main_remote_unchanged": true,
+    "target_branch": "main",
+    "target_drifted_since_acceptance": false,
+    "main_unchanged": true,
+    "local_main_ref_mutated": false
+  },
+  "checks": [
+    {
+      "check": "protected-remote-main-exact-base",
+      "result": "pass"
+    },
+    {
+      "check": "work-branch-exact-base-and-clean",
+      "result": "pass"
+    },
+    {
+      "check": "remote-work-branch-exact-head",
+      "result": "pass"
+    },
+    {
+      "check": "node-22.23.2",
+      "result": "pass"
+    },
+    {
+      "check": "private-staging-path-ignored",
+      "result": "pass"
+    },
+    {
+      "check": "tracked-source-diff-empty",
+      "result": "pass"
+    },
+    {
+      "check": "owner-workspace-recovery",
+      "result": "blocked",
+      "code": "ACTIVATION_BLOCKED"
+    },
+    {
+      "check": "data-worker-backup-app-handoff",
+      "result": "not-attempted"
+    }
+  ],
+  "sanitized_command_evidence": {
+    "raw_commands_published": false,
+    "private_stdout_published": false,
+    "absolute_paths_published": false,
+    "check_categories": [
+      "protected-remote-ref",
+      "worktree-source-state",
+      "runtime-version",
+      "ignored-staging-state",
+      "StockLedger-storage-signature-discovery"
+    ]
+  },
+  "artifact_ref": "refs/heads/project-os-artifacts/stockledger/stockledger-prod-c20-automatic-owner-activation-build-v4",
+  "artifact_commit": "7590d0ba66331a656957cccc49733e5ea14c1bf1",
+  "artifact_tree": "9347b48b91d2166c53b13c31524c9d9e50a03a4e",
+  "artifact_publication": {
+    "ref": "refs/heads/project-os-artifacts/stockledger/stockledger-prod-c20-automatic-owner-activation-build-v4",
+    "payload_commit": "7590d0ba66331a656957cccc49733e5ea14c1bf1",
+    "payload_tree": "9347b48b91d2166c53b13c31524c9d9e50a03a4e",
+    "payload_file_count": 7,
+    "final_carrier_commit": "7590d0ba66331a656957cccc49733e5ea14c1bf1",
+    "final_carrier_tree": "9347b48b91d2166c53b13c31524c9d9e50a03a4e",
+    "final_file_count": 7,
+    "sole_parent": "3934e4cd9f45ee911e0d05e623ad10156cbf0282",
+    "sole_parent_check": true,
+    "remote_verified": true
+  },
+  "artifact_initial_head_replaced_after_privacy_correction": true,
+  "evidence_ref": "refs/heads/codex-fabric/evidence/stockledger/stockledger-prod-c20-automatic-owner-activation-build-v4",
+  "evidence_parent_expected": "3934e4cd9f45ee911e0d05e623ad10156cbf0282",
+  "evidence_commit_sole_parent_required": true,
+  "commits": {
+    "product_commits": 0,
+    "artifact_commits": 1,
+    "evidence_commits": 1
+  },
+  "privacy": {
+    "sensitive_data_published": false,
+    "workspace_or_market_data_published": false,
+    "unrelated_browser_origin_or_database_entry_names_enumerated_read_only": true,
+    "unrelated_browser_origin_or_database_contents_opened": false,
+    "unrelated_local_metadata_filenames_enumerated_read_only": true,
+    "unrelated_local_metadata_contents_opened": false,
+    "unrelated_local_metadata_paths_or_filenames_published": false
+  },
+  "evidence_manifest": null,
+  "fabric_capture": null,
+  "fabric_release": null,
+  "evidence_publisher_release": null,
+  "recovery": null,
+  "transport": {
+    "method": "git-push",
+    "artifact_remote_readback_verified": true,
+    "evidence_remote_readback_verified": true
+  }
+}
