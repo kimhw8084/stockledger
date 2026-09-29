@@ -1,0 +1,7 @@
+{
+  "status": "NOT_ATTEMPTED",
+  "backup_created": false,
+  "backup_restore_ready": false,
+  "database_integrity_pass": false,
+  "sensitive_data_published": false
+}

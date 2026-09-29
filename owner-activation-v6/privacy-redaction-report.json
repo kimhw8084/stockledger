@@ -1,0 +1,11 @@
+{
+  "status": "SANITIZED",
+  "sensitive_data_published": false,
+  "owner_workspace_payload_published": false,
+  "holdings_or_strategy_data_published": false,
+  "private_source_labels_published": false,
+  "credentials_or_browser_storage_published": false,
+  "private_paths_published": false,
+  "raw_command_output_published": false,
+  "only_status_categories_and_booleans_published": true
+}

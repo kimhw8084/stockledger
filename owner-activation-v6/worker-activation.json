@@ -1,0 +1,8 @@
+{
+  "status": "NOT_ATTEMPTED",
+  "worker_database_ready": false,
+  "worker_cycle_completed": false,
+  "product_commits": 0,
+  "product_changed_files": 0,
+  "source_changed": false
+}

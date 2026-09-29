@@ -1,0 +1,10 @@
+{
+  "browser_kind": "chrome",
+  "active_tab_identity_verified": false,
+  "active_tab_validation": "NOT_CONFIRMED_AS_STOCKLEDGER",
+  "native_browser_script_execution_available": false,
+  "workspace_recovered": false,
+  "workspace_validation": "NOT_ATTEMPTED",
+  "recommended_disposition": "ACTIVE_STOCKLEDGER_TAB_REQUIRED",
+  "sensitive_data_published": false
+}

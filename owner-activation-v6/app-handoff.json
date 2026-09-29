@@ -1,0 +1,9 @@
+{
+  "status": "NOT_ATTEMPTED",
+  "handoff_pending_ready": false,
+  "app_folder_grant_ready": false,
+  "app_handoff_applied": false,
+  "app_ack_observed": false,
+  "manual_live_monitoring_ready": false,
+  "sensitive_data_published": false
+}
