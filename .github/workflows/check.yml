@@ -29,7 +29,7 @@ jobs:
       - run: npm run export:all
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
-      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: failure()
         with:
           name: browser-diagnostics
@@ -76,7 +76,7 @@ jobs:
       - run: npm run operations:qualify -- --output artifacts/operations-qualification.json
       - run: npm run release:evidence -- --output artifacts/release-evidence.json --base "$STOCKLEDGER_PROTECTED_BASE"
       - run: npm run release:verify -- --input artifacts/release-evidence.json --base "$STOCKLEDGER_PROTECTED_BASE"
-      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: failure()
         with:
           name: operations-evidence
